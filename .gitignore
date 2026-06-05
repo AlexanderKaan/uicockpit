@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dev-dist/
+*.tsbuildinfo
+
+# Test artifacts
+test-results/
+playwright-report/
+coverage/
+
+# Cloudflare Worker local state
+.wrangler/
+
+# Internal / agent-workflow docs — not for the public repo
+CLAUDE.md
+HANDOFF.md
+SUITE-PLAN.md
+cockpit-reference.html
+.claude/
+
+# Internal build-log roadmap — a curated public ROADMAP replaces this
+ROADMAP.md
+
+# Local env / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json

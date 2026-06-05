@@ -1,0 +1,157 @@
+<!doctype html>
+<!--
+  Static OG card — load at https://uicockpit.com/og-card.html, screenshot
+  the viewport at exactly 1200×630, save as /public/og-image.png. That's
+  the file referenced in index.html's <meta og:image>.
+
+  Why this file exists: WhatsApp + iMessage don't render SVG og:images
+  reliably, so we need a raster fallback. This HTML page is the spec —
+  screenshot it once and ship the PNG alongside the SVG.
+
+  Run a headless browser to grab it:
+    npx playwright screenshot --viewport-size=1200,630 \
+      http://localhost:5173/og-card.html public/og-image.png
+
+  Or open in Chrome at 1200×630 window and ⌘+Shift+P → "Capture full size".
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OG card — UIcockpit</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #0a0a0b;
+        --muted: #6b6b73;
+        --faint: #9a9aa1;
+        --accent: #007aff;
+        --soft: #ebf4ff;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body {
+        width: 1200px;
+        height: 630px;
+        background: var(--bg);
+        font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: var(--fg);
+        letter-spacing: -0.011em;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+      }
+      .card {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        padding: 56px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      /* Same dot grid as the marketing hero, faded from top→bottom */
+      .dots {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(0, 0, 0, 0.10) 1px, transparent 1.6px);
+        background-size: 22px 22px;
+        mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+      }
+      .brand {
+        position: absolute;
+        top: 56px;
+        left: 56px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .brand img { width: 44px; height: 44px; border-radius: 9px; display: block; }
+      .stack {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 28px;
+        max-width: 900px;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: var(--soft);
+        color: var(--accent);
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .eyebrow-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      h1 {
+        font-size: 80px;
+        font-weight: 600;
+        letter-spacing: -0.035em;
+        line-height: 1.02;
+      }
+      .sub {
+        font-size: 22px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 12px 28px;
+        background: linear-gradient(101deg, #007BFF 50.96%, #570BA9 118.53%);
+        color: white;
+        border-radius: 99px;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: -0.005em;
+      }
+      .footer {
+        position: absolute;
+        bottom: 56px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        color: var(--faint);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="dots"></div>
+      <div class="brand">
+        <img src="/logo.svg" alt="" />
+        UIcockpit
+      </div>
+      <div class="stack">
+        <span class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Open Source · No Login · No Lock-In
+        </span>
+        <h1>Design a UI kit<br />in 60 seconds.</h1>
+        <p class="sub">
+          Pick a brand, tweak the shape, dial in motion.<br />Export tokens for any framework.
+        </p>
+        <span class="cta">Build my UI kit →</span>
+      </div>
+      <div class="footer">
+        120+ TOKENS · 40+ COMPONENTS · 16 WCAG CHECKS · 6 EXPORT FORMATS
+      </div>
+    </div>
+  </body>
+</html>

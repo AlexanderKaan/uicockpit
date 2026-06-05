@@ -1,0 +1,18 @@
+# UICockpit — Live Kit CDN Worker.
+# Serves a kit as CSS via genCss(decode(hash)), the same pure pipeline the app's
+# download export uses. Local dev: `npx wrangler dev` → http://localhost:8787.
+# Production deploy + custom domain (kit.uicockpit.com) land with #106.
+name = "uicockpit-kit"
+main = "worker/index.ts"
+compatibility_date = "2026-06-05"
+
+# Custom domain — kit.uicockpit.com → this Worker. On `wrangler deploy`,
+# Cloudflare provisions the DNS record + SSL cert automatically (requires
+# uicockpit.com to be an active zone in the account). The default
+# *.workers.dev URL keeps working too (this is additive).
+routes = [
+  { pattern = "kit.uicockpit.com", custom_domain = true }
+]
+
+# No bindings yet — the stateless /k/<hash>.css lane needs no storage.
+# The stateful live/pinned lanes (P2) add a KV namespace binding here.

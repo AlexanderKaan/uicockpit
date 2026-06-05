@@ -1,0 +1,841 @@
+/* preview-only.css — the NON-exportable preview layer.
+ *
+ * Everything here is live-preview scaffolding that must NOT ship to a CDN
+ * consumer: the global-layer top (kept here until Phase 2b folds it into
+ * src/kit/globalLayer.ts), the component-gallery masonry, the SupaDash app
+ * (dashboard) chrome, configurator panel chrome, and dead-vertical CSS left
+ * after the app-cull. The exportable component recipes live in
+ * src/kit/recipes/index.ts and are injected into the preview by src/main.tsx.
+ *
+ * Generated once by scripts/extract-kit.mjs from preview.css; hand-maintained
+ * thereafter. */
+
+
+/* === Sub-tile scrollbars for overlays ==================================
+ * Browser-default scrollbars are an OS-shaped grey rail that visually
+ * dominates a tasteful overlay (menu, command palette, combobox, sheet).
+ * Replace with a 6px self-rounded thumb that uses the kit's fg-faint —
+ * present when scrolling matters, invisible when it doesn't. WebKit + FF. */
+.cockpit-preview .menu,
+.cockpit-preview .combobox__pop,
+.cockpit-preview .cmdp__list,
+.cockpit-preview .sheet,
+.cockpit-preview .row-menu__pop {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(0 0% 50% / 0.35) transparent;
+}
+.cockpit-preview .menu::-webkit-scrollbar,
+.cockpit-preview .combobox__pop::-webkit-scrollbar,
+.cockpit-preview .cmdp__list::-webkit-scrollbar,
+.cockpit-preview .sheet::-webkit-scrollbar,
+.cockpit-preview .row-menu__pop::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.cockpit-preview .menu::-webkit-scrollbar-thumb,
+.cockpit-preview .combobox__pop::-webkit-scrollbar-thumb,
+.cockpit-preview .cmdp__list::-webkit-scrollbar-thumb,
+.cockpit-preview .sheet::-webkit-scrollbar-thumb,
+.cockpit-preview .row-menu__pop::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 50% / 0.35);
+  border-radius: 999px;
+  transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease);
+}
+.cockpit-preview .menu::-webkit-scrollbar-thumb:hover,
+.cockpit-preview .combobox__pop::-webkit-scrollbar-thumb:hover,
+.cockpit-preview .cmdp__list::-webkit-scrollbar-thumb:hover,
+.cockpit-preview .sheet::-webkit-scrollbar-thumb:hover,
+.cockpit-preview .row-menu__pop::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 50% / 0.6);
+}
+.cockpit-preview .menu::-webkit-scrollbar-track,
+.cockpit-preview .combobox__pop::-webkit-scrollbar-track,
+.cockpit-preview .cmdp__list::-webkit-scrollbar-track,
+.cockpit-preview .sheet::-webkit-scrollbar-track,
+.cockpit-preview .row-menu__pop::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+/* === Component gallery — full-width CSS-Grid masonry ===
+ * Grid (not CSS-columns) so SOME cards can lie landscape across two columns
+ * (.card--wide → tables, kanban, charts, file grids, steppers, media) and the
+ * portrait cards flow tightly around them. Each card's row-span is computed
+ * from its measured height in ComponentGallery.tsx (grid-auto-rows = the unit).
+ * `dense` fills the horizontal gaps a wide card leaves → tightest packing. */
+.gallery {
+  display: grid;
+  /* Roomy single columns (≈340–410px) so a card reads like its natural app
+   * habitat — button rows, form fields, tables and settings rows breathe
+   * instead of wrapping into a cramped phone card. max-width caps the wall at
+   * ~5 columns on XL and centres it on ultra-wide (shadcn /create feel). */
+  /* FIXED 375px columns (not minmax+1fr): a portrait card stays exactly 375px
+   * and never stretches to fill — it reads at its true app width. The wall
+   * fits as many 375px columns as the stage allows and centres them, so on a
+   * wide monitor you get more columns, not wider cards. A .card--wide spans two
+   * (≈790px). */
+  grid-template-columns: repeat(auto-fill, 375px);
+  justify-content: center;
+  /* 1px rows = fine masonry quantisation (waste < 1px). The vertical gap is NOT
+   * a row-gap (that quantises coarsely with these tiny rows); it's baked into
+   * each card's span as trailing empty rows by the JS, so every vertical gap is
+   * EXACTLY --gallery-gap and cards pack tight. */
+  grid-auto-rows: 1px;
+  grid-auto-flow: row dense;
+  /* Fixed 40px gutter — a deliberate showcase-wall constant (a NAMED layout
+   * value, not the Scale-driven component spacing token): the generous breathing
+   * room shadcn /create uses, so each card reads as its own framed surface, and
+   * intentionally does NOT shrink with the user's density. The masonry row-span
+   * JS reads this live via computed rowGap, so spans stay correct. */
+  --gallery-gap: 40px;
+  column-gap: var(--gallery-gap); /* horizontal gutter */
+  row-gap: 0;                     /* vertical gap is baked into the JS span */
+  align-items: start;
+  /* width:100% (not max-width + margin:auto) so the grid FILLS its container
+   * and `auto-fill` adapts the column count to the available width — panel
+   * open vs collapsed — instead of shrink-to-content + overflowing the stage. */
+  width: 100%;
+  /* Query container so 3-col cards (.card--xwide) can promote to span-3 based on
+     the GALLERY's real width — not the viewport (the panel eats width, and the
+     wall breaks out to full stage width), which would overflow. inline-size only
+     contains width; height stays content-driven so the masonry row-span JS works. */
+  container: gallery / inline-size;
+}
+/* Landscape cards span two columns (≈740–840px) — tables, kanban, charts,
+   record details. Kicks in once two 360px columns fit (≈760px) so a span-2
+   never overflows a single-column stage. */
+/* Wide cards span extra columns — promoted by the GALLERY's own width (a
+   container query), never the viewport. The panel eats width and the wall
+   breaks out to full stage width, so a viewport query forces span-2/3 even when
+   only one column fits and the card overflows. Container thresholds match the
+   auto-fill maths exactly: two 375px columns + one 40px gutter = 790px, three =
+   1205px. Below 790px the wall is single-column and every card stays 375px. */
+@container gallery (min-width: 790px) {
+  .card--wide  { grid-column: span 2; }
+  .card--xwide { grid-column: span 2; } /* 3-up content; inner auto-fit is already 3-up, just tighter */
+}
+@container gallery (min-width: 1205px) {
+  .card--xwide { grid-column: span 3; } /* third column to let pricing/feature tiers breathe */
+}
+/* Components view breaks out of the centered 1180px preview box so the
+ * wall uses the full stage width. Other views (the super-app) keep the
+ * centered, framed preview. */
+/* Components view (the card wall) — inset by one full gutter (40px) so the
+   edge-to-card spacing equals the gap BETWEEN cards → spacing reads evenly all
+   round. Targeted via :has(.gallery) so ONLY the components preview is affected
+   (the app view has no .gallery and keeps its --k-space padding). max-width:none
+   is already inherited from the base .cockpit-preview. */
+.cockpit-preview:has(.gallery) {
+  padding: var(--gallery-gap, 40px);
+}
+
+.card {
+  break-inside: avoid;
+  background: var(--k-surface);
+  /* Hairline regardless of Borders setting — gallery cards are demo scaffolding
+     (39 of them on screen), not part of the user's design system. The actual
+     components inside (buttons/inputs/alerts/tabs/table) reflect --k-bw. With
+     2px borders × 39 cards the gallery view would feel like a punch card. */
+  border: 1px solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  /* Gallery-card enter — INSTANT-feeling with a hint of polish.
+     The gallery has 40+ cards. A noticeable stagger here reads as "page is
+     loading" — eyes track each card appearing. Dashboard tiles (≤5 per grid)
+     can afford the slower expressive entrance below; the gallery cannot.
+     Total cascade caps at ~380ms (7 × 25ms stagger + 240ms duration) so
+     the whole gallery is in-place before the user can think "wait, why's it
+     animating?". Subliminal: opacity completes at 140ms, transform settles
+     at 240ms — keeps the premium "find-its-place" texture, just quick. */
+  animation:
+    card-fade 140ms cubic-bezier(.2, 0, .2, 1) backwards,
+    card-rise-quick 240ms cubic-bezier(.16, 1, .3, 1) backwards;
+  animation-delay: calc(min(var(--card-i, 0), 7) * 25ms);
+  /* Box padding uses --k-pad (floored: 16 compact → 24 default → 28/32),
+     the modern card minimum (shadcn p-6 = 24). The internal content-gap
+     stays on the smaller --k-space rhythm so raising padding never balloons
+     the gaps — padding ≠ gap, the shadcn split. */
+  padding: var(--k-pad, 24px);
+  /* No margin — the gallery is a grid; its `gap` owns ALL the spacing between
+     cards (row + column). A card margin-bottom would double the row gap AND
+     break the masonry span math (which measures border-box height, excluding
+     margin), leaving phantom vertical gaps. */
+  margin: 0;
+  box-shadow: var(--k-shadow-sm);
+  color: var(--k-fg);
+  display: flex;
+  flex-direction: column;
+  /* Field/section rhythm = the grid-aligned --k-space (16 at default), NOT a
+     fuzzy multiple. This is the gap between stacked form fields, header→content,
+     etc. shadcn space-y-4/6 equivalent. */
+  gap: var(--k-space, 16px);
+  /* Hover-lift uses the same motion tokens as buttons/tiles (#212 unified). */
+  transition:
+    transform var(--k-dur, 200ms) var(--k-ease-out, ease),
+    box-shadow var(--k-dur, 200ms) var(--k-ease-out, ease);
+}
+/* Over-card hover — gentle 2px lift + deeper shadow. Subtle so it adds life
+ * without distracting from the component the card showcases. */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--k-shadow-md);
+}
+/* Card header reads as a real product heading (shadcn CardHeader), NOT a
+ * component-type meta-label. So: sentence-case, full --k-fg color, body-ish
+ * size — it belongs to the interface the card depicts. The old uppercase +
+ * muted treatment made the label look like part of the mockup; gone. */
+.card__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-2);
+}
+.card__title {
+  font-weight: 600;
+  font-size: var(--k-type-h3);
+  font-family: var(--k-font-display);
+  color: var(--k-fg);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.card__desc {
+  font-size: var(--k-type-small);
+  color: var(--k-fg-muted);
+  line-height: 1.4;
+}
+/* Horizontal row of adjacent controls/buttons — uses the SAME canonical
+   --k-stack-gap as the vertical button stack, so "the gap between two adjacent
+   buttons" is identical in any axis and scales with Scale (8 → 12). */
+.card__row { display: flex; gap: var(--k-stack-gap, 8px); align-items: center; flex-wrap: wrap; }
+.card__col { display: flex; flex-direction: column; gap: var(--k-s-8); }
+/* Footer action zone (shadcn CardFooter): a hairline divider anchors the CTA row
+   to the bottom of the card instead of letting it float in the content flow. The
+   top border + matched top spacing give the actions a clear "home". Holds the
+   card's full-width block buttons, stacked on the canonical gap. */
+.card__foot {
+  margin-top: var(--k-s-16);
+  padding-top: var(--k-s-16);
+  border-top: var(--k-divider);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-stack-gap, 8px);
+}
+
+/* === Dashboard === */
+.dash {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  height: 100%;
+  min-height: 540px;
+  gap: 0;
+}
+.dash__nav {
+  /* App-shell sidebar — driven by the Chrome axis (its own control, NOT depth).
+   * FLUSH (default): sidebar shares the page bg (--k-chrome-bg resolves to
+   *   --k-bg) and a hairline border carries the separation (Linear/Vercel). */
+  border-right: var(--k-divider);
+  padding: var(--k-s-14) var(--k-s-10);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-4);
+  background: var(--k-chrome-bg, var(--k-bg));
+  /* Animate the flip between Flush and Panel so toggling feels intentional. */
+  transition:
+    margin var(--k-dur, 200ms) var(--k-ease-out, ease),
+    border-radius var(--k-dur, 200ms) var(--k-ease-out, ease),
+    box-shadow var(--k-dur, 200ms) var(--k-ease-out, ease);
+}
+/* PANEL: the sidebar becomes a distinct, tinted ROOM — inset from the edges,
+ * a soft shadow, and a border-radius that LISTENS TO Box radius (--k-radius-lg).
+ * Raycast / Vercel-new / floating-sidebar pattern. --k-chrome-bg already carries
+ * the sunken tint in this mode; here we add the structural panel treatment. */
+.cockpit-preview[data-chrome="panel"] .dash__nav,
+[data-chrome="panel"] .dash__nav {
+  margin: var(--k-s-8);
+  border: 1px solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  box-shadow: var(--k-shadow-sm);
+}
+/* RECESSED: the sidebar is a SUNKEN WELL. --k-chrome-bg already carries the
+ * sunken tint (buildTokens); structurally it stays FLUSH — no inset card — and
+ * the existing border-right hairline is the seam where the brighter content
+ * plane lifts above it (macOS / Windows-settings depth). margin/radius/shadow
+ * reset is explicit so a Floating→Recessed switch animates back to flush. */
+.cockpit-preview[data-chrome="recessed"] .dash__nav,
+[data-chrome="recessed"] .dash__nav {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.dash__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-8);
+  padding: var(--k-s-6) var(--k-s-10) var(--k-s-16);
+  font-weight: 600;
+}
+/* Sidebar ROWS, GROUP LABELS and NESTING use the shared .navrow / .nav-group /
+ * .navsub recipe (single source of truth — see "Navigation row" above). The
+ * .dash__* shell here only owns FRAME concerns: brand, rail toggle, pinned
+ * footer, chrome-mode background, and the collapsed-rail behaviour below. */
+/* SupaDash app-icon — rounded-square launcher tile in the brand colour. */
+.dash__appicon {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--k-radius-sm);
+  background: var(--k-primary);
+  color: var(--k-primary-fg, #fff);
+  display: grid;
+  place-items: center;
+  flex: none;
+  box-shadow: var(--k-shadow-sm);
+}
+.dash__brandname { font-family: var(--k-font-display); letter-spacing: -0.01em; }
+/* Collapse toggle in the brand row — ghost icon button. */
+.dash__railtoggle {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--k-radius-sm, 6px);
+  background: transparent;
+  color: var(--k-fg-faint);
+  cursor: pointer;
+  transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease), color var(--k-dur-fast, 140ms);
+}
+.dash__railtoggle:hover { background: var(--k-state-hover); color: var(--k-fg); }
+/* Pinned bottom block — Settings + ⌘K launcher pushed to the floor of the nav. */
+.dash__navfoot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-4);
+  padding-top: var(--k-s-6);
+}
+.dash__navquick {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-8);
+  padding: var(--k-s-8) var(--k-s-10);
+  border: 0;
+  border-radius: var(--k-radius-md);
+  background: transparent;
+  color: var(--k-fg-faint);
+  font-size: var(--k-type-body);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.dash__navquick:hover { background: var(--k-state-hover); color: var(--k-fg); }
+.dash__navquick-kbd { font-size: var(--k-type-caption); }
+
+/* ---- Rail (collapsed) mode -------------------------------------------------
+ * Icon-only sidebar with hover tooltips. The grid column narrows and every
+ * text label / group heading / sub-list collapses away, leaving centered
+ * icons. Tooltips are CSS-only (data-tip attribute) so there's no JS or
+ * extra markup per row. */
+.dash--rail { grid-template-columns: 64px 1fr; }
+.dash--rail .dash__nav { padding: var(--k-s-14) var(--k-s-8); gap: var(--k-s-4); }
+.dash--rail .dash__brand { padding: var(--k-s-6) 0 var(--k-s-16); justify-content: center; }
+.dash--rail .dash__appicon,
+.dash--rail .dash__brandname,
+.dash--rail .navrow__label,
+.dash--rail .navrow__chev,
+.dash--rail .navsub,
+.dash--rail .dash__navquick-kbd { display: none; }
+/* Group labels collapse to slim centered dividers so the verticals stay
+ * visually chunked even without text. The first (under the brand) is dropped. */
+.dash--rail .nav-group {
+  width: 22px;
+  height: 0;
+  margin: var(--k-s-6) auto var(--k-s-4);
+  padding: 0;
+  border-top: var(--k-divider);
+  font-size: 0;
+  overflow: hidden;
+}
+.dash--rail .nav-group:first-of-type { border-top: 0; margin: 0; }
+/* Pinned footer (Settings + ⌘K) sits under a full separator in the rail. */
+.dash--rail .dash__navfoot { border-top: var(--k-divider); padding-top: var(--k-s-8); }
+.dash--rail .navrow,
+.dash--rail .dash__navquick {
+  justify-content: center;
+  gap: 0;
+  padding: var(--k-s-8) 0;
+  position: relative;
+}
+/* Quick-actions shows a search glyph in place of its ⌘K chip when collapsed. */
+.dash--rail .dash__navquick::before {
+  content: '⌘';
+  font-size: var(--k-type-body);
+  line-height: 1;
+}
+/* Unread badge collapses to a small corner dot on the icon. */
+.dash--rail .navrow .badge--count {
+  position: absolute;
+  top: 4px;
+  right: 9px;
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  font-size: 0;
+  border: 1.5px solid var(--k-chrome-bg, var(--k-surface-sunken));
+}
+/* Hover tooltip — flies out to the right of the rail. */
+.dash--rail .navrow[data-tip]::after,
+.dash--rail .dash__railtoggle[data-tip]::after,
+.dash--rail .dash__navquick[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  background: var(--k-fg);
+  color: var(--k-bg);
+  padding: var(--k-s-4) var(--k-s-8);
+  border-radius: var(--k-radius-sm, 6px);
+  font-size: var(--k-type-small);
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: var(--k-shadow-md);
+  transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease),
+              transform var(--k-dur-fast, 140ms) var(--k-ease, ease);
+  z-index: var(--k-z-tooltip);
+}
+.dash--rail .navrow[data-tip]:hover::after,
+.dash--rail .dash__railtoggle[data-tip]:hover::after,
+.dash--rail .dash__navquick[data-tip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+/* In rail mode the toggle sits alone, centered, and points right (expand). */
+.dash--rail .dash__railtoggle { margin: 0 auto; }
+@media (prefers-reduced-motion: reduce) {
+  .dash--rail .navrow[data-tip]::after,
+  .dash--rail .dash__railtoggle[data-tip]::after,
+  .dash--rail .dash__navquick[data-tip]::after { transition: none; }
+}
+.dash__main {
+  padding: calc(var(--k-space, 20px) * 1.1) calc(var(--k-space, 20px) * 1.3);
+  overflow: auto;
+  min-width: 0;
+}
+.dash__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--k-s-16); }
+.dash__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--k-s-12);
+  margin-bottom: var(--k-s-20);
+}
+@media (max-width: 900px) { .dash__stats { grid-template-columns: repeat(2, 1fr); } }
+/* App KPI tiles use the unified .stat-tile recipe (single source of truth —
+ * see the "stat-tile" block below). .dash__stats is just the 4-col grid
+ * wrapper that holds them. */
+
+.activity { display: flex; flex-direction: column; gap: var(--k-s-10); }
+.activity__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--k-s-10);
+  font-size: var(--k-type-small);
+  padding: var(--k-s-8) 0;
+  border-bottom: var(--k-divider);
+}
+.activity__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: var(--k-s-6);
+  flex: none;
+}
+.activity__meta { color: var(--k-fg-faint); font-size: var(--k-type-eyebrow); margin-left: auto; }
+
+.row-menu {
+  position: relative;
+}
+/* Row "…" menu — anchored-popover POSITIONING only. The box + items come from
+ * the shared .menu / .menu__item recipe (the popup element carries both the
+ * `menu` and `row-menu__pop` classes), so there's one dropdown source of truth. */
+.row-menu__pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  min-width: 140px;
+  z-index: var(--k-z-popover);
+}
+
+.linechart { width: 100%; height: 200px; }
+/* Line stroke uses accent — see comment on .barchart__bar for the rationale.
+   Draw-on animation: path appears to draw itself from left to right via
+   stroke-dasharray. Pathlength=1 normalizes regardless of actual length. */
+.linechart path {
+  fill: none;
+  stroke: var(--k-accent);
+  stroke-width: 2;
+  pathLength: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: line-draw 900ms var(--k-ease, cubic-bezier(.4, 0, .2, 1)) 100ms forwards;
+}
+.linechart .area {
+  fill: var(--k-accent);
+  stroke: none;
+  opacity: 0;
+  animation: area-fade 700ms ease 500ms forwards;
+}
+.linechart .axis { stroke: var(--k-border); stroke-width: 1; }
+.linechart .tick { font-size: var(--k-type-caption); fill: var(--k-fg-faint); }
+@keyframes line-draw { to { stroke-dashoffset: 0; } }
+@keyframes area-fade { to { opacity: 0.18; } }
+
+/* Progress bar — fill grows from 0 to target on mount */
+.progress__fill {
+  animation: progress-grow 800ms var(--k-ease-out, cubic-bezier(.2, .8, .2, 1)) backwards;
+  transform-origin: left;
+}
+@keyframes progress-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .barchart__bar,
+  .linechart path,
+  .linechart .area,
+  .progress__fill { animation: none; }
+  .linechart path { stroke-dashoffset: 0; }
+  .linechart .area { opacity: 0.18; }
+}
+
+.dangerzone {
+  border: 1px solid var(--k-danger);
+  border-radius: var(--k-radius-lg);
+  padding: var(--k-pad, 24px);
+  margin-top: var(--k-s-24);
+}
+.dangerzone__head {
+  font-weight: 600;
+  /* Header text sits on the card surface (transparent over white/dark),
+   * so use the actual --k-danger hue. *-fg is reserved for text ON a
+   * coloured fill (button/badge/avatar). */
+  color: var(--k-danger);
+  margin-bottom: var(--k-s-6);
+}
+
+/* === Named animation keyframes (mirror of genCss.ts so previews work in-app) ===
+   These match the exported tokens.css 1:1. */
+@keyframes k-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes k-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes k-slide-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes k-slide-down { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes k-scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes k-scale-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.96); } }
+/* Pulse + shimmer — system-level motion tokens (#127). Pulse is for live
+   dots (online status, recording REC). Shimmer is for skeleton loading. */
+@keyframes k-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.5; }
+  50%      { transform: scale(1.35); opacity: 0;   }
+}
+@keyframes k-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Card-entry — split keyframes so opacity and transform run at different
+   speeds. The card becomes VISIBLE early (~320ms) but continues to settle
+   into place for another ~300ms after. This is what gives iOS app launches
+   and Material's container transforms their "alive" quality vs. the
+   synchronous fade-up which always reads as "JS just rendered something". */
+@keyframes card-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes card-rise {
+  from { transform: translateY(14px) scale(0.985); }
+  to   { transform: translateY(0) scale(1); }
+}
+/* Gallery's compact version — smaller 5px translate, no scale. The motion
+   should be felt, not seen. Dashboard's bigger 14px+scale lift is right
+   for ≤5 destination tiles but oppressive across 40+ gallery cards. */
+@keyframes card-rise-quick {
+  from { transform: translateY(5px); }
+  to   { transform: translateY(0); }
+}
+
+/* Gallery card-i is set by ComponentGallery's useLayoutEffect — it computes
+   each card's visual (top, left) after CSS-columns layout and assigns the
+   index row-major (left→right, top→bottom). Without JS the fallback 0
+   makes all cards animate at once, which still looks fine — just no curtain. */
+
+/* Universal page-open roll-down. Every dashboard / app-vertical page cascades
+   its TOP-LEVEL blocks into place (breadcrumb → header → each content block) —
+   the same premium "afrol" the Overview had, now consistent on every screen
+   regardless of whether the page is built from cards, a table, a list or a
+   two-pane layout. It re-plays on each page switch (the .dash__main content
+   re-mounts), landing right after the skeleton.
+
+   Direct children only. This rule sits LATER in source than the generic
+   `.card` entrance, so for a card that's a direct page child it wins (one
+   motion, no double-animate); nested cards simply ride their rolling
+   container. Reuses card-fade + card-rise so the curve matches the original.
+   Stagger collapses to instant under prefers-reduced-motion (global guard). */
+.dash__main > *,
+.dash__page > * {
+  animation:
+    card-fade 300ms cubic-bezier(.2, 0, .2, 1) backwards,
+    card-rise 540ms cubic-bezier(.16, 1, .3, 1) backwards;
+}
+.dash__main > *:nth-child(1), .dash__page > *:nth-child(1) { animation-delay: 0ms; }
+.dash__main > *:nth-child(2), .dash__page > *:nth-child(2) { animation-delay: 46ms; }
+.dash__main > *:nth-child(3), .dash__page > *:nth-child(3) { animation-delay: 92ms; }
+.dash__main > *:nth-child(4), .dash__page > *:nth-child(4) { animation-delay: 138ms; }
+.dash__main > *:nth-child(5), .dash__page > *:nth-child(5) { animation-delay: 184ms; }
+.dash__main > *:nth-child(6), .dash__page > *:nth-child(6) { animation-delay: 230ms; }
+/* Cap so long pages don't drag — everything past the 7th lands together. */
+.dash__main > *:nth-child(n+7), .dash__page > *:nth-child(n+7) { animation-delay: 270ms; }
+@keyframes activity-rise {
+  from { transform: translateY(8px); }
+  to   { transform: translateY(0); }
+}
+.activity > :nth-child(1) { --card-i: 0; }
+.activity > :nth-child(2) { --card-i: 1; }
+.activity > :nth-child(3) { --card-i: 2; }
+.activity > :nth-child(4) { --card-i: 3; }
+.activity > :nth-child(5) { --card-i: 4; }
+.activity > :nth-child(n+6) { --card-i: 5; }
+
+/* Dialogs and sheets are heavy surfaces — even on Playful motion they keep
+   a standard decelerate. Bounce on a confirmation modal or large drawer
+   reads as glitch, not character. Popover/menu/hover-card still inherit
+   the theme's --k-ease-out and so DO bounce when Playful is selected. */
+.dialog,
+.sheet,
+.sheet--left { animation-timing-function: cubic-bezier(.05,.7,.1,1) !important; }
+
+/* === Music player (#120) =============================================
+ * Album thumb (44×44, gradient bg) + track stack + transport. Scrubber
+ * is a thin 2px bar inside the track stack — minimal visual weight. */
+.player {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-12);
+  padding: var(--k-s-10);
+  background: var(--k-surface-2);
+  border: var(--k-hairline, 1px solid var(--k-border));
+  border-radius: var(--k-radius-md);
+}
+.player__thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 7px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  color: hsl(0 0% 100% / 0.85);
+}
+.player__thumb-grad {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--k-primary), var(--k-secondary, var(--k-accent, var(--k-primary))));
+}
+.player__thumb-glyph { position: relative; }
+.player__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-2);
+  min-width: 0;
+}
+.player__title {
+  font-size: var(--k-type-small);
+  font-weight: 600;
+  color: var(--k-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.player__artist {
+  font-size: var(--k-type-eyebrow);
+  color: var(--k-fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.player__scrub {
+  position: relative;
+  height: 3px;
+  background: var(--k-surface);
+  border-radius: 2px;
+  margin-top: var(--k-s-6);
+}
+.player__scrub-fill {
+  display: block;
+  height: 100%;
+  width: 37%;
+  background: var(--k-primary);
+  border-radius: 2px;
+}
+.player__scrub-thumb {
+  position: absolute;
+  top: 50%;
+  left: 37%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--k-primary);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 2px var(--k-surface-2);
+}
+.player__time {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--k-type-caption);
+  color: var(--k-fg-faint);
+  font-variant-numeric: tabular-nums;
+  margin-top: var(--k-s-2);
+}
+.player__transport {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-4);
+  flex-shrink: 0;
+}
+.player__t-btn {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--k-fg-muted);
+  cursor: pointer;
+  transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease), color var(--k-dur-fast, 110ms) var(--k-ease, ease);
+}
+.player__t-btn:hover { background: var(--k-state-hover); color: var(--k-fg); }
+.player__t-btn--main {
+  width: 32px;
+  height: 32px;
+  background: var(--k-fg);
+  color: var(--k-bg);
+}
+.player__t-btn--main:hover { background: var(--k-fg); opacity: 0.9; color: var(--k-bg); }
+
+/* === MARKETING DEMOS (Tier 4) ========================================
+ * These five recipes are LAYOUT helpers only — geen nieuwe primitives.
+ * Bouwen op .card / .btn / .badge / .toggle / .info-card etc. Toont hoe
+ * je primitives combineert tot marketing-page blokken. */
+
+/* === Form measure ====================================================
+ * Caps a single-column FORM BODY (stacked label→input→button-row) to a
+ * comfortable line-length so a lone input doesn't stretch to paragraph
+ * width — width is an affordance hint, and a ~30ch email field shouldn't
+ * read as "type an essay here". Apply to the form body ONLY, never to a
+ * progress rail / page header (those want the full width). Pair with
+ * --center to sit the body in the middle of a wider card (wizard feel);
+ * omit it for a left-aligned settings form. One token, every form. */
+.form-measure {
+  max-width: var(--k-form-measure);
+  width: 100%;
+}
+.form-measure--center { margin-inline: auto; }
+
+/* === Mobile preview page — phone frame container for showcasing
+ * the mobile shell components in their natural habitat (a phone-sized
+ * frame met notch). Two-column grid: phone left, spec sidebar right. */
+.mp-frame-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: var(--k-s-28);
+  align-items: start;
+  margin-top: var(--k-s-20);
+}
+.mp-frame {
+  width: 360px;
+  height: 720px;
+  background: #0a0a0a;
+  border-radius: 38px;
+  padding: var(--k-s-10);
+  box-shadow:
+    inset 0 0 0 2px hsl(0 0% 30%),
+    0 16px 40px hsl(0 0% 0% / 0.18);
+  position: relative;
+  overflow: hidden;
+}
+.mp-frame__notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 28px;
+  background: #0a0a0a;
+  border-radius: 0 0 18px 18px;
+  z-index: 10;
+}
+.mp-frame .m-shell {
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+}
+.mp-backdrop {
+  position: absolute;
+  inset: 0;
+  background: hsl(0 0% 0% / 0.4);
+  z-index: 5;
+}
+.mp-body {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--k-bg);
+}
+.mp-spec {
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 1100px) {
+  .mp-frame-grid { grid-template-columns: 1fr; }
+}
+
+/* === Color picker (round swatches) ====================================
+ * Generic component voor "kies één van n kleuren" pattern. Used in
+ * product detail pages, theme pickers, custom-color UI. Outer ring
+ * verschijnt op de geselecteerde swatch zodat de kleur self-contained
+ * blijft (geen border-color clash met de swatch zelf). */
+.color-picker {
+  display: flex;
+  gap: var(--k-s-8);
+}
+.color-picker__sw {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  padding: var(--k-s-2);
+  background: var(--k-surface-2);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color var(--k-dur-fast, 110ms) var(--k-ease, ease), transform var(--k-dur-fast) var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
+}
+.color-picker__sw:hover { transform: scale(1.05); }
+.color-picker__sw--on {
+  border-color: var(--k-fg);
+}
+.color-picker__sw > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+}
+.color-picker--sm .color-picker__sw { width: 24px; height: 24px; }
+.color-picker--lg .color-picker__sw { width: 44px; height: 44px; }
+
+/* === PDP (product-detail) component set — Coolblue-style ===============
+ * Composes existing primitives (badge, btn, card, radio) into the parts a
+ * real product page needs. All token-driven; energy-class + star colours
+ * are regulatory/real DATA so they stay hardcoded (per the colour audit). */
+
+

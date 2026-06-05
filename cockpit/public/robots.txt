@@ -1,0 +1,36 @@
+# UIcockpit — robots policy
+
+# Crawl all paths by default. The configurator at /app is fully client-side
+# (URL-hash state) so search engines see only the rendered shell — that's fine.
+User-agent: *
+Allow: /
+
+# Explicit allowances for AI crawlers so they can index + cite us.
+# Several modern engines (OpenAI's GPTBot, Perplexity, Anthropic's
+# ClaudeBot, Google's Google-Extended) check robots.txt before training
+# or web-search citation. Allowing them is how we appear in answers to
+# "what tool can I use to build a design system?"
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Sitemap + plain-text companion for LLMs
+Sitemap: https://uicockpit.com/sitemap.xml

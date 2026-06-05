@@ -1,0 +1,667 @@
+/* The control menu sits in a slim column that *pushes the preview aside*
+ * (no overlap) — a floating rounded card in a --app-bg gutter. Collapsing it
+ * (from the card's own button) removes the column and gives the preview the
+ * full width. The top nav still runs continuously above everything. */
+.panel {
+  flex: none;
+  /* Above the stage so flyout popovers paint over the canvas. */
+  position: relative;
+  z-index: 40;
+  width: 288px;
+  /* Top inset matches the stage's 28px padding so the menu card's top lines up
+   * with the preview frame's top edge (.cockpit-preview). Left inset (22px)
+   * lines the card's left edge up with the topbar logo above it. */
+  padding: 28px 12px 12px 22px;
+  background: var(--app-bg);
+  display: flex;
+  flex-direction: column;
+  /* No overflow clip — the FontPicker dropdown must be free to escape the
+   * card. The accordion is short (one category open), so it stays on-screen. */
+  overflow: visible;
+}
+
+/* === Floating control menu (.fmenu) ===
+ * A nested accordion: category rows → setting recap-rows → the real visual
+ * picker. Same engine as the old flat panel, compact floating shell. */
+.fmenu {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  box-shadow: var(--app-shadow-md);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Slim header — an identity label + the collapse-to-full-width control. */
+.fmenu__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 8px 9px 14px;
+  border-bottom: 1px solid var(--app-border);
+}
+.fmenu__bar-title {
+  flex: 1;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--app-fg-faint);
+}
+.fmenu__collapse {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: transparent;
+  border: 0;
+  color: var(--app-fg-muted);
+  cursor: pointer;
+  transition: background var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease);
+}
+.fmenu__collapse:hover { background: var(--app-hover); color: var(--app-fg); }
+
+/* === Flat menu — one row per control (shadcn-create style) ===
+ * No category accordion: every control's current value is visible at rest.
+ * Click a row → its options float over the canvas (.fmrow__pop). Thin
+ * non-clickable section labels (.fmsec) chunk the list. */
+.fmenu__rows {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+}
+
+/* Section divider — quiet uppercase label, not interactive. */
+.fmsec {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-fg-faint);
+  padding: 12px 10px 4px;
+}
+
+/* A control row: label (left) + current value (right) + chevron. */
+.fmrow { position: relative; }
+.fmrow--open { z-index: 50; }
+.fmrow__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background var(--app-dur) var(--app-ease),
+              border-color var(--app-dur) var(--app-ease);
+}
+.fmrow__head:hover { background: var(--app-hover); }
+.fmrow--open > .fmrow__head {
+  background: var(--app-bg);
+  border-color: var(--app-border);
+}
+.fmrow__label {
+  /* Fixed to its content — never wraps to a second line, never clips. */
+  flex: none;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-fg);
+  letter-spacing: -0.01em;
+}
+.fmrow__val {
+  /* Takes the remaining width and right-aligns; the TEXT ellipsises when long
+   * so only the value shortens — the label stays put. */
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-fg);
+}
+.fmrow__val-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fmrow__chev {
+  flex: none;
+  color: var(--app-fg-faint);
+  transition: transform var(--app-dur-md) var(--app-ease);
+}
+.fmrow--open .fmrow__chev { transform: rotate(90deg); }
+/* Leading dot in a value (Color theme / Brand color). */
+.fmrow__dot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.fmrow__dot--viz {
+  box-shadow: none;
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+}
+/* Hidden native colour picker that fills its row (the Brand-colour footer). */
+.fmrow__colorinput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* === Flyout popover — floats over the canvas, to the right of the menu === */
+.fmrow__pop {
+  position: absolute;
+  top: -6px;
+  left: calc(100% + 10px);
+  min-width: 184px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  box-shadow: var(--app-shadow-md);
+  padding: 5px;
+  z-index: 60;
+  animation: app-menu-roll var(--app-dur-md) var(--app-ease) both;
+}
+.fmrow__pop--font {
+  padding: 0;
+  width: 240px;
+  /* Pin the upload footer: the pop is a flex column, the font list scrolls
+   * inside it, the grey footer stays put. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fmpop__list { display: flex; flex-direction: column; gap: 1px; }
+/* Colour-theme: a 2-column grid of dot + name, filled COLUMN-major so the
+   spectrum reads as a clean fan — down column 1 (neutral → red → orange → green →
+   teal), then down column 2 (sky → blue → indigo → violet → pink). 5 fixed rows ×
+   the 10 themes = 2 even columns; bump the row count if the theme count changes. */
+.fmpop__grid {
+  display: grid;
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  width: 232px;
+}
+.fmopt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--app-fg);
+  text-align: left;
+  width: 100%;
+  transition: background var(--app-dur) var(--app-ease);
+}
+.fmopt:hover { background: var(--app-hover); }
+.fmopt--on { background: var(--app-hover); font-weight: 600; }
+.fmopt__viz {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+}
+.fmopt__label { flex: 1; white-space: nowrap; }
+.fmopt__check { flex: none; color: var(--app-fg); }
+
+/* Brand-colour footer — the emphasised row at the foot of the theme flyout.
+ * Breaks out of the popover padding for a full-width divider; the whole row
+ * is the native colour-picker trigger. */
+.fmbrand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 6px -5px -5px;
+  padding: 11px 12px;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-bg);
+  border-radius: 0 0 9px 9px;
+  cursor: pointer;
+  transition: background var(--app-dur) var(--app-ease);
+}
+.fmbrand:hover { background: var(--app-hover); }
+.fmbrand__label {
+  flex: 1;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--app-fg-muted);
+}
+.fmbrand__val {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-fg);
+}
+
+/* Reduced-motion: the chrome guard at the file end already covers fmrow__pop. */
+
+/* === Ctrl: one labelled control row === */
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ctrl__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.ctrl__name {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--app-fg);
+}
+.ctrl__value {
+  font-size: 11px;
+  color: var(--app-fg-faint);
+  font-feature-settings: 'tnum';
+}
+.ctrl__hint {
+  font-size: 11px;
+  color: var(--app-fg-faint);
+}
+
+/* === Seg: segmented toggle ===
+ *
+ * Depth pattern (no color accent — Cockpit's chrome stays monochrome):
+ *   • Inactive: muted text, transparent on a white-ish track — recedes
+ *   • Active: slightly DARKER background (subtle overlay) + INSET shadow
+ *     so the picked option reads as "pressed into the panel" while the
+ *     others sit flat. Plus 600 weight on active text so the eye snaps
+ *     to the selection at-a-glance without scanning every label. */
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+.seg__opt {
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: var(--app-fg-muted);
+  white-space: nowrap;
+  text-align: center;
+  transition: background var(--app-dur) var(--app-ease),
+              color var(--app-dur) var(--app-ease),
+              box-shadow var(--app-dur) var(--app-ease);
+}
+.seg__opt:hover { color: var(--app-fg); }
+.seg__opt--on {
+  background: var(--app-hover);
+  color: var(--app-fg);
+  font-weight: 600;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* === FontPicker — custom dropdown where each option is rendered in its
+   own typeface (Google Fonts eager-loaded in index.html). Replaces the
+   native <select> which could only show font names in the chrome font. */
+.fp { position: relative; }
+.fp__btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  transition: border-color var(--app-dur) var(--app-ease);
+  line-height: 1.2;
+}
+.fp__btn:hover { border-color: var(--app-fg-muted); }
+.fp__name { flex: 1; color: var(--app-fg); }
+.fp__chev { color: var(--app-fg-faint); display: inline-flex; }
+
+/* Real preview, not a hint — full text color, sized to mirror the font's
+   actual role: display picker shows headline-sized, body picker shows
+   body-reading-sized. Makes the type hierarchy visible in the picker
+   itself, not just in the rendered preview. */
+.fp__sample {
+  margin-top: 8px;
+  padding: 4px 2px 2px;
+  font-weight: 400;
+  color: var(--app-fg);
+}
+.fp__sample--display {
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.fp__sample--body {
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.fp__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  box-shadow: var(--app-shadow-md);
+  padding: 4px;
+  z-index: 12;
+  max-height: 360px;
+  overflow-y: auto;
+  /* Roll-down signature (#210) — chrome parity with the preview's --k-anim-menu. */
+  animation: app-menu-roll var(--app-dur-md) var(--app-ease) both;
+}
+/* Inline mode — the font LIST drops its absolute positioning + own chrome and
+ * fills a parent flyout (.fmrow__pop--font) directly. */
+.fp--inline {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+.fp__menu--inline {
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  border: 0;
+  border-radius: 10px 10px 0 0;
+  box-shadow: none;
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  animation: none;
+}
+
+/* Upload-your-own-font footer — grey, pinned, mirrors the Brand-colour
+ * footer in the theme flyout. */
+.fp__foot {
+  flex: none;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-bg);
+  border-radius: 0 0 10px 10px;
+  transition: background var(--app-dur) var(--app-ease);
+}
+.fp__foot--over { background: var(--app-hover); }
+.fp__foot-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-fg);
+  border-radius: 0 0 10px 10px;
+  transition: background var(--app-dur) var(--app-ease);
+}
+.fp__foot-btn:hover { background: var(--app-hover); }
+.fp__foot-btn > svg { flex: none; color: var(--app-fg-muted); }
+.fp__foot-label { flex: 1; text-align: left; }
+.fp__foot-hint { font-size: 10.5px; font-weight: 400; color: var(--app-fg-faint); }
+.fp__error--foot { padding: 0 12px 8px; }
+/* Items roll out staggered. nth-of-type: item is <button>, group-label is a
+ * <div>, so type-counting indexes buttons within each group. */
+.fp__item {
+  animation: app-menu-item var(--app-dur-md) var(--app-ease) both;
+  animation-delay: calc(var(--stagger-i, 0) * 18ms);
+}
+.fp__item:nth-of-type(1){--stagger-i:0} .fp__item:nth-of-type(2){--stagger-i:1}
+.fp__item:nth-of-type(3){--stagger-i:2} .fp__item:nth-of-type(4){--stagger-i:3}
+.fp__item:nth-of-type(5){--stagger-i:4} .fp__item:nth-of-type(n+6){--stagger-i:5}
+.fp__group + .fp__group { margin-top: 6px; }
+.fp__group-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-fg-faint);
+  padding: 6px 10px 4px;
+}
+.fp__item {
+  width: 100%;
+  display: block;
+  padding: 7px 10px;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 14px;
+  color: var(--app-fg);
+  line-height: 1.2;
+}
+.fp__item:hover { background: var(--app-hover); }
+.fp__item--on { background: var(--app-hover); font-weight: 600; }
+
+/* "Custom" tag — sibling of .fp__name (not nested) so it doesn't pick up
+   the custom font that .fp__name renders in. Stays in the chrome's own
+   neutral type + muted system color so it reads as meta-info, not content. */
+.fp__tag {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--app-hover);
+  color: var(--app-fg-faint);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Warning shown when the user reloaded and their custom font is gone */
+.fp__warn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: var(--app-hover);
+  color: var(--app-fg-muted);
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+/* Upload section — inline variant sits between System and Google fonts
+   groups (so the action is high in the dropdown, not buried). */
+.fp__upload {
+  margin-top: 6px;
+  padding: 6px 4px 4px;
+  border-top: 1px solid var(--app-border);
+}
+.fp__upload--inline {
+  margin-top: 4px;
+  padding: 6px 0 8px;
+  border-top: 0;
+  border-bottom: 1px solid var(--app-border);
+  margin-bottom: 4px;
+}
+.fp__upload-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px dashed var(--app-border);
+  color: var(--app-fg);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--app-dur) var(--app-ease), background var(--app-dur) var(--app-ease);
+  text-align: left;
+}
+.fp__upload-btn:hover {
+  border-color: var(--app-fg-muted);
+  border-style: solid;
+  background: var(--app-hover);
+}
+/* Drag-over state — solid accent border + soft tint. Communicates
+   "release here" more strongly than the hover state. */
+.fp__upload-btn--over,
+.fp__upload-btn--over:hover {
+  border-color: var(--app-accent);
+  border-style: solid;
+  background: var(--app-hover);
+  color: var(--app-accent);
+}
+.fp__upload-hint {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--app-fg-faint);
+  font-weight: 400;
+}
+.fp__upload-disclaimer {
+  padding: 6px 10px 0;
+  font-size: 10.5px;
+  color: var(--app-fg-faint);
+}
+.fp__error {
+  margin-top: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: #c53030;
+}
+
+/* === Select === */
+.select {
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--app-fg);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6b73' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+/* === Saved kits — 3 fixed slots in localStorage === */
+.kits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.kit {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 8px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color var(--app-dur) var(--app-ease), background var(--app-dur) var(--app-ease);
+}
+.kit:hover { border-color: var(--app-fg-muted); }
+.kit__label {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--app-fg-muted);
+  letter-spacing: 0.01em;
+}
+.kit__swatches {
+  display: flex;
+  gap: 2px;
+}
+.kit__sw {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  /* Hairline must follow the theme — a hardcoded black-alpha border vanishes
+   * on the dark panel. --app-border carries the right tone in both modes. */
+  border: 1px solid var(--app-border);
+}
+.kit__plus {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: var(--app-bg);
+  color: var(--app-fg-faint);
+}
+.kit--empty { border-style: dashed; }
+.kit--empty .kit__label { color: var(--app-fg-faint); }
+.kit__clear {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-surface);
+  color: var(--app-fg-muted);
+  box-shadow: var(--app-shadow-sm);
+  cursor: pointer;
+}
+.kit:hover .kit__clear { display: inline-flex; }
+.kit__clear:hover { color: var(--app-fg); background: var(--app-hover); }
+.kit__clear:focus-visible {
+  display: inline-flex;
+  outline: none;
+  box-shadow: 0 0 0 3px var(--k-focus-ring, rgba(59, 130, 246, 0.6));
+}
+
+/* Respect OS reduced-motion for chrome menus (preview side is covered by the
+ * global guard in preview.css; chrome --app-* CSS needs its own). */
+@media (prefers-reduced-motion: reduce) {
+  .fp__menu, .fp__item, .fmrow__pop {
+    animation-duration: 0.01ms !important;
+  }
+}

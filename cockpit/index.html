@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ─────────── Primary SEO ─────────── -->
+    <title>UIcockpit — Design a UI kit in 60 seconds</title>
+    <meta
+      name="description"
+      content="The design-language layer above generic primitives. UIcockpit turns colour, type, shape and motion into framework-neutral design tokens — so your AI-built app doesn't look generic. Export for Tailwind v4, shadcn/ui, or any framework. 100% free, no accounts, no telemetry, no lock-in."
+    />
+    <meta
+      name="keywords"
+      content="design system, design tokens, ui kit configurator, tailwind v4, shadcn/ui, design tokens generator, ai design tools, cursor, v0, lovable, bolt, w3c design tokens, css variables, dark mode tokens, wcag audit"
+    />
+    <meta name="author" content="UIcockpit" />
+    <meta name="theme-color" content="#0a0a0b" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="canonical" href="https://uicockpit.com/" />
+
+    <!-- ─────────── Icons & PWA ─────────── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
+    <meta name="apple-mobile-web-app-title" content="UIcockpit" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!-- ─────────── Open Graph (Facebook, WhatsApp, LinkedIn, iMessage) ───────────
+         WhatsApp + iMessage prefer raster; we ship a PNG for them. Other
+         platforms (X, LinkedIn, Discord, Slack) read either. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="UIcockpit" />
+    <meta property="og:title" content="UIcockpit — Design a UI kit in 60 seconds" />
+    <meta
+      property="og:description"
+      content="The opinion layer above generic primitives — colour, type, shape and motion as framework-neutral tokens, so your AI-built app doesn't look generic. Export for Tailwind v4, shadcn/ui, any framework. 100% free. No accounts. No lock-in."
+    />
+    <meta property="og:url" content="https://uicockpit.com/" />
+    <meta property="og:image" content="https://uicockpit.com/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="UIcockpit — the design-language layer above generic primitives. Framework-neutral, no login, no lock-in."
+    />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- ─────────── Twitter / X Card ─────────── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="UIcockpit — Design a UI kit in 60 seconds" />
+    <meta
+      name="twitter:description"
+      content="The design-language layer above generic primitives. Framework-neutral tokens so your AI-built app doesn't look generic — Tailwind v4, shadcn/ui, any framework. 100% free."
+    />
+    <meta name="twitter:image" content="https://uicockpit.com/og-image.png" />
+    <meta name="twitter:image:alt" content="UIcockpit hero — Design a UI kit in 60 seconds." />
+
+    <!-- ─────────── JSON-LD structured data ───────────
+         Used by both Google's rich-result rendering AND modern AI engines
+         (ChatGPT search, Perplexity, Claude with web access). Telling them
+         exactly what this is, who it's for, and the cost (free) lets them
+         answer "what design system tool can I use?" with us in the citation. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "UIcockpit",
+        "alternateName": "UIcockpit UI Kit Configurator",
+        "url": "https://uicockpit.com/",
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "Design Tool",
+        "operatingSystem": "Web (any modern browser)",
+        "browserRequirements": "Requires JavaScript. Works in Chrome, Firefox, Safari, Edge.",
+        "description": "Browser-based design system configurator. Build a complete framework-neutral UI kit in 60 seconds with 21 visual controls (colors, typography, radii, motion, density). Exports design tokens for Tailwind v4, shadcn/ui, plain CSS, JSON, plus a BRIEF.md and ready-to-paste AI prompt for any AI coding tool.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        "featureList": [
+          "2 base Styles + 10 curated color themes, calibrated to popular interface colours",
+          "21 visual configuration controls",
+          "120+ exported design tokens",
+          "40+ live preview components",
+          "16-pair WCAG contrast audit",
+          "Z-index stack, breakpoints, container widths",
+          "Auto-derived chart palette (6 series)",
+          "Component CSS recipes included",
+          "Tailwind v4 @theme export",
+          "shadcn/ui CSS variables export",
+          "W3C Design Tokens Community Group JSON",
+          "AI prompt for any AI coding tool",
+          "5 icon libraries (Lucide, Iconoir, Phosphor regular/bold, Heroicons)",
+          "Light + dark mode",
+          "URL-hash save (no accounts)",
+          "Anonymous, no telemetry"
+        ],
+        "creator": { "@type": "Organization", "name": "UIcockpit" },
+        "isAccessibleForFree": true,
+        "license": "https://opensource.org/license/mit"
+      }
+    </script>
+
+    <!-- A second JSON-LD block as an FAQ — gives AI engines (ChatGPT/Perplexity/Claude)
+         clean Q&A blocks to cite when users ask "how do I make a design system?" -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is UIcockpit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "UIcockpit is a free, open-source, browser-based tool that helps developers and designers build a complete design system (colors, typography, radii, motion, components) in under a minute. The output is framework-neutral design tokens that drop into Tailwind v4, shadcn/ui, or any project."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who is UIcockpit for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Vibe-coders and product builders using AI coding tools. UIcockpit ships a behavior-shaping AI prompt that tells those tools how to use the design system — so generated components match the tokens automatically."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What formats does UIcockpit export?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Six formats: tokens.css (drop-in CSS variables), tokens.json (W3C Design Tokens Community Group format, Figma-compatible via Tokens Studio), Tailwind v4 globals.css (@theme block), shadcn/ui CSS variables, BRIEF.md (human + AI handoff document), and a dedicated AI prompt (.cursorrules / CLAUDE.md ready)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does UIcockpit require an account?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No accounts, no telemetry, no backend. Your configuration lives in the URL hash — share a kit by copying the link. Custom fonts uploaded via drag-and-drop stay in the browser session and are never uploaded anywhere."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is the accessibility audit included?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Every kit is tested live against 16 WCAG contrast pairs (text on surfaces, button text on fills, status colors on tints, input borders, focus rings). The pass count is visible in the topbar; failures include remedy hints pointing at the config control that fixes them."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- ─────────── Google Fonts (eager, all 17 used by FontPicker) ─────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Figtree:wght@400;500;600;700&family=Fraunces:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lexend:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Newsreader:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

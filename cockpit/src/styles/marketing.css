@@ -1,0 +1,1220 @@
+/* Marketing page — completely isolated from the app's --k-* / --app-* token
+ * systems. Hardcoded for one specific aesthetic:
+ *   • System font stack (zero load, native OS feel)
+ *   • Apple System Blue (#007AFF) accent — single voltage of color
+ *   • Off-white surfaces with subtle borders
+ *   • Generous whitespace (TweakCN / Apple marketing site rhythm)
+ *
+ * Scoped under .mkt — no rules leak to the configurator at /app. */
+
+.mkt {
+  --mkt-bg: #ffffff;
+  --mkt-fg: #0a0a0b;
+  --mkt-fg-muted: #6b6b73;
+  --mkt-fg-faint: #9a9aa1;
+  --mkt-border: #ececef;
+  --mkt-surface: #ffffff;
+  --mkt-sunken: #f7f7f8;
+  --mkt-accent: #007aff;
+  --mkt-accent-hover: #006fe6;
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: 'cv11', 'ss01', 'ss02';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: var(--mkt-fg);
+  background: var(--mkt-bg);
+  min-height: 100vh;
+  letter-spacing: -0.011em;
+}
+
+/* === Smooth-scroll anchor navigation ===
+ * `scroll-behavior: smooth` on :root scrolls in-page anchors with the
+ * browser's native easing curve. Applied globally (safe — the configurator
+ * at /app doesn't use hash anchors for scrolling, only for config state).
+ *
+ * `scroll-margin-top` on sections makes them stop ~64px below the viewport
+ * top so the sticky 60px nav doesn't cover the section heading after the
+ * jump lands. Reduced-motion users get instant jumps. */
+:root { scroll-behavior: smooth; }
+.mkt__section { scroll-margin-top: 4rem; }
+@media (prefers-reduced-motion: reduce) {
+  :root { scroll-behavior: auto; }
+}
+
+/* Reset for marketing scope — keep predictable typography.
+ *
+ * `:where()` keeps the reset's specificity at 0,1,0 (just .mkt). That way
+ * per-element rules like `.mkt__hero-sub { margin: 0 auto 88px }` (also
+ * 0,1,0) win on source order. Without :where(), the reset's element
+ * selectors (0,1,1) would override the class rules' margin-bottom — which
+ * silently kills the spacing between subtitles and their CTAs.
+ */
+.mkt * { box-sizing: border-box; }
+.mkt :where(h1, h2, h3, p) { margin: 0; }
+.mkt a { color: inherit; text-decoration: none; }
+/* Use font longhand instead of `font: inherit`. The shorthand also sets
+ * line-height (to whatever is inherited — 1.5 from the body), which would
+ * beat per-button `line-height` rules due to specificity (0,1,1 > 0,1,0)
+ * and bloat button heights. Longhand keeps line-height untouched. */
+.mkt button {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+}
+
+/* === Container === */
+.mkt__container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* === Nav (sticky top) === */
+.mkt__nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--mkt-border);
+}
+.mkt__nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+.mkt__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+.mkt__brand-logo {
+  /* 28px ≈ 22px × 1.3 — logo +30% so it carries the nav with confidence. */
+  width: 28px;
+  height: 28px;
+  display: block;
+  border-radius: 7px;
+}
+.mkt__nav-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  font-size: 14px;
+  color: var(--mkt-fg-muted);
+}
+.mkt__nav-link { transition: color 160ms ease; }
+.mkt__nav-link:hover { color: var(--mkt-fg); }
+@media (max-width: 700px) { .mkt__nav-links { display: none; } }
+
+/* === Buttons === */
+.mkt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem; /* 6px */
+  padding: 0.5rem 1rem; /* 8px / 16px — on the 4px grid */
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
+  /* Buttons inherit the body's 1.5 line-height, which makes the line-box
+   * ~24px on a 16px label and pushes the visual button height to ~42px.
+   * Tighten to 1.25 so the label sits in a ~20px line-box → final height
+   * lands at a crisp 36px (lg) / 32px (default). */
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  /* `filter` is included because the primary gradient uses brightness
+   * shifts for hover/active instead of swapping the whole gradient. */
+  transition:
+    background 180ms cubic-bezier(.05,.7,.1,1),
+    filter 180ms cubic-bezier(.05,.7,.1,1),
+    transform 180ms cubic-bezier(.05,.7,.1,1);
+}
+/* Primary CTA — green → blue → purple horizontal gradient.
+ * Used on every "Build my UI kit" trigger in the marketing site (nav,
+ * hero, final). The gradient gives the brand a spectrum feel rather than
+ * a single voltage of blue — fits a tool that's all about color systems.
+ *
+ * Hover/active: instead of swapping to a darker variant (which would
+ * mean re-defining the whole gradient), we shift `filter: brightness`.
+ * Cheaper to maintain and reads as the same gradient "lit up" or
+ * "pressed". Transitions on filter are GPU-friendly. */
+.mkt-btn--primary {
+  /* Blue → deep-purple gradient. 101deg gives a slight diagonal tilt
+   * (warmer top-left, cooler bottom-right). Stops extend beyond 100%
+   * (the 118.53% endpoint) so the visible band is mostly the blue with
+   * just a hint of purple bleeding in from the right.
+   * Border-radius inherits 999px from .mkt-btn (the difference between
+   * 99px and 999px on a 38px-tall pill is zero — both fully round). */
+  background: linear-gradient(101deg, #007BFF 50.96%, #570BA9 118.53%);
+  color: #fff;
+}
+.mkt-btn--primary:hover { filter: brightness(0.94); }
+.mkt-btn--primary:active { transform: scale(0.98); filter: brightness(0.9); }
+.mkt-btn--ghost {
+  /* Solid white background — the hero's dot grid would otherwise show
+   * through and undermine the "secondary button" affordance. */
+  background: var(--mkt-bg);
+  color: var(--mkt-fg);
+  border-color: var(--mkt-border);
+}
+.mkt-btn--ghost:hover { border-color: var(--mkt-fg-faint); }
+.mkt-btn--lg {
+  /* Trimmed from 11px top/bottom — was too tall, looked clunky next to
+   * 16px label text. 8px keeps it on the 4px grid; total button height
+   * lands around 36px (8 + 16 + 8 = 32 + border + line-height padding). */
+  padding: 0.5rem 1.5rem; /* 8px / 24px */
+  font-size: 1rem; /* 16px */
+  /* border-radius inherited from .mkt-btn (999px) — don't redeclare here,
+   * so primary's 99px pill spec in .mkt-btn--primary can win on source
+   * order without needing a compound selector. */
+}
+
+/* === Hero ===
+ *
+ * Vertical rhythm follows the 4px design grid in rem units (1rem = 16px):
+ *   eyebrow → h1     : 1.5rem (24px)
+ *   h1      → sub    : 1.5rem (24px)
+ *   sub     → CTAs   : 2rem   (32px)
+ *   section padding  : 6rem   (96px) top, 6rem bottom
+ *
+ * Every multiple is divisible by 4. Using rem instead of px means a user
+ * with a larger base font size scales the whole hero up — accessibility
+ * win, and consistent with how the rest of the design tokens behave.
+ */
+.mkt__hero {
+  padding: 6rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* === Interactive dot grid behind the hero text ===
+ *
+ * Two stacked dot layers, both 22px×22px radial-gradient patterns:
+ *   1. Base — faint grey dots, always visible (rgba(0,0,0,0.10))
+ *   2. Spotlight — Apple-blue dots at full strength, but mask-clipped
+ *      to a radial gradient around the cursor (the `--mx`/`--my` vars
+ *      are written by HeroDotGrid's mousemove handler).
+ *
+ * The grid is `pointer-events: none` so it doesn't intercept clicks on
+ * the CTA buttons stacked above it. The hero's content (everything inside
+ * .mkt__container) needs `position: relative; z-index: 1` so it paints
+ * above the grid; otherwise the dots show on top of the text. */
+.mkt__hero-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Base layer — faint dots covering the whole hero region */
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.10) 1px,
+    transparent 1.6px
+  );
+  background-size: 22px 22px;
+  /* Fade the bottom edge so the dots dissolve into the showcase below
+     instead of cutting off with a hard horizontal line. */
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+}
+.mkt__hero-grid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Spotlight layer — Apple-blue dots, brighter than the base */
+  background-image: radial-gradient(
+    circle,
+    var(--mkt-accent) 1.3px,
+    transparent 1.8px
+  );
+  background-size: 22px 22px;
+  /* Radial mask centered on the cursor — fades to transparent at ~220px.
+     The `at var(--mx) var(--my)` references the live cursor position. */
+  mask-image: radial-gradient(
+    circle 220px at var(--mx, -9999px) var(--my, -9999px),
+    black 0%,
+    rgba(0, 0, 0, 0.6) 40%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle 220px at var(--mx, -9999px) var(--my, -9999px),
+    black 0%,
+    rgba(0, 0, 0, 0.6) 40%,
+    transparent 100%
+  );
+  /* Soft fade-in/out as the cursor approaches/leaves — uses a tiny
+     transition on the mask so the spotlight feels "wet" rather than
+     pixel-locked to the cursor. */
+  transition: opacity 300ms ease;
+}
+/* Hero content must stack above the grid. The container holds eyebrow /
+ * h1 / sub / CTAs — all need to be clickable + visually on top. */
+.mkt__hero > .mkt__container { position: relative; z-index: 1; }
+.mkt__hero > .mkt__showcase { position: relative; z-index: 1; }
+
+/* Readability scrim — a soft white radial behind the hero TEXT only, so the
+ * grey sub-headline stays legible over the dot grid. The container is a
+ * stacking context (z-index:1 above), so this ::before at z-index:-1 paints
+ * ABOVE the grid (grid is z-index:0 in the hero) but BELOW the text children.
+ * Centred on the h1/sub band; fades to nothing at the edges so there's no
+ * visible disc and the grid still reads at the periphery. */
+.mkt__hero > .mkt__container::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -8% -6% -12%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 62% at 50% 44%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.82) 34%,
+    rgba(255, 255, 255, 0) 72%
+  );
+}
+
+/* Reduced-motion / contrast — fully hide the spotlight effect */
+@media (prefers-reduced-motion: reduce) {
+  .mkt__hero-grid::after { display: none; }
+}
+.mkt__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3125rem 0.875rem; /* 5/14 — pill proportions */
+  /* Solid tint — rgba(0,122,255,0.08) on white resolves to ~#ebf4ff.
+   * Hardcoded so the dot grid behind the hero doesn't bleed through. */
+  background: #ebf4ff;
+  color: var(--mkt-accent);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem; /* 24px to h1 */
+}
+.mkt__eyebrow-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: var(--mkt-accent);
+}
+.mkt__hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+  /* h1 and subtitle share max-width (40rem = 640px) so their boxes
+     align — same optical column when stacked. */
+  max-width: 40rem;
+  margin: 0 auto 1.5rem; /* 24px to subtitle */
+  text-align: center;
+  text-wrap: balance;
+}
+.mkt__hero-sub {
+  font-size: clamp(1.0625rem, 2vw, 1.25rem);
+  line-height: 1.5;
+  color: var(--mkt-fg-muted);
+  max-width: 40rem;
+  margin: 0 auto 2rem; /* 32px to CTA pair */
+  text-align: center;
+  text-wrap: balance;
+}
+.mkt__hero-ctas {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* === Hero showcase — the component bouquet ===
+   Full-bleed wrapper for ComponentBouquet (the real <ComponentGallery/>).
+   Breaks out of the page flow to span the whole viewport; the bouquet itself
+   carries the brand tokens + the edge-fade mask. */
+.mkt__showcase {
+  /* Full-bleed — break out of the page flow to span the whole viewport. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: 64px;
+  padding: 0;
+}
+
+/* === Component bouquet — the REAL <ComponentGallery/> as a full-bleed hero ===
+ * Brand-blue, decorative (non-interactive). The top + left + right edges are
+ * dissolved by two intersected gradient masks so the component wall bleeds off
+ * every side instead of cutting off. (See ComponentBouquet.tsx.) */
+.mkt__bouquet.cockpit-preview {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  max-height: 1024px;
+  overflow: hidden;
+  pointer-events: none; /* decorative — the page CTA is the way in */
+  /* Top + bottom fade ONLY. The sides bleed off-screen (hard-cut) so a half
+     component peeks at each edge — see the gallery over-width below. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 10%, #000 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 10%, #000 90%, transparent 100%);
+}
+/* Over-width the wall so the outer columns spill past the viewport and get
+   clipped → a sliver of a component runs off each side. */
+.mkt__bouquet .gallery {
+  width: calc(100% + 440px);
+  margin-inline: -220px;
+}
+
+/* === Hero theme switcher — re-tint the whole wall live (CSS-var swap) ===
+   Sits BELOW the wall (cleaner than crowding the CTA zone), 1.2× scale. */
+.mkt__bouquet-wrap { position: relative; }
+.mkt__theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  margin: 20px auto 4px;
+  padding: 7px 10px 7px 18px;
+  background: var(--mkt-surface);
+  border: 1px solid var(--mkt-border);
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(10, 10, 11, 0.04), 0 8px 24px -12px rgba(10, 10, 11, 0.14);
+  position: relative;
+  z-index: 2; /* above the masked wall */
+}
+.mkt__theme-switch-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--mkt-fg-muted);
+  margin-right: 5px;
+  white-space: nowrap;
+}
+.mkt__theme-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  transition: transform 0.14s ease, outline-color 0.14s ease;
+}
+.mkt__theme-dot:hover { transform: scale(1.14); }
+.mkt__theme-dot.is-on { outline-color: var(--mkt-fg); }
+@media (prefers-reduced-motion: reduce) { .mkt__theme-dot { transition: none; } }
+
+/* === Sections ===
+ *
+ * Rhythm in rem on the 4px grid:
+ *   section padding   : 6rem (96px) top/bottom — same as hero
+ *   h2 → subtitle     : 1.5rem (24px)
+ *   section-head → content : 4rem (64px) — clear visual break before the grid
+ */
+.mkt__section {
+  padding: 6rem 1.5rem;
+}
+.mkt__section--alt {
+  background: var(--mkt-sunken);
+  border-top: 1px solid var(--mkt-border);
+  border-bottom: 1px solid var(--mkt-border);
+}
+.mkt__section-head {
+  text-align: center;
+  margin-bottom: 4rem; /* 64px gap before features/steps grid */
+}
+.mkt__section h2 {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  margin: 0 auto 1.5rem; /* 24px to subtitle */
+  /* h2 and section-sub share max-width (33.75rem = 540px) so their boxes
+     align — same optical column when stacked. */
+  max-width: 33.75rem;
+  text-align: center;
+  text-wrap: balance;
+  hyphens: none;
+}
+.mkt__section-sub {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+  max-width: 33.75rem;
+  margin: 0 auto;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* === Feature grid === */
+.mkt__features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 800px) { .mkt__features { grid-template-columns: 1fr; } }
+.mkt__feature {
+  padding: 32px 26px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 14px;
+  background: var(--mkt-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mkt__feature-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(0, 122, 255, 0.08);
+  color: var(--mkt-accent);
+  display: inline-grid;
+  place-items: center;
+  margin-bottom: 4px;
+}
+.mkt__feature h3 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.011em;
+  line-height: 1.3;
+}
+.mkt__feature p {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+}
+
+/* === Anatomy — exploded component model + reliability guarantees ===
+ * Left: five "sheets" fanned in shallow 3D — the build-up of one component
+ * (markup → tokens → states → a11y → shipped). Tilt is deliberately gentle so
+ * the labels stay readable (an aggressive isometric looks cool but illegible).
+ * Right: the plain-language list of what every component is guaranteed to be. */
+.mkt__anatomy {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+}
+@media (max-width: 900px) { .mkt__anatomy { grid-template-columns: 1fr; gap: 40px; } }
+
+.mkt__exploded {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 6px 0 20px;
+  perspective: 1500px;
+}
+.mkt__exploded-stack {
+  position: relative;
+  width: min(358px, 100%);
+  height: 320px;
+  transform-style: preserve-3d;
+  transform: rotateX(4deg) rotateY(-11deg);
+}
+.mkt__layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  height: 60px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid var(--mkt-border);
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 0 22px 38px -26px rgba(12, 16, 30, 0.5);
+  font-size: 12.5px;
+  /* fan downward: the shipped component (i=4) sits on top, foundations stack
+   * below it, each pushed down + back + slightly smaller. */
+  transform:
+    translateY(calc((4 - var(--i)) * 58px))
+    translateX(calc((4 - var(--i)) * -6px))
+    scale(calc(1 - (4 - var(--i)) * 0.018));
+  transform-origin: top center;
+  opacity: 0;
+  animation: mkt-layer-in 0.5s ease both;
+  animation-delay: calc((4 - var(--i)) * 70ms);
+}
+.mkt__layer code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--mkt-fg);
+}
+.mkt__layer-ic {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(0, 122, 255, 0.09);
+  color: var(--mkt-accent);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.mkt__layer-body {
+  color: var(--mkt-fg-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.mkt__layer-dots { display: inline-flex; gap: 3px; flex: none; }
+.mkt__layer-dots i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.mkt__layer-dots i:nth-child(1) { background: var(--mkt-accent); }
+.mkt__layer-dots i:nth-child(2) { background: #34c759; }
+.mkt__layer-dots i:nth-child(3) { background: #ff9f0a; }
+.mkt__layer-tag {
+  margin-left: auto;
+  flex: none;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--mkt-fg-faint);
+}
+.mkt__layer--final {
+  background: var(--mkt-fg);
+  border-color: var(--mkt-fg);
+  box-shadow: 0 28px 50px -22px rgba(0, 122, 255, 0.55);
+}
+.mkt__layer-tag--final { color: rgba(255, 255, 255, 0.62); }
+.mkt__demo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 9px;
+  border: 0;
+  background: var(--mkt-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: 0 6px 14px -6px rgba(0, 122, 255, 0.85);
+}
+@keyframes mkt-layer-in { to { opacity: 1; } }
+
+.mkt__guarantees {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+}
+.mkt__guarantees li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--mkt-fg-muted);
+}
+.mkt__guarantees strong { color: var(--mkt-fg); font-weight: 600; }
+.mkt__guarantees code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  background: var(--mkt-sunken);
+  padding: 1px 5px;
+  border-radius: 5px;
+  color: var(--mkt-fg);
+}
+.mkt__guarantee-tick { flex: none; margin-top: 1px; color: var(--mkt-accent); }
+
+.mkt__anatomy-note {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  justify-content: center;
+  margin-top: 44px;
+  padding: 14px 22px;
+  border: 1px dashed var(--mkt-border);
+  border-radius: 12px;
+  background: var(--mkt-sunken);
+  font-size: 14px;
+  color: var(--mkt-fg-muted);
+  text-align: center;
+}
+.mkt__anatomy-note svg { color: var(--mkt-accent); flex: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt__layer { animation: none; opacity: 1; }
+}
+
+/* === How-it-works steps === */
+.mkt__steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  counter-reset: step;
+}
+@media (max-width: 800px) { .mkt__steps { grid-template-columns: 1fr; } }
+.mkt__step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  counter-increment: step;
+}
+.mkt__step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--mkt-accent);
+  color: var(--mkt-accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+.mkt__step-num::before { content: counter(step); }
+.mkt__step h3 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.011em;
+}
+.mkt__step p {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+}
+
+/* Docs — "Shipping with launch" inline tag on a section heading. */
+.docs__tag {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--mkt-accent);
+  background: #ebf4ff;
+  border-radius: 999px;
+  padding: 3px 10px;
+  position: relative;
+  top: -1px;
+}
+
+/* === Live kit (CDN) === */
+.mkt__kit {
+  max-width: 40rem;
+  margin: 0 auto;
+  border: 1px solid var(--mkt-border);
+  border-radius: 16px;
+  background: var(--mkt-bg);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(10, 10, 11, 0.04), 0 12px 32px -12px rgba(10, 10, 11, 0.12);
+}
+.mkt__kit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--mkt-border);
+  background: var(--mkt-sunken);
+}
+.mkt__kit-tabs {
+  display: inline-flex;
+  gap: 4px;
+}
+.mkt__kit-tab {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--mkt-fg-muted);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.mkt__kit-tab--on {
+  background: #ebf4ff;
+  color: var(--mkt-accent);
+}
+.mkt__kit-flag {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--mkt-fg-faint);
+  border: 1px solid var(--mkt-border);
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+.mkt__kit-code {
+  margin: 0;
+  padding: 20px 22px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--mkt-fg);
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+}
+.mkt__kit-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-top: 1px solid var(--mkt-border);
+  background: var(--mkt-sunken);
+  font-size: 13px;
+  color: var(--mkt-fg-muted);
+}
+.mkt__kit-foot svg { color: var(--mkt-accent); flex-shrink: 0; }
+.mkt__kit-trio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 2.5rem;
+}
+@media (max-width: 800px) { .mkt__kit-trio { grid-template-columns: 1fr; } }
+.mkt__kit-point {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mkt__kit-point h3 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.011em;
+  line-height: 1.3;
+}
+.mkt__kit-point p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+}
+.mkt__kit-point code,
+.mkt__section-sub code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--mkt-sunken);
+  border: 1px solid var(--mkt-border);
+}
+
+/* === Stat strip === */
+.mkt__stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--mkt-border);
+  border-bottom: 1px solid var(--mkt-border);
+  margin: 0;
+}
+@media (max-width: 800px) { .mkt__stats { grid-template-columns: repeat(2, 1fr); } }
+.mkt__stat {
+  padding: 36px 20px;
+  border-right: 1px solid var(--mkt-border);
+  text-align: center;
+}
+.mkt__stat:last-child { border-right: 0; }
+@media (max-width: 800px) {
+  /* Robust 2-col wrapping for any tile count: bottom rule on all, no right
+     rule on the right column, and no dangling right rule on a lone last tile. */
+  .mkt__stat { border-bottom: 1px solid var(--mkt-border); }
+  .mkt__stat:nth-child(2n) { border-right: 0; }
+  .mkt__stat:last-child:nth-child(odd) { border-right: 0; }
+}
+/* The $0 lead tile — accent number so "free" is the first thing the eye lands on. */
+.mkt__stat--free .mkt__stat-num { color: var(--mkt-accent); }
+.mkt__stat-num {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.mkt__stat-label {
+  font-size: 13px;
+  color: var(--mkt-fg-muted);
+}
+
+/* === Final CTA ===
+ *
+ * Slightly heavier vertical rhythm than other sections — this is a
+ * destination moment, the last thing on the page. Rhythm in rem:
+ *   section padding : 7rem (112px) top / 6rem (96px) bottom
+ *   h2 → sub        : 1.5rem (24px) — matches hero h1→sub
+ *   sub → button    : 2rem (32px)   — matches hero sub→CTAs
+ */
+.mkt__final {
+  padding: 7rem 1.5rem 6rem;
+  text-align: center;
+}
+.mkt__final h2 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  margin-bottom: 1.5rem; /* 24px to subtitle */
+  text-wrap: balance;
+}
+.mkt__final-sub {
+  font-size: 1.125rem;
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+  margin-bottom: 2rem; /* 32px to button */
+}
+
+/* === Footer === */
+.mkt__footer {
+  padding: 32px 24px;
+  border-top: 1px solid var(--mkt-border);
+  background: var(--mkt-sunken);
+}
+.mkt__footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--mkt-fg-muted);
+}
+.mkt__footer-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+}
+.mkt__footer-links a:hover { color: var(--mkt-fg); }
+@media (max-width: 600px) {
+  .mkt__footer-inner { flex-direction: column; gap: 12px; }
+}
+
+/* === Mega-footer (SEO hub) === */
+.mkt__footer--mega { padding-top: 56px; padding-bottom: 28px; }
+.mkt__footcols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px 24px;
+  padding-bottom: 36px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--mkt-border);
+}
+@media (max-width: 760px) { .mkt__footcols { grid-template-columns: repeat(2, 1fr); } }
+.mkt__footcol { display: flex; flex-direction: column; gap: 9px; }
+.mkt__footcol-head {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mkt-fg-faint);
+  margin-bottom: 3px;
+}
+.mkt__footlink {
+  font-size: 13.5px;
+  line-height: 1.3;
+  color: var(--mkt-fg-muted);
+  text-decoration: none;
+  transition: color 0.12s ease;
+}
+.mkt__footlink:hover { color: var(--mkt-accent); }
+.mkt__footer-bottom { padding-top: 4px; }
+
+/* ============================================================
+   SEO landing pages (/compare, /alternatives, /uses) — reuse the
+   .mkt shell; add a hero, a comparison table and cross-link cards.
+   ============================================================ */
+.seo__hero { padding-top: 88px; padding-bottom: 48px; text-align: center; }
+.seo__h1 {
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  max-width: 40rem;
+  margin: 0 auto 1.25rem;
+  text-wrap: balance;
+}
+.seo__sub {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+  max-width: 38rem;
+  margin: 0 auto;
+  text-wrap: balance;
+}
+.seo__ctas {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+.seo__prose { padding-top: 0; padding-bottom: 24px; }
+.seo__prose .mkt__container { max-width: 44rem; }
+.seo__prose p {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--mkt-fg-muted);
+  margin-bottom: 1rem;
+}
+.seo__prose p:last-child { margin-bottom: 0; }
+
+/* Comparison table — a 3-column responsive grid (feature · us · them). */
+.cmp {
+  max-width: 52rem;
+  margin: 0 auto;
+  border: 1px solid var(--mkt-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--mkt-bg);
+}
+.cmp__row {
+  display: grid;
+  grid-template-columns: 1.3fr 1.4fr 1.4fr;
+  align-items: start;
+  gap: 16px;
+  padding: 13px 18px;
+  border-top: 1px solid var(--mkt-border);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.cmp__row:first-child { border-top: 0; }
+.cmp__row--head {
+  background: var(--mkt-sunken);
+  font-weight: 600;
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+}
+.cmp__feat { color: var(--mkt-fg); font-weight: 500; }
+.cmp__row--head .cmp__feat { color: var(--mkt-fg-faint); font-weight: 600; }
+.cmp__col { color: var(--mkt-fg-muted); position: relative; }
+.cmp__col--us { color: var(--mkt-fg); }
+.cmp__row--head .cmp__col--us { color: var(--mkt-accent); }
+.cmp__col.is-win { color: var(--mkt-fg); font-weight: 500; }
+.cmp__col--us.is-win {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.cmp__chk { color: var(--mkt-accent); flex-shrink: 0; margin-top: 1px; }
+@media (max-width: 680px) {
+  .cmp__row { grid-template-columns: 1fr; gap: 4px; }
+  .cmp__row--head { display: none; }
+  .cmp__feat { font-weight: 600; margin-bottom: 2px; }
+  .cmp__col::before {
+    content: 'UIcockpit: ';
+    color: var(--mkt-accent);
+    font-weight: 600;
+  }
+  .cmp__col:last-child::before { content: 'Them: '; color: var(--mkt-fg-faint); }
+}
+
+.seo__points { margin-top: 8px; }
+
+.seo__faq dt { font-weight: 600; }
+
+/* Cross-link cards. */
+.seo__relgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 760px) { .seo__relgrid { grid-template-columns: 1fr; } }
+.seo__relcard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 12px;
+  background: var(--mkt-bg);
+  text-decoration: none;
+  transition: border-color 0.12s ease, transform 0.12s ease;
+}
+.seo__relcard:hover { border-color: var(--mkt-accent); transform: translateY(-2px); }
+.seo__rel-eyebrow {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--mkt-fg-faint);
+}
+.seo__rel-title { font-size: 15px; font-weight: 600; color: var(--mkt-fg); }
+
+/* ============================================================
+   Docs page (/docs) — sticky-TOC documentation. Reuses the .mkt
+   shell (nav + footer) and the --mkt-* palette for continuity.
+   ============================================================ */
+.mkt__nav-link--active { color: var(--mkt-fg); font-weight: 600; }
+
+.docs {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+  display: grid;
+  grid-template-columns: 212px minmax(0, 1fr);
+  gap: 56px;
+}
+
+/* Sticky table of contents. top = nav height (60) + breathing room. */
+.docs__toc {
+  position: sticky;
+  top: 84px;
+  align-self: start;
+  max-height: calc(100vh - 104px);
+  overflow-y: auto;
+}
+.docs__toc-head {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mkt-fg-faint);
+  margin-bottom: 12px;
+}
+.docs__toc nav { display: flex; flex-direction: column; gap: 2px; }
+.docs__toc-link {
+  display: block;
+  padding: 6px 12px;
+  font-size: 13.5px;
+  line-height: 1.3;
+  color: var(--mkt-fg-muted);
+  border-left: 2px solid transparent;
+  border-radius: 0 6px 6px 0;
+  transition: color 140ms ease, background 140ms ease, border-color 140ms ease;
+}
+.docs__toc-link:hover { color: var(--mkt-fg); background: var(--mkt-sunken); }
+.docs__toc-link.is-active {
+  color: var(--mkt-accent);
+  border-left-color: var(--mkt-accent);
+  font-weight: 600;
+}
+
+/* Body */
+.docs__body { min-width: 0; }
+.docs__lede { margin-bottom: 8px; }
+.docs__lede h1 {
+  font-size: 36px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 16px;
+}
+.docs__lede p { font-size: 17px; line-height: 1.6; color: var(--mkt-fg-muted); max-width: 64ch; }
+
+.docs__body section {
+  /* so the sticky nav never covers a heading we jump to */
+  scroll-margin-top: 84px;
+  padding-top: 40px;
+  margin-top: 8px;
+  border-top: 1px solid var(--mkt-border);
+}
+.docs__body section:first-of-type { border-top: 0; padding-top: 24px; }
+.docs__body h2 {
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+}
+.docs__body h3 { font-size: 15px; margin: 0 0 10px; }
+.docs__body p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--mkt-fg-muted);
+  max-width: 68ch;
+  margin: 0 0 14px;
+}
+.docs__body strong { color: var(--mkt-fg); font-weight: 600; }
+.docs__body em { font-style: italic; }
+.docs__link, .docs__body a:not(.docs__toc-link):not(.mkt-btn) {
+  color: var(--mkt-accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--mkt-accent) 35%, transparent);
+}
+.docs__link:hover, .docs__body a:not(.docs__toc-link):not(.mkt-btn):hover {
+  border-bottom-color: var(--mkt-accent);
+}
+
+/* inline + block code */
+.docs__body code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.86em;
+  background: var(--mkt-sunken);
+  border: 1px solid var(--mkt-border);
+  border-radius: 5px;
+  padding: 1px 5px;
+  color: var(--mkt-fg);
+  white-space: nowrap;
+}
+.docs__code {
+  background: var(--mkt-sunken);
+  border: 1px solid var(--mkt-border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  margin: 4px 0 8px;
+}
+.docs__code code {
+  background: none;
+  border: 0;
+  padding: 0;
+  white-space: pre;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--mkt-fg);
+}
+
+/* lists */
+.docs__list, .docs__steps { margin: 0 0 8px; padding-left: 22px; }
+.docs__list { list-style: disc; }
+.docs__steps { list-style: decimal; }
+.docs__list li, .docs__steps li {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--mkt-fg-muted);
+  margin-bottom: 10px;
+  max-width: 68ch;
+}
+.docs__list li code, .docs__steps li code { white-space: normal; }
+
+/* definition list (exports) */
+.docs__deflist { margin: 4px 0; }
+.docs__deflist dt {
+  font-weight: 600;
+  color: var(--mkt-fg);
+  font-size: 14.5px;
+  margin-top: 18px;
+}
+.docs__deflist dt:first-child { margin-top: 0; }
+.docs__deflist dt code { white-space: nowrap; font-size: 0.92em; }
+.docs__deflist dd {
+  margin: 6px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--mkt-fg-muted);
+  max-width: 68ch;
+}
+.docs__deflist dd code { white-space: normal; }
+
+/* two-column do/don't */
+.docs__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.docs__col {
+  border: 1px solid var(--mkt-border);
+  border-radius: 12px;
+  padding: 18px 20px 6px;
+  background: var(--mkt-surface);
+}
+.docs__col--do { border-top: 3px solid #1f9d55; }
+.docs__col--dont { border-top: 3px solid #d64545; }
+.docs__col h3 { margin-bottom: 12px; }
+.docs__col .docs__list { padding-left: 18px; }
+.docs__col .docs__list li { font-size: 13.5px; margin-bottom: 8px; }
+
+.docs__cta { margin-top: 24px; }
+
+@media (max-width: 860px) {
+  .docs { grid-template-columns: 1fr; gap: 0; }
+  .docs__toc { display: none; }
+  .docs__cols { grid-template-columns: 1fr; }
+}

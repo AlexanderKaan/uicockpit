@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Keep the SEO routes in sync with src/marketing/seo/seoData.ts. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Marketing landing — the primary entry point. -->
+  <url>
+    <loc>https://uicockpit.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <!-- Configurator app — the tool itself. -->
+  <url>
+    <loc>https://uicockpit.com/app</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <!-- Documentation — how to use the system. -->
+  <url>
+    <loc>https://uicockpit.com/docs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Comparison pages (UIcockpit vs X). -->
+  <url><loc>https://uicockpit.com/compare/shadcn</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uicockpit.com/compare/v0</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uicockpit.com/compare/tweakcn</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uicockpit.com/compare/material-ui</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://uicockpit.com/compare/tailwind-ui</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Alternative pages (X alternative). -->
+  <url><loc>https://uicockpit.com/alternatives/shadcn</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://uicockpit.com/alternatives/v0</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://uicockpit.com/alternatives/tweakcn</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://uicockpit.com/alternatives/material-ui</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <!-- Use-case / keyword landing pages. -->
+  <url><loc>https://uicockpit.com/uses/design-tokens-for-tailwind</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://uicockpit.com/uses/shadcn-theme-generator</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://uicockpit.com/uses/ai-design-system</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://uicockpit.com/uses/framework-neutral-design-tokens</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>

@@ -1,0 +1,6 @@
+# Cloudflare Pages SPA fallback. Existing static files (assets, /sitemap.xml,
+# /robots.txt, /llms.txt, icons) are served first; any other path falls through
+# to the app shell so client-side routes (/docs, /compare/*, /alternatives/*,
+# /uses/*, /app) resolve on a direct hit or refresh. Status 200 = rewrite, so
+# the URL the visitor sees is preserved (important for SEO).
+/*    /index.html   200

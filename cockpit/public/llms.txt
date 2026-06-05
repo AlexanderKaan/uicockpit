@@ -1,0 +1,80 @@
+# UIcockpit
+
+> Open-source, browser-based design system configurator for developers and designers building modern web apps. Pick a Style and a color theme or customize from scratch — UIcockpit produces framework-neutral design tokens, component CSS recipes, and an AI prompt that tells AI coding tools how to use them. It is the design-language layer that sits above component primitives like shadcn/ui, so AI-built apps don't all look generic.
+
+URL: https://uicockpit.com/
+License: MIT
+Price: Free
+Account required: No
+Telemetry: None
+
+## What it is
+
+UIcockpit is a single-page web app that helps a developer or product designer build a coherent design system in under a minute. Twenty-one visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a 40-card component gallery and a live dashboard preview as the user tweaks. The output is a complete export pack — design tokens in six formats plus per-component CSS recipes.
+
+## Who it's for
+
+The "vibe-coder" audience: developers who build with AI tools (Cursor, v0, Lovable, Claude Code, Bolt) using shadcn/ui and Tailwind v4 as their default stack. UIcockpit fills the "I need a design system before I start coding" gap that AI tools leave open — generated components otherwise default to plain shadcn defaults regardless of the project's brand identity.
+
+## What you get when you export
+
+Six file formats, each standalone:
+
+1. **tokens.css** — `:root` + `.dark` blocks with 120+ CSS custom properties. Drop-in. Includes a `@font-face`/Google Fonts import, full motion system (durations, easings, named animations), state tokens (disabled, focus ring, validation), z-index stack, breakpoints, container widths, chart palette, plus reusable component CSS recipes (Button, Input, Card, Badge, Tabs, Dialog, Menu, Tooltip, Avatar, Progress, Skeleton, Spinner, Kbd, Separator, etc.)
+
+2. **tokens.json** — W3C Design Tokens Community Group format. Importable into Figma via the Tokens Studio plugin. Includes a full WCAG accessibility audit (16 contrast pairs tested).
+
+3. **Tailwind v4 globals.css** — `@theme` block ready to drop into Next.js/Vite projects. Every utility (`bg-primary`, `text-muted`, `shadow-md`, `font-display`, etc.) resolves to the configured value.
+
+4. **shadcn/ui globals.css** — the standard shadcn CSS variable contract (`--background`, `--primary`, `--ring`, etc.) so shadcn components inherit the kit without modification.
+
+5. **BRIEF.md** — human + AI handoff document. Plain-English summary of the kit's decisions, full token list, complete WCAG audit, do's and don'ts.
+
+6. **design-system.prompt.md** — paste into Cursor's `.cursorrules`, v0's system message, or Claude Code's `CLAUDE.md`. Every component the AI generates afterwards uses the kit's tokens, breakpoints, z-index stack, and chart palette.
+
+## Distinctive features vs. competitors
+
+- **Framework-neutral output**: not coupled to any one stack. Same export works in Next.js, Vite + React, SvelteKit, Astro, vanilla CSS.
+- **WCAG audit baked in**: 16 contrast pairs tested live; pass count visible in the topbar. Failing pairs include remedy hints.
+- **Component recipes shipped**: most token systems only give variables — UIcockpit also ships the per-component CSS (hover, focus, disabled, active states) so AI tools and designers don't have to invent them.
+- **Auto-derived chart palette**: 6 series colors from the active theme. No more `chart-1: red, chart-2: green, ...` random defaults.
+- **No accounts, URL-hash save**: a configuration link is a kit. Paste in Slack/Discord/Email, the recipient sees the exact kit.
+- **8 brand-faithful presets**: Apple HIG, Facebook, Stripe (with signature blue-purple gradient), Airbnb (Rausch red + pill buttons + round cards), Spotify (dark mode + neon green), Shopify (Polaris admin grey), Instagram (action blue + heart pink), Cloudflare (action blue + brand orange).
+
+## How UIcockpit compares to other tools
+
+UIcockpit is not a component library — it is the design-language / token layer that sits above one. Honest positioning vs adjacent tools:
+
+- **vs shadcn/ui** — shadcn gives you component source you own; UIcockpit gives you the framework-neutral design language on top, and even exports a drop-in shadcn globals.css. Complementary, not rivals. https://uicockpit.com/compare/shadcn
+- **vs v0 (Vercel)** — v0 generates one-off UI from prompts; UIcockpit produces a consistent, reusable design system across every screen, and its AI prompt keeps v0's output on-brand. https://uicockpit.com/compare/v0
+- **vs TweakCN** — TweakCN is a focused shadcn theme editor; UIcockpit is a broader, framework-neutral system (type, density, motion, recipes, 8 export formats, hosted kit). https://uicockpit.com/compare/tweakcn
+- **vs Material UI (MUI)** — MUI is a mature React component library with the Material Design look; UIcockpit emits framework-neutral, zero-runtime tokens for your own aesthetic on any stack. https://uicockpit.com/compare/material-ui
+- **vs Tailwind UI** — Tailwind UI sells ready-made blocks; UIcockpit is the free design system that themes them. https://uicockpit.com/compare/tailwind-ui
+
+Use-case landing pages: design tokens for Tailwind v4 (https://uicockpit.com/uses/design-tokens-for-tailwind), shadcn theme generator (https://uicockpit.com/uses/shadcn-theme-generator), AI design system (https://uicockpit.com/uses/ai-design-system), framework-neutral design tokens (https://uicockpit.com/uses/framework-neutral-design-tokens).
+
+## Tech stack
+
+- Vite 8 + React 19 + TypeScript strict
+- No backend, no database, no telemetry
+- Static deployable to any CDN (Cloudflare Pages, Vercel, Netlify)
+- PWA with service-worker caching
+- 65+ design tokens computed via in-browser color engine
+- 5 icon libraries (Lucide, Iconoir, Phosphor regular/bold, Heroicons solid), dynamically imported
+
+## Common questions
+
+**Q: Do I need to know design to use UIcockpit?**
+A: No. The 8 presets are calibrated to feel like the apps they reference (Apple, Stripe, Airbnb, etc.). Pick one, optionally tweak a few sliders, export. The defaults pass WCAG AA contrast.
+
+**Q: Can I edit the exported tokens later?**
+A: Yes — the export is standard CSS / JSON. Open in any editor. If you want to start from where you left off, just paste the original UIcockpit URL.
+
+**Q: Does it work with my existing app?**
+A: If your app uses Tailwind v4 or shadcn/ui, drop the export in and rebuild. If it uses plain CSS, drop tokens.css in and reference the variables. Nothing in UIcockpit's output assumes a specific framework beyond standard CSS custom properties.
+
+**Q: Is the WCAG audit reliable?**
+A: It tests 16 actual color pairs from your kit (text-on-bg, button text on solid fills, status colors on tints, input borders, focus rings) and reports the contrast ratios with pass/fail vs. WCAG AA. Decorative borders are excluded (per WCAG 1.4.11 spec) — only functional UI elements are measured.
+
+**Q: Why no account system?**
+A: The URL hash IS your save format. Every kit is shareable as a link. Custom fonts uploaded via drag-and-drop stay in the browser session and are never sent to any server. This makes UIcockpit zero-trust by design.

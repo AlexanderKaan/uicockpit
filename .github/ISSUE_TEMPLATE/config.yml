@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/alexanderkaan/uicockpit/discussions
+    about: Questions, ideas, show-and-tell, and general conversation.
+  - name: 🎨 Try UIcockpit
+    url: https://uicockpit.com
+    about: Build a kit in the browser before filing an issue.

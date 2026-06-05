@@ -1,0 +1,277 @@
+/**
+ * Token categories that aren't user-configurable but matter for a complete
+ * design system export. Z-index, breakpoints, container widths, chart
+ * palette, extended type scale, and the full WCAG audit all live here so
+ * every generator can pull them through one interface.
+ *
+ * The principle: we don't ask the user to pick z-index 50 vs 60 — that's
+ * design-system busywork. Industry-standard stacks are bundled, and we
+ * surface them in the export so the kit feels complete.
+ */
+import type { Config, Tokens } from './types'
+import { contrast, hslToHex, oklchStrToHex } from './color'
+import { buildTokens } from './buildTokens'
+
+/** Resolve a token value to a hex string. Tokens come in three flavors:
+ *  - hex literals (e.g. "#007aff") — return as-is
+ *  - oklch() functions (e.g. "oklch(95% 0.01 240)") — the engine's PRIMARY
+ *    output format (the `hsl()` emitter authors in HSL but emits OKLCH); parse
+ *    via oklchStrToHex.
+ *  - hsl() functions (legacy / any literal HSL) — parse and convert to hex.
+ *  The contrast() utility only accepts hex, so this bridges the gap.
+ *  NOTE: missing the oklch branch silently returned #000000 for every modern
+ *  token, so the WCAG audit compared black-on-black (1.00:1) and reported a
+ *  perfectly accessible theme as failing — guard this with a test. */
+function toHex(val: string): string {
+  if (!val) return '#000000'
+  if (val.startsWith('#')) return val
+  if (val.startsWith('oklch')) return oklchStrToHex(val)
+  const m = val.match(/hsl\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%\s*\)/)
+  if (m) {
+    const h = parseFloat(m[1] as string)
+    const s = parseFloat(m[2] as string)
+    const l = parseFloat(m[3] as string)
+    return hslToHex(h, s, l)
+  }
+  return '#000000'
+}
+
+/* ───────── Z-index stack ─────────
+ * Industry-standard layering (Material/Tailwind/Bootstrap converge on these).
+ * Each tier leaves 90 units of headroom for app-specific overrides between layers. */
+export const Z_INDEX = {
+  base: 0,
+  dropdown: 50,
+  sticky: 100,
+  fixed: 200,
+  drawer: 300,
+  modal: 1000,
+  popover: 1100,
+  toast: 1200,
+  tooltip: 1300,
+} as const
+
+/* ───────── Breakpoints ─────────
+ * Tailwind v4 defaults — de-facto standard in 2026, used by shadcn,
+ * Radix, Vercel templates. Min-width based (mobile-first). */
+export const BREAKPOINTS = {
+  sm: '640px',
+  md: '768px',
+  lg: '1024px',
+  xl: '1280px',
+  '2xl': '1536px',
+} as const
+
+/* ───────── Container widths ─────────
+ * Three named widths cover 95% of layouts. Narrow = reading column (blog,
+ * docs). Regular = app dashboard. Wide = full marketing/showcase. */
+export const CONTAINER_WIDTHS = {
+  narrow: '640px',
+  regular: '1024px',
+  wide: '1280px',
+  max: '1536px',
+} as const
+
+/* ───────── Chart palette ─────────
+ * Six-color rotation for data series. Derived from the active theme so
+ * "Apple kit" gets a blue-led palette, "Airbnb kit" a red-led palette.
+ * Order matters: chart-1 is the highlight series, chart-6 the deemphasized.
+ *
+ * Pattern follows shadcn/charts conventions but auto-tints from primary +
+ * accent + system colors instead of asking the user. */
+export function buildPalette(cfg: Config): Record<string, string> {
+  const tk = buildTokens(cfg)
+  const v = tk.vars as Record<string, string>
+  // Single source: the decorative palette (--k-accent-1..6 + ink + gradients)
+  // and the chart series (--k-chart-1..6, same colours) are derived in
+  // buildTokens from the brand hue per the user's Palette character
+  // (pastel / vivid / brand). Charts + avatars + tiles share one set.
+  const g = (k: string) => v[k] ?? ''
+  const out: Record<string, string> = {}
+  for (let i = 1; i <= 6; i++) {
+    out[`accent-${i}`] = g(`--k-accent-${i}`)
+    out[`accent-${i}-ink`] = g(`--k-accent-${i}-ink`)
+    out[`accent-${i}-soft`] = g(`--k-accent-${i}-soft`)
+    out[`accent-${i}-soft-fg`] = g(`--k-accent-${i}-soft-fg`)
+    out[`grad-${i}`] = g(`--k-grad-${i}`)
+    out[`chart-${i}`] = g(`--k-chart-${i}`)
+  }
+  return out
+}
+
+/* ───────── Extended type scale ─────────
+ * The configurator currently exposes h1, h2, body, small via the TypeScale
+ * setting. For a complete design system we also need h3-h5, display,
+ * caption, and eyebrow. These derive from the base h1/body via a 1.2-1.25
+ * modular ratio (industry-standard "major second" / "major third"). */
+export function buildTypeScale(cfg: Config): Record<string, string> {
+  const tk = buildTokens(cfg)
+  const v = tk.vars as Record<string, string>
+  const num = (k: string) => parseFloat(v[k] ?? '0')
+  // h1/h2/h3/body/small/eyebrow are now first-class scale tokens driven by
+  // the Text size (S/M/L/XL) setting. Display (hero) and h4/h5 (the in-between
+  // steps a marketing page sometimes needs) derive from them.
+  const h1 = num('--k-type-h1')
+  const h2 = num('--k-type-h2')
+  const h3 = num('--k-type-h3')
+  const body = num('--k-type-body')
+  const small = num('--k-type-small')
+  const eyebrow = num('--k-type-eyebrow')
+  return {
+    display: Math.round(h1 * 1.55) + 'px',
+    h1: h1 + 'px',
+    h2: h2 + 'px',
+    h3: h3 + 'px',
+    h4: Math.round((h3 + body) / 2) + 'px',  // tween between h3 and body
+    h5: Math.round(body * 1.05) + 'px',
+    body: body + 'px',
+    small: small + 'px',
+    caption: Math.max(9.5, small - 2) + 'px',  // micro tier below small, scales
+    eyebrow: eyebrow + 'px',  // uppercase micro-label — pairs with the .eyebrow role
+  }
+}
+
+/* ───────── Spacing scale ─────────
+ * The configurator uses one --k-space base (density-driven). For a complete
+ * scale we expose s-0 through s-12 as multiples — pattern used by Tailwind,
+ * Chakra, Material. This way "padding: var(--k-s-4)" is a real token, not
+ * "padding: calc(var(--k-space) * 4)". */
+/* The fine-grained spacing grid — FIXED rem steps keyed by their px-at-16-root
+ * value (so --k-s-12 === 0.75rem === 12px at default). Every common component
+ * padding/gap maps to an exact step (no rounding). This is the 4pt grid as
+ * named tokens (Tailwind-style), used for component-internal spacing; the
+ * density-responsive RHYTHM still lives in --k-space/--k-pad/--k-stack-gap.
+ * REM so it scales with the user's root font-size. */
+export const SPACING_STEPS = [2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32] as const
+export function spacingScale(): Record<string, string> {
+  const out: Record<string, string> = { 's-0': '0' }
+  for (const px of SPACING_STEPS) out[`s-${px}`] = `${+(px / 16).toFixed(4)}rem`
+  return out
+}
+// buildSpacingScale kept for genCss back-compat — now just the fixed scale.
+export function buildSpacingScale(_cfg: Config): Record<string, string> {
+  return spacingScale()
+}
+
+/* ───────── Full WCAG contrast audit ─────────
+ * Every meaningful text-on-background pair in the kit, audited against
+ * WCAG AA (≥4.5:1 for normal text, ≥3:1 for large text and UI components).
+ * Returns the list so genBrief can publish it and the topbar can show
+ * "passing X of Y" — much more rigorous than the single primary-on-button
+ * check we had before. */
+export interface ContrastPair {
+  label: string
+  fg: string
+  bg: string
+  ratio: number
+  required: 4.5 | 3
+  passes: boolean
+  /** One-line fix-it hint shown below failing rows in the A11Y popover.
+   *  Phrased as "Try: X, or Y" — points at a config control in the panel.
+   *  Honest UX: we say what to try, we don't fake-navigate to a gallery
+   *  card that has no fix-action of its own. `null` for passing pairs. */
+  remedy: string | null
+}
+
+/** Standard remedy hints, mapped per pair-label. These are the actual
+ *  config controls a user can flip to influence each contrast pair.
+ *  Hard-coded because each token's failure mode is well-known. */
+const REMEDIES: Record<string, string> = {
+  'Body text on background':       'Try Background: Crisp, or pick a darker neutral ramp.',
+  'Body text on surface':          'Try Background: Crisp, or pick a darker neutral.',
+  'Body text on raised surface':   'Try Background: Crisp — raised surfaces tint lighter than base.',
+  'Body text on overlay':          'Try Background: Crisp — overlay surfaces tint lighter than base.',
+  'Muted text on background':      'Try Background: Crisp — muted text is intentionally low-contrast.',
+  'Muted text on surface-2':       'Try Background: Crisp — muted text is intentionally low-contrast.',
+  'Button text on primary':        'Pick a darker primary, or switch to Mono.',
+  'Button text on primary hover':  'Pick a darker primary — the hover state derives from it.',
+  'Secondary button text':         'Pick a darker secondary-soft, or a lighter secondary-soft-fg.',
+  'Success text on success-soft':  'Try Background: Crisp — system colors widen their gap on Crisp.',
+  'Warning text on warning-soft':  'Try Background: Crisp — system colors widen their gap on Crisp.',
+  'Danger text on danger-soft':    'Try Background: Crisp — system colors widen their gap on Crisp.',
+  'Info text on info-soft':        'Try Background: Crisp — system colors widen their gap on Crisp.',
+  'Primary against background':       'Primary as a SURFACE is fine here; for colored TEXT, use primary-soft tints.',
+  'Input border against background':  'Common in modern UIs (Apple, Stripe both subtle here). Set Borders: Strong if you need strict WCAG, otherwise rely on labels + placeholders for affordance.',
+  'Focus ring against background':    'Pick a higher-saturation primary, or set Background: Crisp.',
+}
+
+export function auditContrast(tk: Tokens): ContrastPair[] {
+  const v = tk.vars as Record<string, string>
+  // Resolve light-mode values explicitly — auditing both modes would
+  // double the count without surfacing new failures (the engine clamps
+  // both to AA already; failures here would be dark-mode-specific edge
+  // cases we'd rather catch via mode-specific audits if needed).
+  const pairs: Array<[string, string, string, 4.5 | 3]> = [
+    ['Body text on background',       '--k-fg',              '--k-bg',              4.5],
+    ['Body text on surface',          '--k-fg',              '--k-surface',         4.5],
+    ['Body text on raised surface',   '--k-fg',              '--k-surface-raised',  4.5],
+    ['Body text on overlay',          '--k-fg',              '--k-surface-overlay', 4.5],
+    ['Muted text on background',      '--k-fg-muted',        '--k-bg',              4.5],
+    ['Muted text on surface-2',       '--k-fg-muted',        '--k-surface-2',       4.5],
+    ['Button text on primary',        '--k-primary-fg',      '--k-primary',         4.5],
+    ['Button text on primary hover',  '--k-primary-fg',      '--k-primary-hover',   4.5],
+    // Our .btn--secondary recipe uses the SOFT variant (light grey bg + dark
+    // ink) not --k-secondary directly. Testing --k-secondary-fg on --k-secondary
+    // tested a token pair that no component in our system actually renders —
+    // produced phantom failures (mid-grey + white = ~3.5:1). The soft pair is
+    // the real button-secondary pair.
+    ['Secondary button text',         '--k-secondary-soft-fg', '--k-secondary-soft', 4.5],
+    ['Success text on success-soft',  '--k-success-soft-fg', '--k-success-soft',    4.5],
+    ['Warning text on warning-soft',  '--k-warning-soft-fg', '--k-warning-soft',    4.5],
+    ['Danger text on danger-soft',    '--k-danger-soft-fg',  '--k-danger-soft',     4.5],
+    ['Info text on info-soft',        '--k-info-soft-fg',    '--k-info-soft',       4.5],
+    ['Primary against background',       '--k-primary',       '--k-bg', 3],
+    // `--k-border` is decorative (card dividers, hairlines between sections).
+    // WCAG 1.4.11 only requires 3:1 for FUNCTIONAL UI elements — decorative
+    // borders are explicitly excluded. Audit the INPUT border instead: that
+    // one IS functional (it tells the user "here's a form field").
+    ['Input border against background',  '--k-input-border',  '--k-bg', 3],
+    ['Focus ring against background',    '--k-ring',          '--k-bg', 3],
+  ]
+  return pairs.map(([label, fgVar, bgVar, required]) => {
+    const fg = v[fgVar]
+    const bg = v[bgVar]
+    // contrast() needs hex. Tokens are stored as HSL strings — convert.
+    const ratio = fg && bg ? contrast(toHex(fg), toHex(bg)) : 0
+    const passes = ratio >= required
+    return {
+      label,
+      fg: fg || '',
+      bg: bg || '',
+      ratio: Math.round(ratio * 100) / 100,
+      required,
+      passes,
+      // Only populate remedy for failing pairs — passing pairs don't need help.
+      remedy: passes ? null : (REMEDIES[label] ?? null),
+    }
+  })
+}
+
+/* ───────── Inventory summary ─────────
+ * One number per category — for the Export Modal "what you'll get" view
+ * and the marketing page's "65+ design tokens" stat. Counted off the
+ * actual variables, not hand-maintained. */
+export interface Inventory {
+  colors: number; typography: number; spacing: number; radii: number
+  shadows: number; motion: number; state: number; zIndex: number
+  breakpoints: number; containers: number; chart: number
+}
+export function buildInventory(tk: Tokens): Inventory {
+  const vars = tk.vars as Record<string, string>
+  const has = (prefix: string) => Object.keys(vars).filter((k) => k.startsWith(prefix)).length
+  return {
+    colors: Object.keys(vars).filter((k) =>
+      /^--k-(bg|fg|surface|primary|secondary|accent|success|warning|danger|info|border|input-border|ring|selection|fill)/.test(k),
+    ).length,
+    typography: Object.keys(vars).filter((k) => k.startsWith('--k-type-') || k.startsWith('--k-font-') || k.startsWith('--k-ui-')).length + 7, // +7 for display/h3/h4/h5/body/caption/eyebrow extras
+    spacing: 10, // s-0 through s-12, the named scale
+    radii: has('--k-radius'),
+    shadows: has('--k-shadow'),
+    motion: has('--k-dur') + has('--k-ease') + has('--k-anim'),
+    state: ['--k-disabled-bg', '--k-disabled-fg', '--k-disabled-opacity', '--k-focus-ring-width', '--k-focus-ring-offset', '--k-input-error-border', '--k-input-success-border', '--k-input-warning-border', '--k-state-hover', '--k-state-border', '--k-state-selected-bg'].filter((k) => vars[k]).length,
+    zIndex: Object.keys(Z_INDEX).length,
+    breakpoints: Object.keys(BREAKPOINTS).length,
+    containers: Object.keys(CONTAINER_WIDTHS).length,
+    chart: 6,
+  }
+}

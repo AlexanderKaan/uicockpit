@@ -1,0 +1,103 @@
+/* The --app-* variables — the entire chrome character.
+   Light cool-grey, neutral. Deliberately separate from --k-* (which live on
+   .cockpit-preview). Cool tone (vs the earlier warm beige) reads cleaner
+   next to colored previews and matches the Linear/GitHub/Vercel chrome
+   convention. See DECISIONS.md §Layout.
+
+   Chrome motion + shadows are independent from preview motion so the user's
+   "Playful" choice never bounces the panel buttons. Chrome stays calm. */
+:root {
+  /* Color */
+  --app-bg:        #f4f5f8;
+  --app-surface:   #ffffff;
+  --app-fg:        #1a1a1d;
+  --app-fg-muted:  #6b6b73;
+  --app-fg-faint:  #9a9aa1;
+  --app-border:    #e3e5ea;
+  --app-hover:     rgba(0, 0, 0, 0.04);
+  --app-accent:    #1a1a1d;
+  /* Motion — Material standard, never inherited from user choice */
+  --app-dur:       120ms;
+  --app-dur-md:    200ms;
+  --app-ease:      cubic-bezier(.4, 0, .2, 1);
+  /* Elevation — chrome uses two consistent depths */
+  --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --app-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --app-shadow-lg: 0 18px 60px rgba(0, 0, 0, 0.25);
+  /* Modal backdrop dim */
+  --app-backdrop:  rgba(0, 0, 0, 0.35);
+}
+
+/* Chrome menu "roll-down" — mirrors the preview's --k-anim-menu signature so
+ * UIcockpit's own dropdowns (Font/Theme picker) open with the same Material-3
+ * roll. Chrome keeps its own --app-* timing (calm, never user-driven). */
+@keyframes app-menu-roll {
+  from { max-height: 0; opacity: 0.6; }
+  to   { max-height: 380px; opacity: 1; }
+}
+@keyframes app-menu-item {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Roll-down for the floating-menu accordion bodies. Same reveal as
+ * app-menu-roll, but ENDS with overflow:visible so a leaf picker's own
+ * dropdown (FontPicker) can escape the clipped container once the roll
+ * settles. overflow is discrete: it stays hidden through 99%, flips at the
+ * end, and animation-fill (both) keeps it visible afterwards. */
+@keyframes fmenu-roll {
+  0%   { max-height: 0; opacity: 0.5; overflow: hidden; }
+  99%  { overflow: hidden; }
+  100% { max-height: 760px; opacity: 1; overflow: visible; }
+}
+
+/* Dark chrome — driven by the topbar mode toggle (.app--theme-dark on the
+ * root). The SAME toggle that flips the preview's --k-* tokens now flips
+ * the whole UIcockpit shell, so dark mode is tested on the entire interface
+ * (panel + chrome + preview) in one click. Near-black Linear/GitHub palette.
+ * Export/primary buttons reference --app-fg/--app-accent → they invert to a
+ * light high-contrast button automatically. */
+.app--theme-dark {
+  --app-bg:        #0e0e11;
+  --app-surface:   #17171b;
+  --app-fg:        #ededf0;
+  --app-fg-muted:  #a1a1aa;
+  --app-fg-faint:  #6f6f78;
+  --app-border:    #2a2a31;
+  --app-hover:     rgba(255, 255, 255, 0.06);
+  --app-accent:    #ededf0;
+  --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --app-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --app-shadow-lg: 0 18px 60px rgba(0, 0, 0, 0.6);
+  --app-backdrop:  rgba(0, 0, 0, 0.6);
+}
+
+/* Chrome focus ring — keyboard focus only, uses --app-accent so it stays
+   neutral instead of picking up the user's brand color (which would feel
+   like the chrome accidentally inherited the preview theme). */
+.app :focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+/* Reset inside the preview — :focus-visible there uses the user's --k-ring */
+.app .cockpit-preview :focus-visible {
+  outline-color: var(--k-ring, var(--app-accent));
+}
+
+/* Full-width top bar + a body below it. The control menu floats over the
+ * body (absolute) instead of reserving a grid column, so the preview always
+ * gets the full width and the top nav runs continuously across the app. */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--app-bg);
+  color: var(--app-fg);
+  font-size: 13px;
+}
+.app__body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+}
