@@ -888,6 +888,9 @@
   gap: 20px;
 }
 .mkt__footer-links a:hover { color: var(--mkt-fg); }
+.mkt__footer-credit { color: var(--mkt-fg-muted); }
+.mkt__footer-credit a { color: var(--mkt-fg); text-decoration: none; }
+.mkt__footer-credit a:hover { text-decoration: underline; }
 @media (max-width: 600px) {
   .mkt__footer-inner { flex-direction: column; gap: 12px; }
 }

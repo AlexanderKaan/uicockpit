@@ -48,9 +48,13 @@ export function MktFooter({ navigate }: MktFooterProps) {
 
         <div className="mkt__footer-inner mkt__footer-bottom">
           <div>© {new Date().getFullYear()} UIcockpit · Made for vibe-coders</div>
-          <div className="mkt__footer-links">
-            <a href="/docs" onClick={(e) => go(e, '/docs')}>Docs</a>
-            <a href="/app" onClick={(e) => go(e, '/app')}>Launch app</a>
+          <div className="mkt__footer-credit">
+            Made with care by{' '}
+            <a href="https://github.com/AlexanderKaan" target="_blank" rel="noopener noreferrer">Alexander Kaan</a>{' '}
+            at{' '}
+            <a href="https://pageminds.com" target="_blank" rel="noopener noreferrer">Pageminds</a>
+            {' · '}
+            <a href="https://github.com/AlexanderKaan/uicockpit" target="_blank" rel="noopener noreferrer">MIT</a>, free forever
           </div>
         </div>
       </div>
