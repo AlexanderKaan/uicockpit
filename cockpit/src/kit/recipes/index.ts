@@ -289,6 +289,89 @@ export const RECIPES: readonly Recipe[] = [
 }`,
   },
   {
+    id: 'card',
+    section: "Card",
+    css: `/* === Card ================================================================
+ * The fundamental surface container: a bordered, rounded, padded box on the
+ * --k-surface plane that holds any component. Anatomy — .card__head (title +
+ * desc), the flex body (default), .card__row / .card__col for inline / stacked
+ * control clusters, and a hairline-divided .card__foot action zone. Padding
+ * follows --k-pad (the card minimum); the internal rhythm follows --k-space so
+ * raising padding never balloons the gaps (the shadcn p-6 / space-y split). */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space, 16px);
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--k-pad, 24px);
+  background: var(--k-surface);
+  color: var(--k-fg);
+  border: 1px solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  box-shadow: var(--k-shadow-sm);
+}
+/* Header reads as a real product heading (shadcn CardHeader) — sentence-case,
+ * full --k-fg, display font. */
+.card__head { display: flex; flex-direction: column; gap: var(--k-s-2); }
+.card__title { font-weight: 600; font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: -0.01em; line-height: 1.25; }
+.card__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.4; }
+/* Inline cluster (adjacent controls) + stacked cluster — both on the canonical
+ * --k-stack-gap so "the gap between two adjacent controls" is axis-independent. */
+.card__row { display: flex; gap: var(--k-stack-gap, 8px); align-items: center; flex-wrap: wrap; }
+.card__col { display: flex; flex-direction: column; gap: var(--k-s-8); }
+/* Footer action zone (shadcn CardFooter) — a hairline divider anchors the CTA
+ * row to the floor of the card. Holds full-width block buttons on the tight gap. */
+.card__foot {
+  margin-top: var(--k-s-16);
+  padding-top: var(--k-s-16);
+  border-top: var(--k-divider);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-stack-gap, 8px);
+}`,
+  },
+  {
+    id: 'button-group',
+    section: "Button group",
+    css: `/* === Button group ========================================================
+ * A row of buttons fused into one control — shared edges, outer corners follow
+ * the button's own radius (--btn-r, set per .btn). Use for split actions or a
+ * segmented set of equal-weight buttons. Compose with any .btn variant/size. */
+.btn-group { display: inline-flex; }
+.btn-group > .btn { border-radius: 0; }
+.btn-group > .btn:not(:first-child) { margin-left: -1px; }
+.btn-group > .btn:first-child { border-top-left-radius: var(--btn-r); border-bottom-left-radius: var(--btn-r); }
+.btn-group > .btn:last-child { border-top-right-radius: var(--btn-r); border-bottom-right-radius: var(--btn-r); }
+/* Hovered / focused segment lifts above its neighbours so its full border + ring show. */
+.btn-group > .btn:hover, .btn-group > .btn:focus-visible { position: relative; z-index: 1; }`,
+  },
+  {
+    id: 'aspect-ratio',
+    section: "Aspect ratio",
+    css: `/* === Aspect ratio ========================================================
+ * A ratio-locked media box — children fill + cover, so images/maps/embeds keep
+ * their shape across the responsive grid. Rounded + sunken so an empty box still
+ * reads as a placeholder. Pick a ratio modifier (the box owns no intrinsic one). */
+.aspect { position: relative; width: 100%; overflow: hidden; border-radius: var(--k-radius-md); background: var(--k-surface-sunken); }
+.aspect--16x9 { aspect-ratio: 16 / 9; }
+.aspect--1x1 { aspect-ratio: 1 / 1; }
+.aspect > img, .aspect > video, .aspect > iframe, .aspect > .aspect__fill { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; border: 0; }`,
+  },
+  {
+    id: 'scroll-area',
+    section: "Scroll area",
+    css: `/* === Scroll area =========================================================
+ * An overflow container with a slim, token-tinted scrollbar (the browser default
+ * is heavy + off-palette). Thumb sits on a surface-coloured ring so it reads on
+ * any plane; track stays invisible. Set a max-height/height on the element. */
+.scroll-area { overflow: auto; scrollbar-width: thin; scrollbar-color: var(--k-border) transparent; }
+.scroll-area::-webkit-scrollbar { width: 10px; height: 10px; }
+.scroll-area::-webkit-scrollbar-track { background: transparent; }
+.scroll-area::-webkit-scrollbar-thumb { background: var(--k-border); border-radius: 999px; border: 2px solid var(--k-surface); }
+.scroll-area::-webkit-scrollbar-thumb:hover { background: var(--k-fg-faint); }`,
+  },
+  {
     id: 'form',
     section: "Form",
     css: `/* === Form ===
@@ -1199,15 +1282,124 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .navsub__item { display: flex; align-items: center; gap: var(--k-s-8); width: 100%; min-height: var(--k-row-h-sm, 28px); padding: 0 var(--k-row-px, 10px); border-radius: var(--k-row-radius, 6px); font-size: var(--k-type-body); color: var(--k-fg-muted); cursor: pointer; font-weight: var(--k-ui-weight, 500); text-align: left; text-decoration: none; background: none; border: 0; font-family: inherit; appearance: none; -webkit-appearance: none; }
 .navsub__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
 .navsub__item--on { color: var(--k-state-selected-fg, var(--k-primary)); font-weight: 600; }
-.nav-group { font-size: var(--k-type-eyebrow); font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--k-fg-faint); padding: 0 var(--k-row-px, 10px); margin: var(--k-s-14) 0 var(--k-s-4); }
-/* Collapsed rail — icon-only with hover tooltips; group labels → slim dividers. */
-.nav--rail .navrow__label, .nav--rail .navrow__chev, .nav--rail .navsub { display: none; }
-.nav--rail .nav-group { width: 22px; height: 0; margin: var(--k-s-6) auto var(--k-s-4); padding: 0; border-top: var(--k-divider); font-size: 0; overflow: hidden; }
-.nav--rail .nav-group:first-of-type { border-top: 0; margin: 0; }
-.nav--rail .navrow { justify-content: center; gap: 0; padding: 0; position: relative; }
-.nav--rail .navrow[data-tip]::after { content: attr(data-tip); position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%) translateX(-4px); background: var(--k-fg); color: var(--k-bg); padding: var(--k-s-4) var(--k-s-8); border-radius: var(--k-radius-sm, 6px); font-size: var(--k-type-small); font-weight: 500; white-space: nowrap; opacity: 0; pointer-events: none; box-shadow: var(--k-shadow-md); z-index: var(--k-z-tooltip); transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease); }
-.nav--rail .navrow[data-tip]:hover::after { opacity: 1; transform: translateY(-50%) translateX(0); }
-@media (prefers-reduced-motion: reduce) { .nav--rail .navrow[data-tip]::after { transition: none; } }`,
+.nav-group { font-size: var(--k-type-eyebrow); font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--k-fg-faint); padding: 0 var(--k-row-px, 10px); margin: var(--k-s-14) 0 var(--k-s-4); }`,
+  },
+  {
+    id: 'sidebar',
+    section: "Sidebar",
+    css: `/* === Sidebar ============================================================
+ * App-shell navigation column. Sits on the Chrome plane (--k-chrome-bg) so it
+ * responds to the Sidebar treatment — flush (hairline seam), recessed (sunken
+ * well) and panel (floating inset room). Rows reuse the shared .navrow /
+ * .nav-group / .navsub recipe. Collapses to a 64px icon-rail with hover
+ * tooltips; the collapse toggle lives in the brand header. */
+.sidenav {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  gap: var(--k-s-4);
+  padding: var(--k-s-14) var(--k-s-10);
+  background: var(--k-chrome-bg, var(--k-bg));
+  border-right: var(--k-divider);
+  transition:
+    width var(--k-dur, 200ms) var(--k-ease-out, ease),
+    margin var(--k-dur, 200ms) var(--k-ease-out, ease),
+    border-radius var(--k-dur, 200ms) var(--k-ease-out, ease),
+    box-shadow var(--k-dur, 200ms) var(--k-ease-out, ease);
+}
+/* PANEL: a distinct, tinted ROOM — inset from the edges, a soft shadow, and a
+ * border-radius that listens to Box radius (Raycast / Vercel-new). */
+[data-chrome="panel"] .sidenav {
+  margin: var(--k-s-8);
+  border: 1px solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  box-shadow: var(--k-shadow-sm);
+}
+/* RECESSED: a SUNKEN WELL — stays flush, no inset card; --k-chrome-bg carries
+ * the sunken tint and the border-right hairline is the seam where the brighter
+ * content plane lifts above it (macOS / Windows-settings depth). */
+[data-chrome="recessed"] .sidenav { margin: 0; border-radius: 0; box-shadow: none; }
+/* Brand header — app-icon launcher tile + name + the collapse toggle. */
+.sidenav__brand { display: flex; align-items: center; gap: var(--k-s-8); padding: var(--k-s-6) var(--k-s-10) var(--k-s-16); font-weight: 600; }
+.sidenav__icon { width: 26px; height: 26px; border-radius: var(--k-radius-sm); background: var(--k-primary); color: var(--k-primary-fg, #fff); display: grid; place-items: center; flex: none; box-shadow: var(--k-shadow-sm); }
+.sidenav__icon > svg { width: 15px; height: 15px; }
+.sidenav__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--k-font-display); letter-spacing: -0.01em; }
+.sidenav__toggle { display: inline-grid; place-items: center; width: 24px; height: 24px; flex: none; border: 0; border-radius: var(--k-radius-sm, 6px); background: transparent; color: var(--k-fg-faint); cursor: pointer; transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease), color var(--k-dur-fast, 140ms); }
+.sidenav__toggle:hover { background: var(--k-state-hover); color: var(--k-fg); }
+.sidenav__toggle > svg { width: 16px; height: 16px; }
+/* Pinned footer — Settings + a launcher pushed to the floor of the column. */
+.sidenav__foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--k-s-4); padding-top: var(--k-s-6); }
+/* ---- Rail (collapsed) ---- icon-only; labels, group text, sub-lists, the app
+ * icon and the name all collapse away, leaving centered icons + tooltips. */
+.sidenav--rail { width: 64px; padding-left: var(--k-s-8); padding-right: var(--k-s-8); }
+.sidenav--rail .sidenav__brand { padding: var(--k-s-6) 0 var(--k-s-16); justify-content: center; }
+.sidenav--rail .sidenav__icon,
+.sidenav--rail .sidenav__name,
+.sidenav--rail .navrow__label,
+.sidenav--rail .navrow__chev,
+.sidenav--rail .navsub { display: none; }
+.sidenav--rail .sidenav__toggle { margin: 0 auto; }
+/* Group labels collapse to slim centered dividers; the first one is dropped. */
+.sidenav--rail .nav-group { width: 22px; height: 0; margin: var(--k-s-6) auto var(--k-s-4); padding: 0; border-top: var(--k-divider); font-size: 0; overflow: hidden; }
+.sidenav--rail .nav-group:first-of-type { border-top: 0; margin: 0; }
+.sidenav--rail .sidenav__foot { border-top: var(--k-divider); padding-top: var(--k-s-8); }
+.sidenav--rail .navrow { justify-content: center; gap: 0; padding: var(--k-s-8) 0; position: relative; }
+/* An unread count badge collapses to a small corner dot on the icon. */
+.sidenav--rail .navrow .badge--count { position: absolute; top: 4px; right: 9px; min-width: 8px; width: 8px; height: 8px; padding: 0; font-size: 0; border: 1.5px solid var(--k-chrome-bg, var(--k-surface-sunken)); }
+/* Hover tooltip — flies out to the right of the rail (CSS-only, data-tip). */
+.sidenav--rail .navrow[data-tip]::after,
+.sidenav--rail .sidenav__toggle[data-tip]::after { content: attr(data-tip); position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%) translateX(-4px); background: var(--k-fg); color: var(--k-bg); padding: var(--k-s-4) var(--k-s-8); border-radius: var(--k-radius-sm, 6px); font-size: var(--k-type-small); font-weight: 500; white-space: nowrap; opacity: 0; pointer-events: none; box-shadow: var(--k-shadow-md); z-index: var(--k-z-tooltip); transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease); }
+.sidenav--rail .navrow[data-tip]:hover::after,
+.sidenav--rail .sidenav__toggle[data-tip]:hover::after { opacity: 1; transform: translateY(-50%) translateX(0); }
+@media (prefers-reduced-motion: reduce) {
+  .sidenav--rail .navrow[data-tip]::after,
+  .sidenav--rail .sidenav__toggle[data-tip]::after { transition: none; }
+}`,
+  },
+  {
+    id: 'activity-feed',
+    section: "Activity feed",
+    css: `/* === Activity feed ======================================================
+ * A vertical event stream — a status-coloured dot, the event text, and a
+ * trailing timestamp, with hairline-separated rows. The .activity__dot colour
+ * is set by the consumer to carry status semantics. */
+.activity { display: flex; flex-direction: column; gap: var(--k-s-10); }
+.activity__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--k-s-10);
+  font-size: var(--k-type-small);
+  padding: var(--k-s-8) 0;
+  border-bottom: var(--k-divider);
+}
+.activity__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: var(--k-s-6);
+  flex: none;
+}
+.activity__meta { color: var(--k-fg-faint); font-size: var(--k-type-eyebrow); margin-left: auto; }`,
+  },
+  {
+    id: 'danger-zone',
+    section: "Danger zone",
+    css: `/* === Danger zone ========================================================
+ * A bordered panel that fences off destructive / irreversible settings
+ * (delete account, transfer ownership). Danger-hued border + heading. */
+.dangerzone {
+  border: 1px solid var(--k-danger);
+  border-radius: var(--k-radius-lg);
+  padding: var(--k-pad, 24px);
+  margin-top: var(--k-s-24);
+}
+.dangerzone__head {
+  font-weight: 600;
+  /* Header text sits on the card surface (transparent over white/dark), so use
+   * the actual --k-danger hue. *-fg is reserved for text ON a coloured fill. */
+  color: var(--k-danger);
+  margin-bottom: var(--k-s-6);
+}`,
   },
   {
     id: 'interactive-list-row',
@@ -1371,9 +1563,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }`,
   },
   {
-    id: 'code-block',
-    section: "Code block",
-    css: `/* === Code block === */
+    id: 'code',
+    section: "Code",
+    css: `/* === Code (inline) =======================================================
+ * Inline monospace token on the sunken plane. The multi-line block with a copy
+ * button + gutter is the separate "CodeBlock" recipe (.codeblock). */
 .code {
   font-family: var(--k-font-mono);
   font-size: var(--k-type-small);
@@ -1384,31 +1578,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border: 1px solid var(--k-border);
   white-space: pre;
   overflow-x: auto;
-}
-/* Wrapper allowing a floating copy button in the top-right corner.
-   Pattern: <div class="code-block"><pre class="code">...</pre><button class="code-block__copy">…</button></div> */
-.code-block { position: relative; }
-.code-block__copy {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-4);
-  padding: var(--k-s-4) var(--k-s-8);
-  font-size: var(--k-type-eyebrow);
-  font-family: var(--k-font-body);
-  color: var(--k-fg-muted);
-  background: var(--k-surface-raised);
-  border: 1px solid var(--k-border);
-  border-radius: var(--k-radius-md);
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-.code-block:hover .code-block__copy,
-.code-block:focus-within .code-block__copy { opacity: 1; }
-.code-block__copy:hover { color: var(--k-fg); background: var(--k-state-hover); }`,
+}`,
   },
   {
     id: 'dialog',
@@ -1813,40 +1983,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .kanban__prio i { height: 1.5px; border-radius: 1px; background: currentColor; }`,
   },
   {
-    id: 'upgrade-banner',
-    section: "Upgrade banner",
-    css: `/* === Upgrade banner ===
-   Dismissible promo strip — used on dashboard Overview. Gradient stripe on
-   left edge picks up the brand fill so it reads as "from this product". */
-.upgrade-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-12);
-  padding: var(--k-space, 16px);
-  background: var(--k-primary-soft);
-  color: var(--k-fg);
-  border: 1px solid var(--k-border);
-  border-left: 3px solid var(--k-primary);
-  border-radius: var(--k-radius-md);
-  font-size: var(--k-type-small);
-  margin-bottom: var(--k-s-16);
-  animation: var(--k-anim-fade-in, k-fade-in 200ms ease) backwards;
-}
-.upgrade-banner__icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--k-primary);
-  color: var(--k-primary-fg);
-  display: inline-grid;
-  place-items: center;
-  flex: none;
-}
-.upgrade-banner__body { flex: 1; min-width: 0; }
-.upgrade-banner__title { font-weight: 600; }
-.upgrade-banner__sub { color: var(--k-fg-muted); font-size: var(--k-type-small); margin-top: 1px; }`,
-  },
-  {
     id: 'sparkline',
     section: "Sparkline",
     css: `/* === Sparkline ===
@@ -1908,75 +2044,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .usage--danger .usage__fill { background: var(--k-danger); }
 .usage__foot { display: flex; align-items: center; justify-content: space-between; }
 .usage__hint { font-size: var(--k-type-caption); color: var(--k-fg-muted); }`,
-  },
-  {
-    id: 'quick-actions-grid',
-    section: "Quick actions grid",
-    css: `/* === Quick actions grid ===
-   4 icon tiles for dashboard. Each tile is a button with icon-stack-label. */
-.quickact {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--k-s-10);
-}
-@media (max-width: 700px) { .quickact { grid-template-columns: repeat(2, 1fr); } }
-.quickact__tile {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--k-s-8);
-  padding: var(--k-space, 16px);
-  border: 1px solid var(--k-border);
-  border-radius: var(--k-radius-md);
-  background: var(--k-surface);
-  cursor: pointer;
-  text-align: left;
-  transition: border-color var(--k-dur, 200ms) var(--k-ease, ease), box-shadow var(--k-dur, 200ms), transform var(--k-dur, 200ms);
-}
-/* Hover-state SYSTEM (consistency rule):
-   · Discrete CARDS / TILES (gaps between them) → border accent + subtle
-     shadow + 1px lift. Clean, no grey fill. (.quickact__tile / .stat-tile--
-     clickable / .product-card share this exact treatment.)
-   · LIST / MENU / TABLE ROWS (tightly stacked) → grey bg overlay
-     (--k-state-hover). A border per row reads as noise; the fill is the
-     standard list-row affordance (Gmail / Linear / Notion). */
-.quickact__tile:hover {
-  border-color: var(--k-state-border);
-  box-shadow: var(--k-shadow-sm);
-  transform: translateY(-1px);
-}
-.quickact__icon {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--k-radius-md);
-  background: var(--k-primary-soft);
-  color: var(--k-primary-soft-fg);
-  display: inline-grid;
-  place-items: center;
-}
-.quickact__label { font-weight: 500; font-size: var(--k-type-small); }
-.quickact__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); }`,
-  },
-  {
-    id: 'team-online-widget',
-    section: "Team-online widget",
-    css: `/* === Team-online widget === */
-.team-online {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--k-space, 16px);
-  border: 1px solid var(--k-border);
-  border-radius: var(--k-radius-md);
-  background: var(--k-surface);
-}
-.team-online__label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-2);
-}
-.team-online__count { font-weight: 600; font-size: var(--k-type-small); }
-.team-online__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); }`,
   },
   {
     id: 'combobox',
@@ -2338,25 +2405,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .taginput input:focus,
 .taginput input:focus-visible { outline: 0; }`,
-  },
-  {
-    id: 'rating',
-    section: "Rating",
-    css: `/* === Rating ===
-   Star rating, hover-preview + click-set. SVG stars inherit fill via color. */
-.rating { display: inline-flex; gap: var(--k-s-2); }
-.rating__star {
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  padding: var(--k-s-2);
-  color: var(--k-fg-faint);
-  display: inline-flex;
-  transition: color var(--k-dur-fast, 120ms) var(--k-ease, ease), transform var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-.rating__star:hover { transform: scale(1.15); }
-.rating__star--on { color: var(--k-warning); }
-.rating__label { margin-left: var(--k-s-6); font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); align-self: center; }`,
   },
   {
     id: 'popover',
@@ -2816,123 +2864,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .stat-tile-strip__cell:nth-last-child(-n+2) { border-bottom: 0; }`,
   },
   {
-    id: 'composer',
-    section: "Composer",
-    css: `/* === Composer (#112) ===================================================
- * AI/chat input bar. Two zones inside a tactile container:
- *   Top: textarea, no border, transparent bg — bleeds into the container.
- *   Bottom: tool chips left, voice + send right.
- * Send button color-pops when text is present (.composer--ready). */
-.composer {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-8);
-  padding: var(--k-s-10) var(--k-s-10) var(--k-s-8);
-  background: var(--k-surface-2);
-  border-radius: calc(var(--k-radius-lg) - 2px);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  /* Flat default — same input philosophy as .in (shadcn-aligned). */
-  box-shadow: none;
-  transition: box-shadow var(--k-dur, 200ms) var(--k-ease, ease);
-}
-.composer:focus-within {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  border-color: var(--k-ring);
-  box-shadow: 0 0 0 3px var(--k-ring-halo);
-}
-.composer__input {
-  background: transparent;
-  border: 0;
-  outline: 0;
-  resize: none;
-  color: var(--k-fg);
-  font: inherit;
-  font-size: var(--k-type-small);
-  padding: var(--k-s-6) var(--k-s-6) var(--k-s-4);
-  width: 100%;
-  font-family: var(--k-font-body);
-  line-height: 1.45;
-  text-rendering: geometricPrecision;
-}
-.composer__input::placeholder { color: var(--k-fg-faint); }
-/* Suppress per-field outline — wrapper owns the focus indicator (see
- * .numinput__field:focus rule for the system pattern). */
-.composer__input:focus,
-.composer__input:focus-visible { outline: 0; }
-.composer__bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--k-s-8);
-}
-.composer__tools, .composer__send {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-6);
-  min-width: 0;
-}
-.composer__tools { overflow: hidden; }
-.composer__attach,
-.composer__voice {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  background: transparent;
-  border: 0;
-  color: var(--k-fg-muted);
-  cursor: pointer;
-  transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease), color var(--k-dur-fast, 110ms) var(--k-ease, ease);
-}
-.composer__attach:hover,
-.composer__voice:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.composer__attach svg, .composer__voice svg { width: 13px; height: 13px; }
-.composer__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-4);
-  padding: var(--k-s-4) var(--k-s-10) var(--k-s-4) var(--k-s-8);
-  border-radius: 999px;
-  background: var(--k-surface);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  color: var(--k-fg-muted);
-  font-size: var(--k-type-eyebrow);
-  font-weight: 500;
-  font-family: var(--k-font-body);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease), color var(--k-dur-fast, 110ms) var(--k-ease, ease);
-}
-.composer__chip:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.composer__chip svg { width: 10px; height: 10px; flex-shrink: 0; }
-.composer__chip--more { padding: var(--k-s-4) var(--k-s-6); }
-.composer__submit {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  border: 0;
-  cursor: pointer;
-  background: var(--k-fg);
-  color: var(--k-bg);
-  transition:
-    background var(--k-dur-fast, 110ms) var(--k-ease, ease),
-    transform 140ms var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
-}
-.composer__submit:disabled { opacity: 0.4; cursor: not-allowed; }
-.composer--ready .composer__submit:not(:disabled) {
-  background: var(--k-primary);
-  color: var(--k-primary-fg);
-}
-.composer__submit:not(:disabled):hover { transform: translateY(-1px); }
-.composer__submit svg { width: 12px; height: 12px; }`,
-  },
-  {
     id: 'attachment-chip-family',
     section: "Attachment chip family",
     css: `/* === Attachment chip family (#113) ====================================
@@ -3007,206 +2938,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease);
 }
 .att-chip__x:hover { background: var(--k-state-hover); color: var(--k-fg); }`,
-  },
-  {
-    id: 'waveform-voice-eq',
-    section: "Waveform + voice eq",
-    css: `/* === Waveform + voice eq (#114) =======================================
- * Waveform: 26 vertical bars between two timestamps. Played portion uses
- * --k-primary, unplayed uses --k-fg-faint. Cursor implicit (transition
- * between played/unplayed colors).
- * Voice eq: 7 centered bars with staggered scaleY animation. Mic button
- * pulses subtly to indicate recording state. */
-.wave {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-10);
-}
-.wave__time {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-}
-.wave__bars {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-2);
-  height: 28px;
-}
-.wave__bar {
-  flex: 1;
-  background: var(--k-fg-faint);
-  border-radius: 1px;
-  min-height: 2px;
-  transition: background var(--k-dur, 200ms) var(--k-ease, ease);
-}
-.wave__bar--played { background: var(--k-primary); }
-
-.eq {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-10);
-  padding: var(--k-s-10) var(--k-s-12);
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-}
-.eq__mic {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  border: 0;
-  background: var(--k-danger);
-  color: var(--k-danger-fg);
-  cursor: pointer;
-  position: relative;
-}
-.eq__mic::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 999px;
-  border: 2px solid var(--k-danger);
-  opacity: 0.4;
-  animation: eq-pulse 1.6s cubic-bezier(.4, 0, .2, 1) infinite;
-}
-@keyframes eq-pulse {
-  0%   { transform: scale(1);    opacity: 0.5; }
-  100% { transform: scale(1.35); opacity: 0; }
-}
-.eq__mic svg { width: 14px; height: 14px; }
-.eq__bars {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--k-s-2);
-  height: 28px;
-}
-.eq__bar {
-  width: 3px;
-  background: var(--k-primary);
-  border-radius: 2px;
-  animation: eq-bar 1.2s cubic-bezier(.4, 0, .2, 1) infinite;
-}
-@keyframes eq-bar {
-  0%, 100% { height: 6px;  opacity: 0.4; }
-  50%      { height: 22px; opacity: 1;   }
-}
-.eq__label {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-  flex-shrink: 0;
-}`,
-  },
-  {
-    id: 'floating-action-stack',
-    section: "Floating action stack",
-    css: `/* === Floating action stack (#115) =====================================
- * Vertical column of round icon buttons with right-side labels. Active
- * row gets primary background + ring. Labels stay visible in the gallery
- * card (in real use, they appear on hover). */
-.fab-stack-wrap {
-  display: flex;
-  justify-content: center;
-  padding: var(--k-s-4) 0;
-}
-.fab-stack {
-  list-style: none;
-  margin: 0;
-  padding: var(--k-s-8);
-  /* Nested radius — children buttons read this so their hover/active
-   * corners visually nest inside the container's rounded corners.
-   * Math: outer (radius-lg) − padding (8px). */
-  --k-nest-radius: max(4px, calc(var(--k-radius-lg) - 8px));
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-4);
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-lg);
-  box-shadow: var(--k-shadow-tactile);
-}
-.fab-stack li {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-10);
-}
-/* FAB stack buttons — square containers that match the LG row height
- * (40px) so the stack visually aligns with sidebar nav width. Width =
- * height keeps the icon centered in a touch-friendly square. */
-.fab-stack__btn {
-  flex-shrink: 0;
-  width: var(--k-row-h-lg, 40px);
-  height: var(--k-row-h-lg, 40px);
-  display: grid;
-  place-items: center;
-  border-radius: var(--k-nest-radius, var(--k-row-radius, 6px));
-  border: 0;
-  background: transparent;
-  color: var(--k-fg-muted);
-  cursor: pointer;
-  transition:
-    background var(--k-dur-fast, 110ms) var(--k-ease, ease),
-    color var(--k-dur-fast, 110ms) var(--k-ease, ease),
-    transform 140ms var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
-}
-.fab-stack__btn svg { width: var(--k-row-icon, 14px); height: var(--k-row-icon, 14px); }
-.fab-stack__btn:hover { background: var(--k-state-hover); color: var(--k-fg); transform: scale(1.06); }
-.fab-stack__btn--active {
-  background: var(--k-primary);
-  color: var(--k-primary-fg);
-  box-shadow: var(--k-shadow-tactile);
-}
-.fab-stack__btn--active:hover { background: var(--k-primary-hover); color: var(--k-primary-fg); }
-.fab-stack__btn svg { width: 14px; height: 14px; }
-.fab-stack__lbl {
-  font-size: var(--k-type-small);
-  font-weight: 500;
-  color: var(--k-fg);
-}`,
-  },
-  {
-    id: 'hover-preview-tooltip',
-    section: "Hover preview tooltip",
-    css: `/* === Hover preview tooltip (#116) =====================================
- * Card with thumbnail + title/subtitle stack. Two rows: one with icon-box
- * thumb, one with avatar-style thumb. Demonstrates two slot patterns. */
-.hpv {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-6);
-}
-.hpv__row {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-10);
-  padding: var(--k-s-8);
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-}
-.hpv__thumb {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--k-radius-sm);
-  font-size: var(--k-type-small);
-  font-weight: 600;
-}
-.hpv__thumb--icon { background: var(--k-info-soft); color: var(--k-info); }
-.hpv__thumb--avatar { background: var(--k-primary); color: var(--k-primary-fg); border-radius: 999px; }
-.hpv__thumb svg { width: 14px; height: 14px; }
-.hpv__body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.hpv__title { font-size: var(--k-type-body); font-weight: 600; color: var(--k-fg); }
-.hpv__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); }`,
   },
   {
     id: 'inline-status-meta-micro-components',
@@ -3287,22 +3018,25 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-muted);
 }
 .meta-notif svg { width: 14px; height: 14px; flex: none; }
+/* Unread indicator — a clean corner DOT, not a number. A count pill would
+ * overlap the bell glyph inside the tight 28px button; the count itself lives
+ * where there's room (the Inbox row's .badge--count, a "N unread" label). The
+ * surface ring lifts the dot off the icon. Any numeric child stays in the DOM
+ * for screen-readers but is clipped to the dot. */
 .meta-notif__dot {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 14px;
-  height: 14px;
-  padding: 0 var(--k-s-4);
+  top: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  min-width: 0;
+  padding: 0;
   border-radius: 999px;
   background: var(--k-danger);
-  color: var(--k-danger-fg);
-  font-size: var(--k-type-caption);
-  font-weight: 700;
-  display: grid;
-  place-items: center;
-  line-height: 1;
-  border: 2px solid var(--k-surface);
+  border: 1.5px solid var(--k-surface);
+  box-sizing: content-box;
+  font-size: 0;
+  overflow: hidden;
 }
 .meta-sort {
   display: inline-flex;
@@ -3326,254 +3060,32 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .meta-sort--asc .meta-sort__arrow { color: var(--k-fg-muted); }`,
   },
   {
-    id: 'activity-heatmap',
-    section: "Activity heatmap",
-    css: `/* === Activity heatmap (#118) ==========================================
- * Mini bars under date labels. Bar height = activity level, opacity also
- * scales (so empty days fade rather than disappear). Two-week view. */
-.heat {
-  display: flex;
-  gap: var(--k-s-4);
-  padding: var(--k-s-6) var(--k-s-2) 0;
+    id: 'carousel',
+    section: "Carousel",
+    css: `/* === Carousel (.carousel) — shadcn gap filler ========================
+ * Sliding track of equal-width slides + absolute prev/next arrows. Dots
+ * reuse the existing .cdots component. Radius follows the Box token. */
+.carousel { display: flex; flex-direction: column; gap: var(--k-s-12); }
+.carousel__viewport { position: relative; overflow: hidden; border-radius: var(--k-radius-lg); }
+.carousel__track { display: flex; transition: transform var(--k-dur, 280ms) var(--k-ease, ease); }
+.carousel__slide {
+  flex: 0 0 100%; aspect-ratio: 16 / 7; display: flex; align-items: flex-end;
+  padding: var(--k-s-16); color: #fff;
 }
-.heat__col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--k-s-4);
+.carousel__caption { font-size: var(--k-type-body); font-weight: 600; text-shadow: 0 1px 3px hsl(0 0% 0% / 0.4); }
+.carousel__arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
+  display: grid; place-items: center; color: var(--k-fg);
+  background: var(--k-surface); box-shadow: var(--k-shadow-md, 0 2px 8px hsl(0 0% 0% / 0.18));
 }
-.heat__bar {
-  width: 100%;
-  max-width: 10px;
-  background: var(--k-primary);
-  border-radius: 2px;
-  min-height: 2px;
-  animation: heat-rise 500ms cubic-bezier(.05, .7, .1, 1) both;
-  animation-delay: calc(var(--card-i, 0) * 0ms + 200ms);
-}
-@keyframes heat-rise {
-  from { transform: scaleY(0); transform-origin: bottom; }
-  to   { transform: scaleY(1); }
-}
-.heat__lbl {
-  font-size: var(--k-type-caption);
-  color: var(--k-fg-faint);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-}`,
-  },
-  {
-    id: 'profile-header',
-    section: "Profile header",
-    css: `/* === Profile header (#122) =============================================
- * Cover band + avatar overlap. The avatar visually pulls 22px up over the
- * cover (negative margin-top). CTAs align right of avatar baseline. */
-.profile {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-4);
-  margin: calc(var(--k-s-10) * -1) calc(var(--k-s-10) * -1) 0;
-  padding: 0 var(--k-s-10) var(--k-s-4);
-}
-.profile__cover {
-  height: 60px;
-  background: linear-gradient(135deg, var(--k-primary), var(--k-secondary, var(--k-accent, var(--k-primary))));
-  border-radius: var(--k-radius-md) var(--k-radius-md) 0 0;
-  margin: 0 calc(var(--k-s-10) * -1);
-}
-.profile__head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-top: calc(var(--k-s-20) * -1);
-}
-.profile__avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--k-primary-soft);
-  color: var(--k-primary-soft-fg);
-  display: grid;
-  place-items: center;
-  font-size: var(--k-type-h2);
-  font-weight: 600;
-  font-family: var(--k-font-display);
-  border: 3px solid var(--k-surface);
-}
-.profile__ctas {
-  display: flex;
-  gap: var(--k-s-6);
-  padding-bottom: var(--k-s-2);
-}
-.profile__name {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-4);
-  margin-top: var(--k-s-8);
-  font-size: var(--k-type-body);
-  font-weight: 600;
-  color: var(--k-fg);
-  font-family: var(--k-font-display);
-}
-.profile__handle {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-}
-.profile__bio {
-  font-size: var(--k-type-small);
-  color: var(--k-fg);
-  line-height: 1.45;
-  margin-top: var(--k-s-4);
-}
-.profile__chips {
-  display: flex;
-  gap: var(--k-s-10);
-  margin-top: var(--k-s-6);
-  flex-wrap: wrap;
-}
-.profile__chip {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-}
-.profile__chip b {
-  color: var(--k-fg);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  margin-right: var(--k-s-2);
-}
+.carousel__arrow:hover { background: var(--k-state-hover); }
+.carousel__arrow--prev { left: var(--k-s-10); }
+.carousel__arrow--next { right: var(--k-s-10); }
 
-.ag-av {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--k-primary-soft);
-  color: var(--k-primary-soft-fg);
-  display: grid;
-  place-items: center;
-  font-size: var(--k-type-eyebrow);
-  font-weight: 600;
-  border: 2px solid var(--k-surface);
-  margin-left: calc(var(--k-s-8) * -1);
-}
-.ag-av:first-child { margin-left: 0; }
-.ag-av--more { background: var(--k-fg-faint); color: var(--k-bg); }`,
-  },
-  {
-    id: 'currency-input-measured-range',
-    section: "Currency input + measured range",
-    css: `/* === Currency input + measured range (#124) ===========================
- * Large numeral entry. Field is borderless inside a styled wrapper with
- * left currency sigil and right unit suffix. */
-.curinp {
-  display: flex;
-  align-items: baseline;
-  gap: var(--k-s-6);
-  padding: var(--k-s-14) var(--k-s-16);
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-  /* Flat default — focus state handled by .curinp:focus-within if added. */
-  box-shadow: none;
-}
-.curinp:focus-within {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  border-color: var(--k-ring);
-  box-shadow: 0 0 0 3px var(--k-ring-halo);
-}
-.curinp__sym {
-  font-size: var(--k-type-h2);
-  font-weight: 500;
-  color: var(--k-fg-muted);
-  font-family: var(--k-font-display);
-}
-.curinp__field {
-  flex: 1;
-  background: transparent;
-  border: 0;
-  outline: 0;
-  color: var(--k-fg);
-  font-family: var(--k-font-display);
-  font-size: var(--k-type-h1);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  min-width: 0;
-  padding: 0;
-  width: 100%;
-  text-rendering: geometricPrecision;
-}
-/* Suppress inner-field outline — wrapper owns the focus indicator. */
-.curinp__field:focus,
-.curinp__field:focus-visible { outline: 0; }
-.curinp__sfx {
-  font-size: var(--k-type-small);
-  color: var(--k-fg-muted);
-  white-space: nowrap;
-}
-.mrange {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-6);
-  padding: var(--k-s-4) var(--k-s-6) 0;
-}
-.mrange__track {
-  position: relative;
-  height: 4px;
-  background: var(--k-track, var(--k-surface-2));
-  border-radius: 2px;
-  border: var(--k-hairline, 1px solid var(--k-border));
-}
-.mrange__fill {
-  display: block;
-  height: 100%;
-  background: var(--k-primary);
-  border-radius: 2px;
-  transition: width var(--k-dur-fast, 110ms) var(--k-ease, ease);
-}
-.mrange__thumb {
-  position: absolute;
-  top: 50%;
-  /* Identical to .slider__knob: white/surface fill + 2px brand rim, scales with
-     Scale, ALWAYS round (shape-locked metaphor). (This thumb mirrors the € field's
-     value — it isn't dragged, so it has no drag/focus selection ring.) */
-  width: var(--k-slider-knob, 16px);
-  height: var(--k-slider-knob, 16px);
-  border-radius: 50%;
-  background: var(--k-surface);
-  border: 2px solid var(--k-primary);
-  transform: translate(-50%, -50%);
-  box-shadow: var(--k-shadow-sm);
-  transition: left var(--k-dur-fast, 110ms) var(--k-ease, ease);
-}
-.mrange__ticks {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--k-s-2);
-}
-.mrange__tick {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--k-s-2);
-}
-.mrange__tick-mark {
-  width: 1px;
-  height: 4px;
-  background: var(--k-fg-faint);
-  opacity: 0.4;
-}
-.mrange__tick-lbl {
-  font-size: var(--k-type-caption);
-  color: var(--k-fg-faint);
-  font-variant-numeric: tabular-nums;
-}`,
-  },
-  {
-    id: 'carousel-dots',
-    section: "Carousel dots",
-    css: `/* === Carousel dots (#125) ============================================ */
+/* ----- Pagination dots (.cdots) — the carousel's position indicator; also
+ * reusable standalone for onboarding / story progress. Three shapes via a
+ * modifier: dots (default), numbers (--num), segment bars (--bars). ----- */
 .cdots {
   display: flex;
   align-items: center;
@@ -3650,30 +3162,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }`,
   },
   {
-    id: 'carousel',
-    section: "Carousel",
-    css: `/* === Carousel (.carousel) — shadcn gap filler ========================
- * Sliding track of equal-width slides + absolute prev/next arrows. Dots
- * reuse the existing .cdots component. Radius follows the Box token. */
-.carousel { display: flex; flex-direction: column; gap: var(--k-s-12); }
-.carousel__viewport { position: relative; overflow: hidden; border-radius: var(--k-radius-lg); }
-.carousel__track { display: flex; transition: transform var(--k-dur, 280ms) var(--k-ease, ease); }
-.carousel__slide {
-  flex: 0 0 100%; aspect-ratio: 16 / 7; display: flex; align-items: flex-end;
-  padding: var(--k-s-16); color: #fff;
-}
-.carousel__caption { font-size: var(--k-type-body); font-weight: 600; text-shadow: 0 1px 3px hsl(0 0% 0% / 0.4); }
-.carousel__arrow {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
-  display: grid; place-items: center; color: var(--k-fg);
-  background: var(--k-surface); box-shadow: var(--k-shadow-md, 0 2px 8px hsl(0 0% 0% / 0.18));
-}
-.carousel__arrow:hover { background: var(--k-state-hover); }
-.carousel__arrow--prev { left: var(--k-s-10); }
-.carousel__arrow--next { right: var(--k-s-10); }`,
-  },
-  {
     id: 'navigation-menu',
     section: "Navigation menu",
     css: `/* === Navigation menu (.navmenu) — shadcn gap filler ==================
@@ -3707,432 +3195,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .ctxmenu__hint { pointer-events: none; }
 .ctxmenu__pop { position: absolute; min-width: 184px; z-index: 20; }`,
-  },
-  {
-    id: 'polish-bits',
-    section: "Polish bits",
-    css: `/* === Polish bits (#126) ===============================================
- * Drag handle (6 dots in a 2×3), onboarding step list, theme pill. */
-.polish-row {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-10);
-  padding: var(--k-s-8) var(--k-s-10);
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-}
-.drag-handle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: var(--k-s-2);
-  width: 10px;
-  height: 14px;
-  cursor: grab;
-}
-.drag-handle span {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--k-fg-faint);
-}
-.onb {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-2);
-  position: relative;
-}
-.onb::before {
-  content: '';
-  position: absolute;
-  left: 12px;
-  top: 12px;
-  bottom: 12px;
-  width: 1.5px;
-  background: var(--k-border);
-}
-.onb__step {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-10);
-  padding: var(--k-s-4) 0;
-  position: relative;
-  z-index: 1;
-}
-.onb__dot {
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--k-surface);
-  border: 1.5px solid var(--k-border);
-  color: var(--k-fg-muted);
-  font-size: var(--k-type-eyebrow);
-  font-weight: 600;
-  display: grid;
-  place-items: center;
-}
-.onb__dot svg { width: 11px; height: 11px; }
-.onb__step--done .onb__dot {
-  background: var(--k-primary);
-  color: var(--k-primary-fg);
-  border-color: transparent;
-}
-.onb__step--current .onb__dot {
-  border-color: var(--k-primary);
-  color: var(--k-primary);
-  background: var(--k-primary-soft);
-}
-.onb__lbl {
-  font-size: var(--k-type-small);
-  color: var(--k-fg-muted);
-}
-.onb__step--done .onb__lbl { color: var(--k-fg); text-decoration: line-through; opacity: 0.6; }
-.onb__step--current .onb__lbl { color: var(--k-fg); font-weight: 500; }
-
-.theme-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-  padding: var(--k-s-2);
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: 999px;
-  align-self: flex-start;
-}
-.theme-pill__opt {
-  width: 26px;
-  height: 22px;
-  border-radius: 999px;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-}
-.theme-pill__opt--on { background: var(--k-surface); box-shadow: var(--k-shadow-tactile); }
-.theme-pill__sun, .theme-pill__moon, .theme-pill__auto {
-  display: block;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--k-fg-muted);
-}
-.theme-pill__moon { background: linear-gradient(90deg, transparent 50%, var(--k-fg-muted) 50%); }
-.theme-pill__auto {
-  background: conic-gradient(from 270deg, var(--k-fg-muted) 50%, transparent 50%);
-  border: 1.5px solid var(--k-fg-muted);
-}`,
-  },
-  {
-    id: 'glass-card',
-    section: "Glass card",
-    css: `/* === Glass card (#127) ================================================
- * Frosted-glass panel over a vivid gradient background. The glass uses
- * --k-glass-bg / --k-glass-blur / --k-glass-edge — the three system
- * tokens that encode the iOS 18 / visionOS aesthetic. */
-.glass-wrap {
-  position: relative;
-  padding: var(--k-s-14);
-  border-radius: var(--k-radius-md);
-  overflow: hidden;
-  min-height: 130px;
-  display: flex;
-  align-items: center;
-}
-.glass-bg {
-  position: absolute;
-  inset: -20px;
-  background:
-    radial-gradient(circle at 25% 25%, var(--k-primary), transparent 55%),
-    radial-gradient(circle at 75% 75%, var(--k-secondary, var(--k-accent, var(--k-primary))), transparent 55%),
-    var(--k-primary-soft);
-  filter: saturate(140%);
-}
-.glass {
-  position: relative;
-  width: 100%;
-  padding: var(--k-s-12);
-  background: var(--k-glass-bg);
-  backdrop-filter: var(--k-glass-blur, saturate(180%) blur(12px));
-  -webkit-backdrop-filter: var(--k-glass-blur, saturate(180%) blur(12px));
-  border-radius: calc(var(--k-radius-md) - 4px);
-  box-shadow: var(--k-glass-edge), 0 8px 24px hsl(0 0% 0% / 0.18);
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-8);
-}
-.glass__title {
-  font-size: var(--k-type-caption);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--k-fg);
-  opacity: 0.7;
-}
-.glass__row {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-10);
-}
-.glass__thumb {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, var(--k-primary), var(--k-secondary, var(--k-accent, var(--k-primary))));
-  flex-shrink: 0;
-}
-.glass__body { flex: 1; min-width: 0; }
-.glass__name {
-  font-size: var(--k-type-small);
-  font-weight: 600;
-  color: var(--k-fg);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.glass__sub {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg);
-  opacity: 0.65;
-}
-.glass__btn {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 0;
-  background: var(--k-fg);
-  color: var(--k-bg);
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-}`,
-  },
-  {
-    id: 'mobile-shell',
-    section: "MOBILE SHELL",
-    css: `/* === MOBILE SHELL (Tier 4) ==============================================
- * .m-shell is a sandbox container that mimics a phone-frame so the
- * top-bar / tab-bar / bottom-sheet components render at "mobile scale"
- * inside the gallery card. Real apps just use the inner components. */
-.m-shell {
-  background: var(--k-bg);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-  overflow: hidden;
-  position: relative;
-  min-height: 140px;
-}
-.m-shell--tabs { min-height: 56px; }
-
-/* Status bar — thin row simulating iOS status (time + signal) */
-.m-statusbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--k-s-4) var(--k-s-12);
-  font-size: var(--k-type-caption);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--k-fg);
-}
-.m-statusbar__center { flex: 1; }`,
-  },
-  {
-    id: 'mobiletopbar',
-    section: "MobileTopBar",
-    css: `/* === MobileTopBar (Tier 4 #1) === */
-.m-topbar {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-8);
-  padding: var(--k-s-8) var(--k-s-12);
-  min-height: 44px;
-  background: var(--k-surface);
-  transition: background var(--k-dur, 200ms) var(--k-ease, ease);
-}
-/* Scrolled state — hairline border + ambient shadow signals "content
- * below has scrolled". At-top this is transparent. */
-.m-topbar--scrolled {
-  border-bottom: var(--k-divider);
-  box-shadow: var(--k-shadow-sm);
-}
-.m-topbar__icon {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  border: 0;
-  background: transparent;
-  color: var(--k-fg);
-  cursor: pointer;
-  transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease);
-}
-.m-topbar__icon:hover { background: var(--k-state-hover); }
-.m-topbar__title {
-  flex: 1;
-  text-align: center;
-  font-size: var(--k-type-body);
-  font-weight: 600;
-  color: var(--k-fg);
-  font-family: var(--k-font-display);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}`,
-  },
-  {
-    id: 'mobiletabbar',
-    section: "MobileTabBar",
-    css: `/* === MobileTabBar (Tier 4 #2) === */
-.m-tabbar {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  padding: var(--k-s-6) var(--k-s-4) calc(var(--k-s-6) + env(safe-area-inset-bottom, 0px));
-  background: var(--k-surface);
-  border-top: var(--k-divider);
-}
-.m-tabbar__tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--k-s-2);
-  padding: var(--k-s-4) var(--k-s-2);
-  background: transparent;
-  border: 0;
-  color: var(--k-fg-muted);
-  font-size: var(--k-type-caption);
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: var(--k-row-radius);
-  transition: color var(--k-dur-fast, 110ms) var(--k-ease, ease);
-}
-.m-tabbar__tab svg { width: 18px; height: 18px; }
-.m-tabbar__tab--on { color: var(--k-primary); }`,
-  },
-  {
-    id: 'bottomsheet',
-    section: "BottomSheet",
-    css: `/* === BottomSheet (Tier 4 #3) === */
-.bottomsheet {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--k-surface);
-  border-radius: var(--k-radius-lg) var(--k-radius-lg) 0 0;
-  box-shadow: 0 -8px 24px hsl(0 0% 0% / 0.12);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  display: flex;
-  flex-direction: column;
-  --k-nest-radius: max(2px, calc(var(--k-radius-md) - 4px));
-  animation: bottomsheet-up 280ms cubic-bezier(.05,.7,.1,1) both;
-}
-@keyframes bottomsheet-up {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
-.bottomsheet--peek { height: 38%; }
-.bottomsheet--half { height: 60%; }
-.bottomsheet--full { height: 100%; border-radius: 0; }
-.bottomsheet__handle {
-  width: 36px;
-  height: 4px;
-  border-radius: 999px;
-  background: var(--k-fg-faint);
-  opacity: 0.4;
-  margin: var(--k-s-8) auto var(--k-s-4);
-}
-.bottomsheet__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--k-s-8) var(--k-s-14) var(--k-s-6);
-}
-.bottomsheet__title { font-size: var(--k-type-h3); font-weight: 600; color: var(--k-fg); font-family: var(--k-font-display); }
-.bottomsheet__close {
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  border: 0;
-  background: var(--k-surface-2);
-  color: var(--k-fg-muted);
-  font-size: var(--k-type-body);
-  line-height: 1;
-  cursor: pointer;
-}
-.bottomsheet__body {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--k-s-4) var(--k-s-14);
-}
-.bottomsheet__row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--k-s-10) 0;
-  font-size: var(--k-type-small);
-  color: var(--k-fg);
-  border-bottom: var(--k-divider);
-}
-.bottomsheet__row:last-child { border-bottom: 0; }
-.bottomsheet__val { color: var(--k-fg-muted); font-size: var(--k-type-small); }
-.bottomsheet__foot { padding: var(--k-s-10) var(--k-s-14) var(--k-s-12); }`,
-  },
-  {
-    id: 'actionsheet',
-    section: "ActionSheet",
-    css: `/* === ActionSheet (Tier 4 #4) === */
-.action-sheet {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-8);
-  animation: bottomsheet-up 280ms cubic-bezier(.05,.7,.1,1) both;
-}
-.action-sheet__group {
-  background: var(--k-surface);
-  border-radius: var(--k-radius-md);
-  overflow: hidden;
-  box-shadow: 0 -2px 12px hsl(0 0% 0% / 0.08);
-}
-.action-sheet__caption {
-  padding: var(--k-s-10) var(--k-s-14) var(--k-s-6);
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-  text-align: center;
-}
-.action-sheet__btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--k-s-8);
-  padding: var(--k-s-12) var(--k-s-14);
-  background: transparent;
-  border: 0;
-  border-top: var(--k-divider);
-  color: var(--k-primary);
-  font-size: var(--k-type-body);
-  font-weight: 500;
-  font-family: var(--k-font-body);
-  cursor: pointer;
-}
-.action-sheet__btn:first-child { border-top: 0; }
-.action-sheet__btn svg { width: 14px; height: 14px; opacity: 0.8; }
-.action-sheet__btn--danger { color: var(--k-danger); }
-.action-sheet__btn--cancel { font-weight: 600; color: var(--k-fg); }`,
   },
   {
     id: 'form-primitives',
@@ -4466,14 +3528,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* .phoneinput--invalid border + focus halo defined in the unified
  * validation block at top of file (state-matched halo system). */
 .phoneinput + .phoneinput { margin-top: var(--k-s-6); }`,
-  },
-  {
-    id: 'settingsrow',
-    section: "SettingsRow",
-    css: `/* === SettingsRow — now just the LIST system =========================
- * Settings rows = \`.list .list--settings\` (bottom-divider, static, title 600)
- * with \`.list__body\` (\`.list__title\` + \`.list__sub\`) and a trailing control
- * (toggle / button). No separate .set-row / .set-rows family. */`,
   },
   {
     id: 'infocard',
@@ -4869,44 +3923,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* StatGroup metric strip → unified into the .stat-tile family as
  * .stat-tile-strip / .stat-tile-strip__cell (defined with the stat-tile
  * block above; cells reuse .stat-tile__value / .stat-tile__label). */`,
-  },
-  {
-    id: 'featuretrio',
-    section: "FeatureTrio",
-    css: `/* === FeatureTrio (#15) === */
-.ftrio {
-  /* Self-responsive feature row: 3-up when the card is wide (auto-fit), stacked
-     when narrow. Same mechanism as .pricing — the card span decides the width. */
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--k-s-12);
-}
-.ftrio__cell {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-6);
-}
-.ftrio__icon {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--k-radius-sm);
-  background: var(--k-primary-soft);
-  color: var(--k-primary-soft-fg);
-}
-.ftrio__icon svg { width: 14px; height: 14px; }
-.ftrio__title {
-  font-size: var(--k-type-small);
-  font-weight: 600;
-  color: var(--k-fg);
-  font-family: var(--k-font-display);
-}
-.ftrio__body {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-  line-height: 1.5;
-}`,
   },
   {
     id: 'twocolumnlayout',

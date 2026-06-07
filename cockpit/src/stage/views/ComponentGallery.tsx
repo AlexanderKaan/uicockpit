@@ -61,16 +61,16 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
     ComboboxCard, DialogCard, KanbanCard, PhoneInputCard, SelectCard, SlotPickerCard,
     PricingCardCard, TagInputCard, AvatarCard, TabsCard, DropzoneCard, TooltipCard,
     CodeBlockCard, SheetCard, InputOtpCard, DescriptionListCard, HoverCardCard,
-    CurrencyInputCard, DateFieldCard, ToolbarCard, AlertDialogCard, TrendCard,
-    UpgradeBannerCard, CmdPaletteCard, DropdownMenuCard, CarouselCard, ListCard,
+    DateFieldCard, ToolbarCard, AlertDialogCard, TrendCard,
+    CmdPaletteCard, DropdownMenuCard, CarouselCard, ListCard,
     LoginCard, StatGroupCard, ContextMenuCard, SignupCard, TimelineCard, NavMenuCard,
-    PaginationCard, TreeViewCard, ComposerCard, NotificationCenterCard, NavCard,
-    FileGridCard, AccordionCard, QuickActionsCard, SettingsRowCard, AlertsCard,
-    BreadcrumbCard, ProgressCard, FeatureTrioCard, UsageMeterCard, TeamOnlineCard,
+    PaginationCard, TreeViewCard, NotificationCenterCard, NavCard,
+    FileGridCard, AccordionCard, SettingsRowCard, AlertsCard,
+    BreadcrumbCard, ProgressCard, UsageMeterCard,
     StatusPageCard, InboxFilterCard, SpinnerCard, ToolbarRecipeCard, SkeletonCard,
-    EmptyStateCard, InfoCardCard, ToastStackCard, LightboxCard, MobileTabBarCard,
+    EmptyStateCard, InfoCardCard, ToastStackCard, LightboxCard,
     WizardStepperCard, DangerZoneCard, FaqCard, TwoColumnLayoutCard, TypographyCard,
-    AttachmentChipCard, StepperCard,
+    AttachmentChipCard, StepperCard, ButtonGroupCard, AspectRatioCard, ScrollAreaCard,
   ]
   const shown = limit ? CARDS.slice(0, limit) : CARDS
 
@@ -88,29 +88,6 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
 /* ── Promoted dashboard widgets — formerly app-only (SupaDash), now first-class
  * gallery cards so the components page stays the single source of truth. They
  * reuse the same preview.css recipes the live app does. */
-function UpgradeBannerCard() {
-  const [open, setOpen] = useState(true)
-  return (
-    <Card wide title="Pro plan" desc="Inline upsell banner — icon, copy, CTA, dismiss.">
-      {open ? (
-        <div className="upgrade-banner">
-          <span className="upgrade-banner__icon"><Icon name="spark" size={14} /></span>
-          <div className="upgrade-banner__body">
-            <div className="upgrade-banner__title">Pro plan unlocks unlimited projects</div>
-            <div className="upgrade-banner__sub">Currently on Team plan — 7 of 10 projects used.</div>
-          </div>
-          <button className="btn btn--primary btn--sm">Upgrade</button>
-          <button className="alert__close" aria-label="Dismiss" onClick={() => setOpen(false)}>
-            <Icon name="x" />
-          </button>
-        </div>
-      ) : (
-        <button className="btn btn--secondary btn--sm" onClick={() => setOpen(true)}>Restore banner</button>
-      )}
-    </Card>
-  )
-}
-
 function UsageMeterCard() {
   return (
     <Card title="Monthly quota" desc="Usage meter — banded fill shifts to warning past 75%.">
@@ -124,49 +101,6 @@ function UsageMeterCard() {
           <span className="usage__hint">Resets in 9 days</span>
           <button className="btn btn--ghost btn--sm">Upgrade plan</button>
         </div>
-      </div>
-    </Card>
-  )
-}
-
-function QuickActionsCard() {
-  const tiles: { icon: IconName; title: string; sub: string; accent: number }[] = [
-    { icon: 'plus', title: 'New project', sub: 'From scratch', accent: 1 },
-    { icon: 'upload', title: 'Import file', sub: 'JSON or CSV', accent: 2 },
-    { icon: 'bell', title: 'Invite', sub: 'Add a teammate', accent: 3 },
-    { icon: 'file', title: 'Docs', sub: 'Read the guide', accent: 4 },
-  ]
-  return (
-    <Card title="Quick actions" desc="Launcher tiles — icon chip + label + hint.">
-      <div className="quickact">
-        {tiles.map((t) => (
-          <button key={t.title} type="button" className="quickact__tile">
-            <span className="quickact__icon" style={{ color: `var(--k-accent-${t.accent}-soft-fg)`, background: `var(--k-accent-${t.accent}-soft)` }}><Icon name={t.icon} /></span>
-            <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <span className="quickact__label">{t.title}</span>
-              <span className="quickact__sub">{t.sub}</span>
-            </span>
-          </button>
-        ))}
-      </div>
-    </Card>
-  )
-}
-
-function TeamOnlineCard() {
-  return (
-    <Card title="Team online" desc="Presence widget — count + overlapping avatars with status dots.">
-      <div className="team-online">
-        <div className="team-online__label">
-          <span className="team-online__count">5 online</span>
-          <span className="team-online__sub">of 12 members</span>
-        </div>
-        <span className="avatar-group">
-          <span className="avatar avatar--sm avatar--a1">JM<span className="avatar__status avatar__status--online" role="img" aria-label="Online" /></span>
-          <span className="avatar avatar--sm avatar--a2">AC<span className="avatar__status avatar__status--online" role="img" aria-label="Online" /></span>
-          <span className="avatar avatar--sm avatar--a3">MK<span className="avatar__status avatar__status--away" role="img" aria-label="Away" /></span>
-          <span className="avatar-group__more">+2</span>
-        </span>
       </div>
     </Card>
   )
@@ -1210,7 +1144,12 @@ function NotificationCenterCard() {
   return (
     <Card title="Notification center">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 'var(--k-s-8)', borderBottom: 'var(--k-divider)' }}>
-        <span style={{ fontWeight: 600, fontSize: 'var(--k-type-small)' }}>{unread} unread</span>
+        {/* Header bell — the .meta-notif recipe: an icon with an unread count
+         * dot, the classic app-bar notification trigger (also in the live app). */}
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--k-s-8)', fontWeight: 600, fontSize: 'var(--k-type-small)' }}>
+          <span className="meta-notif"><Icon name="bell" />{unread > 0 && <span className="meta-notif__dot">{unread}</span>}</span>
+          {unread} unread
+        </span>
         <button className="btn btn--ghost btn--sm" onClick={() => setRead(true)}>Mark all read</button>
       </div>
       {['Today', 'Earlier'].map((g) => (
@@ -1581,28 +1520,40 @@ function EmptyStateCard() {
   )
 }
 
-// Side navigation — grouped rows (.nav-group + .navrow), a nested section
-// (.navrow + .navsub) and a collapsible icon-rail (.nav--rail) with hover
-// tooltips. The toggle captures both the expanded and collapsed states.
+// Side navigation — the exportable `.sidenav` shell: a brand header with an
+// in-header collapse toggle, grouped rows (.nav-group + .navrow), a count badge,
+// a nested section (.navrow + .navsub) and a pinned footer. Sits on the Chrome
+// plane (--k-chrome-bg) so it responds to the Sidebar treatment; collapses to a
+// 64px icon-rail (.sidenav--rail) with hover tooltips. The live SupaDash app
+// dogfoods this exact recipe (see DemoDashboard).
 function NavCard() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [rail, setRail] = useState(false)
   const [open, setOpen] = useState(true)
   return (
-    <Card title="Side navigation" desc="Grouped rows, a count badge, a nested section, a pinned footer, and a collapsible rail.">
-      <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        {/* Header notification bell (the .meta-notif recipe lives beside nav, not
-         * on a nav row — nav rows carry a trailing count badge, see Inbox). */}
-        <button className="btn btn--ghost btn--icon btn--sm" aria-label="Notifications">
-          <span className="meta-notif"><Icon name="bell" /><span className="meta-notif__dot">4</span></span>
-        </button>
-        <button className="btn btn--ghost btn--sm" onClick={() => setCollapsed((c) => !c)}>
-          <Icon name={collapsed ? 'chevR' : 'chevL'} /> {collapsed ? 'Expand' : 'Collapse'}
-        </button>
-      </div>
-      <nav
-        className={collapsed ? 'nav--rail' : ''}
-        style={{ display: 'flex', flexDirection: 'column', gap: 2, width: collapsed ? 56 : '100%', transition: 'width 160ms var(--k-ease, ease)' }}
-      >
+    <Card title="Side navigation" desc="Brand header, grouped rows, a count badge, a nested section, a pinned footer, and a collapsible icon-rail — themed by the Sidebar control.">
+      <nav className={`sidenav ${rail ? 'sidenav--rail' : ''}`}>
+        <div className="sidenav__brand">
+          {/* App-icon launcher tile — 2×2 grid mark in the brand colour. */}
+          <span className="sidenav__icon" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="1" y="1" width="6" height="6" rx="1.8" />
+              <rect x="9" y="1" width="6" height="6" rx="1.8" />
+              <rect x="1" y="9" width="6" height="6" rx="1.8" />
+              <rect x="9" y="9" width="6" height="6" rx="1.8" />
+            </svg>
+          </span>
+          <span className="sidenav__name">Acme</span>
+          <button
+            type="button"
+            className="sidenav__toggle"
+            aria-label={rail ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-pressed={rail}
+            data-tip="Expand"
+            onClick={() => setRail((r) => !r)}
+          >
+            <Icon name={rail ? 'chevR' : 'chevL'} />
+          </button>
+        </div>
         <div className="nav-group">Workspace</div>
         <NavRow icon="home" label="Overview" active />
         <NavRow icon="grid" label="Projects" />
@@ -1627,7 +1578,7 @@ function NavCard() {
         </div>
         {/* Pinned footer — Settings + a ⌘K launcher, mirroring the live app
          * shell's bottom block (built from the SAME .navrow recipe). */}
-        <div style={{ marginTop: 'var(--k-s-8)', paddingTop: 'var(--k-s-8)', borderTop: 'var(--k-divider)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div className="sidenav__foot">
           <NavRow icon="cog" label="Settings" />
           <button type="button" className="navrow" data-tip="Quick actions" aria-label="Quick actions">
             <span className="kbd">⌘K</span>
@@ -1645,6 +1596,56 @@ function NavRow({ icon, label, active }: { icon: IconName; label: string; active
       <Icon name={icon} />
       <span className="navrow__label">{label}</span>
     </button>
+  )
+}
+
+// Button group — equal-weight buttons fused into one control (a view switcher)
+// plus a split action. Outer corners follow the button radius.
+function ButtonGroupCard() {
+  const [view, setView] = useState('board')
+  return (
+    <Card title="Button group" desc="Buttons fused into one control — a view switcher and a split action.">
+      <div className="btn-group" role="group" aria-label="View">
+        {(['Board', 'List', 'Timeline'] as const).map((v) => (
+          <button key={v} type="button" className={`btn btn--sm ${view === v.toLowerCase() ? 'btn--primary' : 'btn--outline'}`} aria-pressed={view === v.toLowerCase()} onClick={() => setView(v.toLowerCase())}>{v}</button>
+        ))}
+      </div>
+      <div className="btn-group" role="group" aria-label="Save options">
+        <button type="button" className="btn btn--outline btn--sm"><Icon name="check" /> Save</button>
+        <button type="button" className="btn btn--outline btn--sm btn--icon" aria-label="More save options"><Icon name="chevD" /></button>
+      </div>
+    </Card>
+  )
+}
+
+// Aspect ratio — ratio-locked media boxes (16:9 + 1:1) whose children cover.
+function AspectRatioCard() {
+  return (
+    <Card title="Aspect ratio" desc="Ratio-locked media boxes — children cover, the shape holds across the grid.">
+      <div className="aspect aspect--16x9">
+        <div className="aspect__fill" style={{ display: 'grid', placeItems: 'center', background: 'var(--k-primary-soft)', color: 'var(--k-primary)' }}><Icon name="grid" size={22} /></div>
+      </div>
+      <div className="card__row">
+        <div className="aspect aspect--1x1" style={{ width: 64, flex: 'none' }}>
+          <div className="aspect__fill" style={{ display: 'grid', placeItems: 'center', background: 'var(--k-surface-sunken)', color: 'var(--k-fg-faint)' }}><Icon name="file" size={18} /></div>
+        </div>
+        <div style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>A 16:9 cover and a 1:1 thumbnail. Pick a ratio modifier — the box owns none.</div>
+      </div>
+    </Card>
+  )
+}
+
+// Scroll area — overflow container with a slim, token-tinted scrollbar.
+function ScrollAreaCard() {
+  const items = ['Overview', 'Analytics', 'Audiences', 'Conversions', 'Funnels', 'Retention', 'Revenue', 'Cohorts', 'Attribution', 'Exports']
+  return (
+    <Card title="Scroll area" desc="Overflow container with a slim, token-tinted scrollbar.">
+      <div className="scroll-area" style={{ maxHeight: 136, border: 'var(--k-divider)', borderRadius: 'var(--k-radius-md)', padding: 'var(--k-s-4)' }}>
+        {items.map((t) => (
+          <button key={t} type="button" className="navrow"><Icon name="chart" /><span className="navrow__label">{t}</span></button>
+        ))}
+      </div>
+    </Card>
   )
 }
 
@@ -2433,55 +2434,6 @@ function InputOtpCard() {
  *   Left: [+] attach + tool chips (Files, Search, Tools)
  *   Right: [mic] voice + [↑] send (primary, animates from disabled→active)
  * Container has the crisp/tactile signature: 2-tone sunken bg + hairline. */
-function ComposerCard() {
-  const [text, setText] = useState('Help me design a pricing page that converts')
-  const canSend = text.trim().length > 0
-  return (
-    <Card wide title="Ask AI" desc="Describe what you want to build.">
-      <div className={'composer' + (canSend ? ' composer--ready' : '')}>
-        <textarea
-          className="composer__input"
-          rows={2}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Ask anything…"
-        />
-        <div className="composer__bar">
-          <div className="composer__tools">
-            <button className="composer__attach" aria-label="Attach">
-              <Icon name="plus" />
-            </button>
-            <button className="composer__chip">
-              <Icon name="file" /> Files
-            </button>
-            <button className="composer__chip">
-              <Icon name="search" /> Search
-            </button>
-            <button className="composer__chip composer__chip--more" aria-label="More tools">
-              <Icon name="grid" />
-            </button>
-          </div>
-          <div className="composer__send">
-            <button className="composer__voice" aria-label="Voice">
-              <Icon name="bell" />
-            </button>
-            <button className="composer__submit" disabled={!canSend} aria-label="Send">
-              <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden>
-                <path d="M7 2 L7 12 M3 6 L7 2 L11 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </Card>
-  )
-}
-
-/* === Attachment chip family (#113) =================================
- * Inline pill that represents an embedded file/link/audio/image. Used in
- * composer drafts, message threads, and "shared with you" lists. Each
- * variant has a left thumb (icon-box or actual thumb) + label stack +
- * close button. Truncates the filename mid-string for long names. */
 function AttachmentChip({
   kind, label, meta,
 }: {
@@ -2534,48 +2486,6 @@ function AttachmentChipCard() {
   )
 }
 
-function CurrencyInputCard() {
-  const [amount, setAmount] = useState(2400)
-  return (
-    <Card title="Monthly budget" desc="Set how much you'll spend.">
-      <div className="curinp">
-        <span className="curinp__sym">€</span>
-        <input
-          type="text"
-          className="curinp__field"
-          value={amount.toLocaleString('en-US')}
-          onChange={(e) => {
-            const n = parseInt(e.target.value.replace(/[^\d]/g, ''), 10)
-            if (!isNaN(n)) setAmount(n)
-          }}
-        />
-        <span className="curinp__sfx">/ month</span>
-      </div>
-      <div className="mrange">
-        <div className="mrange__track">
-          <span className="mrange__fill" style={{ width: ((amount / 5000) * 100) + '%' }} />
-          <span className="mrange__thumb" style={{ left: ((amount / 5000) * 100) + '%' }} />
-        </div>
-        <div className="mrange__ticks">
-          {[0, 1000, 2000, 3000, 4000, 5000].map((v) => (
-            <span key={v} className="mrange__tick">
-              <span className="mrange__tick-mark" />
-              <span className="mrange__tick-lbl">{v === 0 ? '€0' : v >= 1000 ? `€${v / 1000}k` : `€${v}`}</span>
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="card__foot">
-        <button className="btn btn--primary btn--block">Save budget</button>
-      </div>
-    </Card>
-  )
-}
-
-/* === FileGrid ========================================================
- * Generic thumbnail grid voor media libraries, album collections, cloud
- * storage, AI artifacts. 4-cols default, modifier voor 2/3/5 columns.
- * Tiles met spring hover lift (signature). */
 function FileGridCard() {
   const files = [
     { name: 'hero-banner.png', size: '2.4 MB', badge: 'PNG', tone: 'success' as const },
@@ -2616,36 +2526,6 @@ function FileGridCard() {
  * 3-5 tabs onderaan met icon+label, active tab krijgt primary color.
  * Anders dan onze sidebar nav: mobiel-formaat, equal-width grid, label
  * onder icon (Netflix/IMDb pattern). */
-function MobileTabBarCard() {
-  return (
-    <Card title="App navigation" desc="The bottom bar on a phone.">
-      <div className="m-shell m-shell--tabs">
-        <div className="m-tabbar">
-          <button className="m-tabbar__tab m-tabbar__tab--on" aria-current="page">
-            <Icon name="home" /><span>Home</span>
-          </button>
-          <button className="m-tabbar__tab">
-            <Icon name="search" /><span>Search</span>
-          </button>
-          <button className="m-tabbar__tab">
-            <Icon name="chart" /><span>Stats</span>
-          </button>
-          <button className="m-tabbar__tab">
-            <Icon name="bell" /><span>Inbox</span>
-          </button>
-          <button className="m-tabbar__tab">
-            <Icon name="cog" /><span>You</span>
-          </button>
-        </div>
-      </div>
-    </Card>
-  )
-}
-
-/* === NumberInput (Tier 4 #5) ========================================
- * Input + decrement/increment steppers with min/max clamping. Tabular-
- * nums so the digit columns stay aligned during edits. Two demo states:
- * default and "with unit suffix" (px). */
 function NumberInputCard() {
   const [v, setV] = useState(12)
   const [px, setPx] = useState(16)
@@ -3127,38 +3007,6 @@ function StatGroupCard() {
 /* === FeatureTrio (Tier 4 #15) — composed demo ===
  * 3-column feature blocks: icon (in soft tile) + heading + body. The
  * marketing-page mid-section pattern. Stacks to 1-column op smal. */
-function FeatureTrioCard() {
-  return (
-    <Card xwide title="Why Cockpit" desc="Everything you need, built in.">
-      <div className="ftrio">
-        <div className="ftrio__cell">
-          <span className="ftrio__icon"><Icon name="spark" /></span>
-          <div className="ftrio__title">Built-in tokens <span className="badge badge--primary">New</span></div>
-          <div className="ftrio__body">120+ design tokens generated from one config.</div>
-        </div>
-        <div className="ftrio__cell">
-          <span className="ftrio__icon"><Icon name="check" /></span>
-          <div className="ftrio__title">WCAG verified <span className="badge badge--warn">Beta</span></div>
-          <div className="ftrio__body">Every palette tested against AA contrast.</div>
-        </div>
-        <div className="ftrio__cell">
-          <span className="ftrio__icon"><Icon name="upload" /></span>
-          <div className="ftrio__title">Six exports <span className="badge badge--neutral">Pro</span></div>
-          <div className="ftrio__body">Tailwind, shadcn, CSS, JSON, AI prompt, BRIEF.</div>
-        </div>
-      </div>
-      <button className="btn btn--primary btn--block">
-        <Icon name="spark" /> Get started free
-      </button>
-    </Card>
-  )
-}
-
-/* === TwoColumnLayout (Tier 4 #11) — composed demo ===
- * Main + sidebar layout (Hostinger pattern). Main krijgt content
- * blocks; sidebar krijgt InfoCard stack. Het ECHTE patroon is twee
- * .card elementen naast elkaar, niet één card met split. We tonen de
- * compositie compact binnen één gallery-cell. */
 function TwoColumnLayoutCard() {
   return (
     <Card wide title="Site overview" desc="Settings with a details sidebar.">

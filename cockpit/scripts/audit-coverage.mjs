@@ -39,9 +39,8 @@ const HAYSTACK = FILES.map((f) => readFileSync(f, 'utf8')).join('\n')
 const MARKERS = {
   // Dashboard widgets (Home)
   StatTile: 'stat-tile', UsageMeter: 'usage--', Progress: 'progress__fill',
-  QuickActions: 'quickact', TeamOnline: 'team-online', UpgradeBanner: 'upgrade-banner',
   Chart: 'barchart', List: 'list__item', Spinner: 'spinner', Alerts: 'alert alert--',
-  FeatureTrio: 'ftrio', Skeleton: 'PageSkeleton',
+  Skeleton: 'PageSkeleton',
   // Projects
   Kanban: 'kanban', DataTablePro: 'datatable', Sheet: 'sheet__', TagInput: 'taginput',
   Pagination: 'pagination', ContextMenu: 'ctxmenu', DescriptionList: 'dl"',
@@ -52,21 +51,21 @@ const MARKERS = {
   Tabs: 'tabpanel', Toolbar: 'toolbar', Lightbox: 'lightbox', CodeBlock: 'codeblock',
   Carousel: 'carousel',
   // Inbox
-  Combobox: 'combobox', Composer: 'composer', AttachmentChip: 'att-chip',
+  Combobox: 'combobox', AttachmentChip: 'att-chip',
   HoverCard: 'hover-card',
   // CRM
   Popover: 'popover', Validation: 'is-error', PhoneInput: 'phoneinput',
   // Cloud
   StatusPage: 'statuspage', InfoCard: 'info-card', Banner: 'banner--',
   // Billing
-  WizardStepper: 'wstepper', CurrencyInput: 'curinp', NumberInput: 'numinput',
+  WizardStepper: 'wstepper', NumberInput: 'numinput',
   PricingCard: 'pricing__',
   // Media
   Dropzone: 'dropzone',
   // Settings & Account
   SettingsRow: 'list--settings', Switch: 'toggle', Slider: 'InteractiveSlider',
   InputOtp: 'otp__slot', DangerZone: 'dangerzone', AlertDialog: 'dialog--alert',
-  Dialog: 'dialog"', Selection: 'radio"', MobileTabBar: 'm-tabbar',
+  Dialog: 'dialog"', Selection: 'radio"',
   PasswordInput: 'type="password"', Stepper: 'stepper__',
   // Shell / chrome
   Breadcrumb: 'breadcrumb', Avatar: 'avatar', NotificationCenter: 'list--flush',

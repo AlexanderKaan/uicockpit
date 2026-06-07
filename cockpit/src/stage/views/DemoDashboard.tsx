@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
 /* Showcase screens — the primary screen of each former standalone app,
@@ -6,23 +7,10 @@ import type { IconName } from '../../icons/concepts'
  * This is what makes SupaDash the single "super-app": its own pages
  * (Overview…Settings) plus these domain screens so every key component
  * is visible in one place. */
-import { ChartFrame } from './ChartFrame'
-import type { ChartType } from './ChartFrame'
-import { CrmScreen } from './apps/CrmApp'
-import type { CrmSub } from './apps/CrmApp'
-import { HelpdeskScreen } from './apps/HelpdeskApp'
-import type { HelpdeskSub } from './apps/HelpdeskApp'
-import { BillingScreen } from './apps/AccountingApp'
-import type { BillingSub } from './apps/AccountingApp'
-import { CloudScreen } from './apps/CloudApp'
-import { useDropdown, StatusBadge, InteractiveSlider, DatePicker } from './apps/AppHelpers'
+import { StatusBadge, InteractiveSlider, DatePicker } from './apps/AppHelpers'
 import { PageSkeleton } from './Skeletons'
 
-type Page =
-  | 'overview' | 'projects' | 'board' | 'docs' | 'inbox' | 'media' | 'analytics' | 'settings'
-  | 'crm' | 'helpdesk' | 'billing' | 'cloud'
-  | 'profile' | 'signin'
-  | 'calendar'
+type Page = 'overview' | 'projects' | 'docs' | 'inbox' | 'media' | 'settings'
 
 interface NavEntry {
   id: Page
@@ -31,52 +19,30 @@ interface NavEntry {
   badge?: number
 }
 
-/* SupaDash is one super-app spanning multiple product verticals. The sidebar
- * groups tabs by use-case (Workspace / Commerce / Content / Hosting / Finance);
- * each nested app (CRM, Helpdesk, Billing, Cloud) is a vertical with its own
- * sub-pages. Settings is pinned to the bottom, separate from the verticals. */
-/* The rail is the suite's product switcher (Atlassian-style): each group is a
- * domain, each item a product. Renames + nested rebuilds land per phase
- * (SUITE-PLAN.md) — IDs stay stable here so the screen dispatch doesn't churn
- * before the product it belongs to is rebuilt. */
+/* SupaDash is one super-app distilled to SIX archetype screens — each one a
+ * different composition pattern, together rendering every kept component once.
+ * The sidebar groups them by use-case; Settings is pinned to the bottom. The
+ * rail is the suite's product switcher (Atlassian-style): each group a domain,
+ * each item a product. */
 const NAV_GROUPS: { label: string; items: NavEntry[] }[] = [
   {
     label: 'Workspace',
     items: [
       { id: 'overview', label: 'Home', icon: 'home' },
       { id: 'projects', label: 'Projects', icon: 'grid' },
-      { id: 'board', label: 'Board', icon: 'chart' },
       { id: 'docs', label: 'Docs', icon: 'edit' },
-      { id: 'calendar', label: 'Calendar', icon: 'cal' },
-      { id: 'analytics', label: 'Analytics', icon: 'spark' },
     ],
   },
   {
     label: 'Communication',
     items: [
       { id: 'inbox', label: 'Inbox', icon: 'bell', badge: 4 },
-      { id: 'helpdesk', label: 'Support', icon: 'feed' },
-    ],
-  },
-  {
-    label: 'Business',
-    items: [
-      { id: 'crm', label: 'CRM', icon: 'store' },
-      { id: 'billing', label: 'Billing', icon: 'card' },
     ],
   },
   {
     label: 'Platform',
     items: [
-      { id: 'cloud', label: 'Cloud', icon: 'upload' },
       { id: 'media', label: 'Media', icon: 'file' },
-    ],
-  },
-  {
-    label: 'Account',
-    items: [
-      { id: 'profile', label: 'Profile', icon: 'info' },
-      { id: 'signin', label: 'Sign in', icon: 'check' },
     ],
   },
 ]
@@ -88,21 +54,6 @@ export function DemoDashboard() {
   // Sidebar collapse — rail mode shows icon-only nav with hover tooltips
   // (VS Code / Linear pattern). The whole .dash grid narrows to a 64px rail.
   const [rail, setRail] = useState(false)
-  // Nested Settings group — which sub-section is shown, and whether the
-  // sidebar group is expanded. Auto-expands whenever you land on Settings.
-  // Nested Helpdesk section — Tickets / Ticket / Inbox.
-  const [helpdeskSub, setHelpdeskSub] = useState<HelpdeskSub>('tickets')
-  const [helpdeskOpen, setHelpdeskOpen] = useState(false)
-  useEffect(() => { if (page === 'helpdesk') setHelpdeskOpen(true) }, [page])
-  // Nested CRM section — Contacts / Pipeline / Deal / Activity.
-  const [crmSub, setCrmSub] = useState<CrmSub>('contacts')
-  const [crmOpen, setCrmOpen] = useState(false)
-  useEffect(() => { if (page === 'crm') setCrmOpen(true) }, [page])
-  // Nested Billing section — Overview / Invoices / Plans.
-  const [billingSub, setBillingSub] = useState<BillingSub>('invoices')
-  const [billingOpen, setBillingOpen] = useState(false)
-  useEffect(() => { if (page === 'billing') setBillingOpen(true) }, [page])
-  // Nested Cloud section — Deployments / Domains / Logs.
   /* Skeleton-on-load: brief grey shimmer placeholder on first mount and on
    * every page switch, so the Skeleton component is previewed in a real
    * loading context (not just isolated in the gallery). Shimmer respects
@@ -114,74 +65,29 @@ export function DemoDashboard() {
     return () => clearTimeout(t)
   }, [page])
 
-  /* A nav item is either a flat row or a nested parent (guide-lined sub-list).
-   * nestedFor() returns the open-state + sub-state wiring for the deep apps;
-   * renderNavItem() picks the right shape. Used for both the vertical groups
-   * and the pinned Settings entry, so the nesting behaviour is identical. */
-  type Nested = { open: boolean; setOpen: (f: (o: boolean) => boolean) => void; sub: string; setSub: (s: string) => void; items: [string, string][] }
-  const nestedFor = (id: Page): Nested | null => {
-    switch (id) {
-      case 'crm': return { open: crmOpen, setOpen: setCrmOpen, sub: crmSub, setSub: setCrmSub as (s: string) => void, items: [['contacts', 'Contacts'], ['pipeline', 'Pipeline'], ['new', 'New contact']] }
-      case 'helpdesk': return { open: helpdeskOpen, setOpen: setHelpdeskOpen, sub: helpdeskSub, setSub: setHelpdeskSub as (s: string) => void, items: [['tickets', 'Queue'], ['ticket', 'Ticket'], ['help', 'Help centre']] }
-      case 'billing': return { open: billingOpen, setOpen: setBillingOpen, sub: billingSub, setSub: setBillingSub as (s: string) => void, items: [['invoices', 'Invoices'], ['new', 'New invoice'], ['plans', 'Plans']] }
-      default: return null
-    }
-  }
-  const renderNavItem = (n: NavEntry) => {
-    const nested = nestedFor(n.id)
-    if (!nested) {
-      return (
-        <button
-          key={n.id}
-          type="button"
-          className={`navrow ${page === n.id ? 'navrow--on' : ''}`}
-          data-tip={n.label}
-          onClick={() => setPage(n.id)}
-        >
-          <Icon name={n.icon} />
-          <span className="navrow__label">{n.label}</span>
-          {n.badge != null && <span className="badge badge--solid-primary badge--count">{n.badge}</span>}
-        </button>
-      )
-    }
-    return (
-      <div key={n.id}>
-        <button
-          type="button"
-          className={`navrow navrow--parent ${rail && page === n.id ? 'navrow--on' : ''}`}
-          aria-expanded={nested.open}
-          data-tip={n.label}
-          onClick={() => (rail ? setPage(n.id) : nested.setOpen((o) => !o))}
-        >
-          <Icon name={n.icon} />
-          <span className="navrow__label">{n.label}</span>
-          <span className="navrow__chev"><Icon name="chevR" /></span>
-        </button>
-        {nested.open && (
-          <div className="navsub">
-            {nested.items.map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                className={`navsub__item ${page === n.id && nested.sub === id ? 'navsub__item--on' : ''}`}
-                onClick={() => { setPage(n.id); nested.setSub(id) }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    )
-  }
+  /* Every product is now a flat row (the six-archetype cull removed the deep
+   * nested verticals). Used for both the vertical groups and pinned Settings. */
+  const renderNavItem = (n: NavEntry) => (
+    <button
+      key={n.id}
+      type="button"
+      className={`navrow ${page === n.id ? 'navrow--on' : ''}`}
+      data-tip={n.label}
+      onClick={() => setPage(n.id)}
+    >
+      <Icon name={n.icon} />
+      <span className="navrow__label">{n.label}</span>
+      {n.badge != null && <span className="badge badge--solid-primary badge--count">{n.badge}</span>}
+    </button>
+  )
 
   return (
     <div className={`dash ${rail ? 'dash--rail' : ''}`}>
-      <nav className="dash__nav">
-        <div className="dash__brand">
+      <nav className={`sidenav ${rail ? 'sidenav--rail' : ''}`}>
+        <div className="sidenav__brand">
           {/* SupaDash — app-icon: a rounded-square launcher tile in the brand
            * colour with a 2×2 grid mark (reads "the app that does everything"). */}
-          <span className="dash__appicon" aria-hidden="true">
+          <span className="sidenav__icon" aria-hidden="true">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
               <rect x="1" y="1" width="6" height="6" rx="1.8" />
               <rect x="9" y="1" width="6" height="6" rx="1.8" />
@@ -189,10 +95,10 @@ export function DemoDashboard() {
               <rect x="9" y="9" width="6" height="6" rx="1.8" />
             </svg>
           </span>
-          <span className="dash__brandname" style={{ flex: 1 }}>SupaDash</span>
+          <span className="sidenav__name">SupaDash</span>
           <button
             type="button"
-            className="dash__railtoggle"
+            className="sidenav__toggle"
             aria-label={rail ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-pressed={rail}
             data-tip="Expand"
@@ -209,7 +115,7 @@ export function DemoDashboard() {
           </Fragment>
         ))}
         {/* Pinned bottom — Settings (nested) + the ⌘K launcher. */}
-        <div className="dash__navfoot">
+        <div className="sidenav__foot">
           {renderNavItem(SETTINGS_ENTRY)}
           <button
             type="button"
@@ -225,26 +131,14 @@ export function DemoDashboard() {
       {/* Skeleton-on-load — a layout-accurate wireframe of the page that's
        * loading (mirrors its real components, so no layout shift + the wait
        * pre-teaches the screen). See Skeletons.tsx. */}
-      {loading ? <PageSkeleton page={page} sub={page === 'crm' ? crmSub : page === 'helpdesk' ? helpdeskSub : page === 'billing' ? billingSub : ''} />
-      /* Showcase screens bring their OWN .dash__main wrapper, so render
-       * them as direct siblings of the nav (not nested) to avoid double
-       * padding/scroll. SupaDash's own pages share one .dash__main. */
-      : page === 'crm' ? <CrmScreen sub={crmSub} />
-        : page === 'helpdesk' ? <HelpdeskScreen sub={helpdeskSub} />
-        : page === 'billing' ? <BillingScreen sub={billingSub} />
-        : page === 'cloud' ? <CloudScreen />
+      {loading ? <PageSkeleton page={page} />
         : (
           <div className="dash__main">
-            {page === 'overview' && <Overview onDrill={setPage} />}
+            {page === 'overview' && <Overview />}
             {page === 'projects' && <Projects />}
-            {page === 'board' && <Board />}
             {page === 'docs' && <DocsScreen />}
             {page === 'inbox' && <Inbox onOpenCmdp={() => setCmdpOpen(true)} />}
             {page === 'media' && <Media />}
-            {page === 'analytics' && <Analytics />}
-            {page === 'calendar' && <CalendarPage />}
-            {page === 'profile' && <Profile />}
-            {page === 'signin' && <SignIn />}
             {page === 'settings' && <Settings />}
           </div>
         )}
@@ -258,17 +152,12 @@ export function DemoDashboard() {
 function CmdPaletteOverlay({ onClose, onGoto }: { onClose: () => void; onGoto: (p: Page) => void }) {
   const [q, setQ] = useState('')
   const items: Array<{ section: string; label: string; icon: IconName; shortcut?: string; action: () => void }> = [
-    { section: 'Navigate', label: 'Go to Overview', icon: 'home', shortcut: 'G O', action: () => onGoto('overview') },
+    { section: 'Navigate', label: 'Go to Home', icon: 'home', shortcut: 'G H', action: () => onGoto('overview') },
     { section: 'Navigate', label: 'Go to Projects', icon: 'grid', shortcut: 'G P', action: () => onGoto('projects') },
-    { section: 'Navigate', label: 'Go to Board', icon: 'chart', shortcut: 'G B', action: () => onGoto('board') },
+    { section: 'Navigate', label: 'Go to Docs', icon: 'edit', shortcut: 'G D', action: () => onGoto('docs') },
     { section: 'Navigate', label: 'Go to Inbox', icon: 'bell', shortcut: 'G I', action: () => onGoto('inbox') },
     { section: 'Navigate', label: 'Go to Media', icon: 'file', shortcut: 'G M', action: () => onGoto('media') },
-    { section: 'Navigate', label: 'Go to Analytics', icon: 'chart', shortcut: 'G A', action: () => onGoto('analytics') },
     { section: 'Navigate', label: 'Go to Settings', icon: 'cog', shortcut: 'G S', action: () => onGoto('settings') },
-    { section: 'Showcase', label: 'Go to CRM', icon: 'store', action: () => onGoto('crm') },
-    { section: 'Showcase', label: 'Go to Helpdesk', icon: 'chat', action: () => onGoto('helpdesk') },
-    { section: 'Showcase', label: 'Go to Billing', icon: 'cal', action: () => onGoto('billing') },
-    { section: 'Showcase', label: 'Go to Cloud', icon: 'upload', action: () => onGoto('cloud') },
     { section: 'Actions', label: 'New project', icon: 'plus', shortcut: '⌘ N', action: onClose },
     { section: 'Actions', label: 'Invite teammate', icon: 'bell', shortcut: '⌘ I', action: onClose },
     { section: 'Actions', label: 'Upload media', icon: 'upload', shortcut: '⌘ U', action: onClose },
@@ -333,7 +222,7 @@ function Breadcrumb({ here, parent }: { here: string; parent?: string }) {
   )
 }
 
-function Overview({ onDrill }: { onDrill: (p: Page) => void }) {
+function Overview() {
   const [bannerOpen, setBannerOpen] = useState(true)
   const [notifOpen, setNotifOpen] = useState(false)
   const [newOpen, setNewOpen] = useState(false)
@@ -341,17 +230,13 @@ function Overview({ onDrill }: { onDrill: (p: Page) => void }) {
   return (
     <>
       <Breadcrumb here="Home" />
+      {/* System Banner — a page-level info strip (scheduled maintenance / status).
+          The canonical home for the .banner component. */}
       {bannerOpen && (
-        <div className="upgrade-banner">
-          <span className="upgrade-banner__icon"><Icon name="spark" size={14} /></span>
-          <div className="upgrade-banner__body">
-            <div className="upgrade-banner__title">Pro plan unlocks unlimited projects</div>
-            <div className="upgrade-banner__sub">Currently on Team plan — 7 of 10 projects used.</div>
-          </div>
-          <button className="btn btn--primary btn--sm">Upgrade</button>
-          <button className="alert__close" aria-label="Dismiss" onClick={() => setBannerOpen(false)}>
-            <Icon name="x" />
-          </button>
+        <div className="banner banner--info" style={{ marginBottom: 16 }}>
+          <Icon name="info" />
+          <div className="banner__body"><b>Scheduled maintenance</b> — Friday 02:00–04:00 UTC. <a href="#">Learn more</a></div>
+          <button className="banner__close" aria-label="Dismiss" onClick={() => setBannerOpen(false)}>×</button>
         </div>
       )}
       <div className="dash__head">
@@ -400,10 +285,10 @@ function Overview({ onDrill }: { onDrill: (p: Page) => void }) {
           <button className="alert__close" aria-label="Dismiss" onClick={() => setAlertOpen(false)}><Icon name="x" /></button>
         </div>
       )}
-      {/* KPI tiles drill into Analytics — clickable cards with hover lift. */}
+      {/* KPI tiles — stat-tile strip with sparkline + delta (Home's signature). */}
       <div className="dash__stats">
-        <StatCard label="Requests" value="12.4k" delta="+8.2%" accent={1} trend={[42, 51, 49, 58, 65, 60, 72]} onClick={() => onDrill('analytics')} />
-        <StatCard label="Active users" value="3,128" delta="+2.1%" accent={2} trend={[20, 22, 28, 31, 34, 38, 41]} onClick={() => onDrill('analytics')} />
+        <StatCard label="Requests" value="12.4k" delta="+8.2%" accent={1} trend={[42, 51, 49, 58, 65, 60, 72]} />
+        <StatCard label="Active users" value="3,128" delta="+2.1%" accent={2} trend={[20, 22, 28, 31, 34, 38, 41]} />
         <StatCard
           label="Errors"
           value="0.42%"
@@ -411,37 +296,8 @@ function Overview({ onDrill }: { onDrill: (p: Page) => void }) {
           accent={3}
           tooltip="Server-side errors as % of total requests"
           trend={[80, 72, 65, 60, 52, 48, 42]}
-          onClick={() => onDrill('analytics')}
         />
-        <StatCard label="Revenue" value="$4,820" delta="+12%" accent={4} trend={[30, 38, 35, 50, 55, 62, 78]} onClick={() => onDrill('analytics')} />
-      </div>
-
-      {/* Quick actions + team-online side-by-side */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 24 }}>
-        <div>
-          <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 10 }}>Quick actions</h2>
-          <div className="quickact">
-            <QuickTile icon="plus"   title="New project"   sub="From scratch"   accent={1} />
-            <QuickTile icon="upload" title="Import file"   sub="JSON or CSV"    accent={2} />
-            <QuickTile icon="bell"   title="Invite"        sub="Add a teammate" accent={3} />
-            <QuickTile icon="file"   title="Docs"          sub="Read the guide" accent={4} />
-          </div>
-        </div>
-        <div>
-          <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 10 }}>Team online</h2>
-          <div className="team-online">
-            <div className="team-online__label">
-              <span className="team-online__count">5 online</span>
-              <span className="team-online__sub">of 12 members</span>
-            </div>
-            <span className="avatar-group">
-              <span className="avatar avatar--sm avatar--a1">JM<span className="avatar__status avatar__status--online" role="img" aria-label="Online" /></span>
-              <span className="avatar avatar--sm avatar--a2">AC<span className="avatar__status avatar__status--online" role="img" aria-label="Online" /></span>
-              <span className="avatar avatar--sm avatar--a3">MK<span className="avatar__status avatar__status--away" role="img" aria-label="Away" /></span>
-              <span className="avatar-group__more">+2</span>
-            </span>
-          </div>
-        </div>
+        <StatCard label="Revenue" value="$4,820" delta="+12%" accent={4} trend={[30, 38, 35, 50, 55, 62, 78]} />
       </div>
 
       {/* Usage row — the UsageMeter (API quota) paired with a Progress bar
@@ -489,45 +345,7 @@ function Overview({ onDrill }: { onDrill: (p: Page) => void }) {
         <ActivityItem dot="info" text="New member joined: Casey" meta="1h" author="casey_w" />
         <ActivityItem dot="danger" text="Webhook failed for payments-prod" meta="3h" author="jordan_m" />
       </div>
-
-      {/* What's new — the FeatureTrio component (three icon-led feature cells)
-          as an onboarding/changelog row at the foot of the home dashboard. */}
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, margin: '24px 0 10px' }}>What's new</h2>
-      <div className="ftrio">
-        <div className="ftrio__cell">
-          <span className="ftrio__icon"><Icon name="spark" /></span>
-          <div className="ftrio__title">Faster deploys <span className="badge badge--primary">New</span></div>
-          <div className="ftrio__body">Builds now run on the upgraded edge fleet — 40% quicker.</div>
-        </div>
-        <div className="ftrio__cell">
-          <span className="ftrio__icon"><Icon name="chart" /></span>
-          <div className="ftrio__title">Usage insights <span className="badge badge--warn">Beta</span></div>
-          <div className="ftrio__body">Break requests down by tier and source in Analytics.</div>
-        </div>
-        <div className="ftrio__cell">
-          <span className="ftrio__icon"><Icon name="upload" /></span>
-          <div className="ftrio__title">Bulk import <span className="badge badge--neutral">Pro</span></div>
-          <div className="ftrio__body">Bring projects in from CSV or another workspace.</div>
-        </div>
-      </div>
     </>
-  )
-}
-
-// Quick-action tile — icon-stack-label, clickable, hover lift. Each tile's
-// icon chip pulls a distinct decorative-palette accent (soft tint + colour).
-function QuickTile({ icon, title, sub, accent }: { icon: IconName; title: string; sub: string; accent?: number }) {
-  const tint = accent
-    ? { color: `var(--k-accent-${accent}-soft-fg)`, background: `var(--k-accent-${accent}-soft)` }
-    : undefined
-  return (
-    <button type="button" className="quickact__tile">
-      <span className="quickact__icon" style={tint}><Icon name={icon} /></span>
-      <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <span className="quickact__label">{title}</span>
-        <span className="quickact__sub">{sub}</span>
-      </span>
-    </button>
   )
 }
 
@@ -702,6 +520,8 @@ function Projects() {
   const [openIssue, setOpenIssue] = useState<Issue | null>(null)
   const [niType, setNiType] = useState('Feature')
   const [niPrio, setNiPrio] = useState('med')
+  // Table (DataTablePro) vs Board (kanban) — two views of the same backlog.
+  const [view, setView] = useState<'table' | 'board'>('table')
 
   const toggleSort = (k: ProjectSortKey) => {
     if (sortKey === k) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
@@ -741,16 +561,24 @@ function Projects() {
       <div className="dash__head">
         <h1>Projects</h1>
         <div className="card__row">
-          <div className="in in--inline" style={{ maxWidth: 240 }}>
-            <Icon name="search" />
-            <input type="search" aria-label="Filter issues" placeholder="Filter issues…" value={q} onChange={(e) => setQ(e.target.value)} />
+          {/* Table / Board view switch */}
+          <div className="segctrl" role="tablist" aria-label="View">
+            <button role="tab" aria-selected={view === 'table'} className={`segctrl__btn ${view === 'table' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('table')}>Table</button>
+            <button role="tab" aria-selected={view === 'board'} className={`segctrl__btn ${view === 'board' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('board')}>Board</button>
           </div>
+          {view === 'table' && (
+            <div className="in in--inline" style={{ maxWidth: 240 }}>
+              <Icon name="search" />
+              <input type="search" aria-label="Filter issues" placeholder="Filter issues…" value={q} onChange={(e) => setQ(e.target.value)} />
+            </div>
+          )}
           <button className="btn btn--primary btn--sm" onClick={() => setSheetOpen(true)}>
             <Icon name="plus" /> New issue
           </button>
         </div>
       </div>
 
+      {view === 'board' ? <BoardView /> : <>
       {/* Tag-input pattern — filter chips for environment */}
       <div className="card__row" style={{ marginBottom: 14, alignItems: 'center' }}>
         <span style={{ fontSize: 'var(--k-type-eyebrow)', color: 'var(--k-fg-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>
@@ -884,6 +712,7 @@ function Projects() {
           </div>
         </div>
       )}
+      </>}
 
       {/* New issue — a Sheet drawer sliding over the content. Hosts the
           RadioCard (issue type), a Select (priority) and a Date input. */}
@@ -1155,6 +984,14 @@ function DocsScreen() {
                     ))}
                   </pre>
                 </div>
+                {/* Quick-reference InfoCards — key/value callouts beside the prose. */}
+                <h2 style={{ fontSize: 'var(--k-type-h2)', fontWeight: 600, margin: '0 0 0.6em' }}>At a glance</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, margin: '0 0 1.6em' }}>
+                  <div className="info-card"><div className="info-card__label">Package</div><span className="info-card__value">@supadash/sdk</span></div>
+                  <div className="info-card"><div className="info-card__label">Latest version</div><span className="info-card__value">v2.4.0</span></div>
+                  <div className="info-card"><div className="info-card__label">Runtime</div><span className="info-card__value">Node 18+ / Edge</span></div>
+                  <div className="info-card"><div className="info-card__label">Docs</div><a className="info-card__value info-card__value--link" href="#">API reference ↗</a></div>
+                </div>
                 <h2 style={{ fontSize: 'var(--k-type-h2)', fontWeight: 600, margin: '0 0 0.6em' }}>Screenshots</h2>
                 <DocCarousel />
                 <h2 style={{ fontSize: 'var(--k-type-h2)', fontWeight: 600, margin: '1.4em 0 0.5em' }}>Common questions</h2>
@@ -1188,7 +1025,10 @@ function DocsScreen() {
   )
 }
 
-function Board() {
+/* Board view — Projects' kanban mode (toolbar + .kanban). Headerless: Projects
+ * supplies the breadcrumb + page head; the segmented Table/Board switch picks it.
+ * The canonical home for .kanban + the board .toolbar + avatar-group. */
+function BoardView() {
   const [group, setGroup] = useState('None')
   const cols: { name: string; cards: BoardIssue[] }[] = [
     { name: 'To Do', cards: [
@@ -1210,12 +1050,6 @@ function Board() {
   const team = ['AB', 'CD', 'EF', 'GH']
   return (
     <>
-      <Breadcrumb here="Board" />
-      <div className="dash__head">
-        <h1>Board</h1>
-        <button className="btn btn--primary btn--sm"><Icon name="plus" /> Create</button>
-      </div>
-
       {/* Board toolbar — the .toolbar recipe forces every control to one
           height, so the search input, ghost filters, select and Insights
           button all line up regardless of their individual sizing. */}
@@ -1273,15 +1107,6 @@ function Board() {
       </div>
     </>
   )
-}
-
-const METRICS = ['Latency', 'Throughput', 'Error rate']
-const RANGES = ['7d', '30d', '90d', 'Custom'] as const
-
-const SERIES: Record<Exclude<(typeof RANGES)[number], 'Custom'>, number[]> = {
-  '7d':  [42, 38, 51, 47, 60, 55, 64],
-  '30d': [38, 45, 42, 50, 47, 56, 52, 60, 58, 65, 62, 70],
-  '90d': [50, 48, 55, 52, 60, 57, 64, 61, 68, 65, 72, 69, 75, 73, 80],
 }
 
 // ============================================================
@@ -1591,19 +1416,12 @@ function MailThread({ msg, onBack }: { msg: (typeof INBOX_MESSAGES)[number]; onB
           <MailAttachment kind="audio" label="call-notes.m4a" meta="0:42" />
         </div>
       </div>
-      <div className={'composer' + (canSend ? ' composer--ready' : '')} style={{ maxWidth: 680 }}>
-        <textarea className="composer__input" rows={2} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Reply…" />
-        <div className="composer__bar">
-          <div className="composer__tools">
-            <button className="composer__attach" aria-label="Attach"><Icon name="plus" /></button>
-            <button className="composer__chip"><Icon name="file" /> Files</button>
-            <button className="composer__chip composer__chip--more" aria-label="More tools"><Icon name="grid" /></button>
-          </div>
-          <div className="composer__send">
-            <button className="composer__submit" disabled={!canSend} aria-label="Send">
-              <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden><path d="M7 2 L7 12 M3 6 L7 2 L11 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </button>
-          </div>
+      {/* Reply — a plain textarea + send, composed from primitives (.in + .btn). */}
+      <div className="card" style={{ maxWidth: 680, gap: 10 }}>
+        <textarea className="in" rows={3} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Reply…" aria-label="Reply" />
+        <div className="card__row" style={{ justifyContent: 'space-between' }}>
+          <button className="btn btn--ghost btn--sm" aria-label="Attach file"><Icon name="plus" /> Attach</button>
+          <button className="btn btn--primary btn--sm" disabled={!canSend}><Icon name="check" /> Send</button>
         </div>
       </div>
     </>
@@ -1704,15 +1522,18 @@ function Media() {
               List
             </button>
           </div>
-          <button className="btn btn--primary btn--sm">
-            <Icon name="upload" /> Upload
-          </button>
+          {/* Split action — primary + an options chevron, fused via .btn-group. */}
+          <div className="btn-group" role="group" aria-label="Upload">
+            <button className="btn btn--primary btn--sm"><Icon name="upload" /> Upload</button>
+            <button className="btn btn--primary btn--sm btn--icon" aria-label="Upload options"><Icon name="chevD" /></button>
+          </div>
         </div>
       </div>
 
-      {/* Two-pane file browser — folder tree (.tree) + content pane. */}
+      {/* Two-pane file browser — folder tree (.tree) + content pane. The tree
+          sits in a .scroll-area so a deep folder list scrolls with a slim bar. */}
       <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
-        <aside className="tree" style={{ width: 184, flex: 'none' }} role="tree">
+        <aside className="tree scroll-area" style={{ width: 184, flex: 'none', maxHeight: 360 }} role="tree">
           <div
             className="tree__row"
             role="treeitem"
@@ -1823,9 +1644,12 @@ function Media() {
                 textAlign: 'left',
               }}
             >
-              {/* Image tiles show a colour thumbnail (opens the Lightbox); others a file glyph. */}
-              <div style={{ aspectRatio: '4/3', background: f.type === 'image' ? `var(--k-grad-${(f.id % 4) + 1})` : 'var(--k-surface-sunken)', borderRadius: 'calc(var(--k-radius-md) * 0.6)', display: 'grid', placeItems: 'center', color: f.type === 'image' ? '#fff' : 'var(--k-fg-muted)' }}>
-                <Icon name={f.type === 'image' ? 'grid' : f.type === 'video' ? 'chart' : 'file'} size={22} />
+              {/* Ratio-locked thumbnail via the .aspect recipe (opens the Lightbox for
+                  images); the .aspect__fill carries the colour wash / file glyph. */}
+              <div className="aspect aspect--1x1">
+                <div className="aspect__fill" style={{ background: f.type === 'image' ? `var(--k-grad-${(f.id % 4) + 1})` : 'var(--k-surface-sunken)', display: 'grid', placeItems: 'center', color: f.type === 'image' ? 'var(--k-primary-fg, #fff)' : 'var(--k-fg-muted)' }}>
+                  <Icon name={f.type === 'image' ? 'grid' : f.type === 'video' ? 'chart' : 'file'} size={22} />
+                </div>
               </div>
               <div className="card__row" style={{ alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
                 <span style={{ fontSize: 'var(--k-type-small)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
@@ -1924,193 +1748,6 @@ function Media() {
 /* Account › Profile — profile-header pattern (cover + overlapping avatar +
  * bio + dual CTA + counter chips) composed from existing primitives, plus a
  * tabbed body. Demonstrates a consumer profile screen, no new components. */
-function Profile() {
-  const [tab, setTab] = useState<'overview' | 'activity' | 'team'>('overview')
-  const stats: [string, string][] = [['128', 'Posts'], ['4.2k', 'Followers'], ['312', 'Following']]
-  const activity = [
-    { icon: 'spark' as IconName, text: 'Shipped the motion-token playground', meta: '2h ago' },
-    { icon: 'check' as IconName, text: 'Merged PR #248 · token engine refactor', meta: 'Yesterday' },
-    { icon: 'upload' as IconName, text: 'Published design-system v2.4', meta: '3 days ago' },
-    { icon: 'edit' as IconName, text: 'Updated the brand color guidelines', meta: 'Last week' },
-  ]
-  return (
-    <>
-      <Breadcrumb here="Profile" />
-      <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 18 }}>
-        <div style={{ height: 120, background: 'var(--k-grad-1)' }} />
-        <div style={{ padding: '0 20px', display: 'flex', gap: 16, alignItems: 'flex-end', marginTop: -38 }}>
-          <span className="avatar" style={{ width: 86, height: 86, fontSize: 30, border: '3px solid var(--k-surface)', flex: 'none' }}>AC</span>
-          <div style={{ flex: 1, paddingBottom: 6 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <h1 style={{ fontSize: 'var(--k-type-h2)' }}>Ava Chen</h1>
-              <span className="badge badge--neutral">Pro</span>
-            </div>
-            <div style={{ color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }}>@ava_chen · Design engineer</div>
-          </div>
-          <div style={{ display: 'flex', gap: 8, paddingBottom: 6 }}>
-            <button className="btn btn--ghost btn--sm"><Icon name="bell" /> Message</button>
-            <button className="btn btn--primary btn--sm"><Icon name="plus" /> Follow</button>
-          </div>
-        </div>
-        <p style={{ padding: '12px 20px 0', color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)', maxWidth: 580, lineHeight: 1.5 }}>
-          Building design systems at SupaDash — tokens, motion, and the occasional plant photo. Previously at Northwind.
-        </p>
-        <div style={{ display: 'flex', gap: 28, padding: '14px 20px 18px' }}>
-          {stats.map(([n, l]) => (
-            <div key={l}>
-              <div style={{ fontWeight: 700, fontSize: 'var(--k-type-body)' }}>{n}</div>
-              <div style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>{l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="segctrl" style={{ marginBottom: 14, width: 'fit-content' }}>
-        <button className={`segctrl__btn ${tab === 'overview' ? 'segctrl__btn--on' : ''}`} onClick={() => setTab('overview')}>Overview</button>
-        <button className={`segctrl__btn ${tab === 'activity' ? 'segctrl__btn--on' : ''}`} onClick={() => setTab('activity')}>Activity</button>
-        <button className={`segctrl__btn ${tab === 'team' ? 'segctrl__btn--on' : ''}`} onClick={() => setTab('team')}>Team</button>
-      </div>
-
-      {tab === 'team' ? (
-        <Team />
-      ) : tab === 'overview' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
-          {[['Projects', '12', 'Active across 3 teams'], ['Contributions', '1,284', 'This year'], ['Streak', '46 days', 'Current']].map(([t, n, d]) => (
-            <div key={t} className="card">
-              <div style={{ fontSize: 'var(--k-type-eyebrow)', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--k-fg-muted)', fontWeight: 500 }}>{t}</div>
-              <div style={{ fontSize: 'var(--k-type-h2)', fontWeight: 700, margin: '4px 0 2px' }}>{n}</div>
-              <div style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>{d}</div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="card" style={{ maxWidth: 620 }}>
-          <div className="list list--flush">
-            {activity.map((a, i) => (
-              <div key={i} className="list__item">
-                <span className="list__lead list__lead--icon-muted"><Icon name={a.icon} size={15} /></span>
-                <div className="list__body">
-                  <div className="list__title list__title--lg">{a.text}</div>
-                  <div className="list__sub">{a.meta}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </>
-  )
-}
-
-/* Account › Sign in — the auth screen everyone judges a kit by. Reuses the
- * .auth system component; a segmented control flips login ↔ create account. */
-function SignIn() {
-  const [mode, setMode] = useState<'login' | 'register'>('login')
-  const [agree, setAgree] = useState(false)
-  return (
-    <>
-      <Breadcrumb here="Sign in" />
-      <div style={{ display: 'grid', placeItems: 'center', padding: '20px 0' }}>
-        <div className="card" style={{ width: 384, maxWidth: '100%' }}>
-          <div className="segctrl" style={{ marginBottom: 18 }}>
-            <button className={`segctrl__btn ${mode === 'login' ? 'segctrl__btn--on' : ''}`} onClick={() => setMode('login')}>Sign in</button>
-            <button className={`segctrl__btn ${mode === 'register' ? 'segctrl__btn--on' : ''}`} onClick={() => setMode('register')}>Create account</button>
-          </div>
-          {mode === 'login' ? (
-            <div className="auth">
-              <div className="auth__head">
-                <div className="auth__title">Welcome back</div>
-                <div className="auth__sub">Sign in to your SupaDash account</div>
-              </div>
-              <div className="auth__social auth__social--row">
-                <button className="btn btn--outline">Google</button>
-                <button className="btn btn--outline">GitHub</button>
-              </div>
-              <div className="divider-or">or</div>
-              <label className="lab" htmlFor="signin-email"><span>Email</span><input id="signin-email" className="in" type="email" defaultValue="ava@supadash.io" /></label>
-              <label className="lab" htmlFor="signin-password"><span>Password</span><input id="signin-password" className="in" type="password" defaultValue="supersecret" /></label>
-              <div className="auth__meta">
-                <label className="check" style={{ gap: 6 }}><input type="checkbox" defaultChecked /> Remember me</label>
-                <a className="auth__link">Forgot password?</a>
-              </div>
-              <button className="btn btn--primary btn--block">Sign in</button>
-              <div className="auth__foot">Don't have an account? <a className="auth__link" onClick={() => setMode('register')}>Sign up</a></div>
-            </div>
-          ) : (
-            <div className="auth">
-              <div className="auth__head">
-                <div className="auth__title">Create your account</div>
-                <div className="auth__sub">Start your 14-day free trial — no card needed</div>
-              </div>
-              <div className="auth__social"><button className="btn btn--outline btn--block">Continue with Google</button></div>
-              <div className="divider-or">or</div>
-              <label className="lab"><span>Full name</span><input className="in" placeholder="Ava Chen" /></label>
-              <label className="lab"><span>Work email</span><input className="in" type="email" placeholder="you@company.com" /></label>
-              <label className="lab"><span>Password</span><input className="in" type="password" placeholder="8+ characters" /></label>
-              <label className="check" style={{ gap: 6, alignItems: 'flex-start' }}>
-                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-                <span>I agree to the <a className="auth__link">Terms</a> &amp; <a className="auth__link">Privacy Policy</a></span>
-              </label>
-              <button className="btn btn--primary btn--block" disabled={!agree} style={!agree ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}>Create account</button>
-              <div className="auth__foot">Already have an account? <a className="auth__link" onClick={() => setMode('login')}>Sign in</a></div>
-            </div>
-          )}
-        </div>
-      </div>
-    </>
-  )
-}
-
-/* Workspace › Calendar — booking/scheduling screen: month grid (.calendar) +
- * the .slotpicker component for the selected day. Composes existing primitives. */
-function CalendarPage() {
-  const [day, setDay] = useState(4)
-  const [slot, setSlot] = useState('10:30')
-  const slots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '13:00', '13:30', '14:00', '14:30']
-  const off = new Set(['11:00', '13:00'])
-  return (
-    <>
-      <Breadcrumb here="Calendar" />
-      <div className="dash__head"><h1 style={{ flex: 1 }}>Book a session</h1><button className="btn btn--ghost btn--sm"><Icon name="plus" /> New event</button></div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 300px', gap: 24, alignItems: 'flex-start' }}>
-        <div className="card">
-          <div className="card__row" style={{ justifyContent: 'space-between', marginBottom: 12 }}>
-            <span style={{ fontWeight: 600 }}>June 2026</span>
-            <div className="card__row" style={{ gap: 2 }}>
-              <button className="btn btn--ghost btn--icon" aria-label="Previous month"><Icon name="chevL" /></button>
-              <button className="btn btn--ghost btn--icon" aria-label="Next month"><Icon name="chevR" /></button>
-            </div>
-          </div>
-          <div className="calendar">
-            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => <span key={i} className="calendar__head">{d}</span>)}
-            {Array.from({ length: 30 }, (_, i) => i + 1).map((d) => {
-              const parts = ['calendar__cell']
-              if (d === day) parts.push('calendar__cell--today')
-              return <button key={d} type="button" className={parts.join(' ')} onClick={() => setDay(d)}>{d}</button>
-            })}
-          </div>
-        </div>
-        <div className="card">
-          <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 4 }}>June {day}, 2026</h2>
-          <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: '0 0 12px' }}>Select an available time</p>
-          {/* Date input — type a date instead of clicking the grid. */}
-          <label className="lab" style={{ marginBottom: 12 }}>
-            <span>Or jump to a date</span>
-            <DatePicker defaultValue="2026-06-04" ariaLabel="Pick a date" />
-          </label>
-          <div className="slotpicker">
-            {slots.map((t) => (
-              <button key={t} type="button" className={'slot' + (off.has(t) ? ' slot--off' : slot === t ? ' slot--on' : '')} onClick={() => !off.has(t) && setSlot(t)}>{t}</button>
-            ))}
-          </div>
-          <div className="card__foot">
-            <button className="btn btn--primary btn--block"><Icon name="check" /> Book {slot}</button>
-          </div>
-        </div>
-      </div>
-    </>
-  )
-}
 
 /* InboxMessage — a single conversation bubble (avatar + author + time + body),
  * shared by the Inbox mail thread (MailThread). */
@@ -2128,325 +1765,6 @@ function InboxMessage({ name, av, time, body, me }: { name: string; av: string; 
         </div>
       </div>
     </div>
-  )
-}
-function Analytics() {
-  const [metric, setMetric] = useState(0)
-  const [range, setRange] = useState<(typeof RANGES)[number]>('30d')
-  const [chartType, setChartType] = useState<ChartType>('area')
-
-  // Custom range = a real POPOVER. useDropdown gives outside-click + Escape
-  // dismissal; it closes on the SECOND pick (range complete); focus returns to
-  // the trigger on close. Calendar cells are real <button>s. Mirrors the
-  // gallery DateCard — the dashboard instance was previously a static stub.
-  const { open: calOpen, setOpen: setCalOpen, ref: calRef } = useDropdown()
-  const calTrigger = useRef<HTMLButtonElement>(null)
-  const calToday = 14
-  const [start, setStart] = useState<number | null>(10)
-  const [end, setEnd] = useState<number | null>(17)
-  const [hover, setHover] = useState<number | null>(null)
-
-  const calWasOpen = useRef(calOpen)
-  useEffect(() => {
-    if (calWasOpen.current && !calOpen) calTrigger.current?.focus()
-    calWasOpen.current = calOpen
-  }, [calOpen])
-
-  const pickDate = (d: number) => {
-    if (d < 1 || d > 31) return
-    if (start === null || (start !== null && end !== null)) {
-      setStart(d); setEnd(null)
-    } else {
-      if (d < start) { setEnd(start); setStart(d) } else { setEnd(d) }
-      setTimeout(() => setCalOpen(false), 160)
-    }
-  }
-
-  const effEnd = end ?? (start !== null && hover !== null && hover >= start ? hover : null)
-  const effStart = end === null && start !== null && hover !== null && hover < start ? hover : start
-  const calDays = Array.from({ length: 35 }, (_, i) => i - 2)
-  const cellClass = (d: number): string => {
-    const parts = ['calendar__cell']
-    if (d < 1 || d > 31) parts.push('calendar__cell--out')
-    if (d === calToday) parts.push('calendar__cell--today')
-    if (effStart !== null && effEnd !== null) {
-      if (d === effStart && d === effEnd) parts.push('calendar__cell--on')
-      else if (d === effStart) parts.push('calendar__cell--range-start')
-      else if (d === effEnd) parts.push('calendar__cell--range-end')
-      else if (d > effStart && d < effEnd) parts.push('calendar__cell--range')
-    } else if (start !== null && d === start) {
-      parts.push('calendar__cell--on')
-    }
-    return parts.join(' ')
-  }
-  const calSummary =
-    start !== null && end !== null ? `May ${Math.min(start, end)} – ${Math.max(start, end)}`
-      : start !== null ? 'Now pick an end date'
-        : 'Pick a start date'
-
-  const data = SERIES[range === 'Custom' ? '30d' : range]
-
-  return (
-    <>
-      <Breadcrumb here="Analytics" />
-      <div className="dash__head">
-        <h1>Analytics</h1>
-        <div className="card__row">
-          {/* Segmented control — range selector (preset ranges only) */}
-          <div className="segctrl">
-            {(['7d', '30d', '90d'] as const).map((r) => (
-              <button
-                key={r}
-                className={`segctrl__btn ${range === r ? 'segctrl__btn--on' : ''}`}
-                onClick={() => { setRange(r); setCalOpen(false) }}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-          {/* Custom range → real popover (outside-click + Escape dismiss). */}
-          <span className="popover-wrap" ref={calRef}>
-            <button
-              ref={calTrigger}
-              type="button"
-              className={`btn btn--ghost btn--sm ${range === 'Custom' ? 'btn--primary' : ''}`}
-              aria-haspopup="dialog"
-              aria-expanded={calOpen}
-              onClick={() => { setRange('Custom'); setCalOpen((o) => !o) }}
-            >
-              <Icon name="cal" /> Custom
-            </button>
-            {calOpen && (
-              <div className="popover" role="dialog" aria-label="Choose a date range" style={{ left: 'auto', right: 0, width: 268 }}>
-                <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontWeight: 600, fontSize: 'var(--k-type-small)' }}>May 2026</span>
-                  <span className="toolbar__group">
-                    <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Previous month"><Icon name="chevL" /></button>
-                    <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Next month"><Icon name="chevR" /></button>
-                  </span>
-                </div>
-                <div className="calendar" onMouseLeave={() => setHover(null)}>
-                  {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-                    <span key={i} className="calendar__head">{d}</span>
-                  ))}
-                  {calDays.map((d, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      className={cellClass(d)}
-                      disabled={d < 1 || d > 31}
-                      aria-label={d >= 1 && d <= 31 ? `May ${d}` : undefined}
-                      aria-current={d === calToday ? 'date' : undefined}
-                      onClick={() => pickDate(d)}
-                      onMouseEnter={() => d >= 1 && d <= 31 && setHover(d)}
-                    >
-                      {d >= 1 && d <= 31 ? d : ''}
-                    </button>
-                  ))}
-                </div>
-                <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-                  <span style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }}>{calSummary}</span>
-                  {(start !== null || end !== null) && (
-                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => { setStart(null); setEnd(null) }}>Clear</button>
-                  )}
-                </div>
-              </div>
-            )}
-          </span>
-        </div>
-      </div>
-      <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <div className="tabs">
-          {METRICS.map((m, i) => (
-            <button key={m} className={`tab ${metric === i ? 'tab--on' : ''}`} onClick={() => setMetric(i)}>
-              {m}
-            </button>
-          ))}
-        </div>
-        {/* Chart-type switcher — same data, five presentational render modes,
-            all driven by the --k-chart palette. Proves the palette reads. */}
-        <div className="segctrl">
-          {(['line', 'area', 'bar'] as const).map((t) => (
-            <button key={t} className={`segctrl__btn ${chartType === t ? 'segctrl__btn--on' : ''}`} onClick={() => setChartType(t)}>
-              {t}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="card" style={{ marginBottom: 20 }}>
-        <ChartFrame
-          type={chartType}
-          height={190}
-          labels={data.map((_, i) => `${i + 1}`)}
-          series={[
-            { name: METRICS[metric] ?? 'Series', values: data },
-            { name: 'Baseline', values: data.map((v) => Math.round(v * 0.62)) },
-          ]}
-        />
-      </div>
-      {/* Categorical companions — stacked composition + donut share, the two
-          shapes a line chart can't express. */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.4fr) minmax(0,1fr)', gap: 16, marginBottom: 20 }}>
-        <div className="card">
-          <h2 style={{ fontSize: 'var(--k-type-body)', fontWeight: 600, marginBottom: 12 }}>Requests by tier</h2>
-          <ChartFrame
-            type="stacked"
-            height={150}
-            labels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
-            series={[
-              { name: 'Free', values: [22, 30, 26, 34, 40, 28] },
-              { name: 'Pro', values: [18, 20, 24, 22, 28, 30] },
-              { name: 'Enterprise', values: [10, 14, 12, 18, 16, 20] },
-            ]}
-          />
-        </div>
-        <div className="card">
-          <h2 style={{ fontSize: 'var(--k-type-body)', fontWeight: 600, marginBottom: 12 }}>Traffic by source</h2>
-          <ChartFrame
-            type="donut"
-            height={150}
-            labels={['Direct', 'Search', 'Social', 'Referral']}
-            series={[{ name: 'Sources', values: [48, 30, 14, 8] }]}
-          />
-        </div>
-      </div>
-      <div className="dash__stats" style={{ marginTop: 20 }}>
-        <StatCard label="P50" value="124ms" delta="-3.2%" />
-        <StatCard label="P95" value="412ms" delta="+1.1%" tooltip="95th percentile response time" />
-        <StatCard label="Errors" value="0.42%" delta="-0.08%" />
-        <StatCard label="Uptime" value="99.98%" delta="+0.01%" />
-      </div>
-    </>
-  )
-}
-
-// === TEAM PAGE ===
-
-// Avatar colour = decorative ACCENT (identity), NOT a semantic token — a
-// person is not "danger red". `dot` stays semantic (presence: online/away).
-const MEMBERS = [
-  { initials: 'AB', name: 'Aiyana Bowers', role: 'Owner', email: 'aiyana@northwind.dev', dot: 'success' as const, accent: 1 },
-  { initials: 'CD', name: 'Casey Diaz', role: 'Engineer', email: 'casey@northwind.dev', dot: 'success' as const, accent: 2 },
-  { initials: 'EF', name: 'Eliot Friedman', role: 'Engineer', email: 'eliot@northwind.dev', dot: 'warn' as const, accent: 3 },
-  { initials: 'GH', name: 'Greta Holm', role: 'Design', email: 'greta@northwind.dev', dot: 'success' as const, accent: 4 },
-  { initials: 'IJ', name: 'Idris Johar', role: 'Support', email: 'idris@northwind.dev', dot: 'success' as const, accent: 5 },
-  { initials: 'KL', name: 'Kira Lindqvist', role: 'Engineer', email: 'kira@northwind.dev', dot: 'info' as const, accent: 6 },
-]
-
-function Team() {
-  const [openCard, setOpenCard] = useState<number | null>(null)
-  const ref = useRef<HTMLDivElement>(null)
-
-  // Close popover on outside click
-  useEffect(() => {
-    if (openCard === null) return
-    const onDown = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpenCard(null)
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [openCard])
-
-  return (
-    <>
-      <div className="dash__head">
-        <h1>Team members</h1>
-        <button className="btn btn--primary btn--sm">
-          <Icon name="plus" /> Invite member
-        </button>
-      </div>
-      {/* Stepper — the team-setup progress indicator (currently on "Invite"). */}
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div className="card__title" style={{ marginBottom: 10 }}>Set up your team</div>
-        <div className="stepper">
-          {['Account', 'Workspace', 'Invite', 'Done'].map((label, i) => (
-            <div key={label} className={`stepper__step ${i < 2 ? 'stepper__step--done' : ''} ${i === 2 ? 'stepper__step--current' : ''}`}>
-              <span className="stepper__dot">{i < 2 ? <Icon name="check" /> : i + 1}</span>
-              <span>{label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div ref={ref} className="card__col" style={{ gap: 6 }}>
-        {MEMBERS.map((m, i) => (
-          <div
-            key={m.email}
-            className="list__row"
-            role="button"
-            tabIndex={0}
-            aria-haspopup="dialog"
-            aria-expanded={openCard === i}
-            onClick={() => setOpenCard(openCard === i ? null : i)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpenCard(openCard === i ? null : i) }
-            }}
-          >
-            <span
-              className="avatar"
-              style={{
-                background: `var(--k-accent-${m.accent}-soft)`,
-                color: `var(--k-accent-${m.accent}-soft-fg)`,
-                width: 32, height: 32, fontSize: 12,
-              }}
-            >
-              {m.initials}
-            </span>
-            <div className="card__col" style={{ gap: 2, flex: 1 }}>
-              <span style={{ fontWeight: 500 }}>{m.name}</span>
-              <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>{m.email}</span>
-            </div>
-            <span className={`badge badge--neutral`}>{m.role}</span>
-            <span className="activity__dot" style={{ background: `var(--k-${m.dot === 'warn' ? 'warning' : m.dot})` }} role="img" aria-label={`Status: ${m.dot}`} />
-            {openCard === i && (
-              <div
-                className="dialog"
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  marginTop: 6,
-                  zIndex: 10,
-                  padding: 'calc(var(--k-space) * 0.8)',
-                  minWidth: 220,
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="card__row" style={{ gap: 10 }}>
-                  <span
-                    className="avatar"
-                    style={{
-                      background: `var(--k-accent-${m.accent}-soft)`,
-                      color: `var(--k-accent-${m.accent}-soft-fg)`,
-                      width: 36, height: 36, fontSize: 13,
-                    }}
-                  >
-                    {m.initials}
-                  </span>
-                  <div className="card__col" style={{ gap: 1, flex: 1 }}>
-                    <span style={{ fontWeight: 600, fontSize: 'var(--k-type-small)' }}>{m.name}</span>
-                    <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>{m.role}</span>
-                  </div>
-                </div>
-                <div className="card__row" style={{ marginTop: 10, gap: 6 }}>
-                  <button className="btn btn--ghost btn--sm" style={{ flex: 1 }}>Profile</button>
-                  <button className="btn btn--secondary btn--sm" style={{ flex: 1 }}>Message</button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
-        <span>6 members · 1 owner</span>
-        <div className="pagination">
-          <button aria-label="Prev"><Icon name="chevL" /></button>
-          {[1, 2].map((n) => (
-            <button key={n} aria-current={n === 1}>{n}</button>
-          ))}
-          <button aria-label="Next"><Icon name="chevR" /></button>
-        </div>
-      </div>
-    </>
   )
 }
 
@@ -2487,6 +1805,201 @@ function SettingsExtras() {
       <div style={{ borderTop: 'var(--k-divider)', margin: '4px 0 2px' }} />
       <label className="check"><input type="checkbox" defaultChecked /> Add a README</label>
       <label className="check"><input type="checkbox" /> Include .gitignore</label>
+    </>
+  )
+}
+
+const SETTINGS_H2: CSSProperties = { fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 12 }
+
+/* Settings › Account access — the .auth login form re-homed as a security card.
+ * Canonical home for the Auth pattern + PasswordInput. */
+function SettingsAccess() {
+  return (
+    <>
+      <h2 style={SETTINGS_H2}>Account access</h2>
+      <div className="card" style={{ maxWidth: 384, marginBottom: 20 }}>
+        <div className="auth">
+          <div className="auth__head">
+            <div className="auth__title">Sign-in &amp; security</div>
+            <div className="auth__sub">Update the credentials for your account</div>
+          </div>
+          <div className="auth__social auth__social--row">
+            <button className="btn btn--outline">Google</button>
+            <button className="btn btn--outline">GitHub</button>
+          </div>
+          <div className="divider-or">or</div>
+          <label className="lab" htmlFor="set-email"><span>Email</span><input id="set-email" className="in" type="email" defaultValue="ava@supadash.io" /></label>
+          <label className="lab" htmlFor="set-pass"><span>Password</span><input id="set-pass" className="in" type="password" defaultValue="supersecret" /></label>
+          <button className="btn btn--primary btn--block">Update password</button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+/* Settings › Billing contact — a validated form re-homing Validation (inline
+ * error), PhoneInput and DatePicker into the account archetype. */
+function SettingsContact() {
+  const [phone, setPhone] = useState('6 12 34 56 78')
+  return (
+    <>
+      <h2 style={SETTINGS_H2}>Billing contact</h2>
+      <section className="card" style={{ maxWidth: 420, marginBottom: 20 }}>
+        <label className="lab"><span>Full name</span><input className="in" defaultValue="Jordan Maxwell" /></label>
+        {/* Validation — inline error state with message. */}
+        <label className="lab">
+          <span>Email</span>
+          <input className="in is-error" defaultValue="jordan@" aria-invalid="true" aria-describedby="set-billing-err" />
+          <span id="set-billing-err" style={{ fontSize: 11, color: 'var(--k-danger)', marginTop: 2 }}>Enter a valid email address.</span>
+        </label>
+        {/* PhoneInput — country selector + national number. */}
+        <div className="lab">
+          <span>Phone</span>
+          <div className="phoneinput">
+            <button className="phoneinput__country" aria-label="Country">
+              <span className="phoneinput__flag" aria-hidden>🇳🇱</span>
+              <span className="phoneinput__code">+31</span>
+              <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden><path d="M1 1 L5 5 L9 1" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
+            </button>
+            <input className="phoneinput__field" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="6 12 34 56 78" />
+          </div>
+        </div>
+        <label className="lab"><span>Renewal date</span><DatePicker defaultValue="2026-07-01" ariaLabel="Renewal date" /></label>
+      </section>
+    </>
+  )
+}
+
+/* Settings › Plan & billing — the PricingCard tiers + comparison Table. */
+function SettingsPlan() {
+  return (
+    <>
+      <h2 style={SETTINGS_H2}>Plan &amp; billing</h2>
+      <p style={{ color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)', margin: '-6px 0 12px' }}>You're on Team. Upgrade for unlimited projects and reporting.</p>
+      <div className="pricing" style={{ maxWidth: 720 }}>
+        <div className="pricing__tier">
+          <div className="pricing__name">Starter</div>
+          <div className="pricing__price"><span className="pricing__amount">€0</span><span className="pricing__period">/mo</span></div>
+          <ul className="pricing__feats"><li>5 projects</li><li>1 user</li><li>Email support</li></ul>
+          <button className="btn btn--ghost btn--sm" style={{ width: '100%' }}>Downgrade</button>
+        </div>
+        <div className="pricing__tier pricing__tier--featured">
+          <span className="pricing__badge">CURRENT</span>
+          <div className="pricing__name">Team</div>
+          <div className="pricing__price"><span className="pricing__amount">€29</span><span className="pricing__period">/mo</span></div>
+          <ul className="pricing__feats"><li>Unlimited projects</li><li>5 users</li><li>Custom branding</li><li>Reports + insights</li></ul>
+          <button className="btn btn--ghost btn--sm" style={{ width: '100%' }}>Current plan</button>
+        </div>
+        <div className="pricing__tier">
+          <div className="pricing__name">Business</div>
+          <div className="pricing__price"><span className="pricing__amount">€89</span><span className="pricing__period">/mo</span></div>
+          <ul className="pricing__feats"><li>Everything in Team</li><li>Unlimited users</li><li>SSO</li><li>Dedicated CSM</li></ul>
+          <button className="btn btn--primary btn--sm" style={{ width: '100%' }}>Upgrade</button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+/* Settings › New invoice — the WizardStepper (canonical .stepper bar) + a
+ * NumberInput, re-homed from the culled Billing product. */
+function SettingsInvoiceWizard() {
+  const [step, setStep] = useState(1)
+  return (
+    <>
+      <h2 style={{ ...SETTINGS_H2, marginTop: 20 }}>New invoice</h2>
+      <div className="card" style={{ maxWidth: 640, marginBottom: 20 }}>
+        <div className="wstepper">
+          {/* Step bar reuses the canonical .stepper recipe (one stepper system). */}
+          <div className="stepper">
+            {['Customer', 'Items', 'Totals', 'Send'].map((label, i) => {
+              const done = i < step
+              const current = i === step
+              return (
+                <div key={label} className={'stepper__step' + (done ? ' stepper__step--done' : '') + (current ? ' stepper__step--current' : '')}>
+                  <span className="stepper__dot">{done ? <Icon name="check" /> : i + 1}</span>
+                  <span>{label}</span>
+                </div>
+              )
+            })}
+          </div>
+          <div className="wstepper__content">
+            {step === 0 && (
+              <>
+                <div className="wstepper__title">Customer</div>
+                <div className="wstepper__sub">Who is this invoice for?</div>
+                <input className="in" defaultValue="Acme Co." aria-label="Customer name" />
+                <input className="in" type="email" placeholder="billing@acme.com" aria-label="Billing email" style={{ marginTop: 8 }} />
+              </>
+            )}
+            {step === 1 && (
+              <>
+                <div className="wstepper__title">Items</div>
+                <div className="wstepper__sub">Set the quantity. Amounts in EUR.</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <span style={{ fontSize: 13, flex: 1 }}>Quantity</span>
+                  {/* NumberInput — stepper field. */}
+                  <div className="numinput" style={{ width: 130 }}>
+                    <button className="numinput__step">−</button>
+                    <input className="numinput__field" value="3" readOnly aria-label="Quantity" />
+                    <button className="numinput__step">+</button>
+                  </div>
+                </div>
+              </>
+            )}
+            {step >= 2 && (
+              <>
+                <div className="wstepper__title">{step === 2 ? 'Totals' : 'Send'}</div>
+                <dl className="dl">
+                  <dt>Items</dt><dd>3 × €2,400</dd>
+                  <dt>Subtotal</dt><dd>€7,200</dd>
+                  <dt>VAT (21%)</dt><dd>€1,512</dd>
+                  <dt><b>Total</b></dt><dd><b>€8,712</b></dd>
+                </dl>
+              </>
+            )}
+          </div>
+          <div className="wstepper__foot">
+            <button className="btn btn--ghost btn--sm" onClick={() => setStep(Math.max(0, step - 1))}>Back</button>
+            <button className="btn btn--primary btn--sm" onClick={() => setStep(Math.min(3, step + 1))}>{step === 3 ? 'Send invoice' : 'Continue'}</button>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+/* Settings › Service status — the StatusPage (90-day uptime ticks). */
+function SettingsStatus() {
+  const rows = [
+    { name: 'Edge API', pct: '99.98%', p: 'oooooooooooooooooooooo' },
+    { name: 'Dashboard', pct: '99.91%', p: 'ooooooooowoooooooooooo' },
+    { name: 'Webhooks', pct: '98.40%', p: 'ooooooddoooowwoooooooo' },
+    { name: 'CDN', pct: '100%', p: 'oooooooooooooooooooooo' },
+    { name: 'Build pipeline', pct: '99.72%', p: 'oooowoooooooooooodoooo' },
+  ]
+  const Bars = ({ pattern }: { pattern: string }) => (
+    <div className="statuspage__bars">
+      {pattern.split('').map((c, i) => (
+        <span key={i} className={`statuspage__tick ${c === 'w' ? 'statuspage__tick--warn' : c === 'd' ? 'statuspage__tick--down' : ''}`} />
+      ))}
+    </div>
+  )
+  return (
+    <>
+      <h2 style={{ ...SETTINGS_H2, marginTop: 20 }}>Service status</h2>
+      <div className="card" style={{ maxWidth: 640, marginBottom: 20 }}>
+        <div className="statuspage">
+          <div className="statuspage__banner"><Icon name="check" /> All systems operational · last 90 days</div>
+          {rows.map((r) => (
+            <div key={r.name} className="statuspage__row">
+              <span className="statuspage__name">{r.name}</span>
+              <Bars pattern={r.p} />
+              <span className="statuspage__pct">{r.pct}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   )
 }
@@ -2611,17 +2124,15 @@ Authorization: Bearer nw_live_3f8a92...e0d1`}</pre>
 
       <SettingsExtras />
 
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginTop: 20, marginBottom: 8 }}>Mobile app</h2>
-      <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: '0 0 10px' }}>How the bottom tab bar looks on a phone.</p>
-      <div className="m-shell m-shell--tabs" style={{ maxWidth: 300 }}>
-        <div className="m-tabbar">
-          <button className="m-tabbar__tab m-tabbar__tab--on" aria-current="page"><Icon name="home" /><span>Home</span></button>
-          <button className="m-tabbar__tab"><Icon name="search" /><span>Search</span></button>
-          <button className="m-tabbar__tab"><Icon name="chart" /><span>Stats</span></button>
-          <button className="m-tabbar__tab"><Icon name="bell" /><span>Inbox</span></button>
-          <button className="m-tabbar__tab"><Icon name="cog" /><span>You</span></button>
-        </div>
-      </div>
+      <hr className="sep" />
+
+      {/* Re-homed account/billing archetypes — the six-screen cull folds the old
+          Account / Sign-in / Billing / Cloud-status products into Settings. */}
+      <SettingsAccess />
+      <SettingsContact />
+      <SettingsPlan />
+      <SettingsInvoiceWizard />
+      <SettingsStatus />
 
       <div className="dangerzone" style={{ marginTop: 24 }}>
         <div className="dangerzone__head">Danger zone</div>

@@ -209,10 +209,14 @@ equivalent package (most of these ship for Vue / Svelte / Solid as well).
     \`--k-shadow-md\`, label \`--k-fg\` / muted name \`--k-fg-muted\`. For Recharts,
     alias \`:root{--chart-1:var(--k-chart-1)}\` (…-6) and pass as fill/stroke.
 15. Components — see the **Component recipes** block at the bottom of the
-    tokens.css export. Every common shadcn/Radix-style component has its
-    state recipe documented (hover, focus, disabled, active). Match these
-    patterns — don't invent new ones. The recipes document the exact class
-    names + states; mirror that structure when generating components.
+    tokens.css export. It opens with a MANIFEST splitting the kit into three
+    tiers: **PRIMITIVES** (the design system — button, card, input, table,
+    dialog… with full hover/focus/disabled/active state recipes), **HELPERS**
+    (structural glue), and **PATTERNS** (copy-paste compositions built FROM the
+    primitives — auth screen, pricing table, stat tile…). RULE: build screens by
+    composing the PRIMITIVES; reach for a PATTERN only as a ready-made block.
+    Reuse the documented class names + states exactly — never invent a new
+    component or hand-roll inline styles for something a primitive already covers.
 16. Row grammar — every list-style interactive row uses ONE of three height
     tokens. \`--k-row-h-sm\` (28px) for dense menus / dropdown items / table
     rows. \`--k-row-h-md\` (32px) for command palettes / search results.

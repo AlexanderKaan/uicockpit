@@ -129,94 +129,29 @@
   padding: var(--gallery-gap, 40px);
 }
 
-.card {
+/* The Card surface + anatomy (.card, __head/__title/__desc/__row/__col/__foot)
+ * is the exportable "Card" kit recipe (src/kit/recipes) — a calm static
+ * container that ships. The rules below are preview-HARNESS only: the masonry
+ * break, the gallery intro cascade, and an over-card hover-lift. Scoped to
+ * .cockpit-preview so a CDN consumer's card stays static (no surprise motion).
+ * Gallery cards are demo scaffolding (~39 on screen) — the hairline stays 1px
+ * here regardless of the Borders setting; the components INSIDE reflect --k-bw. */
+.cockpit-preview .card {
   break-inside: avoid;
-  background: var(--k-surface);
-  /* Hairline regardless of Borders setting — gallery cards are demo scaffolding
-     (39 of them on screen), not part of the user's design system. The actual
-     components inside (buttons/inputs/alerts/tabs/table) reflect --k-bw. With
-     2px borders × 39 cards the gallery view would feel like a punch card. */
-  border: 1px solid var(--k-border);
-  border-radius: var(--k-radius-lg);
-  /* Gallery-card enter — INSTANT-feeling with a hint of polish.
-     The gallery has 40+ cards. A noticeable stagger here reads as "page is
-     loading" — eyes track each card appearing. Dashboard tiles (≤5 per grid)
-     can afford the slower expressive entrance below; the gallery cannot.
-     Total cascade caps at ~380ms (7 × 25ms stagger + 240ms duration) so
-     the whole gallery is in-place before the user can think "wait, why's it
-     animating?". Subliminal: opacity completes at 140ms, transform settles
-     at 240ms — keeps the premium "find-its-place" texture, just quick. */
+  /* Gallery-card enter — instant-feeling with a hint of polish; opacity done at
+     140ms, transform settles at 240ms, cascade caps at ~380ms (see --card-i). */
   animation:
     card-fade 140ms cubic-bezier(.2, 0, .2, 1) backwards,
     card-rise-quick 240ms cubic-bezier(.16, 1, .3, 1) backwards;
   animation-delay: calc(min(var(--card-i, 0), 7) * 25ms);
-  /* Box padding uses --k-pad (floored: 16 compact → 24 default → 28/32),
-     the modern card minimum (shadcn p-6 = 24). The internal content-gap
-     stays on the smaller --k-space rhythm so raising padding never balloons
-     the gaps — padding ≠ gap, the shadcn split. */
-  padding: var(--k-pad, 24px);
-  /* No margin — the gallery is a grid; its `gap` owns ALL the spacing between
-     cards (row + column). A card margin-bottom would double the row gap AND
-     break the masonry span math (which measures border-box height, excluding
-     margin), leaving phantom vertical gaps. */
-  margin: 0;
-  box-shadow: var(--k-shadow-sm);
-  color: var(--k-fg);
-  display: flex;
-  flex-direction: column;
-  /* Field/section rhythm = the grid-aligned --k-space (16 at default), NOT a
-     fuzzy multiple. This is the gap between stacked form fields, header→content,
-     etc. shadcn space-y-4/6 equivalent. */
-  gap: var(--k-space, 16px);
-  /* Hover-lift uses the same motion tokens as buttons/tiles (#212 unified). */
   transition:
     transform var(--k-dur, 200ms) var(--k-ease-out, ease),
     box-shadow var(--k-dur, 200ms) var(--k-ease-out, ease);
 }
-/* Over-card hover — gentle 2px lift + deeper shadow. Subtle so it adds life
- * without distracting from the component the card showcases. */
-.card:hover {
+/* Over-card hover — gentle 2px lift + deeper shadow (preview affordance). */
+.cockpit-preview .card:hover {
   transform: translateY(-2px);
   box-shadow: var(--k-shadow-md);
-}
-/* Card header reads as a real product heading (shadcn CardHeader), NOT a
- * component-type meta-label. So: sentence-case, full --k-fg color, body-ish
- * size — it belongs to the interface the card depicts. The old uppercase +
- * muted treatment made the label look like part of the mockup; gone. */
-.card__head {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-2);
-}
-.card__title {
-  font-weight: 600;
-  font-size: var(--k-type-h3);
-  font-family: var(--k-font-display);
-  color: var(--k-fg);
-  letter-spacing: -0.01em;
-  line-height: 1.25;
-}
-.card__desc {
-  font-size: var(--k-type-small);
-  color: var(--k-fg-muted);
-  line-height: 1.4;
-}
-/* Horizontal row of adjacent controls/buttons — uses the SAME canonical
-   --k-stack-gap as the vertical button stack, so "the gap between two adjacent
-   buttons" is identical in any axis and scales with Scale (8 → 12). */
-.card__row { display: flex; gap: var(--k-stack-gap, 8px); align-items: center; flex-wrap: wrap; }
-.card__col { display: flex; flex-direction: column; gap: var(--k-s-8); }
-/* Footer action zone (shadcn CardFooter): a hairline divider anchors the CTA row
-   to the bottom of the card instead of letting it float in the content flow. The
-   top border + matched top spacing give the actions a clear "home". Holds the
-   card's full-width block buttons, stacked on the canonical gap. */
-.card__foot {
-  margin-top: var(--k-s-16);
-  padding-top: var(--k-s-16);
-  border-top: var(--k-divider);
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-stack-gap, 8px);
 }
 
 /* === Dashboard === */
@@ -227,90 +162,13 @@
   min-height: 540px;
   gap: 0;
 }
-.dash__nav {
-  /* App-shell sidebar — driven by the Chrome axis (its own control, NOT depth).
-   * FLUSH (default): sidebar shares the page bg (--k-chrome-bg resolves to
-   *   --k-bg) and a hairline border carries the separation (Linear/Vercel). */
-  border-right: var(--k-divider);
-  padding: var(--k-s-14) var(--k-s-10);
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-4);
-  background: var(--k-chrome-bg, var(--k-bg));
-  /* Animate the flip between Flush and Panel so toggling feels intentional. */
-  transition:
-    margin var(--k-dur, 200ms) var(--k-ease-out, ease),
-    border-radius var(--k-dur, 200ms) var(--k-ease-out, ease),
-    box-shadow var(--k-dur, 200ms) var(--k-ease-out, ease);
-}
-/* PANEL: the sidebar becomes a distinct, tinted ROOM — inset from the edges,
- * a soft shadow, and a border-radius that LISTENS TO Box radius (--k-radius-lg).
- * Raycast / Vercel-new / floating-sidebar pattern. --k-chrome-bg already carries
- * the sunken tint in this mode; here we add the structural panel treatment. */
-.cockpit-preview[data-chrome="panel"] .dash__nav,
-[data-chrome="panel"] .dash__nav {
-  margin: var(--k-s-8);
-  border: 1px solid var(--k-border);
-  border-radius: var(--k-radius-lg);
-  box-shadow: var(--k-shadow-sm);
-}
-/* RECESSED: the sidebar is a SUNKEN WELL. --k-chrome-bg already carries the
- * sunken tint (buildTokens); structurally it stays FLUSH — no inset card — and
- * the existing border-right hairline is the seam where the brighter content
- * plane lifts above it (macOS / Windows-settings depth). margin/radius/shadow
- * reset is explicit so a Floating→Recessed switch animates back to flush. */
-.cockpit-preview[data-chrome="recessed"] .dash__nav,
-[data-chrome="recessed"] .dash__nav {
-  margin: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-.dash__brand {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-8);
-  padding: var(--k-s-6) var(--k-s-10) var(--k-s-16);
-  font-weight: 600;
-}
-/* Sidebar ROWS, GROUP LABELS and NESTING use the shared .navrow / .nav-group /
- * .navsub recipe (single source of truth — see "Navigation row" above). The
- * .dash__* shell here only owns FRAME concerns: brand, rail toggle, pinned
- * footer, chrome-mode background, and the collapsed-rail behaviour below. */
-/* SupaDash app-icon — rounded-square launcher tile in the brand colour. */
-.dash__appicon {
-  width: 26px;
-  height: 26px;
-  border-radius: var(--k-radius-sm);
-  background: var(--k-primary);
-  color: var(--k-primary-fg, #fff);
-  display: grid;
-  place-items: center;
-  flex: none;
-  box-shadow: var(--k-shadow-sm);
-}
-.dash__brandname { font-family: var(--k-font-display); letter-spacing: -0.01em; }
-/* Collapse toggle in the brand row — ghost icon button. */
-.dash__railtoggle {
-  display: inline-grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border: 0;
-  border-radius: var(--k-radius-sm, 6px);
-  background: transparent;
-  color: var(--k-fg-faint);
-  cursor: pointer;
-  transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease), color var(--k-dur-fast, 140ms);
-}
-.dash__railtoggle:hover { background: var(--k-state-hover); color: var(--k-fg); }
-/* Pinned bottom block — Settings + ⌘K launcher pushed to the floor of the nav. */
-.dash__navfoot {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-4);
-  padding-top: var(--k-s-6);
-}
+/* The app-shell SIDEBAR itself is the exportable `.sidenav` kit recipe (brand
+ * header, chrome-mode background, pinned footer, and the collapsed icon-rail —
+ * see "Sidebar" in src/kit/recipes). The app dogfoods it: `.dash__nav` was
+ * retired in favour of `.sidenav`. What stays HERE is purely app-LAYOUT glue:
+ * the two-column grid and the bespoke ⌘K launcher in the footer. */
+/* Footer command launcher — a SupaDash-specific quick-action button (not a nav
+ * destination, so not a .navrow). */
 .dash__navquick {
   display: flex;
   align-items: center;
@@ -329,61 +187,24 @@
 .dash__navquick-kbd { font-size: var(--k-type-caption); }
 
 /* ---- Rail (collapsed) mode -------------------------------------------------
- * Icon-only sidebar with hover tooltips. The grid column narrows and every
- * text label / group heading / sub-list collapses away, leaving centered
- * icons. Tooltips are CSS-only (data-tip attribute) so there's no JS or
- * extra markup per row. */
+ * The icon-only sidebar behaviour (labels/groups/sub-lists collapse, tooltips,
+ * badge→dot) is owned by `.sidenav--rail` in the kit. Here we only narrow the
+ * app GRID column and collapse the bespoke ⌘K launcher to a centered glyph. */
 .dash--rail { grid-template-columns: 64px 1fr; }
-.dash--rail .dash__nav { padding: var(--k-s-14) var(--k-s-8); gap: var(--k-s-4); }
-.dash--rail .dash__brand { padding: var(--k-s-6) 0 var(--k-s-16); justify-content: center; }
-.dash--rail .dash__appicon,
-.dash--rail .dash__brandname,
-.dash--rail .navrow__label,
-.dash--rail .navrow__chev,
-.dash--rail .navsub,
 .dash--rail .dash__navquick-kbd { display: none; }
-/* Group labels collapse to slim centered dividers so the verticals stay
- * visually chunked even without text. The first (under the brand) is dropped. */
-.dash--rail .nav-group {
-  width: 22px;
-  height: 0;
-  margin: var(--k-s-6) auto var(--k-s-4);
-  padding: 0;
-  border-top: var(--k-divider);
-  font-size: 0;
-  overflow: hidden;
-}
-.dash--rail .nav-group:first-of-type { border-top: 0; margin: 0; }
-/* Pinned footer (Settings + ⌘K) sits under a full separator in the rail. */
-.dash--rail .dash__navfoot { border-top: var(--k-divider); padding-top: var(--k-s-8); }
-.dash--rail .navrow,
 .dash--rail .dash__navquick {
   justify-content: center;
   gap: 0;
   padding: var(--k-s-8) 0;
   position: relative;
 }
-/* Quick-actions shows a search glyph in place of its ⌘K chip when collapsed. */
+/* Quick-actions shows a ⌘ glyph in place of its ⌘K chip when collapsed. */
 .dash--rail .dash__navquick::before {
   content: '⌘';
   font-size: var(--k-type-body);
   line-height: 1;
 }
-/* Unread badge collapses to a small corner dot on the icon. */
-.dash--rail .navrow .badge--count {
-  position: absolute;
-  top: 4px;
-  right: 9px;
-  min-width: 8px;
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  font-size: 0;
-  border: 1.5px solid var(--k-chrome-bg, var(--k-surface-sunken));
-}
 /* Hover tooltip — flies out to the right of the rail. */
-.dash--rail .navrow[data-tip]::after,
-.dash--rail .dash__railtoggle[data-tip]::after,
 .dash--rail .dash__navquick[data-tip]::after {
   content: attr(data-tip);
   position: absolute;
@@ -404,17 +225,11 @@
               transform var(--k-dur-fast, 140ms) var(--k-ease, ease);
   z-index: var(--k-z-tooltip);
 }
-.dash--rail .navrow[data-tip]:hover::after,
-.dash--rail .dash__railtoggle[data-tip]:hover::after,
 .dash--rail .dash__navquick[data-tip]:hover::after {
   opacity: 1;
   transform: translateY(-50%) translateX(0);
 }
-/* In rail mode the toggle sits alone, centered, and points right (expand). */
-.dash--rail .dash__railtoggle { margin: 0 auto; }
 @media (prefers-reduced-motion: reduce) {
-  .dash--rail .navrow[data-tip]::after,
-  .dash--rail .dash__railtoggle[data-tip]::after,
   .dash--rail .dash__navquick[data-tip]::after { transition: none; }
 }
 .dash__main {
@@ -434,23 +249,9 @@
  * see the "stat-tile" block below). .dash__stats is just the 4-col grid
  * wrapper that holds them. */
 
-.activity { display: flex; flex-direction: column; gap: var(--k-s-10); }
-.activity__item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--k-s-10);
-  font-size: var(--k-type-small);
-  padding: var(--k-s-8) 0;
-  border-bottom: var(--k-divider);
-}
-.activity__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-top: var(--k-s-6);
-  flex: none;
-}
-.activity__meta { color: var(--k-fg-faint); font-size: var(--k-type-eyebrow); margin-left: auto; }
+/* The .activity feed itself is the exportable "Activity feed" kit recipe (see
+ * src/kit/recipes). Only its card-enter intro stagger (--card-i below) stays
+ * preview-only — that's demo animation, not part of the shipped component. */
 
 .row-menu {
   position: relative;
@@ -507,20 +308,7 @@
   .linechart .area { opacity: 0.18; }
 }
 
-.dangerzone {
-  border: 1px solid var(--k-danger);
-  border-radius: var(--k-radius-lg);
-  padding: var(--k-pad, 24px);
-  margin-top: var(--k-s-24);
-}
-.dangerzone__head {
-  font-weight: 600;
-  /* Header text sits on the card surface (transparent over white/dark),
-   * so use the actual --k-danger hue. *-fg is reserved for text ON a
-   * coloured fill (button/badge/avatar). */
-  color: var(--k-danger);
-  margin-bottom: var(--k-s-6);
-}
+/* .dangerzone is the exportable "Danger zone" kit recipe (see src/kit/recipes). */
 
 /* === Named animation keyframes (mirror of genCss.ts so previews work in-app) ===
    These match the exported tokens.css 1:1. */
