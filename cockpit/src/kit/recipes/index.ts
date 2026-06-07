@@ -141,7 +141,7 @@ export const RECIPES: readonly Recipe[] = [
     transform var(--k-dur-fast, 120ms) var(--k-ease, ease),
     box-shadow var(--k-dur-fast, 120ms) var(--k-ease, ease),
     filter var(--k-dur-fast, 120ms) var(--k-ease, ease);
-  border: 1px solid transparent;
+  border: max(1px, var(--k-bw)) solid transparent;
   cursor: pointer;
 }
 /* Unified press (#212) — every button scales down a touch on click: the
@@ -173,8 +173,8 @@ export const RECIPES: readonly Recipe[] = [
   box-shadow: var(--k-btn-shadow, var(--k-shadow-sm));
   transition:
     background var(--k-dur, 200ms) var(--k-ease, ease),
-    transform 140ms var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1)),
-    box-shadow 140ms var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
+    transform var(--k-dur-fast, 140ms) var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1)),
+    box-shadow var(--k-dur-fast, 140ms) var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
 }
 .btn--primary:hover:not(:disabled),
 .btn--secondary:hover:not(:disabled),
@@ -543,7 +543,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  border: 1.5px solid var(--k-input-border);
+  border: max(1.5px, var(--k-bw)) solid var(--k-input-border);
   background: var(--k-surface);
   display: inline-grid;
   place-items: center;
@@ -1174,7 +1174,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
   border-radius: var(--k-radius-md);
   background: var(--k-surface);
-  border: 1px solid var(--k-input-border);
+  border: var(--k-bw, 1px) solid var(--k-input-border);
   color: var(--k-fg);
   font-size: var(--k-type-small);
   font-family: inherit;
@@ -2221,7 +2221,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   place-items: center;
   font-size: var(--k-type-eyebrow);
   font-weight: 600;
-  border: 1.5px solid var(--k-border);
+  border: max(1.5px, var(--k-bw)) solid var(--k-border);
   position: relative;
   z-index: 1;
   transition: background var(--k-dur, 200ms) var(--k-ease, ease);
@@ -2354,7 +2354,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   flex-wrap: wrap;
   gap: var(--k-s-4);
   padding: var(--k-s-4) var(--k-s-8);
-  border: 1px solid var(--k-input-border);
+  border: var(--k-bw, 1px) solid var(--k-input-border);
   border-radius: var(--k-radius-md);
   background: var(--k-surface);
   min-height: var(--k-in-h-default);
@@ -2732,7 +2732,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-body);
   font-family: var(--k-font-mono);
   font-weight: 600;
-  border: 1.5px solid var(--k-input-border);
+  border: max(1.5px, var(--k-bw)) solid var(--k-input-border);
   background: var(--k-surface);
   color: var(--k-fg);
   border-radius: var(--k-radius-md);
@@ -3713,7 +3713,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   height: 22px;
   border-radius: 50%;
   background: var(--k-surface);
-  border: 1.5px solid var(--k-border);
+  border: max(1.5px, var(--k-bw)) solid var(--k-border);
   display: grid;
   place-items: center;
   color: var(--k-fg-muted);
