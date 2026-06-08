@@ -51,7 +51,8 @@ export function ComponentBouquet() {
         className="cockpit-preview mkt__bouquet"
         style={THEME_VARS[theme]}
         data-chrome={BASE.chrome}
-        aria-hidden="true"
+        role="region"
+        aria-label="Interactive component preview — try the controls, then re-tint with the brand colours below"
       >
         {gallery}
       </div>

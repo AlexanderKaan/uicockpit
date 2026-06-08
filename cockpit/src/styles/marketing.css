@@ -358,7 +358,9 @@
   box-shadow: none;
   max-height: 1024px;
   overflow: hidden;
-  pointer-events: none; /* decorative — the page CTA is the way in */
+  /* Interactive: the wall is the REAL component library, so visitors can drive
+     the controls (sliders slide, switches toggle, menus open + dismiss). The CTA
+     lives in its own section above the wall, so this never intercepts it. */
   /* Top + bottom fade ONLY. The sides bleed off-screen (hard-cut) so a half
      component peeks at each edge — see the gallery over-width below. */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 10%, #000 90%, transparent 100%);
