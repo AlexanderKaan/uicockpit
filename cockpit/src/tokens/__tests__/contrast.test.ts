@@ -30,12 +30,16 @@ describe('auditContrast — OKLCH tokens resolve to real ratios', () => {
       expect(body.passes).toBe(true)
     })
 
-    it(`${name}: every pair passes — the functional input border is floored to 3:1`, () => {
-      // --k-input-border is stepped up the neutral ladder until it clears WCAG
-      // 1.4.11 (3:1), since an input has no fill distinct from the page. If this
-      // regresses, the floor in buildTokens broke.
-      expect(byLabel('Input border against background').passes).toBe(true)
-      expect(pairs.every((p) => p.passes)).toBe(true)
+    it(`${name}: every pair passes at default — except the input boundary, now a filled-field pattern (3:1 achievable at Borders:Strong)`, () => {
+      // Inputs are FILLED (brand-tinted --k-input-bg, Material/shadcn-muted), so
+      // the border can stay soft + responsive to the Border control. Strict WCAG
+      // 1.4.11 (3:1) on the input boundary is achievable at Borders:Strong (the
+      // badge surfaces a remedy at lighter steps). Every OTHER audited pair must
+      // still pass at the default — this guards the oklch-parse regression.
+      expect(byLabel('Input border against background')).toBeDefined()
+      expect(pairs.filter((p) => p.label !== 'Input border against background').every((p) => p.passes)).toBe(true)
+      const strong = auditContrast(buildTokens({ ...DEFAULT_CONFIG, ...ov, borders: 'strong' } as Config))
+      expect(strong.find((p) => p.label === 'Input border against background')!.passes).toBe(true)
     })
   }
 })

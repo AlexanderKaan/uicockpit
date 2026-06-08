@@ -387,7 +387,7 @@ export const RECIPES: readonly Recipe[] = [
    * scaling so rounded inputs still keep the label clear of the curve. */
   padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
   border-radius: var(--k-radius-md);
-  background: var(--k-surface);
+  background: var(--k-input-bg, var(--k-surface));
   /* Border thickness follows the Borders token (off/subtle/on/strong →
    * 0/1/1/2px) so dense pro-tool kits get a thicker 2px rim while
    * minimal kits stay at 1px. Previously hardcoded 1px, ignoring the
@@ -1173,7 +1173,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding-block: 0;
   padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
   border-radius: var(--k-radius-md);
-  background: var(--k-surface);
+  background: var(--k-input-bg, var(--k-surface));
   border: var(--k-bw, 1px) solid var(--k-input-border);
   color: var(--k-fg);
   font-size: var(--k-type-small);
@@ -2356,7 +2356,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: var(--k-s-4) var(--k-s-8);
   border: var(--k-bw, 1px) solid var(--k-input-border);
   border-radius: var(--k-radius-md);
-  background: var(--k-surface);
+  background: var(--k-input-bg, var(--k-surface));
   min-height: var(--k-in-h-default);
   align-items: center;
 }
@@ -2733,7 +2733,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-family: var(--k-font-mono);
   font-weight: 600;
   border: max(1.5px, var(--k-bw)) solid var(--k-input-border);
-  background: var(--k-surface);
+  background: var(--k-input-bg, var(--k-surface));
   color: var(--k-fg);
   border-radius: var(--k-radius-md);
   padding: 0;

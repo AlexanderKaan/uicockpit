@@ -36,6 +36,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-surface: oklch(99.5% 0.0056 249.9);
   --k-surface-sunken: oklch(91.6% 0.0077 249.9);
   --k-surface-2: oklch(98.0% 0.0063 249.9);
+  --k-input-bg: oklch(91.6% 0.0077 249.9);
   --k-track: color-mix(in srgb, oklch(24.4% 0.0140 249.9) 9%, oklch(99.5% 0.0056 249.9));
   --k-surface-raised: oklch(99.5% 0.0056 249.9);
   --k-surface-overlay: oklch(99.5% 0.0056 249.9);
@@ -110,7 +111,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-info-soft: oklch(95.1% 0.0080 253.9);
   --k-info-soft-fg: #16160c;
   --k-border: oklch(89.2% 0.0077 249.9);
-  --k-input-border: oklch(64.0% 0.0112 249.9);
+  --k-input-border: oklch(85.8% 0.0084 249.9);
   --k-ring: oklch(56.4% 0.1689 253.9);
   --k-ring-soft: oklch(95.8% 0.0372 253.9);
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
@@ -262,6 +263,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-surface: oklch(25.4% 0.0070 249.9);
   --k-surface-sunken: oklch(17.6% 0.0056 249.9);
   --k-surface-2: oklch(28.5% 0.0077 249.9);
+  --k-input-bg: oklch(17.6% 0.0056 249.9);
   --k-track: color-mix(in srgb, oklch(94.5% 0.0140 249.9) 9%, oklch(25.4% 0.0070 249.9));
   --k-surface-raised: oklch(31.7% 0.0077 249.9);
   --k-surface-overlay: oklch(35.5% 0.0077 249.9);
@@ -336,7 +338,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-info-soft: oklch(31.2% 0.0345 252.2);
   --k-info-soft-fg: #ffffff;
   --k-border: oklch(28.5% 0.0077 249.9);
-  --k-input-border: oklch(53.6% 0.0091 249.9);
+  --k-input-border: oklch(31.7% 0.0077 249.9);
   --k-ring: oklch(56.4% 0.1689 253.9);
   --k-ring-soft: oklch(25.4% 0.0372 253.9);
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
@@ -977,7 +979,7 @@ body {
    * scaling so rounded inputs still keep the label clear of the curve. */
   padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
   border-radius: var(--k-radius-md);
-  background: var(--k-surface);
+  background: var(--k-input-bg, var(--k-surface));
   /* Border thickness follows the Borders token (off/subtle/on/strong →
    * 0/1/1/2px) so dense pro-tool kits get a thicker 2px rim while
    * minimal kits stay at 1px. Previously hardcoded 1px, ignoring the
@@ -1727,7 +1729,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding-block: 0;
   padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
   border-radius: var(--k-radius-md);
-  background: var(--k-surface);
+  background: var(--k-input-bg, var(--k-surface));
   border: var(--k-bw, 1px) solid var(--k-input-border);
   color: var(--k-fg);
   font-size: var(--k-type-small);
@@ -2835,7 +2837,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: var(--k-s-4) var(--k-s-8);
   border: var(--k-bw, 1px) solid var(--k-input-border);
   border-radius: var(--k-radius-md);
-  background: var(--k-surface);
+  background: var(--k-input-bg, var(--k-surface));
   min-height: var(--k-in-h-default);
   align-items: center;
 }
@@ -3185,7 +3187,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-family: var(--k-font-mono);
   font-weight: 600;
   border: max(1.5px, var(--k-bw)) solid var(--k-input-border);
-  background: var(--k-surface);
+  background: var(--k-input-bg, var(--k-surface));
   color: var(--k-fg);
   border-radius: var(--k-radius-md);
   padding: 0;
@@ -4596,7 +4598,7 @@ exports[`genJson > matches snapshot for default mono 1`] = `
         "value": "oklch(89.2% 0.0000 0.0)"
       },
       "input-border": {
-        "value": "oklch(64.0% 0.0000 0.0)"
+        "value": "oklch(85.8% 0.0000 0.0)"
       },
       "ring": {
         "value": "oklch(23.9% 0.0000 89.9)"
@@ -5125,9 +5127,9 @@ exports[`genJson > matches snapshot for default mono 1`] = `
       },
       {
         "label": "Input border against background",
-        "ratio": 3.36,
+        "ratio": 1.54,
         "required": 3,
-        "passes": true
+        "passes": false
       },
       {
         "label": "Focus ring against background",
@@ -5143,6 +5145,7 @@ exports[`genJson > matches snapshot for default mono 1`] = `
     "--k-surface": "oklch(25.4% 0.0000 0.0)",
     "--k-surface-sunken": "oklch(17.6% 0.0000 0.0)",
     "--k-surface-2": "oklch(28.5% 0.0000 0.0)",
+    "--k-input-bg": "oklch(17.6% 0.0000 0.0)",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 9%, oklch(25.4% 0.0000 0.0))",
     "--k-surface-raised": "oklch(31.7% 0.0000 0.0)",
     "--k-surface-overlay": "oklch(35.5% 0.0000 0.0)",
@@ -5206,7 +5209,7 @@ exports[`genJson > matches snapshot for default mono 1`] = `
     "--k-info-soft": "oklch(31.2% 0.0345 252.2)",
     "--k-info-soft-fg": "#ffffff",
     "--k-border": "oklch(28.5% 0.0000 0.0)",
-    "--k-input-border": "oklch(53.6% 0.0000 0.0)",
+    "--k-input-border": "oklch(31.7% 0.0000 0.0)",
     "--k-ring": "oklch(94.0% 0.0000 89.9)",
     "--k-ring-soft": "oklch(25.4% 0.0000 89.9)",
     "--k-ring-halo": "color-mix(in srgb, oklch(94.0% 0.0000 89.9) 28%, transparent)",
@@ -5254,7 +5257,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "destructive": "oklch(56.1% 0.1942 29.0)",
       "destructive-foreground": "#ffffff",
       "border": "oklch(89.2% 0.0077 249.9)",
-      "input": "oklch(64.0% 0.0112 249.9)",
+      "input": "oklch(85.8% 0.0084 249.9)",
       "ring": "oklch(56.4% 0.1689 253.9)",
       "chart-1": "oklch(62.3% 0.1589 252.4)",
       "chart-2": "oklch(64.9% 0.2616 332.9)",
@@ -5289,7 +5292,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "destructive": "oklch(62.4% 0.1583 26.8)",
       "destructive-foreground": "#ffffff",
       "border": "oklch(28.5% 0.0077 249.9)",
-      "input": "oklch(53.6% 0.0091 249.9)",
+      "input": "oklch(31.7% 0.0077 249.9)",
       "ring": "oklch(56.4% 0.1689 253.9)",
       "chart-1": "oklch(63.7% 0.1493 251.8)",
       "chart-2": "oklch(65.5% 0.2511 332.6)",
@@ -5354,7 +5357,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-accent-foreground: #ffffff;
   --color-fill: oklch(56.4% 0.1689 253.9);
   --color-border: oklch(89.2% 0.0077 249.9);
-  --color-input-border: oklch(64.0% 0.0112 249.9);
+  --color-input-border: oklch(85.8% 0.0084 249.9);
   --color-ring: oklch(56.4% 0.1689 253.9);
   --color-ring-soft: oklch(95.8% 0.0372 253.9);
   --color-secondary-soft-foreground: #16160c;
@@ -5515,7 +5518,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-secondary-soft: #263b50;
   --color-accent: oklch(68.6% 0.1503 251.0);
   --color-border: oklch(28.5% 0.0077 249.9);
-  --color-input-border: oklch(53.6% 0.0091 249.9);
+  --color-input-border: oklch(31.7% 0.0077 249.9);
   --color-ring-soft: oklch(25.4% 0.0372 253.9);
   --color-secondary-soft-foreground: #ffffff;
   --color-selection: oklch(70.0% 0.1338 250.3 / 0.28);

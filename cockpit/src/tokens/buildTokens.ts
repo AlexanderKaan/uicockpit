@@ -14,7 +14,7 @@ import type {
   Tokens,
   TypeScale,
 } from './types'
-import { paletteSet, clampToAA, contrast, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, oklchStrToHex, readableInk, TEMP } from './color'
+import { paletteSet, clampToAA, contrast, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
 import { customFontFamily, isCustomFont, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
 
 // Tailwind/shadcn convention: dimensional tokens emit in REM on a 16px root, so
@@ -499,17 +499,14 @@ export function buildTokens(cfg: Config): Tokens {
   // still lift off the canvas (the dark-mode elevation the user asked for).
   const pageBg = dark ? nStep(1) : 'oklch(100% 0 0)'
 
-  // Functional input border — floored to WCAG 1.4.11 (3:1 vs the page).
-  // An `.in` field has NO fill distinct from the page (its bg = --k-surface),
-  // so the border is the ONLY boundary that makes the control perceivable — it
-  // genuinely must clear 3:1, unlike a decorative card divider. We keep the
-  // user's chosen Border weight for --k-border (soft hairlines stay soft) but
-  // step the INPUT border up the neutral ladder until it passes, capped so it
-  // never reaches near-text darkness. Strong themes already pass → unchanged.
-  const borderBgHex = oklchStrToHex(pageBg)
-  let ibIdx = BORDER_STEP[cfg.borders][dark ? 1 : 0]
-  while (ibIdx < 9 && contrast(oklchStrToHex(nStep(ibIdx)), borderBgHex) < 3) ibIdx++
-  const inputBorder = nStep(ibIdx)
+  // Input border — TRACKS the Border control (Faint→Strong), one neutral step
+  // firmer than the decorative --k-border so a field still reads as a field.
+  // Intentionally NO hard 3:1 floor (the old behaviour clamped Faint/Subtle/
+  // Medium all to the same passing step, so the control did nothing to inputs).
+  // Like shadcn's opinionated input: Faint/Subtle give a soft light rim;
+  // Medium/Strong clear WCAG 1.4.11 (3:1) for a11y-first kits — the user's
+  // Border choice IS the accessibility lever. .in keeps bg = --k-surface.
+  const inputBorder = nStep(Math.min(9, BORDER_STEP[cfg.borders][dark ? 1 : 0] + 1))
 
   return {
     mode: cfg.mode,
@@ -529,6 +526,11 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-surface': surf.base,
       '--k-surface-sunken': surf.sunken,
       '--k-surface-2': surf.s2,
+      // Input fill — a recessed, BRAND-TINTED neutral (from the same ramp that
+      // carries the whisper-of-brand, not a dead grey). Gives form fields a
+      // perceivable filled-field surface (Material/shadcn-muted) so the border
+      // can stay soft + Border-control-responsive while the field reads clearly.
+      '--k-input-bg': surf.sunken,
       // --k-track: the recessed grey behind INTERACTIVE control rails — slider
       // track, toggle off-state, segmented-control track. Deliberately a real
       // tonal step (~9% fg over surface ≈ shadcn's 0.92 switch grey), NOT
