@@ -765,6 +765,11 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-control-h-md': `var(--k-in-h-default)`,
       '--k-control-h-sm': `calc(var(--k-in-h-default) - 0.25rem)`,
       '--k-control-h-lg': `calc(var(--k-in-h-default) + 0.5rem)`,
+      // WCAG 2.5.5 / 2.5.8 touch-target floor (44px). Fixed px — it must NOT
+      // shrink with Scale (a Compact kit still needs tappable controls). The
+      // global layer applies it only under `@media (pointer: coarse)`, so dense
+      // desktop layouts are untouched; touch devices floor small controls to it.
+      '--k-touch-target': '44px',
       '--k-cal-cell': rem(st.calCell),
       '--k-toggle-w-default': rem(st.toggleW),
       '--k-toggle-h-default': rem(st.toggleH),

@@ -213,5 +213,14 @@ ${s}.in.is-warning:focus,
 ${s}.in.is-warning:focus-within {
   border-color: var(--k-input-warning-border);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-warning-border) 28%, transparent);
+}
+/* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), the
+ * core tappable controls grow to a 44px minimum so they're comfortably hit-able,
+ * WITHOUT inflating dense desktop (fine-pointer) layouts where this never fires.
+ * Buttons + inputs + selects get a 44px min-height; icon/circle buttons also a
+ * 44px min-width for a square target. */
+@media (pointer: coarse) {
+  ${s}.btn, ${s}.in, ${s}.select-trigger { min-height: var(--k-touch-target); }
+  ${s}.btn--icon, ${s}.btn--circle { min-width: var(--k-touch-target); }
 }`
 }

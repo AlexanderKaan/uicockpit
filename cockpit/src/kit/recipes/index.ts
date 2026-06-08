@@ -966,7 +966,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding-block: var(--k-s-4);
   padding-inline: max(var(--k-s-8), calc(var(--k-radius-md) * 0.5));
   border-radius: var(--k-radius-md);
-  white-space: nowrap;
+  /* Cap width + wrap long copy so a wordy tooltip never runs off a narrow
+     viewport (was nowrap with no max-width → horizontal overflow). */
+  max-width: min(16rem, calc(100vw - 1rem));
   opacity: 0;
   pointer-events: none;
   /* Tooltip: fast fade — ease-out on enter, ease-in on exit (handled by
@@ -1675,6 +1677,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-radius: var(--k-radius-lg);
   border: 1px solid var(--k-border);
   background: var(--k-surface-raised);
+  /* Never exceed the viewport on a narrow phone (a content-sized dialog has no
+     intrinsic width cap otherwise). The frame demo's 90% rule still wins inside it. */
+  max-width: calc(100vw - 2rem);
   /* Box padding floor (shadcn dialog = p-6 = 24); gap on the grid --k-space. */
   padding: var(--k-pad, 24px);
   box-shadow: var(--k-shadow-lg);
@@ -2597,6 +2602,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   right: 0;
   height: 100%;
   width: var(--sheet-w);
+  /* Never wider than the viewport — a 360px sheet must not overflow a 320px phone. */
+  max-width: 100vw;
   background: var(--k-surface-raised);
   border-left: var(--k-divider);
   box-shadow: var(--k-shadow-lg);
@@ -2810,6 +2817,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    pattern: monospace + generous height so digits read clearly. */
 .otp {
   display: inline-flex;
+  /* Wrap the slot row instead of overflowing on a narrow viewport (6 × ~40px
+     slots + gaps exceed a 320px phone). */
+  flex-wrap: wrap;
   gap: var(--k-s-6);
 }
 .otp__slot {

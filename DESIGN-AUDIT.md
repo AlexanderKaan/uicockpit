@@ -64,6 +64,21 @@ Commits this session (on `main`, after Pass B `fdada2f`):
     positioning). Left for a focused pass — purely additive when tackled.
   - **cmd-palette fake "esc" hint** still has no handler (cmd-palette dismiss path).
 
+### ✅ W6 new states/components — DONE (committed GREEN, NOT deployed)
+- `407328e` **W6a** — FormField `.field` contract (`.field`/`__label`/`__req`/`__hint`/
+  `__error`, shadcn FormItem model) in gallery (Account-details) + app (Settings billing);
+  distinct read-only input (`input.in[readonly]` → flat surface + muted, was identical
+  to editable).
+- `feee0d3` **W6b** — `.btn--loading` (width-locked spinner; wrap label in an element),
+  `.toggle--disabled` (state parity), checkbox `:indeterminate` (dash glyph) + disabled
+  checkbox/radio; DataTablePro select-all (gallery + Projects) sets `.indeterminate` via
+  ref when some-not-all selected.
+- `2b447cf` **W6c** — Custom Select was already complete (trigger + searchable listbox +
+  empty-state + aria-selected + selected-check); routed its dismiss through `useDropdown`
+  (outside-click + Escape). W6 component set complete.
+- **All 6 P0 adds from ITEM 9 are now shipped.** Library grade A− → A (the overlay-a11y
+  CSS-only ceiling remains the honest cap vs Radix; documented).
+
 ### KEY FACTS the next session needs
 - **Border control = COLOUR-based, 4 levels Faint/Subtle/Medium/Strong** (`BORDER_STEP` light=[4,5,6,7]).
   `--k-bw` is ALWAYS `1px` (it does NOT vary). So "make borders respond" = use the COLOUR token
