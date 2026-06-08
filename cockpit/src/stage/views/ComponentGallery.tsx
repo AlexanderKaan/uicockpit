@@ -96,7 +96,7 @@ function UsageMeterCard() {
           <span className="usage__title">API calls — monthly quota</span>
           <span className="usage__pct">782,140 of 1,000,000 (78%)</span>
         </div>
-        <div className="usage__bar"><div className="usage__fill" style={{ width: '78%' }} /></div>
+        <div className="usage__bar" role="progressbar" aria-valuenow={78} aria-valuemin={0} aria-valuemax={100} aria-label="API calls — monthly quota"><div className="usage__fill" style={{ width: '78%' }} /></div>
         <div className="usage__foot">
           <span className="usage__hint">Resets in 9 days</span>
           <button className="btn btn--ghost btn--sm">Upgrade plan</button>
@@ -348,7 +348,7 @@ function SelectionCard() {
 function AlertsCard() {
   return (
     <Card title="Activity" desc="Recent events on your workspace.">
-      <div className="alert alert--info">
+      <div className="alert alert--info" role="status">
         <Icon name="info" />
         <div className="alert__body">
           <div className="alert__title">Heads up</div>
@@ -356,21 +356,21 @@ function AlertsCard() {
         </div>
         <button className="alert__close" aria-label="Dismiss"><Icon name="x" /></button>
       </div>
-      <div className="alert alert--success">
+      <div className="alert alert--success" role="status">
         <Icon name="check" />
         <div className="alert__body">
           <div className="alert__title">Deployed</div>
           <div>v2.4.0 is live in production.</div>
         </div>
       </div>
-      <div className="alert alert--warning">
+      <div className="alert alert--warning" role="alert">
         <Icon name="bell" />
         <div className="alert__body">
           <div className="alert__title">Quota nearing limit</div>
           <div>You've used 92% of monthly API calls.</div>
         </div>
       </div>
-      <div className="alert alert--danger">
+      <div className="alert alert--danger" role="alert">
         <Icon name="x" />
         <div className="alert__body">
           <div className="alert__title">Build failed</div>
@@ -2311,7 +2311,7 @@ function BannerCard() {
   }
   return (
     <Card wide title="Maintenance">
-      <div className="banner banner--warn" style={{ borderRadius: 'var(--k-radius-md)' }}>
+      <div className="banner banner--warn" role="status" style={{ borderRadius: 'var(--k-radius-md)' }}>
         <Icon name="info" />
         <div className="banner__body">
           <strong>Scheduled maintenance</strong> — site will be read-only Friday 02:00–04:00 UTC.{' '}
@@ -2891,6 +2891,7 @@ function TimelineCard() {
  * filename + copy button. No syntax highlighting in MVP — use the
  * --k-fg color and let monospace + tabular-nums do the work. */
 function CodeBlockCard() {
+  const [copied, setCopied] = useState(false)
   const lines = [
     'import { buildTokens } from "@uicockpit/tokens"',
     '',
@@ -2909,9 +2910,21 @@ function CodeBlockCard() {
       <div className="codeblock">
         <div className="codeblock__head">
           <span className="codeblock__file">tokens.ts</span>
-          <button className="codeblock__copy" aria-label="Copy">
-            <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden><path d="M3 1 H 9 V 8 M 1 3 H 7 V 11 H 1 Z" fill="none" stroke="currentColor" strokeWidth="1.2" /></svg>
-            Copy
+          <button
+            className="codeblock__copy"
+            aria-label={copied ? 'Copied to clipboard' : 'Copy code'}
+            onClick={() => {
+              navigator.clipboard?.writeText(lines.join('\n'))
+              setCopied(true)
+              setTimeout(() => setCopied(false), 2000)
+            }}
+          >
+            {copied ? (
+              <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden><path d="M2 6.5 L 5 9.5 L 10 2.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            ) : (
+              <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden><path d="M3 1 H 9 V 8 M 1 3 H 7 V 11 H 1 Z" fill="none" stroke="currentColor" strokeWidth="1.2" /></svg>
+            )}
+            <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
           </button>
         </div>
         <pre className="codeblock__pre">
