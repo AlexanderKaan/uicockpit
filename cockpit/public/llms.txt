@@ -10,7 +10,7 @@ Telemetry: None
 
 ## What it is
 
-UIcockpit is a single-page web app that helps a developer or product designer build a coherent design system in under a minute. Twenty-one visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a 40-card component gallery and a live dashboard preview as the user tweaks. The output is a complete export pack — design tokens in six formats plus per-component CSS recipes.
+UIcockpit is a single-page web app that helps a developer or product designer build a coherent design system in under a minute. Twenty-one visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery and a live dashboard preview as the user tweaks. The output is a complete export pack — design tokens in seven formats plus per-component CSS recipes.
 
 ## Who it's for
 
@@ -39,7 +39,7 @@ Six file formats, each standalone:
 - **Component recipes shipped**: most token systems only give variables — UIcockpit also ships the per-component CSS (hover, focus, disabled, active states) so AI tools and designers don't have to invent them.
 - **Auto-derived chart palette**: 6 series colors from the active theme. No more `chart-1: red, chart-2: green, ...` random defaults.
 - **No accounts, URL-hash save**: a configuration link is a kit. Paste in Slack/Discord/Email, the recipient sees the exact kit.
-- **8 brand-faithful presets**: Apple HIG, Facebook, Stripe (with signature blue-purple gradient), Airbnb (Rausch red + pill buttons + round cards), Spotify (dark mode + neon green), Shopify (Polaris admin grey), Instagram (action blue + heart pink), Cloudflare (action blue + brand orange).
+- **Two orthogonal starting axes** (not brand clones): pick a **Style** — the form/shape language (radius, density, motion + elevation signature) — and cross it with a **Color theme** (10 curated brand hues: cobalt, sky, teal, jade, indigo, violet, coral, rose, ember, mono). Then tweak any of the 21 controls. The result is your own design language, not a copy of someone else's app.
 
 ## How UIcockpit compares to other tools
 
@@ -65,7 +65,7 @@ Use-case landing pages: design tokens for Tailwind v4 (https://uicockpit.com/use
 ## Common questions
 
 **Q: Do I need to know design to use UIcockpit?**
-A: No. The 8 presets are calibrated to feel like the apps they reference (Apple, Stripe, Airbnb, etc.). Pick one, optionally tweak a few sliders, export. The defaults pass WCAG AA contrast.
+A: No. Start from a Style + a Color theme, optionally tweak a few sliders, then export. The defaults pass WCAG AA contrast.
 
 **Q: Can I edit the exported tokens later?**
 A: Yes — the export is standard CSS / JSON. Open in any editor. If you want to start from where you left off, just paste the original UIcockpit URL.
