@@ -1946,11 +1946,12 @@ function ComboboxCard() {
   const FRAMEWORKS = ['Next.js', 'Remix', 'Astro', 'SvelteKit', 'Nuxt', 'Vite', 'Solid Start']
   const [q, setQ] = useState('')
   const [picked, setPicked] = useState<string | null>('Next.js')
-  const [open, setOpen] = useState(false)
+  // Custom Select dismiss — outside-click + Escape via the shared controller.
+  const { open, setOpen, ref } = useDropdown()
   const matches = FRAMEWORKS.filter((f) => f.toLowerCase().includes(q.toLowerCase()))
   return (
     <Card title="Framework" desc="Choose a starter for your app.">
-      <div className="combobox">
+      <div className="combobox" ref={ref}>
         <button type="button" className="select-trigger" onClick={() => setOpen((v) => !v)} role="combobox" aria-haspopup="listbox" aria-expanded={open}>
           <span>{picked ?? 'Select a framework…'}</span>
           <Icon name="chevD" />
