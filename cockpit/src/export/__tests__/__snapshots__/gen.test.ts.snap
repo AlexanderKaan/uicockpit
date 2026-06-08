@@ -41,6 +41,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-field-border-color: var(--k-input-border);
   --k-field-underline-color: var(--k-input-border);
   --k-field-radius: var(--k-radius-md);
+  --k-field-hover-edge: var(--k-state-border, var(--k-fg-faint));
+  --k-field-focus-edge: var(--k-ring);
   --k-track: color-mix(in srgb, oklch(24.4% 0.0140 249.9) 9%, oklch(99.5% 0.0056 249.9));
   --k-surface-raised: oklch(99.5% 0.0056 249.9);
   --k-surface-overlay: oklch(99.5% 0.0056 249.9);
@@ -280,6 +282,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-field-border-color: var(--k-input-border);
   --k-field-underline-color: var(--k-input-border);
   --k-field-radius: var(--k-radius-md);
+  --k-field-hover-edge: var(--k-state-border, var(--k-fg-faint));
+  --k-field-focus-edge: var(--k-ring);
   --k-track: color-mix(in srgb, oklch(94.5% 0.0140 249.9) 9%, oklch(25.4% 0.0070 249.9));
   --k-surface-raised: oklch(31.7% 0.0077 249.9);
   --k-surface-overlay: oklch(35.5% 0.0077 249.9);
@@ -1037,13 +1041,17 @@ body {
   /* Horizontal padding floor 12px (Linear / shadcn-equiv) + radius-aware
    * scaling so rounded inputs still keep the label clear of the curve. */
   padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
-  border-radius: var(--k-radius-md);
-  background: var(--k-input-bg, var(--k-surface));
-  /* Border thickness follows the Borders token (off/subtle/on/strong →
-   * 0/1/1/2px) so dense pro-tool kits get a thicker 2px rim while
-   * minimal kits stay at 1px. Previously hardcoded 1px, ignoring the
-   * Borders control. */
-  border: var(--k-bw, 1px) solid var(--k-input-border);
+  /* Surface treatment, token-driven (Outlined/Filled/Plain — one rule, three
+   * looks). --k-field-radius is 0 in Plain (the underline is a straight line).
+   * --k-field-bg is transparent in Plain. The border is set on all sides via
+   * --k-field-border-color (input-border in Outlined, transparent in Filled +
+   * Plain) and the BOTTOM is overridden to --k-field-underline-color — so Plain
+   * shows only an underline while Outlined gets a full box. Border (faint→strong)
+   * still feeds --k-input-border, so it tunes the line in every mode. */
+  border-radius: var(--k-field-radius);
+  background: var(--k-field-bg);
+  border: var(--k-bw, 1px) solid var(--k-field-border-color);
+  border-bottom-color: var(--k-field-underline-color);
   color: var(--k-fg);
   width: 100%;
   font-size: var(--k-type-small);
@@ -1062,7 +1070,7 @@ body {
  * without a heavy inset shadow. Pairs with the tactile button shadow — same row,
  * opposite depth. */
 .in {
-  background: var(--k-input-bg, var(--k-surface));
+  background: var(--k-field-bg);
   /* Inputs sit flat on the surface — no inset pressed shadow. shadcn
    * pattern: emphasis lives in the focus halo, not in a default inner
    * shadow that competes with body text. */
@@ -1072,7 +1080,9 @@ body {
     box-shadow var(--k-dur-fast, 110ms) var(--k-ease, ease),
     background var(--k-dur-fast, 110ms) var(--k-ease, ease);
 }
-.in:hover:not(:focus):not(:disabled) { border-color: var(--k-state-border, var(--k-fg-faint)); }
+/* Hover: the box edge darkens in Outlined/Filled; in Plain only the underline
+ * darkens (--k-field-hover-edge is transparent there, so no box appears). */
+.in:hover:not(:focus):not(:disabled) { border-color: var(--k-field-hover-edge); border-bottom-color: var(--k-state-border, var(--k-fg-faint)); }
 /* Disabled — apply to .in itself and to wrapper-style inputs (numinput,
  * pwinput, etc) when the trigger has [aria-disabled] or contains a
  * disabled field. Opacity + no-pointer is the shadcn standard. */
@@ -1120,7 +1130,11 @@ textarea.in[readonly] {
    * coherent ring across all input shapes. */
   outline: 2px solid transparent;
   outline-offset: 2px;
-  border-color: var(--k-ring);
+  /* Box modes light the whole edge to --k-ring; Plain keeps top/sides
+   * transparent (--k-field-focus-edge) and only brand-colours the underline —
+   * the affordance lives in the focus state (Material-style) + the halo. */
+  border-color: var(--k-field-focus-edge);
+  border-bottom-color: var(--k-ring);
   box-shadow: 0 0 0 3px var(--k-ring-halo);
 }
 /* Bulletproof focus signal — the SINGLE source of focus on a field is its
@@ -1851,8 +1865,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding-block: 0;
   padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
   border-radius: var(--k-radius-md);
-  background: var(--k-input-bg, var(--k-surface));
-  border: var(--k-bw, 1px) solid var(--k-input-border);
+  background: var(--k-field-bg);
+  border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);
   color: var(--k-fg);
   font-size: var(--k-type-small);
   font-family: inherit;
@@ -1872,8 +1886,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .cockpit-preview select.select {
   min-height: var(--k-in-h-default, 40px);
   padding: 0 var(--k-s-28) 0 max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
-  background-color: var(--k-surface-2);
-  border: var(--k-bw, 1px) solid var(--k-input-border);
+  background-color: var(--k-field-bg);
+  border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);
   border-radius: var(--k-radius-md);
   color: var(--k-fg);
   font-size: var(--k-type-small);
@@ -2963,9 +2977,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   flex-wrap: wrap;
   gap: var(--k-s-4);
   padding: var(--k-s-4) var(--k-s-8);
-  border: var(--k-bw, 1px) solid var(--k-input-border);
+  border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);
   border-radius: var(--k-radius-md);
-  background: var(--k-input-bg, var(--k-surface));
+  background: var(--k-field-bg);
   min-height: var(--k-in-h-default);
   align-items: center;
 }
@@ -3320,7 +3334,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-family: var(--k-font-mono);
   font-weight: var(--k-weight-semibold);
   border: max(1.5px, var(--k-bw)) solid var(--k-input-border);
-  background: var(--k-input-bg, var(--k-surface));
+  background: var(--k-field-bg);
   color: var(--k-fg);
   border-radius: var(--k-radius-md);
   padding: 0;
@@ -3781,9 +3795,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   /* Same filled-field signature as .in / .select-trigger / .taginput / .otp:
      the brand-tinted --k-input-bg, so EVERY field type reads as one family
      (was --k-surface-2 → these composed inputs sat lighter than plain .in). */
-  background: var(--k-input-bg, var(--k-surface));
+  background: var(--k-field-bg);
   /* Tokenized border thickness — see .in for rationale. */
-  border: var(--k-bw, 1px) solid var(--k-input-border);
+  border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);
   border-radius: var(--k-radius-md);
   /* Flat default — focus halo carries the emphasis (shadcn pattern). */
   box-shadow: none;

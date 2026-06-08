@@ -547,6 +547,13 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-field-border-color': surfaceFilled || surfacePlain ? 'transparent' : 'var(--k-input-border)',
       '--k-field-underline-color': surfaceFilled ? 'transparent' : 'var(--k-input-border)',
       '--k-field-radius': surfacePlain ? '0' : 'var(--k-radius-md)',
+      // The TOP/SIDES edge colour on hover/focus. In Plain it stays transparent
+      // (so a borderless field never grows a box on interaction — the bottom
+      // underline carries the affordance instead, Material-style); in Outlined/
+      // Filled the whole box edge lights up. The bottom always colours, so a
+      // plain field's underline darkens on hover + goes brand on focus.
+      '--k-field-hover-edge': surfacePlain ? 'transparent' : 'var(--k-state-border, var(--k-fg-faint))',
+      '--k-field-focus-edge': surfacePlain ? 'transparent' : 'var(--k-ring)',
       // --k-track: the recessed grey behind INTERACTIVE control rails — slider
       // track, toggle off-state, segmented-control track. Deliberately a real
       // tonal step (~9% fg over surface ≈ shadcn's 0.92 switch grey), NOT
