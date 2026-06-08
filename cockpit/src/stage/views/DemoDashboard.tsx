@@ -7,7 +7,7 @@ import type { IconName } from '../../icons/concepts'
  * This is what makes SupaDash the single "super-app": its own pages
  * (Overview…Settings) plus these domain screens so every key component
  * is visible in one place. */
-import { StatusBadge, InteractiveSlider, DatePicker } from './apps/AppHelpers'
+import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu } from './apps/AppHelpers'
 import { PageSkeleton } from './Skeletons'
 
 type Page = 'overview' | 'projects' | 'docs' | 'inbox' | 'media' | 'settings'
@@ -941,7 +941,13 @@ function DocsScreen() {
               <button className="btn btn--ghost" aria-label="Inline code"><Icon name="chevR" size={13} /></button>
             </span>
             <span className="toolbar__group">
-              <button className="btn btn--ghost">Heading <Icon name="chevD" size={13} /></button>
+              <MenuButton label="Heading" items={[
+                { label: 'Heading 1' },
+                { label: 'Heading 2' },
+                { label: 'Heading 3' },
+                { label: 'Paragraph' },
+                { label: 'Quote' },
+              ]} />
             </span>
             <span className="toolbar__spacer" />
             <select className="select" style={{ width: 'auto' }} aria-label="Document status">
@@ -1064,8 +1070,18 @@ function BoardView() {
         </span>
         {/* Filter pair — one cluster, tight 8px between them. */}
         <span className="toolbar__group">
-          <button className="btn btn--ghost">Epic <Icon name="chevD" size={13} /></button>
-          <button className="btn btn--ghost">Type <Icon name="chevD" size={13} /></button>
+          <MenuButton label="Epic" items={[
+            { label: 'All epics' },
+            { label: 'Onboarding' },
+            { label: 'Billing' },
+            { label: 'Platform' },
+          ]} />
+          <MenuButton label="Type" items={[
+            { label: 'All types' },
+            { label: 'Bug' },
+            { label: 'Feature' },
+            { label: 'Task' },
+          ]} />
         </span>
         <span className="toolbar__spacer" />
         {/* Right zone = board-view tools, ONE flat cluster (uniform 8px, matching
@@ -1522,11 +1538,17 @@ function Media() {
               List
             </button>
           </div>
-          {/* Split action — primary + an options chevron, fused via .btn-group. */}
-          <div className="btn-group" role="group" aria-label="Upload">
-            <button className="btn btn--primary btn--sm"><Icon name="upload" /> Upload</button>
-            <button className="btn btn--primary btn--sm btn--icon" aria-label="Upload options"><Icon name="chevD" /></button>
-          </div>
+          {/* Split action — primary + an options chevron opening a real menu. */}
+          <SplitMenu
+            primaryLabel="Upload"
+            primaryIcon={<Icon name="upload" />}
+            ariaLabel="Upload"
+            items={[
+              { label: 'Upload files' },
+              { label: 'New folder' },
+              { label: 'Import from URL' },
+            ]}
+          />
         </div>
       </div>
 

@@ -240,7 +240,7 @@ export function RowMenu({ items }: { items: Array<{ label: string; icon?: ReactN
         </svg>
       </button>
       {open && (
-        <div className="menu" style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, minWidth: 180, zIndex: 50 }}>
+        <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, minWidth: 180, zIndex: 'var(--k-z-dropdown)' }}>
           {items.map((item, i) => (
             <button
               key={i}
@@ -254,5 +254,117 @@ export function RowMenu({ items }: { items: Array<{ label: string; icon?: ReactN
         </div>
       )}
     </div>
+  )
+}
+
+/* MenuButton — a labelled (or icon-only) trigger with a REAL dropdown menu,
+ * dismissing on outside-click + Escape via useDropdown. The single answer to
+ * "is a menu attached to every expand trigger?" — any toolbar chevron that used
+ * to be a dead affordance (a caret promising a menu that never opened) becomes
+ * a working menu by swapping the bare <button> for this. role/aria-haspopup/
+ * aria-expanded are wired so it's announced as a menu button. */
+export function MenuButton({
+  label,
+  icon,
+  items,
+  triggerClass = 'btn btn--ghost',
+  align = 'left',
+  ariaLabel,
+}: {
+  label?: string
+  icon?: ReactNode
+  items: Array<{ label: string; icon?: ReactNode; danger?: boolean; onClick?: () => void }>
+  triggerClass?: string
+  align?: 'left' | 'right'
+  ariaLabel?: string
+}) {
+  const { open, setOpen, ref } = useDropdown()
+  return (
+    <div ref={ref} style={{ position: 'relative', display: 'inline-flex' }}>
+      <button
+        className={triggerClass}
+        onClick={(e) => { e.stopPropagation(); setOpen(!open) }}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={ariaLabel}
+      >
+        {label}
+        {label ? <Icon name="chevD" size={13} /> : icon}
+      </button>
+      {open && (
+        <div
+          className="menu"
+          role="menu"
+          style={{ position: 'absolute', [align]: 0, top: 'calc(100% + var(--k-s-4))', minWidth: 180, zIndex: 'var(--k-z-dropdown)' }}
+        >
+          {items.map((it, i) => (
+            <button
+              key={i}
+              role="menuitem"
+              className={'menu__item' + (it.danger ? ' menu__item--danger' : '')}
+              onClick={() => { it.onClick?.(); setOpen(false) }}
+            >
+              {it.icon}
+              {it.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* SplitMenu — a split button: a primary action fused (via .btn-group) to a
+ * chevron that opens a REAL menu (outside-click + Escape via useDropdown). Keeps
+ * the fused .btn-group visual intact — the two buttons stay direct children of
+ * .btn-group — while the previously-dead options chevron becomes a working menu. */
+export function SplitMenu({
+  primaryLabel,
+  primaryIcon,
+  onPrimary,
+  items,
+  ariaLabel,
+}: {
+  primaryLabel: string
+  primaryIcon?: ReactNode
+  onPrimary?: () => void
+  items: Array<{ label: string; icon?: ReactNode; danger?: boolean; onClick?: () => void }>
+  ariaLabel: string
+}) {
+  const { open, setOpen, ref } = useDropdown()
+  return (
+    <span ref={ref} style={{ position: 'relative', display: 'inline-flex' }}>
+      <span className="btn-group" role="group" aria-label={ariaLabel}>
+        <button className="btn btn--primary btn--sm" onClick={onPrimary}>{primaryIcon} {primaryLabel}</button>
+        <button
+          className="btn btn--primary btn--sm btn--icon"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label={`${ariaLabel} options`}
+          onClick={(e) => { e.stopPropagation(); setOpen(!open) }}
+        >
+          <Icon name="chevD" />
+        </button>
+      </span>
+      {open && (
+        <div
+          className="menu"
+          role="menu"
+          style={{ position: 'absolute', right: 0, top: 'calc(100% + var(--k-s-4))', minWidth: 180, zIndex: 'var(--k-z-dropdown)' }}
+        >
+          {items.map((it, i) => (
+            <button
+              key={i}
+              role="menuitem"
+              className={'menu__item' + (it.danger ? ' menu__item--danger' : '')}
+              onClick={() => { it.onClick?.(); setOpen(false) }}
+            >
+              {it.icon}
+              {it.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </span>
   )
 }
