@@ -54,15 +54,15 @@ Commits this session (on `main`, after Pass B `fdada2f`):
   in AppHelpers (built on the existing `useDropdown` = outside-click + Escape). Wired the
   4 dead chevrons (Docs Heading, Projects Epic/Type, Media Upload-options split button).
   RowMenu inline z-index → token too.
-- **W5c STILL TODO (the behavioral/structural remainder):**
-  1. **Dismiss refactor** — header notif/new dropdowns (DemoDashboard ~251/267) + ctxmenu
-     (~691) still dismiss on `onMouseLeave` only (no Escape/outside-click). Route through
-     `useDropdown` like MenuButton. cmd-palette shows a fake "esc" hint with no handler.
-  2. **Overflow clip (P0)** — Projects context-menu is positioned inside `.datatable{overflow:hidden}`
-     → clips. Render outside the clip / portal / drop the overflow.
-  3. **Positioning/flip** — no collision/flip anywhere; min fix = `max-height + overflow:auto`
-     + a flip class on menus near the viewport edge.
-  Helpers `MenuButton`/`SplitMenu` are the template to extend for #1.
+- `c8a0418` **W5c dismiss + clip fix** — Projects ctxmenu was clipped by
+  `.datatable{overflow:hidden}` → now `position:fixed` at viewport cursor coords + real
+  Escape/outside-click dismiss. Header notif/new dropdowns routed through `useDropdown`
+  (were onMouseLeave-only). aria-haspopup added to the bell.
+- **W5 RESIDUAL (deferred, lower priority — needs design judgment):**
+  - **Positioning/flip** — no collision/flip anywhere; menus near the viewport edge don't
+    flip. Min fix = `max-height + overflow:auto` on `.menu` + a flip class (or CSS anchor
+    positioning). Left for a focused pass — purely additive when tackled.
+  - **cmd-palette fake "esc" hint** still has no handler (cmd-palette dismiss path).
 
 ### KEY FACTS the next session needs
 - **Border control = COLOUR-based, 4 levels Faint/Subtle/Medium/Strong** (`BORDER_STEP` light=[4,5,6,7]).

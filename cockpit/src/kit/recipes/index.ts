@@ -407,11 +407,16 @@ export const RECIPES: readonly Recipe[] = [
    * when input becomes focused; geometricPrecision disables that. */
   text-rendering: geometricPrecision;
 }
-/* Sunken 2-tone signature: input sits on surface-2 (slightly darker than card),
- * creating a "pressed-in" feel without a heavy shadow. Pairs with the tactile
- * shadow on buttons — same row, opposite depth. */
+/* Sunken filled-field signature: every input sits on --k-input-bg (the
+ * brand-tinted recessed neutral), the SAME fill as .select-trigger / .taginput /
+ * .otp__slot — so all field types read as one family. Was --k-surface-2 here,
+ * which silently overrode the --k-input-bg set above (this rule comes later in
+ * source order) and made plain inputs/textarea lighter than selects. The fill is
+ * elevation-coupled (tracks Neutrals/Emphasis), giving the "pressed-in" depth
+ * without a heavy inset shadow. Pairs with the tactile button shadow — same row,
+ * opposite depth. */
 .in {
-  background: var(--k-surface-2);
+  background: var(--k-input-bg, var(--k-surface));
   /* Inputs sit flat on the surface — no inset pressed shadow. shadcn
    * pattern: emphasis lives in the focus halo, not in a default inner
    * shadow that competes with body text. */
@@ -3217,7 +3222,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   display: flex;
   align-items: center;
   min-height: var(--k-in-h-default, 40px);
-  background: var(--k-surface-2);
+  /* Same filled-field signature as .in / .select-trigger / .taginput / .otp:
+     the brand-tinted --k-input-bg, so EVERY field type reads as one family
+     (was --k-surface-2 → these composed inputs sat lighter than plain .in). */
+  background: var(--k-input-bg, var(--k-surface));
   /* Tokenized border thickness — see .in for rationale. */
   border: var(--k-bw, 1px) solid var(--k-input-border);
   border-radius: var(--k-radius-md);
