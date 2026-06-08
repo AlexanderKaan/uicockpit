@@ -3590,10 +3590,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
      the card padding while the CONTENT stays edge-aligned with the section
      labels. border-radius makes the hover follow the Box radius (no more square
      grey at Soft). Same idiom as menu/nav rows. */
+  position: relative;
   padding: var(--k-s-8);
   margin-inline: calc(var(--k-s-8) * -1);
   border: 0;
-  border-top: var(--k-divider);
   border-radius: var(--k-radius-sm);
   background: transparent;
   text-align: left;
@@ -3601,7 +3601,21 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg);
   cursor: pointer;
 }
-.list__item:first-of-type { border-top: 0; }
+/* Divider = a FLAT top line via a pseudo-element, NOT border-top — so it never
+   inherits the row's Box radius (border-top would curve down at the corners on
+   Soft). The radius now rounds only the hover bg; the divider stays straight.
+   Width follows the Borders control (--k-bw → gone at Off); inset by the radius
+   so it meets the rounded hover corner cleanly (full-bleed at Box=None). */
+.list__item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--k-radius-sm);
+  right: var(--k-radius-sm);
+  height: var(--k-bw, 1px);
+  background: var(--k-border);
+}
+.list__item:first-of-type::before { content: none; }
 .list__item:hover { background: var(--k-state-hover); }
 .list__lead {
   flex-shrink: 0;
@@ -3653,7 +3667,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
      .list           default — top-divider rows, hover (data / entity lists)
      .list--flush    no dividers, hover (tight feeds: notifications, inbox)
      .list--settings bottom-divider rows, static (settings: title/desc + control) */
-.list--flush .list__item { border-top: 0; }
+.list--flush .list__item::before { content: none; }
 .list--settings .list__item {
   border-top: 0;
   border-bottom: var(--k-divider);
@@ -3662,6 +3676,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-radius: 0;
   cursor: default;
 }
+/* Settings rows are square (radius 0) + keep their own straight border-bottom. */
+.list--settings .list__item::before { content: none; }
 .list--settings .list__item:hover { background: transparent; }
 .list--settings .list__item:last-of-type { border-bottom: 0; }
 .list--settings .list__title { font-weight: 600; }
