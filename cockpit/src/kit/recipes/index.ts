@@ -438,6 +438,19 @@ export const RECIPES: readonly Recipe[] = [
   color: var(--k-disabled-fg, var(--k-fg-muted));
   pointer-events: none;
 }
+/* Read-only — distinct from disabled: still focusable + text-selectable, just
+ * not editable. Drops the sunken input fill so it reads as "display value, not
+ * an input well", mutes the text and shows a default cursor. Targets the
+ * [readonly] ATTRIBUTE (not :read-only, which also matches the .in wrapper
+ * DIVs — divs are always read-only). Was a real defect: read-only looked
+ * identical to an editable field. */
+input.in[readonly],
+textarea.in[readonly] {
+  background: var(--k-surface);
+  color: var(--k-fg-muted);
+  cursor: default;
+  box-shadow: none;
+}
 /* Focus: border + halo SAME hue, different alphas → reads as ONE
  * softening ring (shadcn pattern). Border becomes --k-ring (full alpha),
  * halo is --k-ring-halo (28% alpha of same color). The match is critical:
@@ -537,6 +550,21 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   text-transform: var(--k-ui-transform, none);
   letter-spacing: var(--k-ui-tracking, 0);
 }
+/* === FormField (.field) — the full form-row contract: label + required marker +
+ * control + hint + error, wired for a11y (aria-describedby → hint/error ids,
+ * aria-invalid on the control). This is shadcn's FormItem / FormLabel /
+ * FormDescription / FormMessage collapsed into one primitive so a labelled,
+ * described, validated field is rebuildable from the export — the #1 systemic
+ * gap before. (.lab stays the lightweight label-over-control; .field is the full
+ * contract: reach for .field when a row needs a hint, an error or a required *.) */
+.field { display: flex; flex-direction: column; gap: var(--k-s-6); }
+.field__label { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-small); font-weight: var(--k-weight-medium); color: var(--k-fg); }
+/* Required marker — a danger-toned asterisk after the label text. */
+.field__req { color: var(--k-danger); }
+.field__hint { font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.4; }
+/* Error message — only render when the control is invalid; pairs with
+ * aria-invalid="true" + aria-describedby on the control. */
+.field__error { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-danger); line-height: 1.4; }
 .check, .radio {
   display: inline-flex;
   align-items: center;

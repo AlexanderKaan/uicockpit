@@ -69,8 +69,11 @@ Commits this session (on `main`, after Pass B `fdada2f`):
   `--k-bw` is ALWAYS `1px` (it does NOT vary). So "make borders respond" = use the COLOUR token
   `--k-border` (already does) and, for the soft edge, `--k-hairline` (now fixed). The `1px→var(--k-bw)`
   churn is pointless (no effect) — skip it.
-- **OPEN MICRO-TUNE:** the input fill is subtle (98% in mono). User asked "meer contrast / heel grijs" —
-  may want `--k-input-bg` a notch darker (1 token in buildTokens). Ask before W3.
+- **RESOLVED (`acf833a`):** the "input fill too subtle" was a BUG, not a tuning need. Two stale
+  `--k-surface-2` fills (the 2nd `.in {}` block + the shared numinput/pwinput/searchinput/phoneinput
+  rule) overrode W2's `--k-input-bg`, so text inputs/textarea rendered lighter (0.98) than selects
+  (0.937). Both repointed → every field type now resolves to `--k-input-bg` (verified in live DOM).
+  Field fill is now uniformly elevation-coupled (Neutrals/Emphasis), exactly as the user wanted.
 - **DEFERRED taste call:** border-COLOUR unification (`--k-border` crisp vs `--k-hairline` soft used
   inconsistently across ~43 sites) — needs the user's eye; NOT a mechanical fix. Left as-is.
 - Preview dev-server cache is flaky for the agent; verify served code with `curl localhost:5173/src/...`.

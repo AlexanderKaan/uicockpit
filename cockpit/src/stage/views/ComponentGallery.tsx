@@ -1174,20 +1174,20 @@ function NotificationCenterCard() {
 function ValidationCard() {
   return (
     <Card title="Account details" desc="We'll check these as you type.">
-      <label className="lab">
-        <span>Email · error</span>
-        <input className="in is-error" defaultValue="not-an-email" aria-invalid="true" aria-describedby="email-error" />
-        <span id="email-error" style={{ fontSize: 11, color: 'var(--k-danger)', marginTop: 2 }}>Enter a valid email address.</span>
-      </label>
-      <label className="lab">
-        <span>Username · success</span>
-        <input className="in is-success" defaultValue="ava_chen" />
-        <span style={{ fontSize: 11, color: 'var(--k-success)', marginTop: 2 }}>Available ✓</span>
-      </label>
-      <label className="lab">
-        <span>Disabled</span>
-        <input className="in" defaultValue="Locked" disabled />
-      </label>
+      <div className="field">
+        <label className="field__label" htmlFor="acc-email">Email <span className="field__req" aria-hidden="true">*</span></label>
+        <input className="in is-error" id="acc-email" defaultValue="not-an-email" aria-invalid="true" aria-describedby="acc-email-error" />
+        <span className="field__error" id="acc-email-error"><Icon name="info" /> Enter a valid email address.</span>
+      </div>
+      <div className="field">
+        <label className="field__label" htmlFor="acc-user">Username</label>
+        <input className="in is-success" id="acc-user" defaultValue="ava_chen" aria-describedby="acc-user-hint" />
+        <span className="field__hint" id="acc-user-hint">3–20 characters · available ✓</span>
+      </div>
+      <div className="field">
+        <label className="field__label" htmlFor="acc-plan">Plan</label>
+        <input className="in" id="acc-plan" defaultValue="Pro (locked)" readOnly aria-readonly="true" />
+      </div>
       <button className="btn btn--primary btn--block" disabled>
         <span className="spinner" style={{ borderTopColor: 'currentColor' }} />
         Saving…
