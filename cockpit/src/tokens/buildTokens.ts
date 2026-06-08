@@ -467,6 +467,12 @@ export function buildTokens(cfg: Config): Tokens {
   // a merely-hovered one. Always neutral: Emphasis is a pure intensity dial.
   const selA = Math.min(sla + 0.05, 0.4)
   const stateSelected = hslA(t.h, stS, stL, selA)
+  // Pressed / :active layer — a notch stronger again than selected, so a tap
+  // gives a tactile "pressed" confirm (Material 3 ~10-12% state layer). Families
+  // that had hover but no press (.menu__item, .navrow, nav items, close buttons)
+  // pick this up; --k-state-hover stays the lighter resting hover wash.
+  const pressA = Math.min(sla + 0.1, 0.48)
+  const statePress = hslA(t.h, stS, stL, pressA)
   // Fallback to md for any unknown value — old URL hashes may carry the
   // retired 'normal'/'tight'/'expressive' keys, and a crash there is worse
   // than silently re-centering on the default scale.
@@ -832,6 +838,7 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-ease-out': motion.easeOut,
       '--k-ease-in': motion.easeIn,
       '--k-state-hover': stateHover,
+      '--k-state-press': statePress,
       '--k-font-display': fontFamily(cfg.fontDisplay, displayIsSerif),
       '--k-font-body': fontFamily(cfg.fontBody, false),
       '--k-font-mono': `'${UI_MONO}',ui-monospace,monospace`,

@@ -181,6 +181,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-ease-out: cubic-bezier(.05,.7,.1,1);
   --k-ease-in: cubic-bezier(.3,0,.8,.15);
   --k-state-hover: oklch(25.7% 0.0119 248.3 / 0.05);
+  --k-state-press: oklch(25.7% 0.0119 248.3 / 0.15000000000000002);
   --k-font-display: 'Inter',sans-serif;
   --k-font-body: 'Inter',sans-serif;
   --k-font-mono: 'JetBrains Mono',ui-monospace,monospace;
@@ -422,6 +423,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-ease-out: cubic-bezier(.05,.7,.1,1);
   --k-ease-in: cubic-bezier(.3,0,.8,.15);
   --k-state-hover: oklch(88.9% 0.0088 247.9 / 0.05);
+  --k-state-press: oklch(88.9% 0.0088 247.9 / 0.15000000000000002);
   --k-font-display: 'Inter',sans-serif;
   --k-font-body: 'Inter',sans-serif;
   --k-font-mono: 'JetBrains Mono',ui-monospace,monospace;
@@ -643,6 +645,16 @@ body {
   border-color: var(--k-input-warning-border);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-warning-border) 28%, transparent);
 }
+/* Pressed / :active tier — the nav families carried a hover wash but no pressed
+   state, so a tap jumped hover→release with no tactile confirm. Uses the new
+   --k-state-press layer (a notch stronger than --k-state-hover). Buttons, slider,
+   numinput, kanban already have their own :active, so they're not duplicated. */
+.menu__item:active,
+.navrow:active,
+.navsub__item:active,
+.navmenu__item:active,
+.sidenav__toggle:active { background: var(--k-state-press); }
+
 /* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), tappable
  * controls grow to a 44px minimum so they're comfortably hit-able, WITHOUT
  * inflating dense desktop (fine-pointer) layouts where this never fires. Covers
@@ -5397,6 +5409,7 @@ exports[`genJson > matches snapshot for default mono 1`] = `
     "--k-shadow-pressed": "inset 0 1px 2px hsl(0 0% 0% / 0.35)",
     "--k-btn-shadow": "0 1px 2px hsl(0 0% 0% / 0.35)",
     "--k-state-hover": "oklch(88.4% 0.0082 286.2 / 0.05)",
+    "--k-state-press": "oklch(88.4% 0.0082 286.2 / 0.15000000000000002)",
     "--k-disabled-bg": "oklch(28.5% 0.0000 0.0)",
     "--k-input-error-border": "#d65a51",
     "--k-input-success-border": "#5ccc8b",

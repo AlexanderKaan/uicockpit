@@ -214,6 +214,16 @@ ${s}.in.is-warning:focus-within {
   border-color: var(--k-input-warning-border);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-warning-border) 28%, transparent);
 }
+/* Pressed / :active tier — the nav families carried a hover wash but no pressed
+   state, so a tap jumped hover→release with no tactile confirm. Uses the new
+   --k-state-press layer (a notch stronger than --k-state-hover). Buttons, slider,
+   numinput, kanban already have their own :active, so they're not duplicated. */
+${s}.menu__item:active,
+${s}.navrow:active,
+${s}.navsub__item:active,
+${s}.navmenu__item:active,
+${s}.sidenav__toggle:active { background: var(--k-state-press); }
+
 /* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), tappable
  * controls grow to a 44px minimum so they're comfortably hit-able, WITHOUT
  * inflating dense desktop (fine-pointer) layouts where this never fires. Covers
