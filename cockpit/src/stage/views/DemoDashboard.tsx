@@ -167,7 +167,7 @@ function CmdPaletteOverlay({ onClose, onGoto }: { onClose: () => void; onGoto: (
   return (
     <div
       onClick={onClose}
-      style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'grid', placeItems: 'start center', paddingTop: 80, zIndex: 50 }}
+      style={{ position: 'absolute', inset: 0, background: 'var(--k-scrim)', display: 'grid', placeItems: 'start center', paddingTop: 80, zIndex: 'var(--k-z-modal)' }}
     >
       <div className="cmdp" style={{ width: 460, maxWidth: '90%' }} onClick={(e) => e.stopPropagation()}>
         <div className="cmdp__in">
@@ -248,7 +248,7 @@ function Overview() {
               <span className="meta-notif"><Icon name="bell" /><span className="meta-notif__dot">3</span></span>
             </button>
             {notifOpen && (
-              <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 250, zIndex: 20 }} onMouseLeave={() => setNotifOpen(false)}>
+              <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 250, zIndex: 'var(--k-z-dropdown)' }} onMouseLeave={() => setNotifOpen(false)}>
                 <div className="menu__label">Notifications</div>
                 <button className="menu__item" role="menuitem"><Icon name="spark" /> Deploy finished · 2m</button>
                 <button className="menu__item" role="menuitem"><Icon name="info" /> 3 PRs awaiting review · 1h</button>
@@ -264,7 +264,7 @@ function Overview() {
               <Icon name="plus" /> New project <Icon name="chevD" />
             </button>
             {newOpen && (
-              <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 200, zIndex: 20 }} onMouseLeave={() => setNewOpen(false)}>
+              <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 200, zIndex: 'var(--k-z-dropdown)' }} onMouseLeave={() => setNewOpen(false)}>
                 <button className="menu__item" role="menuitem"><Icon name="plus" /> Blank project</button>
                 <button className="menu__item" role="menuitem"><Icon name="grid" /> From template</button>
                 <button className="menu__item" role="menuitem"><Icon name="upload" /> Import repository</button>
@@ -688,7 +688,7 @@ function Projects() {
           </table>
         </div>
         {ctx && (
-          <div className="menu ctxmenu__pop" style={{ position: 'absolute', left: ctx.x, top: ctx.y, zIndex: 30 }} role="menu" onMouseLeave={() => setCtx(null)}>
+          <div className="menu ctxmenu__pop" style={{ position: 'absolute', left: ctx.x, top: ctx.y, zIndex: 'var(--k-z-dropdown)' }} role="menu" onMouseLeave={() => setCtx(null)}>
             <button className="menu__item" role="menuitem" onClick={() => { const is = PROJECTS.find((p) => p.key === ctx.key); if (is) setOpenIssue(is); setCtx(null) }}><Icon name="info" /> Open issue</button>
             <button className="menu__item" role="menuitem"><Icon name="edit" /> Rename <span className="menu__shortcut">⌘R</span></button>
             <div className="menu__sep" />
@@ -717,7 +717,7 @@ function Projects() {
       {/* New issue — a Sheet drawer sliding over the content. Hosts the
           RadioCard (issue type), a Select (priority) and a Date input. */}
       {sheetOpen && (
-        <div className="sheet-frame" style={{ position: 'fixed', inset: 0, height: 'auto', border: 'none', borderRadius: 0, background: 'none', overflow: 'visible', zIndex: 50 }}>
+        <div className="sheet-frame" style={{ position: 'fixed', inset: 0, height: 'auto', border: 'none', borderRadius: 0, background: 'none', overflow: 'visible', zIndex: 'var(--k-z-drawer)' }}>
           <div className="sheet-frame__backdrop" role="button" tabIndex={0} aria-label="Close" onClick={() => setSheetOpen(false)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheetOpen(false) } }} />
           <aside className="sheet" role="dialog" aria-modal="true" aria-labelledby="ni-title">
             <div className="sheet__head">
@@ -1700,9 +1700,9 @@ function Media() {
         <>
           <div
             onClick={() => setSelectedId(null)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 40 }}
+            style={{ position: 'fixed', inset: 0, background: 'var(--k-scrim)', zIndex: 'var(--k-z-drawer)' }}
           />
-          <aside className="sheet" style={{ position: 'fixed', top: 0, right: 0, height: '100vh', zIndex: 41, width: 340 }}>
+          <aside className="sheet" style={{ position: 'fixed', top: 0, right: 0, height: '100vh', zIndex: 'calc(var(--k-z-drawer) + 1)', width: 340 }}>
             <div className="sheet__head">
               <span className="sheet__title">File details</span>
               <button className="btn btn--ghost btn--icon btn--sm" onClick={() => setSelectedId(null)} aria-label="Close">
@@ -2178,7 +2178,7 @@ Authorization: Bearer nw_live_3f8a92...e0d1`}</pre>
             fontSize: 'var(--k-type-small)',
             fontWeight: 500,
             boxShadow: 'var(--k-shadow-lg)',
-            zIndex: 50,
+            zIndex: 'var(--k-z-toast)',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,

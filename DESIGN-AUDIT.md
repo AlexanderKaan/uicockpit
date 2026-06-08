@@ -30,6 +30,20 @@ Commits this session (on `main`, after Pass B `fdada2f`):
   contract (every other pair passes at default; input boundary clears 3:1 at Borders:Strong; badge shows
   15/16 at Subtle w/ the existing remedy, 16/16 at Strong). Visually verified on the preview.
 
+### ✅ W3 + W4 (committed this session, GREEN, NOT deployed)
+- `e90a2ad` **W3 typography tokens** — new `--k-track-eyebrow` (unifies 14 uppercase
+  eyebrow/caps sites, was hand-set 0.04–0.08em); new `--k-weight-medium/semibold/bold`
+  named scale (replaced 76 font-weight literals in recipes, identical values, zero
+  visual change; the config-pinned `var(--k-ui-weight)` refs left untouched); ONE shared
+  panel-heading rule for `.card__title`/`.dialog__title`/`.sheet__title` (display font +
+  h3 + tracking + margin:0) — sheet-title gained the display font, dialog got a real
+  `.dialog__title` replacing 2 inline-styled `<h3 style={fontSize:14,fontWeight:600}>`.
+- `d859d35` **W4 scale tokens** — `--k-avatar` (24/28/32, with --sm/--lg via calc),
+  `--k-icon-chip` (34/38/42 → lightbox/dialog-alert/dropzone/carousel icon boxes),
+  `--k-dot` (~7/8/9 → avatar/meta/list status dots), all keyed off `--k-in-h-default`
+  so they GROW with Scale. Singletons (stepper/timeline dot, list-lead, otp, spinner)
+  derive from `--k-in-h-default` via inline calc. Default-tier values unchanged.
+
 ### KEY FACTS the next session needs
 - **Border control = COLOUR-based, 4 levels Faint/Subtle/Medium/Strong** (`BORDER_STEP` light=[4,5,6,7]).
   `--k-bw` is ALWAYS `1px` (it does NOT vary). So "make borders respond" = use the COLOUR token
