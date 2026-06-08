@@ -44,6 +44,26 @@ Commits this session (on `main`, after Pass B `fdada2f`):
   so they GROW with Scale. Singletons (stepper/timeline dot, list-lead, otp, spinner)
   derive from `--k-in-h-default` via inline calc. Default-tier values unchanged.
 
+### 🟡 W5 overlays — IN PROGRESS (W5a + W5b committed GREEN; W5c remains)
+- `5602b9b` **W5a z-index + scrim → tokens** — navmenu/ctxmenu panels + every inline
+  DemoDashboard overlay (menus/sheets/toast/cmdp) now use `--k-z-*` tokens (dropdown/
+  drawer/modal/toast) instead of bare 20/30/40/41/50; 2 inline `rgba(0,0,0,.4)` backdrops
+  → `--k-scrim` (mode-aware). Z_INDEX scale lives in `src/tokens/extras.ts` (genCss emits
+  `--k-z-*`); buildTokens does NOT emit them.
+- `ca89740` **W5b dead triggers → real menus** — added `MenuButton` + `SplitMenu` helpers
+  in AppHelpers (built on the existing `useDropdown` = outside-click + Escape). Wired the
+  4 dead chevrons (Docs Heading, Projects Epic/Type, Media Upload-options split button).
+  RowMenu inline z-index → token too.
+- **W5c STILL TODO (the behavioral/structural remainder):**
+  1. **Dismiss refactor** — header notif/new dropdowns (DemoDashboard ~251/267) + ctxmenu
+     (~691) still dismiss on `onMouseLeave` only (no Escape/outside-click). Route through
+     `useDropdown` like MenuButton. cmd-palette shows a fake "esc" hint with no handler.
+  2. **Overflow clip (P0)** — Projects context-menu is positioned inside `.datatable{overflow:hidden}`
+     → clips. Render outside the clip / portal / drop the overflow.
+  3. **Positioning/flip** — no collision/flip anywhere; min fix = `max-height + overflow:auto`
+     + a flip class on menus near the viewport edge.
+  Helpers `MenuButton`/`SplitMenu` are the template to extend for #1.
+
 ### KEY FACTS the next session needs
 - **Border control = COLOUR-based, 4 levels Faint/Subtle/Medium/Strong** (`BORDER_STEP` light=[4,5,6,7]).
   `--k-bw` is ALWAYS `1px` (it does NOT vary). So "make borders respond" = use the COLOUR token

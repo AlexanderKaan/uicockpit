@@ -7,7 +7,7 @@ import type { IconName } from '../../icons/concepts'
  * This is what makes SupaDash the single "super-app": its own pages
  * (Overview…Settings) plus these domain screens so every key component
  * is visible in one place. */
-import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu } from './apps/AppHelpers'
+import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown } from './apps/AppHelpers'
 import { PageSkeleton } from './Skeletons'
 
 type Page = 'overview' | 'projects' | 'docs' | 'inbox' | 'media' | 'settings'
@@ -224,8 +224,11 @@ function Breadcrumb({ here, parent }: { here: string; parent?: string }) {
 
 function Overview() {
   const [bannerOpen, setBannerOpen] = useState(true)
-  const [notifOpen, setNotifOpen] = useState(false)
-  const [newOpen, setNewOpen] = useState(false)
+  // Header dropdowns route through useDropdown (outside-click + Escape) — the
+  // same controller MenuButton/RowMenu/DatePicker use — instead of the old
+  // onMouseLeave-only dismiss (which left them stuck open on tab-away/Escape).
+  const notif = useDropdown()
+  const newKit = useDropdown()
   const [alertOpen, setAlertOpen] = useState(true)
   return (
     <>
@@ -243,12 +246,12 @@ function Overview() {
         <h1>Good afternoon</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {/* Notifications bell → roll-down popover (#213 — more places to test menus). */}
-          <div style={{ position: 'relative' }}>
-            <button className="btn btn--ghost btn--icon btn--sm" aria-label="Notifications" aria-expanded={notifOpen} onClick={() => { setNotifOpen((v) => !v); setNewOpen(false) }}>
+          <div ref={notif.ref} style={{ position: 'relative' }}>
+            <button className="btn btn--ghost btn--icon btn--sm" aria-label="Notifications" aria-haspopup="menu" aria-expanded={notif.open} onClick={() => { newKit.setOpen(false); notif.setOpen(!notif.open) }}>
               <span className="meta-notif"><Icon name="bell" /><span className="meta-notif__dot">3</span></span>
             </button>
-            {notifOpen && (
-              <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 250, zIndex: 'var(--k-z-dropdown)' }} onMouseLeave={() => setNotifOpen(false)}>
+            {notif.open && (
+              <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 250, zIndex: 'var(--k-z-dropdown)' }}>
                 <div className="menu__label">Notifications</div>
                 <button className="menu__item" role="menuitem"><Icon name="spark" /> Deploy finished · 2m</button>
                 <button className="menu__item" role="menuitem"><Icon name="info" /> 3 PRs awaiting review · 1h</button>
@@ -259,12 +262,12 @@ function Overview() {
             )}
           </div>
           {/* New project → dropdown of starting points. */}
-          <div style={{ position: 'relative' }}>
-            <button className="btn btn--primary btn--sm" aria-haspopup="menu" aria-expanded={newOpen} onClick={() => { setNewOpen((v) => !v); setNotifOpen(false) }}>
+          <div ref={newKit.ref} style={{ position: 'relative' }}>
+            <button className="btn btn--primary btn--sm" aria-haspopup="menu" aria-expanded={newKit.open} onClick={() => { notif.setOpen(false); newKit.setOpen(!newKit.open) }}>
               <Icon name="plus" /> New project <Icon name="chevD" />
             </button>
-            {newOpen && (
-              <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 200, zIndex: 'var(--k-z-dropdown)' }} onMouseLeave={() => setNewOpen(false)}>
+            {newKit.open && (
+              <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', minWidth: 200, zIndex: 'var(--k-z-dropdown)' }}>
                 <button className="menu__item" role="menuitem"><Icon name="plus" /> Blank project</button>
                 <button className="menu__item" role="menuitem"><Icon name="grid" /> From template</button>
                 <button className="menu__item" role="menuitem"><Icon name="upload" /> Import repository</button>
@@ -516,6 +519,23 @@ function Projects() {
   // DataTablePro selection + right-click ContextMenu + New-issue Sheet + Issue detail.
   const [sel, setSel] = useState<Set<string>>(new Set())
   const [ctx, setCtx] = useState<{ x: number; y: number; key: string } | null>(null)
+  // Context-menu dismiss: Escape + any outside mousedown (same contract as the
+  // shared useDropdown). The setTimeout(0) lets the opening right-click settle
+  // before the outside-click listener attaches, so the menu doesn't self-close.
+  useEffect(() => {
+    if (!ctx) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setCtx(null) }
+    const onDown = (e: MouseEvent) => {
+      if (!(e.target as Element)?.closest?.('.ctxmenu__pop')) setCtx(null)
+    }
+    const t = setTimeout(() => document.addEventListener('mousedown', onDown), 0)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      clearTimeout(t)
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [ctx])
   const [sheetOpen, setSheetOpen] = useState(false)
   const [openIssue, setOpenIssue] = useState<Issue | null>(null)
   const [niType, setNiType] = useState('Feature')
@@ -662,10 +682,10 @@ function Projects() {
                     onClick={() => setOpenIssue(p)}
                     onContextMenu={(e) => {
                       e.preventDefault()
-                      const host = e.currentTarget.closest('.datatable')
-                      if (!host) return
-                      const r = host.getBoundingClientRect()
-                      setCtx({ x: e.clientX - r.left, y: e.clientY - r.top, key: p.key })
+                      // Viewport coords + position:fixed so the menu is never clipped
+                      // by the .datatable{overflow:hidden} ancestor (was cut off near
+                      // the bottom rows when positioned absolute inside the clip).
+                      setCtx({ x: e.clientX, y: e.clientY, key: p.key })
                     }}
                   >
                     <td className="datatable__check" onClick={(e) => e.stopPropagation()}>
@@ -688,7 +708,7 @@ function Projects() {
           </table>
         </div>
         {ctx && (
-          <div className="menu ctxmenu__pop" style={{ position: 'absolute', left: ctx.x, top: ctx.y, zIndex: 'var(--k-z-dropdown)' }} role="menu" onMouseLeave={() => setCtx(null)}>
+          <div className="menu ctxmenu__pop" style={{ position: 'fixed', left: ctx.x, top: ctx.y, zIndex: 'var(--k-z-dropdown)' }} role="menu">
             <button className="menu__item" role="menuitem" onClick={() => { const is = PROJECTS.find((p) => p.key === ctx.key); if (is) setOpenIssue(is); setCtx(null) }}><Icon name="info" /> Open issue</button>
             <button className="menu__item" role="menuitem"><Icon name="edit" /> Rename <span className="menu__shortcut">⌘R</span></button>
             <div className="menu__sep" />
