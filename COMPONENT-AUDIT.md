@@ -24,12 +24,26 @@
 - #10 **modal contract** — new `useModal` hook (focus-trap + Escape + body scroll-lock + focus-return) on the real overlays (Lightbox + ArrowL/R nav, app New-contact Sheet)
 - #15 **chart non-colour channel** — line series cycle a `stroke-dasharray` (solid/dash/dot/…) so colour-blind + mono-palette kits stay legible
 
-**🟡 DEFERRED (with reasons — tracked for a fresh pass):**
-- #6 `--k-ring` 3:1 contrast floor — needs the contrast helper + cross-theme snapshot re-baseline + visual check
+**✅ DONE — Golf 3 (CSS/token wins, shipped & deployed):**
+- #6 `--k-ring` 3:1 contrast floor (WCAG 2.2 SC 1.4.11) — ring walks its lightness until ≥3:1 vs surf.base; vivid brands (incl. default) unchanged. `buildTokens.ts` `ringFloored`.
+- Indeterminate Progress (`.progress--indeterminate`) + reduced-motion fallback
+- Spinner size tiers (`.spinner--sm/--lg`)
+- Interactive Card (`.card--interactive`) — pointer + hover-lift + `:active` press + focus ring (new Workspaces gallery card)
+
+**🔜 NEXT SESSION — "desktop modules + Avatar" (3 net-new COMPONENTS, each = recipe + React component + gallery card + app usage + 4 audits + live test):**
+- **Image-bearing Avatar** — recipe is initials-only; add `<img>` variant with `onError`→initials fallback + load-delay (smallest of the three)
+- **Menubar** — the app File/Edit/View menu bar. **Reuses the Golf-2 menu substrate** (`handleMenuArrows` + `useDropdown.restoreFocus`): horizontal ArrowLeft/Right between top-level triggers, ArrowDown opens, items use the roving model. Thin composition, not from-scratch.
+- **Resizable / split-pane** — drag-to-resize panes (pointer events + min/max + a11y separator). The genuinely-new-logic one.
+
+**🟡 STILL DEFERRED (with reasons):**
 - #7 overlay exit-animations — `k-scale-out`/`k-fade-out` exist but wiring needs a per-overlay closing-state (React unmounts instantly); pure motion polish, no a11y
-- mini-visual touch targets (toggle knob, 16px checkbox/radio, 3px slider track, chip ×, eye) — need hit-expanding `::after` that collides with their existing art
+- mini-visual touch targets (toggle knob, 16px checkbox/radio, 3px slider track, chip ×, eye) — need hit-expanding `::after` that collides with their existing art; their label is usually already the 44px target
+- dismissible Badge — `att-chip`/`tag-input` cover most filter-chip cases
+
+**❌ DROPPED (not worth it):**
 - keyframe dedup (`sk`↔`k-shimmer`, `meta-status-pulse`↔`k-pulse`) — **verified NOT equivalent** (different direction/scale/opacity); repointing would change the animation
-- the larger composition ADDs (Menubar, Resizable, standalone Collapsible, RTL, interactive Card, indeterminate Progress, image Avatar, dismissible Badge, Spinner sizes) — net-new components, not fixes
+- standalone Collapsible — native `<details>` Accordion already covers single-disclosure
+- RTL / Direction — real but **systemic** (logical properties across all recipes); a deliberate future track, not a leftover
 
 ---
 
