@@ -224,6 +224,21 @@ ${s}.navsub__item:active,
 ${s}.navmenu__item:active,
 ${s}.sidenav__toggle:active { background: var(--k-state-press); }
 
+/* Composed-field disabled — plain .in gets :disabled for free, but the wrapper
+   fields (number/password/search/phone/tag input) hold the disabled <input>
+   inside, so the WRAPPER needs the dimming. Covers a real [disabled] descendant
+   (:has) and an explicit [aria-disabled] on the wrapper. */
+${s}.numinput:has(:disabled), ${s}.pwinput:has(:disabled),
+${s}.searchinput:has(:disabled), ${s}.phoneinput:has(:disabled),
+${s}.taginput:has(:disabled),
+${s}.numinput[aria-disabled="true"], ${s}.pwinput[aria-disabled="true"],
+${s}.searchinput[aria-disabled="true"], ${s}.phoneinput[aria-disabled="true"],
+${s}.taginput[aria-disabled="true"] {
+  opacity: var(--k-disabled-opacity, 0.55);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), tappable
  * controls grow to a 44px minimum so they're comfortably hit-able, WITHOUT
  * inflating dense desktop (fine-pointer) layouts where this never fires. Covers
