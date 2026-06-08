@@ -1,5 +1,21 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { Icon } from '../../../icons/Icon'
+
+/* Roving arrow-key navigation for a [role="menu"] container (WAI-ARIA menu
+ * pattern). Attach to the menu's onKeyDown; it moves focus between the
+ * [role="menuitem"] children. Enter/Space activate via the native <button>;
+ * Escape + focus-return live in useDropdown. */
+function handleMenuArrows(e: ReactKeyboardEvent<HTMLElement>) {
+  const items = Array.from(
+    e.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]:not([aria-disabled="true"])'),
+  )
+  if (!items.length) return
+  const idx = items.indexOf(document.activeElement as HTMLElement)
+  if (e.key === 'ArrowDown') { e.preventDefault(); items[(idx + 1) % items.length]?.focus() }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus() }
+  else if (e.key === 'Home') { e.preventDefault(); items[0]?.focus() }
+  else if (e.key === 'End') { e.preventDefault(); items[items.length - 1]?.focus() }
+}
 
 /* ============================================================================
  * Shared helpers voor de 6 vertical apps. Houden de apps DRY zonder
@@ -17,16 +33,28 @@ export function StatusBadge({ tone, label }: { tone: 'success' | 'warn' | 'dange
 }
 
 /* useDropdown — hook voor any "click trigger → open menu → click outside
- * to close" patroon. Sluit op outside-click én Escape. */
+ * to close" patroon. Sluit op outside-click én Escape, en geeft de focus terug
+ * aan de trigger bij keyboard-close (WAI-ARIA menu-button pattern), zodat
+ * keyboard/SR-gebruikers niet naar <body> vallen na elke dismissal. */
 export function useDropdown() {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  // The element focused when the menu opened IS the trigger; remember it so a
+  // keyboard/SR user returns there on close. restoreFocus is also exposed so a
+  // selection handler (item click) can return focus explicitly.
+  const triggerRef = useRef<HTMLElement | null>(null)
+  const restoreFocus = () => { triggerRef.current?.focus() }
   useEffect(() => {
     if (!open) return
+    triggerRef.current = (document.activeElement as HTMLElement) ?? null
     const handleClick = (e: MouseEvent) => {
+      // Outside-click: focus already moved to where the user clicked — do NOT
+      // yank it back to the trigger (only keyboard-close restores).
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
-    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setOpen(false); restoreFocus() }
+    }
     // Delay 0 zodat de openende click niet meteen close triggert
     setTimeout(() => document.addEventListener('mousedown', handleClick), 0)
     document.addEventListener('keydown', handleKey)
@@ -35,7 +63,7 @@ export function useDropdown() {
       document.removeEventListener('keydown', handleKey)
     }
   }, [open])
-  return { open, setOpen, ref }
+  return { open, setOpen, ref, restoreFocus }
 }
 
 /* InteractiveSlider — drag-to-change value slider die de bestaande
@@ -278,12 +306,18 @@ export function MenuButton({
   align?: 'left' | 'right'
   ariaLabel?: string
 }) {
-  const { open, setOpen, ref } = useDropdown()
+  const { open, setOpen, ref, restoreFocus } = useDropdown()
+  const menuRef = useRef<HTMLDivElement>(null)
+  // Focus the first item when the menu opens (WAI-ARIA menu-button pattern).
+  useEffect(() => {
+    if (open) menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus()
+  }, [open])
   return (
     <div ref={ref} style={{ position: 'relative', display: 'inline-flex' }}>
       <button
         className={triggerClass}
         onClick={(e) => { e.stopPropagation(); setOpen(!open) }}
+        onKeyDown={(e) => { if (!open && (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setOpen(true) } }}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={ariaLabel}
@@ -293,8 +327,10 @@ export function MenuButton({
       </button>
       {open && (
         <div
+          ref={menuRef}
           className="menu"
           role="menu"
+          onKeyDown={handleMenuArrows}
           style={{ position: 'absolute', [align]: 0, top: 'calc(100% + var(--k-s-4))', minWidth: 180, zIndex: 'var(--k-z-dropdown)' }}
         >
           {items.map((it, i) => (
@@ -302,7 +338,7 @@ export function MenuButton({
               key={i}
               role="menuitem"
               className={'menu__item' + (it.danger ? ' menu__item--danger' : '')}
-              onClick={() => { it.onClick?.(); setOpen(false) }}
+              onClick={() => { it.onClick?.(); setOpen(false); restoreFocus() }}
             >
               {it.icon}
               {it.label}
@@ -331,7 +367,11 @@ export function SplitMenu({
   items: Array<{ label: string; icon?: ReactNode; danger?: boolean; onClick?: () => void }>
   ariaLabel: string
 }) {
-  const { open, setOpen, ref } = useDropdown()
+  const { open, setOpen, ref, restoreFocus } = useDropdown()
+  const menuRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (open) menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus()
+  }, [open])
   return (
     <span ref={ref} style={{ position: 'relative', display: 'inline-flex' }}>
       <span className="btn-group" role="group" aria-label={ariaLabel}>
@@ -342,14 +382,17 @@ export function SplitMenu({
           aria-expanded={open}
           aria-label={`${ariaLabel} options`}
           onClick={(e) => { e.stopPropagation(); setOpen(!open) }}
+          onKeyDown={(e) => { if (!open && e.key === 'ArrowDown') { e.preventDefault(); setOpen(true) } }}
         >
           <Icon name="chevD" />
         </button>
       </span>
       {open && (
         <div
+          ref={menuRef}
           className="menu"
           role="menu"
+          onKeyDown={handleMenuArrows}
           style={{ position: 'absolute', right: 0, top: 'calc(100% + var(--k-s-4))', minWidth: 180, zIndex: 'var(--k-z-dropdown)' }}
         >
           {items.map((it, i) => (
@@ -357,7 +400,7 @@ export function SplitMenu({
               key={i}
               role="menuitem"
               className={'menu__item' + (it.danger ? ' menu__item--danger' : '')}
-              onClick={() => { it.onClick?.(); setOpen(false) }}
+              onClick={() => { it.onClick?.(); setOpen(false); restoreFocus() }}
             >
               {it.icon}
               {it.label}
