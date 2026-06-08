@@ -6,6 +6,35 @@
 
 ---
 
+## 0. Implementation status (June 2026)
+
+**✅ DONE — Golf 1 (systemic + quick wins):**
+- #1 touch-target 44px floor expanded to the full interactive roster + `min-width` icon set (`globalLayer`)
+- #4 iOS-zoom guard — `@media (pointer:coarse)` floors field text to `max(--k-type-small, --k-type-input-min=16px)`
+- #5 tone-driven `role`/`aria-live` on Alert + Banner (mirrors Toast)
+- #9 wired the **dead** CodeBlock copy button (clipboard + check-swap + aria-live)
+- #11 `role=progressbar` + aria-value* on the usage meter
+- #13 new `--k-state-press` token + `:active` tier for the nav family
+- #14 native-select focus halo → `--k-ring-halo` (was an undefined token); composed-field `:disabled` wrapper rule
+- dead `.accordion__head:focus-visible` → `.accordion summary`; stale button-height comments fixed
+- + `audit:dead-controls` build gate (flags down-chevron buttons with no handler)
+
+**✅ DONE — Golf 2 (behaviour / a11y):**
+- #2 + #3 **menu keyboard model** — `useDropdown` returns focus to the trigger on Escape; shared roving `handleMenuArrows` (Arrow/Home/End) + focus-first on MenuButton/SplitMenu
+- #10 **modal contract** — new `useModal` hook (focus-trap + Escape + body scroll-lock + focus-return) on the real overlays (Lightbox + ArrowL/R nav, app New-contact Sheet)
+- #15 **chart non-colour channel** — line series cycle a `stroke-dasharray` (solid/dash/dot/…) so colour-blind + mono-palette kits stay legible
+
+**🟡 DEFERRED (with reasons — tracked for a fresh pass):**
+- #6 `--k-ring` 3:1 contrast floor — needs the contrast helper + cross-theme snapshot re-baseline + visual check
+- #7 overlay exit-animations — `k-scale-out`/`k-fade-out` exist but wiring needs a per-overlay closing-state (React unmounts instantly); pure motion polish, no a11y
+- mini-visual touch targets (toggle knob, 16px checkbox/radio, 3px slider track, chip ×, eye) — need hit-expanding `::after` that collides with their existing art
+- keyframe dedup (`sk`↔`k-shimmer`, `meta-status-pulse`↔`k-pulse`) — **verified NOT equivalent** (different direction/scale/opacity); repointing would change the animation
+- the larger composition ADDs (Menubar, Resizable, standalone Collapsible, RTL, interactive Card, indeterminate Progress, image Avatar, dismissible Badge, Spinner sizes) — net-new components, not fixes
+
+---
+
+---
+
 ## 1. Executive Summary — Systemic Patterns
 
 These recur across 4+ families — fixing one root cause pays off everywhere.
