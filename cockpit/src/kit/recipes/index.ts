@@ -2664,7 +2664,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-radius: var(--k-radius-md);
   padding: var(--k-s-2);
   gap: 0;
-  border: 1px solid var(--k-border);
+  /* The track is a contained surface → its rim follows the Surface axis
+     (--k-field-border-color): Outlined keeps a hairline, Filled/Plain drop it
+     for a flatter rail. The track FILL stays --k-track (a fixed muted grey) so
+     the white active thumb stays legible at any Elevation — we tie the border to
+     Surface, not the fill. Tabs (.tab underline) stay their own semantic choice;
+     Surface never swaps segmented ↔ underline. */
+  border: 1px solid var(--k-field-border-color);
 }
 .segctrl__btn {
   padding: var(--k-s-4) var(--k-s-12);
