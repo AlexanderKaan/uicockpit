@@ -29,6 +29,10 @@ interface ChartFrameProps {
 }
 
 const chartVar = (i: number) => `var(--k-chart-${(i % 6) + 1})`
+// Non-colour channel for line series (WCAG 1.4.1 SC, colour-blind) — a dash
+// pattern cycles per series so lines stay distinguishable even when the chart
+// palette is a user-chosen single hue. solid → dash → dot → dash-dot → …
+const chartDash = (i: number) => ['none', '7 4', '2 4', '10 3 2 3', '1 5', '14 5'][i % 6]
 
 const W = 320
 const H = 150
@@ -174,7 +178,7 @@ function LineArea({ series, area, max }: { series: ChartSeries[]; area: boolean;
         return (
           <g key={s.name}>
             {area && <path d={areaD} fill={chartVar(si)} opacity={0.14} />}
-            <path d={d} fill="none" stroke={chartVar(si)} strokeWidth={2} vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+            <path d={d} fill="none" stroke={chartVar(si)} strokeWidth={2} strokeDasharray={chartDash(si)} vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
           </g>
         )
       })}
