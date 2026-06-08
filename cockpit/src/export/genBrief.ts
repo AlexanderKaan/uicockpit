@@ -93,6 +93,15 @@ E.g. a CRM: contacts → table, pipeline → kanban, deal → description list +
 timeline, KPIs → stat tiles. The **Component recipes** block at the bottom of
 the \`tokens.css\` export documents the exact class structure + states.
 
+**Form fields** use the \`.field\` contract: \`.field__label\` (+ a \`.field__req\`
+asterisk), the control, \`.field__hint\` and \`.field__error\` — wire \`aria-invalid\`
++ \`aria-describedby\` on the control (\`.lab\` is the lightweight label-over-control).
+**Interactive states** are real recipes, don't re-roll them: \`.btn--loading\`
+(width-locked spinner + \`aria-busy\`), checkbox \`:indeterminate\` (select-all dash),
+\`.toggle--disabled\`, and read-only inputs via the \`readonly\` attribute (flat fill,
+distinct from \`:disabled\`). On touch (\`pointer: coarse\`) the global layer floors
+buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
+
 ## Design tokens (light + dark)
 \`\`\`css
 ${genCss(cfg)}

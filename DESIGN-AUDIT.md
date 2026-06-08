@@ -79,6 +79,22 @@ Commits this session (on `main`, after Pass B `fdada2f`):
 - **All 6 P0 adds from ITEM 9 are now shipped.** Library grade A− → A (the overlay-a11y
   CSS-only ceiling remains the honest cap vs Radix; documented).
 
+### 🟡 W7 responsive — core done (P0 + key reflows committed GREEN; P1 inner-grids residual)
+- `4e3828a` **W7a/b** — `--k-touch-target` (44px) + `@media (pointer:coarse)` floor in
+  globalLayer (touch-only, desktop untouched); overflow guards: `.sheet` max-width:100vw,
+  `.dialog` max-width:calc(100vw−2rem), `.otp` flex-wrap, tooltip max-width+wrap.
+- `6566d87` **W7c** — `.kanban` 220px floor + overflow-x:auto (horizontal scroll on phone);
+  `.twocol` stacks <640px (desktop ratio kept). Preview-only: gallery columns
+  `minmax(min(375px,100%),375px)` (no sub-375 page-scroll); `.dash` shell → single column +
+  hidden nav <640px.
+- **W7 RESIDUAL (P1/P2, lower priority):** the DemoDashboard inner screen grids still don't
+  reflow — Home `2fr 1fr` (~305), Docs `210px 1fr` (~913), Media tree+grid `repeat(4,1fr)` —
+  these are inline styles (need class-ifying to get a media/container query). filegrid fixed
+  col-count; marketing nav hamburger ≤700px (the latter is item-8 marketing territory anyway).
+  The shell collapse already prevents the worst overflow; these are inner-layout niceties.
+
+### EXECUTION ORDER status: W1✅ W2✅ W3✅ W4✅ W5✅ W6✅ W7 core✅ → **W8 (A+ verify) next** → item 8 marketing → item 10 GitHub.
+
 ### KEY FACTS the next session needs
 - **Border control = COLOUR-based, 4 levels Faint/Subtle/Medium/Strong** (`BORDER_STEP` light=[4,5,6,7]).
   `--k-bw` is ALWAYS `1px` (it does NOT vary). So "make borders respond" = use the COLOUR token

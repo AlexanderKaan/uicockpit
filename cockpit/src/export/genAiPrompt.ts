@@ -217,6 +217,15 @@ equivalent package (most of these ship for Vue / Svelte / Solid as well).
     composing the PRIMITIVES; reach for a PATTERN only as a ready-made block.
     Reuse the documented class names + states exactly — never invent a new
     component or hand-roll inline styles for something a primitive already covers.
+    Form rows: wrap a labelled field in \`.field\` (\`.field__label\` + \`.field__req\`
+    asterisk + \`.field__hint\` + \`.field__error\`, control wired with \`aria-invalid\`
+    + \`aria-describedby\`) — the full FormField contract; \`.lab\` is the lightweight
+    label-over-control. State recipes you should USE (don't re-roll): \`.btn--loading\`
+    (width-locked spinner, wrap the label in a span + \`aria-busy\`), checkbox
+    \`:indeterminate\` (the select-all dash, set via the DOM property),
+    \`.toggle--disabled\`, and read-only inputs via the \`readonly\` attribute (flat
+    fill + muted, distinct from \`:disabled\`). Touch: on a coarse pointer the global
+    layer floors buttons/inputs/selects to \`--k-touch-target\` (44px) automatically.
 16. Row grammar — every list-style interactive row uses ONE of three height
     tokens. \`--k-row-h-sm\` (28px) for dense menus / dropdown items / table
     rows. \`--k-row-h-md\` (32px) for command palettes / search results.
