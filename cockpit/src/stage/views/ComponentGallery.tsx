@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
-import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton } from './apps/AppHelpers'
+import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal } from './apps/AppHelpers'
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 
@@ -1756,6 +1756,9 @@ const LB_IMAGES = [
 ]
 function LightboxCard() {
   const [open, setOpen] = useState<number | null>(null)
+  // Real full-screen overlay → owes the modal contract (trap/Escape/scroll-lock/
+  // focus-return). Arrow-nav for prev/next is wired on the dialog below.
+  const lbRef = useModal<HTMLDivElement>(open !== null, () => setOpen(null))
   return (
     <Card title="Gallery" desc="Click a thumbnail to open the lightbox.">
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
@@ -1764,7 +1767,19 @@ function LightboxCard() {
         ))}
       </div>
       {open !== null && (
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" onClick={() => setOpen(null)}>
+        <div
+          className="lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image viewer"
+          ref={lbRef}
+          tabIndex={-1}
+          onClick={() => setOpen(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowLeft') { e.preventDefault(); setOpen((open + LB_IMAGES.length - 1) % LB_IMAGES.length) }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); setOpen((open + 1) % LB_IMAGES.length) }
+          }}
+        >
           <div className="lightbox__stage" style={{ width: '58%', aspectRatio: '3 / 2', background: LB_IMAGES[open] }} onClick={(e) => e.stopPropagation()} />
           <button className="lightbox__btn lightbox__btn--close" onClick={() => setOpen(null)} aria-label="Close"><Icon name="x" /></button>
           <button className="lightbox__btn lightbox__btn--prev" onClick={(e) => { e.stopPropagation(); setOpen((open + LB_IMAGES.length - 1) % LB_IMAGES.length) }} aria-label="Previous"><Icon name="chevL" /></button>

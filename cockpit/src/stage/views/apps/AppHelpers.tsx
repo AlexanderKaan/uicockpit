@@ -66,6 +66,47 @@ export function useDropdown() {
   return { open, setOpen, ref, restoreFocus }
 }
 
+/* useModal — the modal contract a `role="dialog" aria-modal="true"` surface owes:
+ * focus-trap (Tab/Shift+Tab wrap inside), Escape-to-close, body scroll-lock, and
+ * focus-RETURN to the opener on close. Attach the returned ref to the dialog
+ * element. Pass the same `open` the component renders on + an onClose. */
+export function useModal<T extends HTMLElement = HTMLElement>(open: boolean, onClose: () => void) {
+  const ref = useRef<T>(null)
+  const prevFocus = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    if (!open) return
+    prevFocus.current = document.activeElement as HTMLElement | null
+    const el = ref.current
+    const focusables = () =>
+      el
+        ? Array.from(
+            el.querySelectorAll<HTMLElement>(
+              'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
+            ),
+          )
+        : []
+    ;(focusables()[0] ?? el)?.focus()
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.preventDefault(); onClose(); return }
+      if (e.key !== 'Tab') return
+      const f = focusables()
+      if (!f.length) return
+      const first = f[0], last = f[f.length - 1]
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus() }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+      prevFocus.current?.focus()
+    }
+  }, [open])
+  return ref
+}
+
 /* InteractiveSlider — drag-to-change value slider die de bestaande
  * .slider styling reuse't. Supports mouse + touch + click-to-seek + keyboard. */
 export function InteractiveSlider({

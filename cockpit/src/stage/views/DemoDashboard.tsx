@@ -7,7 +7,7 @@ import type { IconName } from '../../icons/concepts'
  * This is what makes SupaDash the single "super-app": its own pages
  * (Overview…Settings) plus these domain screens so every key component
  * is visible in one place. */
-import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown } from './apps/AppHelpers'
+import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown, useModal } from './apps/AppHelpers'
 import { PageSkeleton } from './Skeletons'
 
 type Page = 'overview' | 'projects' | 'docs' | 'inbox' | 'media' | 'settings'
@@ -537,6 +537,8 @@ function Projects() {
     }
   }, [ctx])
   const [sheetOpen, setSheetOpen] = useState(false)
+  // The New-contact sheet is a real fixed-inset overlay → modal contract.
+  const sheetRef = useModal<HTMLElement>(sheetOpen, () => setSheetOpen(false))
   const [openIssue, setOpenIssue] = useState<Issue | null>(null)
   const [niType, setNiType] = useState('Feature')
   const [niPrio, setNiPrio] = useState('med')
@@ -739,7 +741,7 @@ function Projects() {
       {sheetOpen && (
         <div className="sheet-frame" style={{ position: 'fixed', inset: 0, height: 'auto', border: 'none', borderRadius: 0, background: 'none', overflow: 'visible', zIndex: 'var(--k-z-drawer)' }}>
           <div className="sheet-frame__backdrop" role="button" tabIndex={0} aria-label="Close" onClick={() => setSheetOpen(false)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheetOpen(false) } }} />
-          <aside className="sheet" role="dialog" aria-modal="true" aria-labelledby="ni-title">
+          <aside ref={sheetRef} className="sheet" role="dialog" aria-modal="true" aria-labelledby="ni-title">
             <div className="sheet__head">
               <span className="sheet__title" id="ni-title">New issue</span>
               <button className="btn btn--ghost btn--icon btn--sm" aria-label="Close" onClick={() => setSheetOpen(false)}><Icon name="x" /></button>
