@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
-import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal } from './apps/AppHelpers'
+import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar } from './apps/AppHelpers'
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 
@@ -179,16 +179,27 @@ function AvatarCard() {
         <span className="avatar avatar--a4">LN<span className="avatar__status avatar__status--online" role="img" aria-label="Online" /></span>
         <span className="avatar avatar--a5">EF<span className="avatar__status avatar__status--away" role="img" aria-label="Away" /></span>
       </div>
-      <div className="avatar-group">
+      <div className="avatar-group" style={{ marginBottom: 16 }}>
         <span className="avatar avatar--sm avatar--a1">JM</span>
         <span className="avatar avatar--sm avatar--a2">AC</span>
         <span className="avatar avatar--sm avatar--a3">MK</span>
         <span className="avatar avatar--sm avatar--a6">RP</span>
         <span className="avatar-group__more">+3</span>
       </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <ImgAvatar src={PHOTO_SVG} initials="DV" label="Dana Vance" />
+        <ImgAvatar src={PHOTO_SVG} initials="KW" size="lg" label="Kai Wong" />
+        <ImgAvatar src="/__broken-on-purpose.jpg" initials="BR" tint={4} label="Broken photo — initials fallback" />
+        <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>photo · photo · broken→initials</span>
+      </div>
     </Card>
   )
 }
+
+/* Inline SVG stand-in for a profile photo (always loads, no network) — a soft
+   two-stop gradient so the demo reads as "image", not a flat swatch. */
+const PHOTO_SVG =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23a5b4fc'/%3E%3Cstop offset='1' stop-color='%23f0abfc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' fill='url(%23g)'/%3E%3Ccircle cx='24' cy='19' r='8' fill='%23ffffff' opacity='.85'/%3E%3Cellipse cx='24' cy='40' rx='14' ry='10' fill='%23ffffff' opacity='.85'/%3E%3C/svg%3E"
 
 function AccordionCard() {
   const items: [string, string][] = [

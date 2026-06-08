@@ -32,6 +32,25 @@ export function StatusBadge({ tone, label }: { tone: 'success' | 'warn' | 'dange
   )
 }
 
+/* Photo avatar with graceful fallback. The <img> (.avatar__img) covers the
+ * initials once it loads; a broken/slow src triggers onError → the img unmounts
+ * → the coloured initials underneath show through. Initials stay the accessible
+ * name (img is decorative), so it reads correctly whether the photo loads or not. */
+export function ImgAvatar({
+  src, initials, size, tint, className = '', label,
+}: {
+  src: string; initials: string; size?: 'sm' | 'lg'; tint?: 1 | 2 | 3 | 4 | 5 | 6; className?: string; label?: string
+}) {
+  const [failed, setFailed] = useState(false)
+  const cls = ['avatar', size && `avatar--${size}`, tint && `avatar--a${tint}`, className].filter(Boolean).join(' ')
+  return (
+    <span className={cls} role="img" aria-label={label ?? initials}>
+      <span aria-hidden="true">{initials}</span>
+      {!failed && <img className="avatar__img" src={src} alt="" onError={() => setFailed(true)} />}
+    </span>
+  )
+}
+
 /* useDropdown — hook voor any "click trigger → open menu → click outside
  * to close" patroon. Sluit op outside-click én Escape, en geeft de focus terug
  * aan de trigger bij keyboard-close (WAI-ARIA menu-button pattern), zodat

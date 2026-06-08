@@ -7,7 +7,12 @@ import type { IconName } from '../../icons/concepts'
  * This is what makes SupaDash the single "super-app": its own pages
  * (Overview…Settings) plus these domain screens so every key component
  * is visible in one place. */
-import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown, useModal } from './apps/AppHelpers'
+import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown, useModal, ImgAvatar } from './apps/AppHelpers'
+
+/* Profile photo stand-in (inline SVG — always loads, no network) for the
+   hover-card preview; demonstrates the photo Avatar (.avatar__img) in the app. */
+const USER_PHOTO =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cdefs%3E%3ClinearGradient id='u' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2399f6e4'/%3E%3Cstop offset='1' stop-color='%23a5b4fc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='44' height='44' fill='url(%23u)'/%3E%3Ccircle cx='22' cy='17' r='7.5' fill='%23ffffff' opacity='.9'/%3E%3Cellipse cx='22' cy='37' rx='13' ry='9' fill='%23ffffff' opacity='.9'/%3E%3C/svg%3E"
 import { PageSkeleton } from './Skeletons'
 
 type Page = 'overview' | 'projects' | 'docs' | 'inbox' | 'media' | 'settings'
@@ -474,9 +479,7 @@ function ActivityItem({ dot, text, meta, author }: { dot: 'success' | 'warn' | '
               @{author}
               <span className="hover-card__pop">
                 <div className="card__row" style={{ gap: 8, marginBottom: 4 }}>
-                  <span className="avatar avatar--sm avatar--a2">
-                    {author.slice(0, 2).toUpperCase()}
-                  </span>
+                  <ImgAvatar src={USER_PHOTO} initials={author.slice(0, 2).toUpperCase()} size="sm" tint={2} label={author} />
                   <div className="card__col" style={{ gap: 1, flex: 1 }}>
                     <span style={{ fontWeight: 600, fontSize: 'var(--k-type-small)', color: 'var(--k-fg)' }}>{author}</span>
                     <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>SupaDash member</span>
