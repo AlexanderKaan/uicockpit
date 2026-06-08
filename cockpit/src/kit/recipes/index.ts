@@ -2047,7 +2047,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* ----- Kanban (.kanban) -----
  * Presentational board — equal-width sunken columns with a header count and
  * stacked draggable-looking cards. (No DnD — the layout is the deliverable.) */
-.kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--k-s-10); }
+/* Columns keep a 220px floor and the board scrolls horizontally rather than
+ * crushing 4 columns into a phone width (the standard kanban-on-mobile pattern);
+ * on wide screens 1fr lets them share the space. */
+.kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(min(220px, 100%), 1fr); gap: var(--k-s-10); overflow-x: auto; }
 .kanban__col { background: var(--k-surface-sunken); border-radius: var(--k-radius-md); padding: var(--k-stack-gap, 8px); display: flex; flex-direction: column; gap: var(--k-stack-gap, 8px); }
 .kanban__col-head { display: flex; align-items: center; justify-content: space-between; font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); padding: var(--k-s-2) var(--k-s-4); }
 .kanban__count { background: var(--k-surface); border-radius: 999px; padding: 1px var(--k-s-6); font-size: var(--k-type-caption); }
@@ -4048,6 +4051,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: var(--k-s-10);
+}
+/* Stack the asymmetric two-column to a single column on a phone (the 1.4fr/1fr
+ * split is unreadable below ~36rem). */
+@media (max-width: 640px) {
+  .twocol { grid-template-columns: 1fr; }
 }
 .twocol__main {
   display: flex;

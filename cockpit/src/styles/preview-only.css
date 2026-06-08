@@ -74,7 +74,9 @@
    * fits as many 375px columns as the stage allows and centres them, so on a
    * wide monitor you get more columns, not wider cards. A .card--wide spans two
    * (≈790px). */
-  grid-template-columns: repeat(auto-fill, 375px);
+  /* 375px columns on desktop; below a 375px viewport the column shrinks to fit
+   * (min(375px,100%)) so a phone never gets a horizontal page-scroll. */
+  grid-template-columns: repeat(auto-fill, minmax(min(375px, 100%), 375px));
   justify-content: center;
   /* 1px rows = fine masonry quantisation (waste < 1px). The vertical gap is NOT
    * a row-gap (that quantises coarsely with these tiny rows); it's baked into
@@ -161,6 +163,13 @@
   height: 100%;
   min-height: 540px;
   gap: 0;
+}
+/* Phone: the fixed 200px/64px sidebar makes the 6 screens unusable, so collapse
+ * to a single content column and drop the nav (the demo's value on a phone is the
+ * screen content, not deep nav). Preview-only — never ships to a CDN consumer. */
+@media (max-width: 640px) {
+  .dash, .dash--rail { grid-template-columns: 1fr; }
+  .dash__nav { display: none; }
 }
 /* The app-shell SIDEBAR itself is the exportable `.sidenav` kit recipe (brand
  * header, chrome-mode background, pinned footer, and the collapsed icon-rail —
