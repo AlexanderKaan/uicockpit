@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run verify:icons && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && tsc -b && vite build",
+    "build": "npm run verify:icons && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
@@ -20,7 +20,8 @@
     "audit:components": "node scripts/audit-components.mjs",
     "audit:coverage": "node scripts/audit-coverage.mjs",
     "audit:modifiers": "node scripts/audit-modifiers.mjs",
-    "audit:provenance": "node scripts/scan-app-provenance.mjs"
+    "audit:provenance": "node scripts/scan-app-provenance.mjs",
+    "audit:controls": "node scripts/audit-dead-controls.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
