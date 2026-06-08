@@ -30,10 +30,12 @@
 - Spinner size tiers (`.spinner--sm/--lg`)
 - Interactive Card (`.card--interactive`) — pointer + hover-lift + `:active` press + focus ring (new Workspaces gallery card)
 
-**🔜 NEXT SESSION — "desktop modules + Avatar" (3 net-new COMPONENTS, each = recipe + React component + gallery card + app usage + 4 audits + live test):**
-- **Image-bearing Avatar** — recipe is initials-only; add `<img>` variant with `onError`→initials fallback + load-delay (smallest of the three)
-- **Menubar** — the app File/Edit/View menu bar. **Reuses the Golf-2 menu substrate** (`handleMenuArrows` + `useDropdown.restoreFocus`): horizontal ArrowLeft/Right between top-level triggers, ArrowDown opens, items use the roving model. Thin composition, not from-scratch.
-- **Resizable / split-pane** — drag-to-resize panes (pointer events + min/max + a11y separator). The genuinely-new-logic one.
+**✅ DONE — Golf 3 desktop modules + Avatar (3 net-new COMPONENTS, recipe + React component + gallery card + app usage + 4 audits + live-verified):**
+- **Image-bearing Avatar** (`.avatar__img` + `ImgAvatar` helper) — `<img>` covers the initials; `onError` unmounts it → initials fallback, no layout shift; initials stay the accessible name. Gallery Avatar card (2 photos + 1 broken→fallback) + app hover-card profile preview.
+- **Menubar** (`.menubar` + `Menubar`) — File/Edit/View/Help app menu bar, WAI-ARIA `role=menubar`. **Reuses the Golf-2 menu substrate**: popup is the shared `.menu` recipe + `handleMenuArrows`; the menubar layer adds roving tabindex, ArrowLeft/Right to move/switch the open menu, Down/Enter/Space to open, Esc to close+return focus, hover-to-switch once open. Gallery card + app Docs editor. Live-verified: opens with shortcuts, `aria-expanded` toggles.
+- **Resizable** (`.resizable` + `Resizable`) — drag-to-resize split panes; handle is a WAI-ARIA window splitter (`role=separator`, focusable, ArrowLeft/Right resize, Home/End clamp), pointer-capture drag survives a fast cursor, panes clamp to [min,max]. Gallery card (file list | editor) + app Docs outline|editor split. (Dropped the unused `.resizable--vertical` modifier — component is horizontal-only.)
+
+**→ Golf 3 is now COMPLETE.** All audit findings worth doing are shipped; what remains is the deferred/dropped list below.
 
 **🟡 STILL DEFERRED (with reasons):**
 - #7 overlay exit-animations — `k-scale-out`/`k-fade-out` exist but wiring needs a per-overlay closing-state (React unmounts instantly); pure motion polish, no a11y
