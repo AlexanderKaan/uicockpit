@@ -289,6 +289,21 @@ export function buildTokens(cfg: Config): Tokens {
   const P = okAccentScale(primaryHex, dark)
   const primary = P[8]!
   const primaryHover = P[9]!
+  // Focus ring vs WCAG 2.2 SC 1.4.11 — the ring must hit ≥3:1 against the surface
+  // it sits on. The raw primary can be a pale / low-chroma brand that fails; walk
+  // its lightness toward the foreground until it clears 3:1 (capped so it never
+  // hits black/white). Vivid brands already pass, so this only changes pale ones.
+  const ringFloored = (() => {
+    const surfHex = surf.base
+    if (contrast(primary, surfHex) >= 3) return primary
+    const [h, s, l] = hexToHsl(primary)
+    const dir = dark ? 1 : -1
+    for (let li = l; li >= 14 && li <= 90; li += dir * 2) {
+      const hex = hslToHex(h, s, li)
+      if (contrast(hex, surfHex) >= 3) return hex
+    }
+    return primary
+  })()
   const primaryFg = readableInk(primaryHex)
   const primarySoft = P[2]!
   // Foreground on primary-soft fills (badges, chips, soft-tile icons).
@@ -644,7 +659,7 @@ export function buildTokens(cfg: Config): Tokens {
       ...sysVars,
       '--k-border': border,
       '--k-input-border': inputBorder,
-      '--k-ring': primary,
+      '--k-ring': ringFloored,
       '--k-ring-soft': primarySoft,
       // --k-ring-halo: same hue as --k-ring at ~28% alpha. Used as the
       // focus box-shadow ring. Because it's the SAME color as the border
