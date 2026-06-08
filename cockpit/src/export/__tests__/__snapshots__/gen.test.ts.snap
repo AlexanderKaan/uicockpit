@@ -1971,11 +1971,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .nav-group { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-faint); padding: 0 var(--k-row-px, 10px); margin: var(--k-s-14) 0 var(--k-s-4); }
 
 /* === Sidebar ============================================================
- * App-shell navigation column. Sits on the Chrome plane (--k-chrome-bg) so it
- * responds to the Sidebar treatment — flush (hairline seam), recessed (sunken
- * well) and panel (floating inset room). Rows reuse the shared .navrow /
- * .nav-group / .navsub recipe. Collapses to a 64px icon-rail with hover
- * tooltips; the collapse toggle lives in the brand header. */
+ * App-shell navigation column. Sits on the Chrome plane (--k-chrome-bg), which
+ * the Surface axis drives: Outlined/Plain = flush with a hairline seam, Filled =
+ * a sunken recessed well. Add .sidenav--floating for the lifted inset-room look.
+ * Rows reuse the shared .navrow / .nav-group / .navsub recipe. Collapses to a
+ * 64px icon-rail with hover tooltips; the collapse toggle lives in the brand
+ * header. */
 .sidenav {
   display: flex;
   flex-direction: column;
@@ -1990,18 +1991,19 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     border-radius var(--k-dur, 200ms) var(--k-ease-out, ease),
     box-shadow var(--k-dur, 200ms) var(--k-ease-out, ease);
 }
-/* PANEL: a distinct, tinted ROOM — inset from the edges, a soft shadow, and a
- * border-radius that listens to Box radius (Raycast / Vercel-new). */
-[data-chrome="panel"] .sidenav {
+/* FLOATING: a distinct, tinted ROOM — inset from the edges, a soft shadow, and a
+ * border-radius that listens to Box radius (Raycast / Vercel-new). This was the
+ * old "Floating sidebar" chrome value; per the Surface refactor it's an OPT-IN
+ * utility (a lift, i.e. an Elevation expression) rather than a global mode — so
+ * Surface stays scoped to fill/seam and never silently couples the sidebar to a
+ * global shadow. Recessed (sunken well) now comes for free from Surface=Filled
+ * via --k-chrome-bg; the border-right hairline is the seam. */
+.sidenav--floating {
   margin: var(--k-s-8);
   border: 1px solid var(--k-border);
   border-radius: var(--k-radius-lg);
   box-shadow: var(--k-shadow-sm);
 }
-/* RECESSED: a SUNKEN WELL — stays flush, no inset card; --k-chrome-bg carries
- * the sunken tint and the border-right hairline is the seam where the brighter
- * content plane lifts above it (macOS / Windows-settings depth). */
-[data-chrome="recessed"] .sidenav { margin: 0; border-radius: 0; box-shadow: none; }
 /* Brand header — app-icon launcher tile + name + the collapse toggle. */
 .sidenav__brand { display: flex; align-items: center; gap: var(--k-s-8); padding: var(--k-s-6) var(--k-s-10) var(--k-s-16); font-weight: var(--k-weight-semibold); }
 .sidenav__icon { width: 26px; height: 26px; border-radius: var(--k-radius-sm); background: var(--k-primary); color: var(--k-primary-fg, #fff); display: grid; place-items: center; flex: none; box-shadow: var(--k-shadow-sm); }
