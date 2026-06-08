@@ -155,7 +155,7 @@ ${s}.menu__item:focus-visible,
 ${s}.cmdp__item:focus-visible,
 ${s}.tbl__row:focus-visible,
 ${s}.navrow:focus-visible,
-${s}.accordion__head:focus-visible,
+${s}.accordion summary:focus-visible,
 ${s}.convo:focus-visible,
 ${s}.combobox__item:focus-visible,
 ${s}.tree__row:focus-visible,
@@ -214,13 +214,24 @@ ${s}.in.is-warning:focus-within {
   border-color: var(--k-input-warning-border);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-warning-border) 28%, transparent);
 }
-/* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), the
- * core tappable controls grow to a 44px minimum so they're comfortably hit-able,
- * WITHOUT inflating dense desktop (fine-pointer) layouts where this never fires.
- * Buttons + inputs + selects get a 44px min-height; icon/circle buttons also a
- * 44px min-width for a square target. */
+/* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), tappable
+ * controls grow to a 44px minimum so they're comfortably hit-able, WITHOUT
+ * inflating dense desktop (fine-pointer) layouts where this never fires. Covers
+ * the full interactive roster, not just buttons/inputs: row/item-like controls
+ * grow vertically (min-height); icon-only controls become 44×44 squares.
+ * NOTE: sub-token visual controls whose box IS the visual (toggle knob, checkbox/
+ * radio 16px box, the 3px slider track, the chip × and eye glyphs) are NOT here —
+ * forcing min-height on them would distort the visual; they need a hit-expanding
+ * ::after pseudo, which collides with their existing ::after art, so that's a
+ * separate careful pass. Their text LABEL usually already provides the target. */
 @media (pointer: coarse) {
-  ${s}.btn, ${s}.in, ${s}.select-trigger { min-height: var(--k-touch-target); }
-  ${s}.btn--icon, ${s}.btn--circle { min-width: var(--k-touch-target); }
+  ${s}.btn, ${s}.in, ${s}.select-trigger,
+  ${s}.menu__item, ${s}.navsub__item, ${s}.navmenu__item, ${s}.list__row,
+  ${s}.tab, ${s}.segctrl__btn, ${s}.calendar__cell, ${s}.sidenav__toggle,
+  ${s}.phoneinput__country { min-height: var(--k-touch-target); }
+  ${s}.btn--icon, ${s}.btn--circle,
+  ${s}.lightbox__btn, ${s}.alert__close, ${s}.banner__close, ${s}.toast__close {
+    min-width: var(--k-touch-target); min-height: var(--k-touch-target);
+  }
 }`
 }

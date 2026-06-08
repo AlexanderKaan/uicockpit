@@ -584,7 +584,7 @@ body {
 .cmdp__item:focus-visible,
 .tbl__row:focus-visible,
 .navrow:focus-visible,
-.accordion__head:focus-visible,
+.accordion summary:focus-visible,
 .convo:focus-visible,
 .combobox__item:focus-visible,
 .tree__row:focus-visible,
@@ -643,14 +643,25 @@ body {
   border-color: var(--k-input-warning-border);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-warning-border) 28%, transparent);
 }
-/* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), the
- * core tappable controls grow to a 44px minimum so they're comfortably hit-able,
- * WITHOUT inflating dense desktop (fine-pointer) layouts where this never fires.
- * Buttons + inputs + selects get a 44px min-height; icon/circle buttons also a
- * 44px min-width for a square target. */
+/* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), tappable
+ * controls grow to a 44px minimum so they're comfortably hit-able, WITHOUT
+ * inflating dense desktop (fine-pointer) layouts where this never fires. Covers
+ * the full interactive roster, not just buttons/inputs: row/item-like controls
+ * grow vertically (min-height); icon-only controls become 44×44 squares.
+ * NOTE: sub-token visual controls whose box IS the visual (toggle knob, checkbox/
+ * radio 16px box, the 3px slider track, the chip × and eye glyphs) are NOT here —
+ * forcing min-height on them would distort the visual; they need a hit-expanding
+ * ::after pseudo, which collides with their existing ::after art, so that's a
+ * separate careful pass. Their text LABEL usually already provides the target. */
 @media (pointer: coarse) {
-  .btn, .in, .select-trigger { min-height: var(--k-touch-target); }
-  .btn--icon, .btn--circle { min-width: var(--k-touch-target); }
+  .btn, .in, .select-trigger,
+  .menu__item, .navsub__item, .navmenu__item, .list__row,
+  .tab, .segctrl__btn, .calendar__cell, .sidenav__toggle,
+  .phoneinput__country { min-height: var(--k-touch-target); }
+  .btn--icon, .btn--circle,
+  .lightbox__btn, .alert__close, .banner__close, .toast__close {
+    min-width: var(--k-touch-target); min-height: var(--k-touch-target);
+  }
 }
 
 /* ========================================================================
