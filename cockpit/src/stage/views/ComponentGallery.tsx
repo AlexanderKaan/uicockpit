@@ -1615,6 +1615,9 @@ function NavRow({ icon, label, active }: { icon: IconName; label: string; active
 // plus a split action. Outer corners follow the button radius.
 function ButtonGroupCard() {
   const [view, setView] = useState('board')
+  // The split action's chevron opens a real menu (same useDropdown + .menu the
+  // app uses) — no dead chevron in the canonical demo.
+  const save = useDropdown()
   return (
     <Card title="Button group" desc="Buttons fused into one control — a view switcher and a split action.">
       <div className="btn-group" role="group" aria-label="View">
@@ -1622,9 +1625,18 @@ function ButtonGroupCard() {
           <button key={v} type="button" className={`btn btn--sm ${view === v.toLowerCase() ? 'btn--primary' : 'btn--outline'}`} aria-pressed={view === v.toLowerCase()} onClick={() => setView(v.toLowerCase())}>{v}</button>
         ))}
       </div>
-      <div className="btn-group" role="group" aria-label="Save options">
-        <button type="button" className="btn btn--outline btn--sm"><Icon name="check" /> Save</button>
-        <button type="button" className="btn btn--outline btn--sm btn--icon" aria-label="More save options"><Icon name="chevD" /></button>
+      <div ref={save.ref} style={{ position: 'relative', display: 'inline-flex' }}>
+        <div className="btn-group" role="group" aria-label="Save options">
+          <button type="button" className="btn btn--outline btn--sm"><Icon name="check" /> Save</button>
+          <button type="button" className="btn btn--outline btn--sm btn--icon" aria-label="More save options" aria-haspopup="menu" aria-expanded={save.open} onClick={() => save.setOpen(!save.open)}><Icon name="chevD" /></button>
+        </div>
+        {save.open && (
+          <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + var(--k-s-4))', minWidth: 180, zIndex: 'var(--k-z-dropdown)' }}>
+            <button role="menuitem" className="menu__item" onClick={() => save.setOpen(false)}>Save and close</button>
+            <button role="menuitem" className="menu__item" onClick={() => save.setOpen(false)}>Save as draft</button>
+            <button role="menuitem" className="menu__item" onClick={() => save.setOpen(false)}>Save as template</button>
+          </div>
+        )}
       </div>
     </Card>
   )
