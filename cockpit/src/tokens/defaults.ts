@@ -15,7 +15,7 @@ export const DEFAULT_CONFIG: Config = {
   // 'raised' resolves to the former default combo (balanced ramp · subtle
   // borders · layered chrome · soft shadow), so the default look is unchanged.
   surfaceDepth: 'raised',
-  chrome: 'flush',             // sidebar flows with the page + hairline (Linear/Vercel)
+  surface: 'outlined',         // box-with-border fields + flush hairline-seam sidebar (= the previous default look)
   borders: 'subtle',
   motion: 'smooth',
   motionTempo: 'normal',

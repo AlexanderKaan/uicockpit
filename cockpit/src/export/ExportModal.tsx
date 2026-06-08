@@ -411,7 +411,7 @@ const CHOICE_CAP: Record<string, Record<string, string>> = {
   motionTempo: { snappy: 'Snappy', normal: 'Normal', generous: 'Generous' },
   iconSet: { hairline: 'Iconoir', line: 'Lucide', rounded: 'Phosphor', bold: 'Phosphor Bold', solid: 'Heroicons' },
   surfaceDepth: { flat: 'Flat', soft: 'Subtle', raised: 'Raised', layered: 'Deep' },
-  chrome: { flush: 'Seamless', recessed: 'Recessed', panel: 'Floating' },
+  surface: { outlined: 'Outlined', filled: 'Filled', plain: 'Plain' },
   borders: { faint: 'Faint', subtle: 'Subtle', medium: 'Medium', strong: 'Strong' },
 }
 
@@ -439,7 +439,7 @@ function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ 
     { icon: ic(Gauge), label: 'Tempo', value: cap('motionTempo', cfg.motionTempo) },
     { icon: ic(Sparkles), label: 'Icons', value: cap('iconSet', cfg.iconSet) },
     { icon: ic(Layers), label: 'Elevation', value: cap('surfaceDepth', cfg.surfaceDepth) },
-    { icon: ic(Sidebar), label: 'Sidebar', value: cap('chrome', cfg.chrome) },
+    { icon: ic(Sidebar), label: 'Surface', value: cap('surface', cfg.surface) },
     { icon: ic(Square), label: 'Border', value: cap('borders', cfg.borders) },
   ]
 }

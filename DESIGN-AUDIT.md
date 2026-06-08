@@ -93,7 +93,16 @@ Commits this session (on `main`, after Pass B `fdada2f`):
   col-count; marketing nav hamburger ≤700px (the latter is item-8 marketing territory anyway).
   The shell collapse already prevents the worst overflow; these are inner-layout niceties.
 
-### EXECUTION ORDER status: W1✅ W2✅ W3✅ W4✅ W5✅ W6✅ W7 core✅ → **W8 (A+ verify) next** → item 8 marketing → item 10 GitHub.
+### ✅✅ PROGRAM COMPLETE — all 10 items shipped (code side)
+W1✅ W2✅ W3✅ W4✅ W5✅ W6✅ W7 core✅ W8 (A+ verify)✅ →
+**item 8 marketing✅** (`654c2d5` copy · `b4274fe` interactive bouquet · `91d0614` SEO) — DEPLOYED →
+**item 9✅** (no cull; 6 P0 adds shipped in W6; library A− → A) →
+**item 10 GitHub** (`e283a16` CI workflow + SECURITY.md + README counts).
+TWO production deploys done this session (W1-W8, then item-8 marketing) — uicockpit.com 200.
+**RESIDUAL needing the repo owner (gh auth):** push the local commits to origin (activates CI),
+add repo topics, enable Discussions, generate the OG-image PNG, flip repo to public at launch.
+**RESIDUAL low-priority code:** W7 P1 inner-screen grids (Home/Docs/Media inline `gridTemplateColumns`
+→ class-ify for a query); marketing nav hamburger ≤700px.
 
 ### KEY FACTS the next session needs
 - **Border control = COLOUR-based, 4 levels Faint/Subtle/Medium/Strong** (`BORDER_STEP` light=[4,5,6,7]).

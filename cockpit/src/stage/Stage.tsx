@@ -24,7 +24,7 @@ export function Stage({ cfg, tokens, view }: StageProps) {
     <main className="stage">
       <div className="stage__row">
         <div className="stage__body">
-          <div className="cockpit-preview" style={previewStyle} data-chrome={cfg.chrome}>
+          <div className="cockpit-preview" style={previewStyle}>
             <IconProvider set={cfg.iconSet}>
               <div className="view-transition-root" key={view}>
                 {view === 'components' && <ComponentGallery />}

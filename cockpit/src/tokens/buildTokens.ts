@@ -217,10 +217,13 @@ export function buildTokens(cfg: Config): Tokens {
   const rampContrast = depth.contrast
   const elevationMode = depth.elevation
   // Sidebar treatment — its own axis (seamless / recessed / floating), independent
-  // of Elevation. Both Recessed and Floating give the nav a SUNKEN tint
-  // (--k-chrome-bg = surf.sunken); the CSS then adds the floating-card structure
-  // for Floating only, while Recessed stays flush (a sunken well).
-  const chromeSunkenNav = cfg.chrome === 'panel' || cfg.chrome === 'recessed'
+  // Surface=Filled gives the nav a SUNKEN tint (--k-chrome-bg = surf.sunken) — the
+  // recessed well. Outlined/Plain keep it flush (a hairline seam carries it). The
+  // old "Floating" sidebar is now an Elevation expression (a .sidenav--floating
+  // utility), so it's no longer a chrome-bg branch.
+  const surfaceFilled = cfg.surface === 'filled'
+  const surfacePlain = cfg.surface === 'plain'
+  const chromeSunkenNav = surfaceFilled
   const spread = rampContrast === 'soft' ? 0.62 : rampContrast === 'crisp' ? 1.32 : 1
 
   // Neutral 12-step OKLCH ladder (Radix-contract; perceptually-even). Surfaces,
@@ -531,6 +534,19 @@ export function buildTokens(cfg: Config): Tokens {
       // perceivable filled-field surface (Material/shadcn-muted) so the border
       // can stay soft + Border-control-responsive while the field reads clearly.
       '--k-input-bg': surf.sunken,
+      // === Surface treatment (field facet) — the four tokens a field recipe reads
+      // so ONE .in rule renders all three Surface modes (no selector branching):
+      //   Outlined → fill + full border (the box; default = previous look).
+      //   Filled   → fill, border transparent (the tonal fill carries it).
+      //   Plain    → transparent, no box border, bottom hairline only (underline),
+      //              radius 0. The Linear/Vercel minimal look.
+      // Border (faint→strong) keeps feeding --k-input-border, so it tunes the line
+      // colour in every mode (box edge, the filled-field's soft border, or the
+      // underline) — Surface = WHERE the line is, Border = HOW STRONG.
+      '--k-field-bg': surfacePlain ? 'transparent' : 'var(--k-input-bg)',
+      '--k-field-border-color': surfaceFilled || surfacePlain ? 'transparent' : 'var(--k-input-border)',
+      '--k-field-underline-color': surfaceFilled ? 'transparent' : 'var(--k-input-border)',
+      '--k-field-radius': surfacePlain ? '0' : 'var(--k-radius-md)',
       // --k-track: the recessed grey behind INTERACTIVE control rails — slider
       // track, toggle off-state, segmented-control track. Deliberately a real
       // tonal step (~9% fg over surface ≈ shadcn's 0.92 switch grey), NOT

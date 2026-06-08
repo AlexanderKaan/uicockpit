@@ -98,17 +98,21 @@ export type Neutral = 'auto' | 'cool' | 'neutral' | 'warm'
  *   pastel = soft & light · bright = Material-style clear/legible/modern ·
  *   vivid = saturated & punchy. All three rotate with the brand colour. */
 export type Palette = 'pastel' | 'vivid' | 'bright'
-/* Sidebar treatment — how the app shell (sidebar, top bar, rails) reads against
- * the main content. Its OWN axis, NOT "depth/elevation". User label: "Sidebar".
- *  flush    → "Seamless": sidebar flows with the page; a hairline carries the
- *             separation (Linear / Vercel / Stripe / Mercury). The clean default.
- *  recessed → "Recessed": sidebar sits in a SUNKEN well (--k-chrome-bg =
- *             surf.sunken), flush to the edges + one seam; content reads as the
- *             brighter plane lifted above it (macOS / Windows-settings depth).
- *  panel    → "Floating": a distinct tinted room — own surface, inset margin,
- *             soft shadow, border-radius that follows Box radius (Raycast).
- * Exposes `--k-chrome-bg` + (for panel) the inset/radius/ring via CSS. */
-export type Chrome = 'flush' | 'recessed' | 'panel'
+/* Surface — the STRUCTURE of how every contained/separated surface (fields,
+ * menus, popovers, the sidebar seam) distinguishes itself from its background.
+ * One axis, three archetypes (= shadcn's three field states, generalised). It
+ * replaces the over-specific "Sidebar/chrome" control. Border (faint→strong)
+ * tunes the INTENSITY of whatever line each mode uses; Elevation = the LIFT
+ * (shadow). Those stay separate — Surface never touches shadow or button/tab
+ * component choice (scope kept tight on purpose).
+ *  outlined → a box drawn by a border (+ a light recessed fill). For the sidebar
+ *             this is the flush-with-a-hairline-seam look (the clean default).
+ *  filled   → a box drawn by the tonal fill, border transparent. Sidebar = a
+ *             sunken recessed well (--k-chrome-bg = surf.sunken).
+ *  plain    → no box: a single bottom hairline (underline) on fields, radius 0;
+ *             seamless menus/sidebar that lean on the shadow. Linear/Vercel-clean.
+ * Drives --k-field-* + --k-menu-* tokens + --k-chrome-bg. */
+export type Surface = 'outlined' | 'filled' | 'plain'
 
 /* Surface depth — purely about ELEVATION: how much surfaces lift off the page
  * via shadow, plus the neutral ramp contrast that supports that read. It does
@@ -144,8 +148,9 @@ export interface Config {
   /* Surface depth macro — purely elevation (shadow + ramp contrast); see
    * SurfaceDepth. */
   surfaceDepth: SurfaceDepth
-  /* App-chrome separation — flush vs panel; its own axis (see Chrome). */
-  chrome: Chrome
+  /* Surface separation structure — outlined/filled/plain; see Surface. Replaces
+   * the old over-specific "chrome" (Sidebar) axis. */
+  surface: Surface
   /* Border prominence — standalone (see Borders). */
   borders: Borders
   motion: Motion

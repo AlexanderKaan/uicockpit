@@ -83,11 +83,13 @@ const SURFACE_DEPTH_OPTS = [
   { id: 'raised' as const, cap: 'Raised' },
   { id: 'layered' as const, cap: 'Deep' },
 ]
-// Sidebar treatment — its own axis (separate from Elevation). Outcome-named.
-const CHROME_OPTS = [
-  { id: 'flush' as const, cap: 'Seamless' },
-  { id: 'recessed' as const, cap: 'Recessed' },
-  { id: 'panel' as const, cap: 'Floating' },
+// Surface — the structural separation axis (replaces the over-specific Sidebar).
+// One choice that drives every contained surface (fields, menus, sidebar seam):
+// Outlined = box-with-border · Filled = tonal fill, no border · Plain = underline.
+const SURFACE_OPTS = [
+  { id: 'outlined' as const, cap: 'Outlined' },
+  { id: 'filled' as const, cap: 'Filled' },
+  { id: 'plain' as const, cap: 'Plain' },
 ]
 // Border prominence — its own control (tint of the box edge), 4 steps.
 const BORDER_OPTS = [
@@ -333,16 +335,17 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       onPick: pick('surfaceDepth'),
     },
     {
-      // Sidebar — app-shell treatment. Its OWN axis (separate from Elevation).
-      // Seamless = shares page bg + hairline; Recessed = sunken well, content
-      // lifts above; Floating = tinted inset rounded panel (radius follows Box).
-      key: 'chrome',
-      label: 'Sidebar',
-      value: cap(CHROME_OPTS, cfg.chrome),
+      // Surface — how contained surfaces separate from their background. ONE axis
+      // for fields + menus + the sidebar seam: Outlined (box border) · Filled
+      // (tonal fill, no border) · Plain (underline / seamless). Border tunes the
+      // line strength; Elevation the lift — both stay separate.
+      key: 'surface',
+      label: 'Surface',
+      value: cap(SURFACE_OPTS, cfg.surface),
       kind: 'opts',
-      opts: optsFrom(CHROME_OPTS),
-      selected: cfg.chrome,
-      onPick: pick('chrome'),
+      opts: optsFrom(SURFACE_OPTS),
+      selected: cfg.surface,
+      onPick: pick('surface'),
     },
     {
       key: 'borders',
