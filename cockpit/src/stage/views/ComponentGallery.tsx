@@ -517,9 +517,10 @@ function SwitchCard() {
   const [email, setEmail] = useState(true)
   const [sms, setSms] = useState(false)
   const ROWS = [
-    { label: 'Push notifications', desc: 'Deals, order updates, replies', on: push, set: setPush },
-    { label: 'Email digest', desc: 'A weekly summary every Monday', on: email, set: setEmail },
-    { label: 'SMS alerts', desc: 'Only security & login events', on: sms, set: setSms },
+    { label: 'Push notifications', desc: 'Deals, order updates, replies', on: push, set: setPush, disabled: false },
+    { label: 'Email digest', desc: 'A weekly summary every Monday', on: email, set: setEmail, disabled: false },
+    { label: 'SMS alerts', desc: 'Only security & login events', on: sms, set: setSms, disabled: false },
+    { label: 'Security alerts', desc: "Always on — can't be disabled", on: true, set: (_: (v: boolean) => boolean) => {}, disabled: true },
   ]
   return (
     <Card title="Notification settings">
@@ -537,8 +538,10 @@ function SwitchCard() {
               type="button"
               aria-pressed={r.on}
               aria-label={r.label}
-              className={`toggle ${r.on ? 'toggle--on' : ''}`}
-              onClick={() => r.set((v) => !v)}
+              aria-disabled={r.disabled || undefined}
+              disabled={r.disabled}
+              className={`toggle ${r.on ? 'toggle--on' : ''}${r.disabled ? ' toggle--disabled' : ''}`}
+              onClick={() => { if (!r.disabled) r.set((v) => !v) }}
             >
               <span className="toggle__knob" />
             </button>
@@ -950,7 +953,7 @@ function DataTableProCard() {
           <table className="tbl">
             <thead>
               <tr>
-                <th className="datatable__check"><label className="check"><input type="checkbox" checked={allOn} onChange={toggleAll} aria-label="Select all services" /></label></th>
+                <th className="datatable__check"><label className="check"><input type="checkbox" checked={allOn} ref={(el) => { if (el) el.indeterminate = sel.size > 0 && !allOn }} onChange={toggleAll} aria-label="Select all services" /></label></th>
                 <th>Service</th>
                 <th>Owner</th>
                 <th>Status</th>
@@ -1188,10 +1191,7 @@ function ValidationCard() {
         <label className="field__label" htmlFor="acc-plan">Plan</label>
         <input className="in" id="acc-plan" defaultValue="Pro (locked)" readOnly aria-readonly="true" />
       </div>
-      <button className="btn btn--primary btn--block" disabled>
-        <span className="spinner" style={{ borderTopColor: 'currentColor' }} />
-        Saving…
-      </button>
+      <button className="btn btn--primary btn--block btn--loading" disabled aria-busy="true"><span>Saving…</span></button>
     </Card>
   )
 }

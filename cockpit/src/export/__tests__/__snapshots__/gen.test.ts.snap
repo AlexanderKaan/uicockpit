@@ -899,6 +899,27 @@ body {
  * dominant card-footer CTA pattern (Save / Review order / Update security).
  * Composes with any variant + size. */
 .btn--block { width: 100%; }
+/* Loading — width-locked spinner state. The button's element children fade to
+ * opacity:0 (keeping the button's width so it doesn't collapse) and a centred
+ * spinner draws in the button's own currentColor; pointer events are blocked.
+ * Wrap the label in an element (<span>label</span> or an icon) — a bare text
+ * node can't be hidden by > *. Pair with aria-busy="true" + disabled on the
+ * control for the a11y half. Honours reduced-motion via the k-spin token. */
+.btn--loading { position: relative; pointer-events: none; }
+.btn--loading > * { opacity: 0; }
+.btn--loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  margin: -0.5em 0 0 -0.5em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: var(--k-anim-spin, k-spin 800ms linear infinite);
+}
 /* Stacked action buttons (Save / Cancel) sit on the TIGHT --k-stack-gap (8 at
  * default), not the wider field rhythm they'd otherwise inherit from the card's
  * flex gap. The negative margin nets the flex gap (--k-space) down to --k-stack-
@@ -1228,6 +1249,30 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-left: 1.5px solid var(--k-primary-fg);
   border-bottom: 1.5px solid var(--k-primary-fg);
   transform: translate(-50%, -50%) rotate(-45deg) translate(1px, -1px);
+}
+/* Indeterminate — the "some-but-not-all selected" state (set via the .indeterminate
+ * DOM property in JS; there is no HTML attribute). Filled like :checked but with a
+ * horizontal dash instead of the tick — the standard table select-all glyph. */
+.check input[type="checkbox"]:indeterminate {
+  background: var(--k-primary);
+  border-color: var(--k-primary);
+}
+.check input[type="checkbox"]:indeterminate::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9px;
+  height: 0;
+  border-top: 1.5px solid var(--k-primary-fg);
+  transform: translate(-50%, -50%);
+}
+/* Disabled checkbox/radio — muted + not-allowed, the :checked tick still shows
+ * (a disabled-but-checked row reads as "locked on", not empty). */
+.check input:disabled,
+.radio input:disabled {
+  opacity: var(--k-disabled-opacity, 0.55);
+  cursor: not-allowed;
 }
 .radio input[type="radio"]:checked {
   border-color: var(--k-primary);
@@ -1649,6 +1694,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * change; the knob math adapts automatically. */
 .toggle--sm { --tog-w: 26px; --tog-h: 14px; }
 .toggle--lg { --tog-w: 40px; --tog-h: 22px; }
+/* Disabled toggle — state parity with .slider--disabled / :disabled inputs:
+ * muted + not-allowed + no pointer. Combine with .toggle--on for disabled-on.
+ * (Add aria-disabled="true" on the control for the a11y half.) */
+.toggle--disabled { opacity: var(--k-disabled-opacity, 0.55); pointer-events: none; cursor: not-allowed; }
 
 /* === Slider === */
 /* Slider track is stroke-3 (3px): light enough to read as a control,

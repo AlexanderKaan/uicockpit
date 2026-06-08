@@ -656,7 +656,7 @@ function Projects() {
           <table className="tbl">
             <thead>
               <tr>
-                <th className="datatable__check"><label className="check"><input type="checkbox" checked={allOn} onChange={toggleAll} aria-label="Select all issues" /></label></th>
+                <th className="datatable__check"><label className="check"><input type="checkbox" checked={allOn} ref={(el) => { if (el) el.indeterminate = sel.size > 0 && !allOn }} onChange={toggleAll} aria-label="Select all issues" /></label></th>
                 <SortHeader label="Issue" k="name" sortKey={sortKey} sortDir={sortDir} onToggle={toggleSort} />
                 <SortHeader label="Env" k="env" sortKey={sortKey} sortDir={sortDir} onToggle={toggleSort} />
                 <SortHeader label="Status" k="status" sortKey={sortKey} sortDir={sortDir} onToggle={toggleSort} />
