@@ -814,7 +814,19 @@ export function buildTokens(cfg: Config): Tokens {
       // instead of a hardcoded 9–10px that ignored the control.
       '--k-type-caption': rem(Math.max(9.5, tsSmall - 2)),
       '--k-type-eyebrow': rem(tsEyebrow),
+      // Eyebrow tracking — ONE token for every uppercase micro-label (table
+      // heads, nav-group, menu/cmdp section, stat-tile eyebrow, kanban-tag,
+      // donut-cap, divider-or, pricing-name…). Was hand-set 0.04–0.08em across
+      // ~15 sites with no token; unified to a single airy-caps value so caps
+      // tracking reads consistently and is tunable in one place.
+      '--k-track-eyebrow': '0.06em',
       '--k-ui-weight': uiW,
+      // Named font-weight scale — the three UI weights as semantic tokens so
+      // headings/titles reference a role, not a magic number. medium=labels,
+      // semibold=titles/headings (the house default), bold=hero/auth display.
+      '--k-weight-medium': String(UI_WEIGHTS.medium),
+      '--k-weight-semibold': String(UI_WEIGHTS.semibold),
+      '--k-weight-bold': String(UI_WEIGHTS.bold),
       // === State tokens — closes the shadcn-gap for cautious devs.
       // Disabled buttons/inputs: muted bg + faint fg + opacity convention.
       // Focus ring: 2px solid offset by 2px (shadcn/Radix convention). */

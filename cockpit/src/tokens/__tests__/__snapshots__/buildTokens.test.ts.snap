@@ -210,6 +210,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme cobalt in dar
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 249.9) 9%, oklch(25.4% 0.0070 249.9))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -222,6 +223,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme cobalt in dar
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -436,6 +440,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme cobalt in lig
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 249.9) 9%, oklch(99.5% 0.0056 249.9))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -448,6 +453,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme cobalt in lig
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -662,6 +670,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme coral in dark
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 348.1) 9%, oklch(25.4% 0.0070 348.1))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -674,6 +683,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme coral in dark
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -888,6 +900,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme coral in ligh
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 348.1) 9%, oklch(99.5% 0.0056 348.1))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -900,6 +913,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme coral in ligh
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -1114,6 +1130,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme ember in dark
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 55.7) 9%, oklch(25.4% 0.0070 55.7))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -1126,6 +1143,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme ember in dark
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -1340,6 +1360,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme ember in ligh
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 55.7) 9%, oklch(99.5% 0.0056 55.7))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -1352,6 +1373,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme ember in ligh
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -1566,6 +1590,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme indigo in dar
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 284.5) 9%, oklch(25.4% 0.0070 284.5))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -1578,6 +1603,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme indigo in dar
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -1792,6 +1820,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme indigo in lig
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 284.5) 9%, oklch(99.5% 0.0056 284.5))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -1804,6 +1833,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme indigo in lig
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -2018,6 +2050,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme jade in dark 
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 173.6) 9%, oklch(25.4% 0.0070 173.6))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -2030,6 +2063,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme jade in dark 
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -2244,6 +2280,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme jade in light
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 173.6) 9%, oklch(99.5% 0.0056 173.6))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -2256,6 +2293,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme jade in light
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -2470,6 +2510,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme rose in dark 
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 7.1) 9%, oklch(25.4% 0.0070 7.1))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -2482,6 +2523,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme rose in dark 
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -2696,6 +2740,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme rose in light
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 7.1) 9%, oklch(99.5% 0.0056 7.1))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -2708,6 +2753,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme rose in light
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -2922,6 +2970,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme sky in dark m
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 227.4) 9%, oklch(25.4% 0.0070 227.4))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -2934,6 +2983,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme sky in dark m
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -3148,6 +3200,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme sky in light 
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 227.4) 9%, oklch(99.5% 0.0056 227.4))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -3160,6 +3213,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme sky in light 
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -3374,6 +3430,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme teal in dark 
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 187.5) 9%, oklch(25.4% 0.0070 187.5))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -3386,6 +3443,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme teal in dark 
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -3600,6 +3660,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme teal in light
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 187.5) 9%, oklch(99.5% 0.0056 187.5))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -3612,6 +3673,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme teal in light
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -3826,6 +3890,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme violet in dar
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 299.0) 9%, oklch(25.4% 0.0070 299.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -3838,6 +3903,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme violet in dar
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -4052,6 +4120,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme violet in lig
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0140 299.0) 9%, oklch(99.5% 0.0056 299.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -4064,6 +4133,9 @@ exports[`buildTokens — Color theme coverage (on default) > theme violet in lig
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -4278,6 +4350,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale comfortable in dark 
     "--k-toggle-h-default": "1.375rem",
     "--k-toggle-w-default": "2.5rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 9%, oklch(25.4% 0.0000 0.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -4290,6 +4363,9 @@ exports[`buildTokens — Scale coverage (with Mono) > scale comfortable in dark 
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -4504,6 +4580,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale comfortable in light
     "--k-toggle-h-default": "1.375rem",
     "--k-toggle-w-default": "2.5rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0000 0.0) 9%, oklch(99.5% 0.0000 0.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -4516,6 +4593,9 @@ exports[`buildTokens — Scale coverage (with Mono) > scale comfortable in light
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -4730,6 +4810,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale compact in dark mode
     "--k-toggle-h-default": "0.875rem",
     "--k-toggle-w-default": "1.75rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 9%, oklch(25.4% 0.0000 0.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -4742,6 +4823,9 @@ exports[`buildTokens — Scale coverage (with Mono) > scale compact in dark mode
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -4956,6 +5040,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale compact in light mod
     "--k-toggle-h-default": "0.875rem",
     "--k-toggle-w-default": "1.75rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0000 0.0) 9%, oklch(99.5% 0.0000 0.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -4968,6 +5053,9 @@ exports[`buildTokens — Scale coverage (with Mono) > scale compact in light mod
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -5182,6 +5270,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale default in dark mode
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 9%, oklch(25.4% 0.0000 0.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -5194,6 +5283,9 @@ exports[`buildTokens — Scale coverage (with Mono) > scale default in dark mode
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -5408,6 +5500,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale default in light mod
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0000 0.0) 9%, oklch(99.5% 0.0000 0.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -5420,6 +5513,9 @@ exports[`buildTokens — Scale coverage (with Mono) > scale default in light mod
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -5634,6 +5730,7 @@ exports[`buildTokens — mono baseline > matches snapshot in dark mode 1`] = `
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 9%, oklch(25.4% 0.0000 0.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -5646,6 +5743,9 @@ exports[`buildTokens — mono baseline > matches snapshot in dark mode 1`] = `
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
     "--k-warning-soft-fg": "#ffffff",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;
@@ -5860,6 +5960,7 @@ exports[`buildTokens — mono baseline > matches snapshot in light mode 1`] = `
     "--k-toggle-h-default": "1.125rem",
     "--k-toggle-w-default": "2rem",
     "--k-track": "color-mix(in srgb, oklch(24.4% 0.0000 0.0) 9%, oklch(99.5% 0.0000 0.0))",
+    "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-eyebrow": "0.6875rem",
@@ -5872,6 +5973,9 @@ exports[`buildTokens — mono baseline > matches snapshot in light mode 1`] = `
     "--k-warning-fg": "#16160c",
     "--k-warning-soft": "oklch(97.0% 0.0217 92.5)",
     "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
   },
 }
 `;

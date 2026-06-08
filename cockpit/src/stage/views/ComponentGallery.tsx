@@ -641,7 +641,7 @@ function DialogCard() {
           <>
             <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} aria-label="Close dialog" />
             <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
-              <h3 id="dialog-title" style={{ fontSize: 14, fontWeight: 600 }}>Delete project?</h3>
+              <h3 id="dialog-title" className="dialog__title">Delete project?</h3>
               <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
                 This permanently removes all associated data.
               </p>
@@ -2315,7 +2315,7 @@ function AlertDialogCard() {
             <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} />
             <div className="dialog dialog--alert" role="alertdialog" aria-modal="true" aria-labelledby="alert-title">
               <span className="dialog__icon"><Icon name="trash" /></span>
-              <h3 id="alert-title" style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>Delete project?</h3>
+              <h3 id="alert-title" className="dialog__title">Delete project?</h3>
               <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>
                 This will permanently delete <strong>ai-router</strong>, its history, and 12 deployed environments. Cannot be undone.
               </p>
