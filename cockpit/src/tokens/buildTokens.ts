@@ -665,13 +665,13 @@ export function buildTokens(cfg: Config): Tokens {
       // into every recipe so the base set feels native-premium regardless
       // of which preset/density is active.
       //
-      // --k-hairline: explicit 1px border using the neutral with a low
-      // alpha. Used by cards/dividers/inputs whenever a "subtle edge" is
-      // wanted — independent of the user's borders=on/off/strong toggle
-      // (which controls component borders, not chrome scaffolding).
-      '--k-hairline': dark
-        ? `1px solid hsl(${t.h} ${t.s}% 100% / 0.07)`
-        : `1px solid hsl(${t.h} ${t.s + 4}% 18% / 0.08)`,
+      // --k-hairline: a "subtle edge" for cards/inputs/panels that NOW tracks
+      // the Border control — it's a softer (55%) tint of the live --k-border, so
+      // Faint→Strong moves it too, while staying gentler than the crisp border.
+      // (Was a fixed low-alpha, decoupled from the control; the soft character is
+      // kept, the responsiveness is added. Width = --k-bw, the control being
+      // colour-based.) color-mix is already used across the token layer.
+      '--k-hairline': `var(--k-bw) solid color-mix(in srgb, var(--k-border), transparent 45%)`,
       // --k-divider: the canonical INTERNAL separator (between rows in a list,
       // sections in a menu, header/body in a sheet). Unlike --k-hairline (a
       // fixed edge for component BOXES), the divider is COUPLED to the Borders

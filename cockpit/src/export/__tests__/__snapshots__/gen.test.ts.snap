@@ -131,7 +131,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-shadow-sm: 0 1px 2px hsl(210 16% 18%/.10);
   --k-shadow-md: 0 2px 4px hsl(210 16% 18%/.10),0 6px 14px hsl(210 16% 18%/.12);
   --k-shadow-lg: 0 4px 8px hsl(210 16% 18%/.10),0 12px 24px hsl(210 16% 18%/.14),0 24px 48px hsl(210 16% 18%/.14);
-  --k-hairline: 1px solid hsl(210.12244897959184 18% 18% / 0.08);
+  --k-hairline: var(--k-bw) solid color-mix(in srgb, var(--k-border), transparent 45%);
   --k-divider: var(--k-bw) solid var(--k-border);
   --k-shadow-tactile: inset 0 1px 0 hsl(0 0% 100% / 0.85), 0 1px 2px hsl(210 16% 18%/.08), 0 0 0 1px hsl(210 16% 18%/.04);
   --k-shadow-pressed: inset 0 1px 2px hsl(210 16% 18%/.12);
@@ -357,7 +357,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-shadow-sm: 0 1px 2px hsl(0 0 0/.10);
   --k-shadow-md: 0 2px 4px hsl(0 0 0/.10),0 6px 14px hsl(0 0 0/.12);
   --k-shadow-lg: 0 4px 8px hsl(0 0 0/.10),0 12px 24px hsl(0 0 0/.14),0 24px 48px hsl(0 0 0/.14);
-  --k-hairline: 1px solid hsl(210.12244897959184 14% 100% / 0.07);
+  --k-hairline: var(--k-bw) solid color-mix(in srgb, var(--k-border), transparent 45%);
   --k-divider: var(--k-bw) solid var(--k-border);
   --k-shadow-tactile: inset 0 1px 0 hsl(0 0% 100% / 0.06), 0 1px 2px hsl(0 0% 0% / 0.45);
   --k-shadow-pressed: inset 0 1px 2px hsl(0 0% 0% / 0.35);
@@ -5216,7 +5216,6 @@ exports[`genJson > matches snapshot for default mono 1`] = `
     "--k-shadow-sm": "0 1px 2px hsl(0 0 0/.07)",
     "--k-shadow-md": "0 4px 14px hsl(0 0 0/.10)",
     "--k-shadow-lg": "0 14px 40px hsl(0 0 0/.16)",
-    "--k-hairline": "1px solid hsl(240 8% 100% / 0.07)",
     "--k-shadow-tactile": "inset 0 1px 0 hsl(0 0% 100% / 0.06), 0 1px 2px hsl(0 0% 0% / 0.45)",
     "--k-shadow-pressed": "inset 0 1px 2px hsl(0 0% 0% / 0.35)",
     "--k-btn-shadow": "0 1px 2px hsl(0 0% 0% / 0.35)",
