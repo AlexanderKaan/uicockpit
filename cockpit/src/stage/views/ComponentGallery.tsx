@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
-import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar } from './apps/AppHelpers'
+import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar } from './apps/AppHelpers'
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 
@@ -66,7 +66,7 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
     LoginCard, StatGroupCard, ContextMenuCard, SignupCard, TimelineCard, NavMenuCard,
     PaginationCard, TreeViewCard, NotificationCenterCard, NavCard,
     FileGridCard, AccordionCard, SettingsRowCard, AlertsCard,
-    BreadcrumbCard, ProgressCard, UsageMeterCard, InteractiveCardCard,
+    BreadcrumbCard, ProgressCard, UsageMeterCard, InteractiveCardCard, MenubarCard,
     StatusPageCard, InboxFilterCard, SpinnerCard, ToolbarRecipeCard, SkeletonCard,
     EmptyStateCard, InfoCardCard, ToastStackCard, LightboxCard,
     WizardStepperCard, DangerZoneCard, FaqCard, TwoColumnLayoutCard, TypographyCard,
@@ -1549,6 +1549,39 @@ function InteractiveCardCard() {
         <strong style={{ fontSize: 'var(--k-type-small)' }}>Personal</strong>
         <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>3 projects · just you</span>
       </button>
+    </Card>
+  )
+}
+
+function MenubarCard() {
+  const noop = () => {}
+  return (
+    <Card title="Menubar" desc="Desktop app menu bar — ←/→ between menus, ↓ to open, Esc to close (reuses the menu keyboard model).">
+      <Menubar
+        ariaLabel="Document"
+        menus={[
+          { label: 'File', items: [
+            { label: 'New file', shortcut: '⌘N', onSelect: noop },
+            { label: 'Open…', shortcut: '⌘O', onSelect: noop },
+            { label: 'Save', shortcut: '⌘S', onSelect: noop },
+          ] },
+          { label: 'Edit', items: [
+            { label: 'Undo', shortcut: '⌘Z', onSelect: noop },
+            { label: 'Redo', shortcut: '⇧⌘Z', onSelect: noop },
+            { label: 'Cut', shortcut: '⌘X', onSelect: noop },
+            { label: 'Copy', shortcut: '⌘C', onSelect: noop },
+          ] },
+          { label: 'View', items: [
+            { label: 'Zoom in', shortcut: '⌘+', onSelect: noop },
+            { label: 'Zoom out', shortcut: '⌘−', onSelect: noop },
+            { label: 'Toggle sidebar', shortcut: '⌘\\', onSelect: noop },
+          ] },
+          { label: 'Help', items: [
+            { label: 'Documentation', onSelect: noop },
+            { label: 'Keyboard shortcuts', shortcut: '⌘/', onSelect: noop },
+          ] },
+        ]}
+      />
     </Card>
   )
 }

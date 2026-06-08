@@ -7,7 +7,7 @@ import type { IconName } from '../../icons/concepts'
  * This is what makes SupaDash the single "super-app": its own pages
  * (Overview…Settings) plus these domain screens so every key component
  * is visible in one place. */
-import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown, useModal, ImgAvatar } from './apps/AppHelpers'
+import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown, useModal, ImgAvatar, Menubar } from './apps/AppHelpers'
 
 /* Profile photo stand-in (inline SVG — always loads, no network) for the
    hover-card preview; demonstrates the photo Avatar (.avatar__img) in the app. */
@@ -957,8 +957,35 @@ function DocsScreen() {
           <DocTreeRow label="Changelog" leaf selected={page === 'Changelog'} onClick={() => setPage('Changelog')} />
         </div>
 
-        {/* Document pane — editor Toolbar + Tabs + article. */}
+        {/* Document pane — Menubar + editor Toolbar + Tabs + article. */}
         <div>
+          <div style={{ marginBottom: 10 }}>
+            <Menubar
+              ariaLabel="Document editor"
+              menus={[
+                { label: 'File', items: [
+                  { label: 'New doc', shortcut: '⌘N' },
+                  { label: 'Duplicate' },
+                  { label: 'Move to trash', shortcut: '⌫', danger: true },
+                ] },
+                { label: 'Edit', items: [
+                  { label: 'Undo', shortcut: '⌘Z' },
+                  { label: 'Redo', shortcut: '⇧⌘Z' },
+                  { label: 'Find & replace', shortcut: '⌘F' },
+                ] },
+                { label: 'Insert', items: [
+                  { label: 'Image' },
+                  { label: 'Table' },
+                  { label: 'Code block' },
+                ] },
+                { label: 'Format', items: [
+                  { label: 'Bold', shortcut: '⌘B' },
+                  { label: 'Italic', shortcut: '⌘I' },
+                  { label: 'Clear formatting' },
+                ] },
+              ]}
+            />
+          </div>
           <div className="toolbar" style={{ marginBottom: 14 }}>
             <span className="toolbar__group">
               <button className="btn btn--ghost" aria-label="Bold"><strong>B</strong></button>

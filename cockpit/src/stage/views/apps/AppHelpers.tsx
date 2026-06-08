@@ -410,6 +410,102 @@ export function MenuButton({
   )
 }
 
+/* Menubar — the desktop app menu bar (File / Edit / View …), WAI-ARIA menubar
+ * pattern. Reuses the Golf-2 menu substrate: the popup is the same .menu recipe
+ * and handleMenuArrows drives Up/Down/Home/End inside it. The menubar layer adds
+ * the horizontal model: roving tabindex across the top-level triggers, Arrow
+ * Left/Right to move (and, while a menu is open, to switch to the adjacent menu),
+ * Down/Enter/Space to open, Escape to close + return focus to the trigger. Once a
+ * menu is open, hovering another trigger switches to it (native menubar feel). */
+type MenubarItem = { label: string; shortcut?: string; danger?: boolean; onSelect?: () => void }
+export function Menubar({ menus, ariaLabel = 'Application' }: { menus: Array<{ label: string; items: MenubarItem[] }>; ariaLabel?: string }) {
+  const [open, setOpen] = useState<number | null>(null)
+  const [active, setActive] = useState(0)
+  const barRef = useRef<HTMLDivElement>(null)
+  const popRef = useRef<HTMLDivElement>(null)
+  const triggers = useRef<Array<HTMLButtonElement | null>>([])
+  const n = menus.length
+
+  // Outside-click closes the open menu.
+  useEffect(() => {
+    if (open === null) return
+    const onDoc = (e: MouseEvent) => { if (!barRef.current?.contains(e.target as Node)) setOpen(null) }
+    document.addEventListener('mousedown', onDoc)
+    return () => document.removeEventListener('mousedown', onDoc)
+  }, [open])
+
+  // Focus the first item whenever the open menu changes (open or switch).
+  useEffect(() => {
+    if (open !== null) popRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus()
+  }, [open])
+
+  const moveTo = (i: number) => { setActive(i); triggers.current[i]?.focus() }
+
+  const onTriggerKey = (e: ReactKeyboardEvent, i: number) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); moveTo((i + 1) % n) }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); moveTo((i - 1 + n) % n) }
+    else if (e.key === 'Home') { e.preventDefault(); moveTo(0) }
+    else if (e.key === 'End') { e.preventDefault(); moveTo(n - 1) }
+    else if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActive(i); setOpen(i) }
+  }
+
+  const onPopKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault(); e.stopPropagation()
+      const next = e.key === 'ArrowRight' ? (active + 1) % n : (active - 1 + n) % n
+      setActive(next); setOpen(next)
+    } else if (e.key === 'Escape') {
+      e.preventDefault(); const t = active; setOpen(null); triggers.current[t]?.focus()
+    } else {
+      handleMenuArrows(e)
+    }
+  }
+
+  return (
+    <div ref={barRef} className="menubar" role="menubar" aria-orientation="horizontal" aria-label={ariaLabel} style={{ position: 'relative' }}>
+      {menus.map((m, i) => (
+        <div key={i} style={{ position: 'relative', display: 'inline-flex' }}>
+          <button
+            ref={(el) => { triggers.current[i] = el }}
+            className="menubar__item"
+            role="menuitem"
+            aria-haspopup="menu"
+            aria-expanded={open === i}
+            tabIndex={active === i ? 0 : -1}
+            onClick={() => { setActive(i); setOpen(open === i ? null : i) }}
+            onMouseEnter={() => { if (open !== null) { setActive(i); setOpen(i) } }}
+            onKeyDown={(e) => onTriggerKey(e, i)}
+          >
+            {m.label}
+          </button>
+          {open === i && (
+            <div
+              ref={popRef}
+              className="menu"
+              role="menu"
+              aria-label={m.label}
+              onKeyDown={onPopKey}
+              style={{ position: 'absolute', left: 0, top: 'calc(100% + var(--k-s-4))', minWidth: 184, zIndex: 'var(--k-z-dropdown)' }}
+            >
+              {m.items.map((it, j) => (
+                <button
+                  key={j}
+                  role="menuitem"
+                  className={'menu__item' + (it.danger ? ' menu__item--danger' : '')}
+                  onClick={() => { it.onSelect?.(); const t = active; setOpen(null); triggers.current[t]?.focus() }}
+                >
+                  {it.label}
+                  {it.shortcut && <span className="menu__shortcut">{it.shortcut}</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /* SplitMenu — a split button: a primary action fused (via .btn-group) to a
  * chevron that opens a REAL menu (outside-click + Escape via useDropdown). Keeps
  * the fused .btn-group visual intact — the two buttons stay direct children of

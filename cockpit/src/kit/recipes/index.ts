@@ -2340,6 +2340,38 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .menu__label { padding: var(--k-s-6) var(--k-s-10) var(--k-s-2); font-size: var(--k-type-caption); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-faint); font-weight: var(--k-weight-medium); }`,
   },
   {
+    id: 'menubar',
+    section: "Menubar",
+    css: `/* === Menubar === — the desktop app menu bar (File / Edit / View …). A thin
+   horizontal strip of triggers; each opens the shared .menu popup. WAI-ARIA
+   menubar: role=menubar + roving tabindex across .menubar__item triggers. */
+.menubar {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-2);
+  padding: var(--k-s-2);
+  background: var(--k-chrome-bg, var(--k-surface));
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+}
+.menubar__item {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: var(--k-type-small);
+  color: var(--k-fg);
+  padding: var(--k-s-4) var(--k-s-10);
+  border-radius: var(--k-radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.menubar__item:hover { background: var(--k-state-hover); }
+.menubar__item[aria-expanded="true"] { background: var(--k-state-hover); }
+.menubar__item:focus-visible { outline: var(--k-focus-w, 2px) solid var(--k-ring); outline-offset: -2px; }`,
+  },
+  {
     id: 'stepper',
     section: "Stepper",
     css: `/* === Stepper ===
