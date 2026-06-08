@@ -4,7 +4,7 @@
 
 ### Build a design system you actually like — and keep it in one place.
 
-Make a handful of taste decisions, watch them apply across ~80 components, and take the whole thing
+Make a handful of taste decisions, watch them apply across 74 components, and take the whole thing
 with you: framework-neutral `--k-*` tokens **and** matching components, as one hosted `<link>`, a
 download, Tailwind v4 `@theme`, or shadcn/ui CSS.
 
@@ -86,9 +86,9 @@ The AI-prompt export teaches your coding agent the token contract and a few hous
 
 - **120+ design tokens** — colour ramps (OKLCH, contrast-clamped), a type scale, spacing grid, radii,
   shadows, a 3-tier motion system, a multi-hue chart/avatar palette.
-- **~80 component recipes** — all token-driven, all with real state contracts, shipped in `tokens.css`
+- **74 component recipes** — all token-driven, all with real state contracts, shipped in `tokens.css`
   and over the CDN.
-- **8 export formats** + a live preview of your kit on a real app and an 80-card gallery — change one
+- **7 export formats** + a live preview of your kit on a real app and a full component gallery — change one
   control, watch the whole thing move.
 - **A WCAG contrast check** baked in, so the colours you pick stay readable.
 
