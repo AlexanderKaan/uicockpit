@@ -243,5 +243,15 @@ ${s}.sidenav__toggle:active { background: var(--k-state-press); }
   ${s}.lightbox__btn, ${s}.alert__close, ${s}.banner__close, ${s}.toast__close {
     min-width: var(--k-touch-target); min-height: var(--k-touch-target);
   }
+  /* iOS-zoom guard — Mobile Safari ZOOMS the page when a focused field's
+     font-size is < 16px (and never zooms back). Every field uses --k-type-small
+     (~12-13px), so on a coarse pointer we floor the field text to 16px. Desktop
+     (fine pointer) keeps the dense --k-type-small. Covers the bare fields, the
+     custom select/OTP, and the inner <input> of every composed wrapper. */
+  ${s}.in, ${s}textarea.in, ${s}select.select, ${s}.select-trigger, ${s}.otp__slot,
+  ${s}.numinput input, ${s}.pwinput input, ${s}.searchinput input, ${s}.phoneinput input,
+  ${s}.taginput input, ${s}.cmdp__input, ${s}.combobox__input {
+    font-size: max(var(--k-type-small), var(--k-type-input-min));
+  }
 }`
 }

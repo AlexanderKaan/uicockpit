@@ -850,6 +850,10 @@ export function buildTokens(cfg: Config): Tokens {
       // and reviews now share --k-type-body for one consistent content size —
       // no special reading size, no per-component drift.)
       '--k-type-small': rem(tsSmall),
+      // Fixed 16px floor for input text on a coarse pointer — Mobile Safari zooms
+      // the page when a focused field is < 16px. Used only inside the global
+      // @media (pointer: coarse) field rule; desktop keeps --k-type-small.
+      '--k-type-input-min': '16px',
       // Caption — the micro tier BELOW small, for the smallest meta/label text
       // (badge labels, table-cell sub-meta, tiny captions). Stepped two under
       // small and floored at 9.5 so it stays legible: ~9.5 / 10 / 10.5 / 11

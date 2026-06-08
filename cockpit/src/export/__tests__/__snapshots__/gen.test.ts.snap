@@ -190,6 +190,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-type-h3: 1rem;
   --k-type-body: 0.875rem;
   --k-type-small: 0.75rem;
+  --k-type-input-min: 16px;
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
@@ -432,6 +433,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-type-h3: 1rem;
   --k-type-body: 0.875rem;
   --k-type-small: 0.75rem;
+  --k-type-input-min: 16px;
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
@@ -673,6 +675,16 @@ body {
   .btn--icon, .btn--circle,
   .lightbox__btn, .alert__close, .banner__close, .toast__close {
     min-width: var(--k-touch-target); min-height: var(--k-touch-target);
+  }
+  /* iOS-zoom guard — Mobile Safari ZOOMS the page when a focused field's
+     font-size is < 16px (and never zooms back). Every field uses --k-type-small
+     (~12-13px), so on a coarse pointer we floor the field text to 16px. Desktop
+     (fine pointer) keeps the dense --k-type-small. Covers the bare fields, the
+     custom select/OTP, and the inner <input> of every composed wrapper. */
+  .in, textarea.in, select.select, .select-trigger, .otp__slot,
+  .numinput input, .pwinput input, .searchinput input, .phoneinput input,
+  .taginput input, .cmdp__input, .combobox__input {
+    font-size: max(var(--k-type-small), var(--k-type-input-min));
   }
 }
 
