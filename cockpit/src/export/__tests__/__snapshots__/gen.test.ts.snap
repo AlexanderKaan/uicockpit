@@ -1867,6 +1867,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   background: var(--k-fill, var(--k-primary));
   border-radius: 999px;
 }
+/* Indeterminate — no known %: a 40%-wide fill sweeps the track on a loop. Use
+   when there's no ETA (Radix Progress data-state="indeterminate"); the markup
+   drops aria-valuenow and keeps role=progressbar. Respects reduced-motion. */
+.progress--indeterminate .progress__fill {
+  width: 40%;
+  animation: k-progress-indet 1.4s var(--k-ease, ease) infinite;
+}
+@keyframes k-progress-indet {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress--indeterminate .progress__fill { animation: none; width: 100%; opacity: 0.6; }
+}
 
 /* === Skeleton === */
 .sk {
@@ -1972,6 +1986,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   flex: none;
 }
 @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
+/* Size tiers — default ≈ half the input height; sm for inline/button use, lg for
+   page/section loaders. Border scales with the ring so it stays proportional. */
+.spinner--sm { width: calc(var(--k-in-h-default) / 3); height: calc(var(--k-in-h-default) / 3); border-width: 1.5px; }
+.spinner--lg { width: var(--k-in-h-default); height: var(--k-in-h-default); border-width: 3px; }
 
 /* === Navigation row =====================================================
  * Sidebar / settings nav follows the LG row grammar — these are destinations

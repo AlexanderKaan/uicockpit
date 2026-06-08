@@ -603,6 +603,10 @@ function ProgressCard() {
         <div className="progress__fill" style={{ width: '74%' }} />
       </div>
       <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>74% used — upgrade for more space.</span>
+      <div className="progress progress--indeterminate" role="progressbar" aria-label="Syncing media" style={{ marginTop: 10 }}>
+        <div className="progress__fill" />
+      </div>
+      <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Syncing… (indeterminate — no ETA)</span>
       <button className="btn btn--primary btn--block">
         <Icon name="spark" /> Upgrade storage
       </button>
@@ -1512,6 +1516,12 @@ function SpinnerCard() {
       <div className="card__row" style={{ alignItems: 'center', gap: 12 }}>
         <span className="spinner" aria-label="Loading" />
         <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>Loading workspace…</span>
+      </div>
+      <div className="card__row" style={{ alignItems: 'center', gap: 14, marginTop: 8 }}>
+        <span className="spinner spinner--sm" aria-label="Loading" />
+        <span className="spinner" aria-label="Loading" />
+        <span className="spinner spinner--lg" aria-label="Loading" />
+        <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>sm · md · lg</span>
       </div>
     </Card>
   )
