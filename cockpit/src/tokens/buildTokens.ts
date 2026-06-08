@@ -771,6 +771,14 @@ export function buildTokens(cfg: Config): Tokens {
       // Slider/range thumb = the TOGGLE KNOB size (toggleH − 6px) so the two
       // controls' circles match across every Scale tier. Derived → never drifts.
       '--k-slider-knob': `calc(var(--k-toggle-h-default) - 6px)`,
+      // Scale-aware circular / icon-chip / dot sizes — keyed off the control
+      // height (--k-in-h-default = 32/36/40 across the 3 Scale tiers) so avatars,
+      // icon boxes and status dots GROW with the Scale macro. Previously these
+      // were pinned px (avatar 28, icon-chip 38, dot 7/8) and stayed fixed while
+      // every control around them resized — the one axis Scale didn't reach.
+      '--k-avatar': `calc(var(--k-in-h-default) - 0.5rem)`, // 24 / 28 / 32
+      '--k-icon-chip': `calc(var(--k-in-h-default) + 0.125rem)`, // 34 / 38 / 42
+      '--k-dot': `calc(var(--k-in-h-default) / 4.5)`, // ~7 / 8 / 9
       // --k-row-h-default points to whichever row tier the stature elects
       // as default. .navrow / .in / .btn etc all reference this when no
       // explicit size modifier is set.
