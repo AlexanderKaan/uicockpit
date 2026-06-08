@@ -290,7 +290,7 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
 
           <div className="mkt__anatomy-note">
             <ShieldCheck size={16} strokeWidth={1.9} />
-            The same contract holds for all 80+ components — so the kit feels like one system, end to end.
+            The same contract holds for all 74 components — so the kit feels like one system, end to end.
           </div>
         </div>
       </section>
@@ -318,7 +318,7 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
               <h3>Tweak any decision live</h3>
               <p>
                 Radius, density, motion, typography, fonts, button shape — every change re-renders
-                a 40-card component gallery and a live dashboard preview.
+                a full component gallery and a live dashboard preview.
               </p>
             </div>
             <div className="mkt__step">
@@ -355,7 +355,7 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
                 <span className="mkt__kit-tab mkt__kit-tab--on">Dev · live</span>
                 <span className="mkt__kit-tab">Production · pinned</span>
               </div>
-              <span className="mkt__kit-flag">Shipping with launch</span>
+              <span className="mkt__kit-flag">Live now</span>
             </div>
             <pre className="mkt__kit-code"><code>{`<link rel="stylesheet"
       href="https://kit.uicockpit.com/a7f3c2.css">`}</code></pre>

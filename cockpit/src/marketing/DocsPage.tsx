@@ -120,7 +120,7 @@ export function DocsPage({ onLaunch, onHome, navigate }: DocsPageProps) {
               You make decisions in one panel — a <strong>Style</strong> (form &amp;
               shape), a <strong>Color theme</strong> (brand hue), typography,
               density, motion. UIcockpit derives ~120 design tokens from those
-              choices and renders them live across a 40-card component gallery and
+              choices and renders them live across a full component gallery and
               a working super-app, so you can see every change before you ship it.
             </p>
             <p>
@@ -212,7 +212,7 @@ export function DocsPage({ onLaunch, onHome, navigate }: DocsPageProps) {
           </section>
 
           <section id="livekit">
-            <h2>Live kit (CDN) <span className="docs__tag">Shipping with launch</span></h2>
+            <h2>Live kit (CDN) <span className="docs__tag">Live now</span></h2>
             <p>
               Besides downloading files, you can host your kit behind a single
               <code>&lt;link&gt;</code> — the <em>same artefact</em> the exports

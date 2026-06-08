@@ -168,8 +168,8 @@ export const SEO_ENTRIES: SeoEntry[] = [
       rows: [
         { feature: 'Scope', us: 'Colour, type, shape, density, motion + component recipes', them: 'shadcn theme variables (colour, radius)', winner: 'us' },
         { feature: 'Stack', us: 'Framework-neutral', them: 'shadcn (React + Tailwind)', winner: 'us' },
-        { feature: 'Preview', us: '40-card gallery + real app screens', them: 'shadcn component preview', winner: 'us' },
-        { feature: 'Export formats', us: '8 (tokens.css / JSON / Tailwind / shadcn / AI prompt / components.html …)', them: 'shadcn CSS variables', winner: 'us' },
+        { feature: 'Preview', us: 'Full component gallery + real app screens', them: 'shadcn component preview', winner: 'us' },
+        { feature: 'Export formats', us: '7 (tokens.css / JSON / Tailwind / shadcn / AI prompt / components.html …)', them: 'shadcn CSS variables', winner: 'us' },
         { feature: 'Best if you ship only shadcn', us: 'Works great, plus everything else', them: 'Focused, lightweight choice', winner: 'them' },
         { feature: 'AI handoff', us: 'Behaviour-shaping AI prompt + rules', them: '—', winner: 'us' },
         { feature: 'Hosted live kit', us: 'Yes — returnable, auto-updating', them: 'No', winner: 'us' },
@@ -209,7 +209,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
         { feature: 'Runtime', us: 'Zero runtime — just CSS variables', them: 'Component-library runtime', winner: 'us' },
         { feature: 'Component breadth', us: 'Token + recipe CSS (emit on roadmap)', them: 'Large, mature component set', winner: 'them' },
         { feature: 'Theming', us: '20+ visual controls → tokens', them: 'JS theme object (in code)', winner: 'us' },
-        { feature: 'Output', us: 'Framework-neutral tokens (8 formats)', them: 'React components + theme', winner: 'tie' },
+        { feature: 'Output', us: 'Framework-neutral tokens (7 formats)', them: 'React components + theme', winner: 'tie' },
         { feature: 'Lock-in', us: 'None — eject to files', them: 'React + MUI runtime', winner: 'us' },
       ],
     },
@@ -406,7 +406,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
     ],
     points: [
       { h: 'Drop-in globals.css', p: 'The exact shadcn CSS-variable contract, ready to paste — restyle an existing shadcn app with zero component edits.' },
-      { h: 'More than a colour picker', p: 'Type scale, density, motion and elevation, all previewed on a 40-card component gallery before you export.' },
+      { h: 'More than a colour picker', p: 'Type scale, density, motion and elevation, all previewed on a full component gallery before you export.' },
       NOLOCKIN_POINT,
     ],
     faq: [

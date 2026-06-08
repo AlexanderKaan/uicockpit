@@ -54,7 +54,7 @@ export function MktFooter({ navigate }: MktFooterProps) {
             at{' '}
             <a href="https://pageminds.com" target="_blank" rel="noopener noreferrer">Pageminds</a>
             {' · '}
-            <a href="https://github.com/AlexanderKaan/uicockpit" target="_blank" rel="noopener noreferrer">MIT</a>, free forever
+            <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT</a>, free forever
           </div>
         </div>
       </div>

@@ -15,7 +15,7 @@ export function MktStats() {
         <div className="mkt__stat-label">Design tokens</div>
       </div>
       <div className="mkt__stat">
-        <div className="mkt__stat-num">40+</div>
+        <div className="mkt__stat-num">74</div>
         <div className="mkt__stat-label">UI components</div>
       </div>
       <div className="mkt__stat">
@@ -23,7 +23,7 @@ export function MktStats() {
         <div className="mkt__stat-label">WCAG checks</div>
       </div>
       <div className="mkt__stat">
-        <div className="mkt__stat-num">8</div>
+        <div className="mkt__stat-num">7</div>
         <div className="mkt__stat-label">Export formats</div>
       </div>
     </div>
