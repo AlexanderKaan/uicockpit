@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
-import { useDropdown, InteractiveSlider, StatusBadge, DatePicker } from './apps/AppHelpers'
+import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton } from './apps/AppHelpers'
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 
@@ -1036,8 +1036,20 @@ function ToolbarRecipeCard() {
           <input type="search" placeholder="Search…" aria-label="Search" />
         </label>
         <span className="toolbar__group">
-          <button className="btn btn--ghost">Epic <Icon name="chevD" size={13} /></button>
-          <button className="btn btn--ghost">Type <Icon name="chevD" size={13} /></button>
+          {/* Working dropdowns — same MenuButton the app's Projects toolbar uses,
+              so the gallery demo and the live app stay in sync (no dead chevrons). */}
+          <MenuButton label="Epic" items={[
+            { label: 'All epics' },
+            { label: 'Onboarding' },
+            { label: 'Billing' },
+            { label: 'Platform' },
+          ]} />
+          <MenuButton label="Type" items={[
+            { label: 'All types' },
+            { label: 'Bug' },
+            { label: 'Feature' },
+            { label: 'Task' },
+          ]} />
         </span>
         <span className="toolbar__spacer" />
         <select className="select" style={{ width: 'auto' }} aria-label="Filter issues">
