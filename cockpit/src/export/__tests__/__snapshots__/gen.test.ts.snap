@@ -761,14 +761,14 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--k-s-6);
-  /* Default button height is Stature-driven. Compact stature → 28px (sm-feel
-   * baseline). Balanced → 34px (shadcn-equivalent). Bold → 44px (consumer).
+  /* Default button height is Scale-driven and equals the input height per tier:
+   * Compact → 32px · Default → 36px · Comfortable → 40px (shadcn h-8/9/10 family).
    * Padding-block is 0 because min-height + flex centering handles vertical
    * positioning, and removing padding-block keeps the height exact. */
-  min-height: var(--k-btn-h-default, 34px);
+  min-height: var(--k-btn-h-default, 36px);
   padding-block: 0;
   /* Horizontal padding scales with TWO dimensions:
-   *  1. Button height (Stature drives 28/34/44px) — taller buttons need
+   *  1. Button height (Scale drives 32/36/40px) — taller buttons need
    *     more side padding to stay optically balanced. height × 0.4
    *     matches Apple HIG / Material defaults.
    *  2. Pill detection — when --k-radius-button is huge (999px), the
@@ -1926,8 +1926,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .cockpit-preview select.select:focus,
 .cockpit-preview select.select:focus-visible {
   outline: none;
-  border-color: var(--k-primary);
-  box-shadow: 0 0 0 3px var(--k-focus-ring, color-mix(in srgb, var(--k-primary) 22%, transparent));
+  /* Match the .in focus exactly — --k-ring border + --k-ring-halo (28%) shadow.
+     Was an UNDEFINED --k-focus-ring token (silently fell back to a 22% halo) so
+     the native select's focus read lighter than every sibling field. */
+  border-color: var(--k-ring);
+  box-shadow: 0 0 0 3px var(--k-ring-halo);
 }
 
 /* === Spinner === — uses --k-anim-spin token */
