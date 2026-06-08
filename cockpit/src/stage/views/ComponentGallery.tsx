@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
-import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar } from './apps/AppHelpers'
+import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar, Resizable } from './apps/AppHelpers'
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 
@@ -66,7 +66,7 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
     LoginCard, StatGroupCard, ContextMenuCard, SignupCard, TimelineCard, NavMenuCard,
     PaginationCard, TreeViewCard, NotificationCenterCard, NavCard,
     FileGridCard, AccordionCard, SettingsRowCard, AlertsCard,
-    BreadcrumbCard, ProgressCard, UsageMeterCard, InteractiveCardCard, MenubarCard,
+    BreadcrumbCard, ProgressCard, UsageMeterCard, InteractiveCardCard, MenubarCard, ResizableCard,
     StatusPageCard, InboxFilterCard, SpinnerCard, ToolbarRecipeCard, SkeletonCard,
     EmptyStateCard, InfoCardCard, ToastStackCard, LightboxCard,
     WizardStepperCard, DangerZoneCard, FaqCard, TwoColumnLayoutCard, TypographyCard,
@@ -1549,6 +1549,35 @@ function InteractiveCardCard() {
         <strong style={{ fontSize: 'var(--k-type-small)' }}>Personal</strong>
         <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>3 projects · just you</span>
       </button>
+    </Card>
+  )
+}
+
+function ResizableCard() {
+  return (
+    <Card title="Resizable" desc="Drag the divider — or focus it and use ←/→ (Home/End to clamp). Pane sizes stay within bounds.">
+      <Resizable
+        ariaLabel="Resize file list and editor"
+        start={38}
+        min={22}
+        max={68}
+        minHeight={150}
+        left={
+          <div style={{ padding: 'var(--k-s-12)', fontSize: 'var(--k-type-small)' }}>
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>Files</div>
+            {['index.ts', 'App.tsx', 'styles.css', 'utils.ts'].map((f) => (
+              <div key={f} style={{ padding: '4px 0', color: 'var(--k-fg-muted)', fontFamily: 'var(--k-font-mono)', fontSize: 11.5 }}>{f}</div>
+            ))}
+          </div>
+        }
+        right={
+          <div style={{ padding: 'var(--k-s-12)', fontSize: 11.5, fontFamily: 'var(--k-font-mono)', color: 'var(--k-fg-muted)', lineHeight: 1.7 }}>
+            <div><span style={{ color: 'var(--k-primary)' }}>export</span> function App() {'{'}</div>
+            <div style={{ paddingLeft: 16 }}><span style={{ color: 'var(--k-primary)' }}>return</span> &lt;Hello /&gt;</div>
+            <div>{'}'}</div>
+          </div>
+        }
+      />
     </Card>
   )
 }

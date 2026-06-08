@@ -7,7 +7,7 @@ import type { IconName } from '../../icons/concepts'
  * This is what makes SupaDash the single "super-app": its own pages
  * (Overview…Settings) plus these domain screens so every key component
  * is visible in one place. */
-import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown, useModal, ImgAvatar, Menubar } from './apps/AppHelpers'
+import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown, useModal, ImgAvatar, Menubar, Resizable } from './apps/AppHelpers'
 
 /* Profile photo stand-in (inline SVG — always loads, no network) for the
    hover-card preview; demonstrates the photo Avatar (.avatar__img) in the app. */
@@ -1006,6 +1006,31 @@ function DocsScreen() {
               <option>Draft</option><option>Published</option>
             </select>
             <button className="btn btn--primary"><Icon name="check" /> Publish</button>
+          </div>
+
+          {/* Resizable — outline ↔ editor split; drag the divider (or focus + ←/→). */}
+          <div style={{ marginBottom: 14 }}>
+            <Resizable
+              ariaLabel="Resize outline and editor"
+              start={30}
+              min={20}
+              max={55}
+              minHeight={132}
+              left={
+                <nav style={{ padding: 'var(--k-s-12)', fontSize: 'var(--k-type-small)' }} aria-label="Outline">
+                  <div style={{ fontWeight: 600, marginBottom: 8, color: 'var(--k-fg-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Outline</div>
+                  {['Install the SDK', 'Authenticate', 'First query', 'Deploy'].map((h, i) => (
+                    <div key={h} style={{ padding: '4px 0', color: i === 0 ? 'var(--k-primary)' : 'var(--k-fg-muted)', fontWeight: i === 0 ? 600 : 400 }}>{h}</div>
+                  ))}
+                </nav>
+              }
+              right={
+                <div style={{ padding: 'var(--k-s-12)', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', lineHeight: 1.6 }}>
+                  <strong style={{ color: 'var(--k-fg)' }}>{page}</strong>
+                  <p style={{ margin: '6px 0 0' }}>Drag the divider to give the outline more room, or focus it and use the arrow keys. Pane widths stay within bounds.</p>
+                </div>
+              }
+            />
           </div>
 
           <div className="tabs" role="tablist" aria-label="Document views">

@@ -2372,6 +2372,47 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .menubar__item:focus-visible { outline: var(--k-focus-w, 2px) solid var(--k-ring); outline-offset: -2px; }`,
   },
   {
+    id: 'resizable',
+    section: "Resizable",
+    css: `/* === Resizable === — draggable split panes (IDE / editor split-pane). Two
+   .resizable__pane around a .resizable__handle window-splitter (role=separator,
+   focusable, Arrow keys to resize). The consumer drives the first pane's
+   flex-basis; the handle is the drag affordance + keyboard target. */
+.resizable {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+  overflow: hidden;
+  background: var(--k-surface);
+}
+.resizable__pane { overflow: auto; min-width: 0; }
+.resizable__handle {
+  flex: none;
+  align-self: stretch;
+  width: var(--k-s-10);
+  padding: 0;
+  border: 0;
+  background: var(--k-surface-2);
+  cursor: col-resize;
+  position: relative;
+  touch-action: none;
+}
+.resizable__handle::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 2px; height: var(--k-s-24, 24px);
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--k-fg-faint);
+}
+.resizable__handle:hover { background: var(--k-state-hover); }
+.resizable__handle:hover::before { background: var(--k-fg-muted); }
+.resizable__handle:focus-visible { outline: var(--k-focus-w, 2px) solid var(--k-ring); outline-offset: -2px; }`,
+  },
+  {
     id: 'stepper',
     section: "Stepper",
     css: `/* === Stepper ===

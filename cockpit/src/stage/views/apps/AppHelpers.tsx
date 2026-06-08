@@ -506,6 +506,51 @@ export function Menubar({ menus, ariaLabel = 'Application' }: { menus: Array<{ l
   )
 }
 
+/* Resizable — draggable split panes (the IDE / editor split-pane). The handle is
+ * a WAI-ARIA window splitter: role=separator, focusable, Arrow keys resize (Home/
+ * End jump to the clamp). Pointer-capture makes the drag survive a fast cursor
+ * that outruns the 10px handle. The first pane's flex-basis is the live %; both
+ * panes clamp via [min,max] so neither collapses. */
+export function Resizable({
+  start = 50, min = 20, max = 80, left, right, ariaLabel = 'Resize panels', minHeight = 180,
+}: {
+  start?: number; min?: number; max?: number; left: ReactNode; right: ReactNode; ariaLabel?: string; minHeight?: number
+}) {
+  const [pct, setPct] = useState(start)
+  const ref = useRef<HTMLDivElement>(null)
+  const drag = useRef(false)
+  const clamp = (v: number) => Math.max(min, Math.min(max, v))
+  return (
+    <div ref={ref} className="resizable" style={{ minHeight }}>
+      <div className="resizable__pane" style={{ flex: `0 0 ${pct}%` }}>{left}</div>
+      <div
+        className="resizable__handle"
+        role="separator"
+        aria-orientation="vertical"
+        aria-valuenow={Math.round(pct)}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-label={ariaLabel}
+        tabIndex={0}
+        onPointerDown={(e) => { drag.current = true; e.currentTarget.setPointerCapture(e.pointerId) }}
+        onPointerMove={(e) => {
+          if (!drag.current || !ref.current) return
+          const r = ref.current.getBoundingClientRect()
+          setPct(clamp(((e.clientX - r.left) / r.width) * 100))
+        }}
+        onPointerUp={(e) => { drag.current = false; try { e.currentTarget.releasePointerCapture(e.pointerId) } catch { /* already released */ } }}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') { e.preventDefault(); setPct((p) => clamp(p - 2)) }
+          else if (e.key === 'ArrowRight') { e.preventDefault(); setPct((p) => clamp(p + 2)) }
+          else if (e.key === 'Home') { e.preventDefault(); setPct(min) }
+          else if (e.key === 'End') { e.preventDefault(); setPct(max) }
+        }}
+      />
+      <div className="resizable__pane" style={{ flex: '1 1 0' }}>{right}</div>
+    </div>
+  )
+}
+
 /* SplitMenu — a split button: a primary action fused (via .btn-group) to a
  * chevron that opens a REAL menu (outside-click + Escape via useDropdown). Keeps
  * the fused .btn-group visual intact — the two buttons stay direct children of
