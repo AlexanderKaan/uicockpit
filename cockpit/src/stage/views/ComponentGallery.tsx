@@ -66,7 +66,7 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
     LoginCard, StatGroupCard, ContextMenuCard, SignupCard, TimelineCard, NavMenuCard,
     PaginationCard, TreeViewCard, NotificationCenterCard, NavCard,
     FileGridCard, AccordionCard, SettingsRowCard, AlertsCard,
-    BreadcrumbCard, ProgressCard, UsageMeterCard,
+    BreadcrumbCard, ProgressCard, UsageMeterCard, InteractiveCardCard,
     StatusPageCard, InboxFilterCard, SpinnerCard, ToolbarRecipeCard, SkeletonCard,
     EmptyStateCard, InfoCardCard, ToastStackCard, LightboxCard,
     WizardStepperCard, DangerZoneCard, FaqCard, TwoColumnLayoutCard, TypographyCard,
@@ -1523,6 +1523,21 @@ function SpinnerCard() {
         <span className="spinner spinner--lg" aria-label="Loading" />
         <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>sm · md · lg</span>
       </div>
+    </Card>
+  )
+}
+
+function InteractiveCardCard() {
+  return (
+    <Card title="Workspaces" desc="Whole-card click targets — a button styled as a card (hover lift · press · focus ring).">
+      <button type="button" className="card card--interactive" style={{ gap: 4, padding: 'var(--k-s-14)' }}>
+        <strong style={{ fontSize: 'var(--k-type-small)' }}>Acme Inc</strong>
+        <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>12 projects · 4 members</span>
+      </button>
+      <button type="button" className="card card--interactive" style={{ gap: 4, padding: 'var(--k-s-14)' }}>
+        <strong style={{ fontSize: 'var(--k-type-small)' }}>Personal</strong>
+        <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>3 projects · just you</span>
+      </button>
     </Card>
   )
 }

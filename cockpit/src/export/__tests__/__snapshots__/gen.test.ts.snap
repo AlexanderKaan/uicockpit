@@ -1023,6 +1023,23 @@ body {
   border-radius: var(--k-radius-lg);
   box-shadow: var(--k-shadow-sm);
 }
+/* Interactive — a whole card that's one click target (link/button card). Adds
+   the affordance the base .card lacks: pointer, a hover lift, an :active press,
+   and a focus ring. Put it on a <button>/<a> (the font/text-align resets keep it
+   looking like a card, not a button). */
+.card--interactive {
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  width: 100%;
+  transition:
+    border-color var(--k-dur-fast, 120ms) var(--k-ease, ease),
+    box-shadow var(--k-dur-fast, 120ms) var(--k-ease, ease),
+    transform var(--k-dur-fast, 120ms) var(--k-ease, ease);
+}
+.card--interactive:hover { border-color: var(--k-state-border, var(--k-fg-faint)); box-shadow: var(--k-shadow-md); }
+.card--interactive:active { transform: translateY(1px); box-shadow: var(--k-shadow-sm); }
+.card--interactive:focus-visible { outline: 2px solid var(--k-ring); outline-offset: 2px; }
 /* Header reads as a real product heading (shadcn CardHeader) — sentence-case,
  * full --k-fg, display font. */
 .card__head { display: flex; flex-direction: column; gap: var(--k-s-2); }
