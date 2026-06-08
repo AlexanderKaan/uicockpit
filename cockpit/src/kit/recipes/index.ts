@@ -1462,7 +1462,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     id: 'lightbox',
     section: "Lightbox",
     css: `/* === Lightbox — fullscreen image viewer overlay === */
-.lightbox { position: fixed; inset: 0; z-index: var(--k-z-modal); background: rgba(0, 0, 0, 0.86); display: grid; place-items: center; animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }
+.lightbox { position: fixed; inset: 0; z-index: var(--k-z-modal); background: var(--k-scrim-strong); display: grid; place-items: center; animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }
 .lightbox__stage { max-width: 78%; max-height: 76%; border-radius: var(--k-radius-md); box-shadow: var(--k-shadow-lg); }
 .lightbox__btn { position: absolute; width: 38px; height: 38px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.12); color: #fff; display: grid; place-items: center; cursor: pointer; transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease); }
 .lightbox__btn:hover { background: rgba(255, 255, 255, 0.24); }
@@ -1613,7 +1613,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .dialog-frame__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--k-scrim);
   animation: k-fade-in var(--k-dur, 200ms) var(--k-ease-out, cubic-bezier(.05,.7,.1,1)) backwards;
 }
 .dialog-frame .dialog { position: relative; max-width: 90%; }`,
@@ -2501,7 +2501,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .sheet-frame__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--k-scrim);
 }
 .sheet {
   --sheet-w: 280px;

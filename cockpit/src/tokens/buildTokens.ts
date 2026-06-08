@@ -538,6 +538,11 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-track': `color-mix(in srgb, ${fg.main} 9%, ${surf.base})`,
       '--k-surface-raised': surf.raised,
       '--k-surface-overlay': surf.overlay,
+      // Overlay scrims — ONE source for the dim behind modals/sheets/lightbox
+      // (was 3× hardcoded rgba). A black scrim reads on both light + dark pages.
+      // --k-scrim: modal/sheet backdrop · --k-scrim-strong: full-bleed media (lightbox).
+      '--k-scrim': 'rgba(0, 0, 0, 0.4)',
+      '--k-scrim-strong': 'rgba(0, 0, 0, 0.86)',
       '--k-fg': fg.main,
       '--k-fg-muted': fg.muted,
       '--k-fg-faint': fg.faint,
