@@ -1,12 +1,12 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
+import type { KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
 import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar, Resizable } from './apps/AppHelpers'
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 
-export function ComponentGallery({ limit }: { limit?: number } = {}) {
+export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'block' } = {}) {
   // Order strategy: highest brand-impact first, token-neutral utilities last.
   // Users should SEE the result of every token change without scrolling.
   const galleryRef = useRef<HTMLDivElement>(null)
@@ -54,33 +54,40 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
   // passes a small limit and never mounts the ~80 cards below the fold; the app
   // passes no limit → the whole gallery renders. (Function components are
   // hoisted, so referencing them here before their declarations is fine.)
-  const CARDS = [
-    FormCard, ValidationCard, StatCard, SwitchCard, SelectionCard, TableCard,
-    SliderCard, SearchInputCard, RadioCardCard, ChartCard, DateCard,
-    PasswordInputCard, BannerCard, PopoverCard, NumberInputCard, DataTableProCard, FormPanelCard, FilterBarCard,
-    ComboboxCard, DialogCard, KanbanCard, PhoneInputCard, SelectCard, SlotPickerCard,
-    PricingCardCard, TagInputCard, AvatarCard, TabsCard, DropzoneCard, TooltipCard,
-    CodeBlockCard, SheetCard, InputOtpCard, DescriptionListCard, HoverCardCard,
-    DateFieldCard, ToolbarCard, AlertDialogCard, TrendCard,
-    CmdPaletteCard, DropdownMenuCard, CarouselCard, ListCard,
-    LoginCard, StatGroupCard, ContextMenuCard, SignupCard, TimelineCard, NavMenuCard,
-    PaginationCard, TreeViewCard, NotificationCenterCard, NavCard,
-    FileGridCard, AccordionCard, SettingsRowCard, AlertsCard,
-    BreadcrumbCard, ProgressCard, UsageMeterCard, InteractiveCardCard, MenubarCard, ResizableCard,
-    StatusPageCard, InboxFilterCard, SpinnerCard, ToolbarRecipeCard, SkeletonCard,
-    EmptyStateCard, InfoCardCard, ToastStackCard, LightboxCard,
-    WizardStepperCard, DangerZoneCard, FaqCard, TwoColumnLayoutCard, LayoutPrimitivesCard, TypographyCard,
-    AttachmentChipCard, StepperCard, ButtonGroupCard, AspectRatioCard, ScrollAreaCard,
+  // Each card carries its segment TIER (atom | block), mirroring the graph in
+  // src/kit/segments.ts — so the 4-layer-ladder front-end can split the wall into
+  // the Atoms view and the Blocks view. Cards that map 1:1 to a recipe take that
+  // recipe's tier; composed / showcase / foundation-demo cards (StatGroup, Kanban,
+  // Typography, LayoutPrimitives, …) are 'block'. Order is preserved so the no-tier
+  // path (the marketing bouquet, `limit`-sliced) renders exactly as before.
+  const CARDS: Array<readonly [() => ReactElement, 'atom' | 'block']> = [
+    [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'block'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
+    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'block'], [DateCard, 'block'],
+    [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'block'], [FormPanelCard, 'block'], [FilterBarCard, 'block'],
+    [ComboboxCard, 'atom'], [DialogCard, 'block'], [KanbanCard, 'block'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'block'],
+    [PricingCardCard, 'block'], [TagInputCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'block'], [TooltipCard, 'atom'],
+    [CodeBlockCard, 'block'], [SheetCard, 'block'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
+    [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'block'], [TrendCard, 'block'],
+    [CmdPaletteCard, 'block'], [DropdownMenuCard, 'atom'], [CarouselCard, 'block'], [ListCard, 'atom'],
+    [LoginCard, 'block'], [StatGroupCard, 'block'], [ContextMenuCard, 'atom'], [SignupCard, 'block'], [TimelineCard, 'block'], [NavMenuCard, 'atom'],
+    [PaginationCard, 'atom'], [TreeViewCard, 'block'], [NotificationCenterCard, 'block'], [NavCard, 'block'],
+    [FileGridCard, 'block'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
+    [BreadcrumbCard, 'atom'], [ProgressCard, 'atom'], [UsageMeterCard, 'block'], [InteractiveCardCard, 'atom'], [MenubarCard, 'block'], [ResizableCard, 'block'],
+    [StatusPageCard, 'block'], [InboxFilterCard, 'block'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
+    [EmptyStateCard, 'block'], [InfoCardCard, 'block'], [ToastStackCard, 'block'], [LightboxCard, 'block'],
+    [WizardStepperCard, 'block'], [DangerZoneCard, 'block'], [FaqCard, 'block'], [TwoColumnLayoutCard, 'block'], [LayoutPrimitivesCard, 'block'], [TypographyCard, 'block'],
+    [AttachmentChipCard, 'atom'], [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], [AspectRatioCard, 'atom'], [ScrollAreaCard, 'atom'],
   ]
-  const shown = limit ? CARDS.slice(0, limit) : CARDS
+  const filtered = tier ? CARDS.filter(([, t]) => t === tier) : CARDS
+  const shown = limit ? filtered.slice(0, limit) : filtered
 
   return (
     <div className="gallery" ref={galleryRef}>
       {/* INTERLEAVED WALL — cards woven so a landscape (.card--wide) lands
           roughly every ~3rd slot for an even masonry rhythm (shadcn /create
-          feel). The /docs page + export hold the by-category index; this is the
-          visual showcase. Rendered from CARDS so `limit` can show just the top. */}
-      {shown.map((C, i) => <C key={i} />)}
+          feel). `tier` splits it into the Atoms / Blocks ladder views; no `tier`
+          (the marketing bouquet) shows the full interleaved wall, `limit`-sliced. */}
+      {shown.map(([C], i) => <C key={i} />)}
     </div>
   )
 }

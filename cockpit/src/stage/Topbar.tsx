@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, Check, ChevronDown, Code, Heart, LayoutGrid, Link2, Moon, PanelLeft, ShieldCheck, Sun } from 'lucide-react'
+import { AppWindow, Box, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, ShieldCheck, Sun } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -80,30 +80,28 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         <A11yBadge audit={audit} pass={pass} total={total} allPass={allPass} />
       </div>
       <div className="topbar__center">
-        {/* View switcher — a labeled top toggle (icon + word) between the
-         * Components gallery and the unified Application. Replaces the old
-         * vertical AppRail so both views get the full stage width. */}
+        {/* The 4-layer ladder switcher (mirrors src/kit/segments.ts) — author the
+         * Foundation, then climb the rungs: Atoms → Blocks → Pages. Replaces the
+         * old 2-way Components/Application toggle. */}
         <div className="view-toggle" role="tablist" aria-label="View">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={view === 'components'}
-            className={`view-toggle__btn ${view === 'components' ? 'view-toggle__btn--on' : ''}`}
-            onClick={() => onViewChange('components')}
-          >
-            <LayoutGrid size={14} strokeWidth={1.75} />
-            Components
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={view === 'app'}
-            className={`view-toggle__btn ${view === 'app' ? 'view-toggle__btn--on' : ''}`}
-            onClick={() => onViewChange('app')}
-          >
-            <AppWindow size={14} strokeWidth={1.75} />
-            Application
-          </button>
+          {([
+            ['foundations', 'Foundations', Palette],
+            ['atoms', 'Atoms', Box],
+            ['blocks', 'Blocks', Boxes],
+            ['pages', 'Pages', AppWindow],
+          ] as [ViewKind, string, typeof Palette][]).map(([k, label, Ico]) => (
+            <button
+              key={k}
+              type="button"
+              role="tab"
+              aria-selected={view === k}
+              className={`view-toggle__btn ${view === k ? 'view-toggle__btn--on' : ''}`}
+              onClick={() => onViewChange(k)}
+            >
+              <Ico size={14} strokeWidth={1.75} />
+              {label}
+            </button>
+          ))}
         </div>
       </div>
       <div className="topbar__right">

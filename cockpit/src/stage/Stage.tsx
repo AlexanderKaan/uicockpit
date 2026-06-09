@@ -3,11 +3,14 @@ import type { Config, Tokens } from '../tokens/types'
 import { IconProvider } from '../icons/Icon'
 import { ComponentGallery } from './views/ComponentGallery'
 import { DemoDashboard } from './views/DemoDashboard'
+import { FoundationsView } from './views/FoundationsView'
 
-/* 2 views: the Components gallery (browse primitives in isolation) and
- * the unified super-app (SupaDash + absorbed Shop/Music/Chat/Billing/
- * Cloud screens — every key component in one real product context). */
-export type ViewKind = 'components' | 'app'
+/* The 4-layer ladder (mirrors src/kit/segments.ts):
+ *   foundations → the resolved token scales (twins the panel)
+ *   atoms       → the bare vocabulary (atom-tier gallery cards)
+ *   blocks      → stand-alone pieces of app (block-tier gallery cards)
+ *   pages       → the curated SupaDash super-app (every component in context) */
+export type ViewKind = 'foundations' | 'atoms' | 'blocks' | 'pages'
 
 interface StageProps {
   cfg: Config
@@ -27,8 +30,10 @@ export function Stage({ cfg, tokens, view }: StageProps) {
           <div className="cockpit-preview" style={previewStyle}>
             <IconProvider set={cfg.iconSet}>
               <div className="view-transition-root" key={view}>
-                {view === 'components' && <ComponentGallery />}
-                {view === 'app' && <DemoDashboard />}
+                {view === 'foundations' && <FoundationsView cfg={cfg} tokens={tokens} />}
+                {view === 'atoms' && <ComponentGallery tier="atom" />}
+                {view === 'blocks' && <ComponentGallery tier="block" />}
+                {view === 'pages' && <DemoDashboard />}
               </div>
             </IconProvider>
           </div>

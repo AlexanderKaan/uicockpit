@@ -381,7 +381,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
     <aside className="panel">
       <div className="fmenu">
         <div className="fmenu__bar">
-          <span className="fmenu__bar-title">Design system</span>
+          <span className="fmenu__bar-title">Foundation</span>
           <button
             type="button"
             className="fmenu__collapse"
