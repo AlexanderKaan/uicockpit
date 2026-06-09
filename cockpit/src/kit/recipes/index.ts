@@ -4505,19 +4505,19 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
      .l-center     centered column capped at a readable --l-measure (no magic px) */
 .l-stack { display: flex; flex-direction: column; }
 .l-stack > * { margin-block: 0; }
-.l-stack > * + * { margin-block-start: var(--l-gap, var(--k-s-16)); }
+.l-stack > * + * { margin-block-start: var(--l-gap, var(--k-space)); }
 
-.l-cluster { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-12)); align-items: var(--l-align, center); }
+.l-cluster { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-space)); align-items: var(--l-align, center); }
 
 /* The Switcher: each child grows to fill, but the moment the row's width drops below
  * --l-threshold the basis flips hugely negative and they stack — a container-query-
  * free responsive switch. */
-.l-switcher { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-16)); }
+.l-switcher { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-space)); }
 .l-switcher > * { flex-grow: 1; flex-basis: calc((var(--l-threshold, 28rem) - 100%) * 999); }
 
-.l-grid { display: grid; gap: var(--l-gap, var(--k-s-16)); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--l-min, 16rem)), 1fr)); }
+.l-grid { display: grid; gap: var(--l-gap, var(--k-space)); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--l-min, 16rem)), 1fr)); }
 
-.l-sidebar { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-16)); }
+.l-sidebar { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-space)); }
 .l-sidebar__side { flex-grow: 1; flex-basis: var(--l-side, 16rem); }
 .l-sidebar__main { flex-grow: 999; flex-basis: 0; min-width: var(--l-threshold, 50%); }
 

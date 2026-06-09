@@ -174,35 +174,35 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
             Every-Layout primitives every page composes with. The scaling note is
             the honest answer to "does it scale?": gaps fixed on the grid, the
             centred measure in ch (tracks font), breakpoints in rem (don't wobble). */}
-        <Section title="Layout" hint="Every-Layout primitives" wide>
+        <Section title="Layout" hint={`Every-Layout · gap ${px('--k-space')}`} wide>
           <p className="fnd__hint-line">
-            Gaps sit on the fixed spacing grid; the centred <b>measure is in ch</b> so it tracks your font
-            (bigger type → wider column); breakpoints are <b>rem</b> so layouts don’t wobble with density.
+            Shared gap = <b>{px('--k-space')}</b> — the density unit, so the whole layout <b>tightens on Compact</b>.
+            The centred measure is in <b>ch</b> (tracks your font); min/side breakpoints are <b>rem</b> (fixed, so layouts don’t wobble).
           </p>
           <div className="l-stack fnd__layout">
             <div>
-              <div className="fnd__sw-group-label">Cluster — wraps, shared gap</div>
+              <div className="fnd__sw-group-label">Cluster — wraps · gap {px('--k-space')}</div>
               <div className="l-cluster">{['Design', 'Engineering', 'Product', 'Ops', 'Growth'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
             </div>
             <div>
-              <div className="fnd__sw-group-label">Switcher — flips to a column when tight</div>
+              <div className="fnd__sw-group-label">Switcher — flips to a column · threshold 28rem</div>
               <div className="l-switcher">{['Pane A', 'Pane B', 'Pane C'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
             </div>
             <div>
-              <div className="fnd__sw-group-label">Grid — responsive auto-fit</div>
+              <div className="fnd__sw-group-label">Grid — responsive auto-fit · min column 16rem</div>
               <div className="l-grid">{['One', 'Two', 'Three', 'Four', 'Five', 'Six'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
             </div>
             <div>
-              <div className="fnd__sw-group-label">Sidebar — side + flexible main</div>
+              <div className="fnd__sw-group-label">Sidebar — side 16rem + flexible main</div>
               <div className="l-sidebar">
                 <div className="l-sidebar__side"><div className="fnd__l-tile">Side · 16rem</div></div>
                 <div className="l-sidebar__main"><div className="fnd__l-tile">Main — grows, wraps under when narrow</div></div>
               </div>
             </div>
             <div>
-              <div className="fnd__sw-group-label">Center — capped at a readable measure (ch, tracks font)</div>
-              <div className="l-center l-center--narrow"><div className="fnd__l-tile">Narrow · ~48ch</div></div>
-              <div className="l-center l-center--wide"><div className="fnd__l-tile">Wide · ~90ch</div></div>
+              <div className="fnd__sw-group-label">Center — measure in ch (tracks font)</div>
+              <div className="l-center l-center--narrow"><div className="fnd__l-tile">Narrow · 48ch</div></div>
+              <div className="l-center l-center--wide"><div className="fnd__l-tile">Wide · 90ch</div></div>
             </div>
           </div>
         </Section>
