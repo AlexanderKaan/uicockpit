@@ -39,6 +39,9 @@ const GALLERY_FILES = [
   'src/stage/views/ChartFrame.tsx',
   'src/stage/views/Skeletons.tsx',
   'src/stage/views/apps/AppHelpers.tsx',
+  // The Foundations stage view demonstrates foundation-tier recipes (the layout
+  // primitives + their .l-center--narrow/--wide modifiers) — a real demo surface.
+  'src/stage/views/FoundationsView.tsx',
 ]
 // App = the live SupaDash screens (NOT the shared AppHelpers helper).
 const APP_FILES = [

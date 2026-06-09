@@ -769,3 +769,7 @@
  * shows the border prominence. */
 .cockpit-preview .fnd__surface-fields { display: flex; flex-direction: column; gap: var(--k-s-10); }
 .cockpit-preview .fnd__surface-border { height: var(--k-s-32); border-radius: var(--k-radius-md); background: var(--k-surface); border: var(--k-bw) solid var(--k-border); }
+
+/* Layout foundation — placeholder tiles so the .l-* behaviour reads (not content). */
+.cockpit-preview .fnd__l-tile { background: var(--k-surface-sunken); border: 1px solid var(--k-border); border-radius: var(--k-radius-sm); padding: var(--k-s-8) var(--k-s-10); font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.cockpit-preview .fnd__layout .l-center + .l-center { margin-top: var(--k-s-8); }
