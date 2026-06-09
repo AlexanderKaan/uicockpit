@@ -103,19 +103,19 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
         </Section>
 
         <Section title="Motion" hint={cap(cfg.motion)}>
+          <p className="fnd__hint-line">Hover a row — the dot makes one real transition at that speed, like a UI state change.</p>
           <div className="fnd__motion">
-            {([['Fast', '--k-dur-fast'], ['Normal', '--k-dur'], ['Slow', '--k-dur-slow']] as [string, string][]).map(([label, durVar]) => (
+            {([['Fast', '--k-dur-fast', 'Hover · focus'], ['Normal', '--k-dur', 'Toggle · menu'], ['Slow', '--k-dur-slow', 'Sheet · dialog']] as [string, string, string][]).map(([label, durVar, use]) => (
               <div key={label} className="fnd__motion-row">
-                <span className="fnd__motion-label">{label}</span>
-                <span className="fnd__motion-track"><span className="fnd__motion-dot" style={{ animationDuration: `var(${durVar})` } as CSSProperties} /></span>
+                <span className="fnd__motion-meta"><b>{label}</b><span>{use}</span></span>
+                <span className="fnd__motion-track"><span className="fnd__motion-box" style={{ transitionDuration: `var(${durVar})` } as CSSProperties} /></span>
                 <span className="fnd__motion-val">{val(durVar)}</span>
               </div>
             ))}
-            <div className="fnd__motion-row">
-              <span className="fnd__motion-label">Easing</span>
-              <span className="fnd__motion-track"><span className="fnd__motion-dot" style={{ animationDuration: 'var(--k-dur-slow)' } as CSSProperties} /></span>
-              <span className="fnd__motion-val">{val('--k-ease')}</span>
-            </div>
+          </div>
+          <div className="fnd__motion-ease">
+            <span>Easing</span>
+            <b className="fnd__motion-ease-val">{val('--k-ease')}</b>
           </div>
         </Section>
 
