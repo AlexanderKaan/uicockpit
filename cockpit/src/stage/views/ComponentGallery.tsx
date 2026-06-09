@@ -82,11 +82,12 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   const shown = limit ? filtered.slice(0, limit) : filtered
 
   return (
-    <div className="gallery" ref={galleryRef}>
+    <div className={`gallery${tier === 'atom' ? ' gallery--workbench' : ''}`} ref={galleryRef}>
       {/* INTERLEAVED WALL — cards woven so a landscape (.card--wide) lands
           roughly every ~3rd slot for an even masonry rhythm (shadcn /create
-          feel). `tier` splits it into the Atoms / Blocks ladder views; no `tier`
-          (the marketing bouquet) shows the full interleaved wall, `limit`-sliced. */}
+          feel). `tier` splits it into the Atoms / Blocks ladder views; the Atoms
+          view flattens the demo-frame card to a bare WORKBENCH (no fake jasje).
+          No `tier` (the marketing bouquet) shows the full interleaved wall. */}
       {shown.map(([C], i) => <C key={i} />)}
     </div>
   )

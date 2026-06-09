@@ -696,3 +696,31 @@
 .fnd__icons { display: flex; flex-wrap: wrap; gap: var(--k-s-14); }
 .fnd__icon { color: var(--k-fg-muted); display: inline-flex; }
 .fnd__icon svg { width: 22px; height: 22px; }
+
+/* === Atoms workbench ===================================================
+ * The Atoms ladder view shows each atom BARE — no fake card "jasje" (the
+ * complaint that started the rethink). The demo-frame card (a direct child of
+ * the wall) flattens to transparent so the atom sits on the workbench; its head
+ * becomes a quiet uppercase caption. Only the OUTER frame (> .card) flattens — a
+ * nested demo card (the card atom itself) keeps its real surface. Scoped to
+ * .cockpit-preview .gallery--workbench so blocks/pages and the bouquet keep cards. */
+.cockpit-preview .gallery--workbench > .card {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+.cockpit-preview .gallery--workbench > .card:hover { box-shadow: none; transform: none; }
+.cockpit-preview .gallery--workbench > .card > .card__head {
+  margin-bottom: var(--k-s-12);
+  padding-bottom: var(--k-s-8);
+  border-bottom: var(--k-divider);
+}
+.cockpit-preview .gallery--workbench > .card > .card__head > .card__title {
+  font-size: var(--k-type-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: var(--k-track-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg-muted);
+}
+.cockpit-preview .gallery--workbench > .card > .card__head > .card__desc { display: none; }
