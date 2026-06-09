@@ -755,6 +755,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    rather than the fixed semantic blue of --solid-info. */
 .badge--solid-primary { background: var(--k-primary); color: var(--k-primary-fg); }
 .badge--primary { background: var(--k-primary-soft); color: var(--k-primary-soft-fg); }
+/* Accent (tertiary) soft chip — the highlight role's soft container, completing
+ * the role matrix (every role now has a soft badge). */
+.badge--accent { background: var(--k-accent-soft); color: var(--k-accent-soft-fg); }
 /* ─────────────────────────────────────────────────────────────────
  * Count chip — unified system for round numeric indicators
  * ─────────────────────────────────────────────────────────────────

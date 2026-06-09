@@ -366,6 +366,15 @@ export function buildTokens(cfg: Config): Tokens {
   // variant; warning gets a much higher multiplier than the others.
   const sysL = dark ? 58 : 48
   const sysSoftL = dark ? 20 : 94
+  // Accent (the tertiary/highlight role) was the one semantic role missing a SOFT
+  // container variant — every other role (primary/secondary/danger/warning/info)
+  // ships {base, fg, soft, soft-fg}. Derive accent-soft the same way (accent hue,
+  // reduced sat, the shared soft lightness) so the role matrix is uniform and an
+  // M3-style tertiary-container fill is available. (North Star step 3 — roles audit.)
+  const accentSoftSat = mono ? (dark ? 14 : 12) : Math.round(accentSat * 0.42)
+  const accentSoftHex = hslToHex(ah, accentSoftSat, sysSoftL)
+  const accentSoft = hsl(ah, accentSoftSat, sysSoftL)
+  const accentSoftFg = readableInk(accentSoftHex)
   const SYS: Array<{ k: SystemColor['k']; h: number; s: number; softMul: number }> = [
     { k: 'success', h: 145, s: dark ? 52 : 58, softMul: 0.42 },
     // Hue shifted 38 → 45 (more yellow-centered, less orange-leaning) and
@@ -618,6 +627,8 @@ export function buildTokens(cfg: Config): Tokens {
         : hslA(ph, psat, dark ? 64 : 50, dark ? 0.28 : 0.18),
       '--k-accent': accent,
       '--k-accent-fg': accentFg,
+      '--k-accent-soft': accentSoft,
+      '--k-accent-soft-fg': accentSoftFg,
       '--k-chart-1': chartCols[0] ?? primary,
       '--k-chart-2': chartCols[1] ?? primary,
       '--k-chart-3': chartCols[2] ?? primary,

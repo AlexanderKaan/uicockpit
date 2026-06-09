@@ -62,6 +62,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-selection: oklch(59.9% 0.1813 254.1 / 0.18);
   --k-accent: oklch(62.8% 0.1798 253.4);
   --k-accent-fg: #ffffff;
+  --k-accent-soft: oklch(95.2% 0.0093 242.8);
+  --k-accent-soft-fg: #16160c;
   --k-chart-1: oklch(62.3% 0.1589 252.4);
   --k-chart-2: oklch(64.9% 0.2616 332.9);
   --k-chart-3: oklch(86.5% 0.1907 119.3);
@@ -308,6 +310,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-selection: oklch(70.0% 0.1338 250.3 / 0.28);
   --k-accent: oklch(68.6% 0.1503 251.0);
   --k-accent-fg: #ffffff;
+  --k-accent-soft: oklch(31.4% 0.0423 249.3);
+  --k-accent-soft-fg: #ffffff;
   --k-chart-1: oklch(63.7% 0.1493 251.8);
   --k-chart-2: oklch(65.5% 0.2511 332.6);
   --k-chart-3: oklch(86.4% 0.1838 118.9);
@@ -1445,6 +1449,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    rather than the fixed semantic blue of --solid-info. */
 .badge--solid-primary { background: var(--k-primary); color: var(--k-primary-fg); }
 .badge--primary { background: var(--k-primary-soft); color: var(--k-primary-soft-fg); }
+/* Accent (tertiary) soft chip — the highlight role's soft container, completing
+ * the role matrix (every role now has a soft badge). */
+.badge--accent { background: var(--k-accent-soft); color: var(--k-accent-soft-fg); }
 /* ─────────────────────────────────────────────────────────────────
  * Count chip — unified system for round numeric indicators
  * ─────────────────────────────────────────────────────────────────
@@ -5657,6 +5664,8 @@ exports[`genJson > matches snapshot for default mono 1`] = `
     "--k-primary-soft-fg": "oklch(90.0% 0.0095 286.2)",
     "--k-selection": "oklch(73.8% 0.0300 285.6 / 0.32)",
     "--k-accent": "oklch(68.3% 0.0000 89.9)",
+    "--k-accent-soft": "oklch(29.9% 0.0252 284.8)",
+    "--k-accent-soft-fg": "#ffffff",
     "--k-chart-1": "oklch(83.0% 0.0000 89.9)",
     "--k-chart-2": "oklch(74.8% 0.0000 89.9)",
     "--k-chart-3": "oklch(66.7% 0.0000 89.9)",

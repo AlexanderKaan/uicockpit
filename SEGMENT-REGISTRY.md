@@ -213,3 +213,30 @@ highest-value things to promote into the catalog:
 - `chart`, `usage-meter`, `stat-tile`, `empty-state` → kept as **small Blocks**
   (they have a head/body/surface). Confirm none should drop to Atoms.
 - `resizable`, `toolbar` → layout things: resizable=Block, toolbar=Atom. Confirm.
+
+## Semantic role coverage (vs Material 3) — North Star step 3
+
+The token contract's **semantic colour roles**, audited against Material-3's role
+set. Every role ships the full quartet `{base, -fg, -soft, -soft-fg}` (the M3
+`role / on-role / role-container / on-role-container` shape) — so an agent can map
+any M3 role to a `--k-*` token, and every role can do both a solid and a soft fill.
+
+| Kit role | M3 equivalent | base · fg · soft · soft-fg |
+|---|---|---|
+| `--k-primary` | primary | ✅ (+ `-hover`) |
+| `--k-secondary` | secondary | ✅ |
+| `--k-accent` | tertiary | ✅ **(soft completed — step 3)** |
+| `--k-danger` | error | ✅ |
+| `--k-warning` | (M3: custom) | ✅ |
+| `--k-success` | (M3: custom) | ✅ |
+| `--k-info` | (M3: custom) | ✅ |
+| `--k-surface` / `-raised` / `-sunken` / `-overlay` | surface / surface-container-* | ✅ |
+| `--k-fg` / `-muted` / `-faint` | on-surface / on-surface-variant | ✅ |
+| `--k-border` (+ `--k-input-border`, 3:1 floored) | outline / outline-variant | ✅ |
+| `--k-ring` / `-soft` / `-halo` | (focus, beyond M3) | ✅ |
+
+**Gap found & filled:** `accent` (tertiary) was the only role missing its soft
+container — every other role had `{base, fg, soft, soft-fg}`. Added
+`--k-accent-soft` + `--k-accent-soft-fg` (derived like the other softs) + a
+`.badge--accent` consumer. The role matrix is now **uniform and M3-complete**;
+the agent contract advertises the full set.
