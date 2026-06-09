@@ -66,6 +66,15 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
               <span className="fnd__type-px">{px(v)}</span>
             </div>
           ))}
+          {/* The roles working together — em-based rhythm so it scales with Text size. */}
+          <div className="fnd__prose">
+            <div className="fnd__sw-group-label">In prose</div>
+            <h3 className="fnd__prose-display">Display 1</h3>
+            <p className="fnd__prose-lead">Lead paragraph — sets the tone right under a display headline.</p>
+            <h4 className="fnd__prose-h">Heading 2</h4>
+            <p className="fnd__prose-body">Body — the workhorse size. Longer sentences let you feel how the line-height creates breathing room between rows.</p>
+            <p className="fnd__prose-small">Small — captions, helpers, microcopy.</p>
+          </div>
         </Section>
 
         <Section title="Shape" hint={`Box ${cap(cfg.radius)} · Button ${lbl('buttonShape', cfg.buttonShape)}`}>

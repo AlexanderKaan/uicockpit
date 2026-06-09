@@ -773,3 +773,11 @@
 /* Layout foundation — placeholder tiles so the .l-* behaviour reads (not content). */
 .cockpit-preview .fnd__l-tile { background: var(--k-surface-sunken); border: 1px solid var(--k-border); border-radius: var(--k-radius-sm); padding: var(--k-s-8) var(--k-s-10); font-size: var(--k-type-small); color: var(--k-fg-muted); }
 .cockpit-preview .fnd__layout .l-center + .l-center { margin-top: var(--k-s-8); }
+
+/* Typography — the roles working together in prose (em rhythm scales with Text size). */
+.cockpit-preview .fnd__prose { margin-top: var(--k-s-16); padding-top: var(--k-s-12); border-top: var(--k-divider); }
+.cockpit-preview .fnd__prose-display { font-size: var(--k-type-h2); font-family: var(--k-font-display); font-weight: var(--k-weight-semibold); line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 0.3em; color: var(--k-fg); }
+.cockpit-preview .fnd__prose-lead { font-size: var(--k-type-body); line-height: 1.55; color: var(--k-fg-muted); margin: 0 0 1.2em; }
+.cockpit-preview .fnd__prose-h { font-size: var(--k-type-h3); font-family: var(--k-font-display); font-weight: var(--k-weight-semibold); line-height: 1.2; margin: 0 0 0.4em; color: var(--k-fg); }
+.cockpit-preview .fnd__prose-body { font-size: var(--k-type-body); line-height: 1.55; margin: 0 0 0.6em; color: var(--k-fg); }
+.cockpit-preview .fnd__prose-small { font-size: var(--k-type-small); line-height: 1.5; color: var(--k-fg-muted); margin: 0; }

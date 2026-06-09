@@ -75,7 +75,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [BreadcrumbCard, 'atom'], [ProgressCard, 'atom'], [UsageMeterCard, 'block'], [InteractiveCardCard, 'atom'], [MenubarCard, 'block'], [ResizableCard, 'block'],
     [StatusPageCard, 'block'], [InboxFilterCard, 'block'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
     [EmptyStateCard, 'block'], [InfoCardCard, 'block'], [ToastStackCard, 'block'], [LightboxCard, 'block'],
-    [WizardStepperCard, 'block'], [DangerZoneCard, 'block'], [FaqCard, 'block'], [TwoColumnLayoutCard, 'block'], [TypographyCard, 'block'],
+    [WizardStepperCard, 'block'], [DangerZoneCard, 'block'], [FaqCard, 'block'], [TwoColumnLayoutCard, 'block'],
     [AttachmentChipCard, 'atom'], [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], [AspectRatioCard, 'atom'], [ScrollAreaCard, 'atom'],
   ]
   const filtered = tier ? CARDS.filter(([, t]) => t === tier) : CARDS
@@ -2241,62 +2241,6 @@ function DateCard() {
             </div>
           </div>
         )}
-      </div>
-    </Card>
-  )
-}
-
-function TypographyCard() {
-  // Real vertical rhythm — proportional margins (em-based so they scale with
-  // the user's type-scale choice), distinct line-heights per element role,
-  // and a section-break gap between Display+lead and Heading+body so the
-  // hierarchy reads like real article typography, not a stacked label list.
-  return (
-    <Card title="Article">
-      <div>
-        <h1
-          style={{
-            fontSize: 'var(--k-type-h1)',
-            fontFamily: 'var(--k-font-display)',
-            fontWeight: 600,
-            lineHeight: 1.05,
-            letterSpacing: '-0.02em',
-            margin: '0 0 0.35em',
-          }}
-        >
-          Display 1
-        </h1>
-        <p
-          style={{
-            fontSize: 'var(--k-type-body)',
-            lineHeight: 1.55,
-            color: 'var(--k-fg-muted)',
-            margin: '0 0 1.6em',
-          }}
-        >
-          Lead paragraph — sets the tone right under a display headline.
-        </p>
-
-        <h2
-          style={{
-            fontSize: 'var(--k-type-h2)',
-            fontFamily: 'var(--k-font-display)',
-            fontWeight: 600,
-            lineHeight: 1.2,
-            letterSpacing: '-0.01em',
-            margin: '0 0 0.5em',
-          }}
-        >
-          Heading 2
-        </h2>
-        <p style={{ fontSize: 'var(--k-type-body)', lineHeight: 1.55, margin: '0 0 0.75em' }}>
-          Body — the workhorse text size for paragraphs and UI. Longer sentences
-          let you feel how the line-height creates breathing room between rows.
-        </p>
-        <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', lineHeight: 1.5, margin: 0 }}>
-          Small — captions, helpers, microcopy. Tighter line-height because the
-          text role is dense by design.
-        </p>
       </div>
     </Card>
   )
