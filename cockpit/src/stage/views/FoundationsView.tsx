@@ -26,7 +26,7 @@ function Sw({ v, label }: { v: string; label: string }) {
 
 function Section({ title, hint, children, wide }: { title: string; hint?: string; children: ReactNode; wide?: boolean }) {
   return (
-    <section className={`card fnd__card${wide ? ' fnd__card--wide' : ''}`}>
+    <section id={`fnd-${title.toLowerCase()}`} className={`card fnd__card${wide ? ' fnd__card--wide' : ''}`}>
       <div className="fnd__card-head">
         <h3 className="fnd__card-title">{title}</h3>
         {hint && <span className="fnd__card-hint">{hint}</span>}

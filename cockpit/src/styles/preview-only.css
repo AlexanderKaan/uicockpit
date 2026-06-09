@@ -724,3 +724,12 @@
   color: var(--k-fg-muted);
 }
 .cockpit-preview .gallery--workbench > .card > .card__head > .card__desc { display: none; }
+
+/* Foundations sections land below the topbar on a panel→Foundations jump, and flash
+ * a brand ring so the eye catches the twin that just updated. */
+.cockpit-preview .fnd__card { scroll-margin-top: var(--k-s-16); }
+@keyframes fnd-flash {
+  from { box-shadow: 0 0 0 2px var(--k-ring); }
+  to   { box-shadow: 0 0 0 0 transparent; }
+}
+.cockpit-preview .fnd__card--flash { animation: fnd-flash 1s var(--k-ease, ease); }

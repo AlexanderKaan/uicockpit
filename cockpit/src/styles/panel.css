@@ -82,6 +82,30 @@
   color: var(--app-fg-faint);
   padding: 12px 10px 4px;
 }
+/* A section header that twins a Foundations stage section — clicking jumps there.
+ * Resets button chrome to match the .fmsec label; a → appears on hover as the cue. */
+.fmsec--link {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.14s ease;
+}
+.fmsec--link:hover { color: var(--app-fg-muted); }
+.fmsec--link::after {
+  content: '→';
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.14s ease;
+}
+.fmsec--link:hover::after { opacity: 0.55; }
 
 /* A control row: label (left) + current value (right) + chevron. */
 .fmrow { position: relative; }
