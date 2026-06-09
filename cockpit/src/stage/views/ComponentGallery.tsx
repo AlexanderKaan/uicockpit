@@ -57,7 +57,7 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
   const CARDS = [
     FormCard, ValidationCard, StatCard, SwitchCard, SelectionCard, TableCard,
     SliderCard, SearchInputCard, RadioCardCard, ChartCard, DateCard,
-    PasswordInputCard, BannerCard, PopoverCard, NumberInputCard, DataTableProCard,
+    PasswordInputCard, BannerCard, PopoverCard, NumberInputCard, DataTableProCard, FormPanelCard,
     ComboboxCard, DialogCard, KanbanCard, PhoneInputCard, SelectCard, SlotPickerCard,
     PricingCardCard, TagInputCard, AvatarCard, TabsCard, DropzoneCard, TooltipCard,
     CodeBlockCard, SheetCard, InputOtpCard, DescriptionListCard, HoverCardCard,
@@ -1054,6 +1054,83 @@ function DataTableProCard() {
             {[1, 2, 3].map((n) => (<button key={n} aria-current={page === n} onClick={() => setPage(n)}>{n}</button>))}
             <button onClick={() => setPage((v) => Math.min(3, v + 1))} disabled={page === 3} aria-label="Next"><Icon name="chevR" /></button>
           </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+// Form panel — the editing-surface block: a titled header, labelled fields on a
+// responsive 2-up grid, a titled section, an inline validation summary (toggled by
+// the primary action to demo the error state), and a footer action bar. Composes
+// the field atoms (.in/.field/.lab · .select · .numinput · .phoneinput · .toggle ·
+// .radio-card) + buttons.
+function FormPanelCard() {
+  const [showError, setShowError] = useState(false)
+  const [notify, setNotify] = useState(true)
+  const [plan, setPlan] = useState('team')
+  const [qty, setQty] = useState(3)
+  return (
+    <Card wide title="Form panel" desc="Sectioned fields, validation & an action bar — the form block.">
+      <div className="formpanel">
+        <div className="formpanel__head">
+          <div className="formpanel__title">New workspace</div>
+          <div className="formpanel__desc">Set up a workspace for your team.</div>
+        </div>
+        <div className="formpanel__body">
+          {showError && (
+            <div className="formpanel__error" role="alert">
+              <Icon name="info" />
+              <span>Fix the highlighted field before continuing.</span>
+            </div>
+          )}
+          <div className="formpanel__grid">
+            <label className="lab"><span>Workspace name</span><input className="in" defaultValue="Acme Inc." /></label>
+            <label className="lab"><span>Subdomain</span><input className="in" defaultValue="acme" /></label>
+            <div className="field formpanel__full">
+              <label className="field__label" htmlFor="fp-owner">Owner email <span className="field__req">*</span></label>
+              <input id="fp-owner" className="in" type="email" placeholder="you@company.com" aria-invalid={showError || undefined} aria-describedby={showError ? 'fp-owner-err' : undefined} />
+              {showError && <span id="fp-owner-err" className="field__error"><Icon name="info" /> Enter a valid email address.</span>}
+            </div>
+            <label className="lab"><span>Region</span>
+              <select className="select" aria-label="Region"><option>EU (Frankfurt)</option><option>US (Virginia)</option></select>
+            </label>
+            <div className="lab"><span>Seats</span>
+              <div className="numinput">
+                <button className="numinput__step" onClick={() => setQty((n) => Math.max(1, n - 1))} aria-label="Decrement">−</button>
+                <input className="numinput__field" value={qty} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setQty(n) }} aria-label="Seats" />
+                <button className="numinput__step" onClick={() => setQty((n) => n + 1)} aria-label="Increment">+</button>
+              </div>
+            </div>
+            <div className="lab formpanel__full"><span>Phone (billing alerts)</span>
+              <div className="phoneinput">
+                <button className="phoneinput__country" aria-label="Country"><span className="phoneinput__flag" aria-hidden>🇳🇱</span><span className="phoneinput__code">+31</span></button>
+                <input className="phoneinput__field" defaultValue="6 1234 5678" aria-label="Phone number" />
+              </div>
+            </div>
+          </div>
+          <div className="formpanel__section">
+            <div className="formpanel__section-title">Plan</div>
+            <div className="radio-cards">
+              {([['team', 'Team', '$8 / seat · unlimited projects'], ['biz', 'Business', '$16 / seat · SSO + audit log']] as [string, string, string][]).map(([k, t, d]) => (
+                <label key={k} className={'radio-card' + (plan === k ? ' radio-card--on' : '')}>
+                  <span className="radio"><input type="radio" name="fp-plan" checked={plan === k} onChange={() => setPlan(k)} /></span>
+                  <span className="radio-card__body"><span className="radio-card__title">{t}</span><span className="radio-card__desc">{d}</span></span>
+                </label>
+              ))}
+            </div>
+            <div className="list list--settings">
+              <div className="list__item">
+                <div className="list__body"><div className="list__title">Email notifications</div><div className="list__sub">Send a weekly digest to the owner.</div></div>
+                <button type="button" role="switch" aria-checked={notify} aria-label="Email notifications" className={`toggle ${notify ? 'toggle--on' : ''}`} onClick={() => setNotify((v) => !v)}><span className="toggle__knob" /></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="formpanel__foot">
+          <span className="formpanel__foot-note">You can change these later in Settings.</span>
+          <button className="btn btn--ghost" onClick={() => setShowError(false)}>Cancel</button>
+          <button className="btn btn--primary" onClick={() => setShowError((v) => !v)}><Icon name="check" /> Create workspace</button>
         </div>
       </div>
     </Card>

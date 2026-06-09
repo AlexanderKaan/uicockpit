@@ -1947,29 +1947,38 @@ function SettingsContact() {
   return (
     <>
       <h2 style={SETTINGS_H2}>Billing contact</h2>
-      <section className="card" style={{ maxWidth: 420, marginBottom: 20 }}>
-        <label className="lab"><span>Full name</span><input className="in" defaultValue="Jordan Maxwell" /></label>
-        {/* FormField contract — label + required marker + control + error, wired
-            for a11y (aria-invalid + aria-describedby). */}
-        <div className="field">
-          <label className="field__label" htmlFor="set-billing-email">Email <span className="field__req" aria-hidden="true">*</span></label>
-          <input className="in is-error" id="set-billing-email" defaultValue="jordan@" aria-invalid="true" aria-describedby="set-billing-err" />
-          <span className="field__error" id="set-billing-err"><Icon name="info" /> Enter a valid email address.</span>
-        </div>
-        {/* PhoneInput — country selector + national number. */}
-        <div className="lab">
-          <span>Phone</span>
-          <div className="phoneinput">
-            <button className="phoneinput__country" aria-label="Country">
-              <span className="phoneinput__flag" aria-hidden>🇳🇱</span>
-              <span className="phoneinput__code">+31</span>
-              <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden><path d="M1 1 L5 5 L9 1" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
-            </button>
-            <input className="phoneinput__field" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="6 12 34 56 78" />
+      {/* FormPanel block — labelled fields on a responsive grid, inline validation
+          (the FormField contract: label + required + control + error, a11y-wired),
+          and a footer action bar. Re-homes Validation + PhoneInput + DatePicker. */}
+      <div className="formpanel" style={{ maxWidth: 480, marginBottom: 20 }}>
+        <div className="formpanel__body">
+          <div className="formpanel__grid">
+            <label className="lab"><span>Full name</span><input className="in" defaultValue="Jordan Maxwell" /></label>
+            <label className="lab"><span>Renewal date</span><DatePicker defaultValue="2026-07-01" ariaLabel="Renewal date" /></label>
+            <div className="field formpanel__full">
+              <label className="field__label" htmlFor="set-billing-email">Email <span className="field__req" aria-hidden="true">*</span></label>
+              <input className="in is-error" id="set-billing-email" defaultValue="jordan@" aria-invalid="true" aria-describedby="set-billing-err" />
+              <span className="field__error" id="set-billing-err"><Icon name="info" /> Enter a valid email address.</span>
+            </div>
+            <div className="lab formpanel__full">
+              <span>Phone</span>
+              <div className="phoneinput">
+                <button className="phoneinput__country" aria-label="Country">
+                  <span className="phoneinput__flag" aria-hidden>🇳🇱</span>
+                  <span className="phoneinput__code">+31</span>
+                  <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden><path d="M1 1 L5 5 L9 1" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
+                </button>
+                <input className="phoneinput__field" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="6 12 34 56 78" />
+              </div>
+            </div>
           </div>
         </div>
-        <label className="lab"><span>Renewal date</span><DatePicker defaultValue="2026-07-01" ariaLabel="Renewal date" /></label>
-      </section>
+        <div className="formpanel__foot">
+          <span className="formpanel__foot-note">Changes apply to your next invoice.</span>
+          <button className="btn btn--ghost">Cancel</button>
+          <button className="btn btn--primary">Save changes</button>
+        </div>
+      </div>
     </>
   )
 }

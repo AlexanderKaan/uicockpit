@@ -45,6 +45,9 @@ export const BLOCK_USES: Readonly<Record<string, readonly string[]>> = {
   // header, a rows-per-page select and pagination — matrix-complete across
   // empty / loading / error. Adopting these four was the orphan worklist's lead.
   'data-table': ['table', 'toolbar', 'pagination-breadcrumb', 'select-trigger'],
+  // The editing surface: a titled panel of labelled fields on a responsive grid,
+  // with validation + a footer action bar. Composes the field atoms it lays out.
+  'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'phoneinput', 'switch-toggle', 'radio-card'],
   sidebar: ['navigation-row', 'avatar', 'badges-pills'],
   dialog: ['card', 'buttons'],
   'alert-dialog': ['card', 'buttons'],

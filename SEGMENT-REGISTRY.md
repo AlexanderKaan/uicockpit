@@ -98,11 +98,12 @@ were mis-filed as `helper` and are really foundations:
 
 ---
 
-## Blocks (catalog, surface = component) — 26
+## Blocks (catalog, surface = component) — 27
 
 | id | uses | note |
 |---|---|---|
 | `data-table` | table, toolbar, pagination-breadcrumb, select-trigger | **the flagship** — matrix-complete: toolbar · selection/bulk bar · empty/loading/error state slot · footer (rows-per-page + pagination) · content-stress helpers. North Star step 2; first Gap closed. |
+| `form-panel` | form, form-primitives, buttons, select-trigger, numberinput, phoneinput, switch-toggle, radio-card | the editing surface — header · labelled fields on a responsive grid · titled sections · inline validation summary · footer action bar. North Star step 3; the `form-panel` Gap closed. |
 | `sidebar` | navigation-row, avatar, badges-pills | app-shell nav — *genuinely comes in the jacket* |
 | `dialog` | card, buttons | overlay block |
 | `alert-dialog` | card, buttons | confirm modal |
@@ -148,7 +149,7 @@ e.g. `Docs` → uses: sidebar, menubar, toolbar, tabs, resizable, codeblock, lis
 |---|---|
 | Foundation (recipe-level) | 3 (+ the token system) |
 | Atom | 48 |
-| Block | 26 |
+| Block | 27 |
 | Page | ~11 (external, SupaDash) |
 
 **`helper` is dissolved (7 → resolved):** toolbar→Atom, separator→Atom,
@@ -168,16 +169,17 @@ coverage rule, every atom must have ≥1 parent block; an orphan is a worklist i
 next (the Gaps below). It **shrinks** as blocks land; `segments.test.ts` asserts it,
 so each shrink is a conscious, tracked event.
 
-**30 orphans today** (of 48 atoms — 18 parented). Down from 34: the **data-table**
-block (step 2) adopted `table` · `toolbar` · `pagination-breadcrumb` ·
-`select-trigger`. Most remaining orphans are not "unused" — they render directly in
-SupaDash *pages*; they simply have no **block** wrapping them yet. Grouped by the
-block that will adopt them:
+**25 orphans today** (of 48 atoms — 23 parented). Down from 34: **data-table**
+(step 2) adopted `table·toolbar·pagination-breadcrumb·select-trigger`; **form-panel**
+(step 3) adopted `form·switch-toggle·numberinput·phoneinput·radio-card`. Most
+remaining orphans are not "unused" — they render directly in SupaDash *pages*; they
+simply have no **block** wrapping them yet. Grouped by the block that will adopt them:
 
 | Future block (the Gap) | Adopts these orphan atoms |
 |---|---|
 | ~~**data-table**~~ ✅ **shipped (step 2)** | ~~`table`, `toolbar`, `pagination-breadcrumb`, `select-trigger`~~ — now parented |
-| **form-panel** (next candidate) | `form`, `numberinput`, `passwordinput`, `phoneinput`, `combobox`, `tag-input`, `input-otp`, `radio-card`, `switch-toggle`, `slider` |
+| ~~**form-panel**~~ ✅ **shipped (step 3)** | ~~`form`, `switch-toggle`, `numberinput`, `phoneinput`, `radio-card`~~ — now parented |
+| **auth** (extend) / **filter-bar** | `passwordinput`, `input-otp` (→ auth); `combobox`, `tag-input`, `slider` (→ a filter/query bar) |
 | **app-shell / page-header** | `navigation-menu`, `tabs`, `separator`, `banner` |
 | **detail / record view** | `description-list`, `accordion`, `alert` |
 | overlay/utility (likely stay atoms, or small blocks) | `popover`, `hover-card`, `context-menu`, `tooltip`, `segmented-control-toggle-group`, `button-group`, `aspect-ratio`, `scroll-area`, `skeleton`, `spinner`, `attachment-chip-family`, `inline-status-meta-micro-components` |
@@ -199,7 +201,7 @@ highest-value things to promote into the catalog:
 - **app-shell** (sidebar + topbar/page-header)
 - **page-header** (title + tabs + actions)
 - **settings-section** (`.list--settings` rows + save bar)
-- **form-panel** (labeled fields + validation + footer actions)
+- ~~**form-panel**~~ ✅ **SHIPPED (step 3)** — labelled fields on a grid + validation + footer action bar
 - **stat-row** (a row of stat-tiles)
 - **detail / record view** (a "show one entity" panel)
 

@@ -39,11 +39,11 @@ describe('segment graph integrity', () => {
     expect(f + a + b).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 3 · Block 26 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 3 · Block 27 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('block')).toHaveLength(Object.keys(BLOCK_USES).length)
     expect(idsByTier('foundation')).toHaveLength(3)
-    expect(idsByTier('block')).toHaveLength(26)
+    expect(idsByTier('block')).toHaveLength(27)
   })
 
   it('usesOf returns [] for atoms and foundations', () => {
@@ -60,18 +60,18 @@ describe('orphan-atom worklist', () => {
   // assertion goes red — update it consciously; the shrink is the signal that the
   // contract got thicker.
   //
-  // History: 34 → 30 when the data-table block landed (North Star step 2),
-  // adopting table · toolbar · pagination-breadcrumb · select-trigger.
+  // History: 34 → 30 when the data-table block landed (step 2), adopting table ·
+  // toolbar · pagination-breadcrumb · select-trigger. 30 → 25 when the form-panel
+  // block landed (step 3), adopting form · switch-toggle · numberinput ·
+  // phoneinput · radio-card.
   it('matches the tracked orphan list', () => {
     expect(orphanAtoms()).toEqual([
       'button-group',
       'aspect-ratio',
       'scroll-area',
-      'form',
       'alert',
       'tabs',
       'tooltip',
-      'switch-toggle',
       'slider',
       'skeleton',
       'spinner',
@@ -90,10 +90,7 @@ describe('orphan-atom worklist', () => {
       'inline-status-meta-micro-components',
       'navigation-menu',
       'context-menu',
-      'numberinput',
       'passwordinput',
-      'phoneinput',
-      'radio-card',
     ])
   })
 })

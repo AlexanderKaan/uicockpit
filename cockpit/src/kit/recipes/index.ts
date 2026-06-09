@@ -4405,4 +4405,54 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .slot--on { background: var(--k-primary-soft); border-color: var(--k-ring); color: var(--k-primary-soft-fg); font-weight: var(--k-weight-semibold); }
 .slot--off { opacity: 0.4; pointer-events: none; text-decoration: line-through; }`,
   },
+  {
+    id: 'form-panel',
+    section: "Form panel",
+    css: `/* === Form panel ===
+   The editing-surface BLOCK — what you reach for when a screen needs a real form,
+   not a loose stack of inputs. A bordered panel with a titled header, a body of
+   labelled fields on a responsive grid, sectioned groups, an inline validation
+   summary, and a footer action bar (Cancel / Save). COMPOSES the field atoms
+   (.field / .lab + .in · .select · .numinput · .phoneinput · .switch · .radio-card)
+   and .buttons, so a labelled, validated, sectioned form is rebuildable from the
+   kit — not hand-assembled per screen.
+
+   Anatomy
+     .formpanel                  frame (border + radius + surface)
+       .formpanel__head          title + description (divider below)
+       .formpanel__body          padded field area (vertical rhythm)
+         .formpanel__error       inline validation summary (when submit fails)
+         .formpanel__grid        responsive 2-up field grid; a child takes
+           .formpanel__full      to span the full width
+         .formpanel__section     a titled sub-group (divider above)
+           .formpanel__section-title
+       .formpanel__foot          action bar — note (left) + buttons (right) */
+.formpanel { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); overflow: hidden; }
+.formpanel__head { padding: var(--k-s-16); border-bottom: var(--k-divider); }
+.formpanel__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
+.formpanel__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); margin-top: var(--k-s-2); }
+.formpanel__body { padding: var(--k-s-16); display: flex; flex-direction: column; gap: var(--k-s-16); }
+
+/* Responsive field grid — two columns on a roomy panel, collapses to one when the
+ * panel is narrow (no container query needed: minmax floor + auto-fit). This is
+ * the field-layout grammar a bare card lacks; a full-width field opts out. */
+.formpanel__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--k-s-16); }
+.formpanel__full { grid-column: 1 / -1; }
+
+/* A titled sub-group inside the body — divider above + an eyebrow label, so a long
+ * form reads as sections ("Profile", "Security") instead of one undifferentiated wall. */
+.formpanel__section { display: flex; flex-direction: column; gap: var(--k-s-16); padding-top: var(--k-s-16); border-top: var(--k-divider); }
+.formpanel__section-title { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
+
+/* Inline validation summary — an alert band at the top of the body when submit
+ * fails, in the danger-soft tone so it matches the .alert atom's error variant. */
+.formpanel__error { display: flex; align-items: flex-start; gap: var(--k-s-8); padding: var(--k-s-10) var(--k-s-12); border-radius: var(--k-radius-sm); background: var(--k-danger-soft); color: var(--k-danger-soft-fg, var(--k-danger)); font-size: var(--k-type-small); }
+.formpanel__error svg { flex: none; }
+
+/* Footer action bar — mirrors the data-table foot surface for family consistency:
+ * a sunken band with a top divider, an optional note on the left, the primary
+ * action trailing right. */
+.formpanel__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; padding: var(--k-s-12) var(--k-s-16); border-top: var(--k-divider); background: var(--k-surface-sunken); }
+.formpanel__foot-note { margin-right: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); }`,
+  },
 ]
