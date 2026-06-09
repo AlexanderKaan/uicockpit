@@ -123,7 +123,7 @@ npx vitest run       # tests
 ```
 
 Vite + React 19 + TypeScript (strict). Architecture notes live in
-[`DECISIONS.md`](./DECISIONS.md) · [`SPEC.md`](./SPEC.md) · [`ICONS.md`](./ICONS.md).
+[`DECISIONS.md`](./DECISIONS.md) · [`ICONS.md`](./ICONS.md).
 
 ---
 
