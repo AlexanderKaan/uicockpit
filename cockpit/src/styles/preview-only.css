@@ -673,25 +673,47 @@
 .fnd__type-row { display: flex; align-items: baseline; gap: var(--k-s-14); padding: var(--k-s-8) 0; border-top: var(--k-divider); }
 .fnd__type-row:first-child { border-top: 0; padding-top: 0; }
 .fnd__type-sample { font-family: var(--k-font-display); font-weight: var(--k-weight-semibold); color: var(--k-fg); line-height: 1; width: 2.4em; flex: none; overflow: hidden; }
-.fnd__type-meta { display: flex; flex-direction: column; }
+.fnd__type-meta { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .fnd__type-meta b { font-size: var(--k-type-small); color: var(--k-fg); }
 .fnd__type-meta span { font-size: var(--k-type-caption); color: var(--k-fg-faint); }
+.fnd__type-px { font-size: var(--k-type-caption); color: var(--k-fg-muted); font-family: var(--k-font-mono); font-variant-numeric: tabular-nums; flex: none; }
 
 .fnd__radii, .fnd__shadows { display: flex; gap: var(--k-s-16); flex-wrap: wrap; }
 .fnd__radius-cell, .fnd__shadow-cell { display: flex; flex-direction: column; align-items: center; gap: var(--k-s-8); }
 .fnd__radius-box { width: 56px; height: 56px; background: var(--k-primary-soft); border: 1.5px solid var(--k-primary); }
 .fnd__radius-label, .fnd__shadow-label { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+.fnd__radius-px { font-size: var(--k-type-caption); color: var(--k-fg-faint); font-family: var(--k-font-mono); }
 .fnd__shadow-tile { width: 56px; height: 56px; border-radius: var(--k-radius-md); background: var(--k-surface); border: 1px solid var(--k-border); }
+
+/* Active-option marker (Elevation etc.) — makes the current selection explicit. */
+.fnd__active { font-size: var(--k-type-small); color: var(--k-fg-muted); margin-bottom: var(--k-s-12); }
+.fnd__active b { color: var(--k-fg); }
+
+/* Density — the gap unit + control height that the Scale control actually moves.
+ * Both visuals resize live, so the impact of Scale is visible at a glance. */
+.fnd__density { display: flex; gap: var(--k-s-24); margin-bottom: var(--k-s-16); }
+.fnd__density-cell { display: flex; align-items: center; gap: var(--k-s-8); }
+.fnd__density-gap { height: 12px; background: var(--k-primary); border-radius: var(--k-radius-sm); flex: none; }
+.fnd__density-ctl { width: 12px; background: var(--k-primary); border-radius: var(--k-radius-sm); flex: none; }
+.fnd__density-meta { display: flex; flex-direction: column; }
+.fnd__density-meta b { font-size: var(--k-type-small); color: var(--k-fg); }
+.fnd__density-meta { font-size: var(--k-type-caption); color: var(--k-fg-muted); font-family: var(--k-font-mono); }
 
 .fnd__space { display: flex; flex-direction: column; gap: var(--k-s-8); }
 .fnd__space-row { display: flex; align-items: center; gap: var(--k-s-10); }
 .fnd__space-bar { height: 10px; background: var(--k-primary); border-radius: var(--k-radius-sm); flex: none; }
 .fnd__space-label { font-size: var(--k-type-caption); color: var(--k-fg-faint); font-variant-numeric: tabular-nums; }
 
-.fnd__motion { display: flex; flex-direction: column; gap: var(--k-s-8); }
-.fnd__motion-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--k-s-12); }
-.fnd__motion-label { font-size: var(--k-type-small); color: var(--k-fg); font-weight: var(--k-weight-medium); }
-.fnd__motion-val { font-size: var(--k-type-caption); color: var(--k-fg-muted); font-family: var(--k-font-mono); }
+.fnd__motion { display: flex; flex-direction: column; gap: var(--k-s-12); }
+.fnd__motion-row { display: flex; align-items: center; gap: var(--k-s-10); }
+.fnd__motion-label { width: 4em; flex: none; font-size: var(--k-type-small); color: var(--k-fg); font-weight: var(--k-weight-medium); }
+/* The track + a dot that runs at the resolved duration with the resolved easing —
+ * Fast/Normal/Slow read as visibly different speeds; Easing shows the curve feel. */
+.fnd__motion-track { flex: 1; height: 6px; background: var(--k-surface-sunken); border-radius: var(--k-radius-sm); position: relative; }
+.fnd__motion-dot { position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--k-primary); animation: fnd-run 1s var(--k-ease, ease) infinite alternate; }
+.fnd__motion-val { flex: none; min-width: 5em; text-align: right; font-size: var(--k-type-caption); color: var(--k-fg-muted); font-family: var(--k-font-mono); }
+@keyframes fnd-run { from { left: 0; } to { left: calc(100% - 6px); } }
+@media (prefers-reduced-motion: reduce) { .fnd__motion-dot { animation: none; left: 50%; } }
 
 .fnd__icons { display: flex; flex-wrap: wrap; gap: var(--k-s-14); }
 .fnd__icon { color: var(--k-fg-muted); display: inline-flex; }
