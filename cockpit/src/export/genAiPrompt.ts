@@ -7,6 +7,48 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 import { ICON_LIBS } from './iconLibs'
 import { genCss } from './genCss'
 import { Z_INDEX, BREAKPOINTS } from '../tokens/extras'
+import { RECIPES } from '../kit'
+import { FOUNDATIONS, BLOCK_USES, STANDALONE_ATOMS, idsByTier } from '../kit/segments'
+
+/** The composition contract, derived from the segment graph — the structural part
+ * an agent must enforce: the 4-layer ladder, which blocks exist and what each
+ * composes, and which atoms stand alone. Built from `src/kit/segments.ts`, so it
+ * never drifts from the kit. */
+function componentModel(): string {
+  const label = (id: string) => RECIPES.find((r) => r.id === id)?.section ?? id
+  const blocks = Object.entries(BLOCK_USES)
+    .map(([id, uses]) => `- **${label(id)}** — composes: ${uses.map(label).join(' · ') || '(self-contained)'}`)
+    .join('\n')
+  const atoms = idsByTier('atom').map(label).join(', ')
+  const foundations = FOUNDATIONS.map(label).join(', ')
+  const standalone = STANDALONE_ATOMS.map(label).join(', ')
+  return `## The component model — the composition contract
+
+This kit is a **4-layer ladder** (Foundation → Atom → Block → Page). Build UP it;
+never invent a parallel structure or re-implement what a block already guarantees.
+
+**FOUNDATION** — the tokens (above) + layout grammar (${foundations}). Use the
+layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
+\`.l-stack\` (vertical rhythm) · \`.l-cluster\` (wrapping row) · \`.l-switcher\`
+(row→column when tight) · \`.l-grid\` (responsive auto-fit) · \`.l-sidebar\` ·
+\`.l-center\` (caps width at \`--k-measure-narrow/prose/wide\` — never a hardcoded
+\`max-width\`).
+
+**ATOMS** — the bare vocabulary; only meaningful inside something larger:
+${atoms}.
+
+**BLOCKS** — stand-alone pieces of app. Each IS its surface; build it by COMPOSING
+the atoms listed, not by hand-rolling them inside a bare card:
+${blocks}
+
+**STANDALONE atoms** — attach to anything; use directly, no host block needed:
+${standalone}.
+
+**The rule of reach:** need a data surface? → the **Data table** block (it owns
+toolbar + selection + pagination + empty/loading/error). Need a form? → **Form
+panel**. Need to filter a list? → **Filter bar**. Compose from the ladder; don't
+re-implement what a block already guarantees.`
+}
 
 /**
  * Ready-to-paste prompt for Cursor / v0 / Claude Code / Lovable / Bolt.
@@ -318,6 +360,8 @@ Components ship in three sizes (\`--sm\` / default / \`--lg\`). Pick by context:
 - Row 28px → \`--sm\` variants. Row 32px → default. Row 40px → \`--lg\`.
 
 When in doubt, **pick default**. \`--sm\` and \`--lg\` are explicit opt-ins.
+
+${componentModel()}
 
 ## Components I expect you to build
 
