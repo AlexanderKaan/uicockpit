@@ -20,7 +20,7 @@ import {
  * other view (the target element only exists when Foundations is active). */
 const FND_LINK: Record<string, string> = {
   Color: 'color', Typography: 'typography', Shape: 'shape',
-  Surface: 'elevation', 'Motion & icons': 'motion',
+  Surface: 'surface', 'Motion & icons': 'motion-icons',
 }
 function jumpToFoundation(sec: string) {
   const slug = FND_LINK[sec]

@@ -47,6 +47,9 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
         </p>
       </header>
 
+      {/* Sections mirror the side-panel groups 1:1 — same names, same grouping:
+          Color · Scale · Typography · Shape · Surface · Motion & icons. No section
+          name (e.g. "Space"/"Layout") that the panel doesn't have. */}
       <div className="fnd__grid">
         <Section title="Color" hint={`${cap(cfg.colorTheme)} · ${cap(cfg.palette)}`} wide>
           <SwGroup label="Brand" items={[['--k-primary', 'Primary'], ['--k-primary-soft', 'Primary soft'], ['--k-secondary', 'Secondary'], ['--k-secondary-soft', 'Secondary soft'], ['--k-accent', 'Accent'], ['--k-accent-soft', 'Accent soft']]} val={val} />
@@ -55,6 +58,59 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
           <div className="fnd__sw-group-label">Decorative palette</div>
           <div className="fnd__palette">
             {[1, 2, 3, 4, 5, 6].map((n) => <span key={n} className="fnd__palette-cell" />)}
+          </div>
+        </Section>
+
+        {/* Scale = the panel's single spacing control. Everything it resolves to lives
+            here: density, the spacing grid, and the layout primitives (whose gaps
+            track Scale). No separate "Space"/"Layout" — the panel has neither. */}
+        <Section title="Scale" hint={cap(cfg.scale)} wide>
+          <div className="fnd__sw-group-label">Density — what Scale moves</div>
+          <div className="fnd__density">
+            <div className="fnd__density-cell">
+              <span className="fnd__density-gap" style={{ width: 'var(--k-space)' }} />
+              <span className="fnd__density-meta"><b>Gap</b>{px('--k-space')}</span>
+            </div>
+            <div className="fnd__density-cell">
+              <span className="fnd__density-ctl" style={{ height: 'var(--k-in-h-default)' }} />
+              <span className="fnd__density-meta"><b>Control</b>{px('--k-in-h-default')}</span>
+            </div>
+          </div>
+          <div className="fnd__sw-group-label">Spacing grid (fixed reference)</div>
+          <div className="fnd__space">
+            {[2, 4, 6, 8, 10, 12, 16, 20, 24, 32].map((n) => (
+              <div key={n} className="fnd__space-row">
+                <span className="fnd__space-bar" style={{ width: `var(--k-s-${n})` }} />
+                <span className="fnd__space-label">{n}px</span>
+              </div>
+            ))}
+          </div>
+          <div className="fnd__sw-group-label">Layout — gaps track Scale ({px('--k-space')}, tighter on Compact); measure in ch tracks font</div>
+          <div className="l-stack fnd__layout">
+            <div>
+              <div className="fnd__sw-group-label">Cluster — wraps · gap {px('--k-space')}</div>
+              <div className="l-cluster">{['Design', 'Engineering', 'Product', 'Ops', 'Growth'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
+            </div>
+            <div>
+              <div className="fnd__sw-group-label">Switcher — flips to a column · threshold 28rem</div>
+              <div className="l-switcher">{['Pane A', 'Pane B', 'Pane C'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
+            </div>
+            <div>
+              <div className="fnd__sw-group-label">Grid — responsive auto-fit · min column 16rem</div>
+              <div className="l-grid">{['One', 'Two', 'Three', 'Four', 'Five', 'Six'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
+            </div>
+            <div>
+              <div className="fnd__sw-group-label">Sidebar — side 16rem + flexible main</div>
+              <div className="l-sidebar">
+                <div className="l-sidebar__side"><div className="fnd__l-tile">Side · 16rem</div></div>
+                <div className="l-sidebar__main"><div className="fnd__l-tile">Main — grows, wraps under when narrow</div></div>
+              </div>
+            </div>
+            <div>
+              <div className="fnd__sw-group-label">Center — measure in ch (tracks font)</div>
+              <div className="l-center l-center--narrow"><div className="fnd__l-tile">Narrow · 48ch</div></div>
+              <div className="l-center l-center--wide"><div className="fnd__l-tile">Wide · 90ch</div></div>
+            </div>
           </div>
         </Section>
 
@@ -98,32 +154,8 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
           </div>
         </Section>
 
-        <Section title="Space" hint={cap(cfg.scale)}>
-          {/* Density — the values Scale actually moves (the grid below is a fixed
-              reference). Both visuals resize live as you change Scale. */}
-          <div className="fnd__density">
-            <div className="fnd__density-cell">
-              <span className="fnd__density-gap" style={{ width: 'var(--k-space)' }} />
-              <span className="fnd__density-meta"><b>Gap</b>{px('--k-space')}</span>
-            </div>
-            <div className="fnd__density-cell">
-              <span className="fnd__density-ctl" style={{ height: 'var(--k-in-h-default)' }} />
-              <span className="fnd__density-meta"><b>Control</b>{px('--k-in-h-default')}</span>
-            </div>
-          </div>
-          <div className="fnd__sw-group-label">Grid (reference)</div>
-          <div className="fnd__space">
-            {[2, 4, 6, 8, 10, 12, 16, 20, 24, 32].map((n) => (
-              <div key={n} className="fnd__space-row">
-                <span className="fnd__space-bar" style={{ width: `var(--k-s-${n})` }} />
-                <span className="fnd__space-label">{n}px</span>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        <Section title="Elevation" hint={lbl('surfaceDepth', cfg.surfaceDepth)}>
-          <div className="fnd__active">Active: <b>{lbl('surfaceDepth', cfg.surfaceDepth)}</b></div>
+        <Section title="Surface" hint={`${lbl('surfaceDepth', cfg.surfaceDepth)} · ${lbl('surface', cfg.surface)} · ${lbl('borders', cfg.borders)}`}>
+          <div className="fnd__sw-group-label">Elevation · {lbl('surfaceDepth', cfg.surfaceDepth)}</div>
           <div className="fnd__shadows">
             {([['--k-shadow-xs', 'xs'], ['--k-shadow-sm', 'sm'], ['--k-shadow-md', 'md'], ['--k-shadow-lg', 'lg']] as [string, string][]).map(([v, label]) => (
               <div key={v} className="fnd__shadow-cell">
@@ -132,13 +164,7 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
               </div>
             ))}
           </div>
-        </Section>
-
-        {/* Surface — the panel's "Surface" group also carries treatment + border.
-            Show real .in fields so the separation style (Outlined box / Filled tonal
-            / Plain underline) and the border weight read directly. */}
-        <Section title="Surface" hint={`${lbl('surface', cfg.surface)} · ${lbl('borders', cfg.borders)} border`}>
-          <div className="fnd__sw-group-label">Field separation · {lbl('surface', cfg.surface)}</div>
+          <div className="fnd__sw-group-label">Separation · {lbl('surface', cfg.surface)}</div>
           <div className="fnd__surface-fields">
             <input className="in" defaultValue="Sample field" aria-label="Surface treatment sample" />
             <div className="in in--inline"><Icon name="search" /><input defaultValue="Inline field" aria-label="Inline sample" /></div>
@@ -147,7 +173,8 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
           <div className="fnd__surface-border" />
         </Section>
 
-        <Section title="Motion" hint={cap(cfg.motion)}>
+        <Section title="Motion & icons" hint={`${cap(cfg.motion)} · ${lbl('iconSet', cfg.iconSet)}`}>
+          <div className="fnd__sw-group-label">Motion · {cap(cfg.motion)}</div>
           <p className="fnd__hint-line">Hover a row — the dot makes one real transition at that speed, like a UI state change.</p>
           <div className="fnd__motion">
             {([['Fast', '--k-dur-fast', 'Hover · focus'], ['Normal', '--k-dur', 'Toggle · menu'], ['Slow', '--k-dur-slow', 'Sheet · dialog']] as [string, string, string][]).map(([label, durVar, use]) => (
@@ -162,48 +189,9 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
             <span>Easing</span>
             <b className="fnd__motion-ease-val">{val('--k-ease')}</b>
           </div>
-        </Section>
-
-        <Section title="Icons" hint={lbl('iconSet', cfg.iconSet)}>
+          <div className="fnd__sw-group-label">Icons · {lbl('iconSet', cfg.iconSet)}</div>
           <div className="fnd__icons">
             {ICONS.map((n) => <span key={n} className="fnd__icon"><Icon name={n} /></span>)}
-          </div>
-        </Section>
-
-        {/* Layout — a foundation (segments.ts FOUNDATIONS), not a block: the
-            Every-Layout primitives every page composes with. The scaling note is
-            the honest answer to "does it scale?": gaps fixed on the grid, the
-            centred measure in ch (tracks font), breakpoints in rem (don't wobble). */}
-        <Section title="Layout" hint={`Every-Layout · gap ${px('--k-space')}`} wide>
-          <p className="fnd__hint-line">
-            Shared gap = <b>{px('--k-space')}</b> — the density unit, so the whole layout <b>tightens on Compact</b>.
-            The centred measure is in <b>ch</b> (tracks your font); min/side breakpoints are <b>rem</b> (fixed, so layouts don’t wobble).
-          </p>
-          <div className="l-stack fnd__layout">
-            <div>
-              <div className="fnd__sw-group-label">Cluster — wraps · gap {px('--k-space')}</div>
-              <div className="l-cluster">{['Design', 'Engineering', 'Product', 'Ops', 'Growth'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
-            </div>
-            <div>
-              <div className="fnd__sw-group-label">Switcher — flips to a column · threshold 28rem</div>
-              <div className="l-switcher">{['Pane A', 'Pane B', 'Pane C'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
-            </div>
-            <div>
-              <div className="fnd__sw-group-label">Grid — responsive auto-fit · min column 16rem</div>
-              <div className="l-grid">{['One', 'Two', 'Three', 'Four', 'Five', 'Six'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
-            </div>
-            <div>
-              <div className="fnd__sw-group-label">Sidebar — side 16rem + flexible main</div>
-              <div className="l-sidebar">
-                <div className="l-sidebar__side"><div className="fnd__l-tile">Side · 16rem</div></div>
-                <div className="l-sidebar__main"><div className="fnd__l-tile">Main — grows, wraps under when narrow</div></div>
-              </div>
-            </div>
-            <div>
-              <div className="fnd__sw-group-label">Center — measure in ch (tracks font)</div>
-              <div className="l-center l-center--narrow"><div className="fnd__l-tile">Narrow · 48ch</div></div>
-              <div className="l-center l-center--wide"><div className="fnd__l-tile">Wide · 90ch</div></div>
-            </div>
           </div>
         </Section>
       </div>
@@ -234,8 +222,9 @@ function SwGroup({ label, items, val }: { label: string; items: [string, string]
 }
 
 function Section({ title, hint, children, wide }: { title: string; hint?: string; children: ReactNode; wide?: boolean }) {
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
   return (
-    <section id={`fnd-${title.toLowerCase()}`} className={`card fnd__card${wide ? ' fnd__card--wide' : ''}`}>
+    <section id={`fnd-${slug}`} className={`card fnd__card${wide ? ' fnd__card--wide' : ''}`}>
       <div className="fnd__card-head">
         <h3 className="fnd__card-title">{title}</h3>
         {hint && <span className="fnd__card-hint">{hint}</span>}
