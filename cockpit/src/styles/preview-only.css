@@ -642,14 +642,28 @@
  * Preview chrome only — never ships to a kit consumer. All font-sizes + colours
  * go through --k-* tokens (audit:type/cascade scan this file); widths/paddings
  * are structural px. Everything reads var(--k-*) so it ripples on every change. */
-.fnd { padding: clamp(var(--k-s-20), 4vw, var(--k-s-32)); max-width: 1120px; margin-inline: auto; }
-.fnd__head { margin-bottom: var(--k-s-28); }
-.fnd__eyebrow { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-primary); margin-bottom: var(--k-s-8); }
-.fnd__title { font-size: var(--k-type-h1); font-weight: var(--k-weight-bold); color: var(--k-fg); font-family: var(--k-font-display); margin: 0 0 var(--k-s-8); line-height: 1.1; }
-.fnd__sub { font-size: var(--k-type-body); color: var(--k-fg-muted); max-width: 60ch; margin: 0; }
-.fnd__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: var(--k-s-16); align-items: start; }
+/* Full stage width (like the Blocks gallery) so the masonry gets the same column
+ * count; the grid's justify-content centres the fixed 340px columns. */
+.fnd { padding: clamp(var(--k-s-20), 4vw, var(--k-s-32)); }
+/* Interlocking masonry — same mechanics as the Blocks gallery: fixed 340px columns,
+ * 1px auto-rows (each card's row-span set from its measured height by the JS in
+ * FoundationsView), dense flow packs the gaps, and .fnd__card--wide spans two columns
+ * once two fit (700px container). Vertical gap is baked into the span (row-gap: 0). */
+.fnd__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 340px));
+  justify-content: center;
+  grid-auto-rows: 1px;
+  grid-auto-flow: row dense;
+  column-gap: var(--k-s-20);
+  row-gap: 0;
+  align-items: start;
+  container: fndgrid / inline-size;
+}
 .fnd__card { padding: var(--k-s-16); }
-.fnd__card--wide { grid-column: 1 / -1; }
+@container fndgrid (min-width: 700px) {
+  .fnd__card--wide { grid-column: span 2; }
+}
 .fnd__card-head { display: flex; align-items: baseline; gap: var(--k-s-10); margin-bottom: var(--k-s-14); }
 .fnd__card-title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); color: var(--k-fg); margin: 0; }
 .fnd__card-hint { font-size: var(--k-type-caption); color: var(--k-fg-faint); }

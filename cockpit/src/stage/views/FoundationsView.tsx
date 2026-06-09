@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import type { Config, Tokens } from '../../tokens/types'
 import type { IconName } from '../../icons/concepts'
 import { Icon } from '../../icons/Icon'
@@ -36,21 +36,37 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
     return m ? `${Math.round(parseFloat(m[1] ?? '0') * 16)}px` : s
   }
 
+  // Same interlocking masonry as the Blocks gallery: each section reserves as many
+  // 1px grid-auto-rows as its measured height needs (dense flow packs them tight,
+  // wide cards span two columns). Re-measures on resize + late content via ResizeObserver.
+  const gridRef = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const root = gridRef.current
+    if (!root) return
+    const cards = Array.from(root.querySelectorAll(':scope > .fnd__card')) as HTMLElement[]
+    const layout = () => {
+      const gs = getComputedStyle(root)
+      const ROW = parseFloat(gs.gridAutoRows) || 1
+      const VGAP = parseFloat(gs.columnGap) || 20
+      for (const el of cards) {
+        el.style.gridRowEnd = 'auto'
+        const h = el.getBoundingClientRect().height
+        el.style.gridRowEnd = `span ${Math.max(1, Math.ceil((h + VGAP) / ROW))}`
+      }
+    }
+    layout()
+    const ro = new ResizeObserver(layout)
+    cards.forEach((c) => ro.observe(c))
+    window.addEventListener('resize', layout)
+    return () => { ro.disconnect(); window.removeEventListener('resize', layout) }
+  }, [])
+
   return (
     <div className="fnd">
-      <header className="fnd__head">
-        <div className="fnd__eyebrow">Foundation</div>
-        <h1 className="fnd__title">Your design language, resolved</h1>
-        <p className="fnd__sub">
-          The token scales every Atom, Block and Page inherits — with their live
-          values. Author them on the left; watch the numbers and visuals move here.
-        </p>
-      </header>
-
       {/* Sections mirror the side-panel groups 1:1 — same names, same grouping:
-          Color · Scale · Typography · Shape · Surface · Motion & icons. No section
-          name (e.g. "Space"/"Layout") that the panel doesn't have. */}
-      <div className="fnd__grid">
+          Color · Scale · Typography · Shape · Surface · Motion & icons. They pack into
+          the same interlocking masonry as the Blocks gallery (row-span by height). */}
+      <div className="fnd__grid" ref={gridRef}>
         <Section title="Color" hint={`${cap(cfg.colorTheme)} · ${cap(cfg.palette)}`} wide>
           <SwGroup label="Brand" items={[['--k-primary', 'Primary'], ['--k-primary-soft', 'Primary soft'], ['--k-secondary', 'Secondary'], ['--k-secondary-soft', 'Secondary soft'], ['--k-accent', 'Accent'], ['--k-accent-soft', 'Accent soft']]} val={val} />
           <SwGroup label="System" items={[['--k-success', 'Success'], ['--k-warning', 'Warning'], ['--k-danger', 'Danger'], ['--k-info', 'Info']]} val={val} />
