@@ -12,60 +12,56 @@
  */
 import type { Recipe } from './types'
 import { RECIPES } from './recipes'
+import { idsByTier } from './segments'
 
 export type { Recipe } from './types'
 export { globalLayer } from './globalLayer'
 export { RECIPES } from './recipes'
 
 /**
- * Component TAXONOMY — the system's three tiers (a recipe is a `primitive`
- * unless listed here). This is the single source for "what IS the design system"
- * vs "what's a composition you can copy":
- *   - PRIMITIVE → the reusable vocabulary with state contracts (button, card,
- *     input, table, dialog…). These + the tokens + the binding rules ARE the
- *     system; they're what guarantees a consumer's UI looks like the preview.
- *   - HELPER    → structural / layout / motion glue (toolbar, separator, the
- *     menu roll-down stagger). Systemic, but not a "component".
- *   - PATTERN   → a composition assembled FROM primitives (auth screen, pricing
- *     table, stat tile…). Useful as a copy-paste block; NOT part of the spine.
+ * Component MODEL — the 4-layer ladder. The full graph (tiers + `uses` edges +
+ * the orphan-atom worklist) lives in `./segments`; re-exported here so consumers
+ * import the kit's model from one place.
+ *   - FOUNDATION → tokens + token/motion/layout glue, upstream of the catalog.
+ *   - ATOM       → the bare vocabulary; only meaningful inside something larger.
+ *   - BLOCK      → stands on its own as a piece of app; the surface IS the
+ *                  component, composed FROM atoms (its declared `uses`).
+ *   - PAGE       → an assembly of blocks = a realistic screen (external SupaDash).
  */
-export type Tier = 'primitive' | 'helper' | 'pattern'
-export const TIER: Readonly<Record<string, Exclude<Tier, 'primitive'>>> = {
-  // Structural / layout / motion helpers
-  toolbar: 'helper', separator: 'helper', twocolumnlayout: 'helper',
-  'roll-down-item-stagger': 'helper', 'button-finish': 'helper',
-  'interactive-list-row': 'helper', 'inline-status-meta-micro-components': 'helper',
-  // Compositions (blocks)
-  'activity-feed': 'pattern', 'danger-zone': 'pattern', auth: 'pattern',
-  lightbox: 'pattern', sparkline: 'pattern',
-  'usage-meter': 'pattern',
-  'attachment-chip-family': 'pattern',
-  carousel: 'pattern',
-  infocard: 'pattern', timeline: 'pattern',
-  'stat-tile': 'pattern', pricing: 'pattern',
-  wizardstepper: 'pattern', 'file-grid': 'pattern',
-}
-export const tierOf = (id: string): Tier => TIER[id] ?? 'primitive'
+export type { Tier } from './segments'
+export { tierOf, usesOf, idsByTier, orphanAtoms, FOUNDATIONS, BLOCK_USES } from './segments'
 
 /** A human-readable manifest banner that heads the assembled CSS, so anyone
- * reading the shipped kit sees the spine (primitives) separated from the
- * compositions (patterns) at a glance — without reordering the cascade. */
+ * reading the shipped kit sees the ladder — Foundation / Atom / Block — at a
+ * glance, without reordering the cascade. Derived from the segment graph. */
 function manifest(recipes: readonly Recipe[]): string {
-  const by = (t: Tier) => recipes.filter((r) => tierOf(r.id) === t).map((r) => r.section).join(', ')
-  const prim = by('primitive'), help = by('helper'), patt = by('pattern')
+  const sectionsFor = (t: 'foundation' | 'atom' | 'block') =>
+    idsByTier(t, recipes)
+      .map((id) => recipes.find((r) => r.id === id)?.section)
+      .filter(Boolean)
+      .join(', ')
+  const found = sectionsFor('foundation'), atoms = sectionsFor('atom'), blocks = sectionsFor('block')
   const n = (s: string) => (s ? s.split(', ').length : 0)
   return `/* ========================================================================
- * UIcockpit kit — component manifest (one config → this whole system)
+ * UIcockpit kit — the design contract (one config → this whole system)
  *
- * PRIMITIVES — the design system (${n(prim)}): the reusable vocabulary + state
- *   contracts. These + the tokens + the binding rules guarantee your UI looks
- *   like the configurator preview.
- *     ${prim}
+ * The 4-layer ladder. Style the FOUNDATION once; every layer above inherits it,
+ * so your UI looks like the configurator preview — not a default.
  *
- * HELPERS — structural glue (${n(help)}): ${help}
+ * FOUNDATION — the token layer (colour · type · shape · space · motion, in the
+ *   :root / .dark blocks above) + ${n(found)} structural/motion glue upstream of
+ *   the catalog:
+ *     ${found}
  *
- * PATTERNS — copy-paste compositions (${n(patt)}), built FROM the primitives:
- *     ${patt}
+ * ATOMS — the bare vocabulary (${n(atoms)}): the reusable elements with real
+ *   state contracts. Only meaningful inside something larger; these + the tokens
+ *   are what guarantee a consumer's UI looks like the preview.
+ *     ${atoms}
+ *
+ * BLOCKS — stand-alone pieces of app (${n(blocks)}), composed FROM the atoms — the
+ *   surface IS the component (dialog, sidebar, data tiles, auth, …). Blocks
+ *   assemble into PAGES (your screens).
+ *     ${blocks}
  * ======================================================================== */`
 }
 

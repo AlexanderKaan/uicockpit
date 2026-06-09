@@ -1,4 +1,4 @@
-# Segment Registry — v0
+# Segment Registry
 
 The single vocabulary for UICockpit's component model. Every recipe is one
 **segment** classified into the 4-layer ladder, with explicit `uses` edges (the
@@ -6,6 +6,14 @@ composition graph). This is the seed of "one source / one language": from this
 graph the front-end (workbench / blocks catalog / pages), the exports, the
 distribution dependency-closure, the cross-links and the audits are all *derived*
 — no separate demo/app/recipe languages synced by greps.
+
+> **Encoded (North Star step 1).** The graph below is no longer paper — it lives
+> in **`cockpit/src/kit/segments.ts`** (`FOUNDATIONS`, `BLOCK_USES`, `tierOf`,
+> `usesOf`, `orphanAtoms`), heads every exported kit via the manifest banner, and
+> is guarded by **`src/kit/__tests__/segments.test.ts`** (every `uses` edge points
+> at a real recipe; tiers partition cleanly; the orphan list is asserted). This
+> doc holds the human rationale + per-segment notes; `segments.ts` is the machine
+> truth. Edit the graph there; this doc follows.
 
 ## The 4-layer model
 
@@ -150,6 +158,35 @@ roll-down-stagger→Foundation, button-finish→Foundation.
 
 **Merge candidates:** `form` + `form-primitives` (one form-field atom);
 `interactive-list-row` into `list`.
+
+## Orphan-atom worklist (the coverage contract, derived)
+
+`orphanAtoms()` = atoms that **no block declares in its `uses`**. Per the locked
+coverage rule, every atom must have ≥1 parent block; an orphan is a worklist item
+→ **build its home block, or cut/merge.** This list *drives* which blocks to build
+next (the Gaps below). It **shrinks** as blocks land; `segments.test.ts` asserts it,
+so each shrink is a conscious, tracked event.
+
+**34 orphans today** (of 48 atoms — only 14 are parented at v0, because the block
+layer is still sparse). Most are not "unused" — they render directly in SupaDash
+*pages*; they simply have no **block** wrapping them yet. Grouped by the block that
+will adopt them:
+
+| Future block (the Gap) | Adopts these orphan atoms |
+|---|---|
+| **data-table** (flagship, step 2) | `table`, `toolbar`, `pagination-breadcrumb`, `select-trigger` |
+| **form-panel** | `form`, `numberinput`, `passwordinput`, `phoneinput`, `combobox`, `tag-input`, `input-otp`, `radio-card`, `switch-toggle`, `slider` |
+| **app-shell / page-header** | `navigation-menu`, `tabs`, `separator`, `banner` |
+| **detail / record view** | `description-list`, `accordion`, `alert` |
+| overlay/utility (likely stay atoms, or small blocks) | `popover`, `hover-card`, `context-menu`, `tooltip`, `segmented-control-toggle-group`, `button-group`, `aspect-ratio`, `scroll-area`, `skeleton`, `spinner`, `attachment-chip-family`, `inline-status-meta-micro-components` |
+| **cut / merge** | `interactive-list-row` → merge into `list` |
+
+> Borderline atoms (`popover`, `tooltip`, `context-menu`, `hover-card`,
+> `segmented-control-toggle-group`…) are genuinely "only meaningful inside
+> something" yet have no single home block — these are the candidates to either
+> bless as **always-atoms** (relax the contract for true overlay/utility
+> primitives) or seat inside a host block when one is built. Decide per-atom as the
+> blocks land; don't force a fake parent.
 
 ## Gaps the graph reveals (blocks we *assemble in-app* but don't ship as a segment)
 

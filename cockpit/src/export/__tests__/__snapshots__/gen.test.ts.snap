@@ -704,17 +704,25 @@ body {
 }
 
 /* ========================================================================
- * UIcockpit kit — component manifest (one config → this whole system)
+ * UIcockpit kit — the design contract (one config → this whole system)
  *
- * PRIMITIVES — the design system (55): the reusable vocabulary + state
- *   contracts. These + the tokens + the binding rules guarantee your UI looks
- *   like the configurator preview.
- *     Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Empty state, Select trigger, Spinner, Navigation row, Sidebar, Calendar, KBD, Code, Dialog, Command palette, Accordion, Pagination & breadcrumb, Chart, Combobox, Dropdown menu, Menubar, Resizable, Stepper, File upload dropzone, Toast stack, Tag input, Popover, Hover Card, Sheet / Drawer, Segmented control / Toggle group, Description list, Banner, Alert Dialog, Input OTP, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, CodeBlock, Radio card
+ * The 4-layer ladder. Style the FOUNDATION once; every layer above inherits it,
+ * so your UI looks like the configurator preview — not a default.
  *
- * HELPERS — structural glue (7): Toolbar, Button finish, Interactive list row, Roll-down item stagger, Separator, Inline status & meta micro-components, TwoColumnLayout
+ * FOUNDATION — the token layer (colour · type · shape · space · motion, in the
+ *   :root / .dark blocks above) + 3 structural/motion glue upstream of
+ *   the catalog:
+ *     Button finish, Roll-down item stagger, TwoColumnLayout
  *
- * PATTERNS — copy-paste compositions (14), built FROM the primitives:
- *     Activity feed, Danger zone, Auth, Lightbox, Sparkline, Usage meter, Stat tile, Attachment chip family, Carousel, InfoCard, Timeline, Pricing, WizardStepper, File grid
+ * ATOMS — the bare vocabulary (48): the reusable elements with real
+ *   state contracts. Only meaningful inside something larger; these + the tokens
+ *   are what guarantee a consumer's UI looks like the preview.
+ *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card
+ *
+ * BLOCKS — stand-alone pieces of app (25), composed FROM the atoms — the
+ *   surface IS the component (dialog, sidebar, data tiles, auth, …). Blocks
+ *   assemble into PAGES (your screens).
+ *     Empty state, Sidebar, Activity feed, Danger zone, Auth, Lightbox, Calendar, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, Pricing, WizardStepper, File grid
  * ======================================================================== */
 
 /* === Toolbar ===
