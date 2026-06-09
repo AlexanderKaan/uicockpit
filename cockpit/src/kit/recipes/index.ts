@@ -4455,4 +4455,33 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .formpanel__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; padding: var(--k-s-12) var(--k-s-16); border-top: var(--k-divider); background: var(--k-surface-sunken); }
 .formpanel__foot-note { margin-right: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); }`,
   },
+  {
+    id: 'filter-bar',
+    section: "Filter bar",
+    css: `/* === Filter bar ===
+   The query BLOCK that sits above a list or table: a search field, faceted selects,
+   an autocomplete, a range, plus an active-filter chip row that summarises and
+   clears the current query. COMPOSES the querying atoms (.searchinput · .select /
+   .combobox · .taginput chips · .segctrl · .slider) on the height-invariant
+   .toolbar, so a real filtering UI is rebuildable from the kit.
+
+   Anatomy
+     .filterbar                  frame (surface + border + radius)
+       .toolbar                  the controls row (search · selects · range · actions)
+       .filterbar__active        active-filter chips + "Clear all" (only when filtered)
+         .filterbar__active-label
+       .filterbar__count         result count (trailing, in the active row) */
+.filterbar { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); padding: var(--k-s-12); display: flex; flex-direction: column; gap: var(--k-s-10); }
+/* A labelled control cluster inside the bar (e.g. "Score" + a slider) — the eyebrow
+ * names the control without stealing height from the toolbar's one-row invariant. */
+.filterbar__group { display: inline-flex; align-items: center; gap: var(--k-s-8); white-space: nowrap; }
+.filterbar__group-label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
+/* Active-filter row — divider above, the current facets as removable chips, a
+ * trailing result count, and a text "Clear all". Hidden until something is filtered. */
+.filterbar__active { display: flex; align-items: center; flex-wrap: wrap; gap: var(--k-s-8); padding-top: var(--k-s-10); border-top: var(--k-divider); }
+.filterbar__active-label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
+.filterbar__count { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); white-space: nowrap; }
+.filterbar__clear { font-size: var(--k-type-small); color: var(--k-primary); background: none; border: 0; cursor: pointer; padding: 0; }
+.filterbar__clear:hover { text-decoration: underline; }`,
+  },
 ]

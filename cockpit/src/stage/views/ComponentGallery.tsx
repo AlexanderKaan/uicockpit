@@ -57,7 +57,7 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
   const CARDS = [
     FormCard, ValidationCard, StatCard, SwitchCard, SelectionCard, TableCard,
     SliderCard, SearchInputCard, RadioCardCard, ChartCard, DateCard,
-    PasswordInputCard, BannerCard, PopoverCard, NumberInputCard, DataTableProCard, FormPanelCard,
+    PasswordInputCard, BannerCard, PopoverCard, NumberInputCard, DataTableProCard, FormPanelCard, FilterBarCard,
     ComboboxCard, DialogCard, KanbanCard, PhoneInputCard, SelectCard, SlotPickerCard,
     PricingCardCard, TagInputCard, AvatarCard, TabsCard, DropzoneCard, TooltipCard,
     CodeBlockCard, SheetCard, InputOtpCard, DescriptionListCard, HoverCardCard,
@@ -1137,6 +1137,52 @@ function FormPanelCard() {
   )
 }
 
+// Filter bar — the query block above a list/table: a search field, a faceted
+// select, a scope segmented control, a range slider, and an active-filter chip row
+// (removable taginput chips + result count + Clear all). Composes searchinput ·
+// select-trigger · segctrl · slider · taginput + buttons on the .toolbar.
+function FilterBarCard() {
+  const [q, setQ] = useState('')
+  const [view, setView] = useState('all')
+  const [score, setScore] = useState(60)
+  const [chips, setChips] = useState(['status: open', 'env: prod'])
+  return (
+    <Card wide title="Filter bar" desc="Search, facets, range & active-filter chips — the query block.">
+      <div className="filterbar">
+        <div className="toolbar toolbar--sm">
+          <div className="searchinput" style={{ maxWidth: 200 }}>
+            <Icon name="search" />
+            <input className="searchinput__field" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" aria-label="Search" />
+            {q && <button className="searchinput__clear" onClick={() => setQ('')} aria-label="Clear">×</button>}
+          </div>
+          <select className="select" aria-label="Status" style={{ width: 'auto' }}><option>Any status</option><option>Open</option><option>Closed</option></select>
+          <div className="segctrl" role="tablist" aria-label="Scope">
+            {(['all', 'mine'] as const).map((s) => (
+              <button key={s} role="tab" aria-selected={view === s} className={`segctrl__btn ${view === s ? 'segctrl__btn--on' : ''}`} onClick={() => setView(s)}>{s === 'all' ? 'All' : 'Mine'}</button>
+            ))}
+          </div>
+          <div className="filterbar__group">
+            <span className="filterbar__group-label">Min score</span>
+            <div style={{ width: 116 }}><InteractiveSlider value={score} ariaLabel="Minimum score" onChange={setScore} /></div>
+          </div>
+          <span className="toolbar__spacer" />
+          <button className="btn btn--secondary btn--sm"><Icon name="plus" /> Save view</button>
+        </div>
+        {chips.length > 0 && (
+          <div className="filterbar__active">
+            <span className="filterbar__active-label">Active</span>
+            {chips.map((c) => (
+              <span key={c} className="taginput__chip">{c}<button type="button" className="taginput__remove" onClick={() => setChips(chips.filter((x) => x !== c))} aria-label={`Remove ${c}`}><Icon name="x" size={11} /></button></span>
+            ))}
+            <button className="filterbar__clear" onClick={() => setChips([])}>Clear all</button>
+            <span className="filterbar__count">128 results</span>
+          </div>
+        )}
+      </div>
+    </Card>
+  )
+}
+
 // ---- TreeView ----
 function TreeRow({ label, expanded, onClick, leaf, selected }: { label: string; expanded?: boolean; onClick?: () => void; leaf?: boolean; selected?: boolean }) {
   return (
@@ -1968,6 +2014,9 @@ function LoginCard() {
 // Create account — SSO, name/email/password, terms gate on the CTA.
 function SignupCard() {
   const [agree, setAgree] = useState(false)
+  const [show, setShow] = useState(false)
+  const [pwd, setPwd] = useState('')
+  const strength = Math.min(3, Math.floor(pwd.length / 4))
   return (
     <Card>
       <div className="auth">
@@ -1979,7 +2028,25 @@ function SignupCard() {
         <div className="divider-or">or</div>
         <label className="lab" htmlFor="signup-name"><span>Full name</span><input id="signup-name" className="in" placeholder="Ava Chen" /></label>
         <label className="lab" htmlFor="signup-email"><span>Work email</span><input id="signup-email" className="in" type="email" placeholder="you@company.com" /></label>
-        <label className="lab" htmlFor="signup-password"><span>Password</span><input id="signup-password" className="in" type="password" placeholder="8+ characters" /></label>
+        <div className="lab">
+          <span>Password</span>
+          <div className="pwinput">
+            <input id="signup-password" type={show ? 'text' : 'password'} className="pwinput__field" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="At least 8 characters" />
+            <button type="button" className="pwinput__eye" onClick={() => setShow((v) => !v)} aria-label={show ? 'Hide' : 'Show'}>
+              {show ? (
+                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden><path d="M1 8 C 3 4 5 3 8 3 C 11 3 13 4 15 8 C 13 12 11 13 8 13 C 5 13 3 12 1 8 Z M 1 1 L 15 15" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
+              ) : (
+                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden><path d="M1 8 C 3 4 5 3 8 3 C 11 3 13 4 15 8 C 13 12 11 13 8 13 C 5 13 3 12 1 8 Z" fill="none" stroke="currentColor" strokeWidth="1.4" /><circle cx="8" cy="8" r="2" fill="currentColor" /></svg>
+              )}
+            </button>
+          </div>
+          <div className="pwinput__strength">
+            {[0, 1, 2].map((i) => (
+              <span key={i} className={'pwinput__bar' + (i <= strength ? ' pwinput__bar--on' : '')} data-level={strength} />
+            ))}
+            <span className="pwinput__label">{strength <= 0 ? 'Too short' : strength === 1 ? 'Weak' : strength === 2 ? 'Fair' : 'Strong'}</span>
+          </div>
+        </div>
         <label className="check" style={{ gap: 6, alignItems: 'flex-start' }}>
           <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
           <span>I agree to the <button type="button" className="auth__link">Terms</button> &amp; <button type="button" className="auth__link">Privacy Policy</button></span>

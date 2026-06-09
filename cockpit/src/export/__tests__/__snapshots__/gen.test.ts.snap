@@ -719,10 +719,10 @@ body {
  *   are what guarantee a consumer's UI looks like the preview.
  *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card
  *
- * BLOCKS — stand-alone pieces of app (27), composed FROM the atoms — the
+ * BLOCKS — stand-alone pieces of app (28), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …). Blocks
  *   assemble into PAGES (your screens).
- *     Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Lightbox, Calendar, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, Pricing, WizardStepper, File grid, Form panel
+ *     Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Lightbox, Calendar, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, Pricing, WizardStepper, File grid, Form panel, Filter bar
  * ======================================================================== */
 
 /* === Toolbar ===
@@ -4931,6 +4931,32 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * action trailing right. */
 .formpanel__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; padding: var(--k-s-12) var(--k-s-16); border-top: var(--k-divider); background: var(--k-surface-sunken); }
 .formpanel__foot-note { margin-right: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); }
+
+/* === Filter bar ===
+   The query BLOCK that sits above a list or table: a search field, faceted selects,
+   an autocomplete, a range, plus an active-filter chip row that summarises and
+   clears the current query. COMPOSES the querying atoms (.searchinput · .select /
+   .combobox · .taginput chips · .segctrl · .slider) on the height-invariant
+   .toolbar, so a real filtering UI is rebuildable from the kit.
+
+   Anatomy
+     .filterbar                  frame (surface + border + radius)
+       .toolbar                  the controls row (search · selects · range · actions)
+       .filterbar__active        active-filter chips + "Clear all" (only when filtered)
+         .filterbar__active-label
+       .filterbar__count         result count (trailing, in the active row) */
+.filterbar { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); padding: var(--k-s-12); display: flex; flex-direction: column; gap: var(--k-s-10); }
+/* A labelled control cluster inside the bar (e.g. "Score" + a slider) — the eyebrow
+ * names the control without stealing height from the toolbar's one-row invariant. */
+.filterbar__group { display: inline-flex; align-items: center; gap: var(--k-s-8); white-space: nowrap; }
+.filterbar__group-label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
+/* Active-filter row — divider above, the current facets as removable chips, a
+ * trailing result count, and a text "Clear all". Hidden until something is filtered. */
+.filterbar__active { display: flex; align-items: center; flex-wrap: wrap; gap: var(--k-s-8); padding-top: var(--k-s-10); border-top: var(--k-divider); }
+.filterbar__active-label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
+.filterbar__count { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); white-space: nowrap; }
+.filterbar__clear { font-size: var(--k-type-small); color: var(--k-primary); background: none; border: 0; cursor: pointer; padding: 0; }
+.filterbar__clear:hover { text-decoration: underline; }
 "
 `;
 

@@ -98,12 +98,13 @@ were mis-filed as `helper` and are really foundations:
 
 ---
 
-## Blocks (catalog, surface = component) — 27
+## Blocks (catalog, surface = component) — 28
 
 | id | uses | note |
 |---|---|---|
 | `data-table` | table, toolbar, pagination-breadcrumb, select-trigger | **the flagship** — matrix-complete: toolbar · selection/bulk bar · empty/loading/error state slot · footer (rows-per-page + pagination) · content-stress helpers. North Star step 2; first Gap closed. |
 | `form-panel` | form, form-primitives, buttons, select-trigger, numberinput, phoneinput, switch-toggle, radio-card | the editing surface — header · labelled fields on a responsive grid · titled sections · inline validation summary · footer action bar. North Star step 3; the `form-panel` Gap closed. |
+| `filter-bar` | searchinput, tag-input, select-trigger, segmented-control-toggle-group, slider, buttons | the query surface above a list/table — search · facet selects · scope toggle · range slider · active-filter chip row (count + Clear all). North Star step 4a. |
 | `sidebar` | navigation-row, avatar, badges-pills | app-shell nav — *genuinely comes in the jacket* |
 | `dialog` | card, buttons | overlay block |
 | `alert-dialog` | card, buttons | confirm modal |
@@ -112,7 +113,7 @@ were mis-filed as `helper` and are really foundations:
 | `toast-stack` | — | overlay block |
 | `lightbox` | buttons | **was pattern** fullscreen viewer |
 | `empty-state` | buttons | complete "state" block |
-| `auth` | form-primitives, buttons, card | **was pattern** login/signup |
+| `auth` | form-primitives, passwordinput, buttons, card | **was pattern** login/signup — Signup composes the `.pwinput` (eye + strength) |
 | `wizardstepper` | stepper, form-primitives, buttons | **was pattern** multi-step |
 | `file-upload-dropzone` | buttons | |
 | `file-grid` | card, badges-pills | **was pattern** |
@@ -148,8 +149,8 @@ e.g. `Docs` → uses: sidebar, menubar, toolbar, tabs, resizable, codeblock, lis
 | Tier | count |
 |---|---|
 | Foundation (recipe-level) | 3 (+ the token system) |
-| Atom | 48 |
-| Block | 27 |
+| Atom | 48 (26 composed by a block · 22 blessed standalone) |
+| Block | 28 |
 | Page | ~11 (external, SupaDash) |
 
 **`helper` is dissolved (7 → resolved):** toolbar→Atom, separator→Atom,
@@ -163,34 +164,33 @@ roll-down-stagger→Foundation, button-finish→Foundation.
 
 ## Orphan-atom worklist (the coverage contract, derived)
 
-`orphanAtoms()` = atoms that **no block declares in its `uses`**. Per the locked
-coverage rule, every atom must have ≥1 parent block; an orphan is a worklist item
-→ **build its home block, or cut/merge.** This list *drives* which blocks to build
-next (the Gaps below). It **shrinks** as blocks land; `segments.test.ts` asserts it,
-so each shrink is a conscious, tracked event.
+The coverage contract: **every atom is either composed by a block OR blessed as a
+legitimately-standalone primitive.** `orphanAtoms()` = atoms that are neither — it
+should stay **empty**, and `segments.test.ts` asserts it. The list *drove* which
+blocks to build (34 → 30 → 25 → **0**).
 
-**25 orphans today** (of 48 atoms — 23 parented). Down from 34: **data-table**
-(step 2) adopted `table·toolbar·pagination-breadcrumb·select-trigger`; **form-panel**
-(step 3) adopted `form·switch-toggle·numberinput·phoneinput·radio-card`. Most
-remaining orphans are not "unused" — they render directly in SupaDash *pages*; they
-simply have no **block** wrapping them yet. Grouped by the block that will adopt them:
+**✅ Converged — 0 orphans.** History:
+- `data-table` (step 2) adopted `table·toolbar·pagination-breadcrumb·select-trigger` (34→30)
+- `form-panel` (step 3) adopted `form·switch-toggle·numberinput·phoneinput·radio-card` (30→25)
+- `filter-bar` adopted `slider·tag-input`, `auth` adopted `passwordinput`, and the
+  remaining overlay/utility/standalone-control primitives were **blessed**
+  (`STANDALONE_ATOMS`) (25→**0**)
 
-| Future block (the Gap) | Adopts these orphan atoms |
-|---|---|
-| ~~**data-table**~~ ✅ **shipped (step 2)** | ~~`table`, `toolbar`, `pagination-breadcrumb`, `select-trigger`~~ — now parented |
-| ~~**form-panel**~~ ✅ **shipped (step 3)** | ~~`form`, `switch-toggle`, `numberinput`, `phoneinput`, `radio-card`~~ — now parented |
-| **auth** (extend) / **filter-bar** | `passwordinput`, `input-otp` (→ auth); `combobox`, `tag-input`, `slider` (→ a filter/query bar) |
-| **app-shell / page-header** | `navigation-menu`, `tabs`, `separator`, `banner` |
-| **detail / record view** | `description-list`, `accordion`, `alert` |
-| overlay/utility (likely stay atoms, or small blocks) | `popover`, `hover-card`, `context-menu`, `tooltip`, `segmented-control-toggle-group`, `button-group`, `aspect-ratio`, `scroll-area`, `skeleton`, `spinner`, `attachment-chip-family`, `inline-status-meta-micro-components` |
-| **cut / merge** | `interactive-list-row` → merge into `list` |
+### Blessed standalone atoms (`STANDALONE_ATOMS`, 22)
+Primitives that attach to *anything* and have no single host block, so they satisfy
+coverage on their own (forcing a fake parent would be dishonest):
+- **overlays** — tooltip · popover · hover-card · context-menu
+- **standalone controls / nav** — tabs · accordion · segmented-control · navigation-menu · button-group
+- **self-contained input controls** — input-otp · combobox · interactive-list-row (`.list__row`)
+- **inline messaging / status** — alert · banner · inline-status-micro · attachment-chip-family
+- **loading & layout utilities** — skeleton · spinner · separator · aspect-ratio · scroll-area
+- **data-display** — description-list
 
-> Borderline atoms (`popover`, `tooltip`, `context-menu`, `hover-card`,
-> `segmented-control-toggle-group`…) are genuinely "only meaningful inside
-> something" yet have no single home block — these are the candidates to either
-> bless as **always-atoms** (relax the contract for true overlay/utility
-> primitives) or seat inside a host block when one is built. Decide per-atom as the
-> blocks land; don't force a fake parent.
+> The registry's deliberate answer to "atoms only meaningful *inside* something but
+> belonging to no single block": bless them, don't force a parent. The blessing is a
+> tracked classification (in `segments.ts`, asserted in the test), not a loophole.
+> Remaining Gaps below (app-shell, stat-row, detail-view) are *enrichments*, not
+> coverage requirements.
 
 ## Gaps the graph reveals (blocks we *assemble in-app* but don't ship as a segment)
 

@@ -3,10 +3,12 @@ import { RECIPES } from '../recipes'
 import {
   FOUNDATIONS,
   BLOCK_USES,
+  STANDALONE_ATOMS,
   tierOf,
   usesOf,
   idsByTier,
   orphanAtoms,
+  isCovered,
 } from '../segments'
 
 const IDS = new Set(RECIPES.map((r) => r.id))
@@ -39,11 +41,22 @@ describe('segment graph integrity', () => {
     expect(f + a + b).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 3 · Block 27 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 3 · Block 28 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('block')).toHaveLength(Object.keys(BLOCK_USES).length)
     expect(idsByTier('foundation')).toHaveLength(3)
-    expect(idsByTier('block')).toHaveLength(27)
+    expect(idsByTier('block')).toHaveLength(28)
+  })
+
+  it('every standalone-blessed id is a real ATOM (not a block/foundation)', () => {
+    for (const id of STANDALONE_ATOMS) {
+      expect(IDS.has(id), `unknown standalone: ${id}`).toBe(true)
+      expect(tierOf(id), `${id} is blessed standalone but isn't an atom`).toBe('atom')
+    }
+  })
+
+  it('every atom is covered — composed by a block OR blessed standalone', () => {
+    for (const id of idsByTier('atom')) expect(isCovered(id), `uncovered atom: ${id}`).toBe(true)
   })
 
   it('usesOf returns [] for atoms and foundations', () => {
@@ -60,37 +73,11 @@ describe('orphan-atom worklist', () => {
   // assertion goes red — update it consciously; the shrink is the signal that the
   // contract got thicker.
   //
-  // History: 34 → 30 when the data-table block landed (step 2), adopting table ·
-  // toolbar · pagination-breadcrumb · select-trigger. 30 → 25 when the form-panel
-  // block landed (step 3), adopting form · switch-toggle · numberinput ·
-  // phoneinput · radio-card.
-  it('matches the tracked orphan list', () => {
-    expect(orphanAtoms()).toEqual([
-      'button-group',
-      'aspect-ratio',
-      'scroll-area',
-      'alert',
-      'tabs',
-      'tooltip',
-      'slider',
-      'skeleton',
-      'spinner',
-      'interactive-list-row',
-      'accordion',
-      'combobox',
-      'tag-input',
-      'popover',
-      'hover-card',
-      'segmented-control-toggle-group',
-      'separator',
-      'description-list',
-      'banner',
-      'input-otp',
-      'attachment-chip-family',
-      'inline-status-meta-micro-components',
-      'navigation-menu',
-      'context-menu',
-      'passwordinput',
-    ])
+  // History: 34 → 30 (data-table, step 2) → 25 (form-panel, step 3) → 0 (step 4a):
+  // filter-bar adopted slider·tag-input, auth adopted passwordinput, and the
+  // remaining overlay/utility/standalone-control primitives were blessed as
+  // STANDALONE_ATOMS. The coverage contract is now fully satisfied — keep it there.
+  it('has converged: zero orphan atoms', () => {
+    expect(orphanAtoms()).toEqual([])
   })
 })

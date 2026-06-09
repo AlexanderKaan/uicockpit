@@ -591,12 +591,6 @@ function Projects() {
             <button role="tab" aria-selected={view === 'table'} className={`segctrl__btn ${view === 'table' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('table')}>Table</button>
             <button role="tab" aria-selected={view === 'board'} className={`segctrl__btn ${view === 'board' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('board')}>Board</button>
           </div>
-          {view === 'table' && (
-            <div className="in in--inline" style={{ maxWidth: 240 }}>
-              <Icon name="search" />
-              <input type="search" aria-label="Filter issues" placeholder="Filter issues…" value={q} onChange={(e) => setQ(e.target.value)} />
-            </div>
-          )}
           <button className="btn btn--primary btn--sm" onClick={() => setSheetOpen(true)}>
             <Icon name="plus" /> New issue
           </button>
@@ -604,38 +598,48 @@ function Projects() {
       </div>
 
       {view === 'board' ? <BoardView /> : <>
-      {/* Tag-input pattern — filter chips for environment */}
-      <div className="card__row" style={{ marginBottom: 14, alignItems: 'center' }}>
-        <span style={{ fontSize: 'var(--k-type-eyebrow)', color: 'var(--k-fg-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>
-          Env
-        </span>
-        <div className="taginput" style={{ flex: 1, maxWidth: 380 }}>
-          {envFilters.map((t) => (
-            <span key={t} className="taginput__chip">
-              {t}
-              <button
-                type="button"
-                className="taginput__remove"
-                onClick={() => setEnvFilters(envFilters.filter((x) => x !== t))}
-                aria-label={`Remove ${t}`}
-              >
-                <Icon name="x" size={11} />
-              </button>
-            </span>
-          ))}
-          <input
-            aria-label="Add environment tag"
-            value={envDraft}
-            onChange={(e) => setEnvDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && envDraft.trim() && !envFilters.includes(envDraft.trim())) {
-                setEnvFilters([...envFilters, envDraft.trim()])
-                setEnvDraft('')
-              }
-            }}
-            placeholder={envFilters.length === 0 ? 'Add env tag…' : ''}
-          />
+      {/* FilterBar block — the query surface above the data-table: search +
+          an env tag-input, with an active-filter summary row (count + Clear all). */}
+      <div className="filterbar" style={{ marginBottom: 14 }}>
+        <div className="toolbar toolbar--sm">
+          <div className="searchinput" style={{ maxWidth: 240 }}>
+            <Icon name="search" />
+            <input className="searchinput__field" type="search" aria-label="Filter issues" placeholder="Filter issues…" value={q} onChange={(e) => setQ(e.target.value)} />
+            {q && <button type="button" className="searchinput__clear" onClick={() => setQ('')} aria-label="Clear search">×</button>}
+          </div>
+          <div className="filterbar__group">
+            <span className="filterbar__group-label">Env</span>
+            <div className="taginput" style={{ minWidth: 180 }}>
+              {envFilters.map((t) => (
+                <span key={t} className="taginput__chip">
+                  {t}
+                  <button type="button" className="taginput__remove" onClick={() => setEnvFilters(envFilters.filter((x) => x !== t))} aria-label={`Remove ${t}`}>
+                    <Icon name="x" size={11} />
+                  </button>
+                </span>
+              ))}
+              <input
+                aria-label="Add environment tag"
+                value={envDraft}
+                onChange={(e) => setEnvDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && envDraft.trim() && !envFilters.includes(envDraft.trim())) {
+                    setEnvFilters([...envFilters, envDraft.trim()])
+                    setEnvDraft('')
+                  }
+                }}
+                placeholder={envFilters.length === 0 ? 'Add env tag…' : ''}
+              />
+            </div>
+          </div>
         </div>
+        {(q || envFilters.length > 0) && (
+          <div className="filterbar__active">
+            <span className="filterbar__active-label">Active</span>
+            <button type="button" className="filterbar__clear" onClick={() => { setQ(''); setEnvFilters([]) }}>Clear all</button>
+            <span className="filterbar__count">{filtered.length} of {PROJECTS.length}</span>
+          </div>
+        )}
       </div>
 
       {/* DataTablePro — sticky header, row selection + bulk-action bar; a row
