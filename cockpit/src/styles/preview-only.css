@@ -762,3 +762,10 @@
   to   { box-shadow: 0 0 0 0 transparent; }
 }
 .cockpit-preview .fnd__card--flash { animation: fnd-flash 1s var(--k-ease, ease); }
+
+/* Shape — Button radius sample (real .btn so the corner reads at a glance). */
+.cockpit-preview .fnd__shape-btns { display: flex; align-items: center; gap: var(--k-s-10); flex-wrap: wrap; }
+/* Surface — real fields show the treatment (Outlined/Filled/Plain); a sample box
+ * shows the border prominence. */
+.cockpit-preview .fnd__surface-fields { display: flex; flex-direction: column; gap: var(--k-s-10); }
+.cockpit-preview .fnd__surface-border { height: var(--k-s-32); border-radius: var(--k-radius-md); background: var(--k-surface); border: var(--k-bw) solid var(--k-border); }

@@ -13,6 +13,20 @@ import { Icon } from '../../icons/Icon'
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
+/* The panel shows outcome-named caps that differ from the raw enum (surfaceDepth
+ * 'layered' → "Deep", iconSet 'hairline' → "Iconoir"). Mirror those caps here so the
+ * Foundations view reads identically to the control that drives it. Keep in sync with
+ * the *_OPTS arrays in src/panel/Panel.tsx. */
+const LABELS: Record<string, Record<string, string>> = {
+  surfaceDepth: { flat: 'Flat', soft: 'Subtle', raised: 'Raised', layered: 'Deep' },
+  iconSet: { hairline: 'Iconoir', line: 'Lucide', rounded: 'Phosphor', bold: 'Phosphor Bold', solid: 'Heroicons' },
+  surface: { outlined: 'Outlined', filled: 'Filled', plain: 'Plain' },
+  borders: { faint: 'Faint', subtle: 'Subtle', medium: 'Medium', strong: 'Strong' },
+  buttonShape: { match: 'Match', none: 'None', subtle: 'Subtle', soft: 'Soft', round: 'Round', pill: 'Pill' },
+  neutral: { auto: 'Auto (brand)', cool: 'Cool', neutral: 'Neutral', warm: 'Warm' },
+}
+const lbl = (k: string, v: string) => LABELS[k]?.[v] ?? cap(v)
+
 export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }) {
   // Resolved token value (raw), and a px-formatted version (rem→px for readability).
   const val = (name: string) => String(tokens.vars[name] ?? '')
@@ -37,7 +51,7 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
         <Section title="Color" hint={`${cap(cfg.colorTheme)} · ${cap(cfg.palette)}`} wide>
           <SwGroup label="Brand" items={[['--k-primary', 'Primary'], ['--k-primary-soft', 'Primary soft'], ['--k-secondary', 'Secondary'], ['--k-secondary-soft', 'Secondary soft'], ['--k-accent', 'Accent'], ['--k-accent-soft', 'Accent soft']]} val={val} />
           <SwGroup label="System" items={[['--k-success', 'Success'], ['--k-warning', 'Warning'], ['--k-danger', 'Danger'], ['--k-info', 'Info']]} val={val} />
-          <SwGroup label="Neutrals" items={[['--k-surface', 'Surface'], ['--k-surface-raised', 'Raised'], ['--k-surface-sunken', 'Sunken'], ['--k-border', 'Border'], ['--k-fg', 'Text'], ['--k-fg-muted', 'Muted']]} val={val} />
+          <SwGroup label={`Neutrals · ${lbl('neutral', cfg.neutral)}`} items={[['--k-surface', 'Surface'], ['--k-surface-raised', 'Raised'], ['--k-surface-sunken', 'Sunken'], ['--k-border', 'Border'], ['--k-fg', 'Text'], ['--k-fg-muted', 'Muted']]} val={val} />
           <div className="fnd__sw-group-label">Decorative palette</div>
           <div className="fnd__palette">
             {[1, 2, 3, 4, 5, 6].map((n) => <span key={n} className="fnd__palette-cell" />)}
@@ -54,7 +68,8 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
           ))}
         </Section>
 
-        <Section title="Shape" hint={cap(cfg.radius)}>
+        <Section title="Shape" hint={`Box ${cap(cfg.radius)} · Button ${lbl('buttonShape', cfg.buttonShape)}`}>
+          <div className="fnd__sw-group-label">Box radius</div>
           <div className="fnd__radii">
             {([['--k-radius-sm', 'sm'], ['--k-radius-md', 'md'], ['--k-radius-lg', 'lg']] as [string, string][]).map(([v, label]) => (
               <div key={v} className="fnd__radius-cell">
@@ -63,6 +78,14 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
                 <span className="fnd__radius-px">{px(v)}</span>
               </div>
             ))}
+          </div>
+          {/* Button radius is its own control (decoupled from Box) — show a real
+              .btn so its corner reads at a glance. 'Match' tracks Box radius. */}
+          <div className="fnd__sw-group-label">Button radius</div>
+          <div className="fnd__shape-btns">
+            <button type="button" className="btn btn--primary">Button</button>
+            <button type="button" className="btn">Secondary</button>
+            <span className="fnd__radius-px">{lbl('buttonShape', cfg.buttonShape)}</span>
           </div>
         </Section>
 
@@ -90,8 +113,8 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
           </div>
         </Section>
 
-        <Section title="Elevation" hint={cap(cfg.surfaceDepth)}>
-          <div className="fnd__active">Active: <b>{cap(cfg.surfaceDepth)}</b></div>
+        <Section title="Elevation" hint={lbl('surfaceDepth', cfg.surfaceDepth)}>
+          <div className="fnd__active">Active: <b>{lbl('surfaceDepth', cfg.surfaceDepth)}</b></div>
           <div className="fnd__shadows">
             {([['--k-shadow-xs', 'xs'], ['--k-shadow-sm', 'sm'], ['--k-shadow-md', 'md'], ['--k-shadow-lg', 'lg']] as [string, string][]).map(([v, label]) => (
               <div key={v} className="fnd__shadow-cell">
@@ -100,6 +123,19 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
               </div>
             ))}
           </div>
+        </Section>
+
+        {/* Surface — the panel's "Surface" group also carries treatment + border.
+            Show real .in fields so the separation style (Outlined box / Filled tonal
+            / Plain underline) and the border weight read directly. */}
+        <Section title="Surface" hint={`${lbl('surface', cfg.surface)} · ${lbl('borders', cfg.borders)} border`}>
+          <div className="fnd__sw-group-label">Field separation · {lbl('surface', cfg.surface)}</div>
+          <div className="fnd__surface-fields">
+            <input className="in" defaultValue="Sample field" aria-label="Surface treatment sample" />
+            <div className="in in--inline"><Icon name="search" /><input defaultValue="Inline field" aria-label="Inline sample" /></div>
+          </div>
+          <div className="fnd__sw-group-label">Border · {lbl('borders', cfg.borders)}</div>
+          <div className="fnd__surface-border" />
         </Section>
 
         <Section title="Motion" hint={cap(cfg.motion)}>
@@ -119,7 +155,7 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
           </div>
         </Section>
 
-        <Section title="Icons" hint={cfg.iconSet}>
+        <Section title="Icons" hint={lbl('iconSet', cfg.iconSet)}>
           <div className="fnd__icons">
             {ICONS.map((n) => <span key={n} className="fnd__icon"><Icon name={n} /></span>)}
           </div>
