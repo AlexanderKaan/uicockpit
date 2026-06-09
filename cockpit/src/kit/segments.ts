@@ -31,6 +31,7 @@ export const FOUNDATIONS: readonly string[] = [
   'button-finish', // a styling modifier (clean/tactile/soft) = a token axis on button
   'roll-down-item-stagger', // a motion behaviour, not a component → motion foundation
   'twocolumnlayout', // a page-scaffold layout primitive → layout foundation
+  'layout-primitives', // the Every-Layout set (stack/cluster/switcher/grid/sidebar/center) → layout foundation
 ]
 
 /**

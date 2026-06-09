@@ -433,6 +433,13 @@ export function buildTokens(cfg: Config): Tokens {
   // instead of hardcoding px — same scale in the preview AND every export.
   const sVars: Record<string, string> = { '--k-s-0': '0' }
   for (const px of [2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32]) sVars[`--k-s-${px}`] = rem(px)
+  // Measure — readable line-length caps (in ch, so they track the body font).
+  // The layout grammar uses these instead of arbitrary px max-widths: a prose
+  // column wants ~60-75ch, a narrow form/panel ~48ch, a wide content well ~90ch.
+  // `.l-center` and `.l-prose` cap their width at these; no more magic 375/640px.
+  sVars['--k-measure-narrow'] = '48ch'
+  sVars['--k-measure-prose'] = '68ch'
+  sVars['--k-measure-wide'] = '90ch'
 
   // Shadows auto-tinted toward the brand hue (Stripe/Linear premium feel): a
   // low-sat dark version of the brand instead of a generic near-black-blue.

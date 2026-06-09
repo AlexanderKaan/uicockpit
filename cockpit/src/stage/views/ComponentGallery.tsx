@@ -69,7 +69,7 @@ export function ComponentGallery({ limit }: { limit?: number } = {}) {
     BreadcrumbCard, ProgressCard, UsageMeterCard, InteractiveCardCard, MenubarCard, ResizableCard,
     StatusPageCard, InboxFilterCard, SpinnerCard, ToolbarRecipeCard, SkeletonCard,
     EmptyStateCard, InfoCardCard, ToastStackCard, LightboxCard,
-    WizardStepperCard, DangerZoneCard, FaqCard, TwoColumnLayoutCard, TypographyCard,
+    WizardStepperCard, DangerZoneCard, FaqCard, TwoColumnLayoutCard, LayoutPrimitivesCard, TypographyCard,
     AttachmentChipCard, StepperCard, ButtonGroupCard, AspectRatioCard, ScrollAreaCard,
   ]
   const shown = limit ? CARDS.slice(0, limit) : CARDS
@@ -1178,6 +1178,28 @@ function FilterBarCard() {
             <span className="filterbar__count">128 results</span>
           </div>
         )}
+      </div>
+    </Card>
+  )
+}
+
+// Layout primitives — the Every-Layout foundation set, shown with placeholder
+// tiles so the LAYOUT behaviour reads (not the content). Each uses the recipe's
+// token defaults; tune via the --l-* vars in real use.
+function LayoutPrimitivesCard() {
+  const cap = (t: string) => <div style={{ fontSize: 'var(--k-type-eyebrow)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--k-fg-muted)', marginBottom: 6 }}>{t}</div>
+  const tile = (t: string) => <div key={t} style={{ background: 'var(--k-surface-sunken)', border: '1px solid var(--k-border)', borderRadius: 'var(--k-radius-sm)', padding: '8px 10px', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>{t}</div>
+  return (
+    <Card wide title="Layout primitives" desc="Every-Layout utilities — cluster · switcher · grid · sidebar · center.">
+      <div className="l-stack">
+        <div>{cap('Cluster — wraps, shared gap')}<div className="l-cluster">{['Design', 'Engineering', 'Product', 'Ops', 'Growth'].map(tile)}</div></div>
+        <div>{cap('Switcher — flips to a column when tight')}<div className="l-switcher">{['Pane A', 'Pane B', 'Pane C'].map(tile)}</div></div>
+        <div>{cap('Grid — responsive auto-fit')}<div className="l-grid">{['One', 'Two', 'Three', 'Four', 'Five', 'Six'].map(tile)}</div></div>
+        <div>{cap('Sidebar — side + flexible main')}<div className="l-sidebar"><div className="l-sidebar__side">{tile('Side · 16rem')}</div><div className="l-sidebar__main">{tile('Main — grows, wraps under when narrow')}</div></div></div>
+        <div>{cap('Center — capped at a readable measure (no magic px)')}
+          <div className="l-center l-center--narrow">{tile('Narrow · ~48ch')}</div>
+          <div className="l-center l-center--wide" style={{ marginTop: 8 }}>{tile('Wide · ~90ch')}</div>
+        </div>
       </div>
     </Card>
   )

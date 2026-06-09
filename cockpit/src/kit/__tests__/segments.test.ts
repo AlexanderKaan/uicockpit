@@ -41,10 +41,10 @@ describe('segment graph integrity', () => {
     expect(f + a + b).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 3 · Block 28 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 4 · Block 28 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('block')).toHaveLength(Object.keys(BLOCK_USES).length)
-    expect(idsByTier('foundation')).toHaveLength(3)
+    expect(idsByTier('foundation')).toHaveLength(4)
     expect(idsByTier('block')).toHaveLength(28)
   })
 

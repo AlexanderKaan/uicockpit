@@ -40,6 +40,7 @@ were mis-filed as `helper` and are really foundations:
 | `button-finish` | helper | a styling **modifier** (clean/tactile/soft) — a token axis on button, not a component. Fold into button's variant axis. |
 | `roll-down-item-stagger` | helper | a **motion behaviour**, not a component. → motion foundation. |
 | `twocolumnlayout` | helper | **page-scaffold** layout primitive, not a showcaseable component. → layout foundation. |
+| `layout-primitives` | — | the **Every-Layout** set: `.l-stack` · `.l-cluster` · `.l-switcher` · `.l-grid` · `.l-sidebar` · `.l-center` (token-driven, framework-neutral). Plus the **measure tokens** (`--k-measure-narrow/prose/wide`, in ch) that `.l-center` caps to — the layout grammar (North Star step 4), killing magic px widths. |
 
 ---
 
@@ -148,7 +149,7 @@ e.g. `Docs` → uses: sidebar, menubar, toolbar, tabs, resizable, codeblock, lis
 
 | Tier | count |
 |---|---|
-| Foundation (recipe-level) | 3 (+ the token system) |
+| Foundation (recipe-level) | 4 (+ the token system) |
 | Atom | 48 (26 composed by a block · 22 blessed standalone) |
 | Block | 28 |
 | Page | ~11 (external, SupaDash) |

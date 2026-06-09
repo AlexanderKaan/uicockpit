@@ -4484,4 +4484,44 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .filterbar__clear { font-size: var(--k-type-small); color: var(--k-primary); background: none; border: 0; cursor: pointer; padding: 0; }
 .filterbar__clear:hover { text-decoration: underline; }`,
   },
+  {
+    id: 'layout-primitives',
+    section: "Layout primitives",
+    css: `/* === Layout primitives ===
+   Framework-neutral layout utilities (the "Every Layout" set), token-driven so they
+   inherit your space + measure scale. FOUNDATION glue: composable wrappers that
+   replace ad-hoc flex/grid and magic px widths — the layout grammar the blocks
+   needed (the form-panel grid + filter rows generalised). Each exposes one CSS var
+   to tune; defaults come from the kit so they look right untouched.
+
+     .l-stack      vertical rhythm — even space between stacked children (--l-gap)
+     .l-cluster    a wrapping row of items sharing one gap (--l-gap)
+     .l-switcher   a row that flips to a column when it can't fit --l-threshold
+     .l-grid       responsive auto-fit grid, min column = --l-min (default 16rem)
+     .l-sidebar    a side (--l-side) + a flexible main that wraps under it
+     .l-center     centered column capped at a readable --l-measure (no magic px) */
+.l-stack { display: flex; flex-direction: column; }
+.l-stack > * { margin-block: 0; }
+.l-stack > * + * { margin-block-start: var(--l-gap, var(--k-s-16)); }
+
+.l-cluster { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-12)); align-items: var(--l-align, center); }
+
+/* The Switcher: each child grows to fill, but the moment the row's width drops below
+ * --l-threshold the basis flips hugely negative and they stack — a container-query-
+ * free responsive switch. */
+.l-switcher { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-16)); }
+.l-switcher > * { flex-grow: 1; flex-basis: calc((var(--l-threshold, 28rem) - 100%) * 999); }
+
+.l-grid { display: grid; gap: var(--l-gap, var(--k-s-16)); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--l-min, 16rem)), 1fr)); }
+
+.l-sidebar { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-16)); }
+.l-sidebar__side { flex-grow: 1; flex-basis: var(--l-side, 16rem); }
+.l-sidebar__main { flex-grow: 999; flex-basis: 0; min-width: var(--l-threshold, 50%); }
+
+/* The Center: a readable column. Caps at a ch-based measure token (tracks the body
+ * font) instead of an arbitrary px width — the answer to "kill the 375/640px". */
+.l-center { box-sizing: content-box; max-width: var(--l-measure, var(--k-measure-prose)); margin-inline: auto; padding-inline: var(--l-pad, var(--k-s-16)); }
+.l-center--narrow { --l-measure: var(--k-measure-narrow); }
+.l-center--wide { --l-measure: var(--k-measure-wide); }`,
+  },
 ]

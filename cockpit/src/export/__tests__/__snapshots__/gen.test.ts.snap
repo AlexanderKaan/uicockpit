@@ -31,6 +31,9 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-s-24: 1.5rem;
   --k-s-28: 1.75rem;
   --k-s-32: 2rem;
+  --k-measure-narrow: 48ch;
+  --k-measure-prose: 68ch;
+  --k-measure-wide: 90ch;
   --k-bg: oklch(100% 0 0);
   --k-chrome-bg: oklch(100% 0 0);
   --k-surface: oklch(99.5% 0.0056 249.9);
@@ -274,6 +277,9 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-s-24: 1.5rem;
   --k-s-28: 1.75rem;
   --k-s-32: 2rem;
+  --k-measure-narrow: 48ch;
+  --k-measure-prose: 68ch;
+  --k-measure-wide: 90ch;
   --k-bg: oklch(21.3% 0.0063 249.9);
   --k-chrome-bg: oklch(21.3% 0.0063 249.9);
   --k-surface: oklch(25.4% 0.0070 249.9);
@@ -710,9 +716,9 @@ body {
  * so your UI looks like the configurator preview — not a default.
  *
  * FOUNDATION — the token layer (colour · type · shape · space · motion, in the
- *   :root / .dark blocks above) + 3 structural/motion glue upstream of
+ *   :root / .dark blocks above) + 4 structural/motion glue upstream of
  *   the catalog:
- *     Button finish, Roll-down item stagger, TwoColumnLayout
+ *     Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
  * ATOMS — the bare vocabulary (48): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
@@ -4957,6 +4963,43 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .filterbar__count { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); white-space: nowrap; }
 .filterbar__clear { font-size: var(--k-type-small); color: var(--k-primary); background: none; border: 0; cursor: pointer; padding: 0; }
 .filterbar__clear:hover { text-decoration: underline; }
+
+/* === Layout primitives ===
+   Framework-neutral layout utilities (the "Every Layout" set), token-driven so they
+   inherit your space + measure scale. FOUNDATION glue: composable wrappers that
+   replace ad-hoc flex/grid and magic px widths — the layout grammar the blocks
+   needed (the form-panel grid + filter rows generalised). Each exposes one CSS var
+   to tune; defaults come from the kit so they look right untouched.
+
+     .l-stack      vertical rhythm — even space between stacked children (--l-gap)
+     .l-cluster    a wrapping row of items sharing one gap (--l-gap)
+     .l-switcher   a row that flips to a column when it can't fit --l-threshold
+     .l-grid       responsive auto-fit grid, min column = --l-min (default 16rem)
+     .l-sidebar    a side (--l-side) + a flexible main that wraps under it
+     .l-center     centered column capped at a readable --l-measure (no magic px) */
+.l-stack { display: flex; flex-direction: column; }
+.l-stack > * { margin-block: 0; }
+.l-stack > * + * { margin-block-start: var(--l-gap, var(--k-s-16)); }
+
+.l-cluster { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-12)); align-items: var(--l-align, center); }
+
+/* The Switcher: each child grows to fill, but the moment the row's width drops below
+ * --l-threshold the basis flips hugely negative and they stack — a container-query-
+ * free responsive switch. */
+.l-switcher { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-16)); }
+.l-switcher > * { flex-grow: 1; flex-basis: calc((var(--l-threshold, 28rem) - 100%) * 999); }
+
+.l-grid { display: grid; gap: var(--l-gap, var(--k-s-16)); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--l-min, 16rem)), 1fr)); }
+
+.l-sidebar { display: flex; flex-wrap: wrap; gap: var(--l-gap, var(--k-s-16)); }
+.l-sidebar__side { flex-grow: 1; flex-basis: var(--l-side, 16rem); }
+.l-sidebar__main { flex-grow: 999; flex-basis: 0; min-width: var(--l-threshold, 50%); }
+
+/* The Center: a readable column. Caps at a ch-based measure token (tracks the body
+ * font) instead of an arbitrary px width — the answer to "kill the 375/640px". */
+.l-center { box-sizing: content-box; max-width: var(--l-measure, var(--k-measure-prose)); margin-inline: auto; padding-inline: var(--l-pad, var(--k-s-16)); }
+.l-center--narrow { --l-measure: var(--k-measure-narrow); }
+.l-center--wide { --l-measure: var(--k-measure-wide); }
 "
 `;
 
