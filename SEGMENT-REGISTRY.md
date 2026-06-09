@@ -98,10 +98,11 @@ were mis-filed as `helper` and are really foundations:
 
 ---
 
-## Blocks (catalog, surface = component) — ~25
+## Blocks (catalog, surface = component) — 26
 
 | id | uses | note |
 |---|---|---|
+| `data-table` | table, toolbar, pagination-breadcrumb, select-trigger | **the flagship** — matrix-complete: toolbar · selection/bulk bar · empty/loading/error state slot · footer (rows-per-page + pagination) · content-stress helpers. North Star step 2; first Gap closed. |
 | `sidebar` | navigation-row, avatar, badges-pills | app-shell nav — *genuinely comes in the jacket* |
 | `dialog` | card, buttons | overlay block |
 | `alert-dialog` | card, buttons | confirm modal |
@@ -146,8 +147,8 @@ e.g. `Docs` → uses: sidebar, menubar, toolbar, tabs, resizable, codeblock, lis
 | Tier | count |
 |---|---|
 | Foundation (recipe-level) | 3 (+ the token system) |
-| Atom | ~48 |
-| Block | ~25 |
+| Atom | 48 |
+| Block | 26 |
 | Page | ~11 (external, SupaDash) |
 
 **`helper` is dissolved (7 → resolved):** toolbar→Atom, separator→Atom,
@@ -167,15 +168,16 @@ coverage rule, every atom must have ≥1 parent block; an orphan is a worklist i
 next (the Gaps below). It **shrinks** as blocks land; `segments.test.ts` asserts it,
 so each shrink is a conscious, tracked event.
 
-**34 orphans today** (of 48 atoms — only 14 are parented at v0, because the block
-layer is still sparse). Most are not "unused" — they render directly in SupaDash
-*pages*; they simply have no **block** wrapping them yet. Grouped by the block that
-will adopt them:
+**30 orphans today** (of 48 atoms — 18 parented). Down from 34: the **data-table**
+block (step 2) adopted `table` · `toolbar` · `pagination-breadcrumb` ·
+`select-trigger`. Most remaining orphans are not "unused" — they render directly in
+SupaDash *pages*; they simply have no **block** wrapping them yet. Grouped by the
+block that will adopt them:
 
 | Future block (the Gap) | Adopts these orphan atoms |
 |---|---|
-| **data-table** (flagship, step 2) | `table`, `toolbar`, `pagination-breadcrumb`, `select-trigger` |
-| **form-panel** | `form`, `numberinput`, `passwordinput`, `phoneinput`, `combobox`, `tag-input`, `input-otp`, `radio-card`, `switch-toggle`, `slider` |
+| ~~**data-table**~~ ✅ **shipped (step 2)** | ~~`table`, `toolbar`, `pagination-breadcrumb`, `select-trigger`~~ — now parented |
+| **form-panel** (next candidate) | `form`, `numberinput`, `passwordinput`, `phoneinput`, `combobox`, `tag-input`, `input-otp`, `radio-card`, `switch-toggle`, `slider` |
 | **app-shell / page-header** | `navigation-menu`, `tabs`, `separator`, `banner` |
 | **detail / record view** | `description-list`, `accordion`, `alert` |
 | overlay/utility (likely stay atoms, or small blocks) | `popover`, `hover-card`, `context-menu`, `tooltip`, `segmented-control-toggle-group`, `button-group`, `aspect-ratio`, `scroll-area`, `skeleton`, `spinner`, `attachment-chip-family`, `inline-status-meta-micro-components` |
@@ -193,7 +195,7 @@ will adopt them:
 These are composed live in SupaDash but have **no first-class Block recipe** — the
 highest-value things to promote into the catalog:
 
-- **data-table** (table + toolbar + selection + pagination + empty + loading) — the flagship
+- ~~**data-table**~~ ✅ **SHIPPED (step 2)** — promoted to a first-class block, matrix-complete
 - **app-shell** (sidebar + topbar/page-header)
 - **page-header** (title + tabs + actions)
 - **settings-section** (`.list--settings` rows + save bar)

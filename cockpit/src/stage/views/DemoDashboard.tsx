@@ -707,11 +707,31 @@ function Projects() {
                 ))
               )}
               {!loading && filtered.length === 0 && (
-                <tr><td colSpan={5} style={{ textAlign: 'center', padding: 20, color: 'var(--k-fg-faint)' }}>No matches.</td></tr>
+                <tr><td colSpan={5}>
+                  <div className="datatable__state">
+                    <span className="datatable__state-icon"><Icon name="search" /></span>
+                    <span className="datatable__state-title">No matching issues</span>
+                    <span className="datatable__state-msg">Try clearing the env filter or your search query.</span>
+                  </div>
+                </td></tr>
               )}
             </tbody>
           </table>
         </div>
+        {!loading && filtered.length > 0 && (
+          <div className="datatable__foot">
+            <span className="datatable__foot-info">Showing {filtered.length} of {PROJECTS.length}</span>
+            <span className="datatable__perpage">
+              <span>Rows</span>
+              <select className="select" aria-label="Rows per page" defaultValue="10"><option>10</option><option>25</option><option>50</option></select>
+            </span>
+            <div className="pagination">
+              <button onClick={() => setPageNum((v) => Math.max(1, v - 1))} disabled={pageNum === 1} aria-label="Previous"><Icon name="chevL" /></button>
+              {[1, 2, 3].map((n) => (<button key={n} aria-current={pageNum === n} onClick={() => setPageNum(n)}>{n}</button>))}
+              <button onClick={() => setPageNum((v) => Math.min(3, v + 1))} disabled={pageNum === 3} aria-label="Next"><Icon name="chevR" /></button>
+            </div>
+          </div>
+        )}
         {ctx && (
           <div className="menu ctxmenu__pop" style={{ position: 'fixed', left: ctx.x, top: ctx.y, zIndex: 'var(--k-z-dropdown)' }} role="menu">
             <button className="menu__item" role="menuitem" onClick={() => { const is = PROJECTS.find((p) => p.key === ctx.key); if (is) setOpenIssue(is); setCtx(null) }}><Icon name="info" /> Open issue</button>
@@ -721,22 +741,6 @@ function Projects() {
           </div>
         )}
       </div>
-      {!loading && filtered.length > 0 && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
-          <span>Showing {filtered.length} of {PROJECTS.length}</span>
-          <div className="pagination">
-            <button onClick={() => setPageNum((v) => Math.max(1, v - 1))} aria-label="Previous">
-              <Icon name="chevL" />
-            </button>
-            {[1, 2, 3].map((n) => (
-              <button key={n} aria-current={pageNum === n} onClick={() => setPageNum(n)}>{n}</button>
-            ))}
-            <button onClick={() => setPageNum((v) => Math.min(3, v + 1))} aria-label="Next">
-              <Icon name="chevR" />
-            </button>
-          </div>
-        </div>
-      )}
       </>}
 
       {/* New issue — a Sheet drawer sliding over the content. Hosts the

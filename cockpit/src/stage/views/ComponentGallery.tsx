@@ -926,28 +926,47 @@ function InboxFilterCard() {
 }
 
 const DT_ROWS = [
-  { id: 1, name: 'ai-router', owner: 'Ava', status: 'success' as const, label: 'Healthy' },
-  { id: 2, name: 'pricing-engine', owner: 'Jordan', status: 'success' as const, label: 'Healthy' },
-  { id: 3, name: 'edge-cache', owner: 'Casey', status: 'warn' as const, label: 'Degraded' },
-  { id: 4, name: 'payments-prod', owner: 'Eliot', status: 'danger' as const, label: 'Down' },
-  { id: 5, name: 'background-jobs', owner: 'Kira', status: 'success' as const, label: 'Healthy' },
-  { id: 6, name: 'analytics-etl', owner: 'Greta', status: 'warn' as const, label: 'Degraded' },
+  { id: 1, name: 'ai-router', owner: 'Ava', status: 'success' as const, label: 'Healthy', req: 1820 },
+  { id: 2, name: 'pricing-engine-internal-v2', owner: 'Jordan', status: 'success' as const, label: 'Healthy', req: 942 },
+  { id: 3, name: 'edge-cache', owner: 'Casey', status: 'warn' as const, label: 'Degraded', req: 12840 },
+  { id: 4, name: 'payments-prod', owner: 'Eliot', status: 'danger' as const, label: 'Down', req: 0 },
+  { id: 5, name: 'background-jobs', owner: 'Kira', status: 'success' as const, label: 'Healthy', req: 388 },
+  { id: 6, name: 'analytics-etl', owner: 'Greta', status: 'warn' as const, label: 'Degraded', req: 5102 },
+]
+type DTState = 'data' | 'loading' | 'empty' | 'error'
+const DT_STATES: { k: DTState; label: string }[] = [
+  { k: 'data', label: 'Data' }, { k: 'loading', label: 'Loading' },
+  { k: 'empty', label: 'Empty' }, { k: 'error', label: 'Error' },
 ]
 
-// DataTable Pro — bordered frame, toolbar that flips to a bulk bar on
-// selection, checkbox column, and a scroll body with a sticky header.
+// Data table — the flagship BLOCK, matrix-complete: a .toolbar header that flips
+// to a bulk bar on selection, a sticky-header scroll body, a numeric column +
+// truncation under content stress, the empty / loading / error state slot, and a
+// footer with a rows-per-page .select + .pagination. Composes table · toolbar ·
+// select-trigger · pagination atoms. The state switcher is a demo control, not
+// part of the block.
 function DataTableProCard() {
   const [sel, setSel] = useState<Set<number>>(new Set())
-  const allOn = sel.size === DT_ROWS.length
+  const [state, setState] = useState<DTState>('data')
+  const [page, setPage] = useState(1)
+  const rows = state === 'empty' ? [] : DT_ROWS
+  const hasRows = state === 'data' && rows.length > 0
+  const allOn = hasRows && sel.size === rows.length
   const toggle = (id: number) => {
     const next = new Set(sel)
     next.has(id) ? next.delete(id) : next.add(id)
     setSel(next)
   }
   const toggleAll = () => setSel(allOn ? new Set() : new Set(DT_ROWS.map((r) => r.id)))
+  const setMode = (k: DTState) => { setState(k); setSel(new Set()) }
   return (
-    <Card wide title="Services" desc="Sticky header, selection, bulk actions.">
-      <div className="datatable">
+    <Card wide title="Data table" desc="Toolbar, selection, every state & pagination — the flagship block.">
+      <div className="segctrl" role="tablist" aria-label="Table state" style={{ marginBottom: 12 }}>
+        {DT_STATES.map((s) => (
+          <button key={s.k} role="tab" aria-selected={state === s.k} className={`segctrl__btn ${state === s.k ? 'segctrl__btn--on' : ''}`} onClick={() => setMode(s.k)}>{s.label}</button>
+        ))}
+      </div>
+      <div className={`datatable ${state === 'loading' ? 'datatable--loading' : ''}`}>
         <div className={`datatable__bar ${sel.size > 0 ? 'datatable__bar--active' : ''}`}>
           {sel.size > 0 ? (
             <>
@@ -957,34 +976,84 @@ function DataTableProCard() {
               <button className="btn btn--danger btn--sm"><Icon name="trash" /> Delete</button>
             </>
           ) : (
-            <>
-              <span className="datatable__count">{DT_ROWS.length} services</span>
-              <span className="datatable__spacer" />
+            <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
+              <div className="in in--inline" style={{ maxWidth: 200 }}>
+                <Icon name="search" />
+                <input type="search" aria-label="Search services" placeholder="Search…" />
+              </div>
+              <select className="select" aria-label="Status filter" style={{ width: 'auto' }}>
+                <option>All status</option><option>Healthy</option><option>Degraded</option><option>Down</option>
+              </select>
+              <span className="toolbar__spacer" />
               <button className="btn btn--secondary btn--sm"><Icon name="plus" /> Add</button>
-            </>
+            </div>
           )}
         </div>
         <div className="datatable__body">
           <table className="tbl">
             <thead>
               <tr>
-                <th className="datatable__check"><label className="check"><input type="checkbox" checked={allOn} ref={(el) => { if (el) el.indeterminate = sel.size > 0 && !allOn }} onChange={toggleAll} aria-label="Select all services" /></label></th>
+                <th className="datatable__check"><label className="check"><input type="checkbox" checked={allOn} ref={(el) => { if (el) el.indeterminate = sel.size > 0 && !allOn }} onChange={toggleAll} aria-label="Select all services" disabled={!hasRows} /></label></th>
                 <th>Service</th>
                 <th>Owner</th>
+                <th className="num">Requests</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {DT_ROWS.map((r) => (
-                <tr key={r.id} aria-selected={sel.has(r.id)}>
-                  <td className="datatable__check"><label className="check"><input type="checkbox" checked={sel.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`} /></label></td>
-                  <td style={{ fontWeight: 500 }}>{r.name}</td>
-                  <td style={{ color: 'var(--k-fg-muted)' }}>{r.owner}</td>
-                  <td><StatusBadge tone={r.status} label={r.label} /></td>
-                </tr>
-              ))}
+              {state === 'loading' ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={`sk-${i}`}>
+                    <td className="datatable__check"><span className="sk" style={{ height: 12, width: 16, display: 'block' }} /></td>
+                    <td><span className="sk" style={{ height: 12, width: '70%', display: 'block' }} /></td>
+                    <td><span className="sk" style={{ height: 12, width: 48, display: 'block' }} /></td>
+                    <td className="num"><span className="sk" style={{ height: 12, width: 40, display: 'inline-block' }} /></td>
+                    <td><span className="sk" style={{ height: 12, width: 64, display: 'block' }} /></td>
+                  </tr>
+                ))
+              ) : state === 'error' ? (
+                <tr><td colSpan={5}>
+                  <div className="datatable__state datatable__state--error">
+                    <span className="datatable__state-icon"><Icon name="info" /></span>
+                    <span className="datatable__state-title">Couldn’t load services</span>
+                    <span className="datatable__state-msg">The request timed out. Check your connection and try again.</span>
+                    <button className="btn btn--secondary btn--sm"><Icon name="upload" /> Retry</button>
+                  </div>
+                </td></tr>
+              ) : rows.length === 0 ? (
+                <tr><td colSpan={5}>
+                  <div className="datatable__state">
+                    <span className="datatable__state-icon"><Icon name="search" /></span>
+                    <span className="datatable__state-title">No services yet</span>
+                    <span className="datatable__state-msg">Add your first service to start monitoring uptime and traffic.</span>
+                    <button className="btn btn--primary btn--sm"><Icon name="plus" /> Add service</button>
+                  </div>
+                </td></tr>
+              ) : (
+                rows.map((r) => (
+                  <tr key={r.id} aria-selected={sel.has(r.id)}>
+                    <td className="datatable__check"><label className="check"><input type="checkbox" checked={sel.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`} /></label></td>
+                    <td><span className="truncate" style={{ fontWeight: 500 }}>{r.name}</span></td>
+                    <td style={{ color: 'var(--k-fg-muted)' }}>{r.owner}</td>
+                    <td className="num">{r.req.toLocaleString()}</td>
+                    <td><StatusBadge tone={r.status} label={r.label} /></td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
+        </div>
+        <div className="datatable__foot">
+          <span className="datatable__foot-info">{hasRows ? `1–${rows.length} of ${rows.length}` : '0 results'}</span>
+          <span className="datatable__perpage">
+            <span>Rows</span>
+            <select className="select" aria-label="Rows per page" defaultValue="10"><option>10</option><option>25</option><option>50</option></select>
+          </span>
+          <div className="pagination">
+            <button onClick={() => setPage((v) => Math.max(1, v - 1))} disabled={page === 1} aria-label="Previous"><Icon name="chevL" /></button>
+            {[1, 2, 3].map((n) => (<button key={n} aria-current={page === n} onClick={() => setPage(n)}>{n}</button>))}
+            <button onClick={() => setPage((v) => Math.min(3, v + 1))} disabled={page === 3} aria-label="Next"><Icon name="chevR" /></button>
+          </div>
         </div>
       </div>
     </Card>

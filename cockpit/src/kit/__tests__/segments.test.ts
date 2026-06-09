@@ -39,11 +39,11 @@ describe('segment graph integrity', () => {
     expect(f + a + b).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 3 · Block 25 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 3 · Block 26 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('block')).toHaveLength(Object.keys(BLOCK_USES).length)
     expect(idsByTier('foundation')).toHaveLength(3)
-    expect(idsByTier('block')).toHaveLength(25)
+    expect(idsByTier('block')).toHaveLength(26)
   })
 
   it('usesOf returns [] for atoms and foundations', () => {
@@ -56,29 +56,27 @@ describe('segment graph integrity', () => {
 describe('orphan-atom worklist', () => {
   // The coverage contract: every atom must have ≥1 parent block. The list below
   // is the current worklist — atoms with NO parent block yet → build their home
-  // block, or cut/merge. It SHRINKS as blocks are built (e.g. the data-table block
-  // will adopt table·toolbar·pagination-breadcrumb·select-trigger). When that
-  // happens this assertion goes red — update it consciously; the shrink is the
-  // signal that the contract got thicker.
+  // block, or cut/merge. It SHRINKS as blocks are built. When that happens this
+  // assertion goes red — update it consciously; the shrink is the signal that the
+  // contract got thicker.
+  //
+  // History: 34 → 30 when the data-table block landed (North Star step 2),
+  // adopting table · toolbar · pagination-breadcrumb · select-trigger.
   it('matches the tracked orphan list', () => {
     expect(orphanAtoms()).toEqual([
-      'toolbar',
       'button-group',
       'aspect-ratio',
       'scroll-area',
       'form',
       'alert',
       'tabs',
-      'table',
       'tooltip',
       'switch-toggle',
       'slider',
       'skeleton',
-      'select-trigger',
       'spinner',
       'interactive-list-row',
       'accordion',
-      'pagination-breadcrumb',
       'combobox',
       'tag-input',
       'popover',

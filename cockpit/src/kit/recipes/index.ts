@@ -942,22 +942,50 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 
 /* Tables are restrained shadcn-style: per-row border-top (base .tbl) + hover,
    no zebra striping. The zebra modifier was dropped — the base row treatment
-   already reads cleanly and zebra added visual noise to dense data. */
+   already reads cleanly and zebra added visual noise to dense data.
 
-/* DataTable Pro — bordered frame + toolbar header + scroll body with a
- * sticky thead. Wrap a .tbl in .datatable; the thead stays pinned while
- * .datatable__body scrolls. The toolbar swaps to a bulk-action bar when
- * rows are selected (toggle .datatable__bar--active in JS). */
+   The data-table BLOCK (bordered frame + toolbar + selection + footer +
+   empty/loading/error states) is its own segment — see the "Data table" recipe,
+   which composes this .tbl atom. */`,
+  },
+  {
+    id: 'data-table',
+    section: "Data table",
+    css: `/* === Data table ===
+   The flagship BLOCK: a bordered frame that wraps the .tbl atom into a complete,
+   believable data surface — matrix-complete across every state real data hits.
+   It COMPOSES atoms (.toolbar · .tbl · .select / .select-trigger · .pagination),
+   so the whole surface is rebuildable from the kit, not a one-off.
+
+   Anatomy
+     .datatable                       frame (border + radius + clip)
+       .datatable__bar                header band — holds a .toolbar (search /
+         .datatable__bar--active      filters / actions); swaps to the bulk-action
+                                      bar when rows are selected
+       .datatable__body               scroll well (sticky thead)
+         table.tbl                    the table atom
+         .datatable__state            centered slot for EMPTY / LOADING / ERROR
+       .datatable__foot               footer band — row count · rows-per-page
+                                      .select · .pagination
+   Modifiers
+     .datatable--page                 page-level table: body grows to natural
+                                      height, the PAGE scrolls (no inner well)
+     .datatable--loading              dims the body while skeleton rows show
+   State slot
+     .datatable__state--error         tints the icon danger for a failed load */
 .datatable { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); overflow: hidden; }
+
+/* Header band — a .toolbar lives inside for the default controls; the band
+ * supplies the sunken surface + divider, and flips to the bulk bar on selection. */
 .datatable__bar { display: flex; align-items: center; gap: var(--k-s-10); padding: var(--k-s-8) var(--k-s-12); border-bottom: var(--k-divider); background: var(--k-surface-sunken); font-size: var(--k-type-small); }
 .datatable__bar--active { background: var(--k-state-selected-bg, var(--k-primary-soft)); color: var(--k-state-selected-fg, var(--k-fg)); }
 .datatable__count { font-weight: var(--k-weight-semibold); }
 .datatable__spacer { margin-left: auto; }
+
+/* Scroll body — sticky thead stays pinned while rows scroll. Page-level tables
+ * paginate (~10-12 rows), so they grow to natural height and let the PAGE scroll
+ * (no cramped inner well). The 240px cap stays for the compact gallery tile. */
 .datatable__body { max-height: 240px; overflow: auto; }
-/* Page-level tables paginate (~10-12 rows) so they should grow to natural
- * height and let the PAGE scroll — no cramped inner scroll-well. The 240px cap
- * above stays for the compact gallery demo card (where the inner scroll shows
- * off the sticky header in a small masonry tile). */
 .datatable--page .datatable__body { max-height: none; overflow: visible; }
 .datatable .tbl thead th {
   position: sticky; top: 0; z-index: 1;
@@ -966,8 +994,35 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .datatable .tbl td:first-child, .datatable .tbl th:first-child { padding-left: var(--k-s-12); }
 .datatable .tbl td:last-child, .datatable .tbl th:last-child { padding-right: var(--k-s-12); }
+
 /* Selection cell — checkbox column, fixed narrow width. */
-.datatable__check { width: 36px; }`,
+.datatable__check { width: 36px; }
+
+/* Content-stress helpers (real data is messy):
+ *   th.num / td.num → right-align + tabular figures for money / metric columns
+ *   .truncate       → single-line ellipsis so a long title never blows the grid */
+.datatable .tbl th.num, .datatable .tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.datatable .truncate { display: block; max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* State slot — EMPTY / LOADING / ERROR share one centered well, so a row-less
+ * table reads as a deliberate state, not a broken layout. Drop it in a full-span
+ * <td> (or directly in the body) in place of <tbody> rows. */
+.datatable__state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--k-s-8); padding: var(--k-s-32) var(--k-s-16); text-align: center; color: var(--k-fg-muted); }
+.datatable__state-icon { color: var(--k-fg-faint); line-height: 0; }
+.datatable__state-title { font-weight: var(--k-weight-semibold); color: var(--k-fg); }
+.datatable__state-msg { font-size: var(--k-type-small); max-width: 40ch; }
+.datatable__state--error .datatable__state-icon { color: var(--k-danger); }
+
+/* Loading — skeleton rows in <tbody> (pair each cell with a .sk bar); the body
+ * dims a touch so the table reads as "busy" rather than empty. */
+.datatable--loading .datatable__body { opacity: 0.85; }
+
+/* Footer band — row range, a rows-per-page .select, and the .pagination atom.
+ * Mirrors the header surface, sits below the body inside the frame. */
+.datatable__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; padding: var(--k-s-8) var(--k-s-12); border-top: var(--k-divider); background: var(--k-surface-sunken); font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.datatable__foot-info { margin-right: auto; }
+.datatable__perpage { display: inline-flex; align-items: center; gap: var(--k-s-8); white-space: nowrap; }
+.datatable__perpage .select { width: auto; min-height: var(--k-control-h-sm); }`,
   },
   {
     id: 'tooltip',

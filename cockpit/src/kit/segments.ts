@@ -41,6 +41,10 @@ export const FOUNDATIONS: readonly string[] = [
  * other catalog segment, e.g. toast-stack, resizable.)
  */
 export const BLOCK_USES: Readonly<Record<string, readonly string[]>> = {
+  // The flagship: a complete data surface. Composes the table atom with a toolbar
+  // header, a rows-per-page select and pagination — matrix-complete across
+  // empty / loading / error. Adopting these four was the orphan worklist's lead.
+  'data-table': ['table', 'toolbar', 'pagination-breadcrumb', 'select-trigger'],
   sidebar: ['navigation-row', 'avatar', 'badges-pills'],
   dialog: ['card', 'buttons'],
   'alert-dialog': ['card', 'buttons'],
