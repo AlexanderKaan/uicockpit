@@ -81,17 +81,52 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   const filtered = tier ? CARDS.filter(([, t]) => t === tier) : CARDS
   const shown = limit ? filtered.slice(0, limit) : filtered
 
+  // The Atoms view groups the bare atoms into bordered CATEGORY cards (like the
+  // Foundations sections): the frame lives on the GROUP, so atoms get structure
+  // without each looking like a standalone block. Covers all atom-tier cards.
+  if (tier === 'atom') {
+    return (
+      <div className="gallery atomgroups" ref={galleryRef}>
+        {ATOM_GROUPS.map(([name, comps]) => (
+          <section className="card atomgroup" key={name}>
+            <div className="atomgroup__head">
+              <h3 className="atomgroup__title">{name}</h3>
+              <span className="atomgroup__count">{comps.length}</span>
+            </div>
+            {/* Bare atoms inside (flattened via .gallery--workbench), quiet labels. */}
+            <div className="atomgroup__items gallery--workbench">
+              {comps.map((C, i) => <C key={i} />)}
+            </div>
+          </section>
+        ))}
+      </div>
+    )
+  }
+
   return (
-    <div className={`gallery${tier === 'atom' ? ' gallery--workbench' : ''}`} ref={galleryRef}>
+    <div className="gallery" ref={galleryRef}>
       {/* INTERLEAVED WALL — cards woven so a landscape (.card--wide) lands
           roughly every ~3rd slot for an even masonry rhythm (shadcn /create
-          feel). `tier` splits it into the Atoms / Blocks ladder views; the Atoms
-          view flattens the demo-frame card to a bare WORKBENCH (no fake jasje).
-          No `tier` (the marketing bouquet) shows the full interleaved wall. */}
+          feel). `tier='block'` filters to the Blocks ladder view; no `tier`
+          (the marketing bouquet) shows the full interleaved wall, `limit`-sliced. */}
       {shown.map(([C], i) => <C key={i} />)}
     </div>
   )
 }
+
+// Atom category taxonomy — every atom-tier card bucketed into a matching group.
+// Order = how the groups read top-to-bottom; the masonry packs them by height.
+const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElement>]> = [
+  ['Text inputs', [FormCard, SearchInputCard, PasswordInputCard, NumberInputCard, PhoneInputCard, InputOtpCard]],
+  ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
+  ['Choice & toggles', [SwitchCard, SelectionCard, RadioCardCard, SliderCard, ButtonGroupCard]],
+  ['Actions & menus', [ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
+  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
+  ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
+  ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
+  ['Data & content', [TableCard, ListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
+  ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
+]
 
 /* ── Promoted dashboard widgets — formerly app-only (SupaDash), now first-class
  * gallery cards so the components page stays the single source of truth. They

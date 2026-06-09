@@ -795,3 +795,13 @@
 .cockpit-preview .fnd__prose-h { font-size: var(--k-type-h3); font-family: var(--k-font-display); font-weight: var(--k-weight-semibold); line-height: 1.2; margin: 0 0 0.4em; color: var(--k-fg); }
 .cockpit-preview .fnd__prose-body { font-size: var(--k-type-body); line-height: 1.55; margin: 0 0 0.6em; color: var(--k-fg); }
 .cockpit-preview .fnd__prose-small { font-size: var(--k-type-small); line-height: 1.5; color: var(--k-fg-muted); margin: 0; }
+
+/* === Atoms — grouped category cards ==================================
+ * The Atoms view buckets the bare atoms into bordered CATEGORY cards (like the
+ * Foundations sections): the frame is on the GROUP, so atoms get structure without
+ * each reading as a standalone block. The atoms inside flatten via .gallery--workbench
+ * (frame stripped → bare on the bench, head → quiet caption). */
+.cockpit-preview .atomgroup__head { display: flex; align-items: baseline; gap: var(--k-s-8); margin-bottom: var(--k-s-16); padding-bottom: var(--k-s-10); border-bottom: var(--k-divider); }
+.cockpit-preview .atomgroup__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); color: var(--k-fg); margin: 0; }
+.cockpit-preview .atomgroup__count { font-size: var(--k-type-caption); color: var(--k-fg-faint); font-variant-numeric: tabular-nums; }
+.cockpit-preview .atomgroup__items { display: flex; flex-direction: column; gap: var(--k-s-24); }
