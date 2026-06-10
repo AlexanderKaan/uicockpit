@@ -246,6 +246,31 @@ Shortcuts (drop-in CSS \`animation\` values, durations + easings pre-paired):
 Always respect \`prefers-reduced-motion: reduce\` — \`tokens.css\` includes a
 global reduce-fallback that cuts all animations/transitions to ~instant.
 
+## Behavior boundary — look + layout, not a runtime
+
+This kit is the **visual + composition layer**. Every state a component can be in
+is styled for you — hover, focus, active, disabled, invalid, loading, checked,
+selected, expanded — but the kit ships **no JavaScript**: open/close, filtering,
+positioning, dismiss timers and keyboard navigation are yours to wire. That's
+deliberate — it's what keeps the system framework-neutral.
+
+**When applying the kit, change look/layout/composition only — never the app's
+logic.** Wire the kit's classes onto behavior that already exists, or pair a
+headless library for the interactive parts:
+
+| Component | Pair the behavior with |
+|---|---|
+| Dialog / sheet / alert-dialog | native \`<dialog>\` (\`showModal\` + \`::backdrop\`) or Radix / Base UI |
+| Dropdown / context menu / menubar | Radix / Base UI Menu (wire \`aria-expanded\`) |
+| Combobox / command palette | your filter + \`aria-activedescendant\` |
+| Tooltip / popover / hover-card | Floating UI (positioning + delay) |
+| Tabs / accordion | \`aria-selected\`/\`aria-expanded\` + arrows, or \`<details>\` |
+| Toast / sonner | your queue + auto-dismiss timing (\`.toast-stack\` is the shell) |
+| Date picker / calendar | your month math + disabled/range logic |
+
+The kit guarantees it *looks* right in every state; you (or a headless lib)
+guarantee it *behaves* right.
+
 ## Accessibility — full WCAG audit
 
 Every meaningful text-on-background pair in the kit, tested against WCAG

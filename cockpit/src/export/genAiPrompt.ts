@@ -490,6 +490,46 @@ The **Component recipes** block at the bottom of the \`tokens.css\` export docum
 the exact class structure + states for every class named here — copy from it
 rather than guessing.
 
+## Behavior boundary — what this kit does and does NOT do
+
+This is the **look + layout + composition** layer. The recipes ship every VISUAL
+state baked in — hover, focus-visible, active/press, disabled, invalid/error,
+loading, checked, selected, expanded — so you never hand-style those. But the kit
+ships **no JavaScript behavior runtime**: open/close, focus-trapping, filtering,
+positioning, dismiss timers and keyboard nav are YOURS to wire. This is a feature,
+not a gap — it keeps the kit framework-neutral and lets it sit over any stack.
+
+**The contract:** when you apply this design system, touch only look / layout /
+composition — the classes, the markup structure, the tokens. **Do not rewrite the
+app's logic** to fit the kit; wire the kit's classes onto the behavior that's
+already there (or pair a headless lib below). A re-skin should never change what
+the app *does*.
+
+**Pair the behavior — recommended per interactive component:**
+- **Dialog / sheet / alert-dialog** → the native \`<dialog>\` element (\`.showModal()\`
+  + \`::backdrop\`) or Radix/Base UI Dialog. The recipe styles the panel; you own
+  open/close + focus trap + Esc. Add \`role="dialog"\`/\`"alertdialog"\` + \`aria-modal\`.
+- **Dropdown menu / context menu / menubar** → Radix/Base UI Menu (or your own
+  roving-tabindex). Wire \`aria-expanded\` on the trigger; the \`.menu\` panel + the
+  roll-down stagger are styled for you.
+- **Combobox / command palette** → you own the filter + active-option state; the
+  recipe styles the field + the option list. Add \`role="combobox"\` + \`aria-controls\`
+  + \`aria-activedescendant\`.
+- **Tooltip / popover / hover-card** → Floating UI (or Radix) for positioning +
+  open delay. Add \`role="tooltip"\` / \`aria-describedby\`. The recipe is the visual.
+- **Tabs / accordion** → wire \`aria-selected\`/\`aria-expanded\` + arrow-key nav (or
+  Radix). \`<details>\`/\`<summary>\` gives accordion behavior for free.
+- **Toast / sonner** → you own the queue + auto-dismiss timing; \`.toast-stack\` is
+  the container, the enter/exit keyframes ship in the CSS.
+- **Date picker / calendar** → you own month math + disabled/range logic; the
+  \`.calendar\` grid + day states are styled.
+- **Combobox/select filtering, slider drag, tag add/remove, OTP auto-advance** →
+  your handlers; every visual state they toggle is already in the recipe.
+
+**Honest one-liner:** the kit guarantees it *looks* right in every state; you
+guarantee it *behaves* right. Pair it with a headless lib (Radix / Base UI /
+Floating UI / native elements) and you get both with almost no styling work.
+
 ## Accessibility check (already verified)
 
 - Button text on primary: ${cc.inkOnPrimary.toFixed(2)}:1 ${cc.inkOnPrimary >= 4.5 ? '— passes WCAG AA' : '— BELOW WCAG AA, flag this'}
