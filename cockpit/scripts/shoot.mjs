@@ -70,6 +70,15 @@ if (scrollText) {
   } catch (e) { console.error('scroll failed:', e.message) }
 }
 
+// Optional 7th arg: click a SupaDash sidebar nav item by text (Pages view).
+const appNav = process.argv[8]
+if (appNav) {
+  try {
+    await page.locator('.dash__nav, .sidenav, nav').getByText(new RegExp(`^${appNav}$`, 'i')).first().click()
+    await page.waitForTimeout(600)
+  } catch (e) { console.error('appNav failed:', e.message) }
+}
+
 if (collapse === 'collapse') {
   try {
     // the panel collapse target is the logo / chevron at the panel top

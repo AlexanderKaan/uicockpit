@@ -946,6 +946,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .is-sortable.is-active .tbl__sort-chevron { color: var(--k-primary); }
 
+/* Two-line cell (B★5) — the canonical "primary name + secondary meta" stack
+   inside a table cell (issue key · type · points, file · size, user · email).
+   Was hand-rolled per-table with inline styles; now a kit pattern so the meta
+   hierarchy is consistent: name = near-black --k-fg, meta = the FAINT tier (one
+   step below muted) so the sub-line recedes cleanly behind the name. */
+.tbl__name { font-weight: var(--k-weight-medium); color: var(--k-fg); }
+.tbl__sub { font-size: var(--k-type-small); color: var(--k-fg-faint); margin-top: 1px; }
 /* Tables are restrained shadcn-style: per-row border-top (base .tbl) + hover,
    no zebra striping. The zebra modifier was dropped — the base row treatment
    already reads cleanly and zebra added visual noise to dense data.

@@ -701,8 +701,8 @@ function Projects() {
                       <label className="check"><input type="checkbox" checked={sel.has(p.key)} onChange={() => toggleOne(p.key)} aria-label={`Select ${p.name}`} /></label>
                     </td>
                     <td>
-                      <div style={{ fontWeight: 500 }}>{p.name}</div>
-                      <div style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>{p.key} · {p.type} · {p.points} pts</div>
+                      <div className="tbl__name">{p.name}</div>
+                      <div className="tbl__sub">{p.key} · {p.type} · {p.points} pts</div>
                     </td>
                     <td><span className="badge badge--neutral">{p.env}</span></td>
                     <td><StatusBadge tone={p.status} label={STATUS_LABEL(p.status)} /></td>
