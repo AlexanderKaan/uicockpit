@@ -74,9 +74,14 @@
    * fits as many 375px columns as the stage allows and centres them, so on a
    * wide monitor you get more columns, not wider cards. A .card--wide spans two
    * (≈790px). */
-  /* 375px columns on desktop; below a 375px viewport the column shrinks to fit
-   * (min(375px,100%)) so a phone never gets a horizontal page-scroll. */
-  grid-template-columns: repeat(auto-fill, minmax(min(375px, 100%), 375px));
+  /* Fluid-but-bounded columns (C5): tracks are 320–360px. KEY: auto-fill counts
+   * repetitions from the minmax MAX (the definite length), NOT the floor — so the
+   * MAX is what gates the column count. Dropping it 375→360 lets a THIRD column
+   * appear at a ~1174px wall (3×360 + 2×40 = 1160 ≤ 1174) where the old 375 cap
+   * just missed, while cards stay at their true app width — never stretched to fill
+   * a row. Below 320px the column shrinks to fit (min(320px,100%)) so a phone never
+   * gets a horizontal page-scroll. */
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 360px));
   justify-content: center;
   /* 1px rows = fine masonry quantisation (waste < 1px). The vertical gap is NOT
    * a row-gap (that quantises coarsely with these tiny rows); it's baked into
@@ -129,6 +134,41 @@
    is already inherited from the base .cockpit-preview. */
 .cockpit-preview:has(.gallery) {
   padding: var(--gallery-gap, 40px);
+}
+
+/* Gallery search/filter (C5) — filters the Atoms/Blocks wall by component name.
+   Lives inside .cockpit-preview, so it's themed live by the kit. */
+.gallerywrap { width: 100%; }
+.gallery-search {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-8);
+  width: min(460px, 100%);
+  margin: 0 auto var(--gallery-gap);
+  padding: 0 var(--k-s-12);
+  min-height: var(--k-control-h-md, 36px);
+  border: 1px solid var(--k-input-border, var(--k-border));
+  border-radius: var(--k-radius-md);
+  background: var(--k-input-bg, var(--k-surface));
+  color: var(--k-fg-faint);
+}
+.gallery-search svg { flex-shrink: 0; }
+.gallery-search__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--k-fg);
+  font: inherit;
+  font-size: var(--k-type-small);
+}
+.gallery-search__count { font-size: var(--k-type-caption); color: var(--k-fg-faint); white-space: nowrap; }
+.gallery-empty {
+  text-align: center;
+  color: var(--k-fg-muted);
+  font-size: var(--k-type-small);
+  padding: var(--k-s-40) 0;
 }
 
 /* The Card surface + anatomy (.card, __head/__title/__desc/__row/__col/__foot)

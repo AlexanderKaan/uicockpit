@@ -6,10 +6,19 @@ import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, us
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 
+// Human, searchable label from a card component's function name — zero-maintenance
+// and exactly what a user searches by (component TYPE, not the demo's in-context
+// title): FormCard → "Form", DataTableProCard → "Data Table Pro". (C5)
+const labelOf = (fn: () => ReactElement): string =>
+  fn.name.replace(/Card$/, '').replace(/([a-z0-9])([A-Z])/g, '$1 $2').trim()
+
 export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'block' } = {}) {
   // Order strategy: highest brand-impact first, token-neutral utilities last.
   // Users should SEE the result of every token change without scrolling.
   const galleryRef = useRef<HTMLDivElement>(null)
+  const [q, setQ] = useState('')
+  const query = q.trim().toLowerCase()
+  const matchesQ = (C: () => ReactElement) => !query || labelOf(C).toLowerCase().includes(query)
 
   // Grid masonry — each card spans as many `grid-auto-rows` units as its
   // measured height needs, so portrait cards pack tightly while .card--wide
@@ -47,7 +56,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
       ro.disconnect()
       window.removeEventListener('resize', layout)
     }
-  }, [])
+  }, [q, tier]) // re-measure when the search filter changes the visible card set
 
   // The full wall as an array so callers can render just the first `limit`
   // cards. The marketing bouquet (hero) shows only the top of the wall, so it
@@ -84,21 +93,66 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   // The Atoms view groups the bare atoms into bordered CATEGORY cards (like the
   // Foundations sections): the frame lives on the GROUP, so atoms get structure
   // without each looking like a standalone block. Covers all atom-tier cards.
+  // Search/filter bar (C5) — only in the cockpit Atoms/Blocks views (tier set),
+  // never in the marketing bouquet. Themed by the kit (lives in .cockpit-preview).
+  const searchBar = (count: number, total: number) => (
+    <div className="gallery-search" role="search">
+      <Icon name="search" size={16} />
+      <input
+        className="gallery-search__input"
+        type="search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder={`Search ${tier === 'atom' ? 'atoms' : 'blocks'}…`}
+        aria-label={`Search ${tier === 'atom' ? 'atoms' : 'blocks'}`}
+      />
+      <span className="gallery-search__count">{query ? `${count} of ${total}` : `${total}`}</span>
+    </div>
+  )
+
   if (tier === 'atom') {
+    const groups = ATOM_GROUPS.map(([name, comps]) => [name, comps.filter(matchesQ)] as const).filter(([, c]) => c.length)
+    const total = ATOM_GROUPS.reduce((n, [, c]) => n + c.length, 0)
+    const count = groups.reduce((n, [, c]) => n + c.length, 0)
     return (
-      <div className="gallery atomgroups" ref={galleryRef}>
-        {ATOM_GROUPS.map(([name, comps]) => (
-          <section className="card atomgroup" key={name}>
-            <div className="atomgroup__head">
-              <h3 className="atomgroup__title">{name}</h3>
-              <span className="atomgroup__count">{comps.length}</span>
-            </div>
-            {/* Bare atoms inside (flattened via .gallery--workbench), quiet labels. */}
-            <div className="atomgroup__items gallery--workbench">
-              {comps.map((C, i) => <C key={i} />)}
-            </div>
-          </section>
-        ))}
+      <div className="gallerywrap">
+        {searchBar(count, total)}
+        {groups.length === 0 ? (
+          <div className="gallery-empty">No atoms match “{q}”.</div>
+        ) : (
+          <div className="gallery atomgroups" ref={galleryRef}>
+            {groups.map(([name, comps]) => (
+              <section className="card atomgroup" key={name}>
+                <div className="atomgroup__head">
+                  <h3 className="atomgroup__title">{name}</h3>
+                  <span className="atomgroup__count">{comps.length}</span>
+                </div>
+                {/* Bare atoms inside (flattened via .gallery--workbench), quiet labels. */}
+                <div className="atomgroup__items gallery--workbench">
+                  {comps.map((C, i) => <C key={i} />)}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // BLOCKS view (tier='block') — filterable. The no-tier marketing bouquet path
+  // never reaches the search wrap (it renders the bare interleaved wall below).
+  if (tier === 'block') {
+    const blocks = shown.filter(([C]) => matchesQ(C))
+    return (
+      <div className="gallerywrap">
+        {searchBar(blocks.length, shown.length)}
+        {blocks.length === 0 ? (
+          <div className="gallery-empty">No blocks match “{q}”.</div>
+        ) : (
+          <div className="gallery" ref={galleryRef}>
+            {blocks.map(([C], i) => <C key={i} />)}
+          </div>
+        )}
       </div>
     )
   }
@@ -107,8 +161,8 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     <div className="gallery" ref={galleryRef}>
       {/* INTERLEAVED WALL — cards woven so a landscape (.card--wide) lands
           roughly every ~3rd slot for an even masonry rhythm (shadcn /create
-          feel). `tier='block'` filters to the Blocks ladder view; no `tier`
-          (the marketing bouquet) shows the full interleaved wall, `limit`-sliced. */}
+          feel). No `tier` (the marketing bouquet) shows the full interleaved
+          wall, `limit`-sliced — unchanged. */}
       {shown.map(([C], i) => <C key={i} />)}
     </div>
   )
