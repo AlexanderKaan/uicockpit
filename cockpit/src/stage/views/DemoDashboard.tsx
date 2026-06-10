@@ -2180,85 +2180,89 @@ function Settings() {
         </button>
       </div>
 
-      {/* Account section — uses Description List for read-only key/value data */}
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 12 }}>Account</h2>
-      <dl className="dl" style={{ marginBottom: 20 }}>
-        <dt>Plan</dt>
-        <dd>Team — $48/mo · <a href="#" style={{ color: 'var(--k-primary)' }}>Upgrade</a></dd>
-        <dt>Member since</dt>
-        <dd>March 2024</dd>
-        <dt>Storage</dt>
-        <dd>14.2 GB of 25 GB used</dd>
-        <dt>Status</dt>
-        <dd><span className="badge badge--success">Active</span></dd>
-      </dl>
+      {/* Settings grouped into cards (B★7) — head + body, the shadcn settings
+          look, instead of a flat run of <h2> + <hr> separators. */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k-space)', maxWidth: 'var(--k-measure-wide)' }}>
+        {/* Account — read-only key/value via Description List */}
+        <div className="card">
+          <div className="card__head"><span className="card__title">Account</span></div>
+          <dl className="dl">
+            <dt>Plan</dt>
+            <dd>Team — $48/mo · <a href="#" style={{ color: 'var(--k-primary)' }}>Upgrade</a></dd>
+            <dt>Member since</dt>
+            <dd>March 2024</dd>
+            <dt>Storage</dt>
+            <dd>14.2 GB of 25 GB used</dd>
+            <dt>Status</dt>
+            <dd><span className="badge badge--success">Active</span></dd>
+          </dl>
+        </div>
 
-      <hr className="sep" />
+        {/* Workspace — name, region, notifications */}
+        <div className="card">
+          <div className="card__head"><span className="card__title">Workspace</span></div>
+          <label className="lab" style={{ maxWidth: 360 }}>
+            <span>Name</span>
+            <input className="in" value={name} onChange={(e) => setName(e.target.value)} />
+          </label>
+          <div>
+            <div style={{ fontSize: 'var(--k-type-small)', fontWeight: 'var(--k-weight-medium)', marginBottom: 'var(--k-s-6)' }}>Region</div>
+            <div className="segctrl" role="tablist">
+              {(['eu-west', 'us-east', 'ap-south'] as const).map((r) => (
+                <button key={r} role="tab" aria-selected={region === r} className={`segctrl__btn ${region === r ? 'segctrl__btn--on' : ''}`} onClick={() => setRegion(r)}>{r}</button>
+              ))}
+            </div>
+          </div>
+          <div className="card__col">
+            <ToggleRow label="Email me about deploys" value={notify} onChange={setNotify} />
+            <ToggleRow label="Share usage analytics" value={analytics} onChange={setAnalytics} />
+          </div>
+        </div>
 
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 12 }}>Workspace</h2>
-      <label className="lab" style={{ marginBottom: 16, maxWidth: 360 }}>
-        <span>Name</span>
-        <input className="in" value={name} onChange={(e) => setName(e.target.value)} />
-      </label>
-
-      {/* Region — Segmented Control replaces stack of radios */}
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 12 }}>Region</h2>
-      <div className="segctrl" style={{ marginBottom: 20 }} role="tablist">
-        {(['eu-west', 'us-east', 'ap-south'] as const).map((r) => (
-          <button
-            key={r}
-            role="tab"
-            aria-selected={region === r}
-            className={`segctrl__btn ${region === r ? 'segctrl__btn--on' : ''}`}
-            onClick={() => setRegion(r)}
-          >
-            {r}
-          </button>
-        ))}
-      </div>
-
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 12 }}>Notifications</h2>
-      <div className="card__col">
-        <ToggleRow label="Email me about deploys" value={notify} onChange={setNotify} />
-        <ToggleRow label="Share usage analytics" value={analytics} onChange={setAnalytics} />
-      </div>
-
-      <hr className="sep" />
-
-      {/* 2FA — OTP input demo */}
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 6 }}>Two-factor auth</h2>
-      <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', marginBottom: 10 }}>
-        Enter the 6-digit code from your authenticator app.
-      </p>
-      <div className="otp">
-        {otp.slice(0, 3).map((c, i) => (
-          <input key={i} ref={otpRefs[i]} className="otp__slot" value={c} maxLength={1} onChange={(e) => setOtpAt(i, e.target.value)} />
-        ))}
-        <span className="otp__sep">–</span>
-        {otp.slice(3).map((c, i) => (
-          <input key={i + 3} ref={otpRefs[i + 3]} className="otp__slot" value={c} maxLength={1} onChange={(e) => setOtpAt(i + 3, e.target.value)} />
-        ))}
-      </div>
-
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginTop: 20, marginBottom: 8 }}>API key</h2>
-      <pre className="code">{`POST https://api.northwind.dev/v1
+        {/* Security — 2FA + API key */}
+        <div className="card">
+          <div className="card__head"><span className="card__title">Security</span></div>
+          <div>
+            <div style={{ fontSize: 'var(--k-type-small)', fontWeight: 'var(--k-weight-medium)', marginBottom: 'var(--k-s-2)' }}>Two-factor auth</div>
+            <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', marginBottom: 'var(--k-s-10)', marginTop: 0 }}>Enter the 6-digit code from your authenticator app.</p>
+            <div className="otp">
+              {otp.slice(0, 3).map((c, i) => (
+                <input key={i} ref={otpRefs[i]} className="otp__slot" value={c} maxLength={1} onChange={(e) => setOtpAt(i, e.target.value)} />
+              ))}
+              <span className="otp__sep">–</span>
+              {otp.slice(3).map((c, i) => (
+                <input key={i + 3} ref={otpRefs[i + 3]} className="otp__slot" value={c} maxLength={1} onChange={(e) => setOtpAt(i + 3, e.target.value)} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 'var(--k-type-small)', fontWeight: 'var(--k-weight-medium)', marginBottom: 'var(--k-s-6)' }}>API key</div>
+            <pre className="code" style={{ margin: 0 }}>{`POST https://api.northwind.dev/v1
 Authorization: Bearer nw_live_3f8a92...e0d1`}</pre>
+          </div>
+        </div>
 
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginTop: 20, marginBottom: 6 }}>Advanced</h2>
-      <div className="accordion">
-        <details>
-          <summary>Webhooks</summary>
-          <p>Configure HTTP callbacks for deploy / error / quota events.</p>
-        </details>
-        <details>
-          <summary>Custom domains</summary>
-          <p>Bring your own domain — verification via DNS TXT record.</p>
-        </details>
-        <details>
-          <summary>SSO / SAML</summary>
-          <p>Available on Team and Enterprise plans only.</p>
-        </details>
+        {/* Advanced — disclosure accordion */}
+        <div className="card">
+          <div className="card__head"><span className="card__title">Advanced</span></div>
+          <div className="accordion">
+            <details>
+              <summary>Webhooks</summary>
+              <p>Configure HTTP callbacks for deploy / error / quota events.</p>
+            </details>
+            <details>
+              <summary>Custom domains</summary>
+              <p>Bring your own domain — verification via DNS TXT record.</p>
+            </details>
+            <details>
+              <summary>SSO / SAML</summary>
+              <p>Available on Team and Enterprise plans only.</p>
+            </details>
+          </div>
+        </div>
       </div>
+
+      <hr className="sep" style={{ marginTop: 'var(--k-s-24)' }} />
 
       <SettingsExtras />
 
