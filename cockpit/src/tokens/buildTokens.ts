@@ -249,9 +249,15 @@ export function buildTokens(cfg: Config): Tokens {
         overlay: nStep(5),
       }
     : {
-        base: nStep(0),
-        raised: nStep(0),
-        overlay: nStep(0),
+        // B★2 surface ladder: crisp PURE-WHITE cards/overlays float on the muted
+        // canvas (pageBg → step 1 = 98%). Was nStep(0) (99.5%) on a pure-white
+        // page — a 0.5% step that made cards rely 100% on their border to exist.
+        // Now card(100%) > canvas(98%) is a real 2% lift (the Stripe/Linear-light
+        // recipe). Raised/overlay share pure white and lift by SHADOW, not fill
+        // (shadcn popover = card bg + shadow). [BEAUTY-SPEC §1.1]
+        base: 'oklch(100% 0 0)',
+        raised: 'oklch(100% 0 0)',
+        overlay: 'oklch(100% 0 0)',
         s2: nStep(1),
         sunken: nStep(3 + emph),
       }
@@ -529,15 +535,15 @@ export function buildTokens(cfg: Config): Tokens {
     return `'${name}',${isSerif ? 'serif' : 'sans-serif'}`
   }
 
-  // Page canvas (--k-bg). The page is NOT a system surface — it's the neutral
-  // substrate the interface BLOCKS (cards, panels, chrome) tile onto. So it is
-  // decoupled from the neutral temperature: a warm/cool ramp tints the blocks
-  // (surfaces, borders, text), never the page. Light = PURE WHITE (no tint, no
-  // recessed grey — a tinted page reads as a configurable "background" that
-  // isn't part of the system, and makes every panel look like a floating card).
-  // Dark = a near-black neutral floor recessed below the card surface so panels
-  // still lift off the canvas (the dark-mode elevation the user asked for).
-  const pageBg = dark ? nStep(1) : 'oklch(100% 0 0)'
+  // Page canvas (--k-bg). The neutral substrate the interface BLOCKS (cards,
+  // panels, chrome) tile onto — now step 1 in BOTH modes, so the ladder is
+  // symmetric: canvas(step 1) < card(pure white / step 2 dark) < raised(+shadow).
+  // B★2 reversal (was light = PURE WHITE): a muted ~98% canvas is what makes
+  // crisp white cards POP (Stripe / Linear-light / Notion). The old fear — "a
+  // tinted page makes panels look like floating cards" — was about a STRONG tint;
+  // a whisper-tinted near-white canvas reads as deliberate, not configurable.
+  // Cards floating on it is the intended modern look, not a bug. [BEAUTY-SPEC §1.1]
+  const pageBg = nStep(1)
 
   // Input border — TRACKS the Border control (Faint→Strong), one neutral step
   // firmer than the decorative --k-border so a field still reads as a field.
@@ -570,7 +576,11 @@ export function buildTokens(cfg: Config): Tokens {
       // carries the whisper-of-brand, not a dead grey). Gives form fields a
       // perceivable filled-field surface (Material/shadcn-muted) so the border
       // can stay soft + Border-control-responsive while the field reads clearly.
-      '--k-input-bg': surf.sunken,
+      // B★2: light decouples from surf.sunken (step 3 = 93.7%, a dark "washed"
+      // well) to step 2 (95.8%) — a whisper well below the pure-white card, which
+      // paired with the now-near-black value text reads as "a field ready for
+      // input", not "disabled". Dark keeps the deep sunken well. [BEAUTY-SPEC §1.3]
+      '--k-input-bg': dark ? surf.sunken : nStep(2),
       // === Surface treatment (field facet) — the four tokens a field recipe reads
       // so ONE .in rule renders all three Surface modes (no selector branching):
       //   Outlined → fill + full border (the box; default = previous look).

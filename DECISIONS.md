@@ -126,6 +126,30 @@ the card stays neutral and hierarchy comes from elevation, weight, and spacing.
   "fix" the field widths by building a custom picker unless full layout control
   becomes a real requirement — that's a deliberate trade-off, not an oversight.
 
+## Surfaces & text crispness (B★2 beauty recalibration — June 2026)
+
+- **Light-mode canvas is a muted ~98% grey, NOT pure white** (`pageBg = nStep(1)`,
+  both modes). This **reverses** the earlier "Light = PURE WHITE" decision. The old
+  rationale ("a tinted page makes panels look like floating cards") was about a
+  *strong / brand-configurable* tint; a whisper-tinted near-white neutral canvas is
+  what makes crisp **pure-white cards** (`--k-surface = oklch(100% 0 0)`) pop — the
+  Stripe / Linear-light / Notion recipe. Cards floating on the canvas is the
+  intended modern look. Don't "restore" the white page — that flattens the surface
+  ladder back to white-on-white where cards rely 100% on their border to exist.
+- **Surface ladder (light):** canvas 98% < card/raised/overlay pure-white (lift by
+  SHADOW, not fill — shadcn popover recipe) < filled-field well 95.8%
+  (`--k-input-bg = nStep(2)`, decoupled from `surf.sunken` which stays the deeper
+  chrome-nav well). Dark mode already had a proper ladder and is **untouched**.
+- **Primary text is near-black** (`SCALE_L_LIGHT` step 12 = 0.16, was 0.244) so
+  titles/values/numbers read crisp like shadcn/Linear. Muted (0.503) + faint (0.64)
+  stay put → three text tiers with real separation. Only `--k-fg` (+ a hair of
+  `--k-track`) reads step 12, so this crisps text without moving any surface/border.
+- The full rationale + target values live in `BEAUTY-SPEC.md` (gitignored). Borders
+  were deliberately **left as-is** — once the canvas/card contrast carries the
+  separation, the existing subtle border is a gentle frame, and lightening it would
+  risk the `--k-input-border` 3:1 WCAG floor. Raised-surface shadow tuning is
+  deferred to the B★4 overlays pass (with popovers/dialogs actually in view).
+
 ## Fonts
 
 - Three-tier font model: all-round sans-serifs usable for body AND display; a

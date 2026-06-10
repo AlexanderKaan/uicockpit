@@ -121,7 +121,12 @@ export const oklchStrToHex = (str: string): Hex => {
  * and peaks at the solid. ── */
 
 // OKLCH L anchors (0-1), index 0 = step 1.
-const SCALE_L_LIGHT = [0.995, 0.98, 0.958, 0.937, 0.916, 0.892, 0.858, 0.8, 0.64, 0.605, 0.503, 0.244]
+// Step 12 (the text anchor → --k-fg) is near-black (0.16, was 0.244): primary
+// titles/values/numbers now read crisp like shadcn/Linear (~0.15) instead of
+// medium-grey. Muted (step 11, 0.503) + faint (step 9, 0.64) stay put so the
+// three text tiers gain real separation. Surfaces/borders use steps 1-8, so
+// this only crisps text (+ a hair on --k-track). [BEAUTY-SPEC §1.2]
+const SCALE_L_LIGHT = [0.995, 0.98, 0.958, 0.937, 0.916, 0.892, 0.858, 0.8, 0.64, 0.605, 0.503, 0.16]
 const SCALE_L_DARK = [0.176, 0.213, 0.254, 0.285, 0.317, 0.355, 0.423, 0.536, 0.64, 0.693, 0.775, 0.945]
 // Chroma multipliers (× peak). Quiet backgrounds → peak at the solid (9) → ease
 // back for text. Neutrals pass a tiny peak so this stays a whisper of tint.

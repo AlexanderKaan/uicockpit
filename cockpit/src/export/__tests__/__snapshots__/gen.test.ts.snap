@@ -34,24 +34,24 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-measure-narrow: 48ch;
   --k-measure-prose: 68ch;
   --k-measure-wide: 90ch;
-  --k-bg: oklch(100% 0 0);
-  --k-chrome-bg: oklch(100% 0 0);
-  --k-surface: oklch(99.5% 0.0056 249.9);
+  --k-bg: oklch(98.0% 0.0063 249.9);
+  --k-chrome-bg: oklch(98.0% 0.0063 249.9);
+  --k-surface: oklch(100% 0 0);
   --k-surface-sunken: oklch(91.6% 0.0077 249.9);
   --k-surface-2: oklch(98.0% 0.0063 249.9);
-  --k-input-bg: oklch(91.6% 0.0077 249.9);
+  --k-input-bg: oklch(95.8% 0.0070 249.9);
   --k-field-bg: var(--k-input-bg);
   --k-field-border-color: var(--k-input-border);
   --k-field-underline-color: var(--k-input-border);
   --k-field-radius: var(--k-radius-md);
   --k-field-hover-edge: var(--k-state-border, var(--k-fg-faint));
   --k-field-focus-edge: var(--k-ring);
-  --k-track: color-mix(in srgb, oklch(24.4% 0.0140 249.9) 9%, oklch(99.5% 0.0056 249.9));
-  --k-surface-raised: oklch(99.5% 0.0056 249.9);
-  --k-surface-overlay: oklch(99.5% 0.0056 249.9);
+  --k-track: color-mix(in srgb, oklch(16.0% 0.0140 249.9) 9%, oklch(100% 0 0));
+  --k-surface-raised: oklch(100% 0 0);
+  --k-surface-overlay: oklch(100% 0 0);
   --k-scrim: rgba(0, 0, 0, 0.4);
   --k-scrim-strong: rgba(0, 0, 0, 0.86);
-  --k-fg: oklch(24.4% 0.0140 249.9);
+  --k-fg: oklch(16.0% 0.0140 249.9);
   --k-fg-muted: oklch(50.3% 0.0140 249.9);
   --k-fg-faint: oklch(64.0% 0.0112 249.9);
   --k-primary: oklch(56.4% 0.1689 253.9);
@@ -5041,10 +5041,10 @@ exports[`genJson > matches snapshot for default mono 1`] = `
   "tokens": {
     "color": {
       "background": {
-        "value": "oklch(100% 0 0)"
+        "value": "oklch(98.0% 0.0000 0.0)"
       },
       "foreground": {
-        "value": "oklch(24.4% 0.0000 0.0)"
+        "value": "oklch(16.0% 0.0000 0.0)"
       },
       "foreground-muted": {
         "value": "oklch(50.3% 0.0000 0.0)"
@@ -5053,7 +5053,7 @@ exports[`genJson > matches snapshot for default mono 1`] = `
         "value": "oklch(64.0% 0.0000 0.0)"
       },
       "surface": {
-        "value": "oklch(99.5% 0.0000 0.0)"
+        "value": "oklch(100% 0 0)"
       },
       "surface-sunken": {
         "value": "oklch(93.7% 0.0000 0.0)"
@@ -5062,10 +5062,10 @@ exports[`genJson > matches snapshot for default mono 1`] = `
         "value": "oklch(98.0% 0.0000 0.0)"
       },
       "surface-raised": {
-        "value": "oklch(99.5% 0.0000 0.0)"
+        "value": "oklch(100% 0 0)"
       },
       "surface-overlay": {
-        "value": "oklch(99.5% 0.0000 0.0)"
+        "value": "oklch(100% 0 0)"
       },
       "primary": {
         "value": "oklch(23.9% 0.0000 89.9)",
@@ -5549,31 +5549,31 @@ exports[`genJson > matches snapshot for default mono 1`] = `
     "pairs": [
       {
         "label": "Body text on background",
-        "ratio": 16.29,
+        "ratio": 18.3,
         "required": 4.5,
         "passes": true
       },
       {
         "label": "Body text on surface",
-        "ratio": 16.02,
+        "ratio": 19.44,
         "required": 4.5,
         "passes": true
       },
       {
         "label": "Body text on raised surface",
-        "ratio": 16.02,
+        "ratio": 19.44,
         "required": 4.5,
         "passes": true
       },
       {
         "label": "Body text on overlay",
-        "ratio": 16.02,
+        "ratio": 19.44,
         "required": 4.5,
         "passes": true
       },
       {
         "label": "Muted text on background",
-        "ratio": 5.92,
+        "ratio": 5.57,
         "required": 4.5,
         "passes": true
       },
@@ -5627,19 +5627,19 @@ exports[`genJson > matches snapshot for default mono 1`] = `
       },
       {
         "label": "Primary against background",
-        "ratio": 16.48,
+        "ratio": 15.52,
         "required": 3,
         "passes": true
       },
       {
         "label": "Input border against background",
-        "ratio": 1.54,
+        "ratio": 1.45,
         "required": 3,
         "passes": false
       },
       {
         "label": "Focus ring against background",
-        "ratio": 16.48,
+        "ratio": 15.52,
         "required": 3,
         "passes": true
       }
@@ -5749,12 +5749,12 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
   "type": "registry:theme",
   "cssVars": {
     "light": {
-      "background": "oklch(100% 0 0)",
-      "foreground": "oklch(24.4% 0.0140 249.9)",
-      "card": "oklch(99.5% 0.0056 249.9)",
-      "card-foreground": "oklch(24.4% 0.0140 249.9)",
-      "popover": "oklch(99.5% 0.0056 249.9)",
-      "popover-foreground": "oklch(24.4% 0.0140 249.9)",
+      "background": "oklch(98.0% 0.0063 249.9)",
+      "foreground": "oklch(16.0% 0.0140 249.9)",
+      "card": "oklch(100% 0 0)",
+      "card-foreground": "oklch(16.0% 0.0140 249.9)",
+      "popover": "oklch(100% 0 0)",
+      "popover-foreground": "oklch(16.0% 0.0140 249.9)",
       "primary": "oklch(56.4% 0.1689 253.9)",
       "primary-foreground": "#ffffff",
       "secondary": "#dee8f2",
@@ -5774,7 +5774,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "chart-4": "oklch(48.7% 0.2463 281.4)",
       "chart-5": "oklch(65.6% 0.1692 41.6)",
       "sidebar": "oklch(91.6% 0.0077 249.9)",
-      "sidebar-foreground": "oklch(24.4% 0.0140 249.9)",
+      "sidebar-foreground": "oklch(16.0% 0.0140 249.9)",
       "sidebar-primary": "oklch(56.4% 0.1689 253.9)",
       "sidebar-primary-foreground": "#ffffff",
       "sidebar-accent": "oklch(95.8% 0.0372 253.9)",
@@ -5846,15 +5846,15 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-background: oklch(100% 0 0);
-  --color-foreground: oklch(24.4% 0.0140 249.9);
+  --color-background: oklch(98.0% 0.0063 249.9);
+  --color-foreground: oklch(16.0% 0.0140 249.9);
   --color-muted: oklch(50.3% 0.0140 249.9);
   --color-faint: oklch(64.0% 0.0112 249.9);
-  --color-surface: oklch(99.5% 0.0056 249.9);
+  --color-surface: oklch(100% 0 0);
   --color-surface-sunken: oklch(91.6% 0.0077 249.9);
   --color-surface-2: oklch(98.0% 0.0063 249.9);
-  --color-surface-raised: oklch(99.5% 0.0056 249.9);
-  --color-surface-overlay: oklch(99.5% 0.0056 249.9);
+  --color-surface-raised: oklch(100% 0 0);
+  --color-surface-overlay: oklch(100% 0 0);
   --color-primary: oklch(56.4% 0.1689 253.9);
   --color-primary-hover: oklch(51.4% 0.1638 253.9);
   --color-primary-foreground: #ffffff;
