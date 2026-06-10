@@ -25,6 +25,54 @@
   min-width: 0;
 }
 .topbar__right { justify-content: flex-end; }
+.topbar__left { position: relative; }
+
+/* One-time URL-save hint (C8) — a small callout under the "Saved to URL" chip on
+   first visit, surfacing the app's most elegant (and invisible) idea: the kit
+   lives in the URL. Dismissed → remembered in localStorage. */
+.urlhint {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1150;
+  width: 262px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  box-shadow: 0 10px 24px -6px rgba(15, 20, 35, .18);
+  animation: urlhint-in 200ms cubic-bezier(.16, 1, .3, 1);
+}
+.urlhint::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 20px;
+  width: 9px;
+  height: 9px;
+  background: var(--app-surface);
+  border-left: 1px solid var(--app-border);
+  border-top: 1px solid var(--app-border);
+  transform: rotate(45deg);
+}
+.urlhint__text { font-size: 12.5px; line-height: 1.45; color: var(--app-fg); }
+.urlhint__btn {
+  align-self: flex-end;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--app-border);
+  background: var(--app-bg);
+  color: var(--app-fg);
+  cursor: pointer;
+}
+.urlhint__btn:hover { background: var(--app-hover); }
+@keyframes urlhint-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .urlhint { animation: none; } }
 
 /* Brand — runs continuously across the top, left-aligned. Proportions match
  * the marketing nav wordmark so it feels identical in both contexts. */

@@ -172,6 +172,12 @@ interface RowDef {
   footer?: ReactNode
 }
 
+/* The four controls that decide ~80% of a kit's look (C9). They keep their domain
+ * homes in the flat list, but read as PRIMARY (heavier label + a quiet neutral tick)
+ * so a first-timer knows where to start — without re-introducing the removed
+ * Essentials/Advanced tiering. */
+const ESSENTIAL_KEYS = new Set(['colorTheme', 'scale', 'fontDisplay', 'radius'])
+
 export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
   const set = <K extends keyof Config>(field: K, value: Config[K]) =>
     dispatch({ type: 'SET', patch: { [field]: value } as Partial<Config> })
@@ -418,7 +424,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
                   ? <button type="button" className="fmsec fmsec--link" onClick={() => jumpToFoundation(r.sec!)} title={`Jump to ${r.sec} in Foundations`}>{r.sec}</button>
                   : <div className="fmsec">{r.sec}</div>
               )}
-              <div className={`fmrow ${openKey === r.key ? 'fmrow--open' : ''}`}>
+              <div className={`fmrow ${openKey === r.key ? 'fmrow--open' : ''} ${ESSENTIAL_KEYS.has(r.key) ? 'fmrow--key' : ''}`}>
                 <button
                   type="button"
                   className="fmrow__head"

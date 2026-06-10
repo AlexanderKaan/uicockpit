@@ -43,6 +43,16 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
   const total = audit.length
   const allPass = pass === total
 
+  // One-time URL-as-save-file hint (C8) — the app's most elegant concept (your
+  // whole kit lives in the URL) is otherwise invisible. Shown once, then remembered.
+  const [urlHint, setUrlHint] = useState(() => {
+    try { return localStorage.getItem('uic.hint.url') !== '1' } catch { return false }
+  })
+  const dismissUrlHint = () => {
+    try { localStorage.setItem('uic.hint.url', '1') } catch { /* private mode */ }
+    setUrlHint(false)
+  }
+
   return (
     <header className="topbar">
       {/* Left = ambient status zone. "Saved to URL" tells you your work is
@@ -84,6 +94,12 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         <span className="topbar__save" aria-live="polite">
           {saved ? 'Saved to URL' : 'Saving…'}
         </span>
+        {urlHint && (
+          <div className="urlhint" role="status">
+            <span className="urlhint__text">Your whole kit lives in this URL — copy it any time to save or share. No account needed.</span>
+            <button type="button" className="urlhint__btn" onClick={dismissUrlHint}>Got it</button>
+          </div>
+        )}
         <A11yBadge audit={audit} pass={pass} total={total} allPass={allPass} />
       </div>
       <div className="topbar__center">
@@ -91,17 +107,20 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
          * Foundation, then climb the rungs: Atoms → Blocks → Pages. Replaces the
          * old 2-way Components/Application toggle. */}
         <div className="view-toggle" role="tablist" aria-label="View">
+          {/* Tooltips bridge the ladder's taxonomy to plain language for the
+           * vibe-coder audience (C7) — the names stay, the meaning is one hover away. */}
           {([
-            ['foundations', 'Foundations', Palette],
-            ['atoms', 'Atoms', Box],
-            ['blocks', 'Blocks', Boxes],
-            ['pages', 'Pages', AppWindow],
-          ] as [ViewKind, string, typeof Palette][]).map(([k, label, Ico]) => (
+            ['foundations', 'Foundations', Palette, 'Tokens & scales — the design decisions'],
+            ['atoms', 'Atoms', Box, 'Bare building blocks — buttons, inputs, badges'],
+            ['blocks', 'Blocks', Boxes, 'Ready-made sections — tables, forms, dialogs'],
+            ['pages', 'Pages', AppWindow, 'Full screens — a real app, themed live'],
+          ] as [ViewKind, string, typeof Palette, string][]).map(([k, label, Ico, sub]) => (
             <button
               key={k}
               type="button"
               role="tab"
               aria-selected={view === k}
+              title={`${label} — ${sub}`}
               className={`view-toggle__btn ${view === k ? 'view-toggle__btn--on' : ''}`}
               onClick={() => onViewChange(k)}
             >

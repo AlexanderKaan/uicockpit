@@ -102,7 +102,10 @@
 .fmsec--link::after {
   content: '→';
   margin-left: auto;
-  opacity: 0;
+  /* Persistent faint arrow (C8) — the panel↔Foundations twin had zero affordance
+   * (the jump cue only appeared on hover). A quiet always-on arrow advertises
+   * "click this header to inspect it in Foundations"; it brightens on hover. */
+  opacity: 0.3;
   transition: opacity 0.14s ease;
 }
 .fmsec--link:hover::after { opacity: 0.55; }
@@ -110,6 +113,22 @@
 /* A control row: label (left) + current value (right) + chevron. */
 .fmrow { position: relative; }
 .fmrow--open { z-index: 50; }
+/* Essential rows (C9) — Brand / Scale / Display font / Box radius decide ~80% of
+ * the look, so they read as PRIMARY: a heavier label + a quiet neutral tick on the
+ * left. Neutral on purpose (the panel carries no brand colour), and distinct from
+ * the recessed active state (which is a background, not a tick). */
+.fmrow--key > .fmrow__head > .fmrow__label { font-weight: 680; color: var(--app-fg); }
+.fmrow--key::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 9px;
+  bottom: 9px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--app-fg-faint, #c2c6cc);
+  opacity: 0.6;
+}
 .fmrow__head {
   width: 100%;
   display: flex;
