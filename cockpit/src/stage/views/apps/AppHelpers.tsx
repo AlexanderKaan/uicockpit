@@ -275,9 +275,9 @@ export function DatePicker({
       </button>
       {open && (
         <div className="popover" role="dialog" aria-label={ariaLabel} style={{ width: 264 }}>
-          <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--k-s-6)' }}>
-            <span style={{ fontWeight: 600, fontSize: 'var(--k-type-small)' }}>{DP_MONTHS[view.m]} {view.y}</span>
-            <span className="toolbar__group">
+          <div className="calendar__nav">
+            <span className="calendar__nav-title">{DP_MONTHS[view.m]} {view.y}</span>
+            <span className="calendar__nav-btns">
               <button type="button" className="btn btn--ghost btn--icon btn--sm" onClick={() => shift(-1)} aria-label="Previous month"><Icon name="chevL" /></button>
               <button type="button" className="btn btn--ghost btn--icon btn--sm" onClick={() => shift(1)} aria-label="Next month"><Icon name="chevR" /></button>
             </span>

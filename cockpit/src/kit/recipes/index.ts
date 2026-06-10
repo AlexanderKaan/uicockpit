@@ -1790,7 +1790,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-weight: var(--k-weight-semibold);
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-}`,
+}
+/* Month-nav header (B4) — the title + prev/next cluster above the grid. Promotes
+   the picker's hand-rolled header into the kit so the FULL date-picker is one
+   exported pattern, not a per-app one-off. Pair the nav buttons with
+   .btn--ghost.btn--icon.btn--sm; the consumer owns month-shift + keyboard nav. */
+.calendar__nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--k-s-6); }
+.calendar__nav-title { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
+.calendar__nav-btns { display: inline-flex; gap: var(--k-s-2); }
+/* Disabled date (B4) — a day you can't pick (past / blackout / sold-out),
+   DISTINCT from --out (a faded prev/next-month day): muted + struck +
+   non-interactive. The consumer adds the native \`disabled\` + this class; the
+   recipe owns the look. Booking-grade pickers need this state. */
+.calendar__cell--disabled { color: var(--k-fg-faint); opacity: 0.5; cursor: not-allowed; text-decoration: line-through; }
+.calendar__cell--disabled:hover { background: transparent; }`,
   },
   {
     id: 'kbd',

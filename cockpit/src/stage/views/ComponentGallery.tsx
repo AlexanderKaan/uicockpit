@@ -2218,7 +2218,7 @@ function DateCard() {
   }, [open])
 
   const handleClick = (d: number) => {
-    if (d < 1 || d > 31) return
+    if (d < 1 || d > 31 || isBlocked(d)) return
     if (start === null || (start !== null && end !== null)) {
       // 1st pick (or restart after a complete range) → set start, clear end.
       setStart(d); setEnd(null)
@@ -2233,9 +2233,14 @@ function DateCard() {
   const effEnd = end ?? (start !== null && hover !== null && hover >= start ? hover : null)
   const effStart = end === null && start !== null && hover !== null && hover < start ? hover : start
   const days = Array.from({ length: 35 }, (_, i) => i - 2)
+  // Blackout dates — a couple of "sold-out" days, so the canonical picker demos
+  // the disabled-date state (.calendar__cell--disabled) next to range + today.
+  const BLOCKED = new Set([8, 9])
+  const isBlocked = (d: number) => BLOCKED.has(d)
   const cellClass = (d: number): string => {
     const parts = ['calendar__cell']
     if (d < 1 || d > 31) parts.push('calendar__cell--out')
+    else if (isBlocked(d)) parts.push('calendar__cell--disabled')
     if (d === today) parts.push('calendar__cell--today')
     if (effStart !== null && effEnd !== null) {
       if (d === effStart && d === effEnd) parts.push('calendar__cell--on')
@@ -2275,9 +2280,9 @@ function DateCard() {
         </button>
         {open && (
           <div className="popover" role="dialog" aria-label="Choose a date range" style={{ width: 268 }}>
-            <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontWeight: 600, fontSize: 'var(--k-type-small)' }}>May 2026</span>
-              <span className="toolbar__group">
+            <div className="calendar__nav">
+              <span className="calendar__nav-title">May 2026</span>
+              <span className="calendar__nav-btns">
                 <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Previous month"><Icon name="chevL" /></button>
                 <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Next month"><Icon name="chevR" /></button>
               </span>
@@ -2291,8 +2296,8 @@ function DateCard() {
                   key={i}
                   type="button"
                   className={cellClass(d)}
-                  disabled={d < 1 || d > 31}
-                  aria-label={d >= 1 && d <= 31 ? `May ${d}` : undefined}
+                  disabled={d < 1 || d > 31 || isBlocked(d)}
+                  aria-label={d >= 1 && d <= 31 ? `May ${d}${isBlocked(d) ? ' (unavailable)' : ''}` : undefined}
                   aria-current={d === today ? 'date' : undefined}
                   onClick={() => handleClick(d)}
                   onMouseEnter={() => d >= 1 && d <= 31 && setHover(d)}
