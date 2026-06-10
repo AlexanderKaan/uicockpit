@@ -49,6 +49,8 @@ const HARNESS_EXACT = new Set([
   // SupaDash super-app shell — page layout, not a shippable component.
   'dash', 'dash--rail', 'dash__main', 'dash__head', 'dash__page', 'dash__stats',
   'dash__navquick', 'dash__navquick-kbd',
+  // B★7 — the Home bento grid (page layout, not a shippable component).
+  'dash__bento', 'dash__hero',
   // Form width constraint utility (caps a form to a readable measure).
   'form-measure', 'form-measure--center',
 ])

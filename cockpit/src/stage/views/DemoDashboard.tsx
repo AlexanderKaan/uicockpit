@@ -8,6 +8,7 @@ import type { IconName } from '../../icons/concepts'
  * (Overview…Settings) plus these domain screens so every key component
  * is visible in one place. */
 import { StatusBadge, InteractiveSlider, DatePicker, MenuButton, SplitMenu, useDropdown, useModal, ImgAvatar, Menubar, Resizable } from './apps/AppHelpers'
+import { ChartFrame } from './ChartFrame'
 
 /* Profile photo stand-in (inline SVG — always loads, no network) for the
    hover-card preview; demonstrates the photo Avatar (.avatar__img) in the app. */
@@ -281,37 +282,32 @@ function Overview() {
           </div>
         </div>
       </div>
-      {/* Needs-attention alert — the semantic .alert recipe (tinted bg + leading
-          icon). The home dashboard is the canonical home for the alert stack. */}
-      {alertOpen && (
-        <div className="alert alert--warning" style={{ marginBottom: 16 }}>
-          <Icon name="bell" />
-          <div className="alert__body">
-            <div className="alert__title">Action needed</div>
-            <div>Your payment method expires this month — update it to avoid interruption.</div>
+      {/* Home bento (B★7) — a weighted dashboard grid with ONE focal point (the
+          revenue hero), the four KPI tiles, then usage/storage, builds/activity,
+          and the needs-attention alert. Hierarchy comes from SIZE, not from a
+          stack of full-width strips before the content. */}
+      <div className="dash__bento">
+        {/* Focal hero — recurring revenue + a live area chart. The page anchor. */}
+        <div className="card dash__hero" style={{ gridColumn: 'span 2', gridRow: 'span 2' }}>
+          <div className="card__head">
+            <span style={{ fontSize: 'var(--k-type-eyebrow)', textTransform: 'uppercase', letterSpacing: 'var(--k-track-eyebrow)', color: 'var(--k-fg-muted)', fontWeight: 'var(--k-weight-semibold)' }}>Recurring revenue</span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--k-s-8)', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 'var(--k-type-h1)', fontWeight: 'var(--k-weight-bold)', letterSpacing: '-0.02em', lineHeight: 1 }}>$48,210</span>
+              <span className="badge badge--success">+12.4%</span>
+            </div>
+            <span className="card__desc">This month · vs $42,880 in May</span>
           </div>
-          <button className="alert__close" aria-label="Dismiss" onClick={() => setAlertOpen(false)}><Icon name="x" /></button>
+          <div style={{ flex: 1, minHeight: 150, display: 'flex' }}>
+            <ChartFrame type="area" height={170} showLegend={false} labels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']} series={[{ name: 'MRR', values: [28, 31, 35, 38, 43, 48] }]} />
+          </div>
         </div>
-      )}
-      {/* KPI tiles — stat-tile strip with sparkline + delta (Home's signature). */}
-      <div className="dash__stats">
+        {/* KPI tiles — the .stat-tile recipe with sparkline + delta. */}
         <StatCard label="Requests" value="12.4k" delta="+8.2%" accent={1} trend={[42, 51, 49, 58, 65, 60, 72]} />
         <StatCard label="Active users" value="3,128" delta="+2.1%" accent={2} trend={[20, 22, 28, 31, 34, 38, 41]} />
-        <StatCard
-          label="Errors"
-          value="0.42%"
-          delta="-0.08%"
-          accent={3}
-          tooltip="Server-side errors as % of total requests"
-          trend={[80, 72, 65, 60, 52, 48, 42]}
-        />
-        <StatCard label="Revenue" value="$4,820" delta="+12%" accent={4} trend={[30, 38, 35, 50, 55, 62, 78]} />
-      </div>
-
-      {/* Usage row — the UsageMeter (API quota) paired with a Progress bar
-          (storage). Two distinct meter components, side by side. */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 24, alignItems: 'start' }}>
-        <div className="usage usage--warn">
+        <StatCard label="Errors" value="0.42%" delta="-0.08%" accent={3} tooltip="Server-side errors as % of total requests" trend={[80, 72, 65, 60, 52, 48, 42]} />
+        <StatCard label="Deploys" value="38" delta="+5" accent={4} trend={[3, 4, 6, 5, 7, 6, 8]} />
+        {/* API quota (UsageMeter) */}
+        <div className="usage usage--warn" style={{ gridColumn: 'span 2' }}>
           <div className="usage__head">
             <span className="usage__title">API calls — monthly quota</span>
             <span className="usage__pct">782,140 of 1,000,000 (78%)</span>
@@ -322,36 +318,51 @@ function Overview() {
             <button className="btn btn--ghost btn--sm">Upgrade plan</button>
           </div>
         </div>
-        {/* Progress (Storage) — thin determinate bar + used-of-total readout. */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-            <span style={{ fontSize: 'var(--k-type-small)', fontWeight: 500 }}>Storage</span>
-            <span style={{ fontSize: 11, color: 'var(--k-fg-muted)', fontVariantNumeric: 'tabular-nums' }}>7.4 of 10 GB</span>
+        {/* Storage (Progress) — wrapped as a bento card for surface consistency. */}
+        <div className="card" style={{ gridColumn: 'span 2', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <span style={{ fontSize: 'var(--k-type-small)', fontWeight: 'var(--k-weight-medium)' }}>Storage</span>
+            <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', fontVariantNumeric: 'tabular-nums' }}>7.4 of 10 GB</span>
           </div>
           <div className="progress"><div className="progress__fill" style={{ width: '74%' }} /></div>
-          <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>74% used — upgrade for more space.</span>
+          <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-faint)' }}>74% used — upgrade for more space.</span>
         </div>
-      </div>
-
-      <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, marginBottom: 10 }}>Last 7 days</h2>
-      <div className="barchart" style={{ height: 120, marginBottom: 24 }}>
-        {([['Mon', 55], ['Tue', 68], ['Wed', 42], ['Thu', 80], ['Fri', 51], ['Sat', 73], ['Sun', 90]] as [string, number][]).map(([d, v], i) => (
-          <div key={i} className="barchart__bar" style={{ height: `${v}%`, background: 'var(--k-grad-1)' }} tabIndex={0} role="img" aria-label={`${d}: ${v} builds`}>
-            <span className="barchart__tip">{d} · {v}</span>
+        {/* Builds — the barchart, as a titled bento card. */}
+        <div className="card" style={{ gridColumn: 'span 2' }}>
+          <div className="card__head"><span className="card__title">Builds · last 7 days</span></div>
+          <div className="barchart" style={{ height: 120 }}>
+            {([['Mon', 55], ['Tue', 68], ['Wed', 42], ['Thu', 80], ['Fri', 51], ['Sat', 73], ['Sun', 90]] as [string, number][]).map(([d, v], i) => (
+              <div key={i} className="barchart__bar" style={{ height: `${v}%`, background: 'var(--k-grad-1)' }} tabIndex={0} role="img" aria-label={`${d}: ${v} builds`}>
+                <span className="barchart__tip">{d} · {v}</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <h2 style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, margin: 0 }}>Activity</h2>
-        {/* Spinner — live "syncing" indicator next to the feed title. */}
-        <span className="spinner" aria-label="Syncing" />
-        <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Syncing…</span>
-      </div>
-      <div className="activity" role="list">
-        <ActivityItem dot="success" text="Build #2412 passed" meta="2m" author="ava_chen" />
-        <ActivityItem dot="warn" text="Quota nearing limit" meta="14m" />
-        <ActivityItem dot="info" text="New member joined: Casey" meta="1h" author="casey_w" />
-        <ActivityItem dot="danger" text="Webhook failed for payments-prod" meta="3h" author="jordan_m" />
+        </div>
+        {/* Activity feed — wrapped as a bento card with a live syncing indicator. */}
+        <div className="card" style={{ gridColumn: 'span 2' }}>
+          <div className="card__head" style={{ flexDirection: 'row', alignItems: 'center', gap: 'var(--k-s-8)' }}>
+            <span className="card__title">Activity</span>
+            <span className="spinner" aria-label="Syncing" />
+          </div>
+          <div className="activity" role="list">
+            <ActivityItem dot="success" text="Build #2412 passed" meta="2m" author="ava_chen" />
+            <ActivityItem dot="warn" text="Quota nearing limit" meta="14m" />
+            <ActivityItem dot="info" text="New member joined: Casey" meta="1h" author="casey_w" />
+            <ActivityItem dot="danger" text="Webhook failed for payments-prod" meta="3h" author="jordan_m" />
+          </div>
+        </div>
+        {/* Needs-attention alert — the semantic .alert recipe, as a full-width
+            bento cell (was a stacked strip before the content). */}
+        {alertOpen && (
+          <div className="alert alert--warning" style={{ gridColumn: 'span 4', margin: 0 }}>
+            <Icon name="bell" />
+            <div className="alert__body">
+              <div className="alert__title">Action needed</div>
+              <div>Your payment method expires this month — update it to avoid interruption.</div>
+            </div>
+            <button className="alert__close" aria-label="Dismiss" onClick={() => setAlertOpen(false)}><Icon name="x" /></button>
+          </div>
+        )}
       </div>
     </>
   )

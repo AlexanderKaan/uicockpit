@@ -258,6 +258,27 @@
  * see the "stat-tile" block below). .dash__stats is just the 4-col grid
  * wrapper that holds them. */
 
+/* === Home bento (B★7) — a weighted dashboard grid with ONE focal point.
+ * 4 cols: the revenue hero spans 2×2 (the focal card with a live area chart),
+ * the four KPI tiles fill the right 2×2, then usage/storage and activity/alert
+ * pair off below. Replaces the old vertical stack of full-width strips —
+ * hierarchy now comes from SIZE, not from stacking. Container-query collapses to
+ * 2 cols (hero full-width) on a narrow stage. Gaps tokenized (--k-space). */
+.dash__bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--k-space);
+  margin-bottom: var(--k-s-24);
+  align-items: stretch;
+  container-type: inline-size;
+}
+.dash__bento > * { min-width: 0; margin: 0; }
+.dash__hero { justify-content: space-between; gap: var(--k-s-12); }
+@container (max-width: 680px) {
+  .dash__bento { grid-template-columns: repeat(2, 1fr); }
+  .dash__hero { grid-column: span 2 !important; grid-row: auto !important; }
+}
+
 /* The .activity feed itself is the exportable "Activity feed" kit recipe (see
  * src/kit/recipes). Only its card-enter intro stagger (--card-i below) stays
  * preview-only — that's demo animation, not part of the shipped component. */
