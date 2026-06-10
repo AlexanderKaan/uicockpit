@@ -530,6 +530,32 @@ the app *does*.
 guarantee it *behaves* right. Pair it with a headless lib (Radix / Base UI /
 Floating UI / native elements) and you get both with almost no styling work.
 
+### ARIA contract — the roles/attributes each interactive component needs
+
+The CSS is markup-agnostic, so YOU own the semantics. Wire exactly these (a
+headless lib sets them for you; if you hand-roll, this is the checklist):
+
+| Component | Required roles / ARIA |
+|---|---|
+| Dialog / sheet (.dialog/.sheet) | \`role="dialog"\` + \`aria-modal="true"\` + \`aria-labelledby\`; trap focus, Esc closes |
+| Alert-dialog (.dialog--alert) | \`role="alertdialog"\` + \`aria-modal\` + \`aria-labelledby\` + \`aria-describedby\` |
+| Tabs (.tabs/.tab) | container \`role="tablist"\`; triggers \`role="tab"\` + \`aria-selected\` + \`aria-controls\`; panel \`role="tabpanel"\` + \`aria-labelledby\`; arrow-key roving |
+| Accordion (.accordion) | \`<details>/<summary>\` (free) OR header \`<button aria-expanded aria-controls>\` + region |
+| Menu / dropdown / context (.menu) | trigger \`aria-haspopup="menu"\` + \`aria-expanded\`; \`role="menu"\` + items \`role="menuitem"\`; roving tabindex |
+| Combobox / command (.combobox/.cmdp) | input \`role="combobox"\` + \`aria-expanded\` + \`aria-controls\` + \`aria-activedescendant\`; list \`role="listbox"\`, options \`role="option"\` + \`aria-selected\` |
+| Select trigger (.select-trigger) | \`aria-haspopup="listbox"\` + \`aria-expanded\`; the panel is a listbox |
+| Tooltip (.tt) | trigger \`aria-describedby="\<tipId\>"\`; tip \`role="tooltip"\` |
+| Popover / hover-card (.popover) | trigger \`aria-expanded\` + \`aria-controls\`; panel \`role="dialog"\` if interactive |
+| Switch / toggle (.toggle) | \`role="switch"\` + \`aria-checked\` |
+| Slider (.slider) | \`role="slider"\` + \`aria-valuemin/max/now\` + \`aria-label\` |
+| Progress (.progress/.usage) | \`role="progressbar"\` + \`aria-valuenow/min/max\` |
+| OTP (.otp) | group \`role="group"\` + \`aria-label\`; each slot \`aria-label="Digit N of M"\` |
+| Sortable table header (.tbl th) | \`aria-sort="ascending"\|"descending"\|"none"\` |
+| Toast / status (.toast-stack) | \`role="status"\` (polite) or \`role="alert"\` (assertive) + \`aria-live\` |
+
+Disabled = native \`disabled\` (or \`aria-disabled="true"\` on non-form elements);
+invalid fields = \`aria-invalid="true"\` (pairs with \`.in.is-error\` / \`.select-trigger.is-error\`).
+
 ## Accessibility check (already verified)
 
 - Button text on primary: ${cc.inkOnPrimary.toFixed(2)}:1 ${cc.inkOnPrimary >= 4.5 ? '— passes WCAG AA' : '— BELOW WCAG AA, flag this'}

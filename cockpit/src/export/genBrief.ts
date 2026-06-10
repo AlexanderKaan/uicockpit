@@ -271,6 +271,15 @@ headless library for the interactive parts:
 The kit guarantees it *looks* right in every state; you (or a headless lib)
 guarantee it *behaves* right.
 
+**ARIA wiring (the CSS is markup-agnostic, so you own the roles):** dialog →
+\`role="dialog"\` + \`aria-modal\`; tabs → \`role="tablist/tab/tabpanel"\` + \`aria-selected\`;
+menu → \`aria-haspopup\` + \`aria-expanded\` + \`role="menu/menuitem"\`; combobox →
+\`role="combobox"\` + \`aria-expanded\` + \`aria-activedescendant\`; switch → \`role="switch"\`
++ \`aria-checked\`; slider → \`role="slider"\` + \`aria-valuenow\`; tooltip → \`aria-describedby\`
++ \`role="tooltip"\`; invalid field → \`aria-invalid="true"\`. The full per-component
+ARIA table is in the AI-prompt export. A headless lib (Radix / Base UI) sets these
+for you.
+
 ## Accessibility — full WCAG audit
 
 Every meaningful text-on-background pair in the kit, tested against WCAG
