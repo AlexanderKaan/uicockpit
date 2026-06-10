@@ -1133,7 +1133,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 
 /* Gradient placeholder — square media tile (cover art, category, preload).
    .ph--g1..g6 pull the 6 decorative gradient pairs. */
-.ph { border-radius: var(--k-radius); background: var(--k-fill); }
+.ph { border-radius: var(--k-radius-md); background: var(--k-fill); }
 .ph--g1 { background: var(--k-grad-1); }
 .ph--g2 { background: var(--k-grad-2); }
 .ph--g3 { background: var(--k-grad-3); }
