@@ -152,8 +152,13 @@ function shadowFor(elevation: Elevation, shTone: string): { xs: string; sm: stri
     return {
       xs: `0 1px 2px hsl(${shTone}/.05)`,
       sm: `0 1px 2px hsl(${shTone}/.07)`,
-      md: `0 4px 14px hsl(${shTone}/.10)`,
-      lg: `0 14px 40px hsl(${shTone}/.16)`,
+      // B★4: md/lg are now TWO-LAYER with negative spread — a tight contact layer
+      // + a soft ambient (the shadcn recipe). Single-layer soft shadows read
+      // diffuse; the contact layer gives raised overlays (menu/popover/dialog) a
+      // defined edge so they lift crisply off the now-pure-white cards. Keeps the
+      // brand-tinted shTone for the Stripe/Linear premium feel. [BEAUTY-SPEC §1.5]
+      md: `0 4px 6px -1px hsl(${shTone}/.10), 0 2px 4px -2px hsl(${shTone}/.10)`,
+      lg: `0 10px 15px -3px hsl(${shTone}/.13), 0 4px 6px -4px hsl(${shTone}/.13)`,
     }
   if (elevation === 'sharp')
     return {

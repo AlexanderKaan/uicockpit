@@ -5193,10 +5193,10 @@ exports[`genJson > matches snapshot for default mono 1`] = `
         "value": "0 1px 2px hsl(240 8% 18%/.07)"
       },
       "md": {
-        "value": "0 4px 14px hsl(240 8% 18%/.10)"
+        "value": "0 4px 6px -1px hsl(240 8% 18%/.10), 0 2px 4px -2px hsl(240 8% 18%/.10)"
       },
       "lg": {
-        "value": "0 14px 40px hsl(240 8% 18%/.16)"
+        "value": "0 10px 15px -3px hsl(240 8% 18%/.13), 0 4px 6px -4px hsl(240 8% 18%/.13)"
       }
     },
     "spacing": {
@@ -5728,8 +5728,8 @@ exports[`genJson > matches snapshot for default mono 1`] = `
     "--k-state-selected-bg": "oklch(88.4% 0.0082 286.2 / 0.1)",
     "--k-shadow-xs": "0 1px 2px hsl(0 0 0/.05)",
     "--k-shadow-sm": "0 1px 2px hsl(0 0 0/.07)",
-    "--k-shadow-md": "0 4px 14px hsl(0 0 0/.10)",
-    "--k-shadow-lg": "0 14px 40px hsl(0 0 0/.16)",
+    "--k-shadow-md": "0 4px 6px -1px hsl(0 0 0/.10), 0 2px 4px -2px hsl(0 0 0/.10)",
+    "--k-shadow-lg": "0 10px 15px -3px hsl(0 0 0/.13), 0 4px 6px -4px hsl(0 0 0/.13)",
     "--k-shadow-tactile": "inset 0 1px 0 hsl(0 0% 100% / 0.06), 0 1px 2px hsl(0 0% 0% / 0.45)",
     "--k-shadow-pressed": "inset 0 1px 2px hsl(0 0% 0% / 0.35)",
     "--k-btn-shadow": "0 1px 2px hsl(0 0% 0% / 0.35)",
