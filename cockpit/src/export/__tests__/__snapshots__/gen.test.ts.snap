@@ -1566,6 +1566,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   text-transform: var(--k-ui-transform, none);
   letter-spacing: var(--k-ui-tracking, 0);
 }
+/* Hover + disabled (B1) — an inactive tab darkens toward fg on hover (the
+ * affordance shadcn gives its TabsTrigger), and a disabled tab dims + blocks
+ * the pointer. :not(.tab--on) keeps the active tab from re-darkening. */
+.tab:not(.tab--on):not(:disabled):hover { color: var(--k-fg); }
+.tab:disabled { opacity: var(--k-disabled-opacity, 0.55); cursor: not-allowed; pointer-events: none; }
 .tab--on { color: var(--k-fg); border-bottom-color: var(--k-primary); }
 /* Tab with leading icon — keep icon vertically centered with label. The
  * line-height: 1 + svg display:block treatment is the same as .btn / .badge. */
@@ -1597,6 +1602,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tbl thead { color: var(--k-fg-muted); font-weight: var(--k-weight-semibold); font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
 .tbl tbody tr { border-top: var(--k-divider); }
 .tbl tbody tr:hover { background: var(--k-state-hover); }
+/* Press state (B1) — a clickable row gives a tactile "pressed" confirm on
+ * :active (the stronger --k-state-press wash, a notch above hover). Harmless on
+ * non-interactive tables: it only fires for the instant a row is held down. */
+.tbl tbody tr:active { background: var(--k-state-press); }
 /* Row selected (user checked a row / picked it) — follows the Selection
  * accent toggle: brand-soft when Brand, neutral surface when Neutral. */
 .tbl tbody tr.is-selected,
@@ -1857,8 +1866,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: var(--k-s-2);
   cursor: pointer;
   /* Fast easing for microinteraction — toggle is a tap, not a transition */
-  transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease);
+  transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease),
+              border-color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
+/* Hover affordance (B1) — the OFF track firms its edge, the ON track lifts a
+ * touch, so the toggle reads as live before you click it (the gap shadcn fills
+ * with a subtle hover). Suppressed on the disabled modifier (pointer-events:none
+ * already blocks it, but be explicit). */
+.toggle:not(.toggle--disabled):hover { border-color: var(--k-state-border, var(--k-fg-faint)); }
+.toggle--on:not(.toggle--disabled):hover { filter: brightness(1.05); }
 /* Knob is always (track-h − 6px): leaves 2px padding + 1px border breathing room
  * on top and bottom regardless of stature. ON-translate is (track-w − track-h)
  * which lands the knob exactly at the right edge with matching inset. */
@@ -2044,6 +2060,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   cursor: pointer;
 }
 .select-trigger:hover { border-color: var(--k-state-border, var(--k-fg-faint)); }
+/* Invalid state (B1) — a select with a validation error reads like an errored
+ * input field: the danger border + a soft danger halo. Mirrors .in.is-error so
+ * a select sitting in a form validates with the same language. Toggle with
+ * .is-error or aria-invalid="true". */
+.select-trigger.is-error,
+.select-trigger[aria-invalid="true"] {
+  border-color: var(--k-input-error-border);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-error-border) 22%, transparent);
+}
 
 /* Native <select class="select"> as a first-class PREVIEW form control.
  * The configurator chrome has its OWN unscoped \`.select\` in panel.css
