@@ -64,27 +64,29 @@ type ScaleRow = {
   toggleW: number     // toggle default width
   toggleH: number     // toggle default height
 }
-// All spacing snaps to the 4pt grid — the discipline that makes Tailwind/shadcn/
-// Material read clean. CRUCIAL: the two growth rates are DIFFERENT, on purpose.
-//   • Control size + internal padding (btnH/inH, pad) scale GENEROUSLY with Scale
-//     — bigger tap-targets + more breathing room are what "comfortable" means.
-//   • Vertical RHYTHM between elements (space, stackGap) grows much more GENTLY
-//     and plateaus — exactly how mature systems do it (Material density only
-//     compacts; Carbon condensed; Radix bounded ±10%; shadcn fixed space-y-*).
-//     Linearly inflating the rhythm makes elements drift apart and the layout
-//     read loose/disconnected. So Comfortable keeps Default's 16px field rhythm
-//     and only its controls/padding grow.
-//   pad      = box padding (shadcn p-4/6/7/8)            — generous growth
-//   space    = field/section rhythm (shadcn space-y-3/4) — gentle, plateaus
-//   stackGap = adjacent buttons/rows (shadcn gap-2/3)    — gentle, plateaus
+// Spacing maps onto the named scale (--k-s-*, which includes 2pt steps — 6/8/10
+// are first-class values, not off-grid). DENSITY MODEL (B5, per the A4 decision —
+// gaps are now a REAL density axis, no longer a plateau):
+//   • Control size + box padding (btnH/inH, pad) scale GENEROUSLY — bigger
+//     tap-targets + breathing room are what "comfortable" means.
+//   • Inter-element GAPS now respond across ALL THREE tiers (the old model
+//     plateaued Default↔Comfortable, so Comfortable never looked roomier on gaps):
+//       - space    = field/section rhythm        — 12 / 16 / 20
+//       - stackGap = SIBLING gap (= --k-gap; adjacent buttons, chips, fields)
+//                    — 6 / 8 / 10 (≈ ½·space, the shadcn gap-1.5/2/2.5 progression)
+//   • MICRO gaps (icon↔label INSIDE a control) stay FIXED — an optical relation,
+//     not density. So Compact genuinely tightens and Comfortable genuinely opens,
+//     while a button's icon-gap never moves.
+//   pad      = box padding (shadcn p-4/6/7)               — generous growth
+//   space    = field/section rhythm (shadcn space-y-3/4/5) — 12 / 16 / 20
+//   stackGap = sibling gap → --k-gap (shadcn gap-1.5/2/2.5) — 6 / 8 / 10
 const SCALE: Record<Scale, ScaleRow> = {
-  // 3 tiers on a clean 4px grid (= shadcn sm/default/lg = Material 3's three
-  // density tiers). btnH 32/36/40, even +4 ramp, every value ÷4. (Spacious was
-  // dropped: inflated controls past any premium-app precedent + held the only
-  // off-grid values 50/46.)
-  compact:     { space: 12, pad: 16, stackGap: 8, btnH: 32, inH: 32, rowDefault: 'sm', calCell: 28, toggleW: 28, toggleH: 14 },
+  // 3 tiers = shadcn sm/default/lg = Material 3's three density tiers. btnH
+  // 32/36/40 (÷4). Gaps respond per tier: space 12/16/20, sibling stackGap 6/8/10
+  // (the 6 + 10 are on the named 2pt scale, --k-s-6 / --k-s-10).
+  compact:     { space: 12, pad: 16, stackGap: 6, btnH: 32, inH: 32, rowDefault: 'sm', calCell: 28, toggleW: 28, toggleH: 14 },
   default:     { space: 16, pad: 24, stackGap: 8, btnH: 36, inH: 36, rowDefault: 'md', calCell: 32, toggleW: 32, toggleH: 18 },
-  comfortable: { space: 16, pad: 28, stackGap: 8, btnH: 40, inH: 40, rowDefault: 'lg', calCell: 40, toggleW: 40, toggleH: 22 },
+  comfortable: { space: 20, pad: 28, stackGap: 10, btnH: 40, inH: 40, rowDefault: 'lg', calCell: 40, toggleW: 40, toggleH: 22 },
 }
 // Motion table — speed setting controls all three duration tiers.
 // Easings are split into emphasized (standard state-change), decelerate
@@ -722,10 +724,17 @@ export function buildTokens(cfg: Config): Tokens {
       // --k-space (default 24 = shadcn p-6, compact 16 = Material/Tailwind p-4) so
       // every box meets the modern minimum without inflating the gap rhythm.
       '--k-pad': pad,
-      // Standard vertical gap between STACKED cards/rows (radio-cards, kanban
-      // column, slot picker, attachment list, event lists). One token → every
-      // stacked list shares the same rhythm, and it scales with density.
-      '--k-stack-gap': rem(st.stackGap),
+      // --k-gap (B5) — the canonical SIBLING gap: the space between adjacent
+      // controls on ANY axis (buttons in a group, chips in a row, fields side-by-
+      // side, stacked Save/Cancel, list rows). Density-aware: 6 / 8 / 10 across
+      // Compact / Default / Comfortable (≈ ½·space, shadcn gap-1.5/2/2.5). Use this
+      // for control↔control gaps; use --k-space for section/layout rhythm, and keep
+      // icon↔label MICRO gaps fixed (--k-s-6 etc.). This is the density lever that
+      // makes Compact genuinely tighten and Comfortable genuinely open.
+      '--k-gap': rem(st.stackGap),
+      // --k-stack-gap is the legacy name for the same sibling gap; aliased to
+      // --k-gap so every existing `var(--k-stack-gap)` usage now scales per tier.
+      '--k-stack-gap': 'var(--k-gap)',
       // Single-column FORM measure — the max line-length a stacked form body
       // (label → input → button-row) should occupy. A 700px-wide email field
       // is the classic anti-pattern: width is an affordance hint, so an email

@@ -48,7 +48,7 @@ export const RECIPES: readonly Recipe[] = [
 .toolbar__group {
   display: inline-flex;
   align-items: center;
-  gap: var(--k-s-8);
+  gap: var(--k-gap, var(--k-s-8));
 }
 /* An inline label that names the control next to it ("Group by", "Sort"). The
    eyebrow tier so it reads as a quiet annotation, not a control. A reusable
@@ -365,7 +365,7 @@ export const RECIPES: readonly Recipe[] = [
 /* Inline cluster (adjacent controls) + stacked cluster — both on the canonical
  * --k-stack-gap so "the gap between two adjacent controls" is axis-independent. */
 .card__row { display: flex; gap: var(--k-stack-gap, 8px); align-items: center; flex-wrap: wrap; }
-.card__col { display: flex; flex-direction: column; gap: var(--k-s-8); }
+.card__col { display: flex; flex-direction: column; gap: var(--k-gap, var(--k-s-8)); }
 /* Footer action zone (shadcn CardFooter) — a hairline divider anchors the CTA
  * row to the floor of the card. Holds full-width block buttons on the tight gap. */
 .card__foot {
@@ -2878,7 +2878,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   flex-direction: column;
   gap: var(--k-s-10);
 }
-.sheet__foot { padding: var(--k-space, 16px); border-top: var(--k-divider); display: flex; gap: var(--k-s-8); justify-content: flex-end; }
+.sheet__foot { padding: var(--k-space, 16px); border-top: var(--k-divider); display: flex; gap: var(--k-gap, var(--k-s-8)); justify-content: flex-end; }
 @keyframes sheet-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes sheet-in-left { from { transform: translateX(-100%); } to { transform: translateX(0); } }`,
   },
@@ -4550,7 +4550,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 /* A labelled control cluster inside the bar (e.g. "Score" + a slider) — the eyebrow
  * names the control without stealing height from the toolbar's one-row invariant. */
-.filterbar__group { display: inline-flex; align-items: center; gap: var(--k-s-8); white-space: nowrap; }
+.filterbar__group { display: inline-flex; align-items: center; gap: var(--k-gap, var(--k-s-8)); white-space: nowrap; }
 .filterbar__group-label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
 /* Active-filter row — divider above, the current facets as removable chips, a
  * trailing result count, and a text "Clear all". Hidden until something is filtered. */
