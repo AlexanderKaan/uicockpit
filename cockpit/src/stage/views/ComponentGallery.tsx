@@ -119,8 +119,8 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
 const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElement>]> = [
   ['Text inputs', [FormCard, SearchInputCard, PasswordInputCard, NumberInputCard, PhoneInputCard, InputOtpCard]],
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
-  ['Choice & toggles', [SwitchCard, SelectionCard, RadioCardCard, SliderCard, ButtonGroupCard]],
-  ['Actions & menus', [ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
+  ['Choice & toggles', [SwitchCard, SelectionCard, RadioCardCard, SliderCard]],
+  ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
@@ -1950,6 +1950,39 @@ function NavRow({ icon, label, active }: { icon: IconName; label: string; active
 
 // Button group — equal-weight buttons fused into one control (a view switcher)
 // plus a split action. Outer corners follow the button radius.
+// Canonical buttons showcase — the most fundamental atom, shown the shadcn way:
+// every variant at INTRINSIC width in a row (not stretched), then sizes, then
+// states (icon, loading, disabled). The hierarchy reads at a glance — one loud
+// primary, quiet secondary/outline/ghost siblings, a destructive, a link.
+function ButtonsCard() {
+  const [loading, setLoading] = useState(false)
+  return (
+    <Card title="Buttons" desc="One loud primary, quiet siblings. Variant · size · state — all at intrinsic width.">
+      <div className="card__row">
+        <button type="button" className="btn btn--primary">Get started</button>
+        <button type="button" className="btn btn--secondary">Secondary</button>
+        <button type="button" className="btn btn--outline">Outline</button>
+        <button type="button" className="btn btn--ghost">Ghost</button>
+        <button type="button" className="btn btn--danger">Delete</button>
+        <button type="button" className="btn btn--link">Learn more</button>
+      </div>
+      <div className="card__row" style={{ alignItems: 'center' }}>
+        <button type="button" className="btn btn--primary btn--sm">Small</button>
+        <button type="button" className="btn btn--primary">Default</button>
+        <button type="button" className="btn btn--primary btn--lg">Large</button>
+        <span style={{ width: 1, alignSelf: 'stretch', background: 'var(--k-border)', margin: '0 var(--k-s-2)' }} aria-hidden="true" />
+        <button type="button" className="btn btn--outline"><Icon name="check" /> With icon</button>
+        <button type="button" className="btn btn--primary btn--icon" aria-label="Search"><Icon name="search" /></button>
+      </div>
+      <div className="card__row" style={{ alignItems: 'center' }}>
+        <button type="button" className={`btn btn--primary${loading ? ' btn--loading' : ''}`} onClick={() => { setLoading(true); setTimeout(() => setLoading(false), 1400) }}><span>{loading ? 'Saving' : 'Click to load'}</span></button>
+        <button type="button" className="btn btn--primary" disabled>Disabled</button>
+        <button type="button" className="btn btn--outline" disabled>Disabled</button>
+      </div>
+    </Card>
+  )
+}
+
 function ButtonGroupCard() {
   const [view, setView] = useState('board')
   // The split action's chevron opens a real menu (same useDropdown + .menu the

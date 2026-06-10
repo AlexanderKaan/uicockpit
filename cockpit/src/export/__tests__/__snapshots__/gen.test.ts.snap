@@ -905,11 +905,14 @@ body {
 .btn--primary:hover { background: var(--k-primary-hover); }
 .btn--secondary { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); }
 .btn--secondary:hover { filter: brightness(1.02); }
-/* Ghost = a quiet control (toolbar filter, dropdown trigger, secondary icon
+/* Ghost = the quietest control (toolbar filter, dropdown trigger, secondary icon
    action), NOT a primary button — so it follows the box/field radius, not the
    button-radius. Keeps "Button radius" scoped to actual filled buttons. For a
-   real button pair (Cancel next to Save), use .btn--secondary, not ghost. */
-.btn--ghost { background: transparent; color: var(--k-fg); border-color: var(--k-border); }
+   real button pair (Cancel next to Save), use .btn--secondary, not ghost.
+   BORDERLESS (B★3): a ghost is text + a hover wash — no resting border, so it
+   reads distinctly quieter than .btn--outline (which IS the bordered-quiet
+   variant) and toolbars/icon-buttons stop looking boxy. The shadcn ghost. */
+.btn--ghost { background: transparent; color: var(--k-fg); border-color: transparent; }
 .btn--ghost:hover { background: var(--k-state-hover); }
 .btn--danger { background: var(--k-danger); color: var(--k-danger-fg); }
 /* Outline = the shadcn outline variant: neutral surface + foreground text +

@@ -40,6 +40,36 @@ try {
   try { await page.locator('button', { hasText: new RegExp(view, 'i') }).first().click(); await page.waitForTimeout(500) } catch {}
 }
 
+// Optional 6th positional arg (after view, theme, out, collapse): screenshot just
+// the .card whose title matches this text (element.screenshot auto-scrolls to it).
+const scrollText = process.argv[6]
+if (scrollText) {
+  try {
+    const handle = await page.evaluateHandle((t) => {
+      const cards = [...document.querySelectorAll('.card')]
+      return cards.find((c) => {
+        const title = c.querySelector('.card__title')
+        return title && new RegExp(t, 'i').test(title.textContent || '')
+      }) || null
+    }, scrollText)
+    const el = handle.asElement()
+    if (el) {
+      // Center the card in its scroll container, then a normal viewport shot.
+      await el.evaluate((node) => {
+        const sc = node.closest('.stage__body') || document.scrollingElement
+        const cr = node.getBoundingClientRect(), sr = sc.getBoundingClientRect()
+        sc.scrollTop += cr.top - sr.top - sc.clientHeight / 2 + cr.height / 2
+      })
+      await page.waitForTimeout(500)
+      await page.screenshot({ path: out })
+      await browser.close()
+      console.log('shot (centered) →', out)
+      process.exit(0)
+    }
+    console.error('card not found for', scrollText)
+  } catch (e) { console.error('scroll failed:', e.message) }
+}
+
 if (collapse === 'collapse') {
   try {
     // the panel collapse target is the logo / chevron at the panel top
