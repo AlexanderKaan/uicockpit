@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { IconProvider } from '../icons/Icon'
 import { ComponentGallery } from '../stage/views/ComponentGallery'
 import { buildTokens } from '../tokens/buildTokens'
@@ -33,6 +33,22 @@ const THEME_VARS: Record<string, CSSProperties> = Object.fromEntries(
 
 export function ComponentBouquet() {
   const [theme, setTheme] = useState<ColorTheme>('cobalt')
+  const [userPicked, setUserPicked] = useState(false) // a manual pick takes over for good
+  const [hovering, setHovering] = useState(false)      // pause while the visitor inspects
+
+  // Auto-morph (C6) — practice-what-you-preach: the hero cycles the kit through its
+  // brand colours on its own, so a visitor SEES "your kit, any colour" without
+  // touching anything. Stops the moment they take control (pick) or hover to read,
+  // and never runs under prefers-reduced-motion. The dots advance with it.
+  const autoMorph = !userPicked && !hovering
+  useEffect(() => {
+    if (!autoMorph) return
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    const id = setInterval(() => {
+      setTheme((cur) => SWITCH_THEMES[(SWITCH_THEMES.indexOf(cur) + 1) % SWITCH_THEMES.length]!)
+    }, 3200)
+    return () => clearInterval(id)
+  }, [autoMorph])
 
   // Mount the gallery ONCE. Memoised, so switching themes re-tints via the
   // wrapper's CSS vars without re-rendering / re-laying-out the 34 cards.
@@ -46,7 +62,11 @@ export function ComponentBouquet() {
   )
 
   return (
-    <div className="mkt__bouquet-wrap">
+    <div
+      className="mkt__bouquet-wrap"
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
       <div
         className="cockpit-preview mkt__bouquet"
         style={THEME_VARS[theme]}
@@ -69,7 +89,7 @@ export function ComponentBouquet() {
             aria-label={t}
             className={`mkt__theme-dot${t === theme ? ' is-on' : ''}`}
             style={{ background: COLOR_THEMES[t].cPrimary }}
-            onClick={() => setTheme(t)}
+            onClick={() => { setUserPicked(true); setTheme(t) }}
           />
         ))}
       </div>
