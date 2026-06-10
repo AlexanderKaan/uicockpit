@@ -20,7 +20,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme cobalt in dar
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -239,7 +239,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme cobalt in dar
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -524,7 +524,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme coral in dark
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -743,7 +743,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme coral in dark
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -1028,7 +1028,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme ember in dark
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -1247,7 +1247,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme ember in dark
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -1532,7 +1532,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme indigo in dar
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -1751,7 +1751,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme indigo in dar
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -2036,7 +2036,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme jade in dark 
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -2255,7 +2255,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme jade in dark 
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -2540,7 +2540,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme rose in dark 
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -2759,7 +2759,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme rose in dark 
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -3044,7 +3044,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme sky in dark m
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -3263,7 +3263,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme sky in dark m
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -3548,7 +3548,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme teal in dark 
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -3767,7 +3767,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme teal in dark 
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -4052,7 +4052,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme violet in dar
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -4271,7 +4271,7 @@ exports[`buildTokens — Color theme coverage (on default) > theme violet in dar
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -4556,7 +4556,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale comfortable in dark 
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -4775,7 +4775,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale comfortable in dark 
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -5060,7 +5060,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale compact in dark mode
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -5279,7 +5279,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale compact in dark mode
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -5564,7 +5564,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale default in dark mode
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -5783,7 +5783,7 @@ exports[`buildTokens — Scale coverage (with Mono) > scale default in dark mode
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
@@ -6068,7 +6068,7 @@ exports[`buildTokens — mono baseline > matches snapshot in dark mode 1`] = `
     {
       "hex": "#e4bc44",
       "k": "warning",
-      "soft": "#544412",
+      "soft": "#433b23",
     },
     {
       "hex": "#d65a51",
@@ -6287,7 +6287,7 @@ exports[`buildTokens — mono baseline > matches snapshot in dark mode 1`] = `
     "--k-ui-weight": 600,
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-fg": "#16160c",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",

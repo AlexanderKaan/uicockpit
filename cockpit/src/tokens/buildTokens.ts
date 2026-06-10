@@ -390,11 +390,13 @@ export function buildTokens(cfg: Config): Tokens {
   const accentSoftFg = readableInk(accentSoftHex)
   const SYS: Array<{ k: SystemColor['k']; h: number; s: number; softMul: number }> = [
     { k: 'success', h: 145, s: dark ? 52 : 58, softMul: 0.42 },
-    // Hue shifted 38 → 45 (more yellow-centered, less orange-leaning) and
-    // softMul bumped to 0.78 so the high-lightness fill reads as soft yellow,
-    // not beige. Matches the Tailwind yellow-100 / Material warning container
-    // family.
-    { k: 'warning', h: 45, s: dark ? 75 : 88, softMul: 0.78 },
+    // Hue shifted 38 → 45 (more yellow-centered, less orange-leaning). The high
+    // softMul is LIGHT-mode-specific: at L≈94 a low-sat yellow reads camel/beige,
+    // so saturation stays high to keep it soft-yellow (Tailwind yellow-100 family).
+    // In DARK (L≈20) that same saturation reads as a loud olive that breaks family
+    // with the muted success/danger/info softs — and the beige risk is gone on a
+    // dark surface — so warning drops back to the shared family multiplier.
+    { k: 'warning', h: 45, s: dark ? 75 : 88, softMul: dark ? 0.34 : 0.78 },
     { k: 'danger',  h: 4,   s: dark ? 62 : 68, softMul: 0.42 },
     { k: 'info',    h: 212, s: dark ? 60 : 70, softMul: 0.42 },
   ]

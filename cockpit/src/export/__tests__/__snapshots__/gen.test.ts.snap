@@ -368,7 +368,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-success-soft-fg: #ffffff;
   --k-warning: oklch(80.9% 0.1412 90.1);
   --k-warning-fg: #16160c;
-  --k-warning-soft: oklch(39.3% 0.0696 90.7);
+  --k-warning-soft: oklch(35.4% 0.0395 91.7);
   --k-warning-soft-fg: #ffffff;
   --k-danger: oklch(62.4% 0.1583 26.8);
   --k-danger-fg: #ffffff;
@@ -5798,7 +5798,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-success-soft": "oklch(34.5% 0.0416 158.0)",
     "--k-success-soft-fg": "#ffffff",
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
-    "--k-warning-soft": "oklch(39.3% 0.0696 90.7)",
+    "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-danger": "oklch(62.4% 0.1583 26.8)",
     "--k-danger-soft": "oklch(30.3% 0.0461 24.2)",
@@ -6129,7 +6129,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-success-foreground: #16160c;
   --color-success-soft: oklch(34.5% 0.0416 158.0);
   --color-warning: oklch(80.9% 0.1412 90.1);
-  --color-warning-soft: oklch(39.3% 0.0696 90.7);
+  --color-warning-soft: oklch(35.4% 0.0395 91.7);
   --color-danger: oklch(62.4% 0.1583 26.8);
   --color-danger-soft: oklch(30.3% 0.0461 24.2);
   --color-info: oklch(64.3% 0.1204 252.8);
