@@ -674,6 +674,16 @@ function Projects() {
         </div>
         <div className="datatable__body">
           <table className="tbl">
+            {/* B★7: constrain the meta columns to content width so the ISSUE
+                column absorbs the slack — kills the wide ISSUE↔ENV gap that let
+                the columns spread edge-to-edge. */}
+            <colgroup>
+              <col style={{ width: 36 }} />
+              <col />
+              <col style={{ width: '13%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '11%' }} />
+            </colgroup>
             <thead>
               <tr>
                 <th className="datatable__check"><label className="check"><input type="checkbox" checked={allOn} ref={(el) => { if (el) el.indeterminate = sel.size > 0 && !allOn }} onChange={toggleAll} aria-label="Select all issues" /></label></th>
