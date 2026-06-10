@@ -614,7 +614,14 @@ export function buildTokens(cfg: Config): Tokens {
       // surface-2 (which sits ~2% off white and collapses at Flat depth). Tied
       // to fg so it stays a reliable grey at any surface depth and inverts
       // correctly in dark mode. The point: a white knob / pill must read.
-      '--k-track': `color-mix(in srgb, ${fg.main} 9%, ${surf.base})`,
+      // Recessed-track grey (segmented control rail, slider track). Anchored to
+      // the TINTED neutral ramp (nStep1) — not pure white — so it carries the same
+      // faint tint as the fields / sunken bands / borders and stops reading as a
+      // separate, flatter grey on a crisp-white card. Ink-mixed (5%) keeps a
+      // consistent ~6% recess so the white active thumb always reads, at any
+      // Elevation (nStep is elevation-independent). Was: white + 9% ink (untinted,
+      // ~92% L — the darkest, only-untinted grey on the card).
+      '--k-track': `color-mix(in srgb, ${fg.main} 5%, ${nStep(1)})`,
       '--k-surface-raised': surf.raised,
       '--k-surface-overlay': surf.overlay,
       // Overlay scrims — ONE source for the dim behind modals/sheets/lightbox

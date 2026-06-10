@@ -46,7 +46,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-field-radius: var(--k-radius-md);
   --k-field-hover-edge: var(--k-state-border, var(--k-fg-faint));
   --k-field-focus-edge: var(--k-ring);
-  --k-track: color-mix(in srgb, oklch(16.0% 0.0140 249.9) 9%, oklch(100% 0 0));
+  --k-track: color-mix(in srgb, oklch(16.0% 0.0140 249.9) 5%, oklch(98.0% 0.0063 249.9));
   --k-surface-raised: oklch(100% 0 0);
   --k-surface-overlay: oklch(100% 0 0);
   --k-scrim: rgba(0, 0, 0, 0.4);
@@ -299,7 +299,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-field-radius: var(--k-radius-md);
   --k-field-hover-edge: var(--k-state-border, var(--k-fg-faint));
   --k-field-focus-edge: var(--k-ring);
-  --k-track: color-mix(in srgb, oklch(94.5% 0.0140 249.9) 9%, oklch(25.4% 0.0070 249.9));
+  --k-track: color-mix(in srgb, oklch(94.5% 0.0140 249.9) 5%, oklch(21.3% 0.0063 249.9));
   --k-surface-raised: oklch(31.7% 0.0077 249.9);
   --k-surface-overlay: oklch(35.5% 0.0077 249.9);
   --k-scrim: rgba(0, 0, 0, 0.4);
@@ -5738,7 +5738,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-surface-sunken": "oklch(17.6% 0.0000 0.0)",
     "--k-surface-2": "oklch(28.5% 0.0000 0.0)",
     "--k-input-bg": "oklch(17.6% 0.0000 0.0)",
-    "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 9%, oklch(25.4% 0.0000 0.0))",
+    "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 5%, oklch(21.3% 0.0000 0.0))",
     "--k-surface-raised": "oklch(31.7% 0.0000 0.0)",
     "--k-surface-overlay": "oklch(35.5% 0.0000 0.0)",
     "--k-fg": "oklch(94.5% 0.0000 0.0)",
