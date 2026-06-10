@@ -95,17 +95,22 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   // without each looking like a standalone block. Covers all atom-tier cards.
   // Search/filter bar (C5) — only in the cockpit Atoms/Blocks views (tier set),
   // never in the marketing bouquet. Themed by the kit (lives in .cockpit-preview).
+  // Dogfoods the kit's own .searchinput component (house-style focus halo +
+  // ghost clear button); .gallery-search adds only layout (width + centring).
   const searchBar = (count: number, total: number) => (
-    <div className="gallery-search" role="search">
-      <Icon name="search" size={16} />
+    <div className="searchinput gallery-search" role="search">
+      <Icon name="search" />
       <input
-        className="gallery-search__input"
+        className="searchinput__field"
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder={`Search ${tier === 'atom' ? 'atoms' : 'blocks'}…`}
         aria-label={`Search ${tier === 'atom' ? 'atoms' : 'blocks'}`}
       />
+      {q && (
+        <button className="searchinput__clear" onClick={() => setQ('')} aria-label="Clear search">×</button>
+      )}
       <span className="gallery-search__count">{query ? `${count} of ${total}` : `${total}`}</span>
     </div>
   )
