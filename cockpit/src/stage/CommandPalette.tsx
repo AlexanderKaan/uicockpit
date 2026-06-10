@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ComponentType, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import {
-  AppWindow, Boxes, Box, Code, Link2, Moon, Palette, RotateCcw, Search, Sliders, Square, Sun, Redo2, Undo2, Layers,
+  AppWindow, Boxes, Box, Code, Dices, Link2, Moon, Palette, RotateCcw, Search, Sliders, Square, Sun, Redo2, Undo2, Layers,
 } from 'lucide-react'
 import type { Config, Tokens } from '../tokens/types'
 import type { ConfigAction } from '../state/configReducer'
@@ -30,6 +30,7 @@ interface CommandPaletteProps {
   onViewChange: (v: ViewKind) => void
   onShare: () => void
   onExport: () => void
+  onRandomize: () => void
   undo: () => void
   redo: () => void
 }
@@ -45,7 +46,7 @@ const RADII: { id: Config['radius']; label: string }[] = [
   { id: 'none', label: 'None' }, { id: 'subtle', label: 'Subtle' }, { id: 'soft', label: 'Soft' }, { id: 'round', label: 'Round' },
 ]
 
-export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, onShare, onExport, undo, redo }: CommandPaletteProps) {
+export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, onShare, onExport, onRandomize, undo, redo }: CommandPaletteProps) {
   const [q, setQ] = useState('')
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -85,13 +86,14 @@ export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, 
     cmds.push({ group: 'Appearance', label: 'Light mode', icon: Sun, run: () => dispatch({ type: 'SET', patch: { mode: 'light' } }) })
     cmds.push({ group: 'Appearance', label: 'Dark mode', icon: Moon, run: () => dispatch({ type: 'SET', patch: { mode: 'dark' } }) })
     // Actions
+    cmds.push({ group: 'Actions', label: 'Surprise me — randomize the kit', icon: Dices, run: onRandomize })
     cmds.push({ group: 'Actions', label: 'Copy share link', icon: Link2, hint: 'URL', run: onShare })
     cmds.push({ group: 'Actions', label: 'Use this kit — export', icon: Code, run: onExport })
     cmds.push({ group: 'Actions', label: 'Undo', icon: Undo2, hint: '⌘Z', run: undo })
     cmds.push({ group: 'Actions', label: 'Redo', icon: Redo2, hint: '⇧⌘Z', run: redo })
     cmds.push({ group: 'Actions', label: 'Reset to Mono (greyscale)', icon: RotateCcw, run: () => dispatch({ type: 'APPLY_COLOR_THEME', id: 'mono' }) })
     return cmds
-  }, [dispatch, onViewChange, onShare, onExport, undo, redo])
+  }, [dispatch, onViewChange, onShare, onExport, onRandomize, undo, redo])
 
   // Token-AND filter over (label + group) so "radius round" surfaces "Box radius: Round".
   const matches = useMemo(() => {

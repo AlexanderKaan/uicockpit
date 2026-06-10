@@ -4,6 +4,7 @@ import { Stage, type ViewKind } from './stage/Stage'
 import { Topbar } from './stage/Topbar'
 import { CommandPalette } from './stage/CommandPalette'
 import { useConfig } from './state/useConfig'
+import { randomKit } from './state/randomKit'
 import { Toast } from './export/Toast'
 
 // Lazy-load — export generators + modal only ship when user opens it
@@ -70,6 +71,12 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
     return () => window.removeEventListener('keydown', onKey)
   }, [undo, redo])
 
+  const onRandomize = useCallback(() => {
+    // REPLACE flows through the history reducer, so a roll is undoable (⌘Z).
+    dispatch({ type: 'REPLACE', cfg: randomKit(cfg) })
+    setToast('🎲 Rolled a fresh kit — ⌘Z to undo')
+  }, [cfg, dispatch])
+
   const onShare = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(window.location.href)
@@ -101,6 +108,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         onRedo={redo}
         canUndo={canUndo}
         canRedo={canRedo}
+        onRandomize={onRandomize}
       />
       <div className="app__body">
         {menuOpen && (
@@ -131,6 +139,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         onViewChange={handleViewChange}
         onShare={onShare}
         onExport={() => setExportOpen(true)}
+        onRandomize={onRandomize}
         undo={undo}
         redo={redo}
       />
