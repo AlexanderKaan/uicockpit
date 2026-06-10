@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useId } from 'react'
 
 /* ChartFrame — presentational chart family driven entirely by the chart
  * palette tokens (--k-chart-1 … --k-chart-6). Pure SVG, no chart library:
@@ -50,6 +50,9 @@ function niceMax(raw: number): number {
 export function ChartFrame({ type, series, labels, height = H, showLegend = true }: ChartFrameProps) {
   // Hovered column index (cartesian) — drives the cursor + tooltip.
   const [hover, setHover] = useState<number | null>(null)
+  // Unique-per-instance id for the area gradient defs (colons stripped so the
+  // url(#…) reference is valid). Multiple ChartFrames can render on one page.
+  const uid = useId().replace(/:/g, '')
   const cartesian = type !== 'donut'
 
   const cols = labels?.length ?? series[0]?.values.length ?? 0
@@ -97,7 +100,7 @@ export function ChartFrame({ type, series, labels, height = H, showLegend = true
             </div>
             <svg className="chart__svg" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={`${type} chart`}>
               <Grid max={max} />
-              {(type === 'line' || type === 'area') && <LineArea series={series} area={type === 'area'} max={max} />}
+              {(type === 'line' || type === 'area') && <LineArea series={series} area={type === 'area'} max={max} uid={uid} />}
               {type === 'stackedArea' && <StackedArea series={series} max={max} />}
               {type === 'bar' && <Bars series={series} cols={cols} max={max} hover={hover} />}
               {type === 'stacked' && <Stacked series={series} cols={cols} max={max} hover={hover} />}
@@ -164,20 +167,33 @@ function Grid({ max }: { max: number }) {
 }
 
 /* ---- Line / Area ---------------------------------------------------------- */
-function LineArea({ series, area, max }: { series: ChartSeries[]; area: boolean; max: number }) {
+function LineArea({ series, area, max, uid }: { series: ChartSeries[]; area: boolean; max: number; uid: string }) {
   const toPts = (vals: number[]) => {
     const step = (W - PAD * 2) / Math.max(1, vals.length - 1)
     return vals.map((v, i) => [PAD + i * step, H - PAD - (v / max) * (H - PAD * 2)] as const)
   }
   return (
     <>
+      {/* B★6: area fills use a VERTICAL gradient (opaque near the line → fading
+          to ~transparent at the baseline) instead of a flat 14% wash — the
+          Recharts / shadcn-charts look, reads far more premium than a slab. */}
+      {area && (
+        <defs>
+          {series.map((s, si) => (
+            <linearGradient key={s.name} id={`${uid}-area-${si}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={chartVar(si)} stopOpacity={0.26} />
+              <stop offset="100%" stopColor={chartVar(si)} stopOpacity={0.02} />
+            </linearGradient>
+          ))}
+        </defs>
+      )}
       {series.map((s, si) => {
         const pts = toPts(s.values)
         const d = pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')
         const areaD = `${d} L${(W - PAD).toFixed(1)} ${H - PAD} L${PAD.toFixed(1)} ${H - PAD} Z`
         return (
           <g key={s.name}>
-            {area && <path d={areaD} fill={chartVar(si)} opacity={0.14} />}
+            {area && <path d={areaD} fill={`url(#${uid}-area-${si})`} />}
             <path d={d} fill="none" stroke={chartVar(si)} strokeWidth={2} strokeDasharray={chartDash(si)} vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
           </g>
         )
@@ -225,7 +241,7 @@ function Bars({ series, cols, max, hover }: { series: ChartSeries[]; cols: numbe
           const v = s.values[ci] ?? 0
           const h = (v / max) * (H - PAD * 2)
           const x = PAD + ci * groupW + barGap + si * (barW + barGap)
-          return <rect key={`${ci}-${si}`} x={x} y={H - PAD - h} width={Math.max(1, barW)} height={h} rx={1.5} fill={chartVar(si)} opacity={hover === null || hover === ci ? 1 : 0.45} />
+          return <rect key={`${ci}-${si}`} x={x} y={H - PAD - h} width={Math.max(1, barW)} height={h} rx={2.5} fill={chartVar(si)} opacity={hover === null || hover === ci ? 1 : 0.45} />
         }),
       )}
     </>
