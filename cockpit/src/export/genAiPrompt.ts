@@ -47,7 +47,13 @@ ${standalone}.
 **The rule of reach:** need a data surface? → the **Data table** block (it owns
 toolbar + selection + pagination + empty/loading/error). Need a form? → **Form
 panel**. Need to filter a list? → **Filter bar**. Compose from the ladder; don't
-re-implement what a block already guarantees.`
+re-implement what a block already guarantees.
+
+**Blocks adapt to their CONTAINER, not the viewport.** The flagship blocks
+(data-table, form-panel, filter-bar) carry CSS container queries keyed to their
+own width, so they reflow correctly wherever you drop them — full-bleed, in a
+narrow sidebar, or on mobile — with no per-page media queries. Drop the block and
+trust it; don't wrap it in your own breakpoints.`
 }
 
 /**

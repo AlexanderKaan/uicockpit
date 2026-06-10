@@ -995,7 +995,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
      .datatable--loading              dims the body while skeleton rows show
    State slot
      .datatable__state--error         tints the icon danger for a failed load */
-.datatable { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); overflow: hidden; }
+.datatable { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); overflow: hidden; container: datatable / inline-size; }
+/* Container query (B2) — the block adapts to ITS OWN width, not the viewport, so
+ * it reflows the same whether it's full-bleed or dropped in a narrow sidebar.
+ * Under ~440px the header toolbar stacks its controls full-width (search, filters,
+ * actions each on their own row) instead of cramming one row; the table body keeps
+ * its horizontal scroll. (Named container so a nested block can't mis-trigger.) */
+@container datatable (max-width: 440px) {
+  .datatable__bar .toolbar { flex-direction: column; align-items: stretch; }
+  .datatable__bar .toolbar__spacer { display: none; }
+}
 
 /* Header band — a .toolbar lives inside for the default controls; the band
  * supplies the sunken surface + divider, and flips to the bulk bar on selection. */
@@ -4465,7 +4474,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
          .formpanel__section     a titled sub-group (divider above)
            .formpanel__section-title
        .formpanel__foot          action bar — note (left) + buttons (right) */
-.formpanel { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); overflow: hidden; }
+.formpanel { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); overflow: hidden; container: formpanel / inline-size; }
+/* Container query (B2) — the field grid already collapses to one column via
+ * auto-fit; the query adds what auto-fit can't: under ~380px the action FOOT
+ * stacks (note above, buttons full-width block) so the primary action stays
+ * thumb-reachable on a narrow container. Responds to the panel's own width. */
+@container formpanel (max-width: 380px) {
+  .formpanel__foot { flex-direction: column; align-items: stretch; }
+  .formpanel__foot-note { margin-right: 0; }
+  .formpanel__foot .btn { width: 100%; }
+}
 .formpanel__head { padding: var(--k-s-16); border-bottom: var(--k-divider); }
 .formpanel__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
 .formpanel__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); margin-top: var(--k-s-2); }
@@ -4509,7 +4527,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
        .filterbar__active        active-filter chips + "Clear all" (only when filtered)
          .filterbar__active-label
        .filterbar__count         result count (trailing, in the active row) */
-.filterbar { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); padding: var(--k-s-12); display: flex; flex-direction: column; gap: var(--k-s-10); }
+.filterbar { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); padding: var(--k-s-12); display: flex; flex-direction: column; gap: var(--k-s-10); container: filterbar / inline-size; }
+/* Container query (B2) — the facet toolbar already wraps; under ~440px it stacks
+ * each control full-width so every facet is clearly tappable on a narrow
+ * container (vs wrapped-but-cramped). Responds to the bar's own width. */
+@container filterbar (max-width: 440px) {
+  .filterbar .toolbar { flex-direction: column; align-items: stretch; }
+  .filterbar .toolbar__spacer { display: none; }
+}
 /* A labelled control cluster inside the bar (e.g. "Score" + a slider) — the eyebrow
  * names the control without stealing height from the toolbar's one-row invariant. */
 .filterbar__group { display: inline-flex; align-items: center; gap: var(--k-s-8); white-space: nowrap; }
