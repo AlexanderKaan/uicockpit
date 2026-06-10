@@ -2,9 +2,12 @@ import type { Config } from './types'
 
 // The ONE curated default — our opinionated "house style" (no Style presets;
 // every facet is an individual control). Tune these for the best out-of-box look.
+// C1: new visitors land on a CHROMATIC kit (Cobalt), never greyscale — the first
+// impression must read "designed", not "blank template". Mono is still one click
+// away in the Brand flyout as the neutral reset/baseline.
 export const DEFAULT_CONFIG: Config = {
-  colorTheme: 'mono',          // greyscale default (no chroma)
-  color: 'mono',
+  colorTheme: 'cobalt',        // friendly Apple system blue (#0A84FF) — the always-works brand
+  color: 'tone',               // chromatic mode (brand hue drives primary/links/focus + auto-tints neutrals)
   radius: 'soft',
   buttonShape: 'match',        // follow the box radius by default (unified look)
   scale: 'default',            // size + presence macro (drives ui-weight too)
@@ -20,7 +23,7 @@ export const DEFAULT_CONFIG: Config = {
   motion: 'smooth',
   motionTempo: 'normal',
   motionCurve: 'standard',
-  cPrimary: '#3b3b42',
+  cPrimary: '#0A84FF',      // Cobalt — matches COLOR_THEMES.cobalt (keep in sync)
   palette: 'vivid',
   neutral: 'auto',          // greys auto-tint toward the brand hue (Linear/Vercel)
   mode: 'light',

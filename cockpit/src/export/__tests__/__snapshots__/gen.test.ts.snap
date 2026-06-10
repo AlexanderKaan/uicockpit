@@ -5085,7 +5085,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 "
 `;
 
-exports[`genJson > matches snapshot for default mono 1`] = `
+exports[`genJson > matches snapshot for mono baseline 1`] = `
 "{
   "$schema": "https://design-tokens.org/v1",
   "name": "cockpit-ui-kit",

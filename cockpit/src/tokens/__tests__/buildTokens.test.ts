@@ -7,10 +7,12 @@ import type { Config, Mode, Scale } from '../types'
 const MODES: Mode[] = ['light', 'dark']
 const SCALES: Scale[] = ['compact', 'default', 'comfortable']
 
+// Pinned to Mono explicitly (NOT the default) — DEFAULT_CONFIG is now chromatic
+// (Cobalt, per C1), so this stays a true greyscale-baseline regression test.
 describe('buildTokens — mono baseline', () => {
   for (const mode of MODES) {
     it(`matches snapshot in ${mode} mode`, () => {
-      const cfg: Config = { ...DEFAULT_CONFIG, mode }
+      const cfg: Config = applyColorTheme({ ...DEFAULT_CONFIG, mode }, 'mono')
       expect(buildTokens(cfg)).toMatchSnapshot()
     })
   }

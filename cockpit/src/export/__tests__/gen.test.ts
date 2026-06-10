@@ -52,8 +52,10 @@ describe('genJson', () => {
     expect(parsed.tokens.icon.library.value).toContain('Lucide')
   })
 
-  it('matches snapshot for default mono', () => {
-    expect(genJson(DEFAULT_CONFIG)).toMatchSnapshot()
+  // Pinned to Mono explicitly — DEFAULT_CONFIG is now chromatic (Cobalt, per C1);
+  // the chromatic output is already covered by the cobalt sample snapshots above.
+  it('matches snapshot for mono baseline', () => {
+    expect(genJson(applyColorTheme(DEFAULT_CONFIG, 'mono'))).toMatchSnapshot()
   })
 })
 
