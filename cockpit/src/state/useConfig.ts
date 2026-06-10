@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useReducer, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { buildTokens } from '../tokens/buildTokens'
 import type { Config } from '../tokens/types'
 import type { Tokens } from '../tokens/types'
 import { readHash, writeHash } from './hash'
-import { configReducer, type ConfigAction } from './configReducer'
+import type { ConfigAction } from './configReducer'
+import { historyReducer, initHistory } from './historyReducer'
 
 const HASH_DEBOUNCE_MS = 150
 
@@ -12,6 +13,10 @@ interface UseConfigResult {
   cfg: Config
   tokens: Tokens
   dispatch: (action: ConfigAction) => void
+  undo: () => void
+  redo: () => void
+  canUndo: boolean
+  canRedo: boolean
 }
 
 function initFromHash(): Config {
@@ -19,7 +24,8 @@ function initFromHash(): Config {
 }
 
 export function useConfig(): UseConfigResult {
-  const [cfg, dispatch] = useReducer(configReducer, undefined, initFromHash)
+  const [hist, dispatch] = useReducer(historyReducer, undefined, () => initHistory(initFromHash()))
+  const cfg = hist.present
   const writeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // sync to URL hash with debounce
@@ -45,5 +51,19 @@ export function useConfig(): UseConfigResult {
 
   const tokens = useMemo(() => buildTokens(cfg), [cfg])
 
-  return { cfg, tokens, dispatch }
+  const undo = useCallback(() => dispatch({ type: 'UNDO' }), [])
+  const redo = useCallback(() => dispatch({ type: 'REDO' }), [])
+
+  return {
+    cfg,
+    tokens,
+    // The history dispatch accepts every ConfigAction (HistoryAction is a
+    // superset), so callers (the panel) keep dispatching SET/APPLY_COLOR_THEME/
+    // REPLACE unchanged — undo/redo are layered on transparently.
+    dispatch: dispatch as (action: ConfigAction) => void,
+    undo,
+    redo,
+    canUndo: hist.past.length > 0,
+    canRedo: hist.future.length > 0,
+  }
 }

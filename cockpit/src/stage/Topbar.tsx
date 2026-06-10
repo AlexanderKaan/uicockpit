@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, Box, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, ShieldCheck, Sun } from 'lucide-react'
+import { AppWindow, Box, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -23,9 +23,14 @@ interface TopbarProps {
   onToggleMenu: () => void
   /** Brand click → back to the marketing home. */
   onHome?: () => void
+  /** Undo/redo (C2) — config history. Buttons mirror ⌘Z / ⇧⌘Z. */
+  onUndo: () => void
+  onRedo: () => void
+  canUndo: boolean
+  canRedo: boolean
 }
 
-export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome }: TopbarProps) {
+export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -105,6 +110,27 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         </div>
       </div>
       <div className="topbar__right">
+        {/* Undo / redo (C2) — config history; mirrors ⌘Z / ⇧⌘Z. */}
+        <button
+          type="button"
+          className="topbar__icon-btn"
+          onClick={onUndo}
+          disabled={!canUndo}
+          aria-label="Undo"
+          title="Undo (⌘Z)"
+        >
+          <Undo2 size={15} strokeWidth={1.75} />
+        </button>
+        <button
+          type="button"
+          className="topbar__icon-btn"
+          onClick={onRedo}
+          disabled={!canRedo}
+          aria-label="Redo"
+          title="Redo (⇧⌘Z)"
+        >
+          <Redo2 size={15} strokeWidth={1.75} />
+        </button>
         {/* Saved kits — heart opens a dropdown with the 3 local slots. */}
         <div className="kits-pop-wrap">
           <button

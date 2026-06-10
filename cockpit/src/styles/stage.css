@@ -169,7 +169,9 @@
   cursor: pointer;
   transition: background var(--app-dur) var(--app-ease), border-color var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease);
 }
-.topbar__icon-btn:hover { background: var(--app-hover); border-color: var(--app-fg-muted); color: var(--app-fg); }
+.topbar__icon-btn:hover:not(:disabled) { background: var(--app-hover); border-color: var(--app-fg-muted); color: var(--app-fg); }
+/* Disabled (undo/redo at the ends of history) — dimmed + inert, no hover. */
+.topbar__icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 /* Saved-kits heart — turns favorite-red and shows a count once you've saved
    at least one kit, so the saved count is glanceable. */
 .kit-heart { position: relative; }

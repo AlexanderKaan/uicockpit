@@ -30,7 +30,7 @@ function startViewTransition(cb: () => void): void {
  *  the whole app; below it the stage fills the width and the control menu
  *  *floats* over the top-left (absolute), never reserving a column. */
 export function CockpitApp({ onHome }: CockpitAppProps = {}) {
-  const { cfg, tokens, dispatch } = useConfig()
+  const { cfg, tokens, dispatch, undo, redo, canUndo, canRedo } = useConfig()
   const [menuOpen, setMenuOpen] = useState(true)
   const [view, setView] = useState<ViewKind>('foundations')
   const [saved, setSaved] = useState(true)
@@ -48,6 +48,23 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
     if (next === view) return
     startViewTransition(() => setView(next))
   }
+
+  // Undo/redo keyboard shortcuts (C2): ⌘Z / Ctrl+Z = undo, ⇧⌘Z / Ctrl+Y = redo.
+  // Skip when a text field is focused so the browser's native field-undo wins
+  // (e.g. editing the hex input) — the panel's other controls aren't text inputs.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey) return
+      const k = e.key.toLowerCase()
+      if (k !== 'z' && k !== 'y') return
+      const el = document.activeElement as HTMLElement | null
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return
+      if (k === 'z' && !e.shiftKey) { e.preventDefault(); undo() }
+      else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); redo() }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [undo, redo])
 
   const onShare = useCallback(async () => {
     try {
@@ -76,6 +93,10 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onHome={onHome}
+        onUndo={undo}
+        onRedo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
       <div className="app__body">
         {menuOpen && (
