@@ -6,11 +6,113 @@ import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, us
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 
-// Human, searchable label from a card component's function name — zero-maintenance
-// and exactly what a user searches by (component TYPE, not the demo's in-context
-// title): FormCard → "Form", DataTableProCard → "Data Table Pro". (C5)
+// Human label from a card component's function name (the component TYPE):
+// FormCard → "Form", DataTableProCard → "Data Table Pro". (C5)
 const labelOf = (fn: () => ReactElement): string =>
   fn.name.replace(/Card$/, '').replace(/([a-z0-9])([A-Z])/g, '$1 $2').trim()
+
+// Per-card search index: the VISIBLE title (what the user reads on the card)
+// plus type synonyms, so search matches the heading and common alternate names —
+// not only the function label. The in-context heading often diverges from the
+// type (StatGroupCard reads "Overview", CodeBlockCard reads "Quick start"), which
+// is why title search was failing. Keyed by fn.name; titles mirror each card's
+// <Card title>. Keep an entry in sync when you rename a heading; a missing entry
+// degrades gracefully to the label alone.
+const CARD_KEYWORDS: Record<string, string> = {
+  // — Text inputs —
+  FormCard: 'New contact form fields name email',
+  SearchInputCard: 'Search docs search field query',
+  PasswordInputCard: 'Set a password strength reveal',
+  NumberInputCard: 'Quantity number stepper spinner',
+  PhoneInputCard: 'Phone number country code',
+  InputOtpCard: 'Verify your email OTP one-time code PIN 2FA',
+  // — Pickers & selects —
+  DateFieldCard: 'Due date field date picker',
+  ComboboxCard: 'Framework combobox autocomplete typeahead',
+  SelectCard: 'Deploy region select dropdown',
+  TagInputCard: 'Topics tags chips tokens',
+  DateCard: 'Schedule date picker calendar range',
+  SlotPickerCard: 'Slot picker time booking availability',
+  // — Choice & toggles —
+  SwitchCard: 'Notification settings switch toggle on off',
+  SelectionCard: 'Create repository radio checkbox option',
+  RadioCardCard: 'Radio card option choice',
+  SliderCard: 'Display slider range',
+  // — Actions & menus —
+  ButtonsCard: 'Buttons primary secondary ghost variants CTA',
+  ButtonGroupCard: 'Button group segmented',
+  ToolbarCard: 'Documents toolbar actions',
+  ToolbarRecipeCard: 'Toolbar actions controls',
+  DropdownMenuCard: 'Account dropdown menu',
+  ContextMenuCard: 'Context menu right click',
+  MenubarCard: 'Menubar menu app menu',
+  CmdPaletteCard: 'Quick search command palette cmdk spotlight',
+  // — Navigation —
+  TabsCard: 'Northwind tabs segmented',
+  NavMenuCard: 'Navigation menu navbar megamenu',
+  BreadcrumbCard: 'Breadcrumb path trail',
+  PaginationCard: 'Search results pagination pages',
+  StepperCard: 'Get started stepper steps progress',
+  NavCard: 'Side navigation sidebar nav rail',
+  // — Overlays & disclosure —
+  PopoverCard: 'Profile popover',
+  TooltipCard: 'Last sync tooltip hint',
+  HoverCardCard: 'Mentions hover card preview',
+  AccordionCard: 'Accordion collapse expand disclosure',
+  DialogCard: 'Delete project dialog modal',
+  AlertDialogCard: 'Confirm delete alert dialog confirmation',
+  SheetCard: 'Filters sheet drawer side panel',
+  // — Feedback & status —
+  ValidationCard: 'Account details validation error invalid',
+  BannerCard: 'Maintenance banner alert notice',
+  AlertsCard: 'Activity alerts inline messages',
+  ProgressCard: 'Storage progress bar',
+  SpinnerCard: 'Workspace spinner loader loading',
+  SkeletonCard: 'Activity feed skeleton loading placeholder',
+  ToastStackCard: 'Toast notification snackbar',
+  EmptyStateCard: 'Projects empty state zero blank',
+  StatusPageCard: 'System status uptime incidents health',
+  NotificationCenterCard: 'Notification center inbox bell',
+  // — Data & content —
+  TableCard: 'System health table rows',
+  DataTableProCard: 'Data table pro grid sort filter select',
+  ListCard: 'Library list rows items',
+  DescriptionListCard: 'Subscription description list key value',
+  SettingsRowCard: 'Website settings row toggle preference',
+  AttachmentChipCard: 'Attachments file chip',
+  InteractiveCardCard: 'Workspaces interactive card selectable',
+  AvatarCard: 'Avatar profile picture user',
+  StatCard: 'Recurring revenue MRR stat metric KPI sparkline',
+  StatGroupCard: 'Overview metrics KPIs summary numbers',
+  TrendCard: 'Revenue trend chart sparkline delta',
+  ChartCard: 'Traffic by source chart graph analytics',
+  UsageMeterCard: 'Monthly quota usage meter limit',
+  FileGridCard: 'Files file grid thumbnails',
+  TreeViewCard: 'Explorer tree view folders files',
+  KanbanCard: 'Sprint board kanban columns cards',
+  TimelineCard: 'Release progress timeline activity history',
+  InfoCardCard: 'Hosting details info card definition',
+  // — Blocks / composed —
+  FormPanelCard: 'Form panel labeled fields validation action bar',
+  FilterBarCard: 'Filter bar toolbar facets',
+  InboxFilterCard: 'Inbox filter mail messages',
+  PricingCardCard: 'Plans pricing tiers subscription',
+  CodeBlockCard: 'Quick start code block snippet syntax',
+  LoginCard: 'Log in sign in auth credentials',
+  SignupCard: 'Sign up register create account auth',
+  WizardStepperCard: 'Set up workspace wizard onboarding steps',
+  CarouselCard: 'Carousel slider swipe dots',
+  LightboxCard: 'Gallery lightbox images photos viewer',
+  DropzoneCard: 'Upload files dropzone drag drop',
+  DangerZoneCard: 'Danger zone destructive delete',
+  FaqCard: 'Help centre FAQ questions accordion',
+  TwoColumnLayoutCard: 'Site overview two column layout',
+  ResizableCard: 'Resizable panels split handle',
+  AspectRatioCard: 'Aspect ratio media frame',
+  ScrollAreaCard: 'Scroll area scrollbar overflow',
+}
+const searchText = (C: () => ReactElement) =>
+  (labelOf(C) + ' ' + (CARD_KEYWORDS[C.name] ?? '')).toLowerCase()
 
 export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'block' } = {}) {
   // Order strategy: highest brand-impact first, token-neutral utilities last.
@@ -18,7 +120,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   const galleryRef = useRef<HTMLDivElement>(null)
   const [q, setQ] = useState('')
   const query = q.trim().toLowerCase()
-  const matchesQ = (C: () => ReactElement) => !query || labelOf(C).toLowerCase().includes(query)
+  const matchesQ = (C: () => ReactElement) => !query || searchText(C).includes(query)
 
   // Grid masonry — each card spans as many `grid-auto-rows` units as its
   // measured height needs, so portrait cards pack tightly while .card--wide
@@ -116,7 +218,11 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   )
 
   if (tier === 'atom') {
-    const groups = ATOM_GROUPS.map(([name, comps]) => [name, comps.filter(matchesQ)] as const).filter(([, c]) => c.length)
+    // A group whose NAME matches (e.g. "navigation", "overlays") shows all its
+    // atoms; otherwise filter the atoms individually.
+    const groups = ATOM_GROUPS
+      .map(([name, comps]) => [name, query && name.toLowerCase().includes(query) ? comps : comps.filter(matchesQ)] as const)
+      .filter(([, c]) => c.length)
     const total = ATOM_GROUPS.reduce((n, [, c]) => n + c.length, 0)
     const count = groups.reduce((n, [, c]) => n + c.length, 0)
     return (
