@@ -2072,7 +2072,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   min-height: var(--k-in-h-default, 40px);
   padding-block: 0;
   padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
-  border-radius: var(--k-radius-md);
+  /* --k-field-radius (not --k-radius-md) so Plain flattens to a straight
+     underline — radius-md here left the bottom hairline curling up at the ends. */
+  border-radius: var(--k-field-radius);
   background: var(--k-field-bg);
   border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);
   color: var(--k-fg);
@@ -2105,7 +2107,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: 0 var(--k-s-28) 0 max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
   background-color: var(--k-field-bg);
   border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);
-  border-radius: var(--k-radius-md);
+  border-radius: var(--k-field-radius);
   color: var(--k-fg);
   font-size: var(--k-type-small);
   font-family: var(--k-font-body);
@@ -3287,7 +3289,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   gap: var(--k-s-4);
   padding: var(--k-s-4) var(--k-s-8);
   border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);
-  border-radius: var(--k-radius-md);
+  border-radius: var(--k-field-radius);
   background: var(--k-field-bg);
   min-height: var(--k-in-h-default);
   align-items: center;
@@ -4113,7 +4115,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   background: var(--k-field-bg);
   /* Tokenized border thickness — see .in for rationale. */
   border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);
-  border-radius: var(--k-radius-md);
+  border-radius: var(--k-field-radius);
   /* Flat default — focus halo carries the emphasis (shadcn pattern). */
   box-shadow: none;
   transition:
