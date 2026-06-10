@@ -143,8 +143,15 @@
   display: flex;
   align-items: center;
   gap: var(--k-s-8);
-  width: min(460px, 100%);
-  margin: 0 auto var(--gallery-gap);
+  /* Cap at the 2-column content width (360 + 40 gutter + 360) so on the common
+     panel-open (2-col) stage the bar edge-aligns with the cards, and stays
+     centred + graceful at 1 or 3 columns. */
+  width: min(760px, 100%);
+  /* --gallery-gap is set on .gallery (a SIBLING), so it does NOT inherit here —
+     needs the literal fallback, else the whole `margin` shorthand is invalid and
+     collapses to 0, killing BOTH the `auto` centring (bar floats flush-left) AND
+     the bottom gap (cards touch the bar). This one missing fallback caused both. */
+  margin: 0 auto var(--gallery-gap, 40px);
   padding: 0 var(--k-s-12);
   min-height: var(--k-control-h-md, 36px);
   border: 1px solid var(--k-input-border, var(--k-border));
