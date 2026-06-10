@@ -51,6 +51,10 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-surface-overlay: oklch(100% 0 0);
   --k-scrim: rgba(0, 0, 0, 0.4);
   --k-scrim-strong: rgba(0, 0, 0, 0.86);
+  --k-z-dropdown: 50;
+  --k-z-popover: 50;
+  --k-z-modal: 60;
+  --k-z-tooltip: 70;
   --k-fg: oklch(16.0% 0.0140 249.9);
   --k-fg-muted: oklch(50.3% 0.0140 249.9);
   --k-fg-faint: oklch(64.0% 0.0112 249.9);
@@ -300,6 +304,10 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-surface-overlay: oklch(35.5% 0.0077 249.9);
   --k-scrim: rgba(0, 0, 0, 0.4);
   --k-scrim-strong: rgba(0, 0, 0, 0.86);
+  --k-z-dropdown: 50;
+  --k-z-popover: 50;
+  --k-z-modal: 60;
+  --k-z-tooltip: 70;
   --k-fg: oklch(94.5% 0.0140 249.9);
   --k-fg-muted: oklch(77.5% 0.0140 249.9);
   --k-fg-faint: oklch(64.0% 0.0112 249.9);
@@ -3029,7 +3037,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   width: 100%;
   text-align: left;
   font: inherit;
-  font-size: var(--k-type-body);
+  /* --k-type-small (not body) — match .combobox__item / .cmdp__item and stay ≤ the
+     trigger button's own size. Was --k-type-body, which made dropdown rows render
+     LARGER than the button that opened them. */
+  font-size: var(--k-type-small);
 }
 .menu__item > svg { width: var(--k-row-icon, 14px); height: var(--k-row-icon, 14px); flex-shrink: 0; }
 .menu__item:hover { background: var(--k-state-hover); }

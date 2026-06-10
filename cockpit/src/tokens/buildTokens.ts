@@ -622,6 +622,15 @@ export function buildTokens(cfg: Config): Tokens {
       // --k-scrim: modal/sheet backdrop · --k-scrim-strong: full-bleed media (lightbox).
       '--k-scrim': 'rgba(0, 0, 0, 0.4)',
       '--k-scrim-strong': 'rgba(0, 0, 0, 0.86)',
+      // Z-index ladder. CRITICAL: the recipes reference these (popover/dropdown/
+      // tooltip/modal) but they were NEVER emitted — so every in-card overlay fell
+      // back to `z-index: auto` and got painted UNDER later positioned siblings
+      // (e.g. the date-picker calendar bleeding behind the selects below it).
+      // Anchored menus < dialog < tooltip; all well above flat content (z-auto/0).
+      '--k-z-dropdown': '50',
+      '--k-z-popover': '50',
+      '--k-z-modal': '60',
+      '--k-z-tooltip': '70',
       '--k-fg': fg.main,
       '--k-fg-muted': fg.muted,
       '--k-fg-faint': fg.faint,

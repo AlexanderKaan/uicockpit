@@ -244,6 +244,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme cobalt in dar
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -492,6 +496,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme cobalt in lig
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -740,6 +748,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme coral in dark
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -988,6 +1000,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme coral in ligh
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -1236,6 +1252,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme ember in dark
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -1484,6 +1504,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme ember in ligh
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -1732,6 +1756,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme indigo in dar
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -1980,6 +2008,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme indigo in lig
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -2228,6 +2260,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme jade in dark 
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -2476,6 +2512,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme jade in light
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -2724,6 +2764,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme rose in dark 
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -2972,6 +3016,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme rose in light
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -3220,6 +3268,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme sky in dark m
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -3468,6 +3520,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme sky in light 
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -3716,6 +3772,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme teal in dark 
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -3964,6 +4024,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme teal in light
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -4212,6 +4276,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme violet in dar
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -4460,6 +4528,10 @@ exports[`buildTokens — Color theme coverage (on default) > theme violet in lig
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -4708,6 +4780,10 @@ exports[`buildTokens — Scale coverage (with Mono) > scale comfortable in dark 
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -4956,6 +5032,10 @@ exports[`buildTokens — Scale coverage (with Mono) > scale comfortable in light
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -5204,6 +5284,10 @@ exports[`buildTokens — Scale coverage (with Mono) > scale compact in dark mode
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -5452,6 +5536,10 @@ exports[`buildTokens — Scale coverage (with Mono) > scale compact in light mod
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -5700,6 +5788,10 @@ exports[`buildTokens — Scale coverage (with Mono) > scale default in dark mode
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -5948,6 +6040,10 @@ exports[`buildTokens — Scale coverage (with Mono) > scale default in light mod
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -6196,6 +6292,10 @@ exports[`buildTokens — mono baseline > matches snapshot in dark mode 1`] = `
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;
@@ -6444,6 +6544,10 @@ exports[`buildTokens — mono baseline > matches snapshot in light mode 1`] = `
     "--k-weight-bold": "700",
     "--k-weight-medium": "500",
     "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70",
   },
 }
 `;

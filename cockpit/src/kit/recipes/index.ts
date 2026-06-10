@@ -2432,7 +2432,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   width: 100%;
   text-align: left;
   font: inherit;
-  font-size: var(--k-type-body);
+  /* --k-type-small (not body) — match .combobox__item / .cmdp__item and stay ≤ the
+     trigger button's own size. Was --k-type-body, which made dropdown rows render
+     LARGER than the button that opened them. */
+  font-size: var(--k-type-small);
 }
 .menu__item > svg { width: var(--k-row-icon, 14px); height: var(--k-row-icon, 14px); flex-shrink: 0; }
 .menu__item:hover { background: var(--k-state-hover); }
