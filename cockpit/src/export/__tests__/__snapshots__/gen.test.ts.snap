@@ -578,8 +578,12 @@ body {
 
 /* Disabled state — apply via the :disabled attribute or .is-disabled class.
    bg + color use !important so a component's own fill (e.g. .btn--primary)
-   can't out-specify the disabled greying. */
-:disabled, .is-disabled {
+   can't out-specify the disabled greying.
+   EXCEPT .toggle: a disabled-ON switch ("always on, can't be disabled") must keep
+   its blue track — the !important grey would otherwise flatten it to read as OFF.
+   The toggle self-manages disabled via .toggle--disabled (opacity + not-allowed +
+   pointer-events: none), so it doesn't need — and must not get — the global grey. */
+:disabled:not(.toggle), .is-disabled:not(.toggle) {
   background: var(--k-disabled-bg) !important;
   color: var(--k-disabled-fg) !important;
   opacity: var(--k-disabled-opacity);
