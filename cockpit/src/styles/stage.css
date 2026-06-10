@@ -599,3 +599,42 @@
 }
 .topbar__btn--with-icon > svg { color: var(--app-fg-muted); flex-shrink: 0; }
 .topbar__btn--with-icon:hover > svg { color: var(--app-fg); }
+
+/* === ⌘K command palette (C3) ===
+   A chrome scrim around the kit's OWN `.cmdp` recipe — the palette is rendered
+   inside a `.cockpit-preview` host carrying live `--k-*` tokens, so it literally
+   IS the command-palette component the product ships, themed to the current kit.
+   This block is only the floating frame; the surface itself is pure kit CSS. */
+.cmdk-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1200; /* above the floating panel (1100) and modals (200) */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12vh 16px 16px;
+  background: color-mix(in srgb, #0b1020 38%, transparent);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  animation: cmdk-scrim-in 120ms ease;
+}
+@keyframes cmdk-scrim-in { from { opacity: 0; } to { opacity: 1; } }
+/* Strip the preview-frame chrome from the host so only the inner .cmdp shows. */
+.cmdk-host.cockpit-preview {
+  width: min(560px, 92vw);
+  max-width: 92vw;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  animation: cmdk-pop-in 140ms cubic-bezier(.16, 1, .3, 1);
+}
+@keyframes cmdk-pop-in {
+  from { opacity: 0; transform: translateY(-6px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+.cmdk-scroll { max-height: min(52vh, 460px); overflow-y: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .cmdk-scrim, .cmdk-host.cockpit-preview { animation: none; }
+}

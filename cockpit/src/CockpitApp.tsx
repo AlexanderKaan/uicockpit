@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { Panel } from './panel/Panel'
 import { Stage, type ViewKind } from './stage/Stage'
 import { Topbar } from './stage/Topbar'
+import { CommandPalette } from './stage/CommandPalette'
 import { useConfig } from './state/useConfig'
 import { Toast } from './export/Toast'
 
@@ -35,6 +36,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const [view, setView] = useState<ViewKind>('foundations')
   const [saved, setSaved] = useState(true)
   const [exportOpen, setExportOpen] = useState(false)
+  const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
   // Visual save indicator — flips to "Saving…" briefly after each cfg change
@@ -56,6 +58,8 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
     const onKey = (e: KeyboardEvent) => {
       if (!(e.metaKey || e.ctrlKey) || e.altKey) return
       const k = e.key.toLowerCase()
+      // ⌘K toggles the command palette — works from anywhere, even a focused field.
+      if (k === 'k') { e.preventDefault(); setCmdkOpen((v) => !v); return }
       if (k !== 'z' && k !== 'y') return
       const el = document.activeElement as HTMLElement | null
       if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return
@@ -119,6 +123,17 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         </Suspense>
       )}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      <CommandPalette
+        open={cmdkOpen}
+        onClose={() => setCmdkOpen(false)}
+        tokens={tokens}
+        dispatch={dispatch}
+        onViewChange={handleViewChange}
+        onShare={onShare}
+        onExport={() => setExportOpen(true)}
+        undo={undo}
+        redo={redo}
+      />
     </div>
   )
 }
