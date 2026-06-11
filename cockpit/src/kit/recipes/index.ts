@@ -1901,7 +1901,30 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    non-interactive. The consumer adds the native \`disabled\` + this class; the
    recipe owns the look. Booking-grade pickers need this state. */
 .calendar__cell--disabled { color: var(--k-fg-faint); opacity: 0.5; cursor: not-allowed; text-decoration: line-through; }
-.calendar__cell--disabled:hover { background: transparent; }`,
+.calendar__cell--disabled:hover { background: transparent; }
+/* --- Date & time entry — the trichotomy (H4) ---
+ * The kit ships THREE date/time entry forms; pick by context, never invent a
+ * fourth:
+ *   1. DOCKED  — the inline .calendar grid above, always visible (booking /
+ *      scheduling surfaces where the date IS the content).
+ *   2. POPOVER — an .in--inline trigger opening a .popover with
+ *      .calendar__nav + .calendar (the form-field default; on compact the
+ *      same panel sits inside a .dialog — that's the "modal" arm).
+ *   3. INPUT   — typed entry for keyboard-first / known values: a date .in,
+ *      plus the .timefield below for times (M3's time-INPUT variant — we
+ *      deliberately skip the clock-face dial as touch cosplay).
+ * Time field: hour + minute as two 2-digit cells around a colon, with an
+ * optional meridiem .segctrl. The cells ARE .in atoms, so Surface, Scale and
+ * radius cascade in for free; tabular-nums keeps the digits from wiggling. */
+.timefield { display: inline-flex; align-items: center; gap: var(--k-s-4); }
+.timefield .in {
+  width: calc(var(--k-in-h-default) * 1.4);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding-inline: var(--k-s-4);
+}
+.timefield__sep { font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); }
+.timefield .segctrl { margin-left: var(--k-s-4); }`,
   },
   {
     id: 'kbd',

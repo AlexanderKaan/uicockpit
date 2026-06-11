@@ -2158,6 +2158,12 @@ function Settings() {
   const [region, setRegion] = useState<'eu-west' | 'us-east' | 'ap-south'>('eu-west')
   const [notify, setNotify] = useState(true)
   const [analytics, setAnalytics] = useState(false)
+  // Daily-digest send time — the kit's time INPUT (.timefield), the typed arm
+  // of the date/time trichotomy (same pattern the gallery's Due-date card demos).
+  const [digestH, setDigestH] = useState('09')
+  const [digestM, setDigestM] = useState('00')
+  const [digestMer, setDigestMer] = useState<'AM' | 'PM'>('AM')
+  const clamp2 = (v: string) => v.replace(/\D/g, '').slice(0, 2)
   const [toast, setToast] = useState<string | null>(null)
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -2227,6 +2233,19 @@ function Settings() {
           <div className="card__col">
             <ToggleRow label="Email me about deploys" value={notify} onChange={setNotify} />
             <ToggleRow label="Share usage analytics" value={analytics} onChange={setAnalytics} />
+          </div>
+          <div>
+            <div style={{ fontSize: 'var(--k-type-small)', fontWeight: 'var(--k-weight-medium)', marginBottom: 'var(--k-s-6)' }}>Daily digest</div>
+            <div className="timefield">
+              <input className="in" value={digestH} onChange={(e) => setDigestH(clamp2(e.target.value))} inputMode="numeric" maxLength={2} aria-label="Digest hour" />
+              <span className="timefield__sep" aria-hidden="true">:</span>
+              <input className="in" value={digestM} onChange={(e) => setDigestM(clamp2(e.target.value))} inputMode="numeric" maxLength={2} aria-label="Digest minute" />
+              <div className="segctrl" role="radiogroup" aria-label="AM or PM">
+                {(['AM', 'PM'] as const).map((m) => (
+                  <button key={m} type="button" role="radio" aria-checked={digestMer === m} className={`segctrl__btn ${digestMer === m ? 'segctrl__btn--on' : ''}`} onClick={() => setDigestMer(m)}>{m}</button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

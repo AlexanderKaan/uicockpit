@@ -2433,12 +2433,32 @@ function DateFieldCard() {
   // in single-select mode. This renders the SHARED <DatePicker> component that
   // the SupaDash app also uses (Projects "Due date", Calendar "jump to date"),
   // so the gallery is the source of truth and the app is built FROM it.
+  // Below it: the time INPUT (H4) — the third arm of the date/time trichotomy
+  // (docked calendar · popover picker · typed input). Two .in digit cells
+  // around a colon + a meridiem segctrl; no clock-face dial.
+  const [hh, setHh] = useState('09')
+  const [mm, setMm] = useState('30')
+  const [mer, setMer] = useState<'AM' | 'PM'>('AM')
+  const clamp2 = (v: string) => v.replace(/\D/g, '').slice(0, 2)
   return (
-    <Card title="Due date" desc="Single-date picker — pick a day, popover closes.">
+    <Card title="Due date" desc="Single-date picker + time input — popover for the day, typed cells for the time.">
       <label className="lab">
         <span>Due date</span>
         <DatePicker defaultValue="2026-06-12" ariaLabel="Due date" />
       </label>
+      <div className="lab">
+        <span>Remind me at</span>
+        <div className="timefield">
+          <input className="in" value={hh} onChange={(e) => setHh(clamp2(e.target.value))} inputMode="numeric" maxLength={2} aria-label="Hour" />
+          <span className="timefield__sep" aria-hidden="true">:</span>
+          <input className="in" value={mm} onChange={(e) => setMm(clamp2(e.target.value))} inputMode="numeric" maxLength={2} aria-label="Minute" />
+          <div className="segctrl" role="radiogroup" aria-label="AM or PM">
+            {(['AM', 'PM'] as const).map((m) => (
+              <button key={m} type="button" role="radio" aria-checked={mer === m} className={`segctrl__btn ${mer === m ? 'segctrl__btn--on' : ''}`} onClick={() => setMer(m)}>{m}</button>
+            ))}
+          </div>
+        </div>
+      </div>
     </Card>
   )
 }
