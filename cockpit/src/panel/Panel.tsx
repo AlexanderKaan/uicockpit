@@ -3,7 +3,8 @@ import { Check, ChevronRight, PanelLeftClose } from 'lucide-react'
 import { BODY_FONTS, DISPLAY_GROUPS, customFontFamily, isCustomFont, type FontGroup } from '../tokens/fonts'
 import { nameColor } from '../tokens/color'
 import { COLOR_THEMES } from '../tokens/stylesAndThemes'
-import type { ColorTheme, Config, Tokens } from '../tokens/types'
+import { HARMONY_PRESETS, applyHarmonyPreset } from '../tokens/harmony'
+import type { ColorTheme, Config, Harmony, Tokens } from '../tokens/types'
 import type { ConfigAction } from '../state/configReducer'
 import { FontPicker } from './FontPicker'
 import {
@@ -133,6 +134,15 @@ const PALETTE_OPTS = [
   { id: 'pastel' as const, cap: 'Pastel' },
   { id: 'bright' as const, cap: 'Bright' },
   { id: 'vivid' as const, cap: 'Vivid' },
+]
+/* Harmony (H1) — presets of the two dials underneath (Spread °, Expression %).
+ * Picking a preset snaps both sliders; moving a slider flips the row to Custom.
+ * The primary never rotates — harmony governs the derived family only. */
+const HARMONY_OPTS = [
+  { id: 'mono' as const, cap: 'Mono' },
+  { id: 'tonal' as const, cap: 'Tonal' },
+  { id: 'complement' as const, cap: 'Complement' },
+  { id: 'expressive' as const, cap: 'Expressive' },
 ]
 
 function cap<T extends string>(opts: ReadonlyArray<{ id: T; cap: string }>, id: T): string {
@@ -291,6 +301,65 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       opts: optsFrom(NEUTRAL_OPTS),
       selected: cfg.neutral,
       onPick: pick('neutral'),
+    },
+    {
+      // Harmony (H1) — how the derived family (secondary/accent/decoratives/
+      // neutral tint) relates to the brand. 4 presets + the two live dials
+      // (Spread/Expression) in the flyout foot; a moved dial = Custom.
+      key: 'harmony',
+      label: 'Harmony',
+      value: cfg.harmony === 'custom' ? `Custom · ${cfg.spread}°` : cap(HARMONY_OPTS, cfg.harmony),
+      kind: 'opts',
+      opts: optsFrom(HARMONY_OPTS),
+      selected: cfg.harmony,
+      onPick: (id) => {
+        dispatch({ type: 'SET', patch: applyHarmonyPreset(id as Exclude<Harmony, 'custom'>) })
+        close()
+      },
+      footer: (
+        <div className="fmharmony">
+          <label className="fmslider">
+            <span className="fmslider__label">Spread</span>
+            <input
+              type="range"
+              min={0}
+              max={180}
+              step={5}
+              list="harmony-spread-detents"
+              value={cfg.spread}
+              onChange={(e) => {
+                const v = +e.target.value
+                dispatch({ type: 'SET', patch: cfg.harmony === 'custom' ? { spread: v } : { harmony: 'custom', spread: v } })
+              }}
+              aria-label="Hue spread of the derived color family (degrees)"
+            />
+            <span className="fmslider__val">{cfg.spread}°</span>
+          </label>
+          {/* Detents at the named anchor points: mono / tonal (+60) / complement */}
+          <datalist id="harmony-spread-detents">
+            <option value={HARMONY_PRESETS.mono.spread} />
+            <option value={HARMONY_PRESETS.tonal.spread} />
+            <option value={HARMONY_PRESETS.expressive.spread} />
+            <option value={HARMONY_PRESETS.complement.spread} />
+          </datalist>
+          <label className="fmslider">
+            <span className="fmslider__label">Expression</span>
+            <input
+              type="range"
+              min={0}
+              max={200}
+              step={5}
+              value={cfg.expression}
+              onChange={(e) => {
+                const v = +e.target.value
+                dispatch({ type: 'SET', patch: cfg.harmony === 'custom' ? { expression: v } : { harmony: 'custom', expression: v } })
+              }}
+              aria-label="Chroma expression of the derived color family (percent)"
+            />
+            <span className="fmslider__val">{cfg.expression}%</span>
+          </label>
+        </div>
+      ),
     },
     {
       key: 'palette',

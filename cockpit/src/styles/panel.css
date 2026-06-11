@@ -309,6 +309,71 @@
   color: var(--app-fg);
 }
 
+/* === Harmony dials (H1) — the Spread/Expression sliders at the foot of the
+ * Harmony flyout. Same footer treatment as .fmbrand (divider + recessed band). */
+.fmharmony {
+  display: grid;
+  gap: 8px;
+  margin: 6px -5px -5px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-bg);
+  border-radius: 0 0 9px 9px;
+}
+.fmslider {
+  display: grid;
+  grid-template-columns: 72px 1fr 42px;
+  align-items: center;
+  gap: 8px;
+}
+.fmslider__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--app-fg-muted);
+}
+.fmslider__val {
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--app-fg);
+}
+.fmslider input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 14px;
+  background: transparent;
+  cursor: pointer;
+}
+.fmslider input[type='range']::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--app-border);
+}
+.fmslider input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4.5px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1.5px solid var(--app-fg-muted);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+.fmslider input[type='range']::-moz-range-track {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--app-border);
+}
+.fmslider input[type='range']::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1.5px solid var(--app-fg-muted);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
 /* Reduced-motion: the chrome guard at the file end already covers fmrow__pop. */
 
 /* === Ctrl: one labelled control row === */

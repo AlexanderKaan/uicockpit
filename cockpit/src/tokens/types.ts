@@ -89,6 +89,20 @@ export type Contrast = 'soft' | 'balanced' | 'crisp'
  * hue — the Linear/Vercel "the greys carry a whisper of the brand" trick, pure
  * OKLCH. cool/neutral/warm are explicit overrides; mono falls back to pure grey. */
 export type Neutral = 'auto' | 'cool' | 'neutral' | 'warm'
+/* Harmony — how the DERIVED color family (secondary · accent · decoratives ·
+ * the neutral tint) relates to the brand hue. Two continuous dials (H1):
+ *   spread     0–180  — hue rotation of the derived family, in degrees.
+ *                       PRIMARY NEVER ROTATES (our deliberate deviation from
+ *                       M3 Expressive): the user's brand color stays the brand
+ *                       color; the dial only governs the relatives. 0 = mono-
+ *                       chrome family, 60 = M3-TonalSpot (tertiary +60°),
+ *                       180 = complementary accent.
+ *   expression 0–200  — chroma multiplier (%) on the derived family INCLUDING
+ *                       the neutral surface tint (chromatic surfaces at the
+ *                       high end — the M3-2025 "Expressive" direction).
+ * The named modes are PRESETS of those two dials (see HARMONY_PRESETS in
+ * harmony.ts); 'custom' = the dials were moved by hand. */
+export type Harmony = 'mono' | 'tonal' | 'complement' | 'expressive' | 'custom'
 /* Decorative palette character — the 6-swatch set used for charts AND the
  * decorative layer (avatars, category tiles, cover art, preload placeholders).
  * Exposed as --k-accent-1..6 (flat) + --k-accent-N-ink + --k-grad-1..6
@@ -159,6 +173,12 @@ export interface Config {
   /* Single brand hue. Secondary + accent are DERIVED from this in buildTokens
    * — one color in, a harmonious family out (shadcn/Linear model). */
   cPrimary: Hex
+  /* Harmony dials (H1) — see the Harmony type. `harmony` is the preset label
+   * the panel shows; `spread`/`expression` are the actual continuous values
+   * buildTokens consumes (presets are just (spread, expression) pairs). */
+  harmony: Harmony
+  spread: number
+  expression: number
   palette: Palette
   neutral: Neutral
   mode: Mode

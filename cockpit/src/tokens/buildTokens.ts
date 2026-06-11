@@ -14,7 +14,8 @@ import type {
   Tokens,
   TypeScale,
 } from './types'
-import { paletteSet, clampToAA, contrast, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
+import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
+import { resolveHarmony } from './harmony'
 import { customFontFamily, isCustomFont, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
 
 // Tailwind/shadcn convention: dimensional tokens emit in REM on a 16px root, so
@@ -208,6 +209,13 @@ export const resolveDepth = (d: SurfaceDepth) => DEPTH[d]
 export function buildTokens(cfg: Config): Tokens {
   const mono = cfg.color === 'mono'
   const [ph, ps] = hexToHsl(cfg.cPrimary)
+  // Harmony dials (H1): spreadDeg rotates the DERIVED family (secondary /
+  // accent / decoratives — NEVER the primary), exprMul multiplies the derived
+  // family's chroma incl. the neutral surface tint. Stale-hash-safe resolve.
+  // Mono kits pin spread to 0: greyscale has no harmony, and the calibrated
+  // residual tints (mono accent-soft, mono secondary-soft) must not rotate.
+  const { spreadDeg: spreadRaw, exprMul } = resolveHarmony(cfg)
+  const spreadDeg = mono ? 0 : spreadRaw
   // Neutral temperature. 'auto' (default) tints the grey ladder toward the BRAND
   // hue at a clamped low saturation — the Linear/Vercel "greys carry a whisper of
   // the brand" trick (pure OKLCH; okNeutralScale caps it to a true whisper). In
@@ -238,7 +246,9 @@ export function buildTokens(cfg: Config): Tokens {
   // per-token HSL lightness math — so the greys read as a coherent ramp (the
   // Linear/Radix "clean" feel). Emphasis (spread) nudges the chrome depth; crisp
   // deepens borders. See okNeutralScale.
-  const N = okNeutralScale(t.h, t.s, dark, mono)
+  // Expression scales the neutral whisper too — at 0 the surfaces go pure grey,
+  // at 2 they read perceivably chromatic (M3-2025 "Expressive" surfaces).
+  const N = okNeutralScale(t.h, t.s, dark, mono, exprMul)
   const nStep = (i: number): string => N[Math.max(0, Math.min(11, Math.round(i)))]!
   const emph = rampContrast === 'soft' ? -1 : rampContrast === 'crisp' ? 1 : 0
 
@@ -291,8 +301,14 @@ export function buildTokens(cfg: Config): Tokens {
    * of "default brand". A Mono theme should produce a confident
    * near-black (light) or near-white (dark) — the same restraint shadcn
    * uses for its zero-customisation baseline. */
-  const requestedPl = mono ? (dark ? 92 : 12) : dark ? (warmHue ? 72 : 46) : Math.min(pl0, 52)
-  const pl = mono ? requestedPl : clampToAA(ph, psat, requestedPl)
+  // Mode-parameterised so the INVERSE primary (the brand solid as it would
+  // resolve in the opposite mode — M3's inverse-primary role) reuses the exact
+  // same resolution path instead of a hand-tuned second copy.
+  const plFor = (d: boolean): number => {
+    const requested = mono ? (d ? 92 : 12) : d ? (warmHue ? 72 : 46) : Math.min(pl0, 52)
+    return mono ? requested : clampToAA(ph, psat, requested)
+  }
+  const pl = plFor(dark)
   const primaryHex = hslToHex(ph, psat, pl)
   // Primary family on the 12-step OKLCH ladder. Step 9 is PINNED to the
   // WCAG-safe solid (primaryHex) so --k-primary is byte-identical to before;
@@ -330,10 +346,13 @@ export function buildTokens(cfg: Config): Tokens {
 
   // Secondary + accent are DERIVED from the single brand hue (ph/psat) — one
   // color in, a harmonious family out. Secondary = muted sibling (quiet
-  // buttons / soft fills); accent = brighter sibling (charts, highlights).
-  // Same hue throughout → guaranteed harmony + a monochromatic chart series.
-  const sh = ph
-  const ss = Math.round(psat * 0.6)
+  // buttons / soft fills); accent = the tertiary (charts, highlights).
+  // H1 harmony: the Spread dial rotates the family hues — secondary drifts a
+  // quarter of the spread (stays a close relative), accent takes the full
+  // rotation (60° = M3-TonalSpot tertiary, 180° = complement). Expression
+  // multiplies their chroma. THE PRIMARY NEVER ROTATES.
+  const sh = (ph + spreadDeg * 0.25) % 360
+  const ss = Math.round(psat * 0.6 * exprMul)
   const sl = dark ? 56 : 48
   const ssat = mono ? 0 : Math.min(ss, 82)
   /* Mono locks lightness to a neutral midpoint (chroma opted out). Tone uses
@@ -341,7 +360,7 @@ export function buildTokens(cfg: Config): Tokens {
   const secL = mono ? (dark ? 60 : 54) : sl
   const secHex = hslToHex(sh, ssat, secL)
   const secMain = hsl(sh, ssat, secL)
-  const secFg = readableInk(secHex)
+  const secFg = aaInk(secHex)
   const secSoftHex = mono
     ? hslToHex(sh, dark ? 5 : 6, dark ? 20 : 93)
     : hslToHex(
@@ -351,18 +370,23 @@ export function buildTokens(cfg: Config): Tokens {
       )
   const secSoftFg = readableInk(secSoftHex)
 
-  const ah = ph
-  const as_ = Math.min(psat + 6, 88)
-  const al = dark ? 62 : 54
-  const accentSat = mono ? 0 : Math.min(as_, 88)
-  const accentL = mono ? (dark ? 60 : 52) : al
+  // Accent (tertiary): full Spread rotation off the brand hue + the dislike
+  // guardrail — a rotation must never park the accent on the dark saturated
+  // yellow-green "bile" zone (M3's DislikeAnalyzer; lifts it to L70 instead).
+  const ah0 = (ph + spreadDeg) % 360
+  const as0 = Math.min((psat + 6) * exprMul, 88)
+  const [ah, accentSat, accentL] = mono
+    ? [ah0, 0, dark ? 60 : 52]
+    : dislikeFix(ah0, Math.min(as0, 88), dark ? 62 : 54)
   const accent = hsl(ah, accentSat, accentL)
   const accentHex = hslToHex(ah, accentSat, accentL)
-  const accentFg = readableInk(accentHex)
+  const accentFg = aaInk(accentHex)
 
   // Chart-series palette — 6 colors derived from the brand hue per the chosen
-  // strategy (brand tints / analogous / spectrum). Mono → greyscale ramp.
-  const pal = paletteSet(cfg.palette, ph, mono ? 0 : psat, mono, dark)
+  // strategy. Mono → greyscale ramp. The harmony dials carry through: Spread
+  // scales the hue offsets (60° = the calibrated full set, 0 = a sequential
+  // single-hue family), Expression multiplies the saturation.
+  const pal = paletteSet(cfg.palette, ph, mono ? 0 : psat, mono, dark, { spreadFactor: spreadDeg / 60, exprMul })
   const chartCols = pal.base
 
   // --k-fill: solid brand fill for decorative directional fills (progress,
@@ -402,16 +426,39 @@ export function buildTokens(cfg: Config): Tokens {
   ]
   const sysVars: Record<string, string> = {}
   const sysList: SystemColor[] = []
-  SYS.forEach(({ k, h, s, softMul }) => {
+  SYS.forEach(({ k, h: h0, s, softMul }) => {
+    // Semantic harmonization (H1, always-on M3 machinery): each status hue
+    // leans ≤15° toward the brand so success/warning/danger/info read as
+    // family with ANY brand color — while staying unmistakably themselves.
+    // Mono kits keep the canonical hues (no brand hue to lean toward).
+    const h = mono ? h0 : harmonizeHue(h0, ph)
     const main = hslToHex(h, s, sysL)
     const softS = dark ? Math.round(s * (softMul + 0.08)) : Math.round(s * softMul)
     const soft = hslToHex(h, softS, sysSoftL)
     sysVars['--k-' + k] = hsl(h, s, sysL)
-    sysVars['--k-' + k + '-fg'] = readableInk(main)
+    sysVars['--k-' + k + '-fg'] = aaInk(main)
     sysVars['--k-' + k + '-soft'] = hsl(h, softS, sysSoftL)
-    sysVars['--k-' + k + '-soft-fg'] = readableInk(soft)
+    sysVars['--k-' + k + '-soft-fg'] = aaInk(soft)
     sysList.push({ k, hex: main, soft })
   })
+
+  // === Surface-container ladder + inverse roles (H1) =====================
+  // The internal nStep ramp, EXPORTED as the five named M3-style container
+  // roles — the resting-hierarchy vocabulary (tonal elevation's 2023
+  // replacement). Monotone by construction: lowest sits on/under the card,
+  // highest is the deepest contained well. Light keeps the pure-white card
+  // as `lowest` (our B★2 calibration); dark walks the dark ladder upward.
+  const sfc = dark
+    ? { lowest: nStep(0), low: nStep(2), mid: nStep(3), high: nStep(4), highest: nStep(5) }
+    : { lowest: 'oklch(100% 0 0)', low: nStep(1), mid: nStep(2), high: nStep(3), highest: nStep(4) }
+  // Inverse roles — a slab of the OPPOSITE mode's ladder, for inverse-emphasis
+  // surfaces (dark tooltip on a light UI and vice versa). The inverse primary
+  // re-resolves the brand solid through the same AA-clamped path for !dark.
+  const Ninv = okNeutralScale(t.h, t.s, !dark, mono, exprMul)
+  const nInv = (i: number): string => Ninv[Math.max(0, Math.min(11, i))]!
+  const inverseSurface = nInv(2)
+  const inverseFg = nInv(11)
+  const inversePrimary = okAccentScale(hslToHex(ph, psat, plFor(!dark)), !dark)[8]!
 
   // Border on the SAME neutral ladder — prominence set by the standalone Border
   // control (faint→strong) via BORDER_STEP, NOT by depth/crisp, so a Layered card
@@ -581,6 +628,21 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-surface': surf.base,
       '--k-surface-sunken': surf.sunken,
       '--k-surface-2': surf.s2,
+      // Surface-container ladder (H1) — the named resting-hierarchy roles
+      // (lowest → highest = closer to the canvas → deeper contained well).
+      // M3 retired tint-at-elevation for exactly this fixed ladder; ours rides
+      // the same nStep ramp the rest of the kit uses, so it's coherent with
+      // --k-surface/-2/-sunken rather than a second grey system.
+      '--k-surface-container-lowest': sfc.lowest,
+      '--k-surface-container-low': sfc.low,
+      '--k-surface-container': sfc.mid,
+      '--k-surface-container-high': sfc.high,
+      '--k-surface-container-highest': sfc.highest,
+      // Inverse roles (H1) — the opposite mode's surface/ink/brand for
+      // inverse-emphasis components (the dark tooltip on a light UI).
+      '--k-inverse-surface': inverseSurface,
+      '--k-inverse-fg': inverseFg,
+      '--k-inverse-primary': inversePrimary,
       // Input fill — a recessed, BRAND-TINTED neutral (from the same ramp that
       // carries the whisper-of-brand, not a dead grey). Gives form fields a
       // perceivable filled-field surface (Material/shadcn-muted) so the border

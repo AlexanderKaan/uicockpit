@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { buildTokens } from '../tokens/buildTokens'
+import { DEFAULT_CONFIG } from '../tokens/defaults'
 import type { Config } from '../tokens/types'
 
 /**
@@ -28,7 +29,9 @@ function read(slot: SlotId): Config | null {
   try {
     const raw = localStorage.getItem(KEY(slot))
     if (!raw) return null
-    return JSON.parse(raw) as Config
+    // Merge over DEFAULT_CONFIG: kits saved before newer Config fields existed
+    // (e.g. the H1 harmony dials) must not surface `undefined` into controls.
+    return { ...DEFAULT_CONFIG, ...(JSON.parse(raw) as Partial<Config>) }
   } catch {
     return null
   }

@@ -24,6 +24,12 @@ export const DEFAULT_CONFIG: Config = {
   motionTempo: 'normal',
   motionCurve: 'standard',
   cPrimary: '#0A84FF',      // Cobalt — matches COLOR_THEMES.cobalt (keep in sync)
+  // Harmony (H1): Tonal is the house default — the M3-TonalSpot recipe (accent
+  // = brand + 60°, secondary drifts +15°, neutrals carry the brand tint at 1×).
+  // Primary itself never rotates. Values mirror HARMONY_PRESETS.tonal.
+  harmony: 'tonal',
+  spread: 60,
+  expression: 100,
   palette: 'vivid',
   neutral: 'auto',          // greys auto-tint toward the brand hue (Linear/Vercel)
   mode: 'light',

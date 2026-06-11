@@ -1,5 +1,6 @@
-import type { Config, ColorTheme } from '../tokens/types'
+import type { Config, ColorTheme, Harmony } from '../tokens/types'
 import { applyColorTheme } from '../tokens/stylesAndThemes'
+import { HARMONY_PRESETS } from '../tokens/harmony'
 import { ALL_FONTS, SERIF_FONTS, SYSTEM_FONT } from '../tokens/fonts'
 
 /* "Surprise me" (C4) — a guardrail-aware random kit. GUARDRAILS:
@@ -25,13 +26,19 @@ const TEMPOS = ['snappy', 'normal', 'generous'] as const
 const CURVES = ['standard', 'emphasized', 'spring'] as const
 const PALETTES = ['pastel', 'vivid', 'bright'] as const
 const NEUTRALS = ['auto', 'cool', 'neutral', 'warm'] as const
+// Harmony rolls a vetted PRESET (never random raw slider values) — each preset
+// is a curated (spread, expression) pair, so the family always reads deliberate.
+const HARMONIES = ['mono', 'tonal', 'complement', 'expressive'] as const satisfies readonly Exclude<Harmony, 'custom'>[]
 
 export function randomKit(current: Config, rnd: () => number = Math.random): Config {
   const bodyFonts = ALL_FONTS.filter((f) => f !== SYSTEM_FONT && !SERIF_FONTS.includes(f)) // body = sans only
   const displayFonts = ALL_FONTS.filter((f) => f !== SYSTEM_FONT) // display may be serif
   const themed = applyColorTheme(current, pick(CHROMATIC_THEMES, rnd)) // sets cPrimary + colorTheme + color:'tone'
+  const harmony = pick(HARMONIES, rnd)
   return {
     ...themed,
+    harmony,
+    ...HARMONY_PRESETS[harmony],
     scale: pick(SCALES, rnd),
     radius: pick(RADII, rnd),
     buttonShape: pick(BTN_SHAPES, rnd),

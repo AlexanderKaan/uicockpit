@@ -39,6 +39,14 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-surface: oklch(100% 0 0);
   --k-surface-sunken: oklch(91.6% 0.0077 249.9);
   --k-surface-2: oklch(98.0% 0.0063 249.9);
+  --k-surface-container-lowest: oklch(100% 0 0);
+  --k-surface-container-low: oklch(98.0% 0.0063 249.9);
+  --k-surface-container: oklch(95.8% 0.0070 249.9);
+  --k-surface-container-high: oklch(93.7% 0.0077 249.9);
+  --k-surface-container-highest: oklch(91.6% 0.0077 249.9);
+  --k-inverse-surface: oklch(25.4% 0.0070 249.9);
+  --k-inverse-fg: oklch(94.5% 0.0140 249.9);
+  --k-inverse-primary: oklch(56.4% 0.1689 253.9);
   --k-input-bg: oklch(95.8% 0.0070 249.9);
   --k-field-bg: var(--k-input-bg);
   --k-field-border-color: var(--k-input-border);
@@ -64,9 +72,9 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-primary-soft: oklch(95.8% 0.0372 253.9);
   --k-primary-soft-fg: oklch(56.4% 0.1689 253.9);
   --k-selection: oklch(59.9% 0.1813 254.1 / 0.18);
-  --k-accent: oklch(62.8% 0.1798 253.4);
+  --k-accent: oklch(54.1% 0.2701 298.9);
   --k-accent-fg: #ffffff;
-  --k-accent-soft: oklch(95.2% 0.0093 242.8);
+  --k-accent-soft: oklch(94.5% 0.0160 310.1);
   --k-accent-soft-fg: #16160c;
   --k-chart-1: oklch(62.3% 0.1589 252.4);
   --k-chart-2: oklch(64.9% 0.2616 332.9);
@@ -105,25 +113,25 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-grad-5: linear-gradient(135deg, oklch(65.6% 0.1692 41.6), oklch(80.1% 0.1067 76.8));
   --k-grad-6: linear-gradient(135deg, oklch(80.6% 0.2079 150.0), oklch(84.1% 0.1242 169.0));
   --k-fill: oklch(56.4% 0.1689 253.9);
-  --k-secondary: oklch(56.7% 0.1124 250.4);
+  --k-secondary: oklch(50.1% 0.1466 267.1);
   --k-secondary-fg: #ffffff;
-  --k-secondary-soft: #dee8f2;
+  --k-secondary-soft: #dee3f2;
   --k-secondary-soft-fg: #16160c;
-  --k-success: oklch(71.8% 0.1676 152.9);
-  --k-success-fg: #ffffff;
-  --k-success-soft: oklch(95.8% 0.0091 161.3);
+  --k-success: oklch(72.5% 0.1371 165.8);
+  --k-success-fg: #16160c;
+  --k-success-soft: oklch(95.8% 0.0079 177.3);
   --k-success-soft-fg: #16160c;
-  --k-warning: oklch(78.5% 0.1585 85.9);
+  --k-warning: oklch(89.6% 0.1934 109.7);
   --k-warning-fg: #16160c;
-  --k-warning-soft: oklch(97.0% 0.0217 92.5);
+  --k-warning-soft: oklch(98.0% 0.0275 106.9);
   --k-warning-soft-fg: #16160c;
-  --k-danger: oklch(56.1% 0.1942 29.0);
+  --k-danger: oklch(55.7% 0.1997 17.4);
   --k-danger-fg: #ffffff;
-  --k-danger-soft: oklch(94.9% 0.0088 26.0);
+  --k-danger-soft: oklch(94.8% 0.0101 2.0);
   --k-danger-soft-fg: #16160c;
-  --k-info: oklch(56.3% 0.1594 254.8);
+  --k-info: oklch(56.8% 0.1572 253.9);
   --k-info-fg: #ffffff;
-  --k-info-soft: oklch(95.1% 0.0080 253.9);
+  --k-info-soft: oklch(95.2% 0.0076 241.7);
   --k-info-soft-fg: #16160c;
   --k-border: oklch(89.2% 0.0077 249.9);
   --k-input-border: oklch(85.8% 0.0084 249.9);
@@ -213,9 +221,9 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-disabled-opacity: 0.55;
   --k-focus-ring-offset: 2px;
   --k-focus-ring-width: 2px;
-  --k-input-error-border: #ce3227;
-  --k-input-success-border: #33c16f;
-  --k-input-warning-border: #e6b00f;
+  --k-input-error-border: #ce2746;
+  --k-input-success-border: #33c192;
+  --k-input-warning-border: #e6e60f;
   --k-anim-fade-in: k-fade-in 120ms cubic-bezier(.05,.7,.1,1) both;
   --k-anim-fade-out: k-fade-out 120ms cubic-bezier(.3,0,.8,.15) both;
   --k-anim-slide-up: k-slide-up 200ms cubic-bezier(.05,.7,.1,1) both;
@@ -292,6 +300,14 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-surface: oklch(25.4% 0.0070 249.9);
   --k-surface-sunken: oklch(17.6% 0.0056 249.9);
   --k-surface-2: oklch(28.5% 0.0077 249.9);
+  --k-surface-container-lowest: oklch(17.6% 0.0056 249.9);
+  --k-surface-container-low: oklch(25.4% 0.0070 249.9);
+  --k-surface-container: oklch(28.5% 0.0077 249.9);
+  --k-surface-container-high: oklch(31.7% 0.0077 249.9);
+  --k-surface-container-highest: oklch(35.5% 0.0077 249.9);
+  --k-inverse-surface: oklch(95.8% 0.0070 249.9);
+  --k-inverse-fg: oklch(16.0% 0.0140 249.9);
+  --k-inverse-primary: oklch(56.4% 0.1689 253.9);
   --k-input-bg: oklch(17.6% 0.0056 249.9);
   --k-field-bg: var(--k-input-bg);
   --k-field-border-color: var(--k-input-border);
@@ -317,9 +333,9 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-primary-soft: oklch(25.4% 0.0372 253.9);
   --k-primary-soft-fg: oklch(84.6% 0.0669 248.6);
   --k-selection: oklch(70.0% 0.1338 250.3 / 0.28);
-  --k-accent: oklch(68.6% 0.1503 251.0);
+  --k-accent: oklch(59.9% 0.2408 302.4);
   --k-accent-fg: #ffffff;
-  --k-accent-soft: oklch(31.4% 0.0423 249.3);
+  --k-accent-soft: oklch(28.7% 0.0704 305.5);
   --k-accent-soft-fg: #ffffff;
   --k-chart-1: oklch(63.7% 0.1493 251.8);
   --k-chart-2: oklch(65.5% 0.2511 332.6);
@@ -358,24 +374,24 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-grad-5: linear-gradient(135deg, oklch(66.7% 0.1582 42.5), oklch(79.7% 0.1044 76.7));
   --k-grad-6: linear-gradient(135deg, oklch(80.6% 0.1979 150.8), oklch(83.7% 0.1217 169.1));
   --k-fill: oklch(56.4% 0.1689 253.9);
-  --k-secondary: oklch(63.5% 0.1018 249.7);
+  --k-secondary: oklch(57.4% 0.1318 268.5);
   --k-secondary-fg: #ffffff;
-  --k-secondary-soft: #263b50;
+  --k-secondary-soft: #263050;
   --k-secondary-soft-fg: #ffffff;
-  --k-success: oklch(76.3% 0.1398 155.5);
+  --k-success: oklch(76.9% 0.1174 168.2);
   --k-success-fg: #16160c;
-  --k-success-soft: oklch(34.5% 0.0416 158.0);
+  --k-success-soft: oklch(34.7% 0.0359 170.3);
   --k-success-soft-fg: #ffffff;
-  --k-warning: oklch(80.9% 0.1412 90.1);
+  --k-warning: oklch(89.2% 0.1727 109.4);
   --k-warning-fg: #16160c;
-  --k-warning-soft: oklch(35.4% 0.0395 91.7);
+  --k-warning-soft: oklch(37.4% 0.0494 108.6);
   --k-warning-soft-fg: #ffffff;
-  --k-danger: oklch(62.4% 0.1583 26.8);
-  --k-danger-fg: #ffffff;
-  --k-danger-soft: oklch(30.3% 0.0461 24.2);
+  --k-danger: oklch(61.8% 0.1675 12.1);
+  --k-danger-fg: #16160c;
+  --k-danger-soft: oklch(30.1% 0.0494 8.4);
   --k-danger-soft-fg: #ffffff;
-  --k-info: oklch(64.3% 0.1204 252.8);
-  --k-info-fg: #ffffff;
+  --k-info: oklch(64.7% 0.1186 251.5);
+  --k-info-fg: #16160c;
   --k-info-soft: oklch(31.2% 0.0345 252.2);
   --k-info-soft-fg: #ffffff;
   --k-border: oklch(28.5% 0.0077 249.9);
@@ -466,9 +482,9 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-disabled-opacity: 0.55;
   --k-focus-ring-offset: 2px;
   --k-focus-ring-width: 2px;
-  --k-input-error-border: #d65a51;
-  --k-input-success-border: #5ccc8b;
-  --k-input-warning-border: #e4bc44;
+  --k-input-error-border: #d6516a;
+  --k-input-success-border: #5ccca6;
+  --k-input-warning-border: #e4e444;
   --k-anim-fade-in: k-fade-in 120ms cubic-bezier(.05,.7,.1,1) both;
   --k-anim-fade-out: k-fade-out 120ms cubic-bezier(.3,0,.8,.15) both;
   --k-anim-slide-up: k-slide-up 200ms cubic-bezier(.05,.7,.1,1) both;
@@ -5126,6 +5142,9 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "motionTempo": "normal",
     "motionCurve": "standard",
     "cPrimary": "#3b3b42",
+    "harmony": "tonal",
+    "spread": 60,
+    "expression": 100,
     "palette": "vivid",
     "neutral": "auto",
     "mode": "light"
@@ -5177,7 +5196,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "name": "Gray"
       },
       "secondary-foreground": {
-        "value": "#ffffff"
+        "value": "#16160c"
       },
       "secondary-soft": {
         "value": "#ececee"
@@ -5187,7 +5206,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "name": "Gray"
       },
       "accent-foreground": {
-        "value": "#ffffff"
+        "value": "#16160c"
       },
       "fill": {
         "value": "oklch(23.9% 0.0000 89.9)"
@@ -5214,7 +5233,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "system": {
       "success": {
         "value": "oklch(71.8% 0.1676 152.9)",
-        "foreground": "#ffffff",
+        "foreground": "#16160c",
         "soft": "oklch(95.8% 0.0091 161.3)",
         "soft-foreground": "#16160c"
       },
@@ -5743,6 +5762,14 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-surface": "oklch(25.4% 0.0000 0.0)",
     "--k-surface-sunken": "oklch(17.6% 0.0000 0.0)",
     "--k-surface-2": "oklch(28.5% 0.0000 0.0)",
+    "--k-surface-container-lowest": "oklch(17.6% 0.0000 0.0)",
+    "--k-surface-container-low": "oklch(25.4% 0.0000 0.0)",
+    "--k-surface-container": "oklch(28.5% 0.0000 0.0)",
+    "--k-surface-container-high": "oklch(31.7% 0.0000 0.0)",
+    "--k-surface-container-highest": "oklch(35.5% 0.0000 0.0)",
+    "--k-inverse-surface": "oklch(95.8% 0.0000 0.0)",
+    "--k-inverse-fg": "oklch(16.0% 0.0000 0.0)",
+    "--k-inverse-primary": "oklch(23.9% 0.0000 89.9)",
     "--k-input-bg": "oklch(17.6% 0.0000 0.0)",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 5%, oklch(21.3% 0.0000 0.0))",
     "--k-surface-raised": "oklch(31.7% 0.0000 0.0)",
@@ -5796,16 +5823,17 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-secondary-soft": "#303036",
     "--k-secondary-soft-fg": "#ffffff",
     "--k-success": "oklch(76.3% 0.1398 155.5)",
-    "--k-success-fg": "#16160c",
     "--k-success-soft": "oklch(34.5% 0.0416 158.0)",
     "--k-success-soft-fg": "#ffffff",
     "--k-warning": "oklch(80.9% 0.1412 90.1)",
     "--k-warning-soft": "oklch(35.4% 0.0395 91.7)",
     "--k-warning-soft-fg": "#ffffff",
     "--k-danger": "oklch(62.4% 0.1583 26.8)",
+    "--k-danger-fg": "#16160c",
     "--k-danger-soft": "oklch(30.3% 0.0461 24.2)",
     "--k-danger-soft-fg": "#ffffff",
     "--k-info": "oklch(64.3% 0.1204 252.8)",
+    "--k-info-fg": "#16160c",
     "--k-info-soft": "oklch(31.2% 0.0345 252.2)",
     "--k-info-soft-fg": "#ffffff",
     "--k-border": "oklch(28.5% 0.0000 0.0)",
@@ -5849,13 +5877,13 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "popover-foreground": "oklch(16.0% 0.0140 249.9)",
       "primary": "oklch(56.4% 0.1689 253.9)",
       "primary-foreground": "#ffffff",
-      "secondary": "#dee8f2",
+      "secondary": "#dee3f2",
       "secondary-foreground": "#16160c",
       "muted": "oklch(98.0% 0.0063 249.9)",
       "muted-foreground": "oklch(50.3% 0.0140 249.9)",
-      "accent": "oklch(62.8% 0.1798 253.4)",
+      "accent": "oklch(54.1% 0.2701 298.9)",
       "accent-foreground": "#ffffff",
-      "destructive": "oklch(56.1% 0.1942 29.0)",
+      "destructive": "oklch(55.7% 0.1997 17.4)",
       "destructive-foreground": "#ffffff",
       "border": "oklch(89.2% 0.0077 249.9)",
       "input": "oklch(85.8% 0.0084 249.9)",
@@ -5884,14 +5912,14 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "popover-foreground": "oklch(94.5% 0.0140 249.9)",
       "primary": "oklch(56.4% 0.1689 253.9)",
       "primary-foreground": "#ffffff",
-      "secondary": "#263b50",
+      "secondary": "#263050",
       "secondary-foreground": "#ffffff",
       "muted": "oklch(28.5% 0.0077 249.9)",
       "muted-foreground": "oklch(77.5% 0.0140 249.9)",
-      "accent": "oklch(68.6% 0.1503 251.0)",
+      "accent": "oklch(59.9% 0.2408 302.4)",
       "accent-foreground": "#ffffff",
-      "destructive": "oklch(62.4% 0.1583 26.8)",
-      "destructive-foreground": "#ffffff",
+      "destructive": "oklch(61.8% 0.1675 12.1)",
+      "destructive-foreground": "#16160c",
       "border": "oklch(28.5% 0.0077 249.9)",
       "input": "oklch(31.7% 0.0077 249.9)",
       "ring": "oklch(56.4% 0.1689 253.9)",
@@ -5951,10 +5979,10 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-primary-hover: oklch(51.4% 0.1638 253.9);
   --color-primary-foreground: #ffffff;
   --color-primary-soft: oklch(95.8% 0.0372 253.9);
-  --color-secondary: oklch(56.7% 0.1124 250.4);
+  --color-secondary: oklch(50.1% 0.1466 267.1);
   --color-secondary-foreground: #ffffff;
-  --color-secondary-soft: #dee8f2;
-  --color-accent: oklch(62.8% 0.1798 253.4);
+  --color-secondary-soft: #dee3f2;
+  --color-accent: oklch(54.1% 0.2701 298.9);
   --color-accent-foreground: #ffffff;
   --color-fill: oklch(56.4% 0.1689 253.9);
   --color-border: oklch(89.2% 0.0077 249.9);
@@ -5965,21 +5993,21 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-selection: oklch(59.9% 0.1813 254.1 / 0.18);
   --color-disabled-bg: oklch(98.0% 0.0063 249.9);
   --color-disabled-foreground: oklch(64.0% 0.0112 249.9);
-  --color-input-error-border: #ce3227;
-  --color-input-success-border: #33c16f;
-  --color-input-warning-border: #e6b00f;
-  --color-success: oklch(71.8% 0.1676 152.9);
-  --color-success-foreground: #ffffff;
-  --color-success-soft: oklch(95.8% 0.0091 161.3);
-  --color-warning: oklch(78.5% 0.1585 85.9);
+  --color-input-error-border: #ce2746;
+  --color-input-success-border: #33c192;
+  --color-input-warning-border: #e6e60f;
+  --color-success: oklch(72.5% 0.1371 165.8);
+  --color-success-foreground: #16160c;
+  --color-success-soft: oklch(95.8% 0.0079 177.3);
+  --color-warning: oklch(89.6% 0.1934 109.7);
   --color-warning-foreground: #16160c;
-  --color-warning-soft: oklch(97.0% 0.0217 92.5);
-  --color-danger: oklch(56.1% 0.1942 29.0);
+  --color-warning-soft: oklch(98.0% 0.0275 106.9);
+  --color-danger: oklch(55.7% 0.1997 17.4);
   --color-danger-foreground: #ffffff;
-  --color-danger-soft: oklch(94.9% 0.0088 26.0);
-  --color-info: oklch(56.3% 0.1594 254.8);
+  --color-danger-soft: oklch(94.8% 0.0101 2.0);
+  --color-info: oklch(56.8% 0.1572 253.9);
   --color-info-foreground: #ffffff;
-  --color-info-soft: oklch(95.1% 0.0080 253.9);
+  --color-info-soft: oklch(95.2% 0.0076 241.7);
   --radius-sm: calc(1rem * 0.6);
   --radius-md: 1rem;
   --radius-lg: 1.4375rem;
@@ -6115,26 +6143,27 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-surface-overlay: oklch(35.5% 0.0077 249.9);
   --color-primary-hover: oklch(61.4% 0.1638 253.9);
   --color-primary-soft: oklch(25.4% 0.0372 253.9);
-  --color-secondary: oklch(63.5% 0.1018 249.7);
-  --color-secondary-soft: #263b50;
-  --color-accent: oklch(68.6% 0.1503 251.0);
+  --color-secondary: oklch(57.4% 0.1318 268.5);
+  --color-secondary-soft: #263050;
+  --color-accent: oklch(59.9% 0.2408 302.4);
   --color-border: oklch(28.5% 0.0077 249.9);
   --color-input-border: oklch(31.7% 0.0077 249.9);
   --color-ring-soft: oklch(25.4% 0.0372 253.9);
   --color-secondary-soft-foreground: #ffffff;
   --color-selection: oklch(70.0% 0.1338 250.3 / 0.28);
   --color-disabled-bg: oklch(28.5% 0.0077 249.9);
-  --color-input-error-border: #d65a51;
-  --color-input-success-border: #5ccc8b;
-  --color-input-warning-border: #e4bc44;
-  --color-success: oklch(76.3% 0.1398 155.5);
-  --color-success-foreground: #16160c;
-  --color-success-soft: oklch(34.5% 0.0416 158.0);
-  --color-warning: oklch(80.9% 0.1412 90.1);
-  --color-warning-soft: oklch(35.4% 0.0395 91.7);
-  --color-danger: oklch(62.4% 0.1583 26.8);
-  --color-danger-soft: oklch(30.3% 0.0461 24.2);
-  --color-info: oklch(64.3% 0.1204 252.8);
+  --color-input-error-border: #d6516a;
+  --color-input-success-border: #5ccca6;
+  --color-input-warning-border: #e4e444;
+  --color-success: oklch(76.9% 0.1174 168.2);
+  --color-success-soft: oklch(34.7% 0.0359 170.3);
+  --color-warning: oklch(89.2% 0.1727 109.4);
+  --color-warning-soft: oklch(37.4% 0.0494 108.6);
+  --color-danger: oklch(61.8% 0.1675 12.1);
+  --color-danger-foreground: #16160c;
+  --color-danger-soft: oklch(30.1% 0.0494 8.4);
+  --color-info: oklch(64.7% 0.1186 251.5);
+  --color-info-foreground: #16160c;
   --color-info-soft: oklch(31.2% 0.0345 252.2);
 }
 "

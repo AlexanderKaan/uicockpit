@@ -141,14 +141,19 @@ const SCALE_C_NEUTRAL = [0.4, 0.45, 0.5, 0.55, 0.55, 0.55, 0.6, 0.65, 0.8, 0.85,
  * Neutral 12-step grey ladder. `tHue`/`tSat` are the Neutrals temperature (HSL),
  * carried through as a whisper of OKLCH chroma so greys are never dead-flat
  * `#808080` — the "premium tinted neutral" trick. Mono / zero-sat → pure grey.
+ * `tintMul` (H1 Expression) scales the whisper: 0 = pure grey surfaces, 1 = the
+ * calibrated default, up to 2 = perceivably CHROMATIC surfaces (the M3-2025
+ * "Expressive" direction; absolute ceiling keeps a surface a surface).
  */
-export function okNeutralScale(tHue: number, tSat: number, dark: boolean, mono: boolean): string[] {
+export function okNeutralScale(tHue: number, tSat: number, dark: boolean, mono: boolean, tintMul = 1): string[] {
   const L = dark ? SCALE_L_DARK : SCALE_L_LIGHT
-  if (mono || tSat <= 0) return L.map((l) => oklch(l, 0, 0))
+  if (mono || tSat <= 0 || tintMul <= 0) return L.map((l) => oklch(l, 0, 0))
   const [, cRef, hRef] = hexToOklch(hslToHex(tHue, Math.max(tSat, 8), 50))
   // Cap LOW so even Cool/Warm neutrals stay a whisper — a tinted grey, never a
   // coloured surface. (Was 0.03 → borders read as a faint blue/warm line.)
-  const baseC = Math.min(cRef * 0.65, 0.014)
+  // Expression multiplies the whisper but a hard 0.04 ceiling keeps the most
+  // expressive surface well under "this background is a color".
+  const baseC = Math.min(Math.min(cRef * 0.65, 0.014) * tintMul, 0.04)
   return L.map((l, i) => oklch(l, baseC * (SCALE_C_NEUTRAL[i] ?? 1), hRef))
 }
 
@@ -197,24 +202,46 @@ export function paletteSet(
   s: number,
   mono: boolean,
   dark: boolean,
+  harmony?: { spreadFactor?: number; exprMul?: number },
 ): { base: string[]; ink: string[]; soft: string[]; softFg: string[]; grad: string[] } {
+  /* Harmony dials (H1). spreadFactor scales the hue offsets: 1 = the calibrated
+   * full-wheel set (Spread 60° — the Tonal default, byte-identical to before),
+   * 0 = a single-hue family, >1 widens slightly (capped — the wheel is cyclic).
+   * exprMul multiplies every saturation. */
+  const factor = Math.max(0, Math.min(1.5, harmony?.spreadFactor ?? 1))
+  const xm = Math.max(0, Math.min(2, harmony?.exprMul ?? 1))
+  const xs = (v: number): number => Math.min(96, Math.round(v * xm))
   let hsls: Array<[number, number, number]>
-  if (mono || s === 0) {
+  if (mono || s === 0 || xm === 0) {
     const ls = dark ? [78, 68, 58, 49, 40, 32] : [30, 42, 52, 61, 70, 78]
     hsls = ls.map((l) => [h, 0, l])
   } else if (strategy === 'pastel') {
     // soft, light, low-mid chroma — 6 hues spread around the wheel from brand
     const dh = [0, 42, 96, 168, 220, 292]
-    hsls = dh.map((d, i) => [(h + d) % 360, dark ? 40 : 56, dark ? 56 : 80 - (i % 2 ? 3 : 0)])
+    hsls = dh.map((d, i) => [(h + d * factor) % 360, xs(dark ? 40 : 56), dark ? 56 : 80 - (i % 2 ? 3 : 0)])
   } else if (strategy === 'bright') {
     // Material-inspired: evenly spaced hues (60° steps) at one consistent
     // tone + moderate chroma → clear, legible, modern. Anchored on brand hue.
     const dh = [0, 60, 120, 180, 240, 300]
-    hsls = dh.map((d) => [(h + d) % 360, dark ? 58 : 64, dark ? 64 : 60])
+    hsls = dh.map((d) => [(h + d * factor) % 360, xs(dark ? 58 : 64), dark ? 64 : 60])
   } else {
     // vivid: saturated multi-hue, deeper tone — bold/punchy
     const dh = [0, 42, 96, 168, 220, 292]
-    hsls = dh.map((d) => [(h + d) % 360, dark ? 74 : 76, dark ? 56 : 54])
+    hsls = dh.map((d) => [(h + d * factor) % 360, xs(dark ? 74 : 76), dark ? 56 : 54])
+  }
+  if (!(mono || s === 0 || xm === 0)) {
+    // Low Spread collapses the hues together — restore CATEGORICAL distinction
+    // by blending each swatch's lightness toward the mono ramp in proportion
+    // to the lost spread: at Spread 0 the set is a clean sequential light→dark
+    // family of ONE hue (avatars/chart series stay tellable-apart), at the
+    // default it's untouched.
+    if (factor < 0.999) {
+      const ls = dark ? [78, 68, 58, 49, 40, 32] : [30, 42, 52, 61, 70, 78]
+      hsls = hsls.map(([H, S, L], i) => [H, S, L + ((ls[i] ?? L) - L) * (1 - factor)])
+    }
+    // Dislike guardrail: a rotated swatch must never land on the dark
+    // saturated yellow-green "bile" zone (see dislikeFix).
+    hsls = hsls.map(([H, S, L]) => dislikeFix(H, S, L))
   }
   // Distinction order — Material's categorical rule: consecutive swatches
   // should be FAR apart in hue, so a 2/3-series chart (or adjacent avatars)
@@ -288,6 +315,46 @@ export const contrast = (a: Hex, b: Hex): number => {
 }
 
 export const readableInk = (hex: Hex): Hex => (relLum(hex) > 0.42 ? '#16160c' : '#ffffff')
+
+/**
+ * AA-guarded ink: readableInk's perceptual pick, but if that pick can't make
+ * WCAG AA (4.5:1) against the fill, flip to whichever polarity contrasts more.
+ * Needed since H1: harmonization/spread ROTATE derived hues, and near the
+ * luminance threshold a rotated orange can flip readableInk to white at ~3:1
+ * (white-on-amber). Status/derived fills route through this instead.
+ */
+export const aaInk = (hex: Hex): Hex => {
+  const pick = readableInk(hex)
+  if (contrast(hex, pick) >= 4.5) return pick
+  // Flip ONLY when the other polarity actually clears AA — a flip to a merely
+  // less-bad ink would churn calibrated visuals without buying compliance.
+  const alt = pick === '#ffffff' ? '#16160c' : '#ffffff'
+  return contrast(hex, alt) >= 4.5 ? alt : pick
+}
+
+/**
+ * Dislike guardrail (M3's DislikeAnalyzer, ported to our HSL authoring space).
+ * Peer-reviewed disgust research (Palmer & Schloss 2010): dark saturated
+ * yellow-greens (the "biological waste" zone) are universally disliked. M3
+ * fixes any color that lands there by lifting it to tone 70; we do the same on
+ * DERIVED colors (accent, decorative swatches) — a Spread rotation should never
+ * park the family on bile. The user's own brand hex is exempt (their call).
+ */
+export const dislikeFix = (h: number, s: number, l: number): [number, number, number] =>
+  h >= 90 && h <= 111 && s > 16 && l < 65 ? [h, s, 70] : [h, s, l]
+
+/**
+ * Semantic harmonization (M3's Blend.harmonize): rotate a fixed semantic hue
+ * (success/warning/danger/info) TOWARD the brand hue by half the angular
+ * distance, capped at 15°. Keeps the status colors unmistakably themselves
+ * while making them family with the brand — the reason M3 semantics never
+ * clash with any seed. Always-on machinery, not a dial.
+ */
+export const harmonizeHue = (h: number, toward: number): number => {
+  const d = ((toward - h + 540) % 360) - 180 // signed shortest-path delta
+  const rot = Math.min(Math.abs(d) / 2, 15) * Math.sign(d)
+  return (h + rot + 360) % 360
+}
 
 /**
  * Pick a lightness for a brand primary that guarantees button-text-on-primary
