@@ -3,6 +3,7 @@ import { RECIPES } from '../recipes'
 import {
   FOUNDATIONS,
   BLOCK_USES,
+  SHELL_USES,
   STANDALONE_ATOMS,
   tierOf,
   usesOf,
@@ -27,6 +28,13 @@ describe('segment graph integrity', () => {
       for (const u of uses) expect(IDS.has(u), `${block} uses unknown segment: ${u}`).toBe(true)
   })
 
+  it('every shell id is a real recipe and its edges resolve', () => {
+    for (const [shell, uses] of Object.entries(SHELL_USES)) {
+      expect(IDS.has(shell), `unknown shell: ${shell}`).toBe(true)
+      for (const u of uses) expect(IDS.has(u), `${shell} uses unknown segment: ${u}`).toBe(true)
+    }
+  })
+
   it('a block never composes a foundation (foundations are upstream of the catalog)', () => {
     for (const [block, uses] of Object.entries(BLOCK_USES))
       for (const u of uses) expect(tierOf(u), `${block} uses foundation: ${u}`).not.toBe('foundation')
@@ -34,18 +42,21 @@ describe('segment graph integrity', () => {
 
   it('every recipe resolves to exactly one tier; partitions cleanly', () => {
     const tiers = RECIPES.map((r) => tierOf(r.id))
-    expect(tiers.every((t) => t === 'foundation' || t === 'atom' || t === 'block')).toBe(true)
+    expect(tiers.every((t) => t === 'foundation' || t === 'atom' || t === 'block' || t === 'shell')).toBe(true)
     const f = idsByTier('foundation').length
     const a = idsByTier('atom').length
     const b = idsByTier('block').length
-    expect(f + a + b).toBe(RECIPES.length)
+    const sh = idsByTier('shell').length
+    expect(f + a + b + sh).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 4 · Block 28 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 4 · Block 28 · Shell 3 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('block')).toHaveLength(Object.keys(BLOCK_USES).length)
+    expect(idsByTier('shell')).toHaveLength(Object.keys(SHELL_USES).length)
     expect(idsByTier('foundation')).toHaveLength(4)
     expect(idsByTier('block')).toHaveLength(28)
+    expect(idsByTier('shell')).toHaveLength(3)
   })
 
   it('every standalone-blessed id is a real ATOM (not a block/foundation)', () => {

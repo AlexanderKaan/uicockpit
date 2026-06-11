@@ -855,3 +855,121 @@
 .cockpit-preview .atomgroup__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); color: var(--k-fg); margin: 0; }
 .cockpit-preview .atomgroup__count { font-size: var(--k-type-caption); color: var(--k-fg-faint); font-variant-numeric: tabular-nums; }
 .cockpit-preview .atomgroup__items { display: flex; flex-direction: column; gap: var(--k-s-24); }
+
+/* === Layouts view (H3a) — the shell-tier wireframe workbench ============
+ * Preview chrome only: the scaffold/navsuite/pane recipes under test are the
+ * KIT; everything .lyt__* is the workbench around them (scrubber, ghost
+ * content). Ghosts are deliberately bare — shells own arrangement, not look. */
+.lyt {
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: var(--k-s-8) var(--k-s-16) var(--k-s-32);
+  color: var(--k-fg);
+  font-family: var(--k-font-body);
+}
+.lyt__head { max-width: var(--k-measure-prose); margin-bottom: var(--k-s-16); }
+.lyt__title {
+  margin: 0 0 var(--k-s-6);
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-h2);
+  font-weight: var(--k-weight-semibold);
+}
+.lyt__intro { margin: 0; font-size: var(--k-type-body); color: var(--k-fg-muted); line-height: 1.5; }
+.lyt__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--k-s-16);
+  margin-bottom: var(--k-s-8);
+}
+.lyt__scrub {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-10);
+  flex: 1 1 320px;
+  max-width: 560px;
+}
+.lyt__scrub-label { font-size: var(--k-type-small); color: var(--k-fg-muted); white-space: nowrap; }
+.lyt__scrub input[type='range'] { flex: 1; accent-color: var(--k-primary); min-width: 0; }
+.lyt__scrub-val {
+  font-size: var(--k-type-small);
+  font-variant-numeric: tabular-nums;
+  color: var(--k-fg-muted);
+  white-space: nowrap;
+  min-width: 9em;
+}
+.lyt__scrub-val strong { color: var(--k-fg); font-weight: var(--k-weight-semibold); }
+.lyt__blurb { margin: 0 0 var(--k-s-12); font-size: var(--k-type-small); color: var(--k-fg-faint); max-width: var(--k-measure-prose); }
+/* The stage: a checker-quiet band the resizable shell floats on, so the
+ * shell's edge (the thing being scrubbed) is always visible. */
+.lyt__stage {
+  border: var(--k-bw) dashed var(--k-border);
+  border-radius: var(--k-radius-lg);
+  padding: var(--k-s-12);
+  background: var(--k-surface-sunken);
+  overflow-x: auto;
+}
+.lyt__stage .scaffold {
+  margin: 0 auto 0 0;
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+  overflow: hidden;
+  background: var(--k-bg);
+  height: 460px;
+}
+.lyt__frame { height: 100%; }
+.lyt__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-10);
+  padding: var(--k-s-10) var(--k-s-16);
+  border-bottom: var(--k-bw) solid var(--k-border);
+  background: var(--k-surface);
+}
+.lyt__pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+  padding: var(--k-s-12);
+  border: var(--k-bw) dashed var(--k-border);
+  border-radius: var(--k-radius-md);
+  background: var(--k-surface);
+  overflow: hidden;
+}
+/* Ghost vocabulary — wireframe stand-ins for real content */
+.lyt__ghost {
+  border: var(--k-bw) dashed var(--k-border);
+  border-radius: var(--k-radius-sm);
+  padding: var(--k-s-8);
+  display: grid;
+  gap: var(--k-s-6);
+  background: var(--k-surface);
+}
+.lyt__ghost-media { height: 56px; border-radius: var(--k-radius-sm); background: var(--k-surface-container); }
+.lyt__ghost-line { height: 8px; border-radius: 999px; background: var(--k-surface-container-high); }
+.lyt__ghost-line--short { width: 55%; }
+.lyt__ghost-line--title { height: 12px; width: 40%; margin-bottom: var(--k-s-4); background: var(--k-surface-container-highest); }
+.lyt__ghost-line--bar { width: 120px; }
+.lyt__ghost-dot { width: 20px; height: 20px; border-radius: 999px; background: var(--k-surface-container-highest); flex: none; }
+.lyt__ghostrow {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-10);
+  padding: var(--k-s-8);
+  border-radius: var(--k-radius-sm);
+}
+.lyt__ghostrow--on { background: var(--k-state-selected-bg); }
+.lyt__ghost-lines { flex: 1; display: grid; gap: var(--k-s-6); min-width: 0; }
+.lyt__ghostprose { display: grid; gap: var(--k-s-8); align-content: start; }
+.lyt__legend {
+  display: grid;
+  gap: var(--k-s-4);
+  margin-top: var(--k-s-12);
+  font-size: var(--k-type-caption);
+  color: var(--k-fg-faint);
+}
+.lyt__legend code {
+  font-family: var(--k-font-mono);
+  font-size: var(--k-type-caption);
+  color: var(--k-fg-muted);
+}

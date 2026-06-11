@@ -5,6 +5,8 @@ import {
   Z_INDEX,
   BREAKPOINTS,
   CONTAINER_WIDTHS,
+  WINDOW_CLASSES,
+  PANE_CONSTANTS,
   buildTypeScale,
 } from '../tokens/extras'
 import { assembleKitCss } from '../kit'
@@ -36,6 +38,9 @@ export function genCss(cfg: Config): string {
     ...Object.entries(BREAKPOINTS).map(([k, v]) => `  --k-bp-${k}: ${v};`),
     '\n  /* --- Container widths --- */',
     ...Object.entries(CONTAINER_WIDTHS).map(([k, v]) => `  --k-container-${k}: ${v};`),
+    '\n  /* --- Window classes (shell thresholds) + pane constants --- */',
+    ...Object.entries(WINDOW_CLASSES).map(([k, v]) => `  --k-win-${k}: ${v};`),
+    ...Object.entries(PANE_CONSTANTS).map(([k, v]) => `  --k-pane-${k}: ${v};`),
     '\n  /* --- Extended type scale (derived from --k-type-h1 / --k-type-body) --- */',
     ...Object.entries(typeScale).map(([k, v]) => `  --k-type-${k}: ${v};`),
   ].join('\n')

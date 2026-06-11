@@ -29,18 +29,18 @@ export { RECIPES } from './recipes'
  *   - PAGE       → an assembly of blocks = a realistic screen (external SupaDash).
  */
 export type { Tier } from './segments'
-export { tierOf, usesOf, idsByTier, orphanAtoms, FOUNDATIONS, BLOCK_USES } from './segments'
+export { tierOf, usesOf, idsByTier, orphanAtoms, FOUNDATIONS, BLOCK_USES, SHELL_USES } from './segments'
 
 /** A human-readable manifest banner that heads the assembled CSS, so anyone
  * reading the shipped kit sees the ladder — Foundation / Atom / Block — at a
  * glance, without reordering the cascade. Derived from the segment graph. */
 function manifest(recipes: readonly Recipe[]): string {
-  const sectionsFor = (t: 'foundation' | 'atom' | 'block') =>
+  const sectionsFor = (t: 'foundation' | 'atom' | 'block' | 'shell') =>
     idsByTier(t, recipes)
       .map((id) => recipes.find((r) => r.id === id)?.section)
       .filter(Boolean)
       .join(', ')
-  const found = sectionsFor('foundation'), atoms = sectionsFor('atom'), blocks = sectionsFor('block')
+  const found = sectionsFor('foundation'), atoms = sectionsFor('atom'), blocks = sectionsFor('block'), shells = sectionsFor('shell')
   const n = (s: string) => (s ? s.split(', ').length : 0)
   return `/* ========================================================================
  * UIcockpit kit — the design contract (one config → this whole system)
@@ -59,9 +59,13 @@ function manifest(recipes: readonly Recipe[]): string {
  *     ${atoms}
  *
  * BLOCKS — stand-alone pieces of app (${n(blocks)}), composed FROM the atoms — the
- *   surface IS the component (dialog, sidebar, data tiles, auth, …). Blocks
- *   assemble into PAGES (your screens).
+ *   surface IS the component (dialog, sidebar, data tiles, auth, …).
  *     ${blocks}
+ *
+ * LAYOUTS — the shell tier (${n(shells)}): adaptive app frames that ARRANGE blocks
+ *   per container width (scaffold · nav suite · pane). Shells own arrangement,
+ *   never look; blocks slot into panes; panes assemble into PAGES (your screens).
+ *     ${shells}
  * ======================================================================== */`
 }
 

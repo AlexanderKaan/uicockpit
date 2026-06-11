@@ -274,6 +274,17 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-container-wide: 1280px;
   --k-container-max: 1536px;
 
+  /* --- Window classes (shell thresholds) + pane constants --- */
+  --k-win-compact: 600px;
+  --k-win-medium: 840px;
+  --k-win-expanded: 1200px;
+  --k-win-large: 1600px;
+  --k-pane-fixed: 360px;
+  --k-pane-fixed-xl: 412px;
+  --k-pane-spacer: 24px;
+  --k-pane-margin-compact: 16px;
+  --k-pane-margin: 24px;
+
   /* --- Extended type scale (derived from --k-type-h1 / --k-type-body) --- */
   --k-type-display: 3px;
   --k-type-h1: 1.875px;
@@ -818,9 +829,13 @@ body {
  *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card
  *
  * BLOCKS — stand-alone pieces of app (28), composed FROM the atoms — the
- *   surface IS the component (dialog, sidebar, data tiles, auth, …). Blocks
- *   assemble into PAGES (your screens).
+ *   surface IS the component (dialog, sidebar, data tiles, auth, …).
  *     Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Lightbox, Calendar, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, Pricing, WizardStepper, File grid, Form panel, Filter bar
+ *
+ * LAYOUTS — the shell tier (3): adaptive app frames that ARRANGE blocks
+ *   per container width (scaffold · nav suite · pane). Shells own arrangement,
+ *   never look; blocks slot into panes; panes assemble into PAGES (your screens).
+ *     Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
 
 /* === Toolbar ===
@@ -5189,6 +5204,168 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .l-center { box-sizing: content-box; max-width: var(--l-measure, var(--k-measure-prose)); margin-inline: auto; padding-inline: var(--l-pad, var(--k-s-16)); }
 .l-center--narrow { --l-measure: var(--k-measure-narrow); }
 .l-center--wide { --l-measure: var(--k-measure-wide); }
+
+/* === Adaptive scaffold — the shell tier (H3a) ===
+   The app-frame grammar: a self-measuring shell that re-arranges its regions
+   per its OWN width (container queries — never the viewport) at the M3 window
+   classes: compact <600 · medium 600-839 · expanded 840-1199 · large 1200-1599
+   · extra-large >=1600. Two-element contract: .scaffold is the measuring
+   container, .scaffold__frame carries the grid (a CSS container cannot restyle
+   itself). Regions: __bar (top app bar) · __nav (the navsuite slot) · __body
+   (the panes row). Archetype modifiers (--feed / --list-detail / --supporting)
+   encode the three canonical M3 layouts as ADAPTATION rules — orthogonal to
+   whichever nav model sits in the __nav slot. */
+.scaffold {
+  container-type: inline-size;
+  container-name: scaffold;
+  width: 100%;
+}
+.scaffold__frame {
+  display: grid;
+  min-height: 100%;
+  /* compact: bar on top, nav as a BOTTOM bar (the M3 compact pattern) */
+  grid-template-areas: 'bar' 'body' 'nav';
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr;
+  background: var(--k-bg);
+}
+.scaffold__bar { grid-area: bar; min-width: 0; }
+.scaffold__nav { grid-area: nav; min-width: 0; display: flex; }
+.scaffold__nav > * { flex: 1; }
+.scaffold__body {
+  grid-area: body;
+  display: flex;
+  align-items: stretch;
+  /* M3 constants: pane spacer 24 · margins 16 (compact) / 24 (medium+) */
+  gap: var(--k-s-24);
+  padding: var(--k-s-16);
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+@container scaffold (min-width: 600px) {
+  .scaffold__frame {
+    /* medium+: nav docks as a leading rail */
+    grid-template-areas: 'nav bar' 'nav body';
+    grid-template-rows: auto 1fr;
+    grid-template-columns: auto 1fr;
+  }
+  .scaffold__body { padding: var(--k-s-24); }
+}
+/* --- Archetype: list-detail ------------------------------------------
+   Compact/medium: the LIST owns the full width, the detail pane drops out
+   (the M3 show-hide verb — selection then NAVIGATES, see the behavior
+   contract in the AI prompt). Expanded+: fixed list beside flexible detail. */
+.scaffold--list-detail .pane--detail { display: none; }
+.scaffold--list-detail .pane--fixed { flex: 1 1 auto; width: auto; }
+@container scaffold (min-width: 840px) {
+  .scaffold--list-detail .pane--detail { display: block; }
+  .scaffold--list-detail .pane--fixed { flex: 0 0 360px; width: 360px; }
+}
+/* --- Archetype: supporting pane ---------------------------------------
+   The ~2/3 : 1/3 split; the supporting pane drops below the threshold
+   (compact moves its content into the flow / a bottom sheet — behavior
+   contract, not CSS). */
+.scaffold--supporting .pane--supporting { display: none; }
+@container scaffold (min-width: 840px) {
+  .scaffold--supporting .pane--supporting { display: block; }
+}
+
+/* === Nav suite — ONE nav that reshapes per container width (H3a) ===
+   The adaptive navigation primitive (Compose's NavigationSuiteScaffold as a
+   recipe): bottom bar (<600) -> collapsed icon rail (600-1199) -> expanded
+   rail (>=1200). Google deprecated the nav drawer for exactly this morph.
+   Measures the nearest 'scaffold' container — standalone use: wrap it in any
+   container-type: inline-size element named scaffold. */
+.navsuite {
+  display: flex;
+  flex-direction: row; /* compact: a horizontal bottom bar */
+  justify-content: space-around;
+  align-items: stretch;
+  gap: var(--k-s-4);
+  padding: var(--k-s-8);
+  background: var(--k-chrome-bg);
+  border-top: var(--k-bw) solid var(--k-border);
+  min-width: 0;
+}
+.navsuite__item {
+  display: flex;
+  flex-direction: column; /* icon over label (bar + collapsed rail) */
+  align-items: center;
+  justify-content: center;
+  gap: var(--k-s-4);
+  padding: var(--k-s-6) var(--k-s-10);
+  min-width: 0;
+  border: 0;
+  background: none;
+  font-family: var(--k-font-body);
+  font-size: var(--k-type-caption);
+  font-weight: var(--k-weight-medium);
+  color: var(--k-fg-muted);
+  border-radius: var(--k-row-radius);
+  cursor: pointer;
+  transition:
+    background var(--k-dur-fast, 120ms) var(--k-ease, ease),
+    color var(--k-dur-fast, 120ms) var(--k-ease, ease);
+}
+.navsuite__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
+.navsuite__item:active { background: var(--k-state-press); }
+.navsuite__item--on { color: var(--k-primary-soft-fg); background: var(--k-primary-soft); }
+.navsuite__icon { display: grid; place-items: center; width: var(--k-row-icon); height: var(--k-row-icon); flex: none; }
+.navsuite__icon svg { width: 100%; height: 100%; }
+.navsuite__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+@container scaffold (min-width: 600px) {
+  /* medium+: the COLLAPSED rail — icons stacked, micro labels under them */
+  .navsuite {
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 84px;
+    padding: var(--k-s-8) var(--k-s-6);
+    border-top: 0;
+    border-right: var(--k-bw) solid var(--k-border);
+  }
+}
+@container scaffold (min-width: 1200px) {
+  /* expanded+: the full rail — icon + label rows (the sidebar read) */
+  .navsuite { width: 224px; align-items: stretch; }
+  .navsuite__item {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--k-row-gap);
+    min-height: var(--k-row-h-lg);
+    padding-block: 0;
+    padding-inline: var(--k-row-px);
+    font-size: var(--k-type-small);
+  }
+}
+
+/* === Pane — the content region inside a scaffold body (H3a) ===
+   The NAMED pane layer: every pane is its own container, so content reflows
+   per PANE width — the inner adaptation without which "adaptive" is only
+   true at the shell's edges. --flex = the required flexible pane (>=1 per
+   body); --fixed = the M3 fixed pane (360px; 412px once the SHELL is
+   extra-large). Widths are structural constants, not density tokens. */
+.pane {
+  container-type: inline-size;
+  container-name: pane;
+  min-width: 0;
+  min-height: 0;
+}
+.pane--flex { flex: 1 1 0; }
+.pane--fixed { flex: 0 0 360px; width: 360px; }
+@container scaffold (min-width: 1600px) {
+  /* The archetype-restore rule (.scaffold--list-detail .pane--fixed, 840px+)
+     out-specifies the bare class — repeat it here so the XL growth wins. */
+  .pane--fixed,
+  .scaffold--list-detail .pane--fixed { flex-basis: 412px; width: 412px; }
+}
+/* Inner reflow: a tile grid that packs per the PANE's own width (the M3
+   feed rule — columns live inside panes, min-width-driven). */
+.pane__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--k-gap, var(--k-s-8));
+}
 "
 `;
 

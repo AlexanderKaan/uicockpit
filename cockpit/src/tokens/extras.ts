@@ -54,6 +54,26 @@ export const Z_INDEX = {
 /* ───────── Breakpoints ─────────
  * Tailwind v4 defaults — de-facto standard in 2026, used by shadcn,
  * Radix, Vercel templates. Min-width based (mobile-first). */
+/* ───────── Window classes + pane constants (H3a layout grammar) ─────────
+ * The M3 window-size classes the SHELL recipes adapt at (container-query
+ * thresholds — a @container condition can't read a var(), so the recipes
+ * carry the literals; these tokens are the consumer-facing vocabulary), plus
+ * the pane constants (fixed widths, the 24px spacer, the shell margins). */
+export const WINDOW_CLASSES = {
+  compact: '600px',   // < 600 = compact (bottom-bar territory)
+  medium: '840px',    // 600–839 = medium (collapsed rail)
+  expanded: '1200px', // 840–1199 = expanded (two panes)
+  large: '1600px',    // 1200–1599 = large · ≥1600 = extra-large (412px fixed pane)
+} as const
+
+export const PANE_CONSTANTS = {
+  fixed: '360px',
+  'fixed-xl': '412px',
+  spacer: '24px',
+  'margin-compact': '16px',
+  margin: '24px',
+} as const
+
 export const BREAKPOINTS = {
   sm: '640px',
   md: '768px',

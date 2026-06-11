@@ -19,7 +19,19 @@
  */
 import { RECIPES } from './recipes'
 
-export type Tier = 'foundation' | 'atom' | 'block' | 'page'
+export type Tier = 'foundation' | 'atom' | 'block' | 'shell' | 'page'
+
+/**
+ * SHELLS (H3a — the 5th rung, public name "Layouts"): the app-frame grammar
+ * BETWEEN blocks and pages — adaptive scaffolds, the nav suite, the pane
+ * layer. A shell arranges blocks per container width; it owns arrangement,
+ * never look. `SHELL_USES` declares what each shell slots/composes.
+ */
+export const SHELL_USES: Readonly<Record<string, readonly string[]>> = {
+  scaffold: ['navsuite', 'pane'],
+  navsuite: [],
+  pane: [],
+}
 
 /**
  * FOUNDATIONS (recipe level): token/motion/layout glue that sits UPSTREAM of the
@@ -104,6 +116,7 @@ export const STANDALONE_ATOMS: readonly string[] = [
 
 const FOUNDATION_SET: ReadonlySet<string> = new Set(FOUNDATIONS)
 const BLOCK_SET: ReadonlySet<string> = new Set(Object.keys(BLOCK_USES))
+const SHELL_SET: ReadonlySet<string> = new Set(Object.keys(SHELL_USES))
 const STANDALONE_SET: ReadonlySet<string> = new Set(STANDALONE_ATOMS)
 
 /** The tier of a recipe id. Default = `atom` (the bare vocabulary is the majority);
@@ -111,11 +124,12 @@ const STANDALONE_SET: ReadonlySet<string> = new Set(STANDALONE_ATOMS)
 export function tierOf(id: string): Tier {
   if (FOUNDATION_SET.has(id)) return 'foundation'
   if (BLOCK_SET.has(id)) return 'block'
+  if (SHELL_SET.has(id)) return 'shell'
   return 'atom'
 }
 
 /** The segments a node composes from (Block → Atoms). Atoms/foundations = []. */
-export const usesOf = (id: string): readonly string[] => BLOCK_USES[id] ?? []
+export const usesOf = (id: string): readonly string[] => BLOCK_USES[id] ?? SHELL_USES[id] ?? []
 
 /** All recipe ids of a tier, in authored (cascade) order. */
 export const idsByTier = (t: Tier, recipes: readonly { id: string }[] = RECIPES): string[] =>

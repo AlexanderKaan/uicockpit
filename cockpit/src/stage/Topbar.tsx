@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, Box, Boxes, Check, ChevronDown, Code, Dices, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
+import { AppWindow, Box, Boxes, Check, ChevronDown, Code, Dices, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 , PanelsTopLeft } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -113,6 +113,7 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
             ['foundations', 'Foundations', Palette, 'Tokens & scales — the design decisions'],
             ['atoms', 'Atoms', Box, 'Bare building blocks — buttons, inputs, badges'],
             ['blocks', 'Blocks', Boxes, 'Ready-made sections — tables, forms, dialogs'],
+            ['layouts', 'Layouts', PanelsTopLeft, 'Adaptive shells — scaffold, nav & panes that re-arrange per width'],
             ['pages', 'Pages', AppWindow, 'Full screens — a real app, themed live'],
           ] as [ViewKind, string, typeof Palette, string][]).map(([k, label, Ico, sub]) => (
             <button
