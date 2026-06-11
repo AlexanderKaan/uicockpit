@@ -68,6 +68,10 @@ export function LayoutsView() {
   const [archetype, setArchetype] = useState<Archetype>('list-detail')
   const [width, setWidth] = useState(1000)
   const [active, setActive] = useState(0)
+  // Nav shape (H4): auto = the container queries decide per width; rail /
+  // sidebar pin one shape via the navsuite--rail / --expanded forced states
+  // (the consumer-controlled collapse toggle, now a first-class recipe state).
+  const [navShape, setNavShape] = useState<'auto' | 'rail' | 'expanded'>('auto')
   const arch = ARCHETYPES.find((a) => a.id === archetype)!
   const wc = windowClass(width)
 
@@ -95,6 +99,21 @@ export function LayoutsView() {
               onClick={() => setArchetype(a.id)}
             >
               {a.label}
+            </button>
+          ))}
+        </div>
+        {/* Nav shape — Auto (width decides) vs the H4 forced states */}
+        <div className="segctrl" role="radiogroup" aria-label="Nav shape">
+          {([['auto', 'Auto'], ['rail', 'Rail'], ['expanded', 'Sidebar']] as const).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={navShape === id}
+              className={`segctrl__btn ${navShape === id ? 'segctrl__btn--on' : ''}`}
+              onClick={() => setNavShape(id)}
+            >
+              {label}
             </button>
           ))}
         </div>
@@ -133,7 +152,7 @@ export function LayoutsView() {
               <div className="lyt__ghost-line lyt__ghost-line--bar" />
             </div>
             <nav className="scaffold__nav" aria-label="Demo navigation">
-              <div className="navsuite">
+              <div className={`navsuite${navShape !== 'auto' ? ` navsuite--${navShape}` : ''}`}>
                 {NAV_ITEMS.map((it, i) => (
                   <button
                     key={it.label}

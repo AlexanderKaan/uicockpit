@@ -2750,7 +2750,9 @@ function DropzoneCard() {
   )
 }
 
-type ToastTone = 'success' | 'info' | 'warn' | 'error'
+// 'snackbar' (H4) is the fifth shape: inverse surface, no tone border, one
+// text action — the M3 snackbar contract on the same .toast primitive.
+type ToastTone = 'success' | 'info' | 'warn' | 'error' | 'snackbar'
 interface ToastEntry { id: number; tone: ToastTone; title: string; sub: string }
 
 const TOAST_PRESETS: Record<ToastTone, Omit<ToastEntry, 'id' | 'tone'>> = {
@@ -2758,8 +2760,9 @@ const TOAST_PRESETS: Record<ToastTone, Omit<ToastEntry, 'id' | 'tone'>> = {
   info:    { title: 'New version', sub: 'v2.4.0 is available.' },
   warn:    { title: 'Heads up', sub: 'API quota at 78%.' },
   error:   { title: 'Upload failed', sub: 'Network error — please retry.' },
+  snackbar: { title: 'Message archived', sub: '' },
 }
-const TOAST_ICON: Record<ToastTone, IconName> = { success: 'check', info: 'info', warn: 'info', error: 'x' }
+const TOAST_ICON: Record<ToastTone, IconName> = { success: 'check', info: 'info', warn: 'info', error: 'x', snackbar: 'check' }
 
 function ToastStackCard() {
   const [toasts, setToasts] = useState<ToastEntry[]>([])
@@ -2785,6 +2788,9 @@ function ToastStackCard() {
         <button className="btn btn--ghost btn--sm" onClick={() => fire('error')}>
           <Icon name="x" /> Error
         </button>
+        <button className="btn btn--ghost btn--sm" onClick={() => fire('snackbar')}>
+          <Icon name="chat" /> Snackbar
+        </button>
       </div>
       <div className="toast-demo-frame">
         {toasts.length === 0 && (
@@ -2793,11 +2799,15 @@ function ToastStackCard() {
         <div className="toast-stack">
           {toasts.map((t) => (
             <div key={t.id} className={`toast toast--${t.tone}`} role={t.tone === 'error' ? 'alert' : 'status'}>
-              <Icon name={TOAST_ICON[t.tone]} />
+              {/* Snackbar contract: no tone icon, no sub — one line + ONE text action. */}
+              {t.tone !== 'snackbar' && <Icon name={TOAST_ICON[t.tone]} />}
               <div className="toast__body">
                 <div className="toast__title">{t.title}</div>
-                <div className="toast__sub">{t.sub}</div>
+                {t.sub && <div className="toast__sub">{t.sub}</div>}
               </div>
+              {t.tone === 'snackbar' && (
+                <button className="toast__action" onClick={() => dismiss(t.id)}>Undo</button>
+              )}
               <button className="toast__close" onClick={() => dismiss(t.id)} aria-label="Dismiss">
                 <Icon name="x" />
               </button>

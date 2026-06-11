@@ -2804,7 +2804,40 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   display: inline-flex;
   border-radius: var(--k-radius-md);
 }
-.toast__close:hover { color: var(--k-fg); background: var(--k-state-hover); }`,
+.toast__close:hover { color: var(--k-fg); background: var(--k-state-hover); }
+/* Inline text action ("Undo", "Retry") — sits after the body, before the
+   dismiss ✕. On a regular toast it's primary-tinted; the snackbar recolors
+   it below. NEVER make the action "Dismiss" — that's what the ✕ is for. */
+.toast__action {
+  background: none;
+  border: 0;
+  padding: var(--k-s-2) var(--k-s-6);
+  border-radius: var(--k-radius-sm, 6px);
+  font: inherit;
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-primary);
+  cursor: pointer;
+  flex: none;
+}
+.toast__action:hover { background: var(--k-state-hover); }
+/* Snackbar (H4) — the M3 snackbar CONTRACT on the toast primitive. Look:
+   INVERSE surface (the H1 inverse roles — guaranteed contrast on any theme),
+   no tone border (a snackbar is neutral app feedback, not a status), one
+   optional text action in inverse-primary. Behavior contract (consumer-
+   owned): one line, ONE action max, auto-dismiss 4-10s, and one snackbar at
+   a time — queue them, never stack. */
+.toast--snackbar {
+  background: var(--k-inverse-surface);
+  color: var(--k-inverse-fg);
+  border-color: transparent;
+  align-items: center;
+}
+.toast--snackbar .toast__sub { color: var(--k-inverse-fg); opacity: 0.72; }
+.toast--snackbar .toast__action { color: var(--k-inverse-primary); }
+.toast--snackbar .toast__action:hover { background: transparent; text-decoration: underline; text-underline-offset: 3px; }
+.toast--snackbar .toast__close { color: var(--k-inverse-fg); opacity: 0.75; }
+.toast--snackbar .toast__close:hover { color: var(--k-inverse-fg); background: transparent; opacity: 1; }`,
   },
   {
     id: 'tag-input',
@@ -4926,6 +4959,48 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     padding-inline: var(--k-row-px);
     font-size: var(--k-type-small);
   }
+}
+/* Forced states (H4) — rail⇄sidebar as a FIRST-CLASS, consumer-controlled
+   state. The container queries above pick the DEFAULT shape per width; these
+   modifiers pin ONE shape regardless: .navsuite--rail on a wide scaffold is
+   the classic sidebar-collapse toggle, .navsuite--expanded on a medium one
+   pins the full sidebar, .navsuite--bar forces the bottom bar. Declared
+   after the queries (and with item rules one class deeper) so they win in
+   both directions. Wire the toggle to aria-expanded on the consumer side. */
+.navsuite--bar {
+  flex-direction: row;
+  justify-content: space-around;
+  width: auto;
+  padding: var(--k-s-8);
+  border-right: 0;
+  border-top: var(--k-bw) solid var(--k-border);
+}
+.navsuite--rail,
+.navsuite--expanded {
+  flex-direction: column;
+  justify-content: flex-start;
+  border-top: 0;
+  border-right: var(--k-bw) solid var(--k-border);
+}
+.navsuite--rail { width: 84px; padding: var(--k-s-8) var(--k-s-6); }
+.navsuite--expanded { width: 224px; align-items: stretch; }
+.navsuite--bar .navsuite__item,
+.navsuite--rail .navsuite__item {
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--k-s-4);
+  min-height: 0;
+  padding: var(--k-s-6) var(--k-s-10);
+  font-size: var(--k-type-caption);
+}
+.navsuite--expanded .navsuite__item {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: var(--k-row-gap);
+  min-height: var(--k-row-h-lg);
+  padding-block: 0;
+  padding-inline: var(--k-row-px);
+  font-size: var(--k-type-small);
 }`,
   },
   {
