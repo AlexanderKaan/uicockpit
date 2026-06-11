@@ -4952,6 +4952,22 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .scaffold--supporting .pane--supporting { display: none; }
 @container scaffold (min-width: 840px) {
   .scaffold--supporting .pane--supporting { display: block; }
+}
+/* --- Archetype: workspace (H3c) --------------------------------------
+   The universal 3-pane mock-up — a fixed list, a flexible main and a
+   supporting pane, all at once on wide screens. Progressive collapse:
+   <1200 the supporting pane drops out; <840 the list also yields and the
+   main owns the width (selection then NAVIGATES, like list-detail). One
+   markup, three breakpoints — the densest composition the shell tier holds. */
+.scaffold--workspace .pane--detail { display: none; }
+.scaffold--workspace .pane--supporting { display: none; }
+.scaffold--workspace .pane--fixed { flex: 1 1 auto; width: auto; }
+@container scaffold (min-width: 840px) {
+  .scaffold--workspace .pane--detail { display: block; }
+  .scaffold--workspace .pane--fixed { flex: 0 0 300px; width: 300px; }
+}
+@container scaffold (min-width: 1200px) {
+  .scaffold--workspace .pane--supporting { display: block; }
 }`,
   },
   {

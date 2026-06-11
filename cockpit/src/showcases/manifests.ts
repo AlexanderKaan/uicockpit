@@ -14,7 +14,7 @@ import type { IconName } from '../icons/concepts'
  * JSON while TypeScript still checks every seed against its block's contract.
  */
 
-export type ShowcaseArchetype = 'feed' | 'list-detail' | 'supporting'
+export type ShowcaseArchetype = 'feed' | 'list-detail' | 'supporting' | 'workspace'
 /** suite = the adaptive .navsuite (bar→rail→sidebar per width) · topbar = links in the app bar */
 export type ShowcaseNav = 'suite' | 'topbar'
 
@@ -259,30 +259,34 @@ export const SHOWCASES: ShowcaseManifest[] = [
     ],
   },
   {
-    id: 'mobiel',
-    title: 'Mobiel',
-    blurb: 'Feed archetype at compact width — the SAME markup as every other showcase; the nav suite docks as a bottom bar below 600px.',
+    id: 'consumer',
+    title: 'Consumer',
+    blurb: 'Expressive consumer app at compact width — a music/events feed that leans into the kit’s harmony + signature shape. The non-SaaS surface; the nav suite docks as a bottom bar below 600px.',
     width: 390,
     archetype: 'feed',
     nav: 'suite',
     navItems: [
-      { icon: 'home', label: 'Today' },
-      { icon: 'search', label: 'Search' },
-      { icon: 'bell', label: 'Activity' },
-      { icon: 'cog', label: 'Profile' },
+      { icon: 'home', label: 'For you' },
+      { icon: 'search', label: 'Discover' },
+      { icon: 'spark', label: 'Live' },
+      { icon: 'home', label: 'Profile' },
     ],
-    barTitle: 'Daily',
+    barTitle: 'Tonight',
     panes: [
       {
         role: 'flex',
         blocks: [
-          { block: 'chips', seed: { label: 'Filter feed', options: ['All', 'Mentions', 'Teams', 'Saved'], active: 0 } },
-          { block: 'list', seed: { items: [
-            { icon: 'chat', title: 'Mia mentioned you', sub: '"@you can you review the spec?"', trail: '5m' },
-            { icon: 'check', title: 'Deploy succeeded', sub: 'web · production · 41s', trail: '22m', badge: 'success' },
-            { icon: 'bell', title: 'Standup in 10 minutes', sub: 'Design weekly · Zoom', trail: '1h' },
-            { icon: 'file', title: 'Spec updated', sub: 'Checkout flow v3 — 14 comments', trail: '2h' },
-            { icon: 'plus', title: 'New teammate', sub: 'Ravi joined Platform', trail: '1d' },
+          { block: 'chips', seed: { label: 'Browse', options: ['For you', 'Nearby', 'This week', 'Free'], active: 0 } },
+          { block: 'media', seed: { title: 'Featured tonight', items: [
+            { name: 'Serafina — live set', kind: 'image', badge: '9:30', tone: 'info' },
+            { name: 'Echo Bridge party', kind: 'image', badge: 'Going', tone: 'success' },
+            { name: 'Sunrise rooftop', kind: 'image' },
+            { name: 'Vinyl night', kind: 'image', badge: 'Free', tone: 'warning' },
+          ] } },
+          { block: 'list', seed: { title: 'Your week', items: [
+            { icon: 'spark', title: 'Serafina', sub: 'Paradiso · doors 21:00', trail: 'Fri', badge: 'info' },
+            { icon: 'home', title: 'Echo Bridge', sub: 'Hosted by Odette · 78 going', trail: 'Sat' },
+            { icon: 'chat', title: 'Group chat', sub: 'Mia: making a shared album…', trail: '2m' },
           ] } },
         ],
       },
@@ -365,6 +369,60 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { name: 'brief.pdf', kind: 'file', badge: 'Final', tone: 'warning' },
           ] } },
           { block: 'wizard', seed: { steps: ['Select', 'Crop', 'Caption', 'Publish'], active: 2, title: 'Caption', sub: 'Add alt text and a caption before publishing.' } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'workspace',
+    title: 'Workspace',
+    blurb: 'The 3-pane workspace archetype — spaces, a live thread and an agenda/files rail, all visible at once on wide screens. Below 1200 the rail drops out; below 840 the spaces list yields and the thread owns the width. One markup, three breakpoints — the densest composition the shell tier holds.',
+    width: 1440,
+    archetype: 'workspace',
+    nav: 'suite',
+    navItems: [
+      { icon: 'chat', label: 'Chat' },
+      { icon: 'bell', label: 'Activity' },
+      { icon: 'cal', label: 'Meet' },
+      { icon: 'grid', label: 'Spaces' },
+    ],
+    barTitle: 'Teamspace',
+    panes: [
+      {
+        role: 'fixed',
+        blocks: [
+          { block: 'list', seed: { title: 'Spaces', items: [
+            { icon: 'chat', title: 'Adoption volunteering', sub: '22 members', trail: '3', badge: 'info' },
+            { icon: 'grid', title: 'Museum field trip', sub: 'Casey, +6' },
+            { icon: 'spark', title: 'Annual spring hike', sub: 'Planning' },
+            { icon: 'home', title: 'Lunch break', sub: 'Renée, +4' },
+            { icon: 'file', title: 'Project Sunrise', sub: 'Files & tasks' },
+          ] } },
+        ],
+      },
+      {
+        role: 'detail',
+        blocks: [
+          { block: 'thread', seed: { messages: [
+            { name: 'Elle Petersen', time: '14:02', body: 'I just learned about a volunteering opportunity. The shelter needs help walking dogs and meeting people — want to sign up together?' },
+            { name: 'Dagmar Bachmann', time: '14:05', body: 'I’m going to adopt that scruffy one :)' },
+            { name: 'You', time: '14:06', body: 'Amazing! Do you need a ride to the shelter?', me: true },
+          ] } },
+          { block: 'composer', seed: { placeholder: 'Message the space — ⇧⏎ for a new line' } },
+        ],
+      },
+      {
+        role: 'supporting',
+        blocks: [
+          { block: 'timeline', seed: { events: [
+            { title: 'Teaching workshop', time: '9:00', desc: '9:00 – 12:00', state: 'done' },
+            { title: 'Lunch', time: '13:00', desc: '13:00 – 14:00', state: 'current' },
+            { title: 'Curriculum review', time: '16:00', desc: '16:00 – 17:00' },
+          ] } },
+          { block: 'list', seed: { title: 'Files', items: [
+            { icon: 'file', title: 'Adoption application', sub: 'PDF · 240 KB' },
+            { icon: 'grid', title: 'Shelter map', sub: 'PNG · 1.2 MB' },
+          ] } },
         ],
       },
     ],
