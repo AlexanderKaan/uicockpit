@@ -898,7 +898,7 @@ body {
    * Compact → 32px · Default → 36px · Comfortable → 40px (shadcn h-8/9/10 family).
    * Padding-block is 0 because min-height + flex centering handles vertical
    * positioning, and removing padding-block keeps the height exact. */
-  min-height: var(--k-btn-h-default, 36px);
+  min-height: var(--k-btn-h, var(--k-btn-h-default, 36px));
   padding-block: 0;
   /* Horizontal padding scales with TWO dimensions:
    *  1. Button height (Scale drives 32/36/40px) — taller buttons need
@@ -914,7 +914,10 @@ body {
      it to the box radius below — they read as fields / quiet toolbar controls,
      not buttons, so "Button radius" shouldn't reshape them. One var drives BOTH
      the corner and the pill-aware padding so they can never disagree. */
-  --btn-r: var(--k-radius-button, var(--k-radius-md));
+  /* Comp-tier hook (H2 lazy override): --k-btn-radius is NEVER defined by
+     default — zero bytes until a consumer/agent sets it ("square corners on
+     just my buttons"). Same pattern on the other hooks below. */
+  --btn-r: var(--k-btn-radius, var(--k-radius-button, var(--k-radius-md)));
   padding-inline: max(
     14px,
     calc(var(--k-radius-md) * 0.75),
@@ -997,7 +1000,7 @@ body {
   filter: brightness(0.94);
   box-shadow: var(--k-btn-shadow-press, none);
 }
-.btn--primary { background: var(--k-primary); color: var(--k-primary-fg); }
+.btn--primary { background: var(--k-btn-bg, var(--k-primary)); color: var(--k-btn-fg, var(--k-primary-fg)); }
 .btn--primary:hover { background: var(--k-primary-hover); }
 .btn--secondary { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); }
 .btn--secondary:hover { filter: brightness(1.02); }
@@ -1133,11 +1136,13 @@ body {
   gap: var(--k-space, 16px);
   box-sizing: border-box;
   margin: 0;
-  padding: var(--k-pad, 24px);
-  background: var(--k-surface);
+  /* --k-card-* = lazy comp-tier hooks (H2): undefined by default, override
+     per-scope to restyle JUST cards without touching the system tokens. */
+  padding: var(--k-card-pad, var(--k-pad, 24px));
+  background: var(--k-card-bg, var(--k-surface));
   color: var(--k-fg);
-  border: 1px solid var(--k-border);
-  border-radius: var(--k-radius-lg);
+  border: 1px solid var(--k-card-border-color, var(--k-border));
+  border-radius: var(--k-card-radius, var(--k-radius-lg));
   box-shadow: var(--k-shadow-sm);
 }
 /* Interactive — a whole card that's one click target (link/button card). Adds
@@ -1232,8 +1237,8 @@ body {
    * Plain) and the BOTTOM is overridden to --k-field-underline-color — so Plain
    * shows only an underline while Outlined gets a full box. Border (faint→strong)
    * still feeds --k-input-border, so it tunes the line in every mode. */
-  border-radius: var(--k-field-radius);
-  background: var(--k-field-bg);
+  border-radius: var(--k-in-radius, var(--k-field-radius));
+  background: var(--k-in-bg, var(--k-field-bg));
   border: var(--k-bw, 1px) solid var(--k-field-border-color);
   border-bottom-color: var(--k-field-underline-color);
   color: var(--k-fg);
@@ -1519,7 +1524,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   gap: var(--k-s-4);
   padding-block: var(--k-s-2);
   padding-inline: max(var(--k-s-8), calc(var(--k-radius-md) * 0.5));
-  border-radius: var(--k-radius-md);
+  border-radius: var(--k-badge-radius, var(--k-radius-md));
   font-size: var(--k-type-eyebrow);
   /* UI text properties apply — badges are "chrome text" like buttons.
      Weight stays a step lighter via min(500) clamp so badges don't
