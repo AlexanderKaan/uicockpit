@@ -30,6 +30,10 @@ export type BlockSpec =
   | { block: 'prose'; seed: { title: string; kicker?: string; paragraphs: string[] } }
   | { block: 'dl'; seed: { title?: string; pairs: Array<[string, string]> } }
   | { block: 'chips'; seed: { label: string; options: string[]; active: number } }
+  // H3c harvest — rich patterns lifted out of SupaDash into the manifest model.
+  | { block: 'kanban'; seed: { columns: Array<{ name: string; cards: Array<{ title: string; tag?: string; key?: string; pts?: string; avatar?: string }> }> } }
+  | { block: 'tree'; seed: { label?: string; groups: Array<{ name: string; items: Array<{ title: string; on?: boolean }> }> } }
+  | { block: 'timeline'; seed: { events: Array<{ title: string; time: string; desc?: string; state?: 'done' | 'current' }> } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -167,6 +171,20 @@ export const SHOWCASES: ShowcaseManifest[] = [
             ['Initech', 'Ravi', 'Discovery', '$54k', 'Stakeholder call · Mon'],
             ['Umbrella Co', 'Mia', 'Negotiation', '$210k', 'Security review · Thu'],
           ] } },
+          // H3c: Projects' deal-board pattern, harvested into CRM as the Werk merge.
+          { block: 'kanban', seed: { columns: [
+            { name: 'Discovery', cards: [
+              { title: 'Initech — scope call', tag: 'New', key: 'DEAL-54', pts: '$54k', avatar: 'R' },
+              { title: 'Hooli — intro deck', tag: 'New', key: 'DEAL-61', pts: '$72k', avatar: 'S' },
+            ] },
+            { name: 'Proposal', cards: [
+              { title: 'Globex — pricing sent', tag: 'Warm', key: 'DEAL-48', pts: '$86k', avatar: 'S' },
+            ] },
+            { name: 'Negotiation', cards: [
+              { title: 'Northwind — contract', tag: 'Hot', key: 'DEAL-40', pts: '$120k', avatar: 'L' },
+              { title: 'Umbrella — security', tag: 'Hot', key: 'DEAL-33', pts: '$210k', avatar: 'M' },
+            ] },
+          ] } },
         ],
       },
     ],
@@ -209,9 +227,22 @@ export const SHOWCASES: ShowcaseManifest[] = [
             ['Renewal', 'July 1, 2026'],
             ['Invoices', '12 paid'],
           ] } },
-          { block: 'list', seed: { title: 'Help', items: [
-            { icon: 'file', title: 'Billing FAQ', sub: 'VAT, receipts, proration' },
-            { icon: 'chat', title: 'Contact support', sub: 'Replies within a day' },
+          // H3c: Docs' tree-nav, harvested into Portal (knowledge & account).
+          { block: 'tree', seed: { label: 'Help center', groups: [
+            { name: 'Getting started', items: [
+              { title: 'Set up your workspace' },
+              { title: 'Invite your team', on: true },
+            ] },
+            { name: 'Billing', items: [
+              { title: 'VAT & receipts' },
+              { title: 'Change your plan' },
+            ] },
+          ] } },
+          // H3c: Settings' activity timeline, harvested into Portal.
+          { block: 'timeline', seed: { events: [
+            { title: 'Plan upgraded to Pro', time: 'Jun 1', desc: 'by finance@acme.io', state: 'done' },
+            { title: 'Seat added — ravi@acme.io', time: 'Jun 6', state: 'done' },
+            { title: 'Renewal upcoming', time: 'Jul 1', desc: '$24/mo · auto-renew', state: 'current' },
           ] } },
         ],
       },

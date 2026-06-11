@@ -161,5 +161,69 @@ export function renderBlock(spec: BlockSpec, key: number) {
           ))}
         </div>
       )
+    case 'kanban':
+      return (
+        <div className="kanban" key={key}>
+          {spec.seed.columns.map((col) => (
+            <div className="kanban__col" key={col.name}>
+              <div className="kanban__col-head">{col.name}<span className="kanban__count">{col.cards.length}</span></div>
+              {col.cards.map((c) => (
+                <div className="kanban__card" key={c.title}>
+                  <span className="kanban__card-title">{c.title}</span>
+                  {c.tag && <span className="kanban__tag">{c.tag}</span>}
+                  <div className="kanban__card-foot">
+                    <span className="kanban__stats">
+                      {c.key && <span className="kanban__key"><Icon name="file" size={14} /> {c.key}</span>}
+                      {c.pts && <span className="kanban__pts">{c.pts}</span>}
+                    </span>
+                    {c.avatar && <span className="avatar avatar--sm" style={{ width: 22, height: 22, fontSize: 9 }}>{c.avatar}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )
+    case 'tree':
+      return (
+        <div className="card" key={key}>
+          <div className="tree" role="tree" aria-label={spec.seed.label ?? 'Navigation'}>
+            {spec.seed.groups.map((g) => (
+              <div className="tree__group" key={g.name}>
+                <div className="tree__row">
+                  <span className="tree__chev"><Icon name="chevR" size={13} /></span>
+                  <span className="tree__icon"><Icon name="grid" size={13} /></span>
+                  {g.name}
+                </div>
+                <div className="tree__group">
+                  {g.items.map((it) => (
+                    <div className={`tree__row ${it.on ? 'tree__row--on' : ''}`} key={it.title}>
+                      <span className="tree__chev tree__chev--leaf"><Icon name="chevR" size={13} /></span>
+                      <span className="tree__icon"><Icon name="file" size={13} /></span>
+                      {it.title}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    case 'timeline':
+      return (
+        <div className="card" key={key}>
+          <ol className="timeline">
+            {spec.seed.events.map((e) => (
+              <li className={`timeline__item ${e.state ? `timeline__item--${e.state}` : ''}`} key={e.title}>
+                <span className="timeline__dot">{e.state === 'current' ? <span className="timeline__pulse" /> : <Icon name="check" />}</span>
+                <div className="timeline__body">
+                  <div className="timeline__head"><span className="timeline__title">{e.title}</span><span className="timeline__time">{e.time}</span></div>
+                  {e.desc && <div className="timeline__desc">{e.desc}</div>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )
   }
 }

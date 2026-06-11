@@ -23,6 +23,9 @@ const BLOCK_RECIPES: Record<BlockSpec['block'], string> = {
   prose: '.l-center (foundation) + type tokens',
   dl: '.card + .dl',
   chips: '.chip (+ .chip--on for the active filter)',
+  kanban: '.kanban > .kanban__col > .kanban__card (board with tags + points)',
+  tree: '.card + .tree > .tree__group > .tree__row (collapsible nav)',
+  timeline: '.card + .timeline > .timeline__item (--done/--current states)',
 }
 
 /* Cross-view jump: block id → the gallery view + search query that surfaces
@@ -40,6 +43,9 @@ const BLOCK_GALLERY: Record<BlockSpec['block'], { view: ViewKind; q: string }> =
   prose: { view: 'foundations', q: '' },
   dl: { view: 'atoms', q: 'description' },
   chips: { view: 'atoms', q: 'chip' },
+  kanban: { view: 'blocks', q: 'kanban' },
+  tree: { view: 'atoms', q: 'tree' },
+  timeline: { view: 'atoms', q: 'timeline' },
 }
 
 /**
