@@ -1211,7 +1211,8 @@ function BoardView() {
             {c.cards.map((card) => (
               <div key={card.k + card.t} className="kanban__card">
                 <span className="kanban__card-title">{card.t}</span>
-                <span className="kanban__tag" style={{ background: card.epicColor, color: '#fff' }}>{card.epic}</span>
+                {/* H4 usage pass: the tag wears the recipe's accent container — no per-card hex. */}
+                <span className="kanban__tag">{card.epic}</span>
                 <div className="kanban__card-foot">
                   <span className="kanban__stats">
                     <span className="kanban__key"><Icon name="file" size={14} /> {card.k}</span>

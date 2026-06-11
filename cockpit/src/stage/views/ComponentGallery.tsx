@@ -871,6 +871,12 @@ function ProgressCard() {
         <div className="progress__fill" />
       </div>
       <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Syncing… (indeterminate — no ETA)</span>
+      {/* Wavy (H4 flourish) — value rides on --progress so the root can paint
+          the remaining track; reserve it for the one hero progress moment. */}
+      <div className="progress progress--wavy" role="progressbar" aria-valuenow={62} aria-valuemin={0} aria-valuemax={100} aria-label="Generating preview" style={{ '--progress': '62%', marginTop: 10 } as CSSProperties}>
+        <div className="progress__fill" />
+      </div>
+      <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Generating… (wavy — the expressive hero moment)</span>
       <button className="btn btn--primary btn--block">
         <Icon name="spark" /> Upgrade storage
       </button>
@@ -1549,7 +1555,8 @@ function KanbanCard() {
             {c.cards.map((card, i) => (
               <button type="button" key={card.b} className="kanban__card" aria-label={`${card.t} · ${card.b}`}>
                 <span className="kanban__card-title">{card.t}</span>
-                <span className="kanban__tag" style={{ background: card.tagColor, color: '#fff' }}>{card.tag}</span>
+                {/* H4 usage pass: the tag wears the recipe's accent container — no per-card hex. */}
+                <span className="kanban__tag">{card.tag}</span>
                 <div className="kanban__card-foot">
                   <span className="kanban__stats">
                     <span className="kanban__key"><Icon name="file" size={14} /> {card.b}</span>
