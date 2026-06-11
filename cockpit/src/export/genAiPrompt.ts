@@ -447,6 +447,9 @@ screens instead of inventing app-frame CSS:
 - \`.navsuite\` (in the nav slot) — ONE nav markup that morphs bottom-bar →
   collapsed icon rail → expanded rail. Items: \`.navsuite__item\` (+ \`--on\`)
   with \`__icon\` + \`__label\`. Don't build three navs; build this once.
+  Forced states: \`--bar\` / \`--rail\` / \`--expanded\` pin one shape regardless
+  of width — wire your sidebar-collapse toggle to \`--rail\` ⇄ \`--expanded\`
+  (+ \`aria-expanded\`), never to a second nav markup.
 - \`.pane\` — content regions inside \`.scaffold__body\`: ≥1 \`.pane--flex\`
   (required) + optional \`.pane--fixed\` (360px; 412px at extra-large). Each
   pane is its own container: put grids on \`.pane__grid\` so tiles pack per
@@ -467,6 +470,42 @@ screens instead of inventing app-frame CSS:
   silently drop it.
 - The nav suite never disappears: it morphs. Keep 3–5 destinations; more
   belongs in a secondary menu, not the suite.
+
+## Selection & feedback patterns — pick the sanctioned one
+
+- **Chips are controls, badges are status.** \`.chip\` = a real button in four
+  species: base (assist action) · \`--on\` (filter, selected — wears the
+  SECONDARY container) · \`--input\` (a user-entered token, surface-container +
+  \`.chip__remove\`) · \`--suggestion\` (the quietest: a prompt). A passive label
+  is a \`.badge\`; a token inside a field is \`.taginput__chip\`. Never restyle one
+  into another.
+- **Toggle button:** \`.btn--toggle\` + \`aria-pressed\` on a quiet variant
+  (\`--outline\`/\`--ghost\`); pressed wears the secondary container and morphs
+  the corner (pill themes squish to the box radius — that's intended). Use for
+  press-and-stay single actions (Star, formatting); exclusive sets use
+  \`.segctrl\`, independent sets a \`.btn-group--connected\` of toggles.
+- **Split & grouped actions:** a split button IS a two-segment \`.btn-group\`
+  (label action + chevron trigger opening a \`.menu\`) — no special class.
+  \`--connected\` relaxes the group into gap-separated pebbles (softer voice).
+- **Selection containers rule (one glance, one family):** the loud PRIMARY is
+  reserved for the main action and range ENDPOINTS; anything
+  selected-but-not-the-action (\`.chip--on\`, \`.btn--toggle\`, calendar range
+  fill) wears the SECONDARY container; quiet metadata tags (\`.kanban__tag\`)
+  wear the ACCENT container.
+- **Date & time entry — the trichotomy, never a fourth form:** docked
+  \`.calendar\` (date IS the content) · popover picker (form default; same panel
+  in a \`.dialog\` on compact) · typed input (date \`.in\`, time = \`.timefield\`:
+  two digit cells + colon + meridiem \`.segctrl\`). No clock-face dials.
+- **Snackbar vs toast:** transient neutral feedback with one action ("Archived
+  — Undo") = \`.toast--snackbar\` (inverse surface, one \`.toast__action\`, no
+  tone border; ONE at a time, queue don't stack, auto-dismiss 4–10s). Status
+  feedback keeps the toned \`.toast--success/info/warn/error\`.
+- **Anchored badge:** counts/dots pinned on a host control = \`.anchor\` wrapping
+  the control + \`.anchor__badge\` (a \`.badge--count\` or \`--dot\`) — don't
+  hand-position badges.
+- **Wavy progress** (\`.progress--wavy\`, value via \`--progress: 64%\`) is the
+  ONE hero progress moment (an upload, a generation); every routine meter
+  stays \`.progress\`.
 
 ## Building a screen we don't list — map it, don't invent
 

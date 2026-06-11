@@ -141,6 +141,16 @@ ${genCss(cfg)}
   whole UI scales with the user's font-size / zoom (accessible, Tailwind/shadcn
   convention). 1px borders, stroke weights, focus rings and shadows stay px.
 - Interaction (hover/pressed) uses var(--k-state-hover) as an overlay.
+- Selection containers (H4): the loud PRIMARY is reserved for the main action
+  and range endpoints; selected-but-not-the-action (.chip--on, .btn--toggle
+  pressed, calendar range fill) wears the SECONDARY container; quiet metadata
+  tags (.kanban__tag) wear the ACCENT container. Chips (.chip — assist/--on/
+  --input/--suggestion) are CONTROLS; a passive label stays a .badge.
+- Snackbar vs toast: neutral one-action feedback ("Archived — Undo") =
+  .toast--snackbar on the INVERSE surface, one .toast__action, one at a time;
+  status feedback keeps the toned toasts.
+- Date & time entry ships THREE forms only: docked .calendar · popover picker ·
+  typed input (date .in + .timefield for times). No clock-face dials.
 - Dark mode: add the class .dark to a parent element.
 
 ## Component decision tree — when to pick which variant
