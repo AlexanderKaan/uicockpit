@@ -1030,3 +1030,49 @@
   overflow: auto;
   font-size: var(--k-type-caption);
 }
+/* Inspect mode (slice 2) — dashed outline per block + a clickable id tag;
+ * the picked block pins its spec panel above the stage. */
+.shc__inspect {
+  position: relative;
+  outline: 1px dashed var(--k-info);
+  outline-offset: 3px;
+  border-radius: var(--k-radius-sm);
+}
+.shc__inspect--on { outline: 2px solid var(--k-info); }
+.shc__inspect-tag {
+  position: absolute;
+  top: -10px;
+  left: 6px;
+  z-index: 2;
+  border: 0;
+  padding: 1px var(--k-s-6);
+  border-radius: 999px;
+  background: var(--k-info);
+  color: var(--k-info-fg, #fff);
+  font-family: var(--k-font-mono);
+  font-size: var(--k-type-caption);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.shc__inspect-tag:hover { filter: brightness(1.1); }
+.shc__spec {
+  margin: 0 0 var(--k-s-12);
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+  background: var(--k-surface);
+  padding: var(--k-s-10) var(--k-s-12);
+}
+.shc__spec-head {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-10);
+  margin-bottom: var(--k-s-8);
+}
+.shc__spec-map { font-size: var(--k-type-small); color: var(--k-fg-muted); flex: 1; min-width: 0; }
+.shc__spec-map code { font-family: var(--k-font-mono); font-size: var(--k-type-caption); color: var(--k-fg); }
+.shc__spec-json {
+  margin: 0;
+  max-height: 200px;
+  overflow: auto;
+  font-size: var(--k-type-caption);
+}

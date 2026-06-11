@@ -1,8 +1,25 @@
 import { useState } from 'react'
 import { Icon } from '../../icons/Icon'
-import { SHOWCASES, type ShowcaseManifest } from '../../showcases/manifests'
+import { SHOWCASES, type BlockSpec, type ShowcaseManifest } from '../../showcases/manifests'
 import { renderBlock } from '../../showcases/blocks'
 import { DemoDashboard } from './DemoDashboard'
+
+/* Inspectable composition (H3b slice 2): block id → the KIT recipes it maps
+ * onto. Clicking a block tag in Inspect mode shows its manifest spec + this
+ * mapping — the "what would I grab from the gallery to build this" answer. */
+const BLOCK_RECIPES: Record<BlockSpec['block'], string> = {
+  stats: '.stat-tile (+ __label/__value/__delta)',
+  chart: '.card + ChartFrame (the catalogued chart presenter)',
+  list: '.card + .list .list__item (+ .badge trail)',
+  thread: '.card (message variant — primary-soft for own messages)',
+  composer: '.toolbar + .in + .btn--icon',
+  table: '.card + .tbl',
+  form: '.card + .lab/.in + .card__foot actions',
+  pricing: '.pricing > .pricing__tier (+ --featured) + .btn--block',
+  prose: '.l-center (foundation) + type tokens',
+  dl: '.card + .dl',
+  chips: '.chip (+ .chip--on for the active filter)',
+}
 
 /**
  * Pages view (H3b) — Showcases first, SupaDash one click away.
@@ -27,7 +44,25 @@ function ShowcaseStage({ m }: { m: ShowcaseManifest }) {
   const [width, setWidth] = useState(m.width)
   const [active, setActive] = useState(0)
   const [showManifest, setShowManifest] = useState(false)
+  // Inspect mode (H3b slice 2): overlay every block with its id tag; clicking
+  // a tag pins that block's manifest spec + kit-recipe mapping above the stage.
+  const [inspect, setInspect] = useState(false)
+  const [picked, setPicked] = useState<{ pane: number; block: number } | null>(null)
+  const pickedSpec = picked ? m.panes[picked.pane]?.blocks[picked.block] : undefined
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
+
+  // Export-as-starter: the manifest IS the starter — download it as JSON.
+  // (Pair with tokens.css from the Use-kit modal; `uicockpit init --template`
+  // consumes the same file later, D3.)
+  const downloadManifest = () => {
+    const blob = new Blob([JSON.stringify(m, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${m.id}.manifest.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <>
@@ -55,11 +90,27 @@ function ShowcaseStage({ m }: { m: ShowcaseManifest }) {
         <button type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={showManifest} onClick={() => setShowManifest((s) => !s)}>
           <Icon name="file" />Manifest
         </button>
+        <button type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={inspect} onClick={() => { setInspect((s) => !s); setPicked(null) }}>
+          <Icon name="search" />Inspect
+        </button>
+        <button type="button" className="btn btn--ghost btn--sm" onClick={downloadManifest}>
+          <Icon name="upload" />Download manifest
+        </button>
       </div>
       <p className="lyt__blurb">{m.blurb}</p>
 
       {showManifest && (
         <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
+      )}
+      {inspect && pickedSpec && (
+        <div className="shc__spec" role="note" aria-label={`Block spec — ${pickedSpec.block}`}>
+          <div className="shc__spec-head">
+            <span className="badge badge--info">{pickedSpec.block}</span>
+            <span className="shc__spec-map">builds from: <code>{BLOCK_RECIPES[pickedSpec.block]}</code></span>
+            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Close block spec" onClick={() => setPicked(null)}><Icon name="x" /></button>
+          </div>
+          <pre className="code shc__spec-json">{JSON.stringify(pickedSpec, null, 2)}</pre>
+        </div>
       )}
 
       <div className="lyt__stage">
@@ -99,7 +150,26 @@ function ShowcaseStage({ m }: { m: ShowcaseManifest }) {
             <div className="scaffold__body">
               {m.panes.map((pane, i) => (
                 <section className={`${PANE_CLASS[pane.role]} shc__pane`} key={i} aria-label={`${m.title} ${pane.role} pane`}>
-                  {pane.blocks.map((b, j) => renderBlock(b, j))}
+                  {pane.blocks.map((b, j) =>
+                    inspect ? (
+                      <div
+                        className={`shc__inspect ${picked?.pane === i && picked?.block === j ? 'shc__inspect--on' : ''}`}
+                        key={j}
+                      >
+                        <button
+                          type="button"
+                          className="shc__inspect-tag"
+                          onClick={() => setPicked({ pane: i, block: j })}
+                          aria-label={`Inspect block: ${b.block}`}
+                        >
+                          {b.block}
+                        </button>
+                        {renderBlock(b, j)}
+                      </div>
+                    ) : (
+                      renderBlock(b, j)
+                    ),
+                  )}
                 </section>
               ))}
             </div>
