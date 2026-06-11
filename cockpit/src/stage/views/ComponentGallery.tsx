@@ -2177,12 +2177,24 @@ function ButtonsCard() {
         <button type="button" className="btn btn--link">Learn more</button>
       </div>
       <div className="card__row" style={{ alignItems: 'center' }}>
+        <button type="button" className="btn btn--primary btn--xs">XS</button>
         <button type="button" className="btn btn--primary btn--sm">Small</button>
         <button type="button" className="btn btn--primary">Default</button>
         <button type="button" className="btn btn--primary btn--lg">Large</button>
-        <span style={{ width: 1, alignSelf: 'stretch', background: 'var(--k-border)', margin: '0 var(--k-s-2)' }} aria-hidden="true" />
+        <button type="button" className="btn btn--primary btn--xl">XL — hero action</button>
+      </div>
+      <div className="card__row" style={{ alignItems: 'center' }}>
         <button type="button" className="btn btn--outline"><Icon name="check" /> With icon</button>
         <button type="button" className="btn btn--primary btn--icon" aria-label="Search"><Icon name="search" /></button>
+        {/* Anchored badge — count + dot pinned on a host control (H4) */}
+        <span className="anchor">
+          <button type="button" className="btn btn--outline btn--icon" aria-label="Notifications — 3 unread"><Icon name="bell" /></button>
+          <span className="anchor__badge badge badge--solid-danger">3</span>
+        </span>
+        <span className="anchor">
+          <button type="button" className="btn btn--ghost btn--icon" aria-label="Inbox — new activity"><Icon name="chat" /></button>
+          <span className="anchor__badge anchor__badge--dot" aria-hidden="true" />
+        </span>
       </div>
       <div className="card__row" style={{ alignItems: 'center' }}>
         <button type="button" className={`btn btn--primary${loading ? ' btn--loading' : ''}`} onClick={() => { setLoading(true); setTimeout(() => setLoading(false), 1400) }}><span>{loading ? 'Saving' : 'Click to load'}</span></button>

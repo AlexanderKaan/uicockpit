@@ -1102,6 +1102,30 @@ body {
   );
   font-size: var(--k-type-body);
 }
+/* H4 ramp ends — XS (the densest toolbar/table-row action) and XL (the "big
+ * central action": M3-Expressive's hero button; our deliberate FAB
+ * replacement — same prominence, no floating Android cosplay). */
+.btn--xs {
+  min-height: calc(var(--k-row-h-sm, 28px) - 0.25rem);
+  padding-block: 0;
+  padding-inline: max(
+    8px,
+    calc(var(--k-radius-md) * 0.5),
+    min(calc(var(--btn-r) * 0.4), calc(var(--k-row-h-sm, 28px) * 0.45))
+  );
+  font-size: var(--k-type-caption);
+}
+.btn--xl {
+  min-height: calc(var(--k-control-h-lg) + 1rem);
+  padding-block: 0;
+  padding-inline: max(
+    24px,
+    calc(var(--k-radius-md) * 1),
+    calc(var(--k-control-h-lg) * 0.5),
+    min(calc(var(--btn-r) * 0.5), calc(var(--k-control-h-lg) * 0.7))
+  );
+  font-size: var(--k-type-h3);
+}
 .btn--link { border-radius: 0; }  /* Link buttons never want a button-radius pill */
 /* Full-width block button — fills its container, label stays centered. The
  * dominant card-footer CTA pattern (Save / Review order / Update security).
@@ -1615,6 +1639,26 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    matches the semantic tone and on a solid badge it reads white — no inline
    colour needed. Override with an inline background for the neutral-pill +
    coloured-dot "live status" pattern (e.g. a green dot on a neutral badge). */
+/* Anchored badge (H4) — a dot or count pinned to a HOST's corner (bell,
+   tab, nav item, avatar): wrap the host in .anchor, pin the .anchor__badge.
+   The count form is a regular .badge (usually --solid-danger); the bare
+   dot form is .anchor__badge--dot. The surface-colored ring keeps it
+   legible on any host. */
+.anchor { position: relative; display: inline-flex; flex: none; }
+.anchor__badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(35%, -35%);
+  z-index: 1;
+  box-shadow: 0 0 0 2px var(--k-surface);
+}
+.anchor__badge--dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--k-danger);
+}
 .badge__dot {
   width: 6px;
   height: 6px;
