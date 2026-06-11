@@ -433,6 +433,41 @@ Context menu (\`.ctxmenu\` — right-click drop area; popup reuses \`.menu\`).
 Slot picker (\`.slotpicker\` of \`.slot\` — bookable time/option pills; available /
 selected / disabled states).
 
+## Layout grammar — the shell tier (arrange screens with this, not ad-hoc CSS)
+
+The kit ships an ADAPTIVE SHELL layer above the blocks. Use it to frame whole
+screens instead of inventing app-frame CSS:
+
+- \`.scaffold\` > \`.scaffold__frame\` > \`.scaffold__bar\` + \`.scaffold__nav\` +
+  \`.scaffold__body\` — the app frame. It measures ITSELF (container queries,
+  never the viewport) and re-arranges at the window classes: compact <600 ·
+  medium 600–839 · expanded 840–1199 · large 1200–1599 · extra-large ≥1600
+  (also exported as \`--k-win-*\`). Compact docks the nav at the BOTTOM;
+  medium+ docks it as a leading rail.
+- \`.navsuite\` (in the nav slot) — ONE nav markup that morphs bottom-bar →
+  collapsed icon rail → expanded rail. Items: \`.navsuite__item\` (+ \`--on\`)
+  with \`__icon\` + \`__label\`. Don't build three navs; build this once.
+- \`.pane\` — content regions inside \`.scaffold__body\`: ≥1 \`.pane--flex\`
+  (required) + optional \`.pane--fixed\` (360px; 412px at extra-large). Each
+  pane is its own container: put grids on \`.pane__grid\` so tiles pack per
+  the PANE's width. Pane widths are constants (\`--k-pane-*\`), never ad-hoc.
+- Archetypes = scaffold modifiers, ORTHOGONAL to the nav choice. Pick ONE:
+  \`--feed\` (one flexible pane of tiles) · \`--list-detail\` (fixed list +
+  flexible \`.pane--detail\`) · \`--supporting\` (flexible content + fixed
+  \`.pane--supporting\`). These are the three canonical adaptive layouts; a
+  screen that fits none composes panes directly.
+
+**Behavior contracts (you implement these — the kit only does the CSS):**
+- list-detail: below 840px the detail pane hides — selecting a list item must
+  NAVIGATE to the detail (push state, back button returns to the list with
+  scroll position restored). At ≥840 selection updates the detail in place;
+  show a placeholder/empty-state in the detail when nothing is selected.
+- supporting pane: below 840px the supporting pane hides — move its content
+  into the main flow or behind a trigger (bottom sheet / disclosure). Never
+  silently drop it.
+- The nav suite never disappears: it morphs. Keep 3–5 destinations; more
+  belongs in a secondary menu, not the suite.
+
 ## Building a screen we don't list — map it, don't invent
 
 You'll be asked for screens with no named recipe (a music player, a CRM, a
