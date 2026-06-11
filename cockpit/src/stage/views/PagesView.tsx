@@ -61,12 +61,11 @@ const PANE_CLASS = {
   supporting: 'pane pane--fixed pane--supporting',
 } as const
 
-function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange: (v: ViewKind) => void }) {
+function ShowcaseStage({ m, inspect, onViewChange }: { m: ShowcaseManifest; inspect: boolean; onViewChange: (v: ViewKind) => void }) {
   const [width, setWidth] = useState(m.width)
-  const [showManifest, setShowManifest] = useState(false)
-  // Inspect mode (H3b slice 2): overlay every block with its id tag; clicking
-  // a tag pins that block's manifest spec + kit-recipe mapping above the stage.
-  const [inspect, setInspect] = useState(false)
+  // Inspect is a VIEW MODE now (Live · Inspect · Matrix segctrl in PagesView),
+  // not a buried toggle: tags are always on in inspect, and the inspector
+  // panel groups the spec, the manifest JSON and the recipe mapping.
   const [picked, setPicked] = useState<{ pane: number; block: number } | null>(null)
   const pickedSpec = picked ? m.panes[picked.pane]?.blocks[picked.block] : undefined
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
@@ -125,40 +124,44 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
           </datalist>
           <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong></span>
         </label>
-        <button type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={showManifest} onClick={() => setShowManifest((s) => !s)}>
-          <Icon name="file" />Manifest
-        </button>
-        <button type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={inspect} onClick={() => { setInspect((s) => !s); setPicked(null) }}>
-          <Icon name="search" />Inspect
-        </button>
         <button type="button" className="btn btn--ghost btn--sm" onClick={downloadManifest}>
           <Icon name="upload" />Download manifest
         </button>
       </div>
       <p className="lyt__blurb">{m.blurb}</p>
 
-      {showManifest && (
-        <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
-      )}
-      {inspect && pickedSpec && (
-        <div className="shc__spec" role="note" aria-label={`Block spec — ${pickedSpec.block}`}>
-          <div className="shc__spec-head">
-            <span className="badge badge--info">{pickedSpec.block}</span>
-            <span className="shc__spec-map">builds from: <code>{BLOCK_RECIPES[pickedSpec.block]}</code></span>
-            <button
-              type="button"
-              className="btn btn--outline btn--xs"
-              onClick={() => {
-                const target = BLOCK_GALLERY[pickedSpec.block]
-                setGalleryJump(target.q)
-                onViewChange(target.view)
-              }}
-            >
-              Open in gallery <Icon name="chevR" />
-            </button>
-            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Close block spec" onClick={() => setPicked(null)}><Icon name="x" /></button>
-          </div>
-          <pre className="code shc__spec-json">{JSON.stringify(pickedSpec, null, 2)}</pre>
+      {inspect && (
+        <div className="shc__spec" role="note" aria-label="Showcase inspector">
+          {pickedSpec ? (
+            <>
+              <div className="shc__spec-head">
+                <span className="badge badge--info">{pickedSpec.block}</span>
+                <span className="shc__spec-map">builds from: <code>{BLOCK_RECIPES[pickedSpec.block]}</code></span>
+                <button
+                  type="button"
+                  className="btn btn--outline btn--xs"
+                  onClick={() => {
+                    const target = BLOCK_GALLERY[pickedSpec.block]
+                    setGalleryJump(target.q)
+                    onViewChange(target.view)
+                  }}
+                >
+                  Open in gallery <Icon name="chevR" />
+                </button>
+                <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Close block spec" onClick={() => setPicked(null)}><Icon name="x" /></button>
+              </div>
+              <pre className="code shc__spec-json">{JSON.stringify(pickedSpec, null, 2)}</pre>
+            </>
+          ) : (
+            <div className="shc__spec-head" style={{ marginBottom: 0 }}>
+              <span className="badge badge--info">inspect</span>
+              <span className="shc__spec-map">Click a block tag in the preview to see its manifest spec and which kit recipes build it.</span>
+            </div>
+          )}
+          <details className="shc__manifestbox">
+            <summary>Full manifest JSON — the screen IS this data</summary>
+            <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
+          </details>
         </div>
       )}
 
@@ -273,7 +276,10 @@ function MatrixCell({ m, cfg, label, scale = 0.42 }: { m: ShowcaseManifest; cfg:
 export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
   const [mode, setMode] = useState<'showcases' | 'supadash'>('showcases')
   const [showcaseId, setShowcaseId] = useState(SHOWCASES[0]!.id)
-  const [matrix, setMatrix] = useState(false)
+  // The three WAYS OF LOOKING at one manifest — a first-class segctrl, not
+  // buried toggles: Live (the theater) · Inspect (spec + recipes + JSON) ·
+  // Matrix (the same manifest under contrasting kits).
+  const [viewMode, setViewMode] = useState<'live' | 'inspect' | 'matrix'>('live')
   // ×6: the FULL grid — every showcase × every style (the 3×6 money-shot).
   const [matrixAll, setMatrixAll] = useState(false)
   const m = SHOWCASES.find((s) => s.id === showcaseId)!
@@ -298,8 +304,7 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
         </div>
         <p className="lyt__intro">
           A page here is <em>data</em>: archetype × nav × panes of seeded blocks, rendered through
-          the same kit recipes the export ships. Scrub the width — every showcase adapts via the
-          shell tier, and the manifest button shows the JSON that IS the screen.
+          the same kit recipes the export ships. {VIEWMODE_HINT[viewMode]}
         </p>
       </header>
 
@@ -318,12 +323,24 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
           </button>
         ))}
         <span className="shc__picker-spacer" />
-        <button type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={matrix} onClick={() => setMatrix((s) => !s)}>
-          <Icon name="grid" />Style matrix
-        </button>
+        {/* The three ways of looking — a first-class segctrl, not buried toggles */}
+        <div className="segctrl shc__viewmode" role="radiogroup" aria-label="View mode">
+          {VIEWMODES.map(([id, label, icon]) => (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={viewMode === id}
+              className={`segctrl__btn ${viewMode === id ? 'segctrl__btn--on' : ''}`}
+              onClick={() => setViewMode(id)}
+            >
+              <Icon name={icon} />{label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {matrix ? (
+      {viewMode === 'matrix' ? (
         <>
           <div className="lyt__controls">
             <p className="lyt__blurb" style={{ margin: 0, flex: 1 }}>
@@ -357,10 +374,22 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
         </>
       ) : (
         /* key = remount per showcase so width resets to the manifest default */
-        <ShowcaseStage m={m} key={m.id} onViewChange={onViewChange} />
+        <ShowcaseStage m={m} key={m.id} inspect={viewMode === 'inspect'} onViewChange={onViewChange} />
       )}
     </div>
   )
+}
+
+const VIEWMODES = [
+  ['live', 'Live', 'spark'],
+  ['inspect', 'Inspect', 'search'],
+  ['matrix', 'Matrix', 'grid'],
+] as const
+
+const VIEWMODE_HINT: Record<'live' | 'inspect' | 'matrix', string> = {
+  live: 'Scrub the width — every showcase re-arranges via the shell tier.',
+  inspect: 'Click any block tag to see its manifest spec, which kit recipes build it, and the full JSON.',
+  matrix: 'See your live kit beside two curated contrasts — same structure, different style.',
 }
 
 function ModeToggle({ mode, onMode }: { mode: 'showcases' | 'supadash'; onMode: (m: 'showcases' | 'supadash') => void }) {

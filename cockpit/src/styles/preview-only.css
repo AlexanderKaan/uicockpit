@@ -1079,6 +1079,9 @@
 /* Style matrix (slice 3) — three token universes side by side. Each cell is
  * a fixed viewport that clips a full-width shell scaled down as one unit. */
 .shc__picker-spacer { flex: 1; }
+/* The Live · Inspect · Matrix segctrl — icon + label per segment. */
+.shc__viewmode .segctrl__btn { display: inline-flex; align-items: center; gap: var(--k-s-6); }
+.shc__viewmode .segctrl__btn svg { width: 14px; height: 14px; }
 .shc__matrix {
   display: flex;
   flex-wrap: wrap;
