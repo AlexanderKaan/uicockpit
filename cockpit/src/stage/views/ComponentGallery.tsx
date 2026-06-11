@@ -2166,6 +2166,9 @@ function NavRow({ icon, label, active }: { icon: IconName; label: string; active
 // primary, quiet secondary/outline/ghost siblings, a destructive, a link.
 function ButtonsCard() {
   const [loading, setLoading] = useState(false)
+  // Toggle button (H4) — press-and-stay; on = secondary container + the
+  // round⇄square corner morph (visible on pill themes, springs via --k-spring).
+  const [starred, setStarred] = useState(false)
   return (
     <Card title="Buttons" desc="One loud primary, quiet siblings. Variant · size · state — all at intrinsic width.">
       <div className="card__row">
@@ -2195,6 +2198,9 @@ function ButtonsCard() {
           <button type="button" className="btn btn--ghost btn--icon" aria-label="Inbox — new activity"><Icon name="chat" /></button>
           <span className="anchor__badge anchor__badge--dot" aria-hidden="true" />
         </span>
+        <button type="button" className="btn btn--outline btn--toggle" aria-pressed={starred} onClick={() => setStarred((s) => !s)}>
+          <Icon name="spark" /> {starred ? 'Starred' : 'Star'}
+        </button>
       </div>
       <div className="card__row" style={{ alignItems: 'center' }}>
         <button type="button" className={`btn btn--primary${loading ? ' btn--loading' : ''}`} onClick={() => { setLoading(true); setTimeout(() => setLoading(false), 1400) }}><span>{loading ? 'Saving' : 'Click to load'}</span></button>
@@ -2210,8 +2216,17 @@ function ButtonGroupCard() {
   // The split action's chevron opens a real menu (same useDropdown + .menu the
   // app uses) — no dead chevron in the canonical demo.
   const save = useDropdown()
+  // Connected group (H4) — independent toggles in the relaxed pebble group.
+  const [fmt, setFmt] = useState<Set<string>>(() => new Set(['bold']))
+  const flipFmt = (k: string) =>
+    setFmt((s) => {
+      const next = new Set(s)
+      if (next.has(k)) next.delete(k)
+      else next.add(k)
+      return next
+    })
   return (
-    <Card title="Button group" desc="Buttons fused into one control — a view switcher and a split action.">
+    <Card title="Button group" desc="Buttons fused into one control — a view switcher, a split action and a connected toggle cluster.">
       <div className="btn-group" role="group" aria-label="View">
         {(['Board', 'List', 'Timeline'] as const).map((v) => (
           <button key={v} type="button" className={`btn btn--sm ${view === v.toLowerCase() ? 'btn--primary' : 'btn--outline'}`} aria-pressed={view === v.toLowerCase()} onClick={() => setView(v.toLowerCase())}>{v}</button>
@@ -2229,6 +2244,14 @@ function ButtonGroupCard() {
             <button role="menuitem" className="menu__item" onClick={() => save.setOpen(false)}>Save as template</button>
           </div>
         )}
+      </div>
+      <div className="btn-group btn-group--connected" role="group" aria-label="Formatting">
+        {(['Bold', 'Italic', 'Underline'] as const).map((v) => {
+          const k = v.toLowerCase()
+          return (
+            <button key={k} type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={fmt.has(k)} onClick={() => flipFmt(k)}>{v}</button>
+          )
+        })}
       </div>
     </Card>
   )

@@ -255,6 +255,27 @@ export const RECIPES: readonly Recipe[] = [
  * read as a circle regardless of theme radius. Pairs with .btn--icon so
  * the geometry is square and the 999px radius lands as a perfect circle. */
 .btn--circle { border-radius: 999px; }
+/* Toggle button (H4) — a press-and-STAY .btn, driven by aria-pressed (the
+ * consumer flips the attribute; CSS owns both looks). Compose with a quiet
+ * tier (.btn--outline / .btn--ghost): off = that quiet resting look, on =
+ * the SECONDARY container — selection wears a container, primary stays the
+ * one loud CTA (same rule as .chip--filter). The round⇄square shape axis
+ * comes free: switching on morphs the corner from the button radius down to
+ * the box radius, so pill themes get the M3-Expressive pill→rounded-square
+ * toggle signature and the existing border-radius spring animates it. Sharp
+ * themes morph nothing (the min() collapses) — shape stays a signal here,
+ * never a second look. */
+.btn--toggle[aria-pressed="true"] {
+  background: var(--k-secondary-soft);
+  color: var(--k-secondary-soft-fg);
+  border-color: transparent;
+  border-radius: min(var(--btn-r), var(--k-radius-md));
+  box-shadow: none;
+}
+.btn--toggle[aria-pressed="true"]:hover:not(:disabled) {
+  background: var(--k-secondary-soft);
+  filter: brightness(0.97);
+}
 /* Size variants — same height/pill-aware padding logic as the base .btn,
  * just with smaller/larger floors. The "row-h" tokens give us the right
  * intrinsic height per tier so the height×0.4 / pill×0.55 math lands
@@ -427,7 +448,22 @@ export const RECIPES: readonly Recipe[] = [
 .btn-group > .btn:first-child { border-top-left-radius: var(--btn-r); border-bottom-left-radius: var(--btn-r); }
 .btn-group > .btn:last-child { border-top-right-radius: var(--btn-r); border-bottom-right-radius: var(--btn-r); }
 /* Hovered / focused segment lifts above its neighbours so its full border + ring show. */
-.btn-group > .btn:hover, .btn-group > .btn:focus-visible { position: relative; z-index: 1; }`,
+.btn-group > .btn:hover, .btn-group > .btn:focus-visible { position: relative; z-index: 1; }
+/* Split button ("Save ▾") — deliberately NO dedicated class (H4 assessment):
+ * a split IS a two-segment .btn-group — a label action + an icon chevron that
+ * opens a .menu. The group already owns fused edges + per-segment focus; a
+ * one-off .btn--split would duplicate that for zero new look. */
+/* Connected group (H4 flourish) — the M3-Expressive "connected button group":
+ * segments relax into pebbles with a hairline gap; INNER corners drop to the
+ * small radius, OUTER corners keep the button radius (the base :first/:last
+ * rules above already pin those). Reads softer than the fused default — pick
+ * per product voice. Composes with .btn--toggle for the canonical
+ * formatting / view-switch cluster. */
+.btn-group--connected { gap: var(--k-s-2); }
+.btn-group--connected > .btn {
+  margin-left: 0;
+  border-radius: min(var(--btn-r), var(--k-radius-sm, 6px));
+}`,
   },
   {
     id: 'aspect-ratio',
