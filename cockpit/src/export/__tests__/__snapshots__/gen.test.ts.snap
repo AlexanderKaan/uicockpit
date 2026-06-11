@@ -823,10 +823,10 @@ body {
  *   the catalog:
  *     Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (48): the reusable elements with real
+ * ATOMS — the bare vocabulary (49): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card
+ *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip
  *
  * BLOCKS — stand-alone pieces of app (28), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -5204,6 +5204,67 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .l-center { box-sizing: content-box; max-width: var(--l-measure, var(--k-measure-prose)); margin-inline: auto; padding-inline: var(--l-pad, var(--k-s-16)); }
 .l-center--narrow { --l-measure: var(--k-measure-narrow); }
 .l-center--wide { --l-measure: var(--k-measure-wide); }
+
+/* === Chip — the interactive chip system (H4) ===
+   M3's four chip species as ONE atom. Chips are CONTROLS (real buttons) —
+   distinct from .badge (passive status) and .taginput__chip (the token
+   inside an input field). Species:
+     (base)        assist — an in-context action ("Summarize", "Add to cal")
+     .chip--on     filter, selected — swaps to the SECONDARY container (the
+                   H1 harmony family doing real work in the UI)
+     .chip--input  a user-entered token wearing the surface-container ladder,
+                   with a trailing .chip__remove
+     .chip--suggestion  the quietest species: a prompt, not a state
+   Height = the control scale one notch under buttons (--k-control-h-sm). */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-6);
+  min-height: var(--k-control-h-sm);
+  padding-inline: var(--k-s-12);
+  border: var(--k-bw) solid var(--k-input-border);
+  border-radius: var(--k-chip-radius, var(--k-radius-md));
+  background: transparent;
+  color: var(--k-fg);
+  font-family: var(--k-font-body);
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--k-dur-fast, 120ms) var(--k-ease, ease),
+    border-color var(--k-dur-fast, 120ms) var(--k-ease, ease),
+    color var(--k-dur-fast, 120ms) var(--k-ease, ease);
+}
+.chip:hover:not(:disabled) { background: var(--k-state-hover); }
+.chip:active:not(:disabled) { background: var(--k-state-press); }
+.chip > svg { width: 14px; height: 14px; flex: none; }
+.chip--on {
+  background: var(--k-secondary-soft);
+  border-color: transparent;
+  color: var(--k-secondary-soft-fg);
+}
+.chip--on:hover:not(:disabled) { background: var(--k-secondary-soft); filter: brightness(0.96); }
+.chip--input {
+  background: var(--k-surface-container);
+  border-color: transparent;
+}
+.chip__remove {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-inline-end: calc(var(--k-s-4) * -1);
+  border: 0;
+  padding: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--k-fg-muted);
+  cursor: pointer;
+}
+.chip__remove:hover { background: var(--k-state-press); color: var(--k-fg); }
+.chip--suggestion { color: var(--k-fg-muted); border-color: var(--k-border); }
+.chip--suggestion:hover:not(:disabled) { color: var(--k-fg); }
 
 /* === Adaptive scaffold — the shell tier (H3a) ===
    The app-frame grammar: a self-measuring shell that re-arranges its regions

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
@@ -31,6 +31,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   ComboboxCard: 'Framework combobox autocomplete typeahead',
   SelectCard: 'Deploy region select dropdown',
   TagInputCard: 'Topics tags chips tokens',
+  ChipsCard: 'Chips assist filter input suggestion facet token chip',
   DateCard: 'Schedule date picker calendar range',
   SlotPickerCard: 'Slot picker time booking availability',
   // — Choice & toggles —
@@ -176,7 +177,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'block'], [DateCard, 'block'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'block'], [FormPanelCard, 'block'], [FilterBarCard, 'block'],
     [ComboboxCard, 'atom'], [DialogCard, 'block'], [KanbanCard, 'block'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'block'],
-    [PricingCardCard, 'block'], [TagInputCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'block'], [TooltipCard, 'atom'],
+    [PricingCardCard, 'block'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'block'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'block'], [SheetCard, 'block'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'block'], [TrendCard, 'block'],
     [CmdPaletteCard, 'block'], [DropdownMenuCard, 'atom'], [CarouselCard, 'block'], [ListCard, 'atom'],
@@ -284,7 +285,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
 const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElement>]> = [
   ['Text inputs', [FormCard, SearchInputCard, PasswordInputCard, NumberInputCard, PhoneInputCard, InputOtpCard]],
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
-  ['Choice & toggles', [SwitchCard, SelectionCard, RadioCardCard, SliderCard]],
+  ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
@@ -731,6 +732,50 @@ function TooltipCard() {
  * + the switch on the right, the way it actually appears in product. Reads
  * as a mini settings panel, not three loose toggles. (Mini-interface
  * recompose pattern — #200.) */
+function ChipsCard() {
+  const [facets, setFacets] = useState<string[]>(['Design'])
+  const [tokens, setTokens] = useState(['Q3 report', 'roadmap.fig'])
+  const toggleFacet = (f: string) =>
+    setFacets((cur) => (cur.includes(f) ? cur.filter((x) => x !== f) : [...cur, f]))
+  const row: CSSProperties = { display: 'flex', flexWrap: 'wrap', gap: 'var(--k-gap)', alignItems: 'center' }
+  const lbl: CSSProperties = { fontSize: 'var(--k-type-eyebrow)', fontWeight: 'var(--k-weight-medium)' as never, textTransform: 'uppercase', letterSpacing: 'var(--k-track-eyebrow)', color: 'var(--k-fg-muted)', width: 76, flex: 'none' }
+  return (
+    <Card title="Chips">
+      <div style={row}>
+        <span style={lbl}>Assist</span>
+        <button type="button" className="chip"><Icon name="spark" size={14} />Summarize</button>
+        <button type="button" className="chip"><Icon name="cal" size={14} />Add to calendar</button>
+      </div>
+      <div style={row}>
+        <span style={lbl}>Filter</span>
+        {['Design', 'Engineering', 'Marketing'].map((f) => (
+          <button key={f} type="button" className={`chip ${facets.includes(f) ? 'chip--on' : ''}`} aria-pressed={facets.includes(f)} onClick={() => toggleFacet(f)}>
+            {facets.includes(f) && <Icon name="check" size={13} />}
+            {f}
+          </button>
+        ))}
+      </div>
+      <div style={row}>
+        <span style={lbl}>Input</span>
+        {tokens.map((t) => (
+          <span key={t} className="chip chip--input">
+            {t}
+            <button type="button" className="chip__remove" aria-label={`Remove ${t}`} onClick={() => setTokens(tokens.filter((x) => x !== t))}>
+              <Icon name="x" size={11} />
+            </button>
+          </span>
+        ))}
+        {tokens.length === 0 && <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-faint)' }}>All cleared</span>}
+      </div>
+      <div style={row}>
+        <span style={lbl}>Suggestion</span>
+        <button type="button" className="chip chip--suggestion">Tell me more</button>
+        <button type="button" className="chip chip--suggestion">Give examples</button>
+      </div>
+    </Card>
+  )
+}
+
 function SwitchCard() {
   const [push, setPush] = useState(true)
   const [email, setEmail] = useState(true)
@@ -1380,7 +1425,7 @@ function FilterBarCard() {
           <div className="filterbar__active">
             <span className="filterbar__active-label">Active</span>
             {chips.map((c) => (
-              <span key={c} className="taginput__chip">{c}<button type="button" className="taginput__remove" onClick={() => setChips(chips.filter((x) => x !== c))} aria-label={`Remove ${c}`}><Icon name="x" size={11} /></button></span>
+              <span key={c} className="chip chip--input">{c}<button type="button" className="chip__remove" onClick={() => setChips(chips.filter((x) => x !== c))} aria-label={`Remove ${c}`}><Icon name="x" size={11} /></button></span>
             ))}
             <button className="filterbar__clear" onClick={() => setChips([])}>Clear all</button>
             <span className="filterbar__count">128 results</span>

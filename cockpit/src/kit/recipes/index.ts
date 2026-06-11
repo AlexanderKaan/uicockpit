@@ -4622,6 +4622,70 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .l-center--wide { --l-measure: var(--k-measure-wide); }`,
   },
   {
+    id: 'chip',
+    section: "Chip",
+    css: `/* === Chip — the interactive chip system (H4) ===
+   M3's four chip species as ONE atom. Chips are CONTROLS (real buttons) —
+   distinct from .badge (passive status) and .taginput__chip (the token
+   inside an input field). Species:
+     (base)        assist — an in-context action ("Summarize", "Add to cal")
+     .chip--on     filter, selected — swaps to the SECONDARY container (the
+                   H1 harmony family doing real work in the UI)
+     .chip--input  a user-entered token wearing the surface-container ladder,
+                   with a trailing .chip__remove
+     .chip--suggestion  the quietest species: a prompt, not a state
+   Height = the control scale one notch under buttons (--k-control-h-sm). */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-6);
+  min-height: var(--k-control-h-sm);
+  padding-inline: var(--k-s-12);
+  border: var(--k-bw) solid var(--k-input-border);
+  border-radius: var(--k-chip-radius, var(--k-radius-md));
+  background: transparent;
+  color: var(--k-fg);
+  font-family: var(--k-font-body);
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--k-dur-fast, 120ms) var(--k-ease, ease),
+    border-color var(--k-dur-fast, 120ms) var(--k-ease, ease),
+    color var(--k-dur-fast, 120ms) var(--k-ease, ease);
+}
+.chip:hover:not(:disabled) { background: var(--k-state-hover); }
+.chip:active:not(:disabled) { background: var(--k-state-press); }
+.chip > svg { width: 14px; height: 14px; flex: none; }
+.chip--on {
+  background: var(--k-secondary-soft);
+  border-color: transparent;
+  color: var(--k-secondary-soft-fg);
+}
+.chip--on:hover:not(:disabled) { background: var(--k-secondary-soft); filter: brightness(0.96); }
+.chip--input {
+  background: var(--k-surface-container);
+  border-color: transparent;
+}
+.chip__remove {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-inline-end: calc(var(--k-s-4) * -1);
+  border: 0;
+  padding: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--k-fg-muted);
+  cursor: pointer;
+}
+.chip__remove:hover { background: var(--k-state-press); color: var(--k-fg); }
+.chip--suggestion { color: var(--k-fg-muted); border-color: var(--k-border); }
+.chip--suggestion:hover:not(:disabled) { color: var(--k-fg); }`,
+  },
+  {
     id: 'scaffold',
     section: "Adaptive scaffold",
     css: `/* === Adaptive scaffold — the shell tier (H3a) ===

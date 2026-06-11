@@ -63,7 +63,7 @@ export const BLOCK_USES: Readonly<Record<string, readonly string[]>> = {
   'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'phoneinput', 'switch-toggle', 'radio-card'],
   // The query surface: a filter/search toolbar above a list or table. Composes the
   // querying atoms — search + autocomplete + tag chips + faceted selects + a range.
-  'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons'],
+  'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons', 'chip'],
   sidebar: ['navigation-row', 'avatar', 'badges-pills'],
   dialog: ['card', 'buttons'],
   'alert-dialog': ['card', 'buttons'],

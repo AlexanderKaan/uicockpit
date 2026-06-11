@@ -1351,6 +1351,17 @@ function Inbox({ onOpenCmdp }: { onOpenCmdp: () => void }) {
         </div>
       </div>
 
+      {/* Quick filters — the chip atom's filter species (same state as the
+          combobox; chips are the one-tap path, the combobox the full list) */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--k-gap)' }}>
+        {(['All', 'Unread', 'Billing', 'Code'] as const).map((f) => (
+          <button key={f} type="button" className={`chip ${filter === f ? 'chip--on' : ''}`} aria-pressed={filter === f} onClick={() => { setFilter(f); setPage(1) }}>
+            {filter === f && <Icon name="check" size={13} />}
+            {f}
+          </button>
+        ))}
+      </div>
+
       {/* Message list — or empty state */}
       {filtered.length === 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '40px 8px', textAlign: 'center', border: '1px dashed var(--k-border)', borderRadius: 'var(--k-radius-md)' }}>
