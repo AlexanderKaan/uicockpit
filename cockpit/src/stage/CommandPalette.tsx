@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ComponentType, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import {
-  AppWindow, Boxes, Box, Code, Dices, Link2, Moon, Palette, RotateCcw, Search, Sliders, Square, Sun, Redo2, Undo2, Layers,
-, PanelsTopLeft } from 'lucide-react'
+  AppWindow, Boxes, Box, Code, Dices, Link2, Moon, Palette, PanelsTopLeft, RotateCcw, Search, Sliders, Square, Sun, Redo2, Undo2, Layers,
+} from 'lucide-react'
 import type { Config, Tokens } from '../tokens/types'
 import type { ConfigAction } from '../state/configReducer'
 import { COLOR_THEMES } from '../tokens/stylesAndThemes'
