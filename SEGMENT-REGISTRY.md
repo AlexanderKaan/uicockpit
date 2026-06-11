@@ -1,7 +1,8 @@
 # Segment Registry
 
 The single vocabulary for UICockpit's component model. Every recipe is one
-**segment** classified into the 4-layer ladder, with explicit `uses` edges (the
+**segment** classified into the ladder (4 layers at inception; **5 since H3a** —
+see the Shell addendum at the end), with explicit `uses` edges (the
 composition graph). This is the seed of "one source / one language": from this
 graph the front-end (workbench / blocks catalog / pages), the exports, the
 distribution dependency-closure, the cross-links and the audits are all *derived*
@@ -240,3 +241,26 @@ container — every other role had `{base, fg, soft, soft-fg}`. Added
 `--k-accent-soft` + `--k-accent-soft-fg` (derived like the other softs) + a
 `.badge--accent` consumer. The role matrix is now **uniform and M3-complete**;
 the agent contract advertises the full set.
+
+---
+
+## Addendum (June 2026, H3a) — the 5th rung: SHELL (public name "Layouts")
+
+The ladder gained the rung between Block and Page: **Shell** — the app-frame
+grammar that ARRANGES blocks per container width. Shells own arrangement, never
+look. Encoded as `SHELL_USES` in `segments.ts` (same integrity tests as blocks):
+
+- **scaffold** — the self-measuring app frame (container queries at the M3
+  window classes 600/840/1200/1600; archetype modifiers `--feed` /
+  `--list-detail` / `--supporting` encode the three canonical layouts as
+  adaptation rules, orthogonal to the nav model). Uses: navsuite, pane.
+- **navsuite** — ONE nav that morphs bottom-bar → collapsed rail → expanded
+  rail per the surrounding scaffold's width.
+- **pane** — the named pane layer: each pane is its own container so content
+  reflows per PANE width (`.pane__grid`); fixed 360px → 412px at extra-large.
+
+Canonical home: the **Layouts** stage view (`LayoutsView.tsx`) — the wireframe
+workbench, analogous to the atoms workbench. Pages do not (yet) dogfood the
+scaffold; that lands with H3b's manifest reframe. Behavior contracts
+(list-detail navigation/back/scroll-restore, supporting-pane reflow) ship as
+agent prose in the AI-prompt until contract.json (D1) makes them data.
