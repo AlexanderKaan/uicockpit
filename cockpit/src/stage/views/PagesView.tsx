@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, type BlockSpec, type ShowcaseManifest } from '../../showcases/manifests'
 import { renderBlock } from '../../showcases/blocks'
 import { DemoDashboard } from './DemoDashboard'
+import { buildTokens } from '../../tokens/buildTokens'
+import type { Config } from '../../tokens/types'
 
 /* Inspectable composition (H3b slice 2): block id → the KIT recipes it maps
  * onto. Clicking a block tag in Inspect mode shows its manifest spec + this
@@ -42,7 +44,6 @@ const PANE_CLASS = {
 
 function ShowcaseStage({ m }: { m: ShowcaseManifest }) {
   const [width, setWidth] = useState(m.width)
-  const [active, setActive] = useState(0)
   const [showManifest, setShowManifest] = useState(false)
   // Inspect mode (H3b slice 2): overlay every block with its id tag; clicking
   // a tag pins that block's manifest spec + kit-recipe mapping above the stage.
@@ -50,6 +51,24 @@ function ShowcaseStage({ m }: { m: ShowcaseManifest }) {
   const [picked, setPicked] = useState<{ pane: number; block: number } | null>(null)
   const pickedSpec = picked ? m.panes[picked.pane]?.blocks[picked.block] : undefined
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
+
+  // Inspect-aware block renderer — wraps each block with its clickable id tag.
+  const renderInspectable = (b: BlockSpec, i: number, j: number): ReactNode =>
+    inspect ? (
+      <div className={`shc__inspect ${picked?.pane === i && picked?.block === j ? 'shc__inspect--on' : ''}`} key={j}>
+        <button
+          type="button"
+          className="shc__inspect-tag"
+          onClick={() => setPicked({ pane: i, block: j })}
+          aria-label={`Inspect block: ${b.block}`}
+        >
+          {b.block}
+        </button>
+        {renderBlock(b, j)}
+      </div>
+    ) : (
+      renderBlock(b, j)
+    )
 
   // Export-as-starter: the manifest IS the starter — download it as JSON.
   // (Pair with tokens.css from the Use-kit modal; `uicockpit init --template`
@@ -114,75 +133,117 @@ function ShowcaseStage({ m }: { m: ShowcaseManifest }) {
       )}
 
       <div className="lyt__stage">
-        <div className={`scaffold scaffold--${m.archetype}`} style={{ width, maxWidth: '100%' }}>
-          <div className="scaffold__frame shc__frame">
-            <div className="scaffold__bar shc__bar">
-              <span className="shc__bar-title">{m.barTitle}</span>
-              {m.nav === 'topbar' && (
-                <nav className="shc__bar-links" aria-label={`${m.title} navigation`}>
-                  {m.navItems.map((it, i) => (
-                    <button key={it.label} type="button" className={`tab ${i === active ? 'tab--on' : ''}`} onClick={() => setActive(i)}>{it.label}</button>
-                  ))}
-                </nav>
-              )}
-              <span className="shc__bar-spacer" />
-              <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Search"><Icon name="search" /></button>
-              <span className="avatar avatar--sm">A</span>
-            </div>
-            {m.nav === 'suite' && (
-              <nav className="scaffold__nav" aria-label={`${m.title} navigation`}>
-                <div className="navsuite">
-                  {m.navItems.map((it, i) => (
-                    <button
-                      key={it.label}
-                      type="button"
-                      className={`navsuite__item ${i === active ? 'navsuite__item--on' : ''}`}
-                      aria-current={i === active ? 'page' : undefined}
-                      onClick={() => setActive(i)}
-                    >
-                      <span className="navsuite__icon"><Icon name={it.icon} size={18} /></span>
-                      <span className="navsuite__label">{it.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </nav>
-            )}
-            <div className="scaffold__body">
-              {m.panes.map((pane, i) => (
-                <section className={`${PANE_CLASS[pane.role]} shc__pane`} key={i} aria-label={`${m.title} ${pane.role} pane`}>
-                  {pane.blocks.map((b, j) =>
-                    inspect ? (
-                      <div
-                        className={`shc__inspect ${picked?.pane === i && picked?.block === j ? 'shc__inspect--on' : ''}`}
-                        key={j}
-                      >
-                        <button
-                          type="button"
-                          className="shc__inspect-tag"
-                          onClick={() => setPicked({ pane: i, block: j })}
-                          aria-label={`Inspect block: ${b.block}`}
-                        >
-                          {b.block}
-                        </button>
-                        {renderBlock(b, j)}
-                      </div>
-                    ) : (
-                      renderBlock(b, j)
-                    ),
-                  )}
-                </section>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ShowcaseShell m={m} width={width} renderBlockFn={renderInspectable} />
       </div>
     </>
   )
 }
 
-export function PagesView() {
+/** The pure shell render — one manifest → one live scaffold. Shared by the
+ *  single-stage theater and the style-matrix cells; nav selection is local. */
+function ShowcaseShell({
+  m,
+  width,
+  renderBlockFn = renderBlock,
+}: {
+  m: ShowcaseManifest
+  width: number
+  renderBlockFn?: (b: BlockSpec, paneIdx: number, blockIdx: number) => ReactNode
+}) {
+  const [active, setActive] = useState(0)
+  return (
+    <div className={`scaffold scaffold--${m.archetype}`} style={{ width, maxWidth: '100%' }}>
+      <div className="scaffold__frame shc__frame">
+        <div className="scaffold__bar shc__bar">
+          <span className="shc__bar-title">{m.barTitle}</span>
+          {m.nav === 'topbar' && (
+            <nav className="shc__bar-links" aria-label={`${m.title} navigation`}>
+              {m.navItems.map((it, i) => (
+                <button key={it.label} type="button" className={`tab ${i === active ? 'tab--on' : ''}`} onClick={() => setActive(i)}>{it.label}</button>
+              ))}
+            </nav>
+          )}
+          <span className="shc__bar-spacer" />
+          <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Search"><Icon name="search" /></button>
+          <span className="avatar avatar--sm">A</span>
+        </div>
+        {m.nav === 'suite' && (
+          <nav className="scaffold__nav" aria-label={`${m.title} navigation`}>
+            <div className="navsuite">
+              {m.navItems.map((it, i) => (
+                <button
+                  key={it.label}
+                  type="button"
+                  className={`navsuite__item ${i === active ? 'navsuite__item--on' : ''}`}
+                  aria-current={i === active ? 'page' : undefined}
+                  onClick={() => setActive(i)}
+                >
+                  <span className="navsuite__icon"><Icon name={it.icon} size={18} /></span>
+                  <span className="navsuite__label">{it.label}</span>
+                </button>
+              ))}
+            </div>
+          </nav>
+        )}
+        <div className="scaffold__body">
+          {m.panes.map((pane, i) => (
+            <section className={`${PANE_CLASS[pane.role]} shc__pane`} key={i} aria-label={`${m.title} ${pane.role} pane`}>
+              {pane.blocks.map((b, j) => renderBlockFn(b, i, j))}
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* The style-matrix (H3b slice 3) — the SAME manifest under contrasting kits.
+ * Column 1 is the live cockpit config ("Your kit"); 2 + 3 are curated
+ * contrasts built from the engine's own dials. One manifest × N styles =
+ * the proof that pages are data and style is orthogonal. */
+const MATRIX_STYLES: Array<{ id: string; label: string; patch: Partial<Config> }> = [
+  { id: 'yours', label: 'Your kit', patch: {} },
+  {
+    id: 'complement-dark',
+    label: 'Violet · complement · dark',
+    patch: { cPrimary: '#7C3AED', mode: 'dark', harmony: 'complement', spread: 180, expression: 100 },
+  },
+  {
+    id: 'expressive-warm',
+    label: 'Ember · expressive',
+    patch: { cPrimary: '#EA580C', harmony: 'expressive', spread: 120, expression: 140, shapePoints: 12, shapeDepth: 0.5, shapeSoft: 0.3 },
+  },
+]
+
+function MatrixCell({ m, cfg, label }: { m: ShowcaseManifest; cfg: Config; label: string }) {
+  // Each cell is its own token universe: a nested var-scope div (CSS custom
+  // props cascade, so the cell's full var set overrides the stage's). The
+  // shell renders at its real manifest width and is scaled down as one unit —
+  // container queries measure the LAYOUT width, so each mini gets the true
+  // desktop arrangement.
+  const vars = useMemo(() => buildTokens(cfg).vars as CSSProperties, [cfg])
+  const W = Math.max(m.width, 900)
+  const H = 640
+  const S = 0.42
+  return (
+    <figure className="shc__matrix-cell">
+      <figcaption className="shc__matrix-label">{label}</figcaption>
+      <div className="shc__matrix-port" style={{ width: W * S, height: H * S }}>
+        <div
+          className="shc__matrix-world"
+          style={{ ...vars, width: W, height: H, transform: `scale(${S})` }}
+        >
+          <ShowcaseShell m={m} width={W} />
+        </div>
+      </div>
+    </figure>
+  )
+}
+
+export function PagesView({ cfg }: { cfg: Config }) {
   const [mode, setMode] = useState<'showcases' | 'supadash'>('showcases')
   const [showcaseId, setShowcaseId] = useState(SHOWCASES[0]!.id)
+  const [matrix, setMatrix] = useState(false)
   const m = SHOWCASES.find((s) => s.id === showcaseId)!
 
   if (mode === 'supadash') {
@@ -224,10 +285,28 @@ export function PagesView() {
             {s.title}
           </button>
         ))}
+        <span className="shc__picker-spacer" />
+        <button type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={matrix} onClick={() => setMatrix((s) => !s)}>
+          <Icon name="grid" />Style matrix
+        </button>
       </div>
 
-      {/* key = remount per showcase so width resets to the manifest default */}
-      <ShowcaseStage m={m} key={m.id} />
+      {matrix ? (
+        <>
+          <p className="lyt__blurb">
+            One manifest, three kits — the left column is YOUR live config; the others are curated
+            contrasts. Style is orthogonal to structure: the JSON never changes.
+          </p>
+          <div className="shc__matrix">
+            {MATRIX_STYLES.map((s) => (
+              <MatrixCell key={s.id} m={m} cfg={{ ...cfg, ...s.patch }} label={s.id === 'yours' ? s.label : s.label} />
+            ))}
+          </div>
+        </>
+      ) : (
+        /* key = remount per showcase so width resets to the manifest default */
+        <ShowcaseStage m={m} key={m.id} />
+      )}
     </div>
   )
 }

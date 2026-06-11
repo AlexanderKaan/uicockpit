@@ -1076,3 +1076,32 @@
   overflow: auto;
   font-size: var(--k-type-caption);
 }
+/* Style matrix (slice 3) — three token universes side by side. Each cell is
+ * a fixed viewport that clips a full-width shell scaled down as one unit. */
+.shc__picker-spacer { flex: 1; }
+.shc__matrix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--k-s-16);
+  align-items: flex-start;
+}
+.shc__matrix-cell { margin: 0; }
+.shc__matrix-label {
+  font-size: var(--k-type-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg-muted);
+  margin-bottom: var(--k-s-6);
+}
+.shc__matrix-port {
+  overflow: hidden;
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+}
+.shc__matrix-world {
+  transform-origin: top left;
+  background: var(--k-bg);
+  color: var(--k-fg);
+  font-family: var(--k-font-body);
+}
+.shc__matrix-world .scaffold { height: 640px; }
+.shc__matrix-world .shc__frame { height: 100%; }

@@ -36,7 +36,7 @@ export function Stage({ cfg, tokens, view }: StageProps) {
                 {view === 'atoms' && <ComponentGallery tier="atom" />}
                 {view === 'blocks' && <ComponentGallery tier="block" />}
                 {view === 'layouts' && <LayoutsView />}
-                {view === 'pages' && <PagesView />}
+                {view === 'pages' && <PagesView cfg={cfg} />}
               </div>
             </IconProvider>
           </div>
