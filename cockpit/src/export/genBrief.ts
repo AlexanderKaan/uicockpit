@@ -151,6 +151,10 @@ ${genCss(cfg)}
   status feedback keeps the toned toasts.
 - Date & time entry ships THREE forms only: docked .calendar · popover picker ·
   typed input (date .in + .timefield for times). No clock-face dials.
+- Signature shape (H5): --k-shape-signature (a scalable SVG mask) via the .sig
+  utility, ONLY on the identity layer — avatars, media crops, loaders,
+  empty-states, hero decoration. Structural containers never wear it; they
+  keep the radius role-ladder.
 - Dark mode: add the class .dark to a parent element.
 
 ## Component decision tree — when to pick which variant

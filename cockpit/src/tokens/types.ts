@@ -205,6 +205,14 @@ export interface Config {
   harmony: Harmony
   spread: number
   expression: number
+  /* Shape Lab (H5) — the parametric SIGNATURE shape (one function, four
+   * dials; see src/tokens/shape.ts). Strictly the signature layer: avatar
+   * masks, image crops, loaders, empty-states, hero decoration — NEVER
+   * structural containers (that's the radius role-ladder's territory). */
+  shapePoints: number
+  shapeDepth: number
+  shapeSoft: number
+  shapeJitter: number
   palette: Palette
   neutral: Neutral
   mode: Mode

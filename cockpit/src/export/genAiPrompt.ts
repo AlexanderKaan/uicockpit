@@ -507,6 +507,21 @@ screens instead of inventing app-frame CSS:
   ONE hero progress moment (an upload, a generation); every routine meter
   stays \`.progress\`.
 
+## Signature shape — the third shape layer (strict territories)
+
+The kit ships ONE parametric signature shape as \`--k-shape-signature\` (a
+scalable SVG mask; raw path in \`--k-shape-signature-path\`). Apply it with the
+\`.sig\` utility. The placement grammar is a CONTRACT, not taste:
+- **Structural** (cards, buttons, inputs, dialogs, tables) → the radius
+  role-ladder (\`--k-radius-*\`). NEVER clip a structural container with the
+  signature — content must stay rectangular-readable.
+- **Signature** (\`.sig\`) — whitelist only: avatar masks, image/media crops,
+  loaders, empty-state illustration, hero decoration. One or two per screen.
+- **Interactive** — press/toggle morphs read the \`--k-press-*\` tokens, not
+  this mask.
+Inline-SVG consumers can morph between two dial states of the path (same
+point count + order) for an expressive loader.
+
 ## Building a screen we don't list — map it, don't invent
 
 You'll be asked for screens with no named recipe (a music player, a CRM, a

@@ -1755,7 +1755,9 @@ function Media() {
       {shown.length === 0 ? (
         // Empty-state pattern — shown for the (intentionally empty) Archive folder.
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '48px 8px', textAlign: 'center', border: '1px dashed var(--k-border)', borderRadius: 'var(--k-radius-md)' }}>
-          <span style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--k-surface-2)', display: 'grid', placeItems: 'center', color: 'var(--k-fg-muted)' }}>
+          {/* The empty-state mark wears the kit's SIGNATURE shape (H5) — one of
+              the whitelisted territories (avatars/media/loaders/empty-states). */}
+          <span className="sig" style={{ width: 48, height: 48, background: 'var(--k-surface-2)', display: 'grid', placeItems: 'center', color: 'var(--k-fg-muted)' }}>
             <Icon name="trash" size={22} />
           </span>
           <div className="card__col" style={{ gap: 3, alignItems: 'center' }}>

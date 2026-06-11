@@ -18,6 +18,7 @@ import type {
 } from './types'
 import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
 import { resolveHarmony } from './harmony'
+import { signatureMask, signaturePath, signatureSeed } from './shape'
 import { customFontFamily, isCustomFont, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
 
 // Tailwind/shadcn convention: dimensional tokens emit in REM on a 16px root, so
@@ -581,6 +582,17 @@ export function buildTokens(cfg: Config): Tokens {
         ? 'min(calc(var(--btn-r, var(--k-radius-button)) * 0.5), 10px)'
         : 'var(--btn-r, var(--k-radius-button))',
   }
+  // Shape Lab (H5) — resolve the four dials into the signature path + mask.
+  // Jitter is seeded FROM the dials themselves, so the same kit hash always
+  // produces the same organic wobble (deterministic, URL-round-trippable).
+  const sigShape = {
+    points: cfg.shapePoints ?? 8,
+    depth: cfg.shapeDepth ?? 0.12,
+    softness: cfg.shapeSoft ?? 0.8,
+    jitter: cfg.shapeJitter ?? 0,
+  }
+  const sigPath = signaturePath(sigShape, signatureSeed(sigShape))
+  const sigMask = signatureMask(sigShape, signatureSeed(sigShape))
   const curveSet = CURVE[cfg.motionCurve]
   const ms = (n: number) => `${Math.round(n * mul)}ms`
   const motion = {
@@ -1036,6 +1048,13 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-spring-dur': `${spDef.durMs}ms`,
       '--k-spring-dur-slow': `${spSlow.durMs}ms`,
       ...pressVars,
+      // Signature shape (H5 Shape Lab) — ONE parametric shape from four dials
+      // (points/depth/softness/jitter), emitted as a scalable SVG mask. Apply
+      // via the .sig recipe ONLY on the signature territory (avatar masks,
+      // image crops, loaders, empty-states, hero decoration) — never on
+      // structural containers; those stay on the radius role-ladder.
+      '--k-shape-signature': sigMask,
+      '--k-shape-signature-path': `'${sigPath}'`,
       // Easings — split by motion direction (Material 3 pattern):
       //   --k-ease     emphasized standard, default for state changes
       //   --k-ease-out emphasized decelerate, for INCOMING elements (enters)

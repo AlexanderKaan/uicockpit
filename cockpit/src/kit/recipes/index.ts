@@ -4856,6 +4856,36 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .chip--suggestion:hover:not(:disabled) { color: var(--k-fg); }`,
   },
   {
+    id: 'signature',
+    section: "Signature shape",
+    css: `/* === Signature shape — the Shape Lab utility (H5) =====================
+   ONE parametric shape (points × depth × softness × jitter → an SVG mask in
+   --k-shape-signature), applied with this utility. THE PLACEMENT GRAMMAR —
+   three shape layers with strict territories (contract rules, not taste):
+     1. STRUCTURAL  — cards/buttons/inputs/dialogs follow the radius
+        role-ladder (--k-radius-*). The signature shape NEVER clips a
+        structural container — content must stay rectangular-readable.
+     2. SIGNATURE   — whitelist ONLY: avatar masks, image/media crops,
+        loaders, empty-state illustration, hero decoration. That's where
+        .sig goes; one or two per screen, never wallpaper.
+     3. INTERACTIVE — morphs (press squish via --k-press-*, toggle corner
+        morph). Those read the H2 tokens, not this mask.
+   The mask scales with the element (data-URI SVG, mask-size 100%), so the
+   same token shapes a 24px avatar and a 480px hero. The raw path is also
+   exported (--k-shape-signature-path) for inline-SVG consumers — two dial
+   states share point count + order, so morphing loaders interpolate free. */
+.sig {
+  -webkit-mask-image: var(--k-shape-signature);
+  mask-image: var(--k-shape-signature);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  /* The mask IS the shape — kill any structural radius underneath. */
+  border-radius: 0;
+}`,
+  },
+  {
     id: 'scaffold',
     section: "Adaptive scaffold",
     css: `/* === Adaptive scaffold — the shell tier (H3a) ===

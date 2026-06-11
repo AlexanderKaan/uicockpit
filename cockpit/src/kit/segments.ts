@@ -110,6 +110,9 @@ export const STANDALONE_ATOMS: readonly string[] = [
   'alert', 'banner', 'inline-status-meta-micro-components', 'attachment-chip-family',
   // loading & layout utilities
   'skeleton', 'spinner', 'separator', 'aspect-ratio', 'scroll-area',
+  // the Shape Lab mask utility (H5) — attaches to any whitelisted identity
+  // surface (avatar / media / loader / empty-state); no single host block
+  'signature',
   // data-display primitive
   'description-list',
 ]

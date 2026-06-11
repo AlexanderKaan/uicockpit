@@ -37,6 +37,13 @@ export const DEFAULT_CONFIG: Config = {
   harmony: 'tonal',
   spread: 60,
   expression: 100,
+  // Shape Lab (H5): the house signature — an 8-point softened "flower"
+  // (squircle-petal read, the friendly M3-adjacent default). Jitter 0: the
+  // organic wobble is an explicit opt-in, never the default voice.
+  shapePoints: 8,
+  shapeDepth: 0.12,
+  shapeSoft: 0.8,
+  shapeJitter: 0,
   palette: 'vivid',
   neutral: 'auto',          // greys auto-tint toward the brand hue (Linear/Vercel)
   mode: 'light',
