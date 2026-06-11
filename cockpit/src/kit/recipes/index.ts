@@ -1073,8 +1073,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: absolute;
   bottom: calc(100% + 6px);
   left: 0;
-  background: var(--k-fg);
-  color: var(--k-bg);
+  /* Inverse-emphasis surface (H1): the canonical dark-tooltip-on-light-UI
+     (and vice versa) now wears the NAMED inverse roles instead of an ad-hoc
+     fg/bg swap — same read, real vocabulary (M3 inverse-surface). */
+  background: var(--k-inverse-surface);
+  color: var(--k-inverse-fg);
   font-size: var(--k-type-eyebrow);
   padding-block: var(--k-s-4);
   padding-inline: max(var(--k-s-8), calc(var(--k-radius-md) * 0.5));

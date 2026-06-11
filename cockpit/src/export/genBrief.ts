@@ -40,6 +40,7 @@ colors, radii or spacing — always reference a token.
 - Accent color: ${nameColor(tk.accentHex)} (${tk.accentHex}) — derived brighter sibling
 - System colors (fixed): ${tk.sysList.map((s) => s.k + ' ' + s.hex).join(', ')}
 - Neutrals: ${cfg.neutral} gray ramp${cfg.neutral === 'auto' ? ' (auto-tinted toward the brand hue — cohesive "tinted neutral", not flat grey)' : ''}
+- Harmony: ${cfg.harmony} (spread ${cfg.spread}° · expression ${cfg.expression}%) — secondary/accent/decoratives derive from the brand hue via these dials; the brand primary itself never rotates. Status colors lean ≤15° toward the brand (always-on harmonization).
 - Radius: ${cfg.radius} (cards/dialogs/inputs) · Button radius: ${cfg.buttonShape}${cfg.buttonShape === 'match' ? ' (matches the box radius — buttons share corners with cards & inputs, the default)' : ''}${cfg.buttonShape === 'pill' ? ' (pill — fully capsule buttons regardless of card radius)' : ''}${cfg.buttonShape === 'none' ? ' (square — no button corner radius)' : ''}
 - **Scale: ${cfg.scale}** — the size + density macro (does NOT change font-weight). ${
   cfg.scale === 'compact'

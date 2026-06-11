@@ -503,6 +503,46 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-glass-edge: inset 0 1px 0 hsl(0 0% 100% / 0.08);
 }
 
+/* --- Material 3 compatibility aliases (optional bridge) ---
+ * For codebases/agents written against the M3 sys-color vocabulary:
+ * every --md-sys-color-* resolves to its UIcockpit counterpart. The
+ * aliases are var() references, so they follow light/dark automatically.
+ * Safe to delete if you don't need them. */
+:root {
+  --md-sys-color-primary: var(--k-primary);
+  --md-sys-color-on-primary: var(--k-primary-fg);
+  --md-sys-color-primary-container: var(--k-primary-soft);
+  --md-sys-color-on-primary-container: var(--k-primary-soft-fg);
+  --md-sys-color-secondary: var(--k-secondary);
+  --md-sys-color-on-secondary: var(--k-secondary-fg);
+  --md-sys-color-secondary-container: var(--k-secondary-soft);
+  --md-sys-color-on-secondary-container: var(--k-secondary-soft-fg);
+  --md-sys-color-tertiary: var(--k-accent);
+  --md-sys-color-on-tertiary: var(--k-accent-fg);
+  --md-sys-color-tertiary-container: var(--k-accent-soft);
+  --md-sys-color-on-tertiary-container: var(--k-accent-soft-fg);
+  --md-sys-color-error: var(--k-danger);
+  --md-sys-color-on-error: var(--k-danger-fg);
+  --md-sys-color-error-container: var(--k-danger-soft);
+  --md-sys-color-on-error-container: var(--k-danger-soft-fg);
+  --md-sys-color-surface: var(--k-bg);
+  --md-sys-color-on-surface: var(--k-fg);
+  --md-sys-color-on-surface-variant: var(--k-fg-muted);
+  --md-sys-color-surface-dim: var(--k-surface-sunken);
+  --md-sys-color-surface-bright: var(--k-surface-raised);
+  --md-sys-color-surface-container-lowest: var(--k-surface-container-lowest);
+  --md-sys-color-surface-container-low: var(--k-surface-container-low);
+  --md-sys-color-surface-container: var(--k-surface-container);
+  --md-sys-color-surface-container-high: var(--k-surface-container-high);
+  --md-sys-color-surface-container-highest: var(--k-surface-container-highest);
+  --md-sys-color-outline: var(--k-input-border);
+  --md-sys-color-outline-variant: var(--k-border);
+  --md-sys-color-inverse-surface: var(--k-inverse-surface);
+  --md-sys-color-inverse-on-surface: var(--k-inverse-fg);
+  --md-sys-color-inverse-primary: var(--k-inverse-primary);
+  --md-sys-color-scrim: var(--k-scrim);
+}
+
 /* Selected-text gets the brand soft-tint */
 ::selection { background: var(--k-selection, var(--k-primary-soft)); }
 
@@ -1782,8 +1822,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: absolute;
   bottom: calc(100% + 6px);
   left: 0;
-  background: var(--k-fg);
-  color: var(--k-bg);
+  /* Inverse-emphasis surface (H1): the canonical dark-tooltip-on-light-UI
+     (and vice versa) now wears the NAMED inverse roles instead of an ad-hoc
+     fg/bg swap — same read, real vocabulary (M3 inverse-surface). */
+  background: var(--k-inverse-surface);
+  color: var(--k-inverse-fg);
   font-size: var(--k-type-eyebrow);
   padding-block: var(--k-s-4);
   padding-inline: max(var(--k-s-8), calc(var(--k-radius-md) * 0.5));
