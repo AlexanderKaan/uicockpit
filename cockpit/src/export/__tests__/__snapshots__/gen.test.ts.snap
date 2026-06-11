@@ -195,6 +195,15 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-dur-fast: 120ms;
   --k-dur: 200ms;
   --k-dur-slow: 320ms;
+  --k-spring-fast: linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1);
+  --k-spring: linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1);
+  --k-spring-slow: linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1);
+  --k-spring-dur-fast: 205ms;
+  --k-spring-dur: 290ms;
+  --k-spring-dur-slow: 443ms;
+  --k-press-scale: 0.96;
+  --k-press-opacity: 1;
+  --k-press-radius: var(--btn-r, var(--k-radius-button));
   --k-ease: cubic-bezier(.4,0,.2,1);
   --k-ease-out: cubic-bezier(.05,.7,.1,1);
   --k-ease-in: cubic-bezier(.3,0,.8,.15);
@@ -456,6 +465,15 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-dur-fast: 120ms;
   --k-dur: 200ms;
   --k-dur-slow: 320ms;
+  --k-spring-fast: linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1);
+  --k-spring: linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1);
+  --k-spring-slow: linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1);
+  --k-spring-dur-fast: 205ms;
+  --k-spring-dur: 290ms;
+  --k-spring-dur-slow: 443ms;
+  --k-press-scale: 0.96;
+  --k-press-opacity: 1;
+  --k-press-radius: var(--btn-r, var(--k-radius-button));
   --k-ease: cubic-bezier(.4,0,.2,1);
   --k-ease-out: cubic-bezier(.05,.7,.1,1);
   --k-ease-in: cubic-bezier(.3,0,.8,.15);
@@ -925,13 +943,21 @@ body {
     background var(--k-dur, 200ms) var(--k-ease, ease),
     transform var(--k-dur-fast, 120ms) var(--k-ease, ease),
     box-shadow var(--k-dur-fast, 120ms) var(--k-ease, ease),
-    filter var(--k-dur-fast, 120ms) var(--k-ease, ease);
+    filter var(--k-dur-fast, 120ms) var(--k-ease, ease),
+    border-radius var(--k-dur-fast, 120ms) var(--k-spring, var(--k-ease, ease));
   border: max(1px, var(--k-bw)) solid transparent;
   cursor: pointer;
 }
-/* Unified press (#212) — every button scales down a touch on click: the
- * Material/Stitch tactile "push". Generic so ghost/outline/link get it too. */
-.btn:active:not(:disabled) { transform: scale(0.96); }
+/* Unified press (#212 → H2 Press dial) — what :active does is now the
+ * --k-press-* token trio (None / Opacity / Scale 0.96 = default / Morph =
+ * radius squish, the M3-Expressive 2025 signature). Generic so ghost/
+ * outline/link get it too; border-radius transitions via the spring curve
+ * so the morph reads springy, not snappy. */
+.btn:active:not(:disabled) {
+  transform: scale(var(--k-press-scale, 0.96));
+  opacity: var(--k-press-opacity, 1);
+  border-radius: var(--k-press-radius, var(--btn-r));
+}
 /* SVG icons inside buttons should never shrink and should render as a
  * standalone flex item, not as inline-text-baseline content. Most preview
  * usage already passes display:block via Lucide, but explicit-here guards
@@ -5184,6 +5210,10 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "motion": "smooth",
     "motionTempo": "normal",
     "motionCurve": "standard",
+    "stateIntensity": "whisper",
+    "stateTint": "neutral",
+    "press": "scale",
+    "motionScheme": "standard",
     "cPrimary": "#3b3b42",
     "harmony": "tonal",
     "spread": 60,

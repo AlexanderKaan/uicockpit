@@ -117,6 +117,27 @@ const BORDER_OPTS = [
   { id: 'medium' as const, cap: 'Medium' },
   { id: 'strong' as const, cap: 'Strong' },
 ]
+/* Interaction (H2) — the state-layer algebra + press feedback as dials. */
+const STATE_INTENSITY_OPTS = [
+  { id: 'whisper' as const, cap: 'Whisper' },
+  { id: 'standard' as const, cap: 'Standard' },
+  { id: 'vivid' as const, cap: 'Vivid' },
+]
+const STATE_TINT_OPTS = [
+  { id: 'neutral' as const, cap: 'Neutral' },
+  { id: 'brand' as const, cap: 'Brand' },
+  { id: 'accent' as const, cap: 'Accent' },
+]
+const PRESS_OPTS = [
+  { id: 'none' as const, cap: 'None' },
+  { id: 'opacity' as const, cap: 'Fade' },
+  { id: 'scale' as const, cap: 'Scale' },
+  { id: 'morph' as const, cap: 'Morph' },
+]
+const MOTION_SCHEME_OPTS = [
+  { id: 'standard' as const, cap: 'Standard' },
+  { id: 'expressive' as const, cap: 'Expressive' },
+]
 const ICON_OPTS = [
   { id: 'hairline' as const, cap: 'Iconoir' },
   { id: 'line' as const, cap: 'Lucide' },
@@ -450,6 +471,36 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       onPick: pick('borders'),
     },
     {
+      // Interaction (H2) — hover/selected/press as ONE formula with two dials,
+      // plus the press-feedback character. Defaults = the calibrated house look.
+      sec: 'Interaction',
+      key: 'stateIntensity',
+      label: 'States',
+      value: cap(STATE_INTENSITY_OPTS, cfg.stateIntensity),
+      kind: 'opts',
+      opts: optsFrom(STATE_INTENSITY_OPTS),
+      selected: cfg.stateIntensity,
+      onPick: pick('stateIntensity'),
+    },
+    {
+      key: 'stateTint',
+      label: 'State tint',
+      value: cap(STATE_TINT_OPTS, cfg.stateTint),
+      kind: 'opts',
+      opts: optsFrom(STATE_TINT_OPTS),
+      selected: cfg.stateTint,
+      onPick: pick('stateTint'),
+    },
+    {
+      key: 'press',
+      label: 'Press',
+      value: cap(PRESS_OPTS, cfg.press),
+      kind: 'opts',
+      opts: optsFrom(PRESS_OPTS),
+      selected: cfg.press,
+      onPick: pick('press'),
+    },
+    {
       sec: 'Motion & icons',
       key: 'motion',
       label: 'Motion',
@@ -458,6 +509,16 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       opts: optsFrom(MOTION_OPTS, VIZ_MOTION),
       selected: cfg.motion,
       onPick: pick('motion'),
+    },
+    {
+      // Spring scheme (H2) — pre-sampled M3 spring physics as linear() tokens.
+      key: 'motionScheme',
+      label: 'Springs',
+      value: cap(MOTION_SCHEME_OPTS, cfg.motionScheme),
+      kind: 'opts',
+      opts: optsFrom(MOTION_SCHEME_OPTS),
+      selected: cfg.motionScheme,
+      onPick: pick('motionScheme'),
     },
     {
       key: 'iconSet',

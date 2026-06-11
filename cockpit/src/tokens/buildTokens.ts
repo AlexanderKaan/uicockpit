@@ -7,9 +7,11 @@ import type {
   Contrast,
   SurfaceDepth,
   Motion,
+  MotionScheme,
   MotionTempo,
   MotionCurve,
   Radius,
+  StateIntensity,
   SystemColor,
   Tokens,
   TypeScale,
@@ -128,12 +130,42 @@ const EMPHASIZED = {
   accel:    'cubic-bezier(.3,0,.8,.15)',
   decel:    'cubic-bezier(.05,.7,.1,1)',
 }
-// Hover/selected overlay intensity — a FIXED system constant (the old "Emphasis"
-// control's subtle value). The medium/bold steps read too dark for the premium
-// default; locking to subtle keeps selection states tasteful everywhere. The
-// --k-state-* tokens are still emitted + overridable in exports for the rare
-// data-dense app that wants a heavier selection.
-const STATE_LAYER_SUBTLE = 0.05
+// Hover/selected/press wash intensity (H2 state algebra): ONE base alpha per
+// StateIntensity step; selected steps +0.05 and press +0.10 above it — the
+// whole interaction-state system is one formula with one dial. 'whisper'
+// (0.05) is the calibrated house default (the old fixed constant); 'standard'
+// is the M3 8% figure; 'vivid' for data-dense selection-heavy apps.
+const STATE_ALPHA: Record<StateIntensity, number> = { whisper: 0.05, standard: 0.08, vivid: 0.12 }
+
+/* === Spring physics → CSS linear() pre-sampler (H2 motion schemes) ========
+ * M3 Expressive's motion is 12 spring params (damping, stiffness) per scheme.
+ * Every other web port silently degrades springs to a cubic-bezier; we sample
+ * the true damped-spring position curve into a CSS linear() easing at BUILD
+ * time (we're a compiler — zero runtime cost) plus its emergent settle
+ * duration. Effects (color/opacity) never bounce — they keep the classic
+ * easing tokens; these are for SPATIAL transforms. */
+function springLinear(damping: number, stiffness: number, points = 24): { easing: string; durMs: number } {
+  const w0 = Math.sqrt(stiffness)
+  const zeta = damping
+  // Settle ≈ when the exp envelope decays to 0.1% (perceptually at rest).
+  const settle = 6.91 / (Math.min(zeta, 1) * w0)
+  const pos = (t: number): number => {
+    if (zeta < 1) {
+      const wd = w0 * Math.sqrt(1 - zeta * zeta)
+      return 1 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + ((zeta * w0) / wd) * Math.sin(wd * t))
+    }
+    return 1 - Math.exp(-w0 * t) * (1 + w0 * t) // critically damped
+  }
+  const pts = Array.from({ length: points + 1 }, (_, i) => +pos((i / points) * settle).toFixed(4))
+  pts[points] = 1
+  return { easing: `linear(${pts.join(', ')})`, durMs: Math.round(settle * 1000) }
+}
+// The 12 params, verbatim from androidx StandardMotionTokens/ExpressiveMotionTokens
+// (spatial only — effects are damping-1.0 by spec and never bounce).
+const SPRINGS: Record<MotionScheme, { fast: [number, number]; def: [number, number]; slow: [number, number] }> = {
+  standard:   { fast: [0.9, 1400], def: [0.9, 700], slow: [0.9, 300] },
+  expressive: { fast: [0.6, 800],  def: [0.8, 380], slow: [0.8, 200] },
+}
 /* Type scale — [h1, h2, h3, body, small] in px, per S/M/L/XL step.
  * The floor is deliberate: body/nav never drop below the 13–14px that
  * shadcn + Material 3 treat as the UI minimum. h3 (card titles, section
@@ -531,6 +563,24 @@ export function buildTokens(cfg: Config): Tokens {
    * dense pro-tool. */
   const base = MOT_BASE[cfg.motion]
   const mul = TEMPO[cfg.motionTempo]
+  // Spring scheme (H2): pre-sample the spatial springs into linear() easings.
+  const springSet = SPRINGS[cfg.motionScheme ?? 'standard']
+  const spFast = springLinear(...springSet.fast)
+  const spDef = springLinear(...springSet.def)
+  const spSlow = springLinear(...springSet.slow)
+  // Press feedback (H2) — the --k-press-* trio the button family's :active
+  // consumes. 'scale' (0.96) is the existing house squish; 'morph' is the M3-
+  // Expressive radius squish: a pill squares off a touch while pressed (the
+  // min() clamp makes it visible on pills without distorting square buttons).
+  const pressMode = cfg.press ?? 'scale'
+  const pressVars = {
+    '--k-press-scale': pressMode === 'scale' ? '0.96' : '1',
+    '--k-press-opacity': pressMode === 'opacity' ? '0.85' : '1',
+    '--k-press-radius':
+      pressMode === 'morph'
+        ? 'min(calc(var(--btn-r, var(--k-radius-button)) * 0.5), 10px)'
+        : 'var(--btn-r, var(--k-radius-button))',
+  }
   const curveSet = CURVE[cfg.motionCurve]
   const ms = (n: number) => `${Math.round(n * mul)}ms`
   const motion = {
@@ -541,7 +591,7 @@ export function buildTokens(cfg: Config): Tokens {
     easeOut: cfg.motion === 'none' ? 'linear' : curveSet.easeOut,
     easeIn: cfg.motion === 'none' ? 'linear' : curveSet.easeIn,
   }
-  const sla = STATE_LAYER_SUBTLE
+  const sla = STATE_ALPHA[cfg.stateIntensity ?? 'whisper']
   // Hover / selected wash — a NEUTRAL overlay scaling with Emphasis. NOT pure
   // black/white: at L 0%/100% the Neutrals hue/sat vanish, so the warm/cool
   // tint wouldn't carry into the grey. So we use a near-black (light) /
@@ -553,19 +603,27 @@ export function buildTokens(cfg: Config): Tokens {
   // over-saturated the overlay (→ selection ran ~1.9× warmer/cooler than the bg
   // at the warm/cool neutrals); dropping it makes the ratio consistent across
   // cool/neutral/warm so selection + background read as one temperature.
-  const stS = t.s
+  // Wash color source (H2 State tint): neutral (default) keeps selection a
+  // pure intensity read; brand/accent tint the wash toward the family — the
+  // M3 on-color feel. Saturation capped so the wash stays a wash, not a fill.
+  const [stH, stS] =
+    cfg.stateTint === 'brand' && !mono
+      ? [ph, Math.min(psat, 60)]
+      : cfg.stateTint === 'accent' && !mono
+        ? [ah, Math.min(accentSat, 60)]
+        : [t.h, t.s]
   const stL = dark ? 86 : 14
-  const stateHover = hslA(t.h, stS, stL, sla)
+  const stateHover = hslA(stH, stS, stL, sla)
   // Selected fill — a notch stronger than hover so a selected item reads above
   // a merely-hovered one. Always neutral: Emphasis is a pure intensity dial.
   const selA = Math.min(sla + 0.05, 0.4)
-  const stateSelected = hslA(t.h, stS, stL, selA)
+  const stateSelected = hslA(stH, stS, stL, selA)
   // Pressed / :active layer — a notch stronger again than selected, so a tap
   // gives a tactile "pressed" confirm (Material 3 ~10-12% state layer). Families
   // that had hover but no press (.menu__item, .navrow, nav items, close buttons)
   // pick this up; --k-state-hover stays the lighter resting hover wash.
   const pressA = Math.min(sla + 0.1, 0.48)
-  const statePress = hslA(t.h, stS, stL, pressA)
+  const statePress = hslA(stH, stS, stL, pressA)
   // Fallback to md for any unknown value — old URL hashes may carry the
   // retired 'normal'/'tight'/'expressive' keys, and a crash there is worse
   // than silently re-centering on the default scale.
@@ -967,6 +1025,17 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-dur-fast': motion.fast,
       '--k-dur': motion.normal,
       '--k-dur-slow': motion.slow,
+      // Spring easings (H2) — true damped-spring curves as CSS linear(), with
+      // their emergent settle durations. Use for SPATIAL moves (panels, knobs,
+      // morphs): `transition: transform var(--k-spring-dur) var(--k-spring)`.
+      // Effects (color/opacity) keep --k-ease-* — they never bounce.
+      '--k-spring-fast': spFast.easing,
+      '--k-spring': spDef.easing,
+      '--k-spring-slow': spSlow.easing,
+      '--k-spring-dur-fast': `${spFast.durMs}ms`,
+      '--k-spring-dur': `${spDef.durMs}ms`,
+      '--k-spring-dur-slow': `${spSlow.durMs}ms`,
+      ...pressVars,
       // Easings — split by motion direction (Material 3 pattern):
       //   --k-ease     emphasized standard, default for state changes
       //   --k-ease-out emphasized decelerate, for INCOMING elements (enters)

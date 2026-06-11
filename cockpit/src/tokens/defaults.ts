@@ -23,6 +23,13 @@ export const DEFAULT_CONFIG: Config = {
   motion: 'smooth',
   motionTempo: 'normal',
   motionCurve: 'standard',
+  // Interaction (H2): the calibrated house defaults — byte-identical to the
+  // pre-dial look (whisper wash · neutral tint · 0.96 press squish · standard
+  // springs). The dials open the M3 state algebra without moving the default.
+  stateIntensity: 'whisper',
+  stateTint: 'neutral',
+  press: 'scale',
+  motionScheme: 'standard',
   cPrimary: '#0A84FF',      // Cobalt — matches COLOR_THEMES.cobalt (keep in sync)
   // Harmony (H1): Tonal is the house default — the M3-TonalSpot recipe (accent
   // = brand + 60°, secondary drifts +15°, neutrals carry the brand tint at 1×).

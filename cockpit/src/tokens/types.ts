@@ -85,6 +85,26 @@ export type MotionCurve = 'standard' | 'emphasized' | 'spring'
 /* Background — contrast of the surface grey ramp (soft = flat canvas, crisp =
  * separated layers). Exposed in the panel as "Background". */
 export type Contrast = 'soft' | 'balanced' | 'crisp'
+/* === Interaction states (H2) — the state-layer algebra as dials ==========
+ * M3's machine: hover/selected/press are ONE wash at stepped alphas. We expose
+ * the two opinions as controls and keep the formula fixed:
+ *   intensity → the base alpha (whisper .05 = the calibrated house default ·
+ *               standard .08 = the M3 figure · vivid .12); selected/press step
+ *               +.05/+.10 above it.
+ *   tint      → the wash's color source: neutral (house default — selection is
+ *               a pure intensity read) · brand · accent. The single biggest
+ *               "feel" lever in the state system (M3 uses the on-color).   */
+export type StateIntensity = 'whisper' | 'standard' | 'vivid'
+export type StateTint = 'neutral' | 'brand' | 'accent'
+/* Press feedback (H2) — what :active does to a pressable, via the --k-press-*
+ * tokens consumed by the button family. 'scale' (0.96 squish) is the existing
+ * house default; 'morph' is the 2025 M3-Expressive signature (radius squish:
+ * a pill squares off a touch while pressed). Pure CSS, no JS runtime. */
+export type Press = 'none' | 'opacity' | 'scale' | 'morph'
+/* Motion scheme (H2) — M3's spring physics, pre-sampled into CSS linear()
+ * easings at build time (the 12 spring params; effects never bounce). Standard
+ * = composed, Expressive = bouncier/faster. Emits --k-spring-* tokens. */
+export type MotionScheme = 'standard' | 'expressive'
 /* Neutral temperature. 'auto' (default) tints the grey ladder toward the BRAND
  * hue — the Linear/Vercel "the greys carry a whisper of the brand" trick, pure
  * OKLCH. cool/neutral/warm are explicit overrides; mono falls back to pure grey. */
@@ -170,6 +190,12 @@ export interface Config {
   motion: Motion
   motionTempo: MotionTempo
   motionCurve: MotionCurve
+  /* Interaction-state dials (H2) — see StateIntensity/StateTint/Press. */
+  stateIntensity: StateIntensity
+  stateTint: StateTint
+  press: Press
+  /* Spring scheme (H2) — drives the pre-sampled --k-spring-* easings. */
+  motionScheme: MotionScheme
   /* Single brand hue. Secondary + accent are DERIVED from this in buildTokens
    * — one color in, a harmonious family out (shadcn/Linear model). */
   cPrimary: Hex
