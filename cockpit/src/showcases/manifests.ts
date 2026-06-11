@@ -34,6 +34,10 @@ export type BlockSpec =
   | { block: 'kanban'; seed: { columns: Array<{ name: string; cards: Array<{ title: string; tag?: string; key?: string; pts?: string; avatar?: string }> }> } }
   | { block: 'tree'; seed: { label?: string; groups: Array<{ name: string; items: Array<{ title: string; on?: boolean }> }> } }
   | { block: 'timeline'; seed: { events: Array<{ title: string; time: string; desc?: string; state?: 'done' | 'current' }> } }
+  | { block: 'settings'; seed: { title?: string; rows: Array<{ title: string; sub: string; on: boolean }> } }
+  | { block: 'wizard'; seed: { steps: string[]; active: number; title: string; sub?: string } }
+  | { block: 'dropzone'; seed: { title: string; hint: string } }
+  | { block: 'media'; seed: { title?: string; items: Array<{ name: string; kind: 'image' | 'video' | 'file'; badge?: string; tone?: 'info' | 'success' | 'warning' }> } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -216,6 +220,12 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { name: 'Pro', price: '$24', period: '/mo', feats: ['Unlimited projects', 'Priority support', 'SSO'], featured: true, cta: 'Upgrade' },
             { name: 'Scale', price: '$96', period: '/mo', feats: ['Audit log', 'SLA 99.9%', 'Dedicated CSM'], cta: 'Talk to sales' },
           ] } },
+          // H3c: Settings' toggle rows, harvested into Portal (account preferences).
+          { block: 'settings', seed: { title: 'Notifications', rows: [
+            { title: 'Product updates', sub: 'New features and changelog highlights.', on: true },
+            { title: 'Billing receipts', sub: 'Email a receipt after every payment.', on: true },
+            { title: 'Usage alerts', sub: 'Warn me before I hit a plan limit.', on: false },
+          ] } },
         ],
       },
       {
@@ -308,6 +318,53 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { name: 'Hobby', price: '$0', period: 'forever', feats: ['1 kit', 'CDN link'], cta: 'Start free' },
             { name: 'Team', price: '$12', period: '/mo', feats: ['Unlimited kits', 'Versioned lanes', 'Checks in CI'], featured: true, cta: 'Start trial' },
           ] } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'studio',
+    title: 'Studio',
+    blurb: 'Content / DAM archetype × list-detail — a folder tree beside a media grid with an upload dropzone and a publish wizard. The non-SaaS, content-product surface.',
+    width: 1280,
+    archetype: 'list-detail',
+    nav: 'suite',
+    navItems: [
+      { icon: 'grid', label: 'Library' },
+      { icon: 'upload', label: 'Uploads' },
+      { icon: 'spark', label: 'Collections' },
+      { icon: 'cog', label: 'Settings' },
+    ],
+    barTitle: 'Studio',
+    panes: [
+      {
+        role: 'fixed',
+        blocks: [
+          { block: 'tree', seed: { label: 'Folders', groups: [
+            { name: 'Campaigns', items: [
+              { title: 'Spring launch', on: true },
+              { title: 'Brand refresh' },
+            ] },
+            { name: 'Stock', items: [
+              { title: 'Photography' },
+              { title: 'Illustration' },
+            ] },
+          ] } },
+        ],
+      },
+      {
+        role: 'detail',
+        blocks: [
+          { block: 'dropzone', seed: { title: 'Drop files or click to browse', hint: 'Images, PDFs, video — up to 100 MB per file' } },
+          { block: 'media', seed: { title: 'Spring launch · 6 assets', items: [
+            { name: 'hero-wide.jpg', kind: 'image', badge: 'New', tone: 'success' },
+            { name: 'teaser.mp4', kind: 'video', badge: '0:28', tone: 'info' },
+            { name: 'lookbook.pdf', kind: 'file' },
+            { name: 'badge-set.png', kind: 'image' },
+            { name: 'palette.png', kind: 'image' },
+            { name: 'brief.pdf', kind: 'file', badge: 'Final', tone: 'warning' },
+          ] } },
+          { block: 'wizard', seed: { steps: ['Select', 'Crop', 'Caption', 'Publish'], active: 2, title: 'Caption', sub: 'Add alt text and a caption before publishing.' } },
         ],
       },
     ],

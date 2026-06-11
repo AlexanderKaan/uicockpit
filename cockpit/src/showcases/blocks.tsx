@@ -225,5 +225,71 @@ export function renderBlock(spec: BlockSpec, key: number) {
           </ol>
         </div>
       )
+    case 'settings':
+      return (
+        <div className="card" key={key}>
+          {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
+          <div className="list list--settings">
+            {spec.seed.rows.map((r) => (
+              <div className="list__item" key={r.title}>
+                <div className="list__body"><div className="list__title">{r.title}</div><div className="list__sub">{r.sub}</div></div>
+                <div className={`toggle ${r.on ? 'toggle--on' : ''}`} role="switch" aria-checked={r.on} aria-label={r.title}><div className="toggle__knob" /></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    case 'wizard':
+      return (
+        <div className="card" key={key}>
+          <div className="stepper">
+            {spec.seed.steps.map((label, i) => (
+              <div className={`stepper__step ${i < spec.seed.active ? 'stepper__step--done' : ''} ${i === spec.seed.active ? 'stepper__step--current' : ''}`} key={label}>
+                <span className="stepper__dot">{i < spec.seed.active ? <Icon name="check" /> : i + 1}</span>
+                <span>{label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="wstepper__content">
+            <div className="wstepper__title">{spec.seed.title}</div>
+            {spec.seed.sub && <div className="wstepper__sub">{spec.seed.sub}</div>}
+            <input className="in" placeholder="…" aria-label={spec.seed.title} />
+          </div>
+          <div className="card__foot">
+            <button type="button" className="btn btn--ghost">Back</button>
+            <button type="button" className="btn btn--primary">Continue</button>
+          </div>
+        </div>
+      )
+    case 'dropzone':
+      return (
+        <label className="dropzone" key={key}>
+          <span className="dropzone__icon"><Icon name="upload" /></span>
+          <span className="dropzone__title">{spec.seed.title}</span>
+          <span className="dropzone__hint">{spec.seed.hint}</span>
+          <input type="file" hidden multiple aria-label={spec.seed.title} />
+        </label>
+      )
+    case 'media':
+      return (
+        <div className="card" key={key}>
+          {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
+          <div className="card__row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 'var(--k-s-12)' }}>
+            {spec.seed.items.map((f, i) => (
+              <div key={f.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k-s-8)' }}>
+                <div className="aspect aspect--1x1">
+                  <div className="aspect__fill" style={{ background: f.kind === 'image' ? `var(--k-grad-${(i % 4) + 1})` : 'var(--k-surface-sunken)', display: 'grid', placeItems: 'center', color: f.kind === 'image' ? 'var(--k-primary-fg, #fff)' : 'var(--k-fg-muted)' }}>
+                    <Icon name={f.kind === 'image' ? 'grid' : f.kind === 'video' ? 'chart' : 'file'} size={22} />
+                  </div>
+                </div>
+                <div className="card__row" style={{ alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
+                  <span style={{ fontSize: 'var(--k-type-small)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{f.name}</span>
+                  {f.badge && <span className={`badge badge--${f.tone ?? 'info'}`} style={{ flex: 'none' }}>{f.badge}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
   }
 }

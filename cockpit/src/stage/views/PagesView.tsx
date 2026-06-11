@@ -26,6 +26,10 @@ const BLOCK_RECIPES: Record<BlockSpec['block'], string> = {
   kanban: '.kanban > .kanban__col > .kanban__card (board with tags + points)',
   tree: '.card + .tree > .tree__group > .tree__row (collapsible nav)',
   timeline: '.card + .timeline > .timeline__item (--done/--current states)',
+  settings: '.card + .list--settings > .list__item + .toggle (switch rows)',
+  wizard: '.card + .stepper + .wstepper__content + .card__foot',
+  dropzone: '.dropzone (icon + title + hint, hidden file input)',
+  media: '.card + .aspect--1x1 grid (thumbnails + badges)',
 }
 
 /* Cross-view jump: block id → the gallery view + search query that surfaces
@@ -46,6 +50,10 @@ const BLOCK_GALLERY: Record<BlockSpec['block'], { view: ViewKind; q: string }> =
   kanban: { view: 'blocks', q: 'kanban' },
   tree: { view: 'atoms', q: 'tree' },
   timeline: { view: 'atoms', q: 'timeline' },
+  settings: { view: 'atoms', q: 'toggle' },
+  wizard: { view: 'atoms', q: 'stepper' },
+  dropzone: { view: 'atoms', q: 'dropzone' },
+  media: { view: 'atoms', q: 'aspect' },
 }
 
 /**
