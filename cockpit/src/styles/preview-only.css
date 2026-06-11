@@ -1105,3 +1105,10 @@
 }
 .shc__matrix-world .scaffold { height: 640px; }
 .shc__matrix-world .shc__frame { height: 100%; }
+/* The full 6×3 grid — a row per showcase, the three style columns inside. */
+.shc__matrixgrid { display: grid; gap: var(--k-s-20); }
+.shc__matrixrow-title {
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  margin-bottom: var(--k-s-6);
+}

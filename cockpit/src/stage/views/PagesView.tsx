@@ -5,6 +5,8 @@ import { renderBlock } from '../../showcases/blocks'
 import { DemoDashboard } from './DemoDashboard'
 import { buildTokens } from '../../tokens/buildTokens'
 import type { Config } from '../../tokens/types'
+import { setGalleryJump } from '../../state/galleryJump'
+import type { ViewKind } from '../Stage'
 
 /* Inspectable composition (H3b slice 2): block id → the KIT recipes it maps
  * onto. Clicking a block tag in Inspect mode shows its manifest spec + this
@@ -21,6 +23,23 @@ const BLOCK_RECIPES: Record<BlockSpec['block'], string> = {
   prose: '.l-center (foundation) + type tokens',
   dl: '.card + .dl',
   chips: '.chip (+ .chip--on for the active filter)',
+}
+
+/* Cross-view jump: block id → the gallery view + search query that surfaces
+ * its card(s). The query rides the one-shot galleryJump mailbox; the gallery
+ * pops it on mount and pre-fills its search. */
+const BLOCK_GALLERY: Record<BlockSpec['block'], { view: ViewKind; q: string }> = {
+  stats: { view: 'blocks', q: 'stat' },
+  chart: { view: 'blocks', q: 'chart' },
+  list: { view: 'atoms', q: 'list' },
+  thread: { view: 'atoms', q: 'card' },
+  composer: { view: 'atoms', q: 'toolbar' },
+  table: { view: 'atoms', q: 'table' },
+  form: { view: 'atoms', q: 'form' },
+  pricing: { view: 'blocks', q: 'pricing' },
+  prose: { view: 'foundations', q: '' },
+  dl: { view: 'atoms', q: 'description' },
+  chips: { view: 'atoms', q: 'chip' },
 }
 
 /**
@@ -42,7 +61,7 @@ const PANE_CLASS = {
   supporting: 'pane pane--fixed pane--supporting',
 } as const
 
-function ShowcaseStage({ m }: { m: ShowcaseManifest }) {
+function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange: (v: ViewKind) => void }) {
   const [width, setWidth] = useState(m.width)
   const [showManifest, setShowManifest] = useState(false)
   // Inspect mode (H3b slice 2): overlay every block with its id tag; clicking
@@ -126,6 +145,17 @@ function ShowcaseStage({ m }: { m: ShowcaseManifest }) {
           <div className="shc__spec-head">
             <span className="badge badge--info">{pickedSpec.block}</span>
             <span className="shc__spec-map">builds from: <code>{BLOCK_RECIPES[pickedSpec.block]}</code></span>
+            <button
+              type="button"
+              className="btn btn--outline btn--xs"
+              onClick={() => {
+                const target = BLOCK_GALLERY[pickedSpec.block]
+                setGalleryJump(target.q)
+                onViewChange(target.view)
+              }}
+            >
+              Open in gallery <Icon name="chevR" />
+            </button>
             <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Close block spec" onClick={() => setPicked(null)}><Icon name="x" /></button>
           </div>
           <pre className="code shc__spec-json">{JSON.stringify(pickedSpec, null, 2)}</pre>
@@ -215,7 +245,7 @@ const MATRIX_STYLES: Array<{ id: string; label: string; patch: Partial<Config> }
   },
 ]
 
-function MatrixCell({ m, cfg, label }: { m: ShowcaseManifest; cfg: Config; label: string }) {
+function MatrixCell({ m, cfg, label, scale = 0.42 }: { m: ShowcaseManifest; cfg: Config; label: string; scale?: number }) {
   // Each cell is its own token universe: a nested var-scope div (CSS custom
   // props cascade, so the cell's full var set overrides the stage's). The
   // shell renders at its real manifest width and is scaled down as one unit —
@@ -224,7 +254,7 @@ function MatrixCell({ m, cfg, label }: { m: ShowcaseManifest; cfg: Config; label
   const vars = useMemo(() => buildTokens(cfg).vars as CSSProperties, [cfg])
   const W = Math.max(m.width, 900)
   const H = 640
-  const S = 0.42
+  const S = scale
   return (
     <figure className="shc__matrix-cell">
       <figcaption className="shc__matrix-label">{label}</figcaption>
@@ -240,10 +270,12 @@ function MatrixCell({ m, cfg, label }: { m: ShowcaseManifest; cfg: Config; label
   )
 }
 
-export function PagesView({ cfg }: { cfg: Config }) {
+export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
   const [mode, setMode] = useState<'showcases' | 'supadash'>('showcases')
   const [showcaseId, setShowcaseId] = useState(SHOWCASES[0]!.id)
   const [matrix, setMatrix] = useState(false)
+  // ×6: the FULL grid — every showcase × every style (the 3×6 money-shot).
+  const [matrixAll, setMatrixAll] = useState(false)
   const m = SHOWCASES.find((s) => s.id === showcaseId)!
 
   if (mode === 'supadash') {
@@ -293,19 +325,39 @@ export function PagesView({ cfg }: { cfg: Config }) {
 
       {matrix ? (
         <>
-          <p className="lyt__blurb">
-            One manifest, three kits — the left column is YOUR live config; the others are curated
-            contrasts. Style is orthogonal to structure: the JSON never changes.
-          </p>
-          <div className="shc__matrix">
-            {MATRIX_STYLES.map((s) => (
-              <MatrixCell key={s.id} m={m} cfg={{ ...cfg, ...s.patch }} label={s.id === 'yours' ? s.label : s.label} />
-            ))}
+          <div className="lyt__controls">
+            <p className="lyt__blurb" style={{ margin: 0, flex: 1 }}>
+              One manifest, three kits — the left column is YOUR live config; the others are
+              curated contrasts. Style is orthogonal to structure: the JSON never changes.
+            </p>
+            <button type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={matrixAll} onClick={() => setMatrixAll((s) => !s)}>
+              All 6 × 3
+            </button>
           </div>
+          {matrixAll ? (
+            <div className="shc__matrixgrid">
+              {SHOWCASES.map((s) => (
+                <div key={s.id}>
+                  <div className="shc__matrixrow-title">{s.title}</div>
+                  <div className="shc__matrix">
+                    {MATRIX_STYLES.map((st) => (
+                      <MatrixCell key={st.id} m={s} cfg={{ ...cfg, ...st.patch }} label={st.label} scale={0.26} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="shc__matrix">
+              {MATRIX_STYLES.map((s) => (
+                <MatrixCell key={s.id} m={m} cfg={{ ...cfg, ...s.patch }} label={s.label} />
+              ))}
+            </div>
+          )}
         </>
       ) : (
         /* key = remount per showcase so width resets to the manifest default */
-        <ShowcaseStage m={m} key={m.id} />
+        <ShowcaseStage m={m} key={m.id} onViewChange={onViewChange} />
       )}
     </div>
   )

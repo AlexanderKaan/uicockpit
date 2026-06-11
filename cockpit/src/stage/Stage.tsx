@@ -20,9 +20,11 @@ interface StageProps {
   /** Active view — owned by CockpitApp now that the topbar (the view switcher)
    *  lives above the stage as a full-width bar. */
   view: ViewKind
+  /** Cross-view jumps (H3b: showcase inspect tag → gallery card). */
+  onViewChange: (v: ViewKind) => void
 }
 
-export function Stage({ cfg, tokens, view }: StageProps) {
+export function Stage({ cfg, tokens, view, onViewChange }: StageProps) {
   const previewStyle = tokens.vars as CSSProperties
 
   return (
@@ -36,7 +38,7 @@ export function Stage({ cfg, tokens, view }: StageProps) {
                 {view === 'atoms' && <ComponentGallery tier="atom" />}
                 {view === 'blocks' && <ComponentGallery tier="block" />}
                 {view === 'layouts' && <LayoutsView />}
-                {view === 'pages' && <PagesView cfg={cfg} />}
+                {view === 'pages' && <PagesView cfg={cfg} onViewChange={onViewChange} />}
               </div>
             </IconProvider>
           </div>

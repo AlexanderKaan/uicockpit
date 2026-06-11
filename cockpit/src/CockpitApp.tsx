@@ -122,7 +122,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
             onCollapse={() => setMenuOpen(false)}
           />
         )}
-        <Stage cfg={cfg} tokens={tokens} view={view} />
+        <Stage cfg={cfg} tokens={tokens} view={view} onViewChange={handleViewChange} />
       </div>
       {exportOpen && (
         <Suspense fallback={null}>

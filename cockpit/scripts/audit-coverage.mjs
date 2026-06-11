@@ -28,10 +28,15 @@ const REPORT = process.argv.includes('--report')
 
 const VIEWS = resolve(ROOT, 'src/stage/views')
 const APPS = resolve(VIEWS, 'apps')
-// The live app sources — the super-app shell + every product + shared helpers.
+// The live app sources — the super-app shell + every product + shared helpers
+// PLUS the showcase layer (H3b): manifests + the block renderer + the theater.
+// A component proven inside a manifest-driven showcase is just as "in product
+// context" as one inside SupaDash — coverage SUMS over both surfaces.
+const SHOWCASES = resolve(ROOT, 'src/showcases')
 const FILES = [
-  ...['DemoDashboard.tsx', 'ChartFrame.tsx', 'Skeletons.tsx'].map((f) => resolve(VIEWS, f)),
+  ...['DemoDashboard.tsx', 'ChartFrame.tsx', 'Skeletons.tsx', 'PagesView.tsx'].map((f) => resolve(VIEWS, f)),
   ...readdirSync(APPS).filter((f) => f.endsWith('.tsx')).map((f) => resolve(APPS, f)),
+  ...readdirSync(SHOWCASES).filter((f) => f.endsWith('.ts') || f.endsWith('.tsx')).map((f) => resolve(SHOWCASES, f)),
 ]
 const HAYSTACK = FILES.map((f) => readFileSync(f, 'utf8')).join('\n')
 

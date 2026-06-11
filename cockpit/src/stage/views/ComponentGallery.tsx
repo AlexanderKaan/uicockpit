@@ -5,6 +5,7 @@ import type { IconName } from '../../icons/concepts'
 import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar, Resizable } from './apps/AppHelpers'
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
+import { popGalleryJump } from '../../state/galleryJump'
 
 // Human label from a card component's function name (the component TYPE):
 // FormCard → "Form", DataTableProCard → "Data Table Pro". (C5)
@@ -120,7 +121,9 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   // Order strategy: highest brand-impact first, token-neutral utilities last.
   // Users should SEE the result of every token change without scrolling.
   const galleryRef = useRef<HTMLDivElement>(null)
-  const [q, setQ] = useState('')
+  // One-shot jump from the Showcases inspect panel: a pending query (set via
+  // setGalleryJump) pre-fills the search exactly once on mount.
+  const [q, setQ] = useState(() => (tier ? popGalleryJump() ?? '' : ''))
   const query = q.trim().toLowerCase()
   const matchesQ = (C: () => ReactElement) => !query || searchText(C).includes(query)
 
