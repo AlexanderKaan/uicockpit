@@ -973,3 +973,60 @@
   font-size: var(--k-type-caption);
   color: var(--k-fg-muted);
 }
+
+/* === Showcases view (.shc) — H3b ======================================
+ * Preview chrome around the manifest theater. Reuses the .lyt__* workbench
+ * vocabulary (scrubber, stage band); .shc__* adds only what showcases need:
+ * the picker row, the app-bar content and the manifest JSON peek. The
+ * RENDERED content inside the scaffold is pure kit — no chrome there. */
+.shc__headrow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--k-s-16);
+}
+.shc__modebar {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--k-s-8) var(--k-s-16) 0;
+}
+.shc__picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--k-s-8);
+  margin-bottom: var(--k-s-12);
+}
+/* Showcases carry real content — taller shell than the wireframe workbench. */
+.shc .lyt__stage .scaffold { height: 640px; }
+.shc__frame { height: 100%; }
+.shc__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-10);
+  padding: var(--k-s-8) var(--k-s-16);
+  border-bottom: var(--k-bw) solid var(--k-border);
+  background: var(--k-chrome-bg);
+  min-height: 48px;
+}
+.shc__bar-title {
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  white-space: nowrap;
+}
+.shc__bar-links { display: inline-flex; gap: var(--k-s-4); margin-left: var(--k-s-12); min-width: 0; overflow: hidden; }
+.shc__bar-spacer { flex: 1; }
+.shc__pane { min-width: 0; }
+/* Detail/flex panes stack their blocks; the composer rides the bottom. */
+.shc__pane.pane--flex,
+.shc__pane.pane--fixed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space, 16px);
+}
+.shc__manifest {
+  margin: 0 0 var(--k-s-12);
+  max-height: 320px;
+  overflow: auto;
+  font-size: var(--k-type-caption);
+}

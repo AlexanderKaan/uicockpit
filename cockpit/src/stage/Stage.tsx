@@ -2,16 +2,16 @@ import { type CSSProperties } from 'react'
 import type { Config, Tokens } from '../tokens/types'
 import { IconProvider } from '../icons/Icon'
 import { ComponentGallery } from './views/ComponentGallery'
-import { DemoDashboard } from './views/DemoDashboard'
 import { FoundationsView } from './views/FoundationsView'
 import { LayoutsView } from './views/LayoutsView'
+import { PagesView } from './views/PagesView'
 
 /* The 5-rung ladder (mirrors src/kit/segments.ts — H3a added the shell rung):
  *   foundations → the resolved token scales (twins the panel)
  *   atoms       → the bare vocabulary (atom-tier gallery cards)
  *   blocks      → stand-alone pieces of app (block-tier gallery cards)
  *   layouts     → the SHELL tier: the adaptive scaffold/nav/pane workbench
- *   pages       → the curated SupaDash super-app (every component in context) */
+ *   pages       → Showcases (manifest-driven screens, H3b) + SupaDash */
 export type ViewKind = 'foundations' | 'atoms' | 'blocks' | 'layouts' | 'pages'
 
 interface StageProps {
@@ -36,7 +36,7 @@ export function Stage({ cfg, tokens, view }: StageProps) {
                 {view === 'atoms' && <ComponentGallery tier="atom" />}
                 {view === 'blocks' && <ComponentGallery tier="block" />}
                 {view === 'layouts' && <LayoutsView />}
-                {view === 'pages' && <DemoDashboard />}
+                {view === 'pages' && <PagesView />}
               </div>
             </IconProvider>
           </div>

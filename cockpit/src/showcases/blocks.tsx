@@ -1,0 +1,165 @@
+import { Icon } from '../icons/Icon'
+import { ChartFrame } from '../stage/views/ChartFrame'
+import type { BlockSpec } from './manifests'
+
+/**
+ * H3b — the block renderer: BlockSpec (data) → KIT recipes (markup).
+ *
+ * The deal that makes manifests honest: every renderer below composes
+ * EXPORTED kit classes (plus the catalogued ChartFrame presenter) — no
+ * showcase-only component CSS. If a block can't be built from the kit, the
+ * kit is missing a recipe, and THAT is the bug to fix (gallery first), not
+ * something to patch here. Seeds are typed by the BlockSpec union, so a
+ * manifest typo fails tsc instead of rendering garbage.
+ */
+export function renderBlock(spec: BlockSpec, key: number) {
+  switch (spec.block) {
+    case 'stats':
+      return (
+        <div className="stat-tile-grid" key={key}>
+          {spec.seed.items.map((s) => (
+            <div className="stat-tile" key={s.label}>
+              <div className="stat-tile__label">{s.label}</div>
+              <div className="stat-tile__value">{s.value}</div>
+              {s.delta && (
+                <div className="stat-tile__foot">
+                  <span className={`stat-tile__delta ${s.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{s.delta}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    case 'chart':
+      return (
+        <div className="card" key={key}>
+          <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>
+          <ChartFrame type={spec.seed.type} labels={spec.seed.labels} series={spec.seed.series} />
+        </div>
+      )
+    case 'list':
+      return (
+        <div className="card" key={key}>
+          {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
+          <div className="list list--flush">
+            {spec.seed.items.map((it) => (
+              <button type="button" className="list__item" key={it.title}>
+                {it.icon && <span className="list__lead list__lead--icon"><Icon name={it.icon} /></span>}
+                <span className="list__body">
+                  <span className="list__title">{it.title}</span>
+                  {it.sub && <span className="list__sub">{it.sub}</span>}
+                </span>
+                <span className="list__trail">
+                  {it.badge && <span className={`badge badge--${it.badge}`}>{it.badge === 'success' ? 'OK' : '!'}</span>}
+                  {it.trail && <span className="list__trail--text">{it.trail}</span>}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )
+    case 'thread':
+      return (
+        <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k-stack-gap, 8px)' }}>
+          {spec.seed.messages.map((m, i) => (
+            <div className="card" key={i} style={m.me ? { borderColor: 'var(--k-primary-soft)', background: 'var(--k-primary-soft)' } : undefined}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <strong style={{ fontSize: 'var(--k-type-small)' }}>{m.name}</strong>
+                <span style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }}>{m.time}</span>
+              </div>
+              <p style={{ fontSize: 'var(--k-type-small)', margin: 0, lineHeight: 1.55, color: m.me ? 'inherit' : 'var(--k-fg-muted)' }}>{m.body}</p>
+            </div>
+          ))}
+        </div>
+      )
+    case 'composer':
+      return (
+        <div className="toolbar" key={key} style={{ marginTop: 'auto' }}>
+          <input className="in" placeholder={spec.seed.placeholder} aria-label="Message" style={{ flex: 1 }} />
+          <button type="button" className="btn btn--ghost btn--icon" aria-label="Attach"><Icon name="plus" /></button>
+          <button type="button" className="btn btn--primary btn--icon" aria-label="Send"><Icon name="chevR" /></button>
+        </div>
+      )
+    case 'table':
+      return (
+        <div className="card" key={key}>
+          {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
+          <table className="tbl">
+            <thead>
+              <tr>{spec.seed.columns.map((c) => <th key={c}>{c}</th>)}</tr>
+            </thead>
+            <tbody>
+              {spec.seed.rows.map((r, i) => (
+                <tr key={i}>{r.map((cell, j) => <td key={j}>{cell}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+    case 'form':
+      return (
+        <div className="card" key={key}>
+          <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>
+          {spec.seed.intro && <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>{spec.seed.intro}</p>}
+          {spec.seed.fields.map((f) => (
+            <label className="lab" key={f.label}>
+              <span>{f.label}</span>
+              <input className="in" defaultValue={f.value} placeholder={f.placeholder} />
+            </label>
+          ))}
+          <div className="card__foot">
+            <button type="button" className="btn btn--ghost">Cancel</button>
+            <button type="button" className="btn btn--primary">{spec.seed.submit}</button>
+          </div>
+        </div>
+      )
+    case 'pricing':
+      return (
+        <div className="pricing" key={key}>
+          {spec.seed.tiers.map((t) => (
+            <div className={`pricing__tier ${t.featured ? 'pricing__tier--featured' : ''}`} key={t.name}>
+              {t.featured && <span className="pricing__badge">Popular</span>}
+              <div className="pricing__name">{t.name}</div>
+              <div className="pricing__price"><span className="pricing__amount">{t.price}</span><span className="pricing__period">{t.period}</span></div>
+              <ul className="pricing__feats">
+                {t.feats.map((f) => <li key={f}>{f}</li>)}
+              </ul>
+              <button type="button" className={`btn ${t.featured ? 'btn--primary' : 'btn--outline'} btn--block`}>{t.cta}</button>
+            </div>
+          ))}
+        </div>
+      )
+    case 'prose':
+      return (
+        <article className="l-center" key={key}>
+          {spec.seed.kicker && <div style={{ fontSize: 'var(--k-type-eyebrow)', fontWeight: 'var(--k-weight-semibold)', color: 'var(--k-primary)', marginBottom: 'var(--k-s-6)' }}>{spec.seed.kicker}</div>}
+          <h2 style={{ fontFamily: 'var(--k-font-display)', fontSize: 'var(--k-type-h2)', margin: '0 0 var(--k-s-12)' }}>{spec.seed.title}</h2>
+          {spec.seed.paragraphs.map((p, i) => (
+            <p key={i} style={{ fontSize: 'var(--k-type-body)', lineHeight: 1.65, color: 'var(--k-fg-muted)', margin: '0 0 var(--k-s-12)' }}>{p}</p>
+          ))}
+        </article>
+      )
+    case 'dl':
+      return (
+        <div className="card" key={key}>
+          {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
+          <dl className="dl">
+            {spec.seed.pairs.map(([dt, dd]) => (
+              <span key={dt} style={{ display: 'contents' }}>
+                <dt>{dt}</dt>
+                <dd>{dd}</dd>
+              </span>
+            ))}
+          </dl>
+        </div>
+      )
+    case 'chips':
+      return (
+        <div className="card__row" key={key} role="radiogroup" aria-label={spec.seed.label} style={{ flexWrap: 'wrap' }}>
+          {spec.seed.options.map((o, i) => (
+            <button type="button" role="radio" aria-checked={i === spec.seed.active} className={`chip ${i === spec.seed.active ? 'chip--on' : ''}`} key={o}>{o}</button>
+          ))}
+        </div>
+      )
+  }
+}

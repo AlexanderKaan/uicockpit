@@ -114,7 +114,7 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
             ['atoms', 'Atoms', Box, 'Bare building blocks — buttons, inputs, badges'],
             ['blocks', 'Blocks', Boxes, 'Ready-made sections — tables, forms, dialogs'],
             ['layouts', 'Layouts', PanelsTopLeft, 'Adaptive shells — scaffold, nav & panes that re-arrange per width'],
-            ['pages', 'Pages', AppWindow, 'Full screens — a real app, themed live'],
+            ['pages', 'Pages', AppWindow, 'Full screens — manifest showcases + the SupaDash app, themed live'],
           ] as [ViewKind, string, typeof Palette, string][]).map(([k, label, Ico, sub]) => (
             <button
               key={k}
