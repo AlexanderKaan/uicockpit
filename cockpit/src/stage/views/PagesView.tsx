@@ -5,6 +5,7 @@ import { renderBlock } from '../../showcases/blocks'
 import { buildTokens } from '../../tokens/buildTokens'
 import type { Config } from '../../tokens/types'
 import { setGalleryJump } from '../../state/galleryJump'
+import { COMPONENTS, componentAt } from '../../showcases/components'
 import type { ViewKind } from '../Stage'
 
 /* Inspectable composition (H3b slice 2): block id → the KIT recipes it maps
@@ -80,12 +81,17 @@ function ShowcaseStage({ m, inspect, split, onViewChange }: { m: ShowcaseManifes
   // not a buried toggle: tags are always on in inspect, and the inspector
   // panel groups the spec, the manifest JSON and the recipe mapping.
   const [picked, setPicked] = useState<{ pane: number; block: number } | null>(null)
+  // A2 — Split's leaf-level selection: the kit component clicked inside the page.
+  const [pickedComp, setPickedComp] = useState<string | null>(null)
   const pickedSpec = picked ? m.panes[picked.pane]?.blocks[picked.block] : undefined
+  const comp = pickedComp ? COMPONENTS[pickedComp] : undefined
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
 
   // Inspect-aware block renderer — wraps each block with its clickable id tag.
+  // In Split, the tags are suppressed: the whole page is leaf-clickable instead
+  // (componentAt resolves the deepest kit component under the cursor).
   const renderInspectable = (b: BlockSpec, i: number, j: number): ReactNode =>
-    inspect ? (
+    inspect && !split ? (
       <div className={`shc__inspect ${picked?.pane === i && picked?.block === j ? 'shc__inspect--on' : ''}`} key={j}>
         <button
           type="button"
@@ -183,21 +189,33 @@ function ShowcaseStage({ m, inspect, split, onViewChange }: { m: ShowcaseManifes
           <aside className="shc__specimen" aria-label="Selected component, isolated">
             <div className="shc__specimen-head">
               <span>Specimen</span>
-              {pickedSpec && <span className="badge badge--info">{pickedSpec.block}</span>}
+              {comp && <span className="badge badge--info">{comp.label}</span>}
             </div>
             <div className="shc__specimen-body">
-              {pickedSpec ? (
-                renderBlock(pickedSpec, 0)
+              {comp ? (
+                comp.specimen()
               ) : (
                 <div className="shc__specimen-empty">
                   <Icon name="search" />
-                  <span>Click a block in the page to isolate it here.</span>
+                  <span>Click any component in the page — it appears here with its recipe.</span>
                 </div>
               )}
             </div>
+            {comp && (
+              <div className="shc__specimen-recipe">
+                <div className="shc__recipe-title">Recipe — how it derives</div>
+                {comp.recipe.map(([k, v]) => (
+                  <div className="shc__recipe-row" key={k}><span className="shc__recipe-k">{k}</span><code className="shc__recipe-v">{v}</code></div>
+                ))}
+                <div className="shc__recipe-blurb">{comp.blurb}</div>
+              </div>
+            )}
           </aside>
         )}
-        <div className={split ? 'shc__splitpage' : undefined}>
+        <div
+          className={split ? 'shc__splitpage' : undefined}
+          onClick={split ? (e) => { const id = componentAt(e.target as Element); if (id) setPickedComp(id) } : undefined}
+        >
           <ShowcaseShell m={m} width={split ? Math.min(width, 1100) : width} renderBlockFn={renderInspectable} />
         </div>
       </div>

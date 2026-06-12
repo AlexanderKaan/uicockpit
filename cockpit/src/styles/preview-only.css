@@ -1122,7 +1122,37 @@
   font-size: var(--k-type-small);
 }
 .shc__specimen-empty svg { width: 24px; height: 24px; opacity: 0.5; }
-.shc__splitpage { min-width: 0; }
+.shc__splitpage { min-width: 0; cursor: default; }
+/* A3 — the Recipe block under the specimen: how the component derives. */
+.shc__specimen-recipe {
+  border-top: var(--k-bw) solid var(--k-border);
+  padding: var(--k-s-12);
+  background: var(--k-surface-sunken);
+}
+.shc__recipe-title {
+  font-size: var(--k-type-caption);
+  font-weight: var(--k-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--k-fg-muted);
+  margin-bottom: var(--k-s-8);
+}
+.shc__recipe-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--k-s-10);
+  padding: var(--k-s-4) 0;
+  font-size: var(--k-type-small);
+}
+.shc__recipe-k { color: var(--k-fg-muted); }
+.shc__recipe-v { font-family: var(--k-font-mono); font-size: var(--k-type-caption); color: var(--k-fg); }
+.shc__recipe-blurb {
+  margin-top: var(--k-s-8);
+  font-size: var(--k-type-caption);
+  color: var(--k-fg-muted);
+  line-height: 1.5;
+}
 /* The Live · Inspect · Matrix segctrl — icon + label per segment. */
 .shc__viewmode .segctrl__btn { display: inline-flex; align-items: center; gap: var(--k-s-6); }
 .shc__viewmode .segctrl__btn svg { width: 14px; height: 14px; }
