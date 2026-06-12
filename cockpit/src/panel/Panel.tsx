@@ -74,9 +74,9 @@ const BUTTON_SHAPE_OPTS = [
   { id: 'pill' as const, cap: 'Pill' },
 ]
 const NEUTRAL_OPTS = [
-  // 'Auto (brand)' spells out what Auto derives from — it tints the grey ramp
-  // toward the brand hue. Without the qualifier "Auto" reads as a mystery default.
-  { id: 'auto' as const, cap: 'Auto (brand)' },
+  // 'Auto' tints the grey ramp toward the brand hue; it sits first as the default,
+  // so the bare word reads clearly beside Cool/Neutral/Warm in the segmented strip.
+  { id: 'auto' as const, cap: 'Auto' },
   { id: 'cool' as const, cap: 'Cool' },
   { id: 'neutral' as const, cap: 'Neutral' },
   { id: 'warm' as const, cap: 'Warm' },
@@ -219,10 +219,15 @@ interface RowDef {
   label: string
   value?: string
   dot?: ReactNode
-  kind: 'opts' | 'font'
+  /** 'seg'/'slider' render INLINE (no flyout) — the configurator-pass default.
+   *  'opts'/'font' keep the flyout (lists, dot-grids, dial-bearing knobs). */
+  kind: 'opts' | 'font' | 'seg' | 'slider'
   opts?: Opt[]
   selected?: string
   grid?: boolean
+  /** Inline seg rows whose options are too wide for one line — render the label
+   *  above a full-width strip (Neutrals · Surface · Press). */
+  stack?: boolean
   onPick?: (id: string) => void
   fontGroups?: FontGroup[]
   fontValue?: string
@@ -334,7 +339,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'scale',
       label: 'Scale',
       value: cap(SCALE_OPTS, cfg.scale),
-      kind: 'opts',
+      kind: 'slider',
       opts: optsFrom(SCALE_OPTS),
       selected: cfg.scale,
       onPick: pick('scale'),
@@ -347,7 +352,8 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'neutral',
       label: 'Neutrals',
       value: cap(NEUTRAL_OPTS, cfg.neutral),
-      kind: 'opts',
+      kind: 'seg',
+      stack: true,
       opts: optsFrom(NEUTRAL_OPTS),
       selected: cfg.neutral,
       onPick: pick('neutral'),
@@ -415,7 +421,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'palette',
       label: 'Palette',
       value: cap(PALETTE_OPTS, cfg.palette),
-      kind: 'opts',
+      kind: 'seg',
       opts: optsFrom(PALETTE_OPTS),
       selected: cfg.palette,
       onPick: pick('palette'),
@@ -443,7 +449,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'typeScale',
       label: 'Text size',
       value: cap(TYPESCALE_OPTS, cfg.typeScale),
-      kind: 'opts',
+      kind: 'seg',
       opts: optsFrom(TYPESCALE_OPTS),
       selected: cfg.typeScale,
       onPick: pick('typeScale'),
@@ -453,7 +459,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'radius',
       label: 'Box radius',
       value: cap(RADIUS_OPTS, cfg.radius),
-      kind: 'opts',
+      kind: 'slider',
       opts: optsFrom(RADIUS_OPTS, VIZ_RADIUS),
       selected: cfg.radius,
       onPick: pick('radius'),
@@ -462,7 +468,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'buttonShape',
       label: 'Button radius',
       value: cap(BUTTON_SHAPE_OPTS, cfg.buttonShape),
-      kind: 'opts',
+      kind: 'slider',
       opts: optsFrom(BUTTON_SHAPE_OPTS, VIZ_BUTTON_SHAPE),
       selected: cfg.buttonShape,
       onPick: pick('buttonShape'),
@@ -547,7 +553,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'surfaceDepth',
       label: 'Elevation',
       value: cap(SURFACE_DEPTH_OPTS, cfg.surfaceDepth),
-      kind: 'opts',
+      kind: 'slider',
       opts: optsFrom(SURFACE_DEPTH_OPTS),
       selected: cfg.surfaceDepth,
       onPick: pick('surfaceDepth'),
@@ -560,7 +566,8 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'surface',
       label: 'Surface',
       value: cap(SURFACE_OPTS, cfg.surface),
-      kind: 'opts',
+      kind: 'seg',
+      stack: true,
       opts: optsFrom(SURFACE_OPTS),
       selected: cfg.surface,
       onPick: pick('surface'),
@@ -569,7 +576,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'borders',
       label: 'Border',
       value: cap(BORDER_OPTS, cfg.borders),
-      kind: 'opts',
+      kind: 'slider',
       opts: optsFrom(BORDER_OPTS),
       selected: cfg.borders,
       onPick: pick('borders'),
@@ -581,7 +588,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'stateIntensity',
       label: 'States',
       value: cap(STATE_INTENSITY_OPTS, cfg.stateIntensity),
-      kind: 'opts',
+      kind: 'slider',
       opts: optsFrom(STATE_INTENSITY_OPTS),
       selected: cfg.stateIntensity,
       onPick: pick('stateIntensity'),
@@ -590,7 +597,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'stateTint',
       label: 'State tint',
       value: cap(STATE_TINT_OPTS, cfg.stateTint),
-      kind: 'opts',
+      kind: 'seg',
       opts: optsFrom(STATE_TINT_OPTS),
       selected: cfg.stateTint,
       onPick: pick('stateTint'),
@@ -599,7 +606,8 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'press',
       label: 'Press',
       value: cap(PRESS_OPTS, cfg.press),
-      kind: 'opts',
+      kind: 'seg',
+      stack: true,
       opts: optsFrom(PRESS_OPTS),
       selected: cfg.press,
       onPick: pick('press'),
@@ -609,7 +617,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'motion',
       label: 'Motion',
       value: cap(MOTION_OPTS, cfg.motion),
-      kind: 'opts',
+      kind: 'slider',
       opts: optsFrom(MOTION_OPTS, VIZ_MOTION),
       selected: cfg.motion,
       onPick: pick('motion'),
@@ -619,7 +627,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'motionScheme',
       label: 'Springs',
       value: cap(MOTION_SCHEME_OPTS, cfg.motionScheme),
-      kind: 'opts',
+      kind: 'seg',
       opts: optsFrom(MOTION_SCHEME_OPTS),
       selected: cfg.motionScheme,
       onPick: pick('motionScheme'),
@@ -628,7 +636,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       key: 'iconSet',
       label: 'Icons',
       value: cap(ICON_OPTS, cfg.iconSet),
-      kind: 'opts',
+      kind: 'seg',
       opts: optsFrom(ICON_OPTS, VIZ_ICONS),
       selected: cfg.iconSet,
       onPick: pick('iconSet'),
@@ -651,53 +659,140 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
           </button>
         </div>
         <div className="fmenu__rows">
-          {rows.map((r) => (
+          {rows.map((r) => {
+            // 'seg'/'slider' render the control INLINE in the row (no flyout) —
+            // the configurator-pass "everything visible" surface. 'opts'/'font'
+            // keep the click-to-open flyout (dot-grids, font lists, dial knobs).
+            const inline = r.kind === 'seg' || r.kind === 'slider'
+            return (
             <Fragment key={r.key}>
               {r.sec && (
                 FND_LINK[r.sec]
                   ? <button type="button" className="fmsec fmsec--link" onClick={() => jumpToFoundation(r.sec!)} title={`Jump to ${r.sec} in Foundations`}>{r.sec}</button>
                   : <div className="fmsec">{r.sec}</div>
               )}
-              <div className={`fmrow ${openKey === r.key ? 'fmrow--open' : ''} ${ESSENTIAL_KEYS.has(r.key) ? 'fmrow--key' : ''}`}>
-                <button
-                  type="button"
-                  className="fmrow__head"
-                  onClick={() => setOpenKey((k) => (k === r.key ? null : r.key))}
-                  aria-expanded={openKey === r.key}
-                >
-                  <span className="fmrow__label">{r.label}</span>
-                  <span className="fmrow__val" title={r.value}>
-                    {r.dot && <span className="fmrow__dot fmrow__dot--viz">{r.dot}</span>}
-                    <span className="fmrow__val-text">{r.value}</span>
-                  </span>
-                  <ChevronRight size={14} strokeWidth={2} className="fmrow__chev" />
-                </button>
-                {openKey === r.key && (
-                  <div className={`fmrow__pop ${r.kind === 'font' ? 'fmrow__pop--font' : ''}`} role="menu">
-                    {r.kind === 'opts' ? (
-                      <OptionList
-                        opts={r.opts ?? []}
-                        selected={r.selected}
-                        grid={r.grid}
-                        onPick={r.onPick ?? (() => {})}
-                      />
+              <div className={`fmrow ${inline ? 'fmrow--inline' : ''} ${openKey === r.key ? 'fmrow--open' : ''} ${ESSENTIAL_KEYS.has(r.key) ? 'fmrow--key' : ''}`}>
+                {inline ? (
+                  <div className={`fmrow__inline ${r.stack ? 'fmrow__inline--stack' : ''}`}>
+                    <span className="fmrow__label">{r.label}</span>
+                    {r.kind === 'slider' ? (
+                      <Slider opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
                     ) : (
-                      <FontPicker
-                        inline
-                        value={r.fontValue ?? ''}
-                        groups={r.fontGroups ?? []}
-                        onChange={(f) => { r.onFont?.(f); close() }}
-                      />
+                      <Segmented opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
                     )}
-                    {r.footer}
                   </div>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="fmrow__head"
+                      onClick={() => setOpenKey((k) => (k === r.key ? null : r.key))}
+                      aria-expanded={openKey === r.key}
+                    >
+                      <span className="fmrow__label">{r.label}</span>
+                      <span className="fmrow__val" title={r.value}>
+                        {r.dot && <span className="fmrow__dot fmrow__dot--viz">{r.dot}</span>}
+                        <span className="fmrow__val-text">{r.value}</span>
+                      </span>
+                      <ChevronRight size={14} strokeWidth={2} className="fmrow__chev" />
+                    </button>
+                    {openKey === r.key && (
+                      <div className={`fmrow__pop ${r.kind === 'font' ? 'fmrow__pop--font' : ''}`} role="menu">
+                        {r.kind === 'opts' ? (
+                          <OptionList
+                            opts={r.opts ?? []}
+                            selected={r.selected}
+                            grid={r.grid}
+                            onPick={r.onPick ?? (() => {})}
+                          />
+                        ) : (
+                          <FontPicker
+                            inline
+                            value={r.fontValue ?? ''}
+                            groups={r.fontGroups ?? []}
+                            onChange={(f) => { r.onFont?.(f); close() }}
+                          />
+                        )}
+                        {r.footer}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </Fragment>
-          ))}
+            )
+          })}
         </div>
       </div>
     </aside>
+  )
+}
+
+/** Inline SEGMENTED control — a strip of equal pills, the active one lifted.
+ *  Replaces a flyout for nominal settings (≤4 short options, or icon glyphs):
+ *  the choice is always visible, one click to change — the shadcn "all-open"
+ *  feel the configurator-pass is after. */
+function Segmented({
+  opts,
+  selected,
+  onPick,
+  ariaLabel,
+}: {
+  opts: Opt[]
+  selected?: string
+  onPick: (id: string) => void
+  ariaLabel: string
+}) {
+  return (
+    <div className="fmseg" role="radiogroup" aria-label={ariaLabel}>
+      {opts.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          role="radio"
+          aria-checked={o.id === selected}
+          className={`fmseg__opt ${o.id === selected ? 'fmseg__opt--on' : ''} ${o.viz ? 'fmseg__opt--viz' : ''}`}
+          onClick={() => onPick(o.id)}
+          title={o.label}
+        >
+          {o.viz ? <span className="fmseg__viz">{o.viz}</span> : o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** Inline discrete SLIDER — an ordered axis (Scale, Box radius, Elevation…)
+ *  as a track the user drags between named steps, with the current step read
+ *  out at the right. The options array IS the scale, in order; the slider maps
+ *  index↔option so the named steps and the export stay identical. */
+function Slider({
+  opts,
+  selected,
+  onPick,
+  ariaLabel,
+}: {
+  opts: Opt[]
+  selected?: string
+  onPick: (id: string) => void
+  ariaLabel: string
+}) {
+  const idx = Math.max(0, opts.findIndex((o) => o.id === selected))
+  const cur = opts[idx]
+  return (
+    <div className="fmsld">
+      <input
+        type="range"
+        min={0}
+        max={Math.max(0, opts.length - 1)}
+        step={1}
+        value={idx}
+        onChange={(e) => { const o = opts[+e.target.value]; if (o) onPick(o.id) }}
+        aria-label={ariaLabel}
+        aria-valuetext={cur?.label}
+      />
+      <span className="fmsld__val">{cur?.label}</span>
+    </div>
   )
 }
 

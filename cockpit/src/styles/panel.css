@@ -117,7 +117,8 @@
  * the look, so they read as PRIMARY: a heavier label + a quiet neutral tick on the
  * left. Neutral on purpose (the panel carries no brand colour), and distinct from
  * the recessed active state (which is a background, not a tick). */
-.fmrow--key > .fmrow__head > .fmrow__label { font-weight: 680; color: var(--app-fg); }
+.fmrow--key > .fmrow__head > .fmrow__label,
+.fmrow--key > .fmrow__inline > .fmrow__label { font-weight: 680; color: var(--app-fg); }
 .fmrow--key::before {
   content: "";
   position: absolute;
@@ -372,6 +373,114 @@
   background: #fff;
   border: 1.5px solid var(--app-fg-muted);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+/* === Inline controls (configurator-pass) — the control lives IN the row,
+ * no flyout. 'seg' = a segmented strip (nominal), 'slider' = a discrete track
+ * (ordinal). Label sits left at its natural width; the control takes the rest,
+ * so the choice is always visible (the shadcn "everything open" feel). === */
+.fmrow__inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  min-height: 36px;
+}
+.fmrow__inline > .fmrow__label { flex: none; }
+.fmrow__inline > .fmseg,
+.fmrow__inline > .fmsld { flex: 1; min-width: 0; }
+/* Stacked variant — label above a full-width strip, for segmented sets whose
+ * options are too wide to share a line with the label (Neutrals · Surface · Press). */
+.fmrow__inline--stack { flex-direction: column; align-items: stretch; gap: 5px; padding-top: 6px; padding-bottom: 6px; }
+.fmrow__inline--stack > .fmrow__label { font-size: 12px; }
+
+/* Segmented strip — a recessed track of equal pills; the active pill lifts to
+ * the surface colour (matches the panel's recessed-active language). */
+.fmseg {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+}
+.fmseg__opt {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px 5px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--app-fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease);
+}
+.fmseg__opt:hover { color: var(--app-fg); }
+.fmseg__opt--on {
+  background: var(--app-surface);
+  color: var(--app-fg);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+}
+/* Icon-glyph segment (Icons row) — center the family glyph, no text. */
+.fmseg__opt--viz { display: inline-flex; align-items: center; justify-content: center; padding: 3px; }
+.fmseg__viz { display: inline-flex; }
+
+/* Discrete slider — track + the current step's name read out at the right.
+ * Same thumb/track language as the Harmony/Signature dials (.fmslider). */
+.fmsld { display: flex; align-items: center; gap: 9px; }
+.fmsld input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  height: 16px;
+  background: transparent;
+  cursor: pointer;
+}
+.fmsld input[type='range']::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--app-border);
+}
+.fmsld input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 999px;
+  background: var(--app-surface);
+  border: 1.5px solid var(--app-fg-muted);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+.fmsld input[type='range']::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--app-border);
+}
+.fmsld input[type='range']::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--app-surface);
+  border: 1.5px solid var(--app-fg-muted);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+.fmsld__val {
+  flex: none;
+  min-width: 58px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-fg);
+  white-space: nowrap;
 }
 
 /* Reduced-motion: the chrome guard at the file end already covers fmrow__pop. */
