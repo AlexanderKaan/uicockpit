@@ -8,14 +8,19 @@
  * the gallery POPS it once in its useState initializer. Deliberately not
  * reactive — it's a baton pass, not shared state.
  */
-let pending: string | null = null
+let pending: { q: string; tier?: 'atom' | 'block' } | null = null
 
-export const setGalleryJump = (query: string): void => {
-  pending = query
+export const setGalleryJump = (query: string, tier?: 'atom' | 'block'): void => {
+  pending = { q: query, tier }
 }
 
+/** Read the pending jump's tier WITHOUT consuming it — the Components view uses
+ *  this to pre-select the right altitude so the searched component is visible
+ *  before the gallery pops the query. */
+export const peekGalleryJumpTier = (): 'atom' | 'block' | undefined => pending?.tier
+
 export const popGalleryJump = (): string | null => {
-  const q = pending
+  const q = pending?.q ?? null
   pending = null
   return q
 }

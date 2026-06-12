@@ -57,6 +57,12 @@
 }
 
 
+/* === Altitude sub-toggle (Fase I-C) — the thin bar carrying the Atom/Block
+ * (Components) and Screens/Shells (Pages) segctrl above the merged stage. The
+ * segctrl itself is a real kit component, so it themes with the live config. */
+.stagewrap { display: flex; flex-direction: column; min-width: 0; }
+.stagewrap__bar { display: flex; margin-bottom: var(--k-s-16); }
+
 /* === Component gallery — full-width CSS-Grid masonry ===
  * Grid (not CSS-columns) so SOME cards can lie landscape across two columns
  * (.card--wide → tables, kanban, charts, file grids, steppers, media) and the

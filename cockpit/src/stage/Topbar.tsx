@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, Box, Boxes, Check, ChevronDown, Code, Dices, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 , PanelsTopLeft } from 'lucide-react'
+import { AppWindow, Boxes, Check, ChevronDown, Code, Dices, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -103,18 +103,16 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         <A11yBadge audit={audit} pass={pass} total={total} allPass={allPass} />
       </div>
       <div className="topbar__center">
-        {/* The 4-layer ladder switcher (mirrors src/kit/segments.ts) — author the
-         * Foundation, then climb the rungs: Atoms → Blocks → Pages. Replaces the
-         * old 2-way Components/Application toggle. */}
+        {/* The altitude ladder (Fase I-C) — three visited stages, low → high:
+         * Foundation (tokens) → Components (Atom/Block sub-toggle) → Pages
+         * (Screens/Shells sub-toggle). The 5-rung graph, collapsed; nothing lost. */}
         <div className="view-toggle" role="tablist" aria-label="View">
-          {/* Tooltips bridge the ladder's taxonomy to plain language for the
-           * vibe-coder audience (C7) — the names stay, the meaning is one hover away. */}
+          {/* Tooltips bridge the taxonomy to plain language for the vibe-coder
+           * audience (C7) — the meaning is one hover away. */}
           {([
             ['foundations', 'Foundations', Palette, 'Tokens & scales — the design decisions'],
-            ['atoms', 'Atoms', Box, 'Bare building blocks — buttons, inputs, badges'],
-            ['blocks', 'Blocks', Boxes, 'Ready-made sections — tables, forms, dialogs'],
-            ['layouts', 'Layouts', PanelsTopLeft, 'Adaptive shells — scaffold, nav & panes that re-arrange per width'],
-            ['pages', 'Pages', AppWindow, 'Full screens — manifest showcases + the SupaDash app, themed live'],
+            ['components', 'Components', Boxes, 'The vocabulary — Atoms (bare) & Blocks (ready-made sections)'],
+            ['pages', 'Pages', AppWindow, 'Full screens — manifest showcases — plus the adaptive Shells'],
           ] as [ViewKind, string, typeof Palette, string][]).map(([k, label, Ico, sub]) => (
             <button
               key={k}

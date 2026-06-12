@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ComponentType, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import {
-  AppWindow, Boxes, Box, Code, Dices, Link2, Moon, Palette, PanelsTopLeft, RotateCcw, Search, Sliders, Square, Sun, Redo2, Undo2, Layers,
+  AppWindow, Boxes, Code, Dices, Link2, Moon, Palette, RotateCcw, Search, Sliders, Square, Sun, Redo2, Undo2, Layers,
 } from 'lucide-react'
 import type { Config, Tokens } from '../tokens/types'
 import type { ConfigAction } from '../state/configReducer'
@@ -69,9 +69,7 @@ export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, 
     // Navigate
     const views: { v: ViewKind; label: string; icon: Cmd['icon'] }[] = [
       { v: 'foundations', label: 'Foundations', icon: Sliders },
-      { v: 'atoms', label: 'Atoms', icon: Box },
-      { v: 'blocks', label: 'Blocks', icon: Boxes },
-      { v: 'layouts', label: 'Layouts', icon: PanelsTopLeft },
+      { v: 'components', label: 'Components', icon: Boxes },
       { v: 'pages', label: 'Pages', icon: AppWindow },
     ]
     for (const { v, label, icon } of views) cmds.push({ group: 'Go to', label: `Go to ${label}`, icon, run: () => onViewChange(v) })

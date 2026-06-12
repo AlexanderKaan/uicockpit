@@ -37,7 +37,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   // Land on Blocks (C7): the ladder runs abstract→concrete, but visitor curiosity
   // runs concrete→abstract — real, instantly-themeable surfaces are the hook;
   // Foundations stays the inspect layer one tab away.
-  const [view, setView] = useState<ViewKind>('blocks')
+  const [view, setView] = useState<ViewKind>('components')
   const [saved, setSaved] = useState(true)
   const [exportOpen, setExportOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)

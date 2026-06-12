@@ -35,25 +35,25 @@ const BLOCK_RECIPES: Record<BlockSpec['block'], string> = {
 /* Cross-view jump: block id → the gallery view + search query that surfaces
  * its card(s). The query rides the one-shot galleryJump mailbox; the gallery
  * pops it on mount and pre-fills its search. */
-const BLOCK_GALLERY: Record<BlockSpec['block'], { view: ViewKind; q: string }> = {
-  stats: { view: 'blocks', q: 'stat' },
-  chart: { view: 'blocks', q: 'chart' },
-  list: { view: 'atoms', q: 'list' },
-  thread: { view: 'atoms', q: 'card' },
-  composer: { view: 'atoms', q: 'toolbar' },
-  table: { view: 'atoms', q: 'table' },
-  form: { view: 'atoms', q: 'form' },
-  pricing: { view: 'blocks', q: 'pricing' },
+const BLOCK_GALLERY: Record<BlockSpec['block'], { view: ViewKind; tier?: 'atom' | 'block'; q: string }> = {
+  stats: { view: 'components', tier: 'block', q: 'stat' },
+  chart: { view: 'components', tier: 'block', q: 'chart' },
+  list: { view: 'components', tier: 'atom', q: 'list' },
+  thread: { view: 'components', tier: 'atom', q: 'card' },
+  composer: { view: 'components', tier: 'atom', q: 'toolbar' },
+  table: { view: 'components', tier: 'atom', q: 'table' },
+  form: { view: 'components', tier: 'atom', q: 'form' },
+  pricing: { view: 'components', tier: 'block', q: 'pricing' },
   prose: { view: 'foundations', q: '' },
-  dl: { view: 'atoms', q: 'description' },
-  chips: { view: 'atoms', q: 'chip' },
-  kanban: { view: 'blocks', q: 'kanban' },
-  tree: { view: 'atoms', q: 'tree' },
-  timeline: { view: 'atoms', q: 'timeline' },
-  settings: { view: 'atoms', q: 'toggle' },
-  wizard: { view: 'atoms', q: 'stepper' },
-  dropzone: { view: 'atoms', q: 'dropzone' },
-  media: { view: 'atoms', q: 'aspect' },
+  dl: { view: 'components', tier: 'atom', q: 'description' },
+  chips: { view: 'components', tier: 'atom', q: 'chip' },
+  kanban: { view: 'components', tier: 'block', q: 'kanban' },
+  tree: { view: 'components', tier: 'atom', q: 'tree' },
+  timeline: { view: 'components', tier: 'atom', q: 'timeline' },
+  settings: { view: 'components', tier: 'atom', q: 'toggle' },
+  wizard: { view: 'components', tier: 'atom', q: 'stepper' },
+  dropzone: { view: 'components', tier: 'atom', q: 'dropzone' },
+  media: { view: 'components', tier: 'atom', q: 'aspect' },
 }
 
 /**
@@ -161,7 +161,7 @@ function ShowcaseStage({ m, inspect, split, onViewChange }: { m: ShowcaseManifes
                   className="btn btn--outline btn--xs"
                   onClick={() => {
                     const target = BLOCK_GALLERY[pickedSpec.block]
-                    setGalleryJump(target.q)
+                    setGalleryJump(target.q, target.tier)
                     onViewChange(target.view)
                   }}
                 >
