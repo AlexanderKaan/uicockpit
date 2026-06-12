@@ -21,7 +21,8 @@
     "audit:coverage": "node scripts/audit-coverage.mjs",
     "audit:modifiers": "node scripts/audit-modifiers.mjs",
     "audit:provenance": "node scripts/scan-app-provenance.mjs",
-    "audit:controls": "node scripts/audit-dead-controls.mjs"
+    "audit:controls": "node scripts/audit-dead-controls.mjs",
+    "check": "node scripts/uicockpit-check.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
