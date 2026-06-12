@@ -37,19 +37,14 @@ const DEF_FILES = ['src/kit/recipes/index.ts', 'src/styles/preview-only.css', 's
 const GALLERY_FILES = [
   'src/stage/views/ComponentGallery.tsx',
   'src/stage/views/ChartFrame.tsx',
-  'src/stage/views/Skeletons.tsx',
   'src/stage/views/apps/AppHelpers.tsx',
   // The Foundations stage view demonstrates foundation-tier recipes (the layout
   // primitives + their .l-center--narrow/--wide modifiers) — a real demo surface.
   'src/stage/views/FoundationsView.tsx',
 ]
-// App = the live SupaDash screens (NOT the shared AppHelpers helper).
-const APP_FILES = [
-  'src/stage/views/DemoDashboard.tsx',
-  ...readdirSync(resolve(ROOT, 'src/stage/views/apps'))
-    .filter((f) => f.endsWith('.tsx') && f !== 'AppHelpers.tsx')
-    .map((f) => join('src/stage/views/apps', f)),
-]
+// App = the manifest-driven showcase renderer (H3c — SupaDash retired); blocks.tsx
+// composes EXPORTED kit recipes only. (PagesView is workbench chrome, not "app".)
+const APP_FILES = ['src/showcases/blocks.tsx']
 
 /* App-FRAME modifier prefixes — the demo shell / viewport chrome is intentionally
  * app-only and not a catalogue component (mirrors audit-parity's FRAME_PREFIXES). */

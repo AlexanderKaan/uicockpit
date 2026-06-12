@@ -27,55 +27,33 @@ const ROOT = resolve(HERE, '..')
 const REPORT = process.argv.includes('--report')
 
 const VIEWS = resolve(ROOT, 'src/stage/views')
-const APPS = resolve(VIEWS, 'apps')
-// The live app sources — the super-app shell + every product + shared helpers
-// PLUS the showcase layer (H3b): manifests + the block renderer + the theater.
-// A component proven inside a manifest-driven showcase is just as "in product
-// context" as one inside SupaDash — coverage SUMS over both surfaces.
+// H3c — SupaDash retired. The product surface is now the manifest-driven showcase
+// layer ONLY: blocks.tsx (BlockSpec → kit recipes) + manifests.ts (the seeds) +
+// PagesView.tsx (the theater's shell chrome) + ChartFrame (the chart presenter
+// blocks compose). Coverage now tracks what the SHOWCASES demonstrate — a smaller,
+// honest set than the old 58-deep SupaDash surface (a deliberate trade, recorded
+// in ROADMAP H3c). Components only shown bare in the gallery are gallery-only.
 const SHOWCASES = resolve(ROOT, 'src/showcases')
 const FILES = [
-  ...['DemoDashboard.tsx', 'ChartFrame.tsx', 'Skeletons.tsx', 'PagesView.tsx'].map((f) => resolve(VIEWS, f)),
-  ...readdirSync(APPS).filter((f) => f.endsWith('.tsx')).map((f) => resolve(APPS, f)),
+  ...['ChartFrame.tsx', 'PagesView.tsx'].map((f) => resolve(VIEWS, f)),
   ...readdirSync(SHOWCASES).filter((f) => f.endsWith('.ts') || f.endsWith('.tsx')).map((f) => resolve(SHOWCASES, f)),
 ]
 const HAYSTACK = FILES.map((f) => readFileSync(f, 'utf8')).join('\n')
 
-// component → a marker substring proving it renders in a live app screen.
+// component → a marker substring proving it renders in a manifest-driven showcase.
+// This is the showcase BLOCK vocabulary + the shell tier the theater composes.
 const MARKERS = {
-  // Dashboard widgets (Home)
-  StatTile: 'stat-tile', UsageMeter: 'usage--', Progress: 'progress__fill',
-  Chart: 'barchart', List: 'list__item', Spinner: 'spinner', Alerts: 'alert alert--',
-  Skeleton: 'PageSkeleton',
-  // Projects
-  Kanban: 'kanban', DataTablePro: 'datatable', Sheet: 'sheet__', TagInput: 'taginput',
-  Pagination: 'pagination', ContextMenu: 'ctxmenu', DescriptionList: 'dl"',
-  Timeline: 'timeline__', TwoColumnLayout: 'twocol', RadioCard: 'radio-card',
-  DatePicker: 'DatePicker',
-  // Docs
-  Typography: 'k-font-display', TreeView: 'tree__row', Accordion: 'accordion',
-  Tabs: 'tabpanel', Toolbar: 'toolbar', Lightbox: 'lightbox', CodeBlock: 'codeblock',
-  Carousel: 'carousel',
-  // Inbox
-  Combobox: 'combobox', AttachmentChip: 'att-chip',
-  HoverCard: 'hover-card',
-  // CRM
-  Popover: 'popover', Validation: 'is-error', PhoneInput: 'phoneinput',
-  // Cloud
-  StatusPage: 'statuspage', InfoCard: 'info-card', Banner: 'banner--',
-  // Billing
-  WizardStepper: 'wstepper', NumberInput: 'numinput',
-  PricingCard: 'pricing__',
-  // Media
-  Dropzone: 'dropzone',
-  // Settings & Account
-  SettingsRow: 'list--settings', Switch: 'toggle', Slider: 'InteractiveSlider',
-  InputOtp: 'otp__slot', DangerZone: 'dangerzone', AlertDialog: 'dialog--alert',
-  Dialog: 'dialog"', Selection: 'radio"',
-  PasswordInput: 'type="password"', Stepper: 'stepper__',
-  // Shell / chrome
-  Breadcrumb: 'breadcrumb', Avatar: 'avatar', NotificationCenter: 'list--flush',
-  DropdownMenu: 'menu__item', CmdPalette: 'Cmdp', Select: 'select"',
-  StatusBadge: 'StatusBadge', NavMenu: 'navmenu',
+  // Block tier — the 18 typed blocks (showcases/blocks.tsx)
+  StatTile: 'stat-tile', Chart: 'ChartFrame', List: 'list__item', Card: 'card"',
+  Thread: 'primary-soft', Composer: 'toolbar', Input: 'className="in"', Table: 'tbl',
+  Form: 'className="lab"', Pricing: 'pricing__', Prose: 'l-center',
+  DescriptionList: 'className="dl"', Chip: 'chip ', Kanban: 'kanban__',
+  TreeView: 'tree__row', Timeline: 'timeline__', SettingsRow: 'list--settings',
+  Switch: 'toggle', WizardStepper: 'wstepper', Stepper: 'stepper__',
+  Dropzone: 'dropzone', Media: 'aspect--1x1', Badge: 'badge badge--',
+  // Shell tier — the adaptive scaffold the showcase theater renders (PagesView)
+  Scaffold: 'scaffold scaffold--', NavSuite: 'navsuite', Pane: 'PANE_CLASS',
+  Avatar: 'avatar avatar--', Tab: 'tab ', Segmented: 'segctrl',
 }
 
 // Intentionally gallery-only — no believable product home. Logged, not failed.

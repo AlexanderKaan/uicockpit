@@ -36,25 +36,20 @@ const DEF_FILES = ['src/kit/recipes/index.ts', 'src/styles/preview-only.css', 's
 const PAGE_FILES = [
   'src/stage/views/ComponentGallery.tsx',
   'src/stage/views/ChartFrame.tsx',
-  'src/stage/views/Skeletons.tsx',
   'src/stage/views/apps/AppHelpers.tsx',
 ]
-/* APP = the live SupaDash screens (NOT the shared AppHelpers helper). */
-const APP_FILES = [
-  'src/stage/views/DemoDashboard.tsx',
-  ...readdirSync(resolve(ROOT, 'src/stage/views/apps'))
-    .filter((f) => f.endsWith('.tsx') && f !== 'AppHelpers.tsx')
-    .map((f) => join('src/stage/views/apps', f)),
-]
+/* APP = the manifest-driven showcase renderer (H3c — SupaDash retired). blocks.tsx
+ * maps every BlockSpec onto EXPORTED kit recipes, so it IS the honest app surface
+ * (manifests.ts is pure data; PagesView is preview workbench chrome, like
+ * LayoutsView, and is not treated as "app"). */
+const APP_FILES = ['src/showcases/blocks.tsx']
 
 /* App-FRAME prefixes — intentionally app-only (the live demo shell + a few
  * page-specific showcase surfaces). These are NOT catalogue components, so the
  * gallery is not expected to carry them. Keep this list tight + documented. */
 const FRAME_PREFIXES = [
-  'dash',        // super-app shell (sidebar/header/main/page/stats/navfoot…)
-  'app-frame',   // desktop/mobile viewport frame
-  'viewtoggle',  // components↔application switch
-  'm-statusbar', // mobile status bar chrome
+  'l-center',    // foundation layout primitive (centered measure) — the prose block
+                 // composes it; it's demonstrated in FoundationsView, not a card.
 ]
 
 /* Primitives / composition wrappers / sub-parts that legitimately live only in

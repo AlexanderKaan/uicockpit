@@ -2,7 +2,6 @@ import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, type BlockSpec, type ShowcaseManifest } from '../../showcases/manifests'
 import { renderBlock } from '../../showcases/blocks'
-import { DemoDashboard } from './DemoDashboard'
 import { buildTokens } from '../../tokens/buildTokens'
 import type { Config } from '../../tokens/types'
 import { setGalleryJump } from '../../state/galleryJump'
@@ -288,7 +287,6 @@ function MatrixCell({ m, cfg, label, scale = 0.42 }: { m: ShowcaseManifest; cfg:
 }
 
 export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
-  const [mode, setMode] = useState<'showcases' | 'supadash'>('showcases')
   const [showcaseId, setShowcaseId] = useState(SHOWCASES[0]!.id)
   // The three WAYS OF LOOKING at one manifest — a first-class segctrl, not
   // buried toggles: Live (the theater) · Inspect (spec + recipes + JSON) ·
@@ -298,23 +296,11 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
   const [matrixAll, setMatrixAll] = useState(false)
   const m = SHOWCASES.find((s) => s.id === showcaseId)!
 
-  if (mode === 'supadash') {
-    return (
-      <div className="shc">
-        <div className="shc__modebar">
-          <ModeToggle mode={mode} onMode={setMode} />
-        </div>
-        <DemoDashboard />
-      </div>
-    )
-  }
-
   return (
     <div className="lyt shc">
       <header className="lyt__head">
         <div className="shc__headrow">
           <h2 className="lyt__title">Showcases — pages as manifests</h2>
-          <ModeToggle mode={mode} onMode={setMode} />
         </div>
         <p className="lyt__intro">
           A page here is <em>data</em>: archetype × nav × panes of seeded blocks, rendered through
@@ -406,14 +392,3 @@ const VIEWMODE_HINT: Record<'live' | 'inspect' | 'matrix', string> = {
   matrix: 'See your live kit beside two curated contrasts — same structure, different style.',
 }
 
-function ModeToggle({ mode, onMode }: { mode: 'showcases' | 'supadash'; onMode: (m: 'showcases' | 'supadash') => void }) {
-  return (
-    <div className="segctrl" role="radiogroup" aria-label="Pages mode">
-      {([['showcases', 'Showcases'], ['supadash', 'SupaDash']] as const).map(([id, label]) => (
-        <button key={id} type="button" role="radio" aria-checked={mode === id} className={`segctrl__btn ${mode === id ? 'segctrl__btn--on' : ''}`} onClick={() => onMode(id)}>
-          {label}
-        </button>
-      ))}
-    </div>
-  )
-}
