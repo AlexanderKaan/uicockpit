@@ -1,5 +1,2422 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`genContract (Fase D1 — the machine-readable contract) > matches snapshot for soft + cobalt sample 1`] = `
+"{
+  "$schema": "https://uicockpit.com/contract/v1",
+  "contractVersion": 1,
+  "name": "uicockpit-kit",
+  "config": {
+    "colorTheme": "cobalt",
+    "color": "tone",
+    "radius": "round",
+    "buttonShape": "match",
+    "scale": "comfortable",
+    "typeScale": "md",
+    "fontDisplay": "Inter",
+    "fontBody": "Inter",
+    "iconSet": "line",
+    "surfaceDepth": "layered",
+    "surface": "outlined",
+    "borders": "subtle",
+    "motion": "smooth",
+    "motionTempo": "normal",
+    "motionCurve": "standard",
+    "stateIntensity": "whisper",
+    "stateTint": "neutral",
+    "press": "scale",
+    "motionScheme": "standard",
+    "cPrimary": "#0A84FF",
+    "harmony": "tonal",
+    "spread": 60,
+    "expression": 100,
+    "shapePoints": 8,
+    "shapeDepth": 0.12,
+    "shapeSoft": 0.8,
+    "shapeJitter": 0,
+    "palette": "vivid",
+    "neutral": "auto",
+    "mode": "light"
+  },
+  "tokens": {
+    "--k-accent": "oklch(54.1% 0.2701 298.9)",
+    "--k-accent-1": "oklch(62.3% 0.1589 252.4)",
+    "--k-accent-1-ink": "#ffffff",
+    "--k-accent-1-soft": "oklch(89.0% 0.0437 248.3)",
+    "--k-accent-1-soft-fg": "oklch(33.9% 0.0953 253.0)",
+    "--k-accent-2": "oklch(64.9% 0.2616 332.9)",
+    "--k-accent-2-ink": "#ffffff",
+    "--k-accent-2-soft": "oklch(88.1% 0.0814 329.6)",
+    "--k-accent-2-soft-fg": "oklch(35.9% 0.1527 333.0)",
+    "--k-accent-3": "oklch(86.5% 0.1907 119.3)",
+    "--k-accent-3-ink": "#16160c",
+    "--k-accent-3-soft": "oklch(95.8% 0.0654 115.0)",
+    "--k-accent-3-soft-fg": "oklch(48.3% 0.1109 120.0)",
+    "--k-accent-4": "oklch(48.7% 0.2463 281.4)",
+    "--k-accent-4-ink": "#ffffff",
+    "--k-accent-4-soft": "oklch(84.8% 0.0697 294.0)",
+    "--k-accent-4-soft-fg": "oklch(25.9% 0.1456 278.3)",
+    "--k-accent-5": "oklch(65.6% 0.1692 41.6)",
+    "--k-accent-5-ink": "#ffffff",
+    "--k-accent-5-soft": "oklch(89.5% 0.0444 44.5)",
+    "--k-accent-5-soft-fg": "oklch(35.9% 0.1021 40.5)",
+    "--k-accent-6": "oklch(80.6% 0.2079 150.0)",
+    "--k-accent-6-ink": "#16160c",
+    "--k-accent-6-soft": "oklch(93.3% 0.0670 156.8)",
+    "--k-accent-6-soft-fg": "oklch(45.0% 0.1223 149.2)",
+    "--k-accent-fg": "#ffffff",
+    "--k-accent-soft": "oklch(94.5% 0.0160 310.1)",
+    "--k-accent-soft-fg": "#16160c",
+    "--k-anim-fade-in": "k-fade-in 120ms cubic-bezier(.05,.7,.1,1) both",
+    "--k-anim-fade-out": "k-fade-out 120ms cubic-bezier(.3,0,.8,.15) both",
+    "--k-anim-fade-through": "k-fade-through 200ms cubic-bezier(.2,0,0,1) both",
+    "--k-anim-menu": "k-menu-roll 200ms cubic-bezier(.05,.7,.1,1) both",
+    "--k-anim-menu-item": "k-menu-item 200ms cubic-bezier(.05,.7,.1,1) both",
+    "--k-anim-pulse": "k-pulse 1.8s cubic-bezier(.4, 0, .2, 1) infinite",
+    "--k-anim-scale-in": "k-scale-in 200ms cubic-bezier(.05,.7,.1,1) both",
+    "--k-anim-scale-out": "k-scale-out 120ms cubic-bezier(.3,0,.8,.15) both",
+    "--k-anim-shimmer": "k-shimmer 1.6s linear infinite",
+    "--k-anim-slide-down": "k-slide-down 200ms cubic-bezier(.05,.7,.1,1) both",
+    "--k-anim-slide-up": "k-slide-up 200ms cubic-bezier(.05,.7,.1,1) both",
+    "--k-anim-spin": "k-spin 800ms linear infinite",
+    "--k-avatar": "calc(var(--k-in-h-default) - 0.5rem)",
+    "--k-bg": "oklch(98.0% 0.0063 249.9)",
+    "--k-border": "oklch(89.2% 0.0077 249.9)",
+    "--k-btn-h-default": "2.5rem",
+    "--k-btn-lift": "-1px",
+    "--k-btn-shadow": "0 1px 2px hsl(210 16% 18%/.06)",
+    "--k-btn-shadow-press": "none",
+    "--k-bw": "1px",
+    "--k-cal-cell": "2.5rem",
+    "--k-canvas": "radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%), radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%), radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%), var(--k-bg)",
+    "--k-chart-1": "oklch(62.3% 0.1589 252.4)",
+    "--k-chart-2": "oklch(64.9% 0.2616 332.9)",
+    "--k-chart-3": "oklch(86.5% 0.1907 119.3)",
+    "--k-chart-4": "oklch(48.7% 0.2463 281.4)",
+    "--k-chart-5": "oklch(65.6% 0.1692 41.6)",
+    "--k-chart-6": "oklch(80.6% 0.2079 150.0)",
+    "--k-chrome-bg": "oklch(98.0% 0.0063 249.9)",
+    "--k-control-h-lg": "calc(var(--k-in-h-default) + 0.5rem)",
+    "--k-control-h-md": "var(--k-in-h-default)",
+    "--k-control-h-sm": "calc(var(--k-in-h-default) - 0.25rem)",
+    "--k-danger": "oklch(55.7% 0.1997 17.4)",
+    "--k-danger-fg": "#ffffff",
+    "--k-danger-soft": "oklch(94.8% 0.0101 2.0)",
+    "--k-danger-soft-fg": "#16160c",
+    "--k-disabled-bg": "oklch(98.0% 0.0063 249.9)",
+    "--k-disabled-fg": "oklch(64.0% 0.0112 249.9)",
+    "--k-disabled-opacity": "0.55",
+    "--k-divider": "var(--k-bw) solid var(--k-border)",
+    "--k-dot": "calc(var(--k-in-h-default) / 4.5)",
+    "--k-dur": "200ms",
+    "--k-dur-fast": "120ms",
+    "--k-dur-slow": "320ms",
+    "--k-ease": "cubic-bezier(.4,0,.2,1)",
+    "--k-ease-emphasized": "cubic-bezier(.2,0,0,1)",
+    "--k-ease-emphasized-accel": "cubic-bezier(.3,0,.8,.15)",
+    "--k-ease-emphasized-decel": "cubic-bezier(.05,.7,.1,1)",
+    "--k-ease-in": "cubic-bezier(.3,0,.8,.15)",
+    "--k-ease-out": "cubic-bezier(.05,.7,.1,1)",
+    "--k-ease-spring": "cubic-bezier(.34, 1.56, .64, 1)",
+    "--k-fg": "oklch(16.0% 0.0140 249.9)",
+    "--k-fg-faint": "oklch(64.0% 0.0112 249.9)",
+    "--k-fg-muted": "oklch(50.3% 0.0140 249.9)",
+    "--k-field-bg": "var(--k-input-bg)",
+    "--k-field-border-color": "var(--k-input-border)",
+    "--k-field-focus-edge": "var(--k-ring)",
+    "--k-field-hover-edge": "var(--k-state-border, var(--k-fg-faint))",
+    "--k-field-radius": "var(--k-radius-md)",
+    "--k-field-underline-color": "var(--k-input-border)",
+    "--k-fill": "oklch(56.4% 0.1689 253.9)",
+    "--k-focus-ring-offset": "2px",
+    "--k-focus-ring-width": "2px",
+    "--k-font-body": "'Inter',sans-serif",
+    "--k-font-display": "'Inter',sans-serif",
+    "--k-font-mono": "'JetBrains Mono',ui-monospace,monospace",
+    "--k-form-measure": "30rem",
+    "--k-gap": "0.625rem",
+    "--k-glass-bg": "hsl(0 0% 100% / 0.72)",
+    "--k-glass-blur": "saturate(180%) blur(12px)",
+    "--k-glass-edge": "inset 0 1px 0 hsl(0 0% 100% / 0.6)",
+    "--k-grad-1": "linear-gradient(135deg, oklch(62.3% 0.1589 252.4), oklch(64.0% 0.1477 271.2))",
+    "--k-grad-2": "linear-gradient(135deg, oklch(64.9% 0.2616 332.9), oklch(69.7% 0.1702 345.7))",
+    "--k-grad-3": "linear-gradient(135deg, oklch(86.5% 0.1907 119.3), oklch(85.7% 0.1629 130.1))",
+    "--k-grad-4": "linear-gradient(135deg, oklch(48.7% 0.2463 281.4), oklch(64.8% 0.1807 305.2))",
+    "--k-grad-5": "linear-gradient(135deg, oklch(65.6% 0.1692 41.6), oklch(80.1% 0.1067 76.8))",
+    "--k-grad-6": "linear-gradient(135deg, oklch(80.6% 0.2079 150.0), oklch(84.1% 0.1242 169.0))",
+    "--k-hairline": "var(--k-bw) solid color-mix(in srgb, var(--k-border), transparent 45%)",
+    "--k-icon-chip": "calc(var(--k-in-h-default) + 0.125rem)",
+    "--k-in-h-default": "2.5rem",
+    "--k-info": "oklch(56.8% 0.1572 253.9)",
+    "--k-info-fg": "#ffffff",
+    "--k-info-soft": "oklch(95.2% 0.0076 241.7)",
+    "--k-info-soft-fg": "#16160c",
+    "--k-input-bg": "oklch(95.8% 0.0070 249.9)",
+    "--k-input-border": "oklch(85.8% 0.0084 249.9)",
+    "--k-input-error-border": "#ce2746",
+    "--k-input-success-border": "#33c192",
+    "--k-input-warning-border": "#e6e60f",
+    "--k-inverse-fg": "oklch(94.5% 0.0140 249.9)",
+    "--k-inverse-primary": "oklch(56.4% 0.1689 253.9)",
+    "--k-inverse-surface": "oklch(25.4% 0.0070 249.9)",
+    "--k-measure-narrow": "48ch",
+    "--k-measure-prose": "68ch",
+    "--k-measure-wide": "90ch",
+    "--k-menu-stagger": "20ms",
+    "--k-pad": "1.75rem",
+    "--k-press-opacity": "1",
+    "--k-press-radius": "var(--btn-r, var(--k-radius-button))",
+    "--k-press-scale": "0.96",
+    "--k-primary": "oklch(56.4% 0.1689 253.9)",
+    "--k-primary-fg": "#ffffff",
+    "--k-primary-hover": "oklch(51.4% 0.1638 253.9)",
+    "--k-primary-soft": "oklch(95.8% 0.0372 253.9)",
+    "--k-primary-soft-fg": "oklch(56.4% 0.1689 253.9)",
+    "--k-radius-button": "1rem",
+    "--k-radius-lg": "1.4375rem",
+    "--k-radius-md": "1rem",
+    "--k-radius-pill": "999px",
+    "--k-radius-sm": "0.6875rem",
+    "--k-ring": "oklch(56.4% 0.1689 253.9)",
+    "--k-ring-halo": "color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent)",
+    "--k-ring-soft": "oklch(95.8% 0.0372 253.9)",
+    "--k-row-gap": "0.625rem",
+    "--k-row-h-default": "var(--k-row-h-lg)",
+    "--k-row-h-lg": "2.5rem",
+    "--k-row-h-md": "2rem",
+    "--k-row-h-sm": "1.75rem",
+    "--k-row-icon": "0.875rem",
+    "--k-row-px": "0.625rem",
+    "--k-row-radius": "min(0.5rem, var(--k-radius-md))",
+    "--k-s-0": "0",
+    "--k-s-10": "0.625rem",
+    "--k-s-12": "0.75rem",
+    "--k-s-14": "0.875rem",
+    "--k-s-16": "1rem",
+    "--k-s-2": "0.125rem",
+    "--k-s-20": "1.25rem",
+    "--k-s-24": "1.5rem",
+    "--k-s-28": "1.75rem",
+    "--k-s-32": "2rem",
+    "--k-s-4": "0.25rem",
+    "--k-s-6": "0.375rem",
+    "--k-s-8": "0.5rem",
+    "--k-scrim": "rgba(0, 0, 0, 0.4)",
+    "--k-scrim-strong": "rgba(0, 0, 0, 0.86)",
+    "--k-secondary": "oklch(50.1% 0.1466 267.1)",
+    "--k-secondary-fg": "#ffffff",
+    "--k-secondary-soft": "#dee3f2",
+    "--k-secondary-soft-fg": "#16160c",
+    "--k-selection": "oklch(59.9% 0.1813 254.1 / 0.18)",
+    "--k-shadow-lg": "0 4px 8px hsl(210 16% 18%/.10),0 12px 24px hsl(210 16% 18%/.14),0 24px 48px hsl(210 16% 18%/.14)",
+    "--k-shadow-md": "0 2px 4px hsl(210 16% 18%/.10),0 6px 14px hsl(210 16% 18%/.12)",
+    "--k-shadow-pressed": "inset 0 1px 2px hsl(210 16% 18%/.12)",
+    "--k-shadow-sm": "0 1px 2px hsl(210 16% 18%/.10)",
+    "--k-shadow-tactile": "inset 0 1px 0 hsl(0 0% 100% / 0.85), 0 1px 2px hsl(210 16% 18%/.08), 0 0 0 1px hsl(210 16% 18%/.04)",
+    "--k-shadow-xs": "0 1px 2px hsl(210 16% 18%/.05)",
+    "--k-shape-signature": "url(\\"data:image/svg+xml,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox%3D'0 0 100 100'%3E%3Cpath d%3D'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z' fill%3D'black'%2F%3E%3C%2Fsvg%3E\\")",
+    "--k-shape-signature-path": "'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z'",
+    "--k-slider-knob": "calc(var(--k-toggle-h-default) - 6px)",
+    "--k-space": "1.25rem",
+    "--k-spring": "linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1)",
+    "--k-spring-dur": "290ms",
+    "--k-spring-dur-fast": "205ms",
+    "--k-spring-dur-slow": "443ms",
+    "--k-spring-fast": "linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1)",
+    "--k-spring-slow": "linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1)",
+    "--k-stack-gap": "var(--k-gap)",
+    "--k-state-border": "oklch(58.9% 0.0341 249.9)",
+    "--k-state-hover": "oklch(25.7% 0.0119 248.3 / 0.05)",
+    "--k-state-press": "oklch(25.7% 0.0119 248.3 / 0.15000000000000002)",
+    "--k-state-selected-bg": "oklch(25.7% 0.0119 248.3 / 0.1)",
+    "--k-state-selected-fg": "var(--k-fg)",
+    "--k-stroke-1": "1px",
+    "--k-stroke-2": "2px",
+    "--k-stroke-3": "3px",
+    "--k-stroke-progress": "6px",
+    "--k-success": "oklch(72.5% 0.1371 165.8)",
+    "--k-success-fg": "#16160c",
+    "--k-success-soft": "oklch(95.8% 0.0079 177.3)",
+    "--k-success-soft-fg": "#16160c",
+    "--k-surface": "oklch(100% 0 0)",
+    "--k-surface-2": "oklch(98.0% 0.0063 249.9)",
+    "--k-surface-container": "oklch(95.8% 0.0070 249.9)",
+    "--k-surface-container-high": "oklch(93.7% 0.0077 249.9)",
+    "--k-surface-container-highest": "oklch(91.6% 0.0077 249.9)",
+    "--k-surface-container-low": "oklch(98.0% 0.0063 249.9)",
+    "--k-surface-container-lowest": "oklch(100% 0 0)",
+    "--k-surface-overlay": "oklch(100% 0 0)",
+    "--k-surface-raised": "oklch(100% 0 0)",
+    "--k-surface-sunken": "oklch(91.6% 0.0077 249.9)",
+    "--k-toggle-h-default": "1.375rem",
+    "--k-toggle-w-default": "2.5rem",
+    "--k-touch-target": "44px",
+    "--k-track": "color-mix(in srgb, oklch(16.0% 0.0140 249.9) 5%, oklch(98.0% 0.0063 249.9))",
+    "--k-track-eyebrow": "0.06em",
+    "--k-type-body": "0.875rem",
+    "--k-type-caption": "0.625rem",
+    "--k-type-eyebrow": "0.6875rem",
+    "--k-type-h1": "1.875rem",
+    "--k-type-h2": "1.375rem",
+    "--k-type-h3": "1rem",
+    "--k-type-input-min": "16px",
+    "--k-type-small": "0.75rem",
+    "--k-ui-weight": "600",
+    "--k-warning": "oklch(89.6% 0.1934 109.7)",
+    "--k-warning-fg": "#16160c",
+    "--k-warning-soft": "oklch(98.0% 0.0275 106.9)",
+    "--k-warning-soft-fg": "#16160c",
+    "--k-weight-bold": "700",
+    "--k-weight-medium": "500",
+    "--k-weight-semibold": "600",
+    "--k-z-dropdown": "50",
+    "--k-z-modal": "60",
+    "--k-z-popover": "50",
+    "--k-z-tooltip": "70"
+  },
+  "tokensDark": {
+    "--k-accent": "oklch(59.9% 0.2408 302.4)",
+    "--k-accent-1": "oklch(63.7% 0.1493 251.8)",
+    "--k-accent-1-soft": "oklch(37.5% 0.0982 252.3)",
+    "--k-accent-1-soft-fg": "oklch(84.7% 0.0681 249.3)",
+    "--k-accent-2": "oklch(65.5% 0.2511 332.6)",
+    "--k-accent-2-soft": "oklch(39.1% 0.1608 333.0)",
+    "--k-accent-2-soft-fg": "oklch(83.7% 0.1256 330.3)",
+    "--k-accent-3": "oklch(86.4% 0.1838 118.9)",
+    "--k-accent-3-soft": "oklch(52.4% 0.1170 119.2)",
+    "--k-accent-3-soft-fg": "oklch(95.2% 0.0989 116.1)",
+    "--k-accent-4": "oklch(50.5% 0.2342 283.2)",
+    "--k-accent-4-soft": "oklch(29.0% 0.1522 280.5)",
+    "--k-accent-4-soft-fg": "oklch(78.2% 0.1090 292.6)",
+    "--k-accent-5": "oklch(66.7% 0.1582 42.5)",
+    "--k-accent-5-soft": "oklch(39.6% 0.1045 41.9)",
+    "--k-accent-5-soft-fg": "oklch(85.6% 0.0698 44.2)",
+    "--k-accent-6": "oklch(80.6% 0.1979 150.8)",
+    "--k-accent-6-soft": "oklch(48.8% 0.1282 149.8)",
+    "--k-accent-6-soft-fg": "oklch(91.6% 0.1015 155.9)",
+    "--k-accent-soft": "oklch(28.7% 0.0704 305.5)",
+    "--k-accent-soft-fg": "#ffffff",
+    "--k-bg": "oklch(21.3% 0.0063 249.9)",
+    "--k-border": "oklch(28.5% 0.0077 249.9)",
+    "--k-btn-shadow": "0 1px 2px hsl(0 0% 0% / 0.35)",
+    "--k-chart-1": "oklch(63.7% 0.1493 251.8)",
+    "--k-chart-2": "oklch(65.5% 0.2511 332.6)",
+    "--k-chart-3": "oklch(86.4% 0.1838 118.9)",
+    "--k-chart-4": "oklch(50.5% 0.2342 283.2)",
+    "--k-chart-5": "oklch(66.7% 0.1582 42.5)",
+    "--k-chart-6": "oklch(80.6% 0.1979 150.8)",
+    "--k-chrome-bg": "oklch(21.3% 0.0063 249.9)",
+    "--k-danger": "oklch(61.8% 0.1675 12.1)",
+    "--k-danger-fg": "#16160c",
+    "--k-danger-soft": "oklch(30.1% 0.0494 8.4)",
+    "--k-danger-soft-fg": "#ffffff",
+    "--k-disabled-bg": "oklch(28.5% 0.0077 249.9)",
+    "--k-fg": "oklch(94.5% 0.0140 249.9)",
+    "--k-fg-muted": "oklch(77.5% 0.0140 249.9)",
+    "--k-glass-bg": "hsl(210.12244897959184 14% 14.6% / 0.72)",
+    "--k-glass-edge": "inset 0 1px 0 hsl(0 0% 100% / 0.08)",
+    "--k-grad-1": "linear-gradient(135deg, oklch(63.7% 0.1493 251.8), oklch(64.1% 0.1434 271.1))",
+    "--k-grad-2": "linear-gradient(135deg, oklch(65.5% 0.2511 332.6), oklch(69.5% 0.1669 345.2))",
+    "--k-grad-3": "linear-gradient(135deg, oklch(86.4% 0.1838 118.9), oklch(85.3% 0.1592 129.9))",
+    "--k-grad-4": "linear-gradient(135deg, oklch(50.5% 0.2342 283.2), oklch(64.9% 0.1769 305.5))",
+    "--k-grad-5": "linear-gradient(135deg, oklch(66.7% 0.1582 42.5), oklch(79.7% 0.1044 76.7))",
+    "--k-grad-6": "linear-gradient(135deg, oklch(80.6% 0.1979 150.8), oklch(83.7% 0.1217 169.1))",
+    "--k-info": "oklch(64.7% 0.1186 251.5)",
+    "--k-info-fg": "#16160c",
+    "--k-info-soft": "oklch(31.2% 0.0345 252.2)",
+    "--k-info-soft-fg": "#ffffff",
+    "--k-input-bg": "oklch(17.6% 0.0056 249.9)",
+    "--k-input-border": "oklch(31.7% 0.0077 249.9)",
+    "--k-input-error-border": "#d6516a",
+    "--k-input-success-border": "#5ccca6",
+    "--k-input-warning-border": "#e4e444",
+    "--k-inverse-fg": "oklch(16.0% 0.0140 249.9)",
+    "--k-inverse-surface": "oklch(95.8% 0.0070 249.9)",
+    "--k-primary-hover": "oklch(61.4% 0.1638 253.9)",
+    "--k-primary-soft": "oklch(25.4% 0.0372 253.9)",
+    "--k-primary-soft-fg": "oklch(84.6% 0.0669 248.6)",
+    "--k-ring-soft": "oklch(25.4% 0.0372 253.9)",
+    "--k-secondary": "oklch(57.4% 0.1318 268.5)",
+    "--k-secondary-soft": "#263050",
+    "--k-secondary-soft-fg": "#ffffff",
+    "--k-selection": "oklch(70.0% 0.1338 250.3 / 0.28)",
+    "--k-shadow-lg": "0 4px 8px hsl(0 0 0/.10),0 12px 24px hsl(0 0 0/.14),0 24px 48px hsl(0 0 0/.14)",
+    "--k-shadow-md": "0 2px 4px hsl(0 0 0/.10),0 6px 14px hsl(0 0 0/.12)",
+    "--k-shadow-pressed": "inset 0 1px 2px hsl(0 0% 0% / 0.35)",
+    "--k-shadow-sm": "0 1px 2px hsl(0 0 0/.10)",
+    "--k-shadow-tactile": "inset 0 1px 0 hsl(0 0% 100% / 0.06), 0 1px 2px hsl(0 0% 0% / 0.45)",
+    "--k-shadow-xs": "0 1px 2px hsl(0 0 0/.05)",
+    "--k-state-border": "oklch(67.6% 0.0262 248.2)",
+    "--k-state-hover": "oklch(88.9% 0.0088 247.9 / 0.05)",
+    "--k-state-press": "oklch(88.9% 0.0088 247.9 / 0.15000000000000002)",
+    "--k-state-selected-bg": "oklch(88.9% 0.0088 247.9 / 0.1)",
+    "--k-success": "oklch(76.9% 0.1174 168.2)",
+    "--k-success-soft": "oklch(34.7% 0.0359 170.3)",
+    "--k-success-soft-fg": "#ffffff",
+    "--k-surface": "oklch(25.4% 0.0070 249.9)",
+    "--k-surface-2": "oklch(28.5% 0.0077 249.9)",
+    "--k-surface-container": "oklch(28.5% 0.0077 249.9)",
+    "--k-surface-container-high": "oklch(31.7% 0.0077 249.9)",
+    "--k-surface-container-highest": "oklch(35.5% 0.0077 249.9)",
+    "--k-surface-container-low": "oklch(25.4% 0.0070 249.9)",
+    "--k-surface-container-lowest": "oklch(17.6% 0.0056 249.9)",
+    "--k-surface-overlay": "oklch(35.5% 0.0077 249.9)",
+    "--k-surface-raised": "oklch(31.7% 0.0077 249.9)",
+    "--k-surface-sunken": "oklch(17.6% 0.0056 249.9)",
+    "--k-track": "color-mix(in srgb, oklch(94.5% 0.0140 249.9) 5%, oklch(21.3% 0.0063 249.9))",
+    "--k-warning": "oklch(89.2% 0.1727 109.4)",
+    "--k-warning-soft": "oklch(37.4% 0.0494 108.6)",
+    "--k-warning-soft-fg": "#ffffff"
+  },
+  "components": {
+    "tiers": {
+      "foundation": [
+        "button-finish",
+        "roll-down-item-stagger",
+        "twocolumnlayout",
+        "layout-primitives"
+      ],
+      "atom": [
+        "toolbar",
+        "buttons",
+        "card",
+        "button-group",
+        "aspect-ratio",
+        "scroll-area",
+        "form",
+        "badges-pills",
+        "alert",
+        "tabs",
+        "table",
+        "tooltip",
+        "avatar",
+        "switch-toggle",
+        "slider",
+        "progress",
+        "skeleton",
+        "select-trigger",
+        "spinner",
+        "navigation-row",
+        "interactive-list-row",
+        "kbd",
+        "code",
+        "accordion",
+        "pagination-breadcrumb",
+        "sparkline",
+        "combobox",
+        "dropdown-menu",
+        "stepper",
+        "tag-input",
+        "popover",
+        "hover-card",
+        "segmented-control-toggle-group",
+        "separator",
+        "description-list",
+        "banner",
+        "input-otp",
+        "attachment-chip-family",
+        "inline-status-meta-micro-components",
+        "navigation-menu",
+        "context-menu",
+        "form-primitives",
+        "numberinput",
+        "passwordinput",
+        "searchinput",
+        "phoneinput",
+        "list",
+        "radio-card",
+        "chip",
+        "signature"
+      ],
+      "block": [
+        "data-table",
+        "empty-state",
+        "sidebar",
+        "activity-feed",
+        "danger-zone",
+        "auth",
+        "lightbox",
+        "calendar",
+        "dialog",
+        "command-palette",
+        "chart",
+        "usage-meter",
+        "menubar",
+        "resizable",
+        "file-upload-dropzone",
+        "toast-stack",
+        "sheet-drawer",
+        "alert-dialog",
+        "stat-tile",
+        "carousel",
+        "infocard",
+        "timeline",
+        "codeblock",
+        "pricing",
+        "wizardstepper",
+        "file-grid",
+        "form-panel",
+        "filter-bar"
+      ],
+      "shell": [
+        "scaffold",
+        "navsuite",
+        "pane"
+      ]
+    },
+    "recipes": {
+      "toolbar": {
+        "tier": "atom",
+        "section": "Toolbar",
+        "uses": []
+      },
+      "buttons": {
+        "tier": "atom",
+        "section": "Buttons",
+        "uses": []
+      },
+      "button-finish": {
+        "tier": "foundation",
+        "section": "Button finish",
+        "uses": []
+      },
+      "card": {
+        "tier": "atom",
+        "section": "Card",
+        "uses": []
+      },
+      "button-group": {
+        "tier": "atom",
+        "section": "Button group",
+        "uses": []
+      },
+      "aspect-ratio": {
+        "tier": "atom",
+        "section": "Aspect ratio",
+        "uses": []
+      },
+      "scroll-area": {
+        "tier": "atom",
+        "section": "Scroll area",
+        "uses": []
+      },
+      "form": {
+        "tier": "atom",
+        "section": "Form",
+        "uses": []
+      },
+      "badges-pills": {
+        "tier": "atom",
+        "section": "Badges & pills",
+        "uses": []
+      },
+      "alert": {
+        "tier": "atom",
+        "section": "Alert",
+        "uses": []
+      },
+      "tabs": {
+        "tier": "atom",
+        "section": "Tabs",
+        "uses": []
+      },
+      "table": {
+        "tier": "atom",
+        "section": "Table",
+        "uses": []
+      },
+      "data-table": {
+        "tier": "block",
+        "section": "Data table",
+        "uses": [
+          "table",
+          "toolbar",
+          "pagination-breadcrumb",
+          "select-trigger"
+        ]
+      },
+      "tooltip": {
+        "tier": "atom",
+        "section": "Tooltip",
+        "uses": []
+      },
+      "avatar": {
+        "tier": "atom",
+        "section": "Avatar",
+        "uses": []
+      },
+      "switch-toggle": {
+        "tier": "atom",
+        "section": "Switch / toggle",
+        "uses": []
+      },
+      "slider": {
+        "tier": "atom",
+        "section": "Slider",
+        "uses": []
+      },
+      "progress": {
+        "tier": "atom",
+        "section": "Progress",
+        "uses": []
+      },
+      "skeleton": {
+        "tier": "atom",
+        "section": "Skeleton",
+        "uses": []
+      },
+      "empty-state": {
+        "tier": "block",
+        "section": "Empty state",
+        "uses": [
+          "buttons"
+        ]
+      },
+      "select-trigger": {
+        "tier": "atom",
+        "section": "Select trigger",
+        "uses": []
+      },
+      "spinner": {
+        "tier": "atom",
+        "section": "Spinner",
+        "uses": []
+      },
+      "navigation-row": {
+        "tier": "atom",
+        "section": "Navigation row",
+        "uses": []
+      },
+      "sidebar": {
+        "tier": "block",
+        "section": "Sidebar",
+        "uses": [
+          "navigation-row",
+          "avatar",
+          "badges-pills"
+        ]
+      },
+      "activity-feed": {
+        "tier": "block",
+        "section": "Activity feed",
+        "uses": [
+          "avatar",
+          "badges-pills",
+          "list"
+        ]
+      },
+      "danger-zone": {
+        "tier": "block",
+        "section": "Danger zone",
+        "uses": [
+          "card",
+          "buttons"
+        ]
+      },
+      "interactive-list-row": {
+        "tier": "atom",
+        "section": "Interactive list row",
+        "uses": []
+      },
+      "auth": {
+        "tier": "block",
+        "section": "Auth",
+        "uses": [
+          "form-primitives",
+          "passwordinput",
+          "buttons",
+          "card"
+        ]
+      },
+      "lightbox": {
+        "tier": "block",
+        "section": "Lightbox",
+        "uses": [
+          "buttons"
+        ]
+      },
+      "calendar": {
+        "tier": "block",
+        "section": "Calendar",
+        "uses": [
+          "buttons"
+        ]
+      },
+      "kbd": {
+        "tier": "atom",
+        "section": "KBD",
+        "uses": []
+      },
+      "code": {
+        "tier": "atom",
+        "section": "Code",
+        "uses": []
+      },
+      "dialog": {
+        "tier": "block",
+        "section": "Dialog",
+        "uses": [
+          "card",
+          "buttons"
+        ]
+      },
+      "command-palette": {
+        "tier": "block",
+        "section": "Command palette",
+        "uses": [
+          "searchinput",
+          "list",
+          "kbd"
+        ]
+      },
+      "accordion": {
+        "tier": "atom",
+        "section": "Accordion",
+        "uses": []
+      },
+      "pagination-breadcrumb": {
+        "tier": "atom",
+        "section": "Pagination & breadcrumb",
+        "uses": []
+      },
+      "chart": {
+        "tier": "block",
+        "section": "Chart",
+        "uses": [
+          "card"
+        ]
+      },
+      "sparkline": {
+        "tier": "atom",
+        "section": "Sparkline",
+        "uses": []
+      },
+      "usage-meter": {
+        "tier": "block",
+        "section": "Usage meter",
+        "uses": [
+          "progress"
+        ]
+      },
+      "combobox": {
+        "tier": "atom",
+        "section": "Combobox",
+        "uses": []
+      },
+      "dropdown-menu": {
+        "tier": "atom",
+        "section": "Dropdown menu",
+        "uses": []
+      },
+      "roll-down-item-stagger": {
+        "tier": "foundation",
+        "section": "Roll-down item stagger",
+        "uses": []
+      },
+      "menubar": {
+        "tier": "block",
+        "section": "Menubar",
+        "uses": [
+          "dropdown-menu",
+          "buttons"
+        ]
+      },
+      "resizable": {
+        "tier": "block",
+        "section": "Resizable",
+        "uses": []
+      },
+      "stepper": {
+        "tier": "atom",
+        "section": "Stepper",
+        "uses": []
+      },
+      "file-upload-dropzone": {
+        "tier": "block",
+        "section": "File upload dropzone",
+        "uses": [
+          "buttons"
+        ]
+      },
+      "toast-stack": {
+        "tier": "block",
+        "section": "Toast stack",
+        "uses": []
+      },
+      "tag-input": {
+        "tier": "atom",
+        "section": "Tag input",
+        "uses": []
+      },
+      "popover": {
+        "tier": "atom",
+        "section": "Popover",
+        "uses": []
+      },
+      "hover-card": {
+        "tier": "atom",
+        "section": "Hover Card",
+        "uses": []
+      },
+      "sheet-drawer": {
+        "tier": "block",
+        "section": "Sheet / Drawer",
+        "uses": [
+          "card",
+          "buttons"
+        ]
+      },
+      "segmented-control-toggle-group": {
+        "tier": "atom",
+        "section": "Segmented control / Toggle group",
+        "uses": []
+      },
+      "separator": {
+        "tier": "atom",
+        "section": "Separator",
+        "uses": []
+      },
+      "description-list": {
+        "tier": "atom",
+        "section": "Description list",
+        "uses": []
+      },
+      "banner": {
+        "tier": "atom",
+        "section": "Banner",
+        "uses": []
+      },
+      "alert-dialog": {
+        "tier": "block",
+        "section": "Alert Dialog",
+        "uses": [
+          "card",
+          "buttons"
+        ]
+      },
+      "input-otp": {
+        "tier": "atom",
+        "section": "Input OTP",
+        "uses": []
+      },
+      "stat-tile": {
+        "tier": "block",
+        "section": "Stat tile",
+        "uses": [
+          "card",
+          "sparkline",
+          "badges-pills"
+        ]
+      },
+      "attachment-chip-family": {
+        "tier": "atom",
+        "section": "Attachment chip family",
+        "uses": []
+      },
+      "inline-status-meta-micro-components": {
+        "tier": "atom",
+        "section": "Inline status & meta micro-components",
+        "uses": []
+      },
+      "carousel": {
+        "tier": "block",
+        "section": "Carousel",
+        "uses": [
+          "buttons"
+        ]
+      },
+      "navigation-menu": {
+        "tier": "atom",
+        "section": "Navigation menu",
+        "uses": []
+      },
+      "context-menu": {
+        "tier": "atom",
+        "section": "Context menu",
+        "uses": []
+      },
+      "form-primitives": {
+        "tier": "atom",
+        "section": "Form primitives",
+        "uses": []
+      },
+      "numberinput": {
+        "tier": "atom",
+        "section": "NumberInput",
+        "uses": []
+      },
+      "passwordinput": {
+        "tier": "atom",
+        "section": "PasswordInput",
+        "uses": []
+      },
+      "searchinput": {
+        "tier": "atom",
+        "section": "SearchInput",
+        "uses": []
+      },
+      "phoneinput": {
+        "tier": "atom",
+        "section": "PhoneInput",
+        "uses": []
+      },
+      "infocard": {
+        "tier": "block",
+        "section": "InfoCard",
+        "uses": [
+          "card",
+          "buttons"
+        ]
+      },
+      "list": {
+        "tier": "atom",
+        "section": "List",
+        "uses": []
+      },
+      "timeline": {
+        "tier": "block",
+        "section": "Timeline",
+        "uses": [
+          "avatar",
+          "badges-pills"
+        ]
+      },
+      "codeblock": {
+        "tier": "block",
+        "section": "CodeBlock",
+        "uses": [
+          "code",
+          "buttons"
+        ]
+      },
+      "pricing": {
+        "tier": "block",
+        "section": "Pricing",
+        "uses": [
+          "card",
+          "buttons",
+          "badges-pills"
+        ]
+      },
+      "twocolumnlayout": {
+        "tier": "foundation",
+        "section": "TwoColumnLayout",
+        "uses": []
+      },
+      "wizardstepper": {
+        "tier": "block",
+        "section": "WizardStepper",
+        "uses": [
+          "stepper",
+          "form-primitives",
+          "buttons"
+        ]
+      },
+      "file-grid": {
+        "tier": "block",
+        "section": "File grid",
+        "uses": [
+          "card",
+          "badges-pills"
+        ]
+      },
+      "radio-card": {
+        "tier": "atom",
+        "section": "Radio card",
+        "uses": []
+      },
+      "form-panel": {
+        "tier": "block",
+        "section": "Form panel",
+        "uses": [
+          "form",
+          "form-primitives",
+          "buttons",
+          "select-trigger",
+          "numberinput",
+          "phoneinput",
+          "switch-toggle",
+          "radio-card"
+        ]
+      },
+      "filter-bar": {
+        "tier": "block",
+        "section": "Filter bar",
+        "uses": [
+          "searchinput",
+          "tag-input",
+          "select-trigger",
+          "segmented-control-toggle-group",
+          "slider",
+          "buttons",
+          "chip"
+        ]
+      },
+      "layout-primitives": {
+        "tier": "foundation",
+        "section": "Layout primitives",
+        "uses": []
+      },
+      "chip": {
+        "tier": "atom",
+        "section": "Chip",
+        "uses": []
+      },
+      "signature": {
+        "tier": "atom",
+        "section": "Signature shape",
+        "uses": []
+      },
+      "scaffold": {
+        "tier": "shell",
+        "section": "Adaptive scaffold",
+        "uses": [
+          "navsuite",
+          "pane"
+        ]
+      },
+      "navsuite": {
+        "tier": "shell",
+        "section": "Nav suite",
+        "uses": []
+      },
+      "pane": {
+        "tier": "shell",
+        "section": "Pane",
+        "uses": []
+      }
+    },
+    "classes": {
+      "accordion": {
+        "modifiers": [],
+        "parts": [
+          "chevron"
+        ]
+      },
+      "activity": {
+        "modifiers": [],
+        "parts": [
+          "dot",
+          "item",
+          "meta"
+        ]
+      },
+      "alert": {
+        "modifiers": [
+          "danger",
+          "info",
+          "success",
+          "warning"
+        ],
+        "parts": [
+          "body",
+          "close",
+          "title"
+        ]
+      },
+      "anchor": {
+        "modifiers": [
+          "dot"
+        ],
+        "parts": [
+          "badge"
+        ]
+      },
+      "aspect": {
+        "modifiers": [
+          "16x9",
+          "1x1"
+        ],
+        "parts": [
+          "fill"
+        ]
+      },
+      "att-chip": {
+        "modifiers": [
+          "audio",
+          "file",
+          "image",
+          "link"
+        ],
+        "parts": [
+          "body",
+          "label",
+          "meta",
+          "thumb",
+          "x"
+        ]
+      },
+      "att-chip-stack": {
+        "modifiers": [],
+        "parts": []
+      },
+      "auth": {
+        "modifiers": [
+          "row"
+        ],
+        "parts": [
+          "foot",
+          "head",
+          "link",
+          "meta",
+          "social",
+          "sub",
+          "title"
+        ]
+      },
+      "avatar": {
+        "modifiers": [
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5",
+          "a6",
+          "away",
+          "lg",
+          "offline",
+          "online",
+          "sm"
+        ],
+        "parts": [
+          "img",
+          "status"
+        ]
+      },
+      "avatar-group": {
+        "modifiers": [],
+        "parts": [
+          "more"
+        ]
+      },
+      "badge": {
+        "modifiers": [
+          "accent",
+          "count",
+          "danger",
+          "info",
+          "neutral",
+          "primary",
+          "solid-danger",
+          "solid-info",
+          "solid-primary",
+          "solid-success",
+          "solid-warn",
+          "success",
+          "warn"
+        ],
+        "parts": [
+          "dot"
+        ]
+      },
+      "banner": {
+        "modifiers": [
+          "danger",
+          "info",
+          "success",
+          "warn"
+        ],
+        "parts": [
+          "body",
+          "close",
+          "link"
+        ]
+      },
+      "barchart": {
+        "modifiers": [
+          "series"
+        ],
+        "parts": [
+          "bar",
+          "tip"
+        ]
+      },
+      "breadcrumb": {
+        "modifiers": [],
+        "parts": []
+      },
+      "btn": {
+        "modifiers": [
+          "block",
+          "circle",
+          "danger",
+          "ghost",
+          "icon",
+          "lg",
+          "link",
+          "loading",
+          "outline",
+          "primary",
+          "secondary",
+          "sm",
+          "split",
+          "toggle",
+          "xl",
+          "xs"
+        ],
+        "parts": []
+      },
+      "btn-group": {
+        "modifiers": [
+          "connected"
+        ],
+        "parts": []
+      },
+      "buttonFinish": {
+        "modifiers": [],
+        "parts": []
+      },
+      "buttons": {
+        "modifiers": [],
+        "parts": []
+      },
+      "calendar": {
+        "modifiers": [
+          "disabled",
+          "on",
+          "out",
+          "range",
+          "range-end",
+          "range-start",
+          "today"
+        ],
+        "parts": [
+          "cell",
+          "head",
+          "nav",
+          "nav-btns",
+          "nav-title"
+        ]
+      },
+      "card": {
+        "modifiers": [
+          "interactive"
+        ],
+        "parts": [
+          "col",
+          "desc",
+          "foot",
+          "head",
+          "row",
+          "title"
+        ]
+      },
+      "carousel": {
+        "modifiers": [
+          "next",
+          "prev"
+        ],
+        "parts": [
+          "arrow",
+          "caption",
+          "slide",
+          "track",
+          "viewport"
+        ]
+      },
+      "cdots": {
+        "modifiers": [
+          "bars",
+          "num"
+        ],
+        "parts": [
+          "bar",
+          "dot",
+          "num"
+        ]
+      },
+      "chart": {
+        "modifiers": [
+          "donut",
+          "on"
+        ],
+        "parts": [
+          "axis",
+          "canvas",
+          "cursor",
+          "donut-cap",
+          "donut-num",
+          "grid",
+          "legend",
+          "legend-item",
+          "svg",
+          "swatch",
+          "tip",
+          "tip-dot",
+          "tip-label",
+          "tip-name",
+          "tip-row",
+          "tip-val",
+          "xlabel",
+          "xlabels",
+          "yaxis",
+          "ytick"
+        ]
+      },
+      "chart-legend": {
+        "modifiers": [],
+        "parts": [
+          "dot",
+          "item"
+        ]
+      },
+      "check": {
+        "modifiers": [],
+        "parts": []
+      },
+      "chip": {
+        "modifiers": [
+          "filter",
+          "input",
+          "on",
+          "suggestion"
+        ],
+        "parts": [
+          "remove"
+        ]
+      },
+      "cmdp": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "empty",
+          "in",
+          "item",
+          "item-icon",
+          "list",
+          "section",
+          "shortcut"
+        ]
+      },
+      "cockpit-preview": {
+        "modifiers": [],
+        "parts": []
+      },
+      "code": {
+        "modifiers": [],
+        "parts": []
+      },
+      "codeblock": {
+        "modifiers": [],
+        "parts": [
+          "copy",
+          "file",
+          "gutter",
+          "head",
+          "line",
+          "pre",
+          "text"
+        ]
+      },
+      "combobox": {
+        "modifiers": [
+          "inline",
+          "on",
+          "selected"
+        ],
+        "parts": [
+          "check",
+          "empty",
+          "item",
+          "list",
+          "pop"
+        ]
+      },
+      "css": {
+        "modifiers": [],
+        "parts": []
+      },
+      "ctxmenu": {
+        "modifiers": [],
+        "parts": [
+          "hint",
+          "pop"
+        ]
+      },
+      "dangerzone": {
+        "modifiers": [],
+        "parts": [
+          "head"
+        ]
+      },
+      "datatable": {
+        "modifiers": [
+          "active",
+          "error",
+          "loading",
+          "page"
+        ],
+        "parts": [
+          "bar",
+          "body",
+          "check",
+          "count",
+          "foot",
+          "foot-info",
+          "perpage",
+          "spacer",
+          "state",
+          "state-icon",
+          "state-msg",
+          "state-title"
+        ]
+      },
+      "dialog": {
+        "modifiers": [
+          "alert"
+        ],
+        "parts": [
+          "icon",
+          "title"
+        ]
+      },
+      "dialog-frame": {
+        "modifiers": [],
+        "parts": [
+          "backdrop"
+        ]
+      },
+      "divider-or": {
+        "modifiers": [],
+        "parts": []
+      },
+      "dl": {
+        "modifiers": [],
+        "parts": []
+      },
+      "dropzone": {
+        "modifiers": [
+          "over"
+        ],
+        "parts": [
+          "hint",
+          "icon",
+          "title"
+        ]
+      },
+      "e": {
+        "modifiers": [],
+        "parts": []
+      },
+      "empty": {
+        "modifiers": [],
+        "parts": [
+          "icon",
+          "sub",
+          "title"
+        ]
+      },
+      "field": {
+        "modifiers": [],
+        "parts": [
+          "error",
+          "hint",
+          "label",
+          "req"
+        ]
+      },
+      "filegrid": {
+        "modifiers": [
+          "2",
+          "3",
+          "5"
+        ],
+        "parts": [
+          "cover",
+          "meta",
+          "name",
+          "row",
+          "tile"
+        ]
+      },
+      "filterbar": {
+        "modifiers": [],
+        "parts": [
+          "active",
+          "active-label",
+          "clear",
+          "count",
+          "group",
+          "group-label"
+        ]
+      },
+      "formpanel": {
+        "modifiers": [],
+        "parts": [
+          "body",
+          "desc",
+          "error",
+          "foot",
+          "foot-note",
+          "full",
+          "grid",
+          "head",
+          "section",
+          "section-title",
+          "title"
+        ]
+      },
+      "g": {
+        "modifiers": [],
+        "parts": []
+      },
+      "g6": {
+        "modifiers": [],
+        "parts": []
+      },
+      "hover-card": {
+        "modifiers": [
+          "open"
+        ],
+        "parts": [
+          "pop"
+        ]
+      },
+      "in": {
+        "modifiers": [
+          "inline"
+        ],
+        "parts": []
+      },
+      "indeterminate": {
+        "modifiers": [],
+        "parts": []
+      },
+      "info-card": {
+        "modifiers": [
+          "link"
+        ],
+        "parts": [
+          "label",
+          "value"
+        ]
+      },
+      "is-active": {
+        "modifiers": [],
+        "parts": []
+      },
+      "is-done": {
+        "modifiers": [],
+        "parts": []
+      },
+      "is-error": {
+        "modifiers": [],
+        "parts": []
+      },
+      "is-on": {
+        "modifiers": [],
+        "parts": []
+      },
+      "is-selected": {
+        "modifiers": [],
+        "parts": []
+      },
+      "is-sortable": {
+        "modifiers": [],
+        "parts": []
+      },
+      "kanban": {
+        "modifiers": [],
+        "parts": [
+          "card",
+          "card-foot",
+          "card-title",
+          "col",
+          "col-head",
+          "count",
+          "icons",
+          "key",
+          "prio",
+          "pts",
+          "stats",
+          "tag"
+        ]
+      },
+      "kbd": {
+        "modifiers": [],
+        "parts": []
+      },
+      "l-center": {
+        "modifiers": [
+          "narrow",
+          "wide"
+        ],
+        "parts": []
+      },
+      "l-cluster": {
+        "modifiers": [],
+        "parts": []
+      },
+      "l-grid": {
+        "modifiers": [],
+        "parts": []
+      },
+      "l-sidebar": {
+        "modifiers": [],
+        "parts": [
+          "main",
+          "side"
+        ]
+      },
+      "l-stack": {
+        "modifiers": [],
+        "parts": []
+      },
+      "l-switcher": {
+        "modifiers": [],
+        "parts": []
+      },
+      "lab": {
+        "modifiers": [],
+        "parts": []
+      },
+      "lightbox": {
+        "modifiers": [
+          "close",
+          "next",
+          "prev"
+        ],
+        "parts": [
+          "btn",
+          "count",
+          "stage"
+        ]
+      },
+      "list": {
+        "modifiers": [
+          "avatar",
+          "flush",
+          "icon",
+          "icon-muted",
+          "lg",
+          "settings",
+          "text",
+          "unread"
+        ],
+        "parts": [
+          "body",
+          "dot",
+          "item",
+          "lead",
+          "row",
+          "section",
+          "sub",
+          "title",
+          "trail"
+        ]
+      },
+      "menu": {
+        "modifiers": [
+          "check",
+          "danger",
+          "uncheck"
+        ],
+        "parts": [
+          "item",
+          "label",
+          "sep",
+          "shortcut"
+        ]
+      },
+      "menubar": {
+        "modifiers": [],
+        "parts": [
+          "item"
+        ]
+      },
+      "meta-avatar": {
+        "modifiers": [],
+        "parts": []
+      },
+      "meta-new": {
+        "modifiers": [],
+        "parts": []
+      },
+      "meta-notif": {
+        "modifiers": [],
+        "parts": [
+          "dot"
+        ]
+      },
+      "meta-pill": {
+        "modifiers": [],
+        "parts": []
+      },
+      "meta-row": {
+        "modifiers": [],
+        "parts": []
+      },
+      "meta-sort": {
+        "modifiers": [
+          "asc"
+        ],
+        "parts": [
+          "arrow"
+        ]
+      },
+      "meta-status": {
+        "modifiers": [
+          "away",
+          "busy",
+          "online"
+        ],
+        "parts": [
+          "dot"
+        ]
+      },
+      "meta-verified": {
+        "modifiers": [],
+        "parts": []
+      },
+      "nav-group": {
+        "modifiers": [],
+        "parts": []
+      },
+      "navmenu": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "group",
+          "item",
+          "panel"
+        ]
+      },
+      "navrow": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "chev",
+          "label"
+        ]
+      },
+      "navsub": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "item"
+        ]
+      },
+      "navsuite": {
+        "modifiers": [
+          "bar",
+          "expanded",
+          "on",
+          "rail"
+        ],
+        "parts": [
+          "icon",
+          "item",
+          "label"
+        ]
+      },
+      "notif-center": {
+        "modifiers": [],
+        "parts": []
+      },
+      "notif-item": {
+        "modifiers": [],
+        "parts": []
+      },
+      "num": {
+        "modifiers": [],
+        "parts": []
+      },
+      "numinput": {
+        "modifiers": [
+          "with-suffix"
+        ],
+        "parts": [
+          "chev",
+          "field",
+          "step",
+          "steps",
+          "suffix"
+        ]
+      },
+      "org": {
+        "modifiers": [],
+        "parts": []
+      },
+      "otp": {
+        "modifiers": [],
+        "parts": [
+          "sep",
+          "slot"
+        ]
+      },
+      "pagination": {
+        "modifiers": [],
+        "parts": [
+          "ellipsis"
+        ]
+      },
+      "pane": {
+        "modifiers": [
+          "detail",
+          "fixed",
+          "flex",
+          "supporting"
+        ],
+        "parts": [
+          "grid"
+        ]
+      },
+      "ph": {
+        "modifiers": [
+          "g1",
+          "g2",
+          "g3",
+          "g4",
+          "g5",
+          "g6"
+        ],
+        "parts": []
+      },
+      "phoneinput": {
+        "modifiers": [
+          "invalid"
+        ],
+        "parts": [
+          "code",
+          "country",
+          "field",
+          "flag"
+        ]
+      },
+      "popover": {
+        "modifiers": [
+          "open"
+        ],
+        "parts": [
+          "arrow"
+        ]
+      },
+      "popover-wrap": {
+        "modifiers": [],
+        "parts": []
+      },
+      "pricing": {
+        "modifiers": [
+          "featured"
+        ],
+        "parts": [
+          "amount",
+          "badge",
+          "feats",
+          "name",
+          "period",
+          "price",
+          "tier"
+        ]
+      },
+      "progress": {
+        "modifiers": [
+          "indeterminate",
+          "wavy"
+        ],
+        "parts": [
+          "fill"
+        ]
+      },
+      "pwinput": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "bar",
+          "eye",
+          "field",
+          "label",
+          "strength"
+        ]
+      },
+      "quickact": {
+        "modifiers": [],
+        "parts": [
+          "tile"
+        ]
+      },
+      "radio": {
+        "modifiers": [],
+        "parts": []
+      },
+      "radio-card": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "body",
+          "desc",
+          "meta",
+          "title"
+        ]
+      },
+      "radio-cards": {
+        "modifiers": [],
+        "parts": []
+      },
+      "resizable": {
+        "modifiers": [],
+        "parts": [
+          "handle",
+          "pane"
+        ]
+      },
+      "scaffold": {
+        "modifiers": [
+          "list-detail",
+          "supporting",
+          "workspace"
+        ],
+        "parts": [
+          "bar",
+          "body",
+          "frame",
+          "nav"
+        ]
+      },
+      "scroll-area": {
+        "modifiers": [],
+        "parts": []
+      },
+      "searchinput": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "clear",
+          "field",
+          "group",
+          "item",
+          "kbd",
+          "sugg"
+        ]
+      },
+      "segctrl": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "btn"
+        ]
+      },
+      "select": {
+        "modifiers": [],
+        "parts": []
+      },
+      "select-trigger": {
+        "modifiers": [],
+        "parts": []
+      },
+      "sep": {
+        "modifiers": [
+          "labeled",
+          "vertical"
+        ],
+        "parts": []
+      },
+      "sheet": {
+        "modifiers": [
+          "left"
+        ],
+        "parts": [
+          "body",
+          "foot",
+          "head",
+          "title"
+        ]
+      },
+      "sheet-frame": {
+        "modifiers": [],
+        "parts": [
+          "backdrop"
+        ]
+      },
+      "sidenav": {
+        "modifiers": [
+          "floating",
+          "rail"
+        ],
+        "parts": [
+          "brand",
+          "foot",
+          "icon",
+          "name",
+          "toggle"
+        ]
+      },
+      "sig": {
+        "modifiers": [],
+        "parts": []
+      },
+      "sk": {
+        "modifiers": [],
+        "parts": []
+      },
+      "slider": {
+        "modifiers": [
+          "disabled",
+          "grabbing"
+        ],
+        "parts": [
+          "fill",
+          "knob"
+        ]
+      },
+      "slot": {
+        "modifiers": [
+          "off",
+          "on"
+        ],
+        "parts": []
+      },
+      "slotpicker": {
+        "modifiers": [],
+        "parts": []
+      },
+      "sparkline": {
+        "modifiers": [],
+        "parts": [
+          "area",
+          "path"
+        ]
+      },
+      "spinner": {
+        "modifiers": [
+          "lg",
+          "sm"
+        ],
+        "parts": []
+      },
+      "stat-tile": {
+        "modifiers": [
+          "accent",
+          "clickable",
+          "down",
+          "primary",
+          "up"
+        ],
+        "parts": [
+          "delta",
+          "drill",
+          "foot",
+          "head",
+          "icon",
+          "label",
+          "spark",
+          "value"
+        ]
+      },
+      "stat-tile-grid": {
+        "modifiers": [],
+        "parts": []
+      },
+      "stat-tile-strip": {
+        "modifiers": [],
+        "parts": [
+          "cell"
+        ]
+      },
+      "statgrp": {
+        "modifiers": [],
+        "parts": []
+      },
+      "statuspage": {
+        "modifiers": [
+          "down",
+          "warn"
+        ],
+        "parts": [
+          "banner",
+          "bars",
+          "name",
+          "pct",
+          "row",
+          "tick"
+        ]
+      },
+      "stepper": {
+        "modifiers": [
+          "current",
+          "done"
+        ],
+        "parts": [
+          "dot",
+          "step"
+        ]
+      },
+      "switch": {
+        "modifiers": [],
+        "parts": []
+      },
+      "tab": {
+        "modifiers": [
+          "on"
+        ],
+        "parts": [
+          "badge"
+        ]
+      },
+      "tabs": {
+        "modifiers": [],
+        "parts": []
+      },
+      "taginput": {
+        "modifiers": [],
+        "parts": [
+          "chip",
+          "remove"
+        ]
+      },
+      "tbl": {
+        "modifiers": [],
+        "parts": [
+          "name",
+          "sort",
+          "sort-chevron",
+          "sub"
+        ]
+      },
+      "timefield": {
+        "modifiers": [],
+        "parts": [
+          "sep"
+        ]
+      },
+      "timeline": {
+        "modifiers": [
+          "current",
+          "done"
+        ],
+        "parts": [
+          "body",
+          "desc",
+          "dot",
+          "head",
+          "item",
+          "pulse",
+          "time",
+          "title"
+        ]
+      },
+      "toast": {
+        "modifiers": [
+          "error",
+          "info",
+          "snackbar",
+          "success",
+          "warn"
+        ],
+        "parts": [
+          "action",
+          "body",
+          "close",
+          "sub",
+          "title"
+        ]
+      },
+      "toast-demo-frame": {
+        "modifiers": [],
+        "parts": [
+          "empty"
+        ]
+      },
+      "toast-stack": {
+        "modifiers": [],
+        "parts": []
+      },
+      "toggle": {
+        "modifiers": [
+          "disabled",
+          "lg",
+          "on",
+          "sm"
+        ],
+        "parts": [
+          "knob"
+        ]
+      },
+      "toolbar": {
+        "modifiers": [
+          "sm"
+        ],
+        "parts": [
+          "group",
+          "label",
+          "spacer"
+        ]
+      },
+      "tree": {
+        "modifiers": [
+          "leaf",
+          "on"
+        ],
+        "parts": [
+          "chev",
+          "group",
+          "icon",
+          "row"
+        ]
+      },
+      "truncate": {
+        "modifiers": [],
+        "parts": []
+      },
+      "tt": {
+        "modifiers": [
+          "always"
+        ],
+        "parts": [
+          "pop"
+        ]
+      },
+      "twocol": {
+        "modifiers": [],
+        "parts": [
+          "block",
+          "main",
+          "side",
+          "tile"
+        ]
+      },
+      "tx": {
+        "modifiers": [],
+        "parts": []
+      },
+      "usage": {
+        "modifiers": [
+          "danger",
+          "warn"
+        ],
+        "parts": [
+          "bar",
+          "fill",
+          "foot",
+          "head",
+          "hint",
+          "pct",
+          "title"
+        ]
+      },
+      "viewtoggle": {
+        "modifiers": [],
+        "parts": []
+      },
+      "w3": {
+        "modifiers": [],
+        "parts": []
+      },
+      "wstepper": {
+        "modifiers": [],
+        "parts": [
+          "content",
+          "foot",
+          "sub",
+          "title"
+        ]
+      }
+    },
+    "standalone": [
+      "accordion",
+      "alert",
+      "aspect-ratio",
+      "attachment-chip-family",
+      "banner",
+      "button-group",
+      "combobox",
+      "context-menu",
+      "description-list",
+      "hover-card",
+      "inline-status-meta-micro-components",
+      "input-otp",
+      "interactive-list-row",
+      "navigation-menu",
+      "popover",
+      "scroll-area",
+      "segmented-control-toggle-group",
+      "separator",
+      "signature",
+      "skeleton",
+      "spinner",
+      "tabs",
+      "tooltip"
+    ],
+    "orphans": []
+  },
+  "rules": [
+    {
+      "id": "tokens-exist",
+      "severity": "error",
+      "check": "tokens-exist",
+      "statement": "Every var(--k-*) reference must resolve to a token defined in this contract."
+    },
+    {
+      "id": "no-raw-color",
+      "severity": "warn",
+      "check": "no-raw-color",
+      "statement": "Use the --k-* colour tokens, not raw hex / rgb / hsl literals — this is the anti-generic guarantee."
+    },
+    {
+      "id": "spacing-on-grid",
+      "severity": "warn",
+      "check": "spacing-grid",
+      "statement": "Spacing (margin / padding / gap) should use the --k-s-* scale or land on the 4px grid."
+    },
+    {
+      "id": "radius-from-scale",
+      "severity": "warn",
+      "check": "radius-scale",
+      "statement": "border-radius should use the --k-radius-* tokens, not arbitrary px."
+    },
+    {
+      "id": "font-size-from-scale",
+      "severity": "warn",
+      "check": "font-size-scale",
+      "statement": "font-size should use the --k-type-* scale, not hardcoded px."
+    },
+    {
+      "id": "known-modifiers",
+      "severity": "error",
+      "check": "known-modifiers",
+      "statement": "A kit class written as root--modifier must use a modifier this contract defines."
+    },
+    {
+      "id": "primary-never-rotates",
+      "severity": "info",
+      "statement": "The brand primary hue never rotates; Harmony governs only the derived secondary/accent/decorative family."
+    },
+    {
+      "id": "one-recipe-per-pattern",
+      "severity": "info",
+      "statement": "Each UI pattern has exactly one recipe — the single source feeds both the live preview and every export."
+    },
+    {
+      "id": "unscoped-drop-in",
+      "severity": "info",
+      "statement": "Component CSS is unscoped and token-driven, so it drops into any app at :root without a wrapper class."
+    },
+    {
+      "id": "app-subset-of-gallery",
+      "severity": "info",
+      "statement": "Every class the product surface renders is defined in the exportable kit and demonstrated in the gallery."
+    },
+    {
+      "id": "modifiers-defined-and-demoed",
+      "severity": "info",
+      "statement": "Every root--modifier is defined in CSS and its variant axis is demonstrated."
+    },
+    {
+      "id": "control-height-invariant",
+      "severity": "info",
+      "statement": "Buttons, inputs and selects share one height per scale tier (32 / 36 / 44), so controls align in a row."
+    }
+  ],
+  "accessibility": {
+    "pairs": [
+      {
+        "label": "Body text on background",
+        "ratio": 18.32,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Body text on surface",
+        "ratio": 19.38,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Body text on raised surface",
+        "ratio": 19.38,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Body text on overlay",
+        "ratio": 19.38,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Muted text on background",
+        "ratio": 5.59,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Muted text on surface-2",
+        "ratio": 5.59,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Button text on primary",
+        "ratio": 4.63,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Button text on primary hover",
+        "ratio": 5.71,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Secondary button text",
+        "ratio": 14.19,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Success text on success-soft",
+        "ratio": 16.16,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Warning text on warning-soft",
+        "ratio": 17.22,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Danger text on danger-soft",
+        "ratio": 15.55,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Info text on info-soft",
+        "ratio": 15.86,
+        "required": 4.5,
+        "passes": true
+      },
+      {
+        "label": "Primary against background",
+        "ratio": 4.38,
+        "required": 3,
+        "passes": true
+      },
+      {
+        "label": "Input border against background",
+        "ratio": 1.45,
+        "required": 3,
+        "passes": false
+      },
+      {
+        "label": "Focus ring against background",
+        "ratio": 4.38,
+        "required": 3,
+        "passes": true
+      }
+    ]
+  }
+}"
+`;
+
 exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
 "/* tokens.css — UIcockpit design system
  *

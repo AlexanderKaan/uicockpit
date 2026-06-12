@@ -17,6 +17,7 @@ import {
   MousePointerClick,
   Palette,
   Ruler,
+  ShieldCheck,
   Sidebar,
   Sparkles,
   Square,
@@ -37,13 +38,14 @@ import { genBrief } from './genBrief'
 import { genShadcn } from './genShadcn'
 import { genRegistry } from './genRegistry'
 import { genAiPrompt } from './genAiPrompt'
+import { genContract } from './genContract'
 
 /** Base URL of the Live Kit CDN Worker (cockpit/worker). The stateless lane
  *  `${BASE}/k/<hash>.css` serves genCss(decode(hash)) — the full kit, byte-identical
  *  to the download. LIVE on Cloudflare at the branded custom domain. */
 const KIT_CDN_BASE = 'https://kit.uicockpit.com'
 
-type TabId = 'overview' | 'ai' | 'brief' | 'css' | 'html' | 'json' | 'tailwind' | 'shadcn' | 'registry'
+type TabId = 'overview' | 'ai' | 'brief' | 'css' | 'html' | 'json' | 'tailwind' | 'shadcn' | 'registry' | 'contract'
 
 interface Tab {
   id: TabId
@@ -119,6 +121,14 @@ const TABS: Tab[] = [
     filename: 'registry-theme.json',
     icon: Layers,
     generator: genRegistry,
+  },
+  {
+    id: 'contract',
+    label: 'contract.json',
+    hint: 'Machine-readable — what uicockpit check verifies',
+    filename: 'uicockpit.contract.json',
+    icon: ShieldCheck,
+    generator: genContract,
   },
 ]
 
@@ -215,6 +225,15 @@ function getInstall(tab: TabId, fw: Framework, pm: Pm): Install {
           'Open Cursor, v0, Claude, Lovable, or Bolt.',
           'Paste this as your first / system message before asking for components.',
           'The model will build UI that matches your kit\'s tokens exactly.',
+        ],
+      }
+    case 'contract':
+      return {
+        showFramework: false,
+        steps: [
+          'Save as uicockpit.contract.json at your repo root.',
+          'It enumerates every token, the component graph, the BEM vocabulary and the rules as data.',
+          'Run npx uicockpit check against your codebase — it reports drift from this contract with a CI exit code.',
         ],
       }
     default:

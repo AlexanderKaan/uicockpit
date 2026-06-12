@@ -4,6 +4,7 @@ import { genJson } from '../genJson'
 import { genTailwind } from '../genTailwind'
 import { genBrief } from '../genBrief'
 import { genRegistry } from '../genRegistry'
+import { genContract } from '../genContract'
 import { DEFAULT_CONFIG } from '../../tokens/defaults'
 import { applyColorTheme } from '../../tokens/stylesAndThemes'
 import type { Config } from '../../tokens/types'
@@ -122,5 +123,46 @@ describe('genBrief', () => {
     // The BRIEF now ships a full WCAG audit table — verify the
     // "Button text on primary" row + a pass/fail symbol is rendered.
     expect(out).toMatch(/Button text on primary \| \d+\.\d+:1 \| 4\.5:1 \| [✓✗]/)
+  })
+})
+
+describe('genContract (Fase D1 — the machine-readable contract)', () => {
+  it('produces valid JSON with the contract shape + token vocabulary', () => {
+    const c = JSON.parse(genContract(sampleCfg))
+    expect(c.$schema).toContain('uicockpit.com/contract')
+    expect(c.contractVersion).toBe(1)
+    expect(c.config.colorTheme).toBe('cobalt')
+    // the flat token vocabulary the checker resolves against
+    expect(c.tokens['--k-primary']).toBeTruthy()
+    expect(Object.keys(c.tokens).length).toBeGreaterThan(80)
+    // dark deltas present (and a strict subset of the light tokens)
+    expect(Object.keys(c.tokensDark).length).toBeGreaterThan(0)
+  })
+
+  it('serialises the component graph + extracted BEM class vocabulary', () => {
+    const c = JSON.parse(genContract(sampleCfg))
+    // the tier graph + uses edges, straight from segments
+    expect(c.components.tiers.block).toContain('data-table')
+    expect(c.components.recipes['data-table'].tier).toBe('block')
+    expect(c.components.recipes['data-table'].uses).toContain('table')
+    // BEM extraction from the static recipe CSS
+    expect(c.components.classes.btn).toBeTruthy()
+    expect(c.components.classes.btn.modifiers).toContain('primary')
+    expect(c.components.classes.card.parts).toContain('head')
+    // the coverage worklist — a valid kit leaves no orphan atoms
+    expect(c.components.orphans).toEqual([])
+  })
+
+  it('ships the rules as data, with machine-checkable checks tagged', () => {
+    const c = JSON.parse(genContract(sampleCfg))
+    const checks = c.rules.filter((r: { check?: string }) => r.check).map((r: { check: string }) => r.check)
+    expect(checks).toContain('tokens-exist')
+    expect(checks).toContain('no-raw-color')
+    expect(checks).toContain('known-modifiers')
+    expect(c.rules.find((r: { id: string }) => r.id === 'tokens-exist').severity).toBe('error')
+  })
+
+  it('matches snapshot for soft + cobalt sample', () => {
+    expect(genContract(sampleCfg)).toMatchSnapshot()
   })
 })
