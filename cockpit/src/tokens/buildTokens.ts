@@ -690,6 +690,15 @@ export function buildTokens(cfg: Config): Tokens {
     vars: {
       ...sVars,
       '--k-bg': pageBg,
+      // Brand canvas (Fase I-D) — the premium mesh you see behind the cockpit
+      // preview, shipped so a consumer can sit their app shell on the same
+      // brand-derived atmosphere: `background: var(--k-canvas)`. Self-referential
+      // (primary/secondary/accent over the page bg), gentle alphas for full-bleed.
+      '--k-canvas':
+        'radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%),' +
+        ' radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%),' +
+        ' radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%),' +
+        ' var(--k-bg)',
       // App-chrome bg — sidebars, top bars, app rails. Driven by the Chrome
       // axis (NOT depth): Panel = sunken tint (a distinct room); Flush = same as
       // page bg, separated by a hairline (Linear/Vercel/Stripe). The shell CSS

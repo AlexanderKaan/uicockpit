@@ -35,6 +35,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-measure-prose: 68ch;
   --k-measure-wide: 90ch;
   --k-bg: oklch(98.0% 0.0063 249.9);
+  --k-canvas: radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%), radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%), radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%), var(--k-bg);
   --k-chrome-bg: oklch(98.0% 0.0063 249.9);
   --k-surface: oklch(100% 0 0);
   --k-surface-sunken: oklch(91.6% 0.0077 249.9);
@@ -318,6 +319,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-measure-prose: 68ch;
   --k-measure-wide: 90ch;
   --k-bg: oklch(21.3% 0.0063 249.9);
+  --k-canvas: radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%), radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%), radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%), var(--k-bg);
   --k-chrome-bg: oklch(21.3% 0.0063 249.9);
   --k-surface: oklch(25.4% 0.0070 249.9);
   --k-surface-sunken: oklch(17.6% 0.0056 249.9);

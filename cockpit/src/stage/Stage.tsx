@@ -27,10 +27,20 @@ interface StageProps {
 export function Stage({ cfg, tokens, view, onViewChange }: StageProps) {
   const previewStyle = tokens.vars as CSSProperties
 
+  // Fase I-D — the gradient canvas. A subtle brand-derived mesh behind the
+  // preview (cockpit chrome, NOT exported) so the framed kit floats on a premium
+  // surface instead of flat form-grey. Driven by the live brand/secondary/accent
+  // hexes, so it re-tints the moment the brand changes.
+  const canvasStyle = {
+    '--canvas-1': tokens.primaryHex,
+    '--canvas-2': tokens.secHex,
+    '--canvas-3': tokens.accentHex,
+  } as CSSProperties
+
   return (
     <main className="stage">
       <div className="stage__row">
-        <div className="stage__body">
+        <div className="stage__body" style={canvasStyle}>
           <div className="cockpit-preview" style={previewStyle}>
             <IconProvider set={cfg.iconSet}>
               <div className="view-transition-root" key={view}>
