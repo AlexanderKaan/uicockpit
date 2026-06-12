@@ -74,7 +74,7 @@ const PANE_CLASS = {
   supporting: 'pane pane--fixed pane--supporting',
 } as const
 
-function ShowcaseStage({ m, inspect, onViewChange }: { m: ShowcaseManifest; inspect: boolean; onViewChange: (v: ViewKind) => void }) {
+function ShowcaseStage({ m, inspect, split, onViewChange }: { m: ShowcaseManifest; inspect: boolean; split?: boolean; onViewChange: (v: ViewKind) => void }) {
   const [width, setWidth] = useState(m.width)
   // Inspect is a VIEW MODE now (Live · Inspect · Matrix segctrl in PagesView),
   // not a buried toggle: tags are always on in inspect, and the inspector
@@ -178,8 +178,28 @@ function ShowcaseStage({ m, inspect, onViewChange }: { m: ShowcaseManifest; insp
         </div>
       )}
 
-      <div className="lyt__stage">
-        <ShowcaseShell m={m} width={width} renderBlockFn={renderInspectable} />
+      <div className={`lyt__stage ${split ? 'shc__splitstage' : ''}`}>
+        {split && (
+          <aside className="shc__specimen" aria-label="Selected component, isolated">
+            <div className="shc__specimen-head">
+              <span>Specimen</span>
+              {pickedSpec && <span className="badge badge--info">{pickedSpec.block}</span>}
+            </div>
+            <div className="shc__specimen-body">
+              {pickedSpec ? (
+                renderBlock(pickedSpec, 0)
+              ) : (
+                <div className="shc__specimen-empty">
+                  <Icon name="search" />
+                  <span>Click a block in the page to isolate it here.</span>
+                </div>
+              )}
+            </div>
+          </aside>
+        )}
+        <div className={split ? 'shc__splitpage' : undefined}>
+          <ShowcaseShell m={m} width={split ? Math.min(width, 1100) : width} renderBlockFn={renderInspectable} />
+        </div>
       </div>
     </>
   )
@@ -291,7 +311,7 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
   // The three WAYS OF LOOKING at one manifest — a first-class segctrl, not
   // buried toggles: Live (the theater) · Inspect (spec + recipes + JSON) ·
   // Matrix (the same manifest under contrasting kits).
-  const [viewMode, setViewMode] = useState<'live' | 'inspect' | 'matrix'>('live')
+  const [viewMode, setViewMode] = useState<'live' | 'inspect' | 'matrix' | 'split'>('live')
   // ×6: the FULL grid — every showcase × every style (the 3×6 money-shot).
   const [matrixAll, setMatrixAll] = useState(false)
   const m = SHOWCASES.find((s) => s.id === showcaseId)!
@@ -374,7 +394,7 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
         </>
       ) : (
         /* key = remount per showcase so width resets to the manifest default */
-        <ShowcaseStage m={m} key={m.id} inspect={viewMode === 'inspect'} onViewChange={onViewChange} />
+        <ShowcaseStage m={m} key={m.id} inspect={viewMode === 'inspect' || viewMode === 'split'} split={viewMode === 'split'} onViewChange={onViewChange} />
       )}
     </div>
   )
@@ -383,12 +403,14 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
 const VIEWMODES = [
   ['live', 'Live', 'spark'],
   ['inspect', 'Inspect', 'search'],
+  ['split', 'Split', 'card'],
   ['matrix', 'Matrix', 'grid'],
 ] as const
 
-const VIEWMODE_HINT: Record<'live' | 'inspect' | 'matrix', string> = {
+const VIEWMODE_HINT: Record<'live' | 'inspect' | 'matrix' | 'split', string> = {
   live: 'Scrub the width — every showcase re-arranges via the shell tier.',
   inspect: 'Click any block tag to see its manifest spec, which kit recipes build it, and the full JSON.',
+  split: 'Click a block in the page — it appears isolated as a specimen on the left, beside its live context.',
   matrix: 'See your live kit beside two curated contrasts — same structure, different style.',
 }
 

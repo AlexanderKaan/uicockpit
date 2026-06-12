@@ -1079,6 +1079,50 @@
 /* Style matrix (slice 3) — three token universes side by side. Each cell is
  * a fixed viewport that clips a full-width shell scaled down as one unit. */
 .shc__picker-spacer { flex: 1; }
+/* Split stage (Fase I-A) — the picked block isolated as a specimen on the
+ * left, beside its live in-context showcase on the right. Click a block tag in
+ * the page → it appears here. The de-risk of the v2 "Split" altitude. */
+.shc__splitstage {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: var(--k-s-16);
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .shc__splitstage { grid-template-columns: 1fr; }
+}
+.shc__specimen {
+  position: sticky;
+  top: var(--k-s-12);
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  background: var(--k-surface);
+  overflow: hidden;
+}
+.shc__specimen-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--k-s-8);
+  padding: var(--k-s-10) var(--k-s-12);
+  border-bottom: var(--k-bw) solid var(--k-border);
+  font-size: var(--k-type-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg-muted);
+}
+.shc__specimen-body { padding: var(--k-s-16); container-type: inline-size; }
+.shc__specimen-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--k-s-10);
+  padding: var(--k-s-32) var(--k-s-16);
+  text-align: center;
+  color: var(--k-fg-muted);
+  font-size: var(--k-type-small);
+}
+.shc__specimen-empty svg { width: 24px; height: 24px; opacity: 0.5; }
+.shc__splitpage { min-width: 0; }
 /* The Live · Inspect · Matrix segctrl — icon + label per segment. */
 .shc__viewmode .segctrl__btn { display: inline-flex; align-items: center; gap: var(--k-s-6); }
 .shc__viewmode .segctrl__btn svg { width: 14px; height: 14px; }
