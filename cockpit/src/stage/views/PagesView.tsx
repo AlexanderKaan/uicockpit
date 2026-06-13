@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
+import { useMemo, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, type BlockSpec, type ShowcaseManifest } from '../../showcases/manifests'
 import { renderBlock } from '../../showcases/blocks'
@@ -42,6 +42,15 @@ const BLOCK_INFO: Record<string, { label: string; seg: string; jump: { q: string
 const blockInfo = (kind: string) =>
   BLOCK_INFO[kind] ?? { label: kind, seg: kind, jump: { q: kind, tier: 'block' as const } }
 
+/* Archetype → a tiny human caption (the one quiet line that gives a showcase its
+ * identity, in place of the old standing intro + per-page blurb — Fase J-7). */
+const ARCH_LABEL: Record<string, string> = {
+  feed: 'Feed',
+  'list-detail': 'List · detail',
+  supporting: 'Supporting pane',
+  workspace: 'Workspace',
+}
+
 /* The loupe's altitude. page → block → atom is a continuous zoom; each level is
  * a breadcrumb crumb you can click to fly back out (Fase J-2). */
 type Focus =
@@ -50,15 +59,13 @@ type Focus =
   | { level: 'atom'; pane: number; idx: number; comp: string }
 
 /**
- * Pages view (H3b) — Showcases first, SupaDash one click away.
+ * Pages — the loupe (H3b manifest model · Fase J).
  *
- * The Showcases theater renders MANIFESTS: a page = archetype × nav × panes
- * of seeded blocks, as plain JSON (see src/showcases/manifests.ts). Each
- * showcase gets the width-scrubber theater (the H3a workbench pattern) and a
- * "view manifest" disclosure that prints the literal object — the proof that
- * the screen is round-trippable data, not bespoke TSX. SupaDash (the deep
- * hand-built super-app) stays as the second tab until its screens are
- * reframed into manifests (H3b later slices).
+ * A page is DATA: archetype × nav × panes of seeded blocks (src/showcases/
+ * manifests.ts), rendered through the same kit recipes the export ships. The view
+ * is deliberately content-first (Fase J-7): chips → preview, with every control
+ * pushed into a slim bottom dock or one click away. Inspect turns the preview into
+ * a continuous zoom — Page › Block › Atom › All tokens — with a breadcrumb spine.
  */
 
 const PANE_CLASS = {
@@ -71,24 +78,19 @@ const PANE_CLASS = {
 function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void }) {
   const [width, setWidth] = useState(m.width)
   // The loupe (Fase J-2): a continuous zoom Page › Block › Atom. `loupe` off is a
-  // clean live page (the old "Live"); turning it on reveals the breadcrumb and
-  // makes blocks pickable. Click a block → it isolates and enlarges (atoms inside
-  // become clickable); click an atom → its specimen + recipe. The breadcrumb flies
-  // you back out a level at a time. One surface, three altitudes — not four modes.
+  // clean live page; turning it on reveals the breadcrumb and makes blocks
+  // pickable. Click a block → it isolates and enlarges (atoms inside clickable);
+  // click an atom → its specimen + recipe; All tokens → the foundation grid.
   const [loupe, setLoupe] = useState(false)
   const [focus, setFocus] = useState<Focus>({ level: 'page' })
   const [railOpen, setRailOpen] = useState(true)
-  // Fase J-3 — the deepest zoom. Orthogonal to `focus`: any altitude can drill
-  // past it into the All-tokens inspector (the resolved foundation scales). This
-  // is Foundations-as-deepest-zoom, demoting it from a peer tab (J6 removes the
-  // tab). Tokens derive from the live config, so the grid ripples on every change.
   const [tokensOpen, setTokensOpen] = useState(false)
+  const [showJson, setShowJson] = useState(false)
   const tokens = useMemo(() => buildTokens(cfg), [cfg])
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
   // Fase J-5 — Shells folded into the slider: a `suite`-nav showcase morphs its
   // navigation bar → rail → sidebar at the scaffold container's 600/1200px
-  // breakpoints (see the `@container scaffold` queries in recipes). Annotating it
-  // here surfaces the old standalone Shells workbench's only unique value, live.
+  // breakpoints (see the `@container scaffold` queries in recipes).
   const navState = m.nav === 'suite' ? (width < 600 ? 'Bottom bar' : width < 1200 ? 'Rail' : 'Sidebar') : null
 
   const block = focus.level !== 'page' ? m.panes[focus.pane]?.blocks[focus.idx] : undefined
@@ -118,8 +120,8 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
   const exitLoupe = () => { setLoupe(false); setFocus({ level: 'page' }); setTokensOpen(false) }
 
   // The breadcrumb spine — one crumb per visited altitude, each a button that
-  // flies back out to its level (the deepest is inert; it's where you are). The
-  // All-tokens inspector (J3) appends as the deepest rung whenever it's open.
+  // flies back out to its level. The All-tokens inspector (J3) appends as the
+  // deepest rung whenever it's open.
   const crumbs: Array<{ label: string; go: () => void; on: boolean }> = [
     { label: `Page · ${m.title}`, go: () => { setTokensOpen(false); setFocus({ level: 'page' }) }, on: !tokensOpen && focus.level === 'page' },
   ]
@@ -133,11 +135,13 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
   const hint =
     tokensOpen ? 'Every resolved token — the foundation behind the kit'
       : focus.level === 'page' ? 'Click any block to zoom in'
-        : focus.level === 'block' ? 'Click any element inside to drill to its atom'
-          : 'Deepest atom level — open All tokens to see the foundation'
+        : focus.level === 'block' ? 'Click any element to drill to its atom'
+          : 'Deepest atom level'
 
   const stageKey = `${tokensOpen ? 'tokens' : focus.level}-${focus.level !== 'page' ? `${focus.pane}.${focus.idx}` : ''}-${focus.level === 'atom' ? focus.comp : ''}`
   const blockCount = m.panes.reduce((n, p) => n + p.blocks.length, 0)
+  const caption = `${ARCH_LABEL[m.archetype] ?? m.archetype} · ${m.nav === 'suite' ? 'adaptive nav' : 'top nav'}`
+  const showWidth = !loupe || (focus.level === 'page' && !tokensOpen)
 
   // Export-as-starter: the manifest IS the starter — download it as JSON.
   const downloadManifest = () => {
@@ -152,48 +156,7 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
 
   return (
     <>
-      <div className="lyt__controls">
-        {(!loupe || (focus.level === 'page' && !tokensOpen)) && (
-          <label className="lyt__scrub">
-            <span className="lyt__scrub-label">Shell width</span>
-            <input
-              type="range"
-              min={360}
-              max={1680}
-              step={10}
-              value={width}
-              list="shc-win-detents"
-              onChange={(e) => setWidth(+e.target.value)}
-              aria-label="Shell width in pixels"
-            />
-            <datalist id="shc-win-detents">
-              <option value={600} />
-              <option value={840} />
-              <option value={1200} />
-              <option value={1600} />
-            </datalist>
-            <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong>{navState && <> · nav <strong>{navState}</strong></>}</span>
-          </label>
-        )}
-        <span className="shc__picker-spacer" />
-        {loupe && !tokensOpen && (
-          <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={railOpen} onClick={() => setRailOpen((o) => !o)}>
-            {railOpen ? 'Hide recipe' : 'Show recipe'}
-          </button>
-        )}
-        {loupe && (
-          <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={tokensOpen} onClick={() => setTokensOpen((o) => !o)}>
-            <Icon name="grid" />All tokens
-          </button>
-        )}
-        <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={loupe} onClick={() => (loupe ? exitLoupe() : enterLoupe())}>
-          <Icon name="search" />{loupe ? 'Done inspecting' : 'Inspect'}
-        </button>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={downloadManifest}>
-          <Icon name="upload" />Download manifest
-        </button>
-      </div>
-
+      {/* Context line — the breadcrumb spine when inspecting, else a quiet caption. */}
       {loupe ? (
         <nav className="shc__loupebar" aria-label="Zoom level">
           <div className="shc__crumbs">
@@ -207,17 +170,10 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
           <span className="shc__loupehint">{hint}</span>
         </nav>
       ) : (
-        <>
-          <p className="lyt__blurb">
-            {m.blurb} — scrub the width to watch the shell re-arrange; Inspect to drill Page › Block › Atom.
-          </p>
-          <details className="shc__manifestbox">
-            <summary>Full manifest JSON — the screen IS this data</summary>
-            <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
-          </details>
-        </>
+        <p className="shc__caption">{caption}</p>
       )}
 
+      {/* The stage — the preview floats, centred on the canvas; rail beside it when inspecting. */}
       <div className={`lyt__stage shc__loupebody ${loupe && railOpen && !tokensOpen ? 'shc__loupebody--rail' : ''}`}>
         <div className="shc__loupestage" key={stageKey}>
           {tokensOpen ? (
@@ -225,7 +181,7 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
           ) : (
             <>
               {(!loupe || focus.level === 'page') && (
-                <div className={loupe ? 'shc__pickpage' : undefined} onClick={loupe ? pickBlock : undefined}>
+                <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickBlock : undefined}>
                   <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} />
                 </div>
               )}
@@ -246,7 +202,7 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
             {focus.level === 'page' && (
               <>
                 <div className="shc__loupe-head">The page</div>
-                <p className="shc__loupe-blurb">A showcase is data: {blockCount} blocks of seeded content across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any block to zoom in.</p>
+                <p className="shc__loupe-blurb">A showcase is data: {blockCount} blocks across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any block to zoom in.</p>
                 <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>
                   All tokens <Icon name="chevR" />
                 </button>
@@ -255,7 +211,7 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
             {focus.level === 'block' && bInfo && (
               <>
                 <div className="shc__loupe-head">Block · {bInfo.label}</div>
-                <p className="shc__loupe-blurb">Composes these atoms — click any element in the block to drill into it:</p>
+                <p className="shc__loupe-blurb">Composes these atoms — click any element to drill into it:</p>
                 <ul className="shc__uses">
                   {(usesOf(bInfo.seg).length ? usesOf(bInfo.seg) : ['(self-contained)']).map((u) => <li key={u}>{u}</li>)}
                 </ul>
@@ -276,11 +232,7 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
                 ))}
                 <div className="shc__recipe-blurb">{comp.blurb}</div>
                 <div className="shc__loupe-actions">
-                  <button
-                    type="button"
-                    className="btn btn--outline btn--xs"
-                    onClick={() => setTokensOpen(true)}
-                  >
+                  <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>
                     All tokens <Icon name="chevR" />
                   </button>
                   <button
@@ -296,12 +248,63 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
           </aside>
         )}
       </div>
+
+      {/* The dock — a slim bottom toolbar. Width on the left (the old header
+       * scrubber, demoted); the actions on the right. Everything that used to
+       * stack above the preview now lives here, out of the content's way. */}
+      <div className="shc__dock">
+        {showWidth && (
+          <label className="lyt__scrub shc__dock-scrub">
+            <span className="lyt__scrub-label">Width</span>
+            <input
+              type="range"
+              min={360}
+              max={1680}
+              step={10}
+              value={width}
+              list="shc-win-detents"
+              onChange={(e) => setWidth(+e.target.value)}
+              aria-label="Shell width in pixels"
+            />
+            <datalist id="shc-win-detents">
+              <option value={600} />
+              <option value={840} />
+              <option value={1200} />
+              <option value={1600} />
+            </datalist>
+            <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong>{navState && <> · {navState}</>}</span>
+          </label>
+        )}
+        <span className="shc__dock-spacer" />
+        {loupe && !tokensOpen && (
+          <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={railOpen} onClick={() => setRailOpen((o) => !o)}>
+            {railOpen ? 'Hide recipe' : 'Show recipe'}
+          </button>
+        )}
+        {loupe && (
+          <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={tokensOpen} onClick={() => setTokensOpen((o) => !o)}>
+            <Icon name="grid" />All tokens
+          </button>
+        )}
+        <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={loupe} onClick={() => (loupe ? exitLoupe() : enterLoupe())}>
+          <Icon name="search" />{loupe ? 'Done' : 'Inspect'}
+        </button>
+        <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={showJson} onClick={() => setShowJson((o) => !o)}>
+          <Icon name="file" />JSON
+        </button>
+        <button type="button" className="btn btn--ghost btn--icon btn--sm" onClick={downloadManifest} aria-label="Download manifest" title="Download manifest">
+          <Icon name="upload" />
+        </button>
+      </div>
+
+      {showJson && (
+        <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
+      )}
     </>
   )
 }
 
-/** The pure shell render — one manifest → one live scaffold. Shared by the
- *  single-stage theater and the style-matrix cells; nav selection is local. */
+/** The pure shell render — one manifest → one live scaffold. Nav selection is local. */
 function ShowcaseShell({
   m,
   width,
@@ -370,73 +373,16 @@ function ShowcaseShell({
   )
 }
 
-/* The style-matrix (H3b slice 3) — the SAME manifest under contrasting kits.
- * Column 1 is the live cockpit config ("Your kit"); 2 + 3 are curated
- * contrasts built from the engine's own dials. One manifest × N styles =
- * the proof that pages are data and style is orthogonal. */
-const MATRIX_STYLES: Array<{ id: string; label: string; patch: Partial<Config> }> = [
-  { id: 'yours', label: 'Your kit', patch: {} },
-  {
-    id: 'complement-dark',
-    label: 'Violet · complement · dark',
-    patch: { cPrimary: '#7C3AED', mode: 'dark', harmony: 'complement', spread: 180, expression: 100 },
-  },
-  {
-    id: 'expressive-warm',
-    label: 'Ember · expressive',
-    patch: { cPrimary: '#EA580C', harmony: 'expressive', spread: 120, expression: 140, shapePoints: 12, shapeDepth: 0.5, shapeSoft: 0.3 },
-  },
-]
-
-function MatrixCell({ m, cfg, label, scale = 0.42 }: { m: ShowcaseManifest; cfg: Config; label: string; scale?: number }) {
-  // Each cell is its own token universe: a nested var-scope div (CSS custom
-  // props cascade, so the cell's full var set overrides the stage's). The
-  // shell renders at its real manifest width and is scaled down as one unit —
-  // container queries measure the LAYOUT width, so each mini gets the true
-  // desktop arrangement.
-  const vars = useMemo(() => buildTokens(cfg).vars as CSSProperties, [cfg])
-  const W = Math.max(m.width, 900)
-  const H = 640
-  const S = scale
-  return (
-    <figure className="shc__matrix-cell">
-      <figcaption className="shc__matrix-label">{label}</figcaption>
-      <div className="shc__matrix-port" style={{ width: W * S, height: H * S }}>
-        <div
-          className="shc__matrix-world"
-          style={{ ...vars, width: W, height: H, transform: `scale(${S})` }}
-        >
-          <ShowcaseShell m={m} width={W} />
-        </div>
-      </div>
-    </figure>
-  )
-}
-
 export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
   const [showcaseId, setShowcaseId] = useState(SHOWCASES[0]!.id)
-  // Fase J-1/J4: Live/Inspect/Split collapsed into ONE loupe (ShowcaseStage). The
-  // last peer view-mode, Matrix, is no longer a mode at all — it's a "Compare kits"
-  // ACTION (a button, not a segctrl). The page IS the default; comparison is a
-  // place you go and come back from, so the picker stops being a mode switch.
-  const [matrix, setMatrix] = useState(false)
-  // ×6: the FULL grid — every showcase × every style (the 3×6 money-shot).
-  const [matrixAll, setMatrixAll] = useState(false)
   const m = SHOWCASES.find((s) => s.id === showcaseId)!
 
+  // Content-first (Fase J-7): the chips ARE the header. No standing intro, no
+  // per-page blurb, no Compare-kits matrix — the live re-tint on every config
+  // change already proves style is orthogonal to structure. Controls live in the
+  // dock at the bottom of ShowcaseStage.
   return (
     <div className="lyt shc">
-      <header className="lyt__head">
-        <div className="shc__headrow">
-          <h2 className="lyt__title">Showcases — pages as manifests</h2>
-        </div>
-        <p className="lyt__intro">
-          A page here is <em>data</em>: archetype × nav × panes of seeded blocks, rendered through
-          the same kit recipes the export ships.{matrix ? ' Compare it under three kits — structure is orthogonal to style.' : ' Inspect to click into any component and read its recipe.'}
-        </p>
-      </header>
-
-      {/* Showcase picker — dogfoods the kit's own filter chips */}
       <div className="shc__picker" role="radiogroup" aria-label="Showcase">
         {SHOWCASES.map((s) => (
           <button
@@ -450,58 +396,10 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
             {s.title}
           </button>
         ))}
-        <span className="shc__picker-spacer" />
-        {/* Compare kits (J4) — not a peer view-mode but an ACTION: the loupe is the
-         * default; "Compare kits" takes you to the matrix and "Back to page" returns. */}
-        {matrix ? (
-          <button type="button" className="btn btn--ghost btn--sm shc__viewmode-btn" onClick={() => setMatrix(false)}>
-            <Icon name="chevL" />Back to page
-          </button>
-        ) : (
-          <button type="button" className="btn btn--outline btn--sm shc__viewmode-btn" onClick={() => setMatrix(true)}>
-            <Icon name="grid" />Compare kits
-          </button>
-        )}
       </div>
 
-      {matrix ? (
-        <>
-          <div className="lyt__controls">
-            <p className="lyt__blurb" style={{ margin: 0, flex: 1 }}>
-              One manifest, three kits — the left column is YOUR live config; the others are
-              curated contrasts. Style is orthogonal to structure: the JSON never changes.
-            </p>
-            <button type="button" className="btn btn--outline btn--sm btn--toggle" aria-pressed={matrixAll} onClick={() => setMatrixAll((s) => !s)}>
-              All 6 × 3
-            </button>
-          </div>
-          {matrixAll ? (
-            <div className="shc__matrixgrid">
-              {SHOWCASES.map((s) => (
-                <div key={s.id}>
-                  <div className="shc__matrixrow-title">{s.title}</div>
-                  <div className="shc__matrix">
-                    {MATRIX_STYLES.map((st) => (
-                      <MatrixCell key={st.id} m={s} cfg={{ ...cfg, ...st.patch }} label={st.label} scale={0.26} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="shc__matrix">
-              {MATRIX_STYLES.map((s) => (
-                <MatrixCell key={s.id} m={m} cfg={{ ...cfg, ...s.patch }} label={s.label} />
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        /* key = remount per showcase so width resets to the manifest default */
-        <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} />
-      )}
+      {/* key = remount per showcase so width resets to the manifest default */}
+      <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} />
     </div>
   )
 }
-
-

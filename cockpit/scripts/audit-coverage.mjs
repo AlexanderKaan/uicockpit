@@ -58,10 +58,14 @@ const MARKERS = {
 
 // Intentionally gallery-only — no believable product home. Logged, not failed.
 const ALLOWLIST = {
-  Lightbox: false, // (kept — it IS covered in Media; example of allowlist shape)
+  // No showcase manifest has a "segmented control" block — it's a CHROME control,
+  // not a content block. It's demonstrated bare in the gallery (the Segmented
+  // card) and dogfooded in the cockpit's own Components/Pages sub-toggles, so it's
+  // legitimately gallery-only as far as the SHOWCASES go. (Fase J-7: this used to
+  // pass only because a code comment in PagesView contained the word "segctrl" —
+  // that false positive is now an honest allowlist entry.)
+  Segmented: true,
 }
-// (empty in practice; left as the mechanism for future judgment calls)
-delete ALLOWLIST.Lightbox
 
 const missing = []
 for (const [name, marker] of Object.entries(MARKERS)) {
