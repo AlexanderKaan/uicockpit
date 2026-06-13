@@ -425,7 +425,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "list",
         "radio-card",
         "chip",
-        "signature"
+        "signature",
+        "message"
       ],
       "block": [
         "data-table",
@@ -982,6 +983,11 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "pane": {
         "tier": "shell",
         "section": "Pane",
+        "uses": []
+      },
+      "message": {
+        "tier": "atom",
+        "section": "Chat message",
         "uses": []
       }
     },
@@ -1668,6 +1674,17 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "modifiers": [],
         "parts": []
       },
+      "msg": {
+        "modifiers": [
+          "me"
+        ],
+        "parts": [
+          "body",
+          "head",
+          "name",
+          "time"
+        ]
+      },
       "nav-group": {
         "modifiers": [],
         "parts": []
@@ -2080,6 +2097,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "sub"
         ]
       },
+      "thread": {
+        "modifiers": [],
+        "parts": []
+      },
       "timefield": {
         "modifiers": [],
         "parts": [
@@ -2233,6 +2254,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "inline-status-meta-micro-components",
       "input-otp",
       "interactive-list-row",
+      "message",
       "navigation-menu",
       "popover",
       "scroll-area",
@@ -3246,10 +3268,10 @@ body {
  *   the catalog:
  *     Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (50): the reusable elements with real
+ * ATOMS — the bare vocabulary (51): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape
+ *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape, Chat message
  *
  * BLOCKS — stand-alone pieces of app (28), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -8105,6 +8127,46 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: var(--k-gap, var(--k-s-8));
 }
+
+/* === Chat message ===
+   A conversation bubble — a name/time header over the body, on the surface.
+   Stack them in a .thread (a plain vertical-rhythm container) for a chat or
+   comment feed. The modifier flips ONE axis: who is speaking.
+     .msg          → an incoming message (left, neutral surface)
+     .msg--me      → the sender's own message (right, brand-soft fill)
+   The bubble caps its width so a thread reads as a conversation, not full-bleed
+   paragraphs. Everything derives — fill, border and text all from tokens. */
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space, var(--k-s-8));
+}
+.msg {
+  align-self: flex-start;
+  max-width: 85%;
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  background: var(--k-surface);
+  padding: var(--k-s-10) var(--k-s-12);
+}
+.msg--me {
+  align-self: flex-end;
+  border-color: var(--k-primary-soft);
+  background: var(--k-primary-soft);
+  color: var(--k-primary-soft-fg);
+}
+.msg__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--k-s-8);
+  margin-bottom: var(--k-s-4);
+}
+.msg__name { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); }
+.msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+.msg--me .msg__time { color: inherit; opacity: 0.7; }
+.msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
+.msg--me .msg__body { color: inherit; }
 "
 `;
 

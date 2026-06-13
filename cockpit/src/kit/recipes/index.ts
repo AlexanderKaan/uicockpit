@@ -5114,4 +5114,47 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   gap: var(--k-gap, var(--k-s-8));
 }`,
   },
+  {
+    id: 'message',
+    section: 'Chat message',
+    css: `/* === Chat message ===
+   A conversation bubble — a name/time header over the body, on the surface.
+   Stack them in a .thread (a plain vertical-rhythm container) for a chat or
+   comment feed. The modifier flips ONE axis: who is speaking.
+     .msg          → an incoming message (left, neutral surface)
+     .msg--me      → the sender's own message (right, brand-soft fill)
+   The bubble caps its width so a thread reads as a conversation, not full-bleed
+   paragraphs. Everything derives — fill, border and text all from tokens. */
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space, var(--k-s-8));
+}
+.msg {
+  align-self: flex-start;
+  max-width: 85%;
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  background: var(--k-surface);
+  padding: var(--k-s-10) var(--k-s-12);
+}
+.msg--me {
+  align-self: flex-end;
+  border-color: var(--k-primary-soft);
+  background: var(--k-primary-soft);
+  color: var(--k-primary-soft-fg);
+}
+.msg__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--k-s-8);
+  margin-bottom: var(--k-s-4);
+}
+.msg__name { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); }
+.msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+.msg--me .msg__time { color: inherit; opacity: 0.7; }
+.msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
+.msg--me .msg__body { color: inherit; }`,
+  },
 ]

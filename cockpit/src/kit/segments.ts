@@ -108,6 +108,8 @@ export const STANDALONE_ATOMS: readonly string[] = [
   'input-otp', 'interactive-list-row', 'combobox',
   // inline messaging / status — drop in anywhere
   'alert', 'banner', 'inline-status-meta-micro-components', 'attachment-chip-family',
+  // a chat/comment bubble — self-contained, stacks into a .thread (Fase J-8)
+  'message',
   // loading & layout utilities
   'skeleton', 'spinner', 'separator', 'aspect-ratio', 'scroll-area',
   // the Shape Lab mask utility (H5) — attaches to any whitelisted identity

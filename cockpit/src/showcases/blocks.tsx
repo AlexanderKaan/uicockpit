@@ -60,14 +60,14 @@ export function renderBlock(spec: BlockSpec, key: number) {
       )
     case 'thread':
       return (
-        <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k-stack-gap, 8px)' }}>
+        <div className="thread" key={key}>
           {spec.seed.messages.map((m, i) => (
-            <div className="card" key={i} style={m.me ? { borderColor: 'var(--k-primary-soft)', background: 'var(--k-primary-soft)' } : undefined}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                <strong style={{ fontSize: 'var(--k-type-small)' }}>{m.name}</strong>
-                <span style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }}>{m.time}</span>
+            <div className={`msg ${m.me ? 'msg--me' : ''}`} key={i}>
+              <div className="msg__head">
+                <span className="msg__name">{m.name}</span>
+                <span className="msg__time">{m.time}</span>
               </div>
-              <p style={{ fontSize: 'var(--k-type-small)', margin: 0, lineHeight: 1.55, color: m.me ? 'inherit' : 'var(--k-fg-muted)' }}>{m.body}</p>
+              <p className="msg__body">{m.body}</p>
             </div>
           ))}
         </div>

@@ -278,6 +278,23 @@ export const COMPONENTS: Record<string, ComponentSpec> = {
       </div>
     ),
   },
+  message: {
+    label: 'Chat message',
+    blurb: 'A conversation bubble; your own message flips right on the brand-soft fill.',
+    recipe: [['Fill', '--k-surface / --k-primary-soft'], ['Radius', '--k-radius-lg'], ['Width', 'cap 85%'], ['Name', 'fs-small semibold']],
+    specimen: () => (
+      <div className="thread" style={{ maxWidth: 280 }}>
+        <div className="msg">
+          <div className="msg__head"><span className="msg__name">Mira</span><span className="msg__time">09:24</span></div>
+          <p className="msg__body">Draft contract is ready for review.</p>
+        </div>
+        <div className="msg msg--me">
+          <div className="msg__head"><span className="msg__name">You</span><span className="msg__time">09:26</span></div>
+          <p className="msg__body">Looks good — sending the redline now.</p>
+        </div>
+      </div>
+    ),
+  },
   toolbar: {
     label: 'Toolbar',
     blurb: 'A control-height row — inputs and buttons share one baseline.',
@@ -307,6 +324,7 @@ const CLASS_MAP: Array<[string, string]> = [
   ['in', 'input'],
   ['btn', 'button'],
   ['list__item', 'list'],
+  ['msg', 'message'],
   // Block-tier containers (Fase J-8) — resolve the distinctive chrome to its real
   // recipe before the walk-up reaches the generic .card wrapper.
   ['chart', 'chart'],

@@ -97,6 +97,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   InfoCardCard: 'Hosting details info card definition',
   // — Blocks / composed —
   FormPanelCard: 'Form panel labeled fields validation action bar',
+  ThreadCard: 'Conversation chat message thread bubble comments',
   FilterBarCard: 'Filter bar toolbar facets',
   InboxFilterCard: 'Inbox filter mail messages',
   PricingCardCard: 'Plans pricing tiers subscription',
@@ -184,7 +185,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [PricingCardCard, 'block'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'block'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'block'], [SheetCard, 'block'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'block'], [TrendCard, 'block'],
-    [CmdPaletteCard, 'block'], [DropdownMenuCard, 'atom'], [CarouselCard, 'block'], [ListCard, 'atom'],
+    [CmdPaletteCard, 'block'], [DropdownMenuCard, 'atom'], [CarouselCard, 'block'], [ListCard, 'atom'], [ThreadCard, 'block'],
     [LoginCard, 'block'], [StatGroupCard, 'block'], [ContextMenuCard, 'atom'], [SignupCard, 'block'], [TimelineCard, 'block'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'block'], [NotificationCenterCard, 'block'], [NavCard, 'block'],
     [FileGridCard, 'block'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
@@ -3500,6 +3501,27 @@ function ListCard() {
       <div className="card__foot">
         <button className="btn btn--ghost btn--block">Manage storage</button>
         <button className="btn btn--ghost btn--block">Sign out</button>
+      </div>
+    </Card>
+  )
+}
+
+/* === Chat message (Fase J-8) =========================================
+ * A conversation thread — incoming bubbles on the surface, the sender's
+ * own (.msg--me) on the right in the brand-soft fill. Comment feeds,
+ * support chats, AI assistants. */
+function ThreadCard() {
+  return (
+    <Card title="Conversation" desc="A chat thread — incoming vs your own message.">
+      <div className="thread">
+        <div className="msg">
+          <div className="msg__head"><span className="msg__name">Mira</span><span className="msg__time">09:24</span></div>
+          <p className="msg__body">Draft contract is ready for review — can we sign off today?</p>
+        </div>
+        <div className="msg msg--me">
+          <div className="msg__head"><span className="msg__name">You</span><span className="msg__time">09:26</span></div>
+          <p className="msg__body">Looks good. Sending the redline now.</p>
+        </div>
       </div>
     </Card>
   )

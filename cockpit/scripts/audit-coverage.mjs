@@ -45,7 +45,7 @@ const HAYSTACK = FILES.map((f) => readFileSync(f, 'utf8')).join('\n')
 const MARKERS = {
   // Block tier — the 18 typed blocks (showcases/blocks.tsx)
   StatTile: 'stat-tile', Chart: 'ChartFrame', List: 'list__item', Card: 'card"',
-  Thread: 'primary-soft', Composer: 'toolbar', Input: 'className="in"', Table: 'tbl',
+  Thread: 'msg__', Composer: 'toolbar', Input: 'className="in"', Table: 'tbl',
   Form: 'className="lab"', Pricing: 'pricing__', Prose: 'l-center',
   DescriptionList: 'className="dl"', Chip: 'chip ', Kanban: 'kanban__',
   TreeView: 'tree__row', Timeline: 'timeline__', SettingsRow: 'list--settings',
