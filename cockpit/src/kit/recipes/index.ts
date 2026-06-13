@@ -3367,6 +3367,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   line-height: 1.05;
   color: var(--k-fg);
 }
+/* CP3 — the HERO stat (confident-pro gap #1: one focal point per surface). The
+ * lead KPI spans the full grid and renders its value at the display tier (~48px),
+ * so a dashboard reads as a bento with one feature metric instead of a uniform
+ * 2×2 of equals. The number earns its focus through SIZE, not colour — accent
+ * stays reserved for the one action (CP2). The Linear/Stripe insight move. */
+.stat-tile--hero { grid-column: 1 / -1; }
+.stat-tile--hero .stat-tile__value {
+  font-size: var(--k-type-display);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
 .stat-tile__foot {
   display: flex;
   align-items: center;

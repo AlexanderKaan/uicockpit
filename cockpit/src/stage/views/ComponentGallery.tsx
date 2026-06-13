@@ -1811,12 +1811,15 @@ function ToolbarCard() {
  *
  * Two tiles in one card to demo the success + danger delta variants. */
 function StatTile({
-  label, value, delta, sparkPath, positive, good = positive, accent, clickable,
+  label, value, delta, sparkPath, positive, good = positive, accent, clickable, hero,
 }: {
   label: string
   value: string
   delta: string
   sparkPath: string
+  /** Hero KPI — the one focal metric on the surface: renders its value at the
+   *  display tier and spans the full grid (the confident-pro bento move). */
+  hero?: boolean
   /** Arrow DIRECTION — did the number go up or down? */
   positive: boolean
   /** SENTIMENT — is that movement good for the business? Drives the colour.
@@ -1831,7 +1834,7 @@ function StatTile({
   const tone = good ? 'var(--k-success)' : 'var(--k-danger)'
   return (
     <div
-      className={'stat-tile' + (clickable ? ' stat-tile--clickable' : '')}
+      className={'stat-tile' + (hero ? ' stat-tile--hero' : '') + (clickable ? ' stat-tile--clickable' : '')}
       role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : undefined}
     >
@@ -1871,8 +1874,17 @@ function StatCard() {
           delta="12.4%"
           positive
           accent="primary"
-          clickable
+          hero
           sparkPath="M0 18 L10 16 L20 14 L30 15 L40 11 L50 9 L60 6 L70 7 L80 3"
+        />
+        <StatTile
+          label="Active users"
+          value="8,431"
+          delta="4.1%"
+          positive
+          accent="primary"
+          clickable
+          sparkPath="M0 19 L10 17 L20 16 L30 13 L40 12 L50 10 L60 8 L70 6 L80 4"
         />
         <StatTile
           label="Churn rate"

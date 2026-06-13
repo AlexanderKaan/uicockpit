@@ -19,7 +19,7 @@ export type ShowcaseArchetype = 'feed' | 'list-detail' | 'supporting' | 'workspa
 export type ShowcaseNav = 'suite' | 'topbar'
 
 export type BlockSpec =
-  | { block: 'stats'; seed: { items: Array<{ label: string; value: string; delta?: string; up?: boolean }> } }
+  | { block: 'stats'; seed: { items: Array<{ label: string; value: string; delta?: string; up?: boolean; hero?: boolean }> } }
   | { block: 'chart'; seed: { title: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> } }
   | { block: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
   | { block: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean }> } }
@@ -77,10 +77,9 @@ export const SHOWCASES: ShowcaseManifest[] = [
         role: 'flex',
         blocks: [
           { block: 'stats', seed: { items: [
-            { label: 'MRR', value: '$48.2k', delta: '+12%', up: true },
+            { label: 'MRR', value: '$48.2k', delta: '+12%', up: true, hero: true },
             { label: 'Active users', value: '8,431', delta: '+4.1%', up: true },
             { label: 'Churn', value: '1.9%', delta: '-0.3%', up: true },
-            { label: 'NPS', value: '62', delta: '-2', up: false },
           ] } },
           { block: 'chart', seed: { title: 'Revenue — last 6 months', type: 'area', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
             { name: 'Subscriptions', values: [28, 31, 30, 36, 41, 48] },
@@ -165,7 +164,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
         role: 'detail',
         blocks: [
           { block: 'stats', seed: { items: [
-            { label: 'Pipeline', value: '$1.24M', delta: '+8%', up: true },
+            { label: 'Pipeline', value: '$1.24M', delta: '+8%', up: true, hero: true },
             { label: 'Won (Q2)', value: '$310k', delta: '+22%', up: true },
             { label: 'Avg. cycle', value: '34d', delta: '+3d', up: false },
           ] } },

@@ -18,7 +18,7 @@ export function renderBlock(spec: BlockSpec, key: number) {
       return (
         <div className="stat-tile-grid" key={key}>
           {spec.seed.items.map((s) => (
-            <div className="stat-tile" key={s.label}>
+            <div className={'stat-tile' + (s.hero ? ' stat-tile--hero' : '')} key={s.label}>
               <div className="stat-tile__label">{s.label}</div>
               <div className="stat-tile__value">{s.value}</div>
               {s.delta && (
