@@ -6,13 +6,47 @@ import { buildTokens } from '../../tokens/buildTokens'
 import type { Config } from '../../tokens/types'
 import { setGalleryJump } from '../../state/galleryJump'
 import { COMPONENTS, componentAt } from '../../showcases/components'
+import { usesOf } from '../../kit/segments'
 import type { ViewKind } from '../Stage'
 
 /* Component → gallery tier guess for the specimen's "Open in gallery" jump
  * (Fase J-1). componentAt returns a kit-class id; the stat-tile/table/card
- * patterns live in the Block tier, the rest are Atoms. (J2 re-adds block-level
- * jumps once the breadcrumb gives block context.) */
+ * patterns live in the Block tier, the rest are Atoms. */
 const COMP_TIER: Record<string, 'atom' | 'block'> = { stat: 'block', table: 'block', card: 'block' }
+
+/* Manifest block kind → graph wiring (Fase J-2). The manifest uses short names
+ * ('stats', 'table'); the segment graph (segments.ts) + the gallery use canonical
+ * ids ('stat-tile', 'data-table'). This bridge powers the breadcrumb label, the
+ * "composes these atoms" rail (usesOf), and the block→gallery jump. */
+const BLOCK_INFO: Record<string, { label: string; seg: string; jump: { q: string; tier: 'atom' | 'block' } }> = {
+  stats: { label: 'Stats', seg: 'stat-tile', jump: { q: 'stat', tier: 'block' } },
+  chart: { label: 'Chart', seg: 'chart', jump: { q: 'chart', tier: 'block' } },
+  list: { label: 'List', seg: 'activity-feed', jump: { q: 'list', tier: 'atom' } },
+  thread: { label: 'Thread', seg: 'thread', jump: { q: 'thread', tier: 'block' } },
+  composer: { label: 'Composer', seg: 'composer', jump: { q: 'composer', tier: 'atom' } },
+  table: { label: 'Table', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
+  form: { label: 'Form', seg: 'form-panel', jump: { q: 'form panel', tier: 'block' } },
+  pricing: { label: 'Pricing', seg: 'pricing', jump: { q: 'pricing', tier: 'block' } },
+  prose: { label: 'Prose', seg: 'prose', jump: { q: 'two column', tier: 'block' } },
+  dl: { label: 'Details', seg: 'description-list', jump: { q: 'description list', tier: 'atom' } },
+  chips: { label: 'Chips', seg: 'chip', jump: { q: 'chip', tier: 'atom' } },
+  kanban: { label: 'Kanban', seg: 'kanban', jump: { q: 'kanban', tier: 'block' } },
+  tree: { label: 'Tree', seg: 'tree', jump: { q: 'tree', tier: 'block' } },
+  timeline: { label: 'Timeline', seg: 'timeline', jump: { q: 'timeline', tier: 'block' } },
+  settings: { label: 'Settings', seg: 'settings', jump: { q: 'settings', tier: 'atom' } },
+  wizard: { label: 'Wizard', seg: 'wizardstepper', jump: { q: 'wizard', tier: 'block' } },
+  dropzone: { label: 'Dropzone', seg: 'file-upload-dropzone', jump: { q: 'upload', tier: 'block' } },
+  media: { label: 'Media', seg: 'file-grid', jump: { q: 'file grid', tier: 'block' } },
+}
+const blockInfo = (kind: string) =>
+  BLOCK_INFO[kind] ?? { label: kind, seg: kind, jump: { q: kind, tier: 'block' as const } }
+
+/* The loupe's altitude. page → block → atom is a continuous zoom; each level is
+ * a breadcrumb crumb you can click to fly back out (Fase J-2). */
+type Focus =
+  | { level: 'page' }
+  | { level: 'block'; pane: number; idx: number }
+  | { level: 'atom'; pane: number; idx: number; comp: string }
 
 /**
  * Pages view (H3b) — Showcases first, SupaDash one click away.
@@ -35,21 +69,60 @@ const PANE_CLASS = {
 
 function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange: (v: ViewKind) => void }) {
   const [width, setWidth] = useState(m.width)
-  // The loupe (Fase J-1): the live page, with a COLLAPSIBLE specimen rail.
-  // Rail closed = a clean preview (the old "Live"); Inspect opens it and makes
-  // the page leaf-clickable — click any element → it's isolated on the left with
-  // its recipe (the old "Split"). One toggle, not three modes.
-  const [railOpen, setRailOpen] = useState(false)
-  const [pickedComp, setPickedComp] = useState<string | null>(null)
-  const comp = pickedComp ? COMPONENTS[pickedComp] : undefined
+  // The loupe (Fase J-2): a continuous zoom Page › Block › Atom. `loupe` off is a
+  // clean live page (the old "Live"); turning it on reveals the breadcrumb and
+  // makes blocks pickable. Click a block → it isolates and enlarges (atoms inside
+  // become clickable); click an atom → its specimen + recipe. The breadcrumb flies
+  // you back out a level at a time. One surface, three altitudes — not four modes.
+  const [loupe, setLoupe] = useState(false)
+  const [focus, setFocus] = useState<Focus>({ level: 'page' })
+  const [railOpen, setRailOpen] = useState(true)
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
 
-  // Clicking the page (only when the rail is open) isolates the deepest kit
-  // component under the cursor into the specimen rail.
-  const pick = (e: ReactMouseEvent) => {
-    const id = componentAt(e.target as Element)
-    if (id) { setPickedComp(id); setRailOpen(true) }
+  const block = focus.level !== 'page' ? m.panes[focus.pane]?.blocks[focus.idx] : undefined
+  const bInfo = block ? blockInfo(block.block) : undefined
+  const comp = focus.level === 'atom' ? COMPONENTS[focus.comp] : undefined
+
+  // Page → Block: walk up from the clicked node to the block wrapper (carries its
+  // pane/idx as data-attrs), then isolate it.
+  const pickBlock = (e: ReactMouseEvent) => {
+    let el = e.target as HTMLElement | null
+    while (el && el !== e.currentTarget) {
+      if (el.dataset && el.dataset.idx != null) {
+        setFocus({ level: 'block', pane: +el.dataset.pane!, idx: +el.dataset.idx })
+        return
+      }
+      el = el.parentElement
+    }
   }
+  // Block → Atom: the existing leaf-pick, now scoped to the isolated block.
+  const pickAtom = (e: ReactMouseEvent) => {
+    if (focus.level !== 'block') return
+    const id = componentAt(e.target as Element)
+    if (id) setFocus({ level: 'atom', pane: focus.pane, idx: focus.idx, comp: id })
+  }
+
+  const enterLoupe = () => { setLoupe(true); setFocus({ level: 'page' }) }
+  const exitLoupe = () => { setLoupe(false); setFocus({ level: 'page' }) }
+
+  // The breadcrumb spine — one crumb per visited altitude, each a button that
+  // flies back out to its level (the deepest is inert; it's where you are).
+  const crumbs: Array<{ label: string; go: () => void; on: boolean }> = [
+    { label: `Page · ${m.title}`, go: () => setFocus({ level: 'page' }), on: focus.level === 'page' },
+  ]
+  if (bInfo && focus.level !== 'page') {
+    const { pane, idx } = focus
+    crumbs.push({ label: `Block · ${bInfo.label}`, go: () => setFocus({ level: 'block', pane, idx }), on: focus.level === 'block' })
+  }
+  if (comp) crumbs.push({ label: `Atom · ${comp.label}`, go: () => {}, on: true })
+
+  const hint =
+    focus.level === 'page' ? 'Click any block to zoom in'
+      : focus.level === 'block' ? 'Click any element inside to drill to its atom'
+        : 'Deepest level — the recipe is on the right'
+
+  const stageKey = `${focus.level}-${focus.level !== 'page' ? `${focus.pane}.${focus.idx}` : ''}-${focus.level === 'atom' ? focus.comp : ''}`
+  const blockCount = m.panes.reduce((n, p) => n + p.blocks.length, 0)
 
   // Export-as-starter: the manifest IS the starter — download it as JSON.
   const downloadManifest = () => {
@@ -65,62 +138,109 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
   return (
     <>
       <div className="lyt__controls">
-        <label className="lyt__scrub">
-          <span className="lyt__scrub-label">Shell width</span>
-          <input
-            type="range"
-            min={360}
-            max={1680}
-            step={10}
-            value={width}
-            list="shc-win-detents"
-            onChange={(e) => setWidth(+e.target.value)}
-            aria-label="Shell width in pixels"
-          />
-          <datalist id="shc-win-detents">
-            <option value={600} />
-            <option value={840} />
-            <option value={1200} />
-            <option value={1600} />
-          </datalist>
-          <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong></span>
-        </label>
+        {(!loupe || focus.level === 'page') && (
+          <label className="lyt__scrub">
+            <span className="lyt__scrub-label">Shell width</span>
+            <input
+              type="range"
+              min={360}
+              max={1680}
+              step={10}
+              value={width}
+              list="shc-win-detents"
+              onChange={(e) => setWidth(+e.target.value)}
+              aria-label="Shell width in pixels"
+            />
+            <datalist id="shc-win-detents">
+              <option value={600} />
+              <option value={840} />
+              <option value={1200} />
+              <option value={1600} />
+            </datalist>
+            <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong></span>
+          </label>
+        )}
         <span className="shc__picker-spacer" />
-        <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={railOpen} onClick={() => setRailOpen((o) => !o)}>
-          <Icon name="search" />{railOpen ? 'Done inspecting' : 'Inspect'}
+        {loupe && (
+          <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={railOpen} onClick={() => setRailOpen((o) => !o)}>
+            {railOpen ? 'Hide recipe' : 'Show recipe'}
+          </button>
+        )}
+        <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={loupe} onClick={() => (loupe ? exitLoupe() : enterLoupe())}>
+          <Icon name="search" />{loupe ? 'Done inspecting' : 'Inspect'}
         </button>
         <button type="button" className="btn btn--ghost btn--sm" onClick={downloadManifest}>
           <Icon name="upload" />Download manifest
         </button>
       </div>
-      <p className="lyt__blurb">
-        {m.blurb} {railOpen ? '— click any element in the page to isolate it beside its recipe.' : '— scrub the width to watch the shell re-arrange; Inspect to click into any component.'}
-      </p>
 
-      <details className="shc__manifestbox">
-        <summary>Full manifest JSON — the screen IS this data</summary>
-        <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
-      </details>
+      {loupe ? (
+        <nav className="shc__loupebar" aria-label="Zoom level">
+          <div className="shc__crumbs">
+            {crumbs.map((c, i) => (
+              <span key={i} className="shc__crumb-wrap">
+                {i > 0 && <span className="shc__crumb-sep" aria-hidden>›</span>}
+                <button type="button" className={`shc__crumb ${c.on ? 'shc__crumb--on' : ''}`} onClick={c.go} aria-current={c.on ? 'true' : undefined}>{c.label}</button>
+              </span>
+            ))}
+          </div>
+          <span className="shc__loupehint">{hint}</span>
+        </nav>
+      ) : (
+        <>
+          <p className="lyt__blurb">
+            {m.blurb} — scrub the width to watch the shell re-arrange; Inspect to drill Page › Block › Atom.
+          </p>
+          <details className="shc__manifestbox">
+            <summary>Full manifest JSON — the screen IS this data</summary>
+            <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
+          </details>
+        </>
+      )}
 
-      <div className={`lyt__stage ${railOpen ? 'shc__splitstage' : ''}`}>
-        {railOpen && (
-          <aside className="shc__specimen" aria-label="Selected component, isolated">
-            <div className="shc__specimen-head">
-              <span>Specimen</span>
-              {comp && <span className="badge badge--info">{comp.label}</span>}
+      <div className={`lyt__stage shc__loupebody ${loupe && railOpen ? 'shc__loupebody--rail' : ''}`}>
+        <div className="shc__loupestage" key={stageKey}>
+          {(!loupe || focus.level === 'page') && (
+            <div className={loupe ? 'shc__pickpage' : undefined} onClick={loupe ? pickBlock : undefined}>
+              <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} />
             </div>
-            <div className="shc__specimen-body">
-              {comp ? (
-                comp.specimen()
-              ) : (
-                <div className="shc__specimen-empty">
-                  <Icon name="search" />
-                  <span>Click any component in the page — it appears here with its recipe.</span>
-                </div>
-              )}
+          )}
+          {loupe && focus.level === 'block' && block && (
+            <div className="shc__focusblock" onClick={pickAtom}>
+              {renderBlock(block, focus.idx)}
             </div>
-            {comp && (
-              <div className="shc__specimen-recipe">
+          )}
+          {loupe && focus.level === 'atom' && comp && (
+            <div className="shc__atomstage">{comp.specimen()}</div>
+          )}
+        </div>
+
+        {loupe && railOpen && (
+          <aside className="shc__loupe-rail" aria-label="Loupe inspector">
+            {focus.level === 'page' && (
+              <>
+                <div className="shc__loupe-head">The page</div>
+                <p className="shc__loupe-blurb">A showcase is data: {blockCount} blocks of seeded content across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any block to zoom in.</p>
+              </>
+            )}
+            {focus.level === 'block' && bInfo && (
+              <>
+                <div className="shc__loupe-head">Block · {bInfo.label}</div>
+                <p className="shc__loupe-blurb">Composes these atoms — click any element in the block to drill into it:</p>
+                <ul className="shc__uses">
+                  {(usesOf(bInfo.seg).length ? usesOf(bInfo.seg) : ['(self-contained)']).map((u) => <li key={u}>{u}</li>)}
+                </ul>
+                <button
+                  type="button"
+                  className="btn btn--outline btn--xs"
+                  onClick={() => { setGalleryJump(bInfo.jump.q, bInfo.jump.tier); onViewChange('components') }}
+                >
+                  Open in gallery <Icon name="chevR" />
+                </button>
+              </>
+            )}
+            {focus.level === 'atom' && comp && (
+              <>
                 <div className="shc__recipe-title">Recipe — how it derives</div>
                 {comp.recipe.map(([k, v]) => (
                   <div className="shc__recipe-row" key={k}><span className="shc__recipe-k">{k}</span><code className="shc__recipe-v">{v}</code></div>
@@ -129,20 +249,14 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
                 <button
                   type="button"
                   className="btn btn--outline btn--xs"
-                  onClick={() => { setGalleryJump(comp.label.toLowerCase(), COMP_TIER[pickedComp!] ?? 'atom'); onViewChange('components') }}
+                  onClick={() => { setGalleryJump(comp.label.toLowerCase(), COMP_TIER[focus.comp] ?? 'atom'); onViewChange('components') }}
                 >
                   Open in gallery <Icon name="chevR" />
                 </button>
-              </div>
+              </>
             )}
           </aside>
         )}
-        <div
-          className={railOpen ? 'shc__splitpage' : undefined}
-          onClick={railOpen ? pick : undefined}
-        >
-          <ShowcaseShell m={m} width={railOpen ? Math.min(width, 1100) : width} />
-        </div>
       </div>
     </>
   )
@@ -154,10 +268,14 @@ function ShowcaseShell({
   m,
   width,
   renderBlockFn = renderBlock,
+  pickable = false,
 }: {
   m: ShowcaseManifest
   width: number
   renderBlockFn?: (b: BlockSpec, paneIdx: number, blockIdx: number) => ReactNode
+  /** Loupe page-level: wrap each block in a hover-pickable target carrying its
+   *  pane/idx (Fase J-2). The stage delegates the click and walks up to read it. */
+  pickable?: boolean
 }) {
   const [active, setActive] = useState(0)
   return (
@@ -197,7 +315,15 @@ function ShowcaseShell({
         <div className="scaffold__body">
           {m.panes.map((pane, i) => (
             <section className={`${PANE_CLASS[pane.role]} shc__pane`} key={i} aria-label={`${m.title} ${pane.role} pane`}>
-              {pane.blocks.map((b, j) => renderBlockFn(b, i, j))}
+              {pane.blocks.map((b, j) =>
+                pickable ? (
+                  <div className="shc__pick" key={j} data-pane={i} data-idx={j} data-label={blockInfo(b.block).label}>
+                    {renderBlockFn(b, i, j)}
+                  </div>
+                ) : (
+                  renderBlockFn(b, i, j)
+                ),
+              )}
             </section>
           ))}
         </div>

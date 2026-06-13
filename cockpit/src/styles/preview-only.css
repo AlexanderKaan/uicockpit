@@ -1085,56 +1085,152 @@
 /* Style matrix (slice 3) — three token universes side by side. Each cell is
  * a fixed viewport that clips a full-width shell scaled down as one unit. */
 .shc__picker-spacer { flex: 1; }
-/* Split stage (Fase I-A) — the picked block isolated as a specimen on the
- * left, beside its live in-context showcase on the right. Click a block tag in
- * the page → it appears here. The de-risk of the v2 "Split" altitude. */
-.shc__splitstage {
+/* The loupe (Fase J-2) — a continuous zoom Page › Block › Atom on ONE surface.
+ * The breadcrumb is the spine; each altitude swaps the stage and re-tints the
+ * rail. Evolves the I-A split: the block now ISOLATES (its own altitude) before
+ * the atom, instead of jumping straight from page to specimen. */
+.shc__loupebar {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-12);
+  flex-wrap: wrap;
+  margin-bottom: var(--k-s-12);
+}
+.shc__crumbs { display: flex; align-items: center; gap: var(--k-s-2); flex-wrap: wrap; }
+.shc__crumb-wrap { display: inline-flex; align-items: center; gap: var(--k-s-2); }
+.shc__crumb-sep { color: var(--k-fg-faint); margin: 0 var(--k-s-4); }
+.shc__crumb {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg-muted);
+  padding: var(--k-s-4) var(--k-s-8);
+  border-radius: var(--k-radius-sm);
+}
+.shc__crumb:hover { background: var(--k-surface-sunken); color: var(--k-fg); }
+.shc__crumb--on { color: var(--k-primary); }
+.shc__loupehint {
+  flex: 1;
+  min-width: 140px;
+  font-size: var(--k-type-caption);
+  color: var(--k-fg-faint);
+}
+
+/* The body — stage alone, or stage + a sticky inspector rail (Show/Hide recipe). */
+.shc__loupebody {
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--k-s-16);
   align-items: start;
 }
+.shc__loupebody--rail { grid-template-columns: minmax(0, 1fr) 280px; }
 @media (max-width: 1100px) {
-  .shc__splitstage { grid-template-columns: 1fr; }
+  .shc__loupebody--rail { grid-template-columns: 1fr; }
 }
-.shc__specimen {
+.shc__loupestage { min-width: 0; animation: shc-zoom 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes shc-zoom {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Page altitude — each block becomes a hover-pickable target with a name pill. */
+.shc__pickpage { min-width: 0; cursor: default; }
+.shc__pick {
+  position: relative;
+  cursor: zoom-in;
+  border-radius: var(--k-radius-md);
+  outline: var(--k-bw) solid transparent;
+  outline-offset: 2px;
+  transition: outline-color var(--k-dur-fast, 140ms) var(--k-ease, ease);
+}
+.shc__pick:hover { outline-color: var(--k-primary); }
+.shc__pick::after {
+  content: attr(data-label);
+  position: absolute;
+  top: var(--k-s-4);
+  left: var(--k-s-4);
+  z-index: 3;
+  font-size: var(--k-type-caption);
+  font-weight: var(--k-weight-semibold);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--k-primary);
+  background: var(--k-primary-soft);
+  padding: var(--k-s-2) var(--k-s-8);
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease);
+  pointer-events: none;
+}
+.shc__pick:hover::after { opacity: 1; }
+
+/* Block altitude — the isolated block, enlarged; click inside drills to its atom. */
+.shc__focusblock {
+  min-width: 0;
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  background: var(--k-surface);
+  padding: var(--k-s-24);
+  cursor: zoom-in;
+  container-type: inline-size;
+}
+.shc__focusblock:hover { box-shadow: var(--k-shadow-1); }
+
+/* Atom altitude — the specimen, centred on a sunken stage. */
+.shc__atomstage {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  padding: var(--k-s-32);
+  border: var(--k-bw) dashed var(--k-border);
+  border-radius: var(--k-radius-lg);
+  background: var(--k-surface-sunken);
+  container-type: inline-size;
+}
+
+/* The altitude rail — re-tints per level (page blurb · block uses · atom recipe). */
+.shc__loupe-rail {
   position: sticky;
   top: var(--k-s-12);
   border: var(--k-bw) solid var(--k-border);
   border-radius: var(--k-radius-lg);
   background: var(--k-surface);
-  overflow: hidden;
+  padding: var(--k-s-16);
 }
-.shc__specimen-head {
+.shc__loupe-head {
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+  margin-bottom: var(--k-s-6);
+}
+.shc__loupe-blurb {
+  font-size: var(--k-type-caption);
+  line-height: 1.5;
+  color: var(--k-fg-muted);
+  margin: 0 0 var(--k-s-10);
+}
+.shc__uses {
+  list-style: none;
+  margin: 0 0 var(--k-s-12);
+  padding: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--k-s-8);
-  padding: var(--k-s-10) var(--k-s-12);
-  border-bottom: var(--k-bw) solid var(--k-border);
-  font-size: var(--k-type-eyebrow);
+  flex-wrap: wrap;
+  gap: var(--k-s-6);
+}
+.shc__uses li {
+  font-size: var(--k-type-caption);
   font-weight: var(--k-weight-semibold);
   color: var(--k-fg-muted);
-}
-.shc__specimen-body { padding: var(--k-s-16); container-type: inline-size; }
-.shc__specimen-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--k-s-10);
-  padding: var(--k-s-32) var(--k-s-16);
-  text-align: center;
-  color: var(--k-fg-muted);
-  font-size: var(--k-type-small);
-}
-.shc__specimen-empty svg { width: 24px; height: 24px; opacity: 0.5; }
-.shc__splitpage { min-width: 0; cursor: default; }
-/* A3 — the Recipe block under the specimen: how the component derives. */
-.shc__specimen-recipe {
-  border-top: var(--k-bw) solid var(--k-border);
-  padding: var(--k-s-12);
   background: var(--k-surface-sunken);
+  border: var(--k-bw) solid var(--k-border);
+  padding: var(--k-s-2) var(--k-s-8);
+  border-radius: 999px;
 }
+/* The Recipe rows (reused from the I-A specimen) — how the atom derives. */
 .shc__recipe-title {
   font-size: var(--k-type-caption);
   font-weight: var(--k-weight-semibold);
