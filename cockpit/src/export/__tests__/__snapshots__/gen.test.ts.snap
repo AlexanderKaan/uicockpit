@@ -6522,6 +6522,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-display);
   letter-spacing: -0.03em;
   line-height: 1;
+  /* CP6 — deploy the dormant CP1 entrance: the hero KPI rises + fades + settles
+     on mount (the "the number arrives" Linear/Stripe beat). --k-anim-rise is
+     'none' at Motion=None and the global reduced-motion guard snaps it instant
+     (k-rise uses both-fill, so it lands on the visible end-state, never stuck). It
+     replays only on remount / Motion change, not on every config tweak. */
+  animation: var(--k-anim-rise);
 }
 .stat-tile__foot {
   display: flex;
