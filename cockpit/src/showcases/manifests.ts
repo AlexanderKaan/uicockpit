@@ -24,7 +24,7 @@ export type BlockSpec =
   | { block: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
   | { block: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean }> } }
   | { block: 'composer'; seed: { placeholder: string } }
-  | { block: 'table'; seed: { title?: string; columns: string[]; rows: string[][] } }
+  | { block: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[] } }
   | { block: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string } }
   | { block: 'pricing'; seed: { tiers: Array<{ name: string; price: string; period: string; feats: string[]; featured?: boolean; cta: string }> } }
   | { block: 'prose'; seed: { title: string; kicker?: string; paragraphs: string[] } }
@@ -168,7 +168,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { label: 'Won (Q2)', value: '$310k', delta: '+22%', up: true },
             { label: 'Avg. cycle', value: '34d', delta: '+3d', up: false },
           ] } },
-          { block: 'table', seed: { title: 'Hot accounts', columns: ['Account', 'Owner', 'Stage', 'Value', 'Next step'], rows: [
+          { block: 'table', seed: { title: 'Hot accounts', numericCols: [3], columns: ['Account', 'Owner', 'Stage', 'Value', 'Next step'], rows: [
             ['Northwind Traders', 'Lena', 'Negotiation', '$120k', 'Contract review · Fri'],
             ['Globex', 'Sam', 'Proposal', '$86k', 'Demo follow-up · Tue'],
             ['Initech', 'Ravi', 'Discovery', '$54k', 'Stakeholder call · Mon'],

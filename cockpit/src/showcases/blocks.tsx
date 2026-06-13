@@ -86,11 +86,11 @@ export function renderBlock(spec: BlockSpec, key: number) {
           {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
           <table className="tbl">
             <thead>
-              <tr>{spec.seed.columns.map((c) => <th key={c}>{c}</th>)}</tr>
+              <tr>{spec.seed.columns.map((c, j) => <th key={c} className={spec.seed.numericCols?.includes(j) ? 'num' : undefined}>{c}</th>)}</tr>
             </thead>
             <tbody>
               {spec.seed.rows.map((r, i) => (
-                <tr key={i}>{r.map((cell, j) => <td key={j}>{cell}</td>)}</tr>
+                <tr key={i}>{r.map((cell, j) => <td key={j} className={spec.seed.numericCols?.includes(j) ? 'num' : undefined}>{cell}</td>)}</tr>
               ))}
             </tbody>
           </table>

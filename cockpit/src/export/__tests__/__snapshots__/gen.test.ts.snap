@@ -4340,6 +4340,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    step below muted) so the sub-line recedes cleanly behind the name. */
 .tbl__name { font-weight: var(--k-weight-medium); color: var(--k-fg); }
 .tbl__sub { font-size: var(--k-type-small); color: var(--k-fg-faint); margin-top: 1px; }
+/* Numeric column (CP3 — the Attio/Linear "dense but calm" data signature). Value
+   columns (money, counts, %) right-align and use TABULAR figures so digits line
+   up in a column and the eye scans magnitudes straight down the stack — the
+   pro-data-table move every left-aligned table misses. On the .tbl ATOM (was
+   scoped to the .datatable block) so EVERY table earns it, not just the flagship.
+   Apply the num class to BOTH the column's th and its td. */
+.tbl th.num, .tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
 /* Tables are restrained shadcn-style: per-row border-top (base .tbl) + hover,
    no zebra striping. The zebra modifier was dropped — the base row treatment
    already reads cleanly and zebra added visual noise to dense data.
@@ -4404,10 +4411,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Selection cell — checkbox column, fixed narrow width. */
 .datatable__check { width: 36px; }
 
-/* Content-stress helpers (real data is messy):
- *   th.num / td.num → right-align + tabular figures for money / metric columns
- *   .truncate       → single-line ellipsis so a long title never blows the grid */
-.datatable .tbl th.num, .datatable .tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
+/* Content-stress helper (real data is messy): .truncate clamps a long title to a
+   single-line ellipsis so it never blows the grid. (Numeric columns — th.num /
+   td.num — are now handled on the .tbl atom above, so every table gets them.) */
 .datatable .truncate { display: block; max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* State slot — EMPTY / LOADING / ERROR share one centered well, so a row-less
