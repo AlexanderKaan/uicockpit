@@ -3546,7 +3546,8 @@ function ThreadCard() {
  * marketing copy, CMS body fields. */
 function ProseCard() {
   return (
-    <Card title="Article" desc="A rich-text container — drop in semantic tags.">
+    <Card title="Article" desc="A rich-text container — drop in semantic tags. The .t-display role lands the hero headline at the display tier.">
+      <h2 className="t-display" style={{ marginBottom: 'var(--k-s-8)' }}>Ship with conviction.</h2>
       <article className="prose">
         <div className="prose__kicker">Changelog</div>
         <h2>What’s new in v2.4</h2>

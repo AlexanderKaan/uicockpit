@@ -5215,6 +5215,21 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg);
   margin: 0 0 var(--k-s-12);
 }
+/* CP6 — the hero HEADING role. The --k-type-display tier (CP1, ~48–61px) was
+   reachable only via .stat-tile--hero (a number); .t-display lets any HEADING
+   wear it — page titles, marketing hero lines, an empty-state greeting, a doc
+   title. Display font, bold, tight tracking, snug leading, balanced wrap. The
+   ONE focal headline per surface (pair with .eyebrow above + a lead below). */
+.t-display {
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-display);
+  font-weight: var(--k-weight-bold);
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  color: var(--k-fg);
+  text-wrap: balance;
+  margin: 0;
+}
 .prose h3 {
   font-family: var(--k-font-display);
   font-size: var(--k-type-h3);
