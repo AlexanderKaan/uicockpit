@@ -2331,7 +2331,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .chart__svg { width: 100%; height: 100%; display: block; }
 .chart__svg--donut { max-width: 220px; margin: 0 auto; }
 .chart__axis { stroke: var(--k-border); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.chart__donut-num { font-size: var(--k-type-h3); font-weight: var(--k-weight-bold); fill: var(--k-fg); font-family: var(--k-font-display); }
+.chart__donut-num { font-size: var(--k-type-h3); font-weight: var(--k-weight-bold); fill: var(--k-fg); font-family: var(--k-font-display); font-variant-numeric: tabular-nums; }
 .chart__donut-cap { font-size: var(--k-type-caption); fill: var(--k-fg-faint); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
 .chart__legend { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); margin-top: var(--k-s-10); }
 .chart__legend-item { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
