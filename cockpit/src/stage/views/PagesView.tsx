@@ -85,6 +85,11 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
   const [tokensOpen, setTokensOpen] = useState(false)
   const tokens = useMemo(() => buildTokens(cfg), [cfg])
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
+  // Fase J-5 — Shells folded into the slider: a `suite`-nav showcase morphs its
+  // navigation bar → rail → sidebar at the scaffold container's 600/1200px
+  // breakpoints (see the `@container scaffold` queries in recipes). Annotating it
+  // here surfaces the old standalone Shells workbench's only unique value, live.
+  const navState = m.nav === 'suite' ? (width < 600 ? 'Bottom bar' : width < 1200 ? 'Rail' : 'Sidebar') : null
 
   const block = focus.level !== 'page' ? m.panes[focus.pane]?.blocks[focus.idx] : undefined
   const bInfo = block ? blockInfo(block.block) : undefined
@@ -167,7 +172,7 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
               <option value={1200} />
               <option value={1600} />
             </datalist>
-            <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong></span>
+            <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong>{navState && <> · nav <strong>{navState}</strong></>}</span>
           </label>
         )}
         <span className="shc__picker-spacer" />
