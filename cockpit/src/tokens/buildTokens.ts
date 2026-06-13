@@ -514,7 +514,12 @@ export function buildTokens(cfg: Config): Tokens {
     // 6px fallback everywhere), so these never followed the Radius setting.
     sm: rem(Math.round(r * 0.66)),
     md: rem(r),
-    lg: rem(Math.round(r * 1.45)),
+    // Outer/large radius — cards, dialogs, panels. CP1 recalibration (confident-
+    // pro gap #2): the old 1.45× multiplier inflated cards to 15px (soft) / 23px
+    // (round) — bubbly, not deliberate. Now a gentle 1.2× CAPPED at 16px so the
+    // card corner lands ~12px at the default and never goes past the pro ceiling:
+    // 0 / 6 / 12 / 16 across None / Subtle / Soft / Round.
+    lg: rem(Math.min(Math.round(r * 1.2), 16)),
     // Always pill — this token is for elements that are ALWAYS pill (badges,
     // status dots, slider tracks, progress, toggle tracks). Independent of
     // the user's Radius setting because those metaphors don't scale.
@@ -640,6 +645,12 @@ export function buildTokens(cfg: Config): Tokens {
   // retired 'normal'/'tight'/'expressive' keys, and a crash there is worse
   // than silently re-centering on the default scale.
   const [tsH1, tsH2, tsH3, tsBody, tsSmall] = TS[cfg.typeScale] ?? TS.md
+  // CP1 — the HERO/display tier (the confident-pro foundation gap #1). The type
+  // ceiling was h1 (38px at XL); a pro KPI / page title wants 48–60px so a screen
+  // has ONE undeniable focal point. Derived 1.6× off h1 so it tracks Text-size:
+  // ~42 / 48 / 54 / 61 across S / M / L / XL. Reserved for the single hero element
+  // per surface (stat hero value, page-title display) — the "one focal point" rule.
+  const tsDisplay = Math.round(tsH1 * 1.6)
   // Eyebrow = uppercase micro-label (table heads, stat labels, group labels).
   // Sits just under small; the .eyebrow role adds the caps + tracking.
   const tsEyebrow = Math.max(10, Math.round((tsSmall - 1) * 10) / 10)
@@ -1076,6 +1087,10 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-font-display': fontFamily(cfg.fontDisplay, displayIsSerif),
       '--k-font-body': fontFamily(cfg.fontBody, false),
       '--k-font-mono': `'${UI_MONO}',ui-monospace,monospace`,
+      // CP1 hero tier — the page-title / hero-KPI display size (~48px default).
+      // Lives in the live token layer now (was export-only, derived in extras),
+      // so the preview, recipes and FoundationsView can all reach the focal tier.
+      '--k-type-display': rem(tsDisplay),
       '--k-type-h1': rem(tsH1),
       '--k-type-h2': rem(tsH2),
       '--k-type-h3': rem(tsH3),
@@ -1128,6 +1143,14 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-anim-fade-out':  `k-fade-out ${motion.fast} ${motion.easeIn} both`,
       '--k-anim-slide-up':  `k-slide-up ${motion.normal} ${motion.easeOut} both`,
       '--k-anim-slide-down': `k-slide-down ${motion.normal} ${motion.easeOut} both`,
+      // CP1 motion-choreography hook (confident-pro gap #3): the "hero animates
+      // in" signature — a focal element (hero stat, page title, primary card)
+      // rises + fades + settles on a gentle spring-decel. Slower than slide-up so
+      // it reads as a deliberate entrance, not a micro-transition. Pair with
+      // animation-delay for a staggered reveal. Collapses to instant at Motion=None.
+      '--k-anim-rise': cfg.motion === 'none'
+        ? 'none'
+        : `k-rise ${motion.slow} ${EMPHASIZED.decel} both`,
       // Scale-in is the shadcn/Radix popover/menu enter — small zoom anchored
       // to the trigger. Origin is set per-component via transform-origin.
       '--k-anim-scale-in':  `k-scale-in ${motion.normal} ${motion.easeOut} both`,

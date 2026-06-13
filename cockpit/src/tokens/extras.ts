@@ -138,7 +138,7 @@ export function buildTypeScale(cfg: Config): Record<string, string> {
   const small = num('--k-type-small')
   const eyebrow = num('--k-type-eyebrow')
   return {
-    display: Math.round(h1 * 1.55) + 'px',
+    display: Math.round(h1 * 1.6) + 'px',  // CP1 hero tier — matches buildTokens --k-type-display (1.6×)
     h1: h1 + 'px',
     h2: h2 + 'px',
     h3: h3 + 'px',

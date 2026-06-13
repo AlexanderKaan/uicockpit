@@ -131,7 +131,7 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
         </Section>
 
         <Section title="Typography" hint={`${cfg.fontDisplay} / ${cfg.fontBody}`}>
-          {([['--k-type-h1', 'Display'], ['--k-type-h2', 'Heading'], ['--k-type-h3', 'Subhead'], ['--k-type-body', 'Body'], ['--k-type-small', 'Small'], ['--k-type-caption', 'Caption']] as [string, string][]).map(([v, label]) => (
+          {([['--k-type-display', 'Display'], ['--k-type-h1', 'Title'], ['--k-type-h2', 'Heading'], ['--k-type-h3', 'Subhead'], ['--k-type-body', 'Body'], ['--k-type-small', 'Small'], ['--k-type-caption', 'Caption']] as [string, string][]).map(([v, label]) => (
             <div key={v} className="fnd__type-row">
               <span className="fnd__type-sample" style={{ fontSize: `var(${v})` }}>Ag</span>
               <span className="fnd__type-meta"><b>{label}</b><span>{v.replace('--k-type-', '')}</span></span>

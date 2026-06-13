@@ -27,6 +27,7 @@ const FILES = ['src/kit/recipes/index.ts', 'src/styles/preview-only.css', 'src/k
 // TS table + derived tokens). For the at-a-glance spread; keep in sync if TS changes.
 const TYPE_PX = {
   //            S      M      L      XL
+  display: [42, 48, 54, 61], // CP1 hero tier — round(h1 * 1.6)
   h1:      [26, 30, 34, 38],
   h2:      [19, 22, 24, 27],
   h3:      [15, 16, 17, 19],

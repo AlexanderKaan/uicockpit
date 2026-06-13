@@ -72,6 +72,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-anim-menu": "k-menu-roll 200ms cubic-bezier(.05,.7,.1,1) both",
     "--k-anim-menu-item": "k-menu-item 200ms cubic-bezier(.05,.7,.1,1) both",
     "--k-anim-pulse": "k-pulse 1.8s cubic-bezier(.4, 0, .2, 1) infinite",
+    "--k-anim-rise": "k-rise 320ms cubic-bezier(.05,.7,.1,1) both",
     "--k-anim-scale-in": "k-scale-in 200ms cubic-bezier(.05,.7,.1,1) both",
     "--k-anim-scale-out": "k-scale-out 120ms cubic-bezier(.3,0,.8,.15) both",
     "--k-anim-shimmer": "k-shimmer 1.6s linear infinite",
@@ -172,7 +173,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-primary-soft": "oklch(95.8% 0.0372 253.9)",
     "--k-primary-soft-fg": "oklch(56.4% 0.1689 253.9)",
     "--k-radius-button": "1rem",
-    "--k-radius-lg": "1.4375rem",
+    "--k-radius-lg": "1rem",
     "--k-radius-md": "1rem",
     "--k-radius-pill": "999px",
     "--k-radius-sm": "0.6875rem",
@@ -254,6 +255,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-track-eyebrow": "0.06em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
+    "--k-type-display": "3rem",
     "--k-type-eyebrow": "0.6875rem",
     "--k-type-h1": "1.875rem",
     "--k-type-h2": "1.375rem",
@@ -2597,7 +2599,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-bw: 1px;
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
-  --k-radius-lg: 1.4375rem;
+  --k-radius-lg: 1rem;
   --k-radius-pill: 999px;
   --k-radius-button: 1rem;
   --k-space: 1.25rem;
@@ -2667,6 +2669,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-font-display: 'Inter',sans-serif;
   --k-font-body: 'Inter',sans-serif;
   --k-font-mono: 'JetBrains Mono',ui-monospace,monospace;
+  --k-type-display: 3rem;
   --k-type-h1: 1.875rem;
   --k-type-h2: 1.375rem;
   --k-type-h3: 1rem;
@@ -2692,6 +2695,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-anim-fade-out: k-fade-out 120ms cubic-bezier(.3,0,.8,.15) both;
   --k-anim-slide-up: k-slide-up 200ms cubic-bezier(.05,.7,.1,1) both;
   --k-anim-slide-down: k-slide-down 200ms cubic-bezier(.05,.7,.1,1) both;
+  --k-anim-rise: k-rise 320ms cubic-bezier(.05,.7,.1,1) both;
   --k-anim-scale-in: k-scale-in 200ms cubic-bezier(.05,.7,.1,1) both;
   --k-anim-scale-out: k-scale-out 120ms cubic-bezier(.3,0,.8,.15) both;
   --k-anim-menu: k-menu-roll 200ms cubic-bezier(.05,.7,.1,1) both;
@@ -2881,7 +2885,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-bw: 1px;
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
-  --k-radius-lg: 1.4375rem;
+  --k-radius-lg: 1rem;
   --k-radius-pill: 999px;
   --k-radius-button: 1rem;
   --k-space: 1.25rem;
@@ -2951,6 +2955,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-font-display: 'Inter',sans-serif;
   --k-font-body: 'Inter',sans-serif;
   --k-font-mono: 'JetBrains Mono',ui-monospace,monospace;
+  --k-type-display: 3rem;
   --k-type-h1: 1.875rem;
   --k-type-h2: 1.375rem;
   --k-type-h3: 1rem;
@@ -2976,6 +2981,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-anim-fade-out: k-fade-out 120ms cubic-bezier(.3,0,.8,.15) both;
   --k-anim-slide-up: k-slide-up 200ms cubic-bezier(.05,.7,.1,1) both;
   --k-anim-slide-down: k-slide-down 200ms cubic-bezier(.05,.7,.1,1) both;
+  --k-anim-rise: k-rise 320ms cubic-bezier(.05,.7,.1,1) both;
   --k-anim-scale-in: k-scale-in 200ms cubic-bezier(.05,.7,.1,1) both;
   --k-anim-scale-out: k-scale-out 120ms cubic-bezier(.3,0,.8,.15) both;
   --k-anim-menu: k-menu-roll 200ms cubic-bezier(.05,.7,.1,1) both;
@@ -3065,6 +3071,14 @@ body {
 @keyframes k-scale-in {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
+}
+/* CP1 hero entrance (--k-anim-rise) — a focal element rises further (12px) and
+   scales up a touch as it fades in, so it reads as a deliberate "lands into
+   place" moment rather than a micro slide. Pairs with the emphasized-decel
+   curve + the slow duration tier. */
+@keyframes k-rise {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes k-scale-out {
   from { opacity: 1; transform: scale(1); }
@@ -8399,7 +8413,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "value": "0.625rem"
       },
       "lg": {
-        "value": "0.9375rem"
+        "value": "0.75rem"
       },
       "pill": {
         "value": "999px"
@@ -9122,7 +9136,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-info-soft: oklch(95.2% 0.0076 241.7);
   --radius-sm: calc(1rem * 0.6);
   --radius-md: 1rem;
-  --radius-lg: 1.4375rem;
+  --radius-lg: 1rem;
   --radius-pill: 999px;
   --radius-button: 1rem;
   --shadow-sm: 0 1px 2px hsl(210 16% 18%/.10);

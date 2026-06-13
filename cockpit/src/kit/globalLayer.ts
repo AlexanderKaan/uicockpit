@@ -78,6 +78,14 @@ ${body}
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }
+/* CP1 hero entrance (--k-anim-rise) — a focal element rises further (12px) and
+   scales up a touch as it fades in, so it reads as a deliberate "lands into
+   place" moment rather than a micro slide. Pairs with the emphasized-decel
+   curve + the slow duration tier. */
+@keyframes k-rise {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 @keyframes k-scale-out {
   from { opacity: 1; transform: scale(1); }
   to { opacity: 0; transform: scale(0.96); }
