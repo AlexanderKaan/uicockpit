@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { useMemo, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, type BlockSpec, type ShowcaseManifest } from '../../showcases/manifests'
 import { renderBlock } from '../../showcases/blocks'
@@ -8,53 +8,11 @@ import { setGalleryJump } from '../../state/galleryJump'
 import { COMPONENTS, componentAt } from '../../showcases/components'
 import type { ViewKind } from '../Stage'
 
-/* Inspectable composition (H3b slice 2): block id → the KIT recipes it maps
- * onto. Clicking a block tag in Inspect mode shows its manifest spec + this
- * mapping — the "what would I grab from the gallery to build this" answer. */
-const BLOCK_RECIPES: Record<BlockSpec['block'], string> = {
-  stats: '.stat-tile (+ __label/__value/__delta)',
-  chart: '.card + ChartFrame (the catalogued chart presenter)',
-  list: '.card + .list .list__item (+ .badge trail)',
-  thread: '.card (message variant — primary-soft for own messages)',
-  composer: '.toolbar + .in + .btn--icon',
-  table: '.card + .tbl',
-  form: '.card + .lab/.in + .card__foot actions',
-  pricing: '.pricing > .pricing__tier (+ --featured) + .btn--block',
-  prose: '.l-center (foundation) + type tokens',
-  dl: '.card + .dl',
-  chips: '.chip (+ .chip--on for the active filter)',
-  kanban: '.kanban > .kanban__col > .kanban__card (board with tags + points)',
-  tree: '.card + .tree > .tree__group > .tree__row (collapsible nav)',
-  timeline: '.card + .timeline > .timeline__item (--done/--current states)',
-  settings: '.card + .list--settings > .list__item + .toggle (switch rows)',
-  wizard: '.card + .stepper + .wstepper__content + .card__foot',
-  dropzone: '.dropzone (icon + title + hint, hidden file input)',
-  media: '.card + .aspect--1x1 grid (thumbnails + badges)',
-}
-
-/* Cross-view jump: block id → the gallery view + search query that surfaces
- * its card(s). The query rides the one-shot galleryJump mailbox; the gallery
- * pops it on mount and pre-fills its search. */
-const BLOCK_GALLERY: Record<BlockSpec['block'], { view: ViewKind; tier?: 'atom' | 'block'; q: string }> = {
-  stats: { view: 'components', tier: 'block', q: 'stat' },
-  chart: { view: 'components', tier: 'block', q: 'chart' },
-  list: { view: 'components', tier: 'atom', q: 'list' },
-  thread: { view: 'components', tier: 'atom', q: 'card' },
-  composer: { view: 'components', tier: 'atom', q: 'toolbar' },
-  table: { view: 'components', tier: 'atom', q: 'table' },
-  form: { view: 'components', tier: 'atom', q: 'form' },
-  pricing: { view: 'components', tier: 'block', q: 'pricing' },
-  prose: { view: 'foundations', q: '' },
-  dl: { view: 'components', tier: 'atom', q: 'description' },
-  chips: { view: 'components', tier: 'atom', q: 'chip' },
-  kanban: { view: 'components', tier: 'block', q: 'kanban' },
-  tree: { view: 'components', tier: 'atom', q: 'tree' },
-  timeline: { view: 'components', tier: 'atom', q: 'timeline' },
-  settings: { view: 'components', tier: 'atom', q: 'toggle' },
-  wizard: { view: 'components', tier: 'atom', q: 'stepper' },
-  dropzone: { view: 'components', tier: 'atom', q: 'dropzone' },
-  media: { view: 'components', tier: 'atom', q: 'aspect' },
-}
+/* Component → gallery tier guess for the specimen's "Open in gallery" jump
+ * (Fase J-1). componentAt returns a kit-class id; the stat-tile/table/card
+ * patterns live in the Block tier, the rest are Atoms. (J2 re-adds block-level
+ * jumps once the breadcrumb gives block context.) */
+const COMP_TIER: Record<string, 'atom' | 'block'> = { stat: 'block', table: 'block', card: 'block' }
 
 /**
  * Pages view (H3b) — Showcases first, SupaDash one click away.
@@ -75,41 +33,25 @@ const PANE_CLASS = {
   supporting: 'pane pane--fixed pane--supporting',
 } as const
 
-function ShowcaseStage({ m, inspect, split, onViewChange }: { m: ShowcaseManifest; inspect: boolean; split?: boolean; onViewChange: (v: ViewKind) => void }) {
+function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange: (v: ViewKind) => void }) {
   const [width, setWidth] = useState(m.width)
-  // Inspect is a VIEW MODE now (Live · Inspect · Matrix segctrl in PagesView),
-  // not a buried toggle: tags are always on in inspect, and the inspector
-  // panel groups the spec, the manifest JSON and the recipe mapping.
-  const [picked, setPicked] = useState<{ pane: number; block: number } | null>(null)
-  // A2 — Split's leaf-level selection: the kit component clicked inside the page.
+  // The loupe (Fase J-1): the live page, with a COLLAPSIBLE specimen rail.
+  // Rail closed = a clean preview (the old "Live"); Inspect opens it and makes
+  // the page leaf-clickable — click any element → it's isolated on the left with
+  // its recipe (the old "Split"). One toggle, not three modes.
+  const [railOpen, setRailOpen] = useState(false)
   const [pickedComp, setPickedComp] = useState<string | null>(null)
-  const pickedSpec = picked ? m.panes[picked.pane]?.blocks[picked.block] : undefined
   const comp = pickedComp ? COMPONENTS[pickedComp] : undefined
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
 
-  // Inspect-aware block renderer — wraps each block with its clickable id tag.
-  // In Split, the tags are suppressed: the whole page is leaf-clickable instead
-  // (componentAt resolves the deepest kit component under the cursor).
-  const renderInspectable = (b: BlockSpec, i: number, j: number): ReactNode =>
-    inspect && !split ? (
-      <div className={`shc__inspect ${picked?.pane === i && picked?.block === j ? 'shc__inspect--on' : ''}`} key={j}>
-        <button
-          type="button"
-          className="shc__inspect-tag"
-          onClick={() => setPicked({ pane: i, block: j })}
-          aria-label={`Inspect block: ${b.block}`}
-        >
-          {b.block}
-        </button>
-        {renderBlock(b, j)}
-      </div>
-    ) : (
-      renderBlock(b, j)
-    )
+  // Clicking the page (only when the rail is open) isolates the deepest kit
+  // component under the cursor into the specimen rail.
+  const pick = (e: ReactMouseEvent) => {
+    const id = componentAt(e.target as Element)
+    if (id) { setPickedComp(id); setRailOpen(true) }
+  }
 
   // Export-as-starter: the manifest IS the starter — download it as JSON.
-  // (Pair with tokens.css from the Use-kit modal; `uicockpit init --template`
-  // consumes the same file later, D3.)
   const downloadManifest = () => {
     const blob = new Blob([JSON.stringify(m, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -143,49 +85,25 @@ function ShowcaseStage({ m, inspect, split, onViewChange }: { m: ShowcaseManifes
           </datalist>
           <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong></span>
         </label>
+        <span className="shc__picker-spacer" />
+        <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={railOpen} onClick={() => setRailOpen((o) => !o)}>
+          <Icon name="search" />{railOpen ? 'Done inspecting' : 'Inspect'}
+        </button>
         <button type="button" className="btn btn--ghost btn--sm" onClick={downloadManifest}>
           <Icon name="upload" />Download manifest
         </button>
       </div>
-      <p className="lyt__blurb">{m.blurb}</p>
+      <p className="lyt__blurb">
+        {m.blurb} {railOpen ? '— click any element in the page to isolate it beside its recipe.' : '— scrub the width to watch the shell re-arrange; Inspect to click into any component.'}
+      </p>
 
-      {inspect && (
-        <div className="shc__spec" role="note" aria-label="Showcase inspector">
-          {pickedSpec ? (
-            <>
-              <div className="shc__spec-head">
-                <span className="badge badge--info">{pickedSpec.block}</span>
-                <span className="shc__spec-map">builds from: <code>{BLOCK_RECIPES[pickedSpec.block]}</code></span>
-                <button
-                  type="button"
-                  className="btn btn--outline btn--xs"
-                  onClick={() => {
-                    const target = BLOCK_GALLERY[pickedSpec.block]
-                    setGalleryJump(target.q, target.tier)
-                    onViewChange(target.view)
-                  }}
-                >
-                  Open in gallery <Icon name="chevR" />
-                </button>
-                <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Close block spec" onClick={() => setPicked(null)}><Icon name="x" /></button>
-              </div>
-              <pre className="code shc__spec-json">{JSON.stringify(pickedSpec, null, 2)}</pre>
-            </>
-          ) : (
-            <div className="shc__spec-head" style={{ marginBottom: 0 }}>
-              <span className="badge badge--info">inspect</span>
-              <span className="shc__spec-map">Click a block tag in the preview to see its manifest spec and which kit recipes build it.</span>
-            </div>
-          )}
-          <details className="shc__manifestbox">
-            <summary>Full manifest JSON — the screen IS this data</summary>
-            <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
-          </details>
-        </div>
-      )}
+      <details className="shc__manifestbox">
+        <summary>Full manifest JSON — the screen IS this data</summary>
+        <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
+      </details>
 
-      <div className={`lyt__stage ${split ? 'shc__splitstage' : ''}`}>
-        {split && (
+      <div className={`lyt__stage ${railOpen ? 'shc__splitstage' : ''}`}>
+        {railOpen && (
           <aside className="shc__specimen" aria-label="Selected component, isolated">
             <div className="shc__specimen-head">
               <span>Specimen</span>
@@ -208,15 +126,22 @@ function ShowcaseStage({ m, inspect, split, onViewChange }: { m: ShowcaseManifes
                   <div className="shc__recipe-row" key={k}><span className="shc__recipe-k">{k}</span><code className="shc__recipe-v">{v}</code></div>
                 ))}
                 <div className="shc__recipe-blurb">{comp.blurb}</div>
+                <button
+                  type="button"
+                  className="btn btn--outline btn--xs"
+                  onClick={() => { setGalleryJump(comp.label.toLowerCase(), COMP_TIER[pickedComp!] ?? 'atom'); onViewChange('components') }}
+                >
+                  Open in gallery <Icon name="chevR" />
+                </button>
               </div>
             )}
           </aside>
         )}
         <div
-          className={split ? 'shc__splitpage' : undefined}
-          onClick={split ? (e) => { const id = componentAt(e.target as Element); if (id) setPickedComp(id) } : undefined}
+          className={railOpen ? 'shc__splitpage' : undefined}
+          onClick={railOpen ? pick : undefined}
         >
-          <ShowcaseShell m={m} width={split ? Math.min(width, 1100) : width} renderBlockFn={renderInspectable} />
+          <ShowcaseShell m={m} width={railOpen ? Math.min(width, 1100) : width} />
         </div>
       </div>
     </>
@@ -326,10 +251,10 @@ function MatrixCell({ m, cfg, label, scale = 0.42 }: { m: ShowcaseManifest; cfg:
 
 export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
   const [showcaseId, setShowcaseId] = useState(SHOWCASES[0]!.id)
-  // The three WAYS OF LOOKING at one manifest — a first-class segctrl, not
-  // buried toggles: Live (the theater) · Inspect (spec + recipes + JSON) ·
-  // Matrix (the same manifest under contrasting kits).
-  const [viewMode, setViewMode] = useState<'live' | 'inspect' | 'matrix' | 'split'>('live')
+  // Fase J-1: Live/Inspect/Split collapsed into ONE loupe (ShowcaseStage, with
+  // its own collapsible rail). The only peer view left is Matrix — a single
+  // toggle, not a 4-button mode strip (J4 will pull it out into a Compare action).
+  const [matrix, setMatrix] = useState(false)
   // ×6: the FULL grid — every showcase × every style (the 3×6 money-shot).
   const [matrixAll, setMatrixAll] = useState(false)
   const m = SHOWCASES.find((s) => s.id === showcaseId)!
@@ -342,7 +267,7 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
         </div>
         <p className="lyt__intro">
           A page here is <em>data</em>: archetype × nav × panes of seeded blocks, rendered through
-          the same kit recipes the export ships. {VIEWMODE_HINT[viewMode]}
+          the same kit recipes the export ships.{matrix ? ' Compare it under three kits — structure is orthogonal to style.' : ' Inspect to click into any component and read its recipe.'}
         </p>
       </header>
 
@@ -361,24 +286,19 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
           </button>
         ))}
         <span className="shc__picker-spacer" />
-        {/* The three ways of looking — a first-class segctrl, not buried toggles */}
-        <div className="segctrl shc__viewmode" role="radiogroup" aria-label="View mode">
-          {VIEWMODES.map(([id, label, icon]) => (
-            <button
-              key={id}
-              type="button"
-              role="radio"
-              aria-checked={viewMode === id}
-              className={`segctrl__btn ${viewMode === id ? 'segctrl__btn--on' : ''}`}
-              onClick={() => setViewMode(id)}
-            >
-              <Icon name={icon} />{label}
-            </button>
-          ))}
+        {/* Two ways to view one manifest: the live Page (the loupe) or the Matrix
+         * comparison. J4 → Matrix becomes a "Compare kits" action. */}
+        <div className="segctrl shc__viewmode" role="radiogroup" aria-label="View">
+          <button type="button" role="radio" aria-checked={!matrix} className={`segctrl__btn ${!matrix ? 'segctrl__btn--on' : ''}`} onClick={() => setMatrix(false)}>
+            <Icon name="card" />Page
+          </button>
+          <button type="button" role="radio" aria-checked={matrix} className={`segctrl__btn ${matrix ? 'segctrl__btn--on' : ''}`} onClick={() => setMatrix(true)}>
+            <Icon name="grid" />Matrix
+          </button>
         </div>
       </div>
 
-      {viewMode === 'matrix' ? (
+      {matrix ? (
         <>
           <div className="lyt__controls">
             <p className="lyt__blurb" style={{ margin: 0, flex: 1 }}>
@@ -412,23 +332,10 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
         </>
       ) : (
         /* key = remount per showcase so width resets to the manifest default */
-        <ShowcaseStage m={m} key={m.id} inspect={viewMode === 'inspect' || viewMode === 'split'} split={viewMode === 'split'} onViewChange={onViewChange} />
+        <ShowcaseStage m={m} key={m.id} onViewChange={onViewChange} />
       )}
     </div>
   )
 }
 
-const VIEWMODES = [
-  ['live', 'Live', 'spark'],
-  ['inspect', 'Inspect', 'search'],
-  ['split', 'Split', 'card'],
-  ['matrix', 'Matrix', 'grid'],
-] as const
-
-const VIEWMODE_HINT: Record<'live' | 'inspect' | 'matrix' | 'split', string> = {
-  live: 'Scrub the width — every showcase re-arranges via the shell tier.',
-  inspect: 'Click any block tag to see its manifest spec, which kit recipes build it, and the full JSON.',
-  split: 'Click a block in the page — it appears isolated as a specimen on the left, beside its live context.',
-  matrix: 'See your live kit beside two curated contrasts — same structure, different style.',
-}
 
