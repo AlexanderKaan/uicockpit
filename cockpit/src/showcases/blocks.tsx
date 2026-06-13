@@ -64,6 +64,7 @@ export function renderBlock(spec: BlockSpec, key: number) {
           {spec.seed.messages.map((m, i) => (
             <div className={`msg ${m.me ? 'msg--me' : ''}`} key={i}>
               <div className="msg__head">
+                {m.avatar && <span className={`avatar avatar--sm avatar--a${(i % 6) + 1}`} aria-hidden="true">{m.avatar}</span>}
                 <span className="msg__name">{m.name}</span>
                 <span className="msg__time">{m.time}</span>
               </div>

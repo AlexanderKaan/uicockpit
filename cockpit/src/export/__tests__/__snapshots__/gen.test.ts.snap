@@ -8234,13 +8234,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .msg__head {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: center;
   gap: var(--k-s-8);
   margin-bottom: var(--k-s-4);
 }
 .msg__name { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); }
-.msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+/* CP6 — time pushes to the trailing edge so an optional leading .avatar groups
+   with the name (avatar + name left, time right). Was justify-content:space-between
+   on the head; an avatar there would have spread away from the name. */
+.msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); margin-left: auto; }
 .msg--me .msg__time { color: inherit; opacity: 0.7; }
 .msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
 .msg--me .msg__body { color: inherit; }

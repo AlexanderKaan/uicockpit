@@ -22,7 +22,7 @@ export type BlockSpec =
   | { block: 'stats'; seed: { items: Array<{ label: string; value: string; delta?: string; up?: boolean; hero?: boolean }> } }
   | { block: 'chart'; seed: { title: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> } }
   | { block: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
-  | { block: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean }> } }
+  | { block: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean; avatar?: string }> } }
   | { block: 'composer'; seed: { placeholder: string } }
   | { block: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[] } }
   | { block: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string } }
@@ -403,9 +403,11 @@ export const SHOWCASES: ShowcaseManifest[] = [
         role: 'detail',
         blocks: [
           { block: 'thread', seed: { messages: [
-            { name: 'Elle Petersen', time: '14:02', body: 'I just learned about a volunteering opportunity. The shelter needs help walking dogs and meeting people — want to sign up together?' },
-            { name: 'Dagmar Bachmann', time: '14:05', body: 'I’m going to adopt that scruffy one :)' },
-            { name: 'You', time: '14:06', body: 'Amazing! Do you need a ride to the shelter?', me: true },
+            { name: 'Elle Petersen', time: '14:02', avatar: 'EP', body: 'The shelter on Maple needs dog-walkers Sat AM — want to sign up together?' },
+            { name: 'Dagmar Bachmann', time: '14:05', avatar: 'DB', body: 'I’m adopting the scruffy one — his name is Otto 🐶' },
+            { name: 'Priya Nadar', time: '14:05', avatar: 'PN', body: 'I can drive — fits 4 + crates.' },
+            { name: 'You', time: '14:06', body: 'Amazing. I’ll book the 9:00 slot for six of us.', me: true },
+            { name: 'Marco Bauer', time: '14:11', avatar: 'MB', body: 'Bringing leashes + treats.' },
           ] } },
           { block: 'composer', seed: { placeholder: 'Message the space — ⇧⏎ for a new line' } },
         ],
