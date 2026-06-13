@@ -23,8 +23,8 @@ export type BlockSpec =
   | { block: 'chart'; seed: { title: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> } }
   | { block: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
   | { block: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean; avatar?: string }> } }
-  | { block: 'composer'; seed: { placeholder: string } }
-  | { block: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[] } }
+  | { block: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[] } }
+  | { block: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[] } }
   | { block: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string } }
   | { block: 'pricing'; seed: { tiers: Array<{ name: string; price: string; period: string; feats: string[]; featured?: boolean; cta: string }> } }
   | { block: 'prose'; seed: { title: string; kicker?: string; paragraphs: string[] } }
@@ -37,7 +37,8 @@ export type BlockSpec =
   | { block: 'settings'; seed: { title?: string; rows: Array<{ title: string; sub: string; on: boolean }> } }
   | { block: 'wizard'; seed: { steps: string[]; active: number; title: string; sub?: string } }
   | { block: 'dropzone'; seed: { title: string; hint: string } }
-  | { block: 'media'; seed: { title?: string; items: Array<{ name: string; kind: 'image' | 'video' | 'file'; badge?: string; tone?: 'info' | 'success' | 'warning' }> } }
+  | { block: 'media'; seed: { title?: string; items: Array<{ name: string; kind: 'image' | 'video' | 'file'; badge?: string; tone?: 'info' | 'success' | 'warning'; hero?: boolean; img?: string; meta?: string }> } }
+  | { block: 'empty'; seed: { icon: IconName; title: string; sub: string; cta?: string } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -129,7 +130,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { name: 'Copilot', time: '14:02', body: 'Here is a three-phase timeline: July 7 closed beta (50 design partners), August 11 open beta with pricing page live, September 9 GA with the launch post and lifecycle emails. Want me to expand any phase into tasks?' },
             { name: 'You', time: '14:05', body: 'Expand the closed beta phase into a checklist.', me: true },
           ] } },
-          { block: 'composer', seed: { placeholder: 'Message Copilot — ⇧⏎ for a new line' } },
+          { block: 'composer', seed: { placeholder: 'Ask Aria anything — ⏎ to send, ⇧⏎ for a new line', hero: true, suggestions: ['Summarize a PR', 'Explain this error', 'Draft a SQL query', 'Write a test'] } },
         ],
       },
     ],
@@ -168,7 +169,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { label: 'Won (Q2)', value: '$310k', delta: '+22%', up: true },
             { label: 'Avg. cycle', value: '34d', delta: '+3d', up: false },
           ] } },
-          { block: 'table', seed: { title: 'Hot accounts', numericCols: [3], columns: ['Account', 'Owner', 'Stage', 'Value', 'Next step'], rows: [
+          { block: 'table', seed: { title: 'Hot accounts', numericCols: [3], badgeCols: [2], sortableCols: [0, 3], columns: ['Account', 'Owner', 'Stage', 'Value', 'Next step'], rows: [
             ['Northwind Traders', 'Lena', 'Negotiation', '$120k', 'Contract review · Fri'],
             ['Globex', 'Sam', 'Proposal', '$86k', 'Demo follow-up · Tue'],
             ['Initech', 'Ravi', 'Discovery', '$54k', 'Stakeholder call · Mon'],
@@ -277,16 +278,17 @@ export const SHOWCASES: ShowcaseManifest[] = [
         blocks: [
           { block: 'chips', seed: { label: 'Browse', options: ['For you', 'Nearby', 'This week', 'Free'], active: 0 } },
           { block: 'media', seed: { title: 'Featured tonight', items: [
-            { name: 'Serafina — live set', kind: 'image', badge: '9:30', tone: 'info' },
-            { name: 'Echo Bridge party', kind: 'image', badge: 'Going', tone: 'success' },
-            { name: 'Sunrise rooftop', kind: 'image' },
-            { name: 'Vinyl night', kind: 'image', badge: 'Free', tone: 'warning' },
+            { name: 'Serafina — live set', kind: 'image', hero: true, badge: 'LIVE 9:30', tone: 'info', meta: 'Paradiso, Amsterdam · doors 21:00 · 312 going' },
+            { name: 'Echo Bridge rooftop', kind: 'image', badge: 'Going', tone: 'success' },
+            { name: 'Vinyl night · De School', kind: 'image', badge: '€8', tone: 'warning' },
+            { name: 'Sunrise set · NDSM', kind: 'image' },
           ] } },
           { block: 'list', seed: { title: 'Your week', items: [
             { icon: 'spark', title: 'Serafina', sub: 'Paradiso · doors 21:00', trail: 'Fri', badge: 'info' },
             { icon: 'home', title: 'Echo Bridge', sub: 'Hosted by Odette · 78 going', trail: 'Sat' },
             { icon: 'chat', title: 'Group chat', sub: 'Mia: making a shared album…', trail: '2m' },
           ] } },
+          { block: 'empty', seed: { icon: 'search', title: 'That’s everything near you tonight', sub: 'Try Nearby to catch shows in Rotterdam & Utrecht.', cta: 'Widen search' } },
         ],
       },
     ],

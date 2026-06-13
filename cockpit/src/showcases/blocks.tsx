@@ -74,11 +74,44 @@ export function renderBlock(spec: BlockSpec, key: number) {
         </div>
       )
     case 'composer':
+      // CP6 — hero composer: the composer IS the hero (Raycast/Claude). A tall
+      // multi-line field + a starter-prompt chip row + the one aimed Send action,
+      // built from existing atoms (.tx / .chip / .btn). The thin toolbar stays the
+      // default for inline message bars.
+      if (spec.seed.hero) {
+        return (
+          <div className="card" key={key} style={{ gap: 'var(--k-s-10)' }}>
+            {spec.seed.suggestions && spec.seed.suggestions.length > 0 && (
+              <div className="card__row" style={{ flexWrap: 'wrap' }}>
+                {spec.seed.suggestions.map((s) => <span className="chip" key={s}>{s}</span>)}
+              </div>
+            )}
+            <textarea className="in tx" placeholder={spec.seed.placeholder} aria-label="Message" rows={3} />
+            <div className="card__row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+              <button type="button" className="btn btn--ghost btn--sm"><Icon name="plus" /> Attach</button>
+              <button type="button" className="btn btn--primary"><Icon name="chevR" /> Send</button>
+            </div>
+          </div>
+        )
+      }
       return (
         <div className="toolbar" key={key} style={{ marginTop: 'auto' }}>
           <input className="in" placeholder={spec.seed.placeholder} aria-label="Message" style={{ flex: 1 }} />
           <button type="button" className="btn btn--ghost btn--icon" aria-label="Attach"><Icon name="plus" /></button>
           <button type="button" className="btn btn--primary btn--icon" aria-label="Send"><Icon name="chevR" /></button>
+        </div>
+      )
+    case 'empty':
+      // CP6 — end-of-feed / no-results state (the memorable Things 3 / Spotify
+      // close). Wraps the existing .empty recipe; one quiet CTA, never a brand fill.
+      return (
+        <div className="card" key={key}>
+          <div className="empty">
+            <div className="empty__icon"><Icon name={spec.seed.icon} /></div>
+            <div className="empty__title">{spec.seed.title}</div>
+            <div className="empty__sub">{spec.seed.sub}</div>
+            {spec.seed.cta && <button type="button" className="btn btn--secondary btn--sm">{spec.seed.cta}</button>}
+          </div>
         </div>
       )
     case 'table':
@@ -87,11 +120,18 @@ export function renderBlock(spec: BlockSpec, key: number) {
           {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
           <table className="tbl">
             <thead>
-              <tr>{spec.seed.columns.map((c, j) => <th key={c} className={spec.seed.numericCols?.includes(j) ? 'num' : undefined}>{c}</th>)}</tr>
+              <tr>{spec.seed.columns.map((c, j) => {
+                const cls = [spec.seed.numericCols?.includes(j) && 'num', spec.seed.sortableCols?.includes(j) && 'is-sortable'].filter(Boolean).join(' ')
+                return <th key={c} className={cls || undefined}>{c}</th>
+              })}</tr>
             </thead>
             <tbody>
               {spec.seed.rows.map((r, i) => (
-                <tr key={i}>{r.map((cell, j) => <td key={j} className={spec.seed.numericCols?.includes(j) ? 'num' : undefined}>{cell}</td>)}</tr>
+                <tr key={i}>{r.map((cell, j) => (
+                  <td key={j} className={spec.seed.numericCols?.includes(j) ? 'num' : undefined}>
+                    {spec.seed.badgeCols?.includes(j) ? <span className="badge">{cell}</span> : cell}
+                  </td>
+                ))}</tr>
               ))}
             </tbody>
           </table>
@@ -273,13 +313,27 @@ export function renderBlock(spec: BlockSpec, key: number) {
       return (
         <div className="card" key={key}>
           {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
+          {/* CP6 — hero cover(s): full-bleed 16:9 with a display-tier title overlay (the
+              "asset/cover IS the UI" move). Real img when given, else the brand gradient. */}
+          {spec.seed.items.filter((m) => m.hero).map((f, i) => (
+            <div className="aspect aspect--16x9" key={'hero-' + f.name}>
+              {f.img ? <img src={f.img} alt={f.name} /> : <div className="aspect__fill" style={{ background: `var(--k-grad-${(i % 6) + 1})` }} />}
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 'var(--k-s-6)', padding: 'var(--k-space)', background: 'linear-gradient(to top, rgba(0,0,0,.62), transparent 62%)' }}>
+                {f.badge && <span className={`badge badge--${f.tone ?? 'info'}`} style={{ alignSelf: 'flex-start' }}>{f.badge}</span>}
+                <span className="t-display" style={{ color: '#fff' }}>{f.name}</span>
+                {f.meta && <span style={{ color: 'rgba(255,255,255,.82)', fontSize: 'var(--k-type-small)' }}>{f.meta}</span>}
+              </div>
+            </div>
+          ))}
           <div className="card__row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 'var(--k-s-12)' }}>
-            {spec.seed.items.map((f, i) => (
+            {spec.seed.items.filter((m) => !m.hero).map((f, i) => (
               <div key={f.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k-s-8)' }}>
                 <div className="aspect aspect--1x1">
+                  {f.img ? <img src={f.img} alt={f.name} /> : (
                   <div className="aspect__fill" style={{ background: f.kind === 'image' ? `var(--k-grad-${(i % 4) + 1})` : 'var(--k-surface-sunken)', display: 'grid', placeItems: 'center', color: f.kind === 'image' ? 'var(--k-primary-fg, #fff)' : 'var(--k-fg-muted)' }}>
                     <Icon name={f.kind === 'image' ? 'grid' : f.kind === 'video' ? 'chart' : 'file'} size={22} />
                   </div>
+                  )}
                 </div>
                 <div className="card__row" style={{ alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
                   <span style={{ fontSize: 'var(--k-type-small)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{f.name}</span>
