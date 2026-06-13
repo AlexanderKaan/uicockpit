@@ -2,19 +2,16 @@ import { useState, type CSSProperties } from 'react'
 import type { Config, Tokens } from '../tokens/types'
 import { IconProvider } from '../icons/Icon'
 import { ComponentGallery } from './views/ComponentGallery'
-import { FoundationsView } from './views/FoundationsView'
 import { PagesView } from './views/PagesView'
 import { peekGalleryJumpTier } from '../state/galleryJump'
 
-/* The altitude ladder (Fase I-C → J5 — the 5-rung graph collapsed to 3 visited
- * stages, capacity intact; the sub-toggles ARE the missing rungs):
- *   foundations → the resolved token scales (twins the panel)
- *   components  → the vocabulary: one gallery, Atom/Block is a sub-toggle
- *   pages       → the loupe: Showcases (manifest screens) you drill Page › Block
- *                 › Atom › All tokens. Shells folded into the width slider (J5):
- *                 the nav morphs bar → rail → sidebar as you scrub, so the
- *                 standalone Shells workbench is gone. */
-export type ViewKind = 'foundations' | 'components' | 'pages'
+/* The two modi (Fase J-6 — the loupe IA settles to TWO tabs; the 5-rung graph
+ * lives as altitudes inside them, capacity intact):
+ *   components → the vocabulary: one gallery, Atom/Block is a sub-toggle
+ *   pages      → the loupe: Showcases you drill Page › Block › Atom › All tokens.
+ *                Foundations is the deepest zoom (J3), not a peer tab; Shells
+ *                folded into the width slider (J5). */
+export type ViewKind = 'components' | 'pages'
 
 /* Components — the merged Atom/Block altitude. One gallery; the tier is an
  * inline segctrl (dogfoods the kit) instead of two top-level tabs. Arriving via
@@ -79,7 +76,6 @@ export function Stage({ cfg, tokens, view, onViewChange }: StageProps) {
           <div className="cockpit-preview" style={previewStyle}>
             <IconProvider set={cfg.iconSet}>
               <div className="view-transition-root" key={view}>
-                {view === 'foundations' && <FoundationsView cfg={cfg} tokens={tokens} />}
                 {view === 'components' && <ComponentsView />}
                 {view === 'pages' && <PagesView cfg={cfg} onViewChange={onViewChange} />}
               </div>

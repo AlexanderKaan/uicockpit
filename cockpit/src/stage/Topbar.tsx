@@ -103,16 +103,16 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         <A11yBadge audit={audit} pass={pass} total={total} allPass={allPass} />
       </div>
       <div className="topbar__center">
-        {/* The altitude ladder (Fase I-C) — three visited stages, low → high:
-         * Foundation (tokens) → Components (Atom/Block sub-toggle) → Pages
-         * (Screens/Shells sub-toggle). The 5-rung graph, collapsed; nothing lost. */}
+        {/* The two modi (Fase J-6) — the loupe IA settled to TWO tabs. The old
+         * Foundations + Shells rungs live INSIDE the Pages loupe now (Foundations
+         * = the deepest "All tokens" zoom; Shells = the width slider's nav morph),
+         * so the topbar is just the vocabulary and the screens that use it. */}
         <div className="view-toggle" role="tablist" aria-label="View">
           {/* Tooltips bridge the taxonomy to plain language for the vibe-coder
            * audience (C7) — the meaning is one hover away. */}
           {([
-            ['foundations', 'Foundations', Palette, 'Tokens & scales — the design decisions'],
             ['components', 'Components', Boxes, 'The vocabulary — Atoms (bare) & Blocks (ready-made sections)'],
-            ['pages', 'Pages', AppWindow, 'Full screens — manifest showcases — plus the adaptive Shells'],
+            ['pages', 'Pages', AppWindow, 'Full screens — drill a showcase Page › Block › Atom › All tokens'],
           ] as [ViewKind, string, typeof Palette, string][]).map(([k, label, Ico, sub]) => (
             <button
               key={k}

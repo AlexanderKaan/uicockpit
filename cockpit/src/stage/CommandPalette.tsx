@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ComponentType, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import {
-  AppWindow, Boxes, Code, Dices, Link2, Moon, Palette, RotateCcw, Search, Sliders, Square, Sun, Redo2, Undo2, Layers,
+  AppWindow, Boxes, Code, Dices, Link2, Moon, Palette, RotateCcw, Search, Square, Sun, Redo2, Undo2, Layers,
 } from 'lucide-react'
 import type { Config, Tokens } from '../tokens/types'
 import type { ConfigAction } from '../state/configReducer'
@@ -68,7 +68,6 @@ export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, 
     const cmds: Cmd[] = []
     // Navigate
     const views: { v: ViewKind; label: string; icon: Cmd['icon'] }[] = [
-      { v: 'foundations', label: 'Foundations', icon: Sliders },
       { v: 'components', label: 'Components', icon: Boxes },
       { v: 'pages', label: 'Pages', icon: AppWindow },
     ]
