@@ -27,7 +27,7 @@ export type BlockSpec =
   | { block: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[] } }
   | { block: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string } }
   | { block: 'pricing'; seed: { tiers: Array<{ name: string; price: string; period: string; feats: string[]; featured?: boolean; cta: string }> } }
-  | { block: 'prose'; seed: { title: string; kicker?: string; paragraphs: string[] } }
+  | { block: 'prose'; seed: { title: string; kicker?: string; paragraphs: string[]; hero?: boolean; ctas?: string[] } }
   | { block: 'dl'; seed: { title?: string; pairs: Array<[string, string]> } }
   | { block: 'chips'; seed: { label: string; options: string[]; active: number } }
   // H3c harvest — rich patterns lifted out of SupaDash into the manifest model.
@@ -72,25 +72,25 @@ export const SHOWCASES: ShowcaseManifest[] = [
       { icon: 'bell', label: 'Alerts' },
       { icon: 'cog', label: 'Settings' },
     ],
-    barTitle: 'Acme Analytics',
+    barTitle: 'Meridian',
     panes: [
       {
         role: 'flex',
         blocks: [
           { block: 'stats', seed: { items: [
-            { label: 'MRR', value: '$48.2k', delta: '+12%', up: true, hero: true },
-            { label: 'Active users', value: '8,431', delta: '+4.1%', up: true },
-            { label: 'Churn', value: '1.9%', delta: '-0.3%', up: true },
+            { label: 'Net revenue', value: '$312,480', delta: '+9.2%', up: true, hero: true },
+            { label: 'Active accounts', value: '1,284', delta: '+3.4%', up: true },
+            { label: 'Runway', value: '18 mo', delta: '+2 mo', up: true },
           ] } },
-          { block: 'chart', seed: { title: 'Revenue — last 6 months', type: 'area', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
-            { name: 'Subscriptions', values: [28, 31, 30, 36, 41, 48] },
-            { name: 'Services', values: [9, 8, 11, 10, 12, 13] },
+          { block: 'chart', seed: { title: 'Net revenue — last 6 months', type: 'area', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
+            { name: 'Subscriptions', values: [186, 204, 198, 241, 273, 312] },
+            { name: 'Services', values: [42, 38, 51, 47, 58, 64] },
           ] } },
           { block: 'list', seed: { title: 'Recent activity', items: [
-            { icon: 'check', title: 'Invoice #1208 paid', sub: 'Acme GmbH · $1,400', trail: '2m', badge: 'success' },
-            { icon: 'bell', title: 'Quota at 81%', sub: 'API requests — Pro plan', trail: '1h', badge: 'warning' },
-            { icon: 'plus', title: 'New workspace member', sub: 'lena@acme.io joined Design', trail: '3h' },
-            { icon: 'upload', title: 'Export completed', sub: 'transactions-may.csv · 2.1 MB', trail: '5h' },
+            { icon: 'check', title: 'Payout to Loomis Studio', sub: 'ACH · $4,200', trail: '2m', badge: 'success' },
+            { icon: 'bell', title: 'Card spend at 81%', sub: 'September limit — $40k', trail: '1h', badge: 'warning' },
+            { icon: 'plus', title: 'New treasury account', sub: 'Opened by Priya N. · USD', trail: '3h' },
+            { icon: 'upload', title: 'Statement ready', sub: 'august-2026.pdf · 2.1 MB', trail: '5h' },
           ] } },
         ],
       },
@@ -109,7 +109,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
       { icon: 'file', label: 'Files' },
       { icon: 'cog', label: 'Settings' },
     ],
-    barTitle: 'Copilot',
+    barTitle: 'Aria',
     panes: [
       {
         role: 'fixed',
@@ -127,7 +127,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
         blocks: [
           { block: 'thread', seed: { messages: [
             { name: 'You', time: '14:02', body: 'Draft a rollout timeline for the Q3 launch — beta in July, GA in September.', me: true },
-            { name: 'Copilot', time: '14:02', body: 'Here is a three-phase timeline: July 7 closed beta (50 design partners), August 11 open beta with pricing page live, September 9 GA with the launch post and lifecycle emails. Want me to expand any phase into tasks?' },
+            { name: 'Aria', time: '14:02', body: 'Here is a three-phase timeline: July 7 closed beta (50 design partners), August 11 open beta with pricing page live, September 9 GA with the launch post and lifecycle emails. Want me to expand any phase into tasks?' },
             { name: 'You', time: '14:05', body: 'Expand the closed beta phase into a checklist.', me: true },
           ] } },
           { block: 'composer', seed: { placeholder: 'Ask Aria anything — ⏎ to send, ⇧⏎ for a new line', hero: true, suggestions: ['Summarize a PR', 'Explain this error', 'Draft a SQL query', 'Write a test'] } },
@@ -170,24 +170,16 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { label: 'Avg. cycle', value: '34d', delta: '+3d', up: false },
           ] } },
           { block: 'table', seed: { title: 'Hot accounts', numericCols: [3], badgeCols: [2], sortableCols: [0, 3], columns: ['Account', 'Owner', 'Stage', 'Value', 'Next step'], rows: [
-            ['Northwind Traders', 'Lena', 'Negotiation', '$120k', 'Contract review · Fri'],
-            ['Globex', 'Sam', 'Proposal', '$86k', 'Demo follow-up · Tue'],
-            ['Initech', 'Ravi', 'Discovery', '$54k', 'Stakeholder call · Mon'],
-            ['Umbrella Co', 'Mia', 'Negotiation', '$210k', 'Security review · Thu'],
+            ['Brightwave', 'Lena', 'Negotiation', '$120k', 'Contract review · Fri'],
+            ['Cedar Health', 'Sam', 'Proposal', '$86k', 'Demo follow-up · Tue'],
+            ['Halcyon Labs', 'Ravi', 'Discovery', '$54k', 'Stakeholder call · Mon'],
+            ['Vantage Retail', 'Mia', 'Negotiation', '$210k', 'Security review · Thu'],
           ] } },
-          // H3c: Projects' deal-board pattern, harvested into CRM as the Werk merge.
-          { block: 'kanban', seed: { columns: [
-            { name: 'Discovery', cards: [
-              { title: 'Initech — scope call', tag: 'New', key: 'DEAL-54', pts: '$54k', avatar: 'R' },
-              { title: 'Hooli — intro deck', tag: 'New', key: 'DEAL-61', pts: '$72k', avatar: 'S' },
-            ] },
-            { name: 'Proposal', cards: [
-              { title: 'Globex — pricing sent', tag: 'Warm', key: 'DEAL-48', pts: '$86k', avatar: 'S' },
-            ] },
-            { name: 'Negotiation', cards: [
-              { title: 'Northwind — contract', tag: 'Hot', key: 'DEAL-40', pts: '$120k', avatar: 'L' },
-              { title: 'Umbrella — security', tag: 'Hot', key: 'DEAL-33', pts: '$210k', avatar: 'M' },
-            ] },
+          // CP6 — the CRM signal a deal-board can't give: where the quarter lands.
+          // Committed vs best-case forecast (Attio/Salesforce's focal chart).
+          { block: 'chart', seed: { title: 'Forecast — next 4 quarters', type: 'area', labels: ['Q1', 'Q2', 'Q3', 'Q4'], series: [
+            { name: 'Committed', values: [310, 420, 480, 560] },
+            { name: 'Best case', values: [380, 520, 610, 720] },
           ] } },
         ],
       },
@@ -210,15 +202,21 @@ export const SHOWCASES: ShowcaseManifest[] = [
       {
         role: 'flex',
         blocks: [
+          // CP6 — a customer portal opens on the number that matters: amount due.
+          // The hero stat deploys the display tier; one focused upgrade card, not a
+          // 3-tier marketing wall (you're already a customer).
+          { block: 'stats', seed: { items: [
+            { label: 'Amount due', value: '€288.00', hero: true },
+            { label: 'Due date', value: 'Jul 1' },
+            { label: 'Current plan', value: 'Pro · annual' },
+          ] } },
           { block: 'form', seed: { title: 'Organization', intro: 'These details appear on your invoices.', fields: [
-            { label: 'Company name', value: 'Acme GmbH' },
+            { label: 'Company name', value: 'Lumen Studio' },
             { label: 'VAT number', placeholder: 'EU123456789' },
-            { label: 'Billing email', value: 'finance@acme.io' },
+            { label: 'Billing email', value: 'finance@lumenstudio.io' },
           ], submit: 'Save changes' } },
           { block: 'pricing', seed: { tiers: [
-            { name: 'Starter', price: '$0', period: '/mo', feats: ['3 projects', 'Community support'], cta: 'Current plan' },
-            { name: 'Pro', price: '$24', period: '/mo', feats: ['Unlimited projects', 'Priority support', 'SSO'], featured: true, cta: 'Upgrade' },
-            { name: 'Scale', price: '$96', period: '/mo', feats: ['Audit log', 'SLA 99.9%', 'Dedicated CSM'], cta: 'Talk to sales' },
+            { name: 'Scale', price: '€96', period: '/mo', feats: ['Audit log & SSO', 'SLA 99.9%', 'Dedicated CSM'], featured: true, cta: 'Upgrade plan' },
           ] } },
           // H3c: Settings' toggle rows, harvested into Portal (account preferences).
           { block: 'settings', seed: { title: 'Notifications', rows: [
@@ -232,7 +230,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
         role: 'supporting',
         blocks: [
           { block: 'dl', seed: { title: 'Your plan', pairs: [
-            ['Plan', 'Starter — free'],
+            ['Plan', 'Pro · annual'],
             ['Seats', '4 of 5 used'],
             ['Renewal', 'July 1, 2026'],
             ['Invoices', '12 paid'],
@@ -312,6 +310,15 @@ export const SHOWCASES: ShowcaseManifest[] = [
         role: 'flex',
         blocks: [
           { block: 'prose', seed: {
+            hero: true,
+            kicker: 'The design-system configurator',
+            title: 'Ship a design system with conviction.',
+            paragraphs: [
+              'Compose a coherent, opinionated kit in minutes — brand, type, shape, motion — then export framework-neutral tokens and a machine-readable contract your agent actually follows. No lock-in, no component zoo, no accounts.',
+            ],
+            ctas: ['Start free', 'Read the docs'],
+          } },
+          { block: 'prose', seed: {
             kicker: 'Changelog · June 2026',
             title: 'Design tokens, now with a contract',
             paragraphs: [
@@ -360,15 +367,24 @@ export const SHOWCASES: ShowcaseManifest[] = [
       {
         role: 'detail',
         blocks: [
-          { block: 'dropzone', seed: { title: 'Drop files or click to browse', hint: 'Images, PDFs, video — up to 100 MB per file' } },
+          // CP6 — the asset IS the UI: a hero cover leads, the contact sheet
+          // follows, metadata sits beside it. Dropzone + publish wizard are the
+          // working chrome below the focal asset.
           { block: 'media', seed: { title: 'Spring launch · 6 assets', items: [
-            { name: 'hero-wide.jpg', kind: 'image', badge: 'New', tone: 'success' },
+            { name: 'Spring launch — hero', kind: 'image', hero: true, badge: 'New', tone: 'success', meta: 'hero-wide.jpg · 4000×2250 · 3.4 MB · added by Noa' },
             { name: 'teaser.mp4', kind: 'video', badge: '0:28', tone: 'info' },
             { name: 'lookbook.pdf', kind: 'file' },
             { name: 'badge-set.png', kind: 'image' },
             { name: 'palette.png', kind: 'image' },
             { name: 'brief.pdf', kind: 'file', badge: 'Final', tone: 'warning' },
           ] } },
+          { block: 'dl', seed: { title: 'Asset details', pairs: [
+            ['Dimensions', '4000 × 2250'],
+            ['Format', 'JPEG · sRGB'],
+            ['Uploaded', 'Jun 11 · by Noa'],
+            ['Collection', 'Spring launch'],
+          ] } },
+          { block: 'dropzone', seed: { title: 'Drop files or click to browse', hint: 'Images, PDFs, video — up to 100 MB per file' } },
           { block: 'wizard', seed: { steps: ['Select', 'Crop', 'Caption', 'Publish'], active: 2, title: 'Caption', sub: 'Add alt text and a caption before publishing.' } },
         ],
       },

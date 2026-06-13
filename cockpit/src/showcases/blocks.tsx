@@ -170,14 +170,32 @@ export function renderBlock(spec: BlockSpec, key: number) {
           ))}
         </div>
       )
-    case 'prose':
-      return (
-        <article className="prose l-center" key={key}>
+    case 'prose': {
+      // CP6 — prose has two registers. Default = an article column (changelog,
+      // docs). hero = the landing headline: the display tier on a --k-canvas band
+      // (Site's gradient-identity signature) with one aimed CTA pair. Both are
+      // pure atoms — .t-display + --k-canvas token + .btn — so zero new classes.
+      const article = (
+        <article className="prose l-center">
           {spec.seed.kicker && <div className="prose__kicker">{spec.seed.kicker}</div>}
-          <h2>{spec.seed.title}</h2>
+          {spec.seed.hero ? <h1 className="t-display">{spec.seed.title}</h1> : <h2>{spec.seed.title}</h2>}
           {spec.seed.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+          {spec.seed.ctas && spec.seed.ctas.length > 0 && (
+            <div className="card__row" style={{ justifyContent: 'center', marginTop: 'var(--k-s-8)', flexWrap: 'wrap' }}>
+              {spec.seed.ctas.map((c, i) => (
+                <button type="button" className={'btn ' + (i === 0 ? 'btn--primary' : 'btn--secondary')} key={c}>{c}</button>
+              ))}
+            </div>
+          )}
         </article>
       )
+      if (!spec.seed.hero) return <div key={key}>{article}</div>
+      return (
+        <div key={key} style={{ background: 'var(--k-canvas)', border: '1px solid var(--k-border)', borderRadius: 'var(--k-radius-lg)', padding: 'clamp(var(--k-s-24), 6vw, var(--k-s-32))', textAlign: 'center' }}>
+          {article}
+        </div>
+      )
+    }
     case 'dl':
       return (
         <div className="card" key={key}>

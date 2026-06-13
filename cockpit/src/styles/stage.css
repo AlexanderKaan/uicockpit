@@ -475,13 +475,16 @@
   font-size: var(--k-type-body, 14px);
 }
 
-.cockpit-preview h1, .cockpit-preview h2 {
+/* Bare-semantic-heading helper for the preview only. Excludes .t-display so an
+   EXPLICIT display-tier headline (CP6 hero) is never defeated by this chrome —
+   the exported kit has no such rule, so this only re-aligns preview with export. */
+.cockpit-preview h1:not(.t-display), .cockpit-preview h2:not(.t-display) {
   font-family: var(--k-font-display, system-ui);
   font-weight: 600;
   letter-spacing: -0.02em;
 }
-.cockpit-preview h1 { font-size: var(--k-type-h1); margin-bottom: 6px; }
-.cockpit-preview h2 { font-size: var(--k-type-h2); margin-bottom: 4px; }
+.cockpit-preview h1:not(.t-display) { font-size: var(--k-type-h1); margin-bottom: 6px; }
+.cockpit-preview h2:not(.t-display) { font-size: var(--k-type-h2); margin-bottom: 4px; }
 
 /* Empty state for when no preview view is active (defensive — should not
    normally render; Stage always renders Components or Dashboard). */
