@@ -316,7 +316,7 @@ function ShowcaseShell({
 }: {
   m: ShowcaseManifest
   width: number
-  renderBlockFn?: (b: BlockSpec, paneIdx: number, blockIdx: number) => ReactNode
+  renderBlockFn?: (b: BlockSpec, key: number) => ReactNode
   /** Loupe page-level: wrap each block in a hover-pickable target carrying its
    *  pane/idx (Fase J-2). The stage delegates the click and walks up to read it. */
   pickable?: boolean
@@ -362,10 +362,13 @@ function ShowcaseShell({
               {pane.blocks.map((b, j) =>
                 pickable ? (
                   <div className="shc__pick" key={j} data-pane={i} data-idx={j} data-label={blockInfo(b.block).label}>
-                    {renderBlockFn(b, i, j)}
+                    {renderBlockFn(b, j)}
                   </div>
                 ) : (
-                  renderBlockFn(b, i, j)
+                  // key = the block's own index (unique among the pane's children);
+                  // passing the PANE index here collided all blocks onto one key,
+                  // leaving a stale duplicate when Inspect re-wrapped them (Fase J-8).
+                  renderBlockFn(b, j)
                 ),
               )}
             </section>
