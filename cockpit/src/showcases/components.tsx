@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Icon } from '../icons/Icon'
+import { ChartFrame } from '../stage/views/ChartFrame'
 
 /**
  * Fase I-A3 — the per-component specimen + Recipe registry (the v2 "SPECS"
@@ -152,11 +153,150 @@ export const COMPONENTS: Record<string, ComponentSpec> = {
       </div>
     ),
   },
+  // Fase J-8 — the block-tier recipes the showcases render. Adding them here (+
+  // CLASS_MAP below) means Inspect resolves them to their REAL recipe instead of
+  // bottoming out at the wrapping Card, so a chart/kanban/tree/etc. no longer
+  // *looks* fabricated. (The honest "made-up" detector: anything that still won't
+  // resolve after this is genuinely bespoke.)
+  chart: {
+    label: 'Chart',
+    blurb: 'A token-driven presenter — axes, grid and the series colour all derive.',
+    recipe: [['Surface', '--k-surface'], ['Grid', '--k-border'], ['Series', '--k-primary'], ['Numerals', 'tabular']],
+    specimen: () => (
+      <div style={{ width: 260 }}>
+        <ChartFrame type="area" labels={['M', 'T', 'W', 'T', 'F']} series={[{ name: 'Visits', values: [8, 12, 9, 15, 13] }]} />
+      </div>
+    ),
+  },
+  kanban: {
+    label: 'Kanban',
+    blurb: 'Columns of cards — count, tag and assignee all come from the seed.',
+    recipe: [['Column', '--k-surface-sunken'], ['Card', '--k-surface + shadow-xs'], ['Tag', 'badge tone'], ['Gap', '--k-s-*']],
+    specimen: () => (
+      <div className="kanban" style={{ maxWidth: 200 }}>
+        <div className="kanban__col">
+          <div className="kanban__col-head">In progress<span className="kanban__count">2</span></div>
+          <div className="kanban__card"><span className="kanban__card-title">Wire the API</span><span className="kanban__tag">api</span></div>
+          <div className="kanban__card"><span className="kanban__card-title">Polish empty state</span></div>
+        </div>
+      </div>
+    ),
+  },
+  tree: {
+    label: 'Tree',
+    blurb: 'Disclosure rows — chevron, icon, label; the active row wears the soft tone.',
+    recipe: [['Row', '--k-row-h'], ['On', '--k-primary-soft'], ['Hover', '--k-state-hover'], ['Indent', '--k-s-*']],
+    specimen: () => (
+      <div className="card" style={{ maxWidth: 240 }}>
+        <div className="tree" role="tree" aria-label="Files">
+          <div className="tree__group">
+            <div className="tree__row"><span className="tree__chev"><Icon name="chevR" size={13} /></span><span className="tree__icon"><Icon name="grid" size={13} /></span>Campaigns</div>
+            <div className="tree__group">
+              <div className="tree__row tree__row--on"><span className="tree__chev tree__chev--leaf"><Icon name="chevR" size={13} /></span><span className="tree__icon"><Icon name="file" size={13} /></span>Spring launch</div>
+              <div className="tree__row"><span className="tree__chev tree__chev--leaf"><Icon name="chevR" size={13} /></span><span className="tree__icon"><Icon name="file" size={13} /></span>Brand refresh</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  timeline: {
+    label: 'Timeline',
+    blurb: 'A vertical rail of events; the current node pulses on the motion spring.',
+    recipe: [['Rail', '--k-border'], ['Dot', '--k-primary'], ['Done', '--k-success'], ['Pulse', '--k-pulse']],
+    specimen: () => (
+      <div className="card" style={{ maxWidth: 260 }}>
+        <ol className="timeline">
+          <li className="timeline__item timeline__item--done"><span className="timeline__dot"><Icon name="check" /></span><div className="timeline__body"><div className="timeline__head"><span className="timeline__title">Deployed</span><span className="timeline__time">2h</span></div></div></li>
+          <li className="timeline__item timeline__item--current"><span className="timeline__dot"><span className="timeline__pulse" /></span><div className="timeline__body"><div className="timeline__head"><span className="timeline__title">Running tests</span><span className="timeline__time">now</span></div></div></li>
+        </ol>
+      </div>
+    ),
+  },
+  pricing: {
+    label: 'Pricing tier',
+    blurb: 'A plan card — the featured tier lifts with the brand fill and a badge.',
+    recipe: [['Card', '--k-surface + radius-lg'], ['Featured', '--k-primary border'], ['Amount', 'fs-h2'], ['CTA', 'btn--block']],
+    specimen: () => (
+      <div className="pricing" style={{ maxWidth: 200 }}>
+        <div className="pricing__tier pricing__tier--featured">
+          <span className="pricing__badge">Popular</span>
+          <div className="pricing__name">Pro</div>
+          <div className="pricing__price"><span className="pricing__amount">$29</span><span className="pricing__period">/mo</span></div>
+          <ul className="pricing__feats"><li>Everything in Free</li><li>Unlimited seats</li></ul>
+          <button type="button" className="btn btn--primary btn--block">Choose Pro</button>
+        </div>
+      </div>
+    ),
+  },
+  dl: {
+    label: 'Description list',
+    blurb: 'Key/value pairs on a two-column grid — terms muted, values in --k-fg.',
+    recipe: [['Term', '--k-fg-muted'], ['Value', '--k-fg'], ['Layout', 'grid 2-col'], ['Gap', '--k-s-*']],
+    specimen: () => (
+      <div className="card" style={{ maxWidth: 240 }}>
+        <dl className="dl">
+          <dt>Plan</dt><dd>Pro</dd>
+          <dt>Seats</dt><dd>12 of 20</dd>
+          <dt>Renews</dt><dd>July 2025</dd>
+        </dl>
+      </div>
+    ),
+  },
+  dropzone: {
+    label: 'Dropzone',
+    blurb: 'A dashed upload target — the whole tile is the file input’s label.',
+    recipe: [['Border', '--k-border dashed'], ['Radius', '--k-radius-lg'], ['Hover', '--k-primary'], ['Hint', 'fs-caption muted']],
+    specimen: () => (
+      <label className="dropzone" style={{ maxWidth: 280 }}>
+        <span className="dropzone__icon"><Icon name="upload" /></span>
+        <span className="dropzone__title">Drop files or click to browse</span>
+        <span className="dropzone__hint">Images, PDFs — up to 100 MB</span>
+        <input type="file" hidden aria-label="Upload" />
+      </label>
+    ),
+  },
+  stepper: {
+    label: 'Stepper',
+    blurb: 'Progress dots — done steps carry a check, the current one the brand fill.',
+    recipe: [['Dot', '--k-surface-sunken'], ['Done', '--k-success'], ['Current', '--k-primary'], ['Track', '--k-border']],
+    specimen: () => (
+      <div className="stepper" style={{ maxWidth: 280 }}>
+        <div className="stepper__step stepper__step--done"><span className="stepper__dot"><Icon name="check" /></span><span>Account</span></div>
+        <div className="stepper__step stepper__step--current"><span className="stepper__dot">2</span><span>Workspace</span></div>
+        <div className="stepper__step"><span className="stepper__dot">3</span><span>Invite</span></div>
+      </div>
+    ),
+  },
+  aspect: {
+    label: 'Aspect tile',
+    blurb: 'A ratio-locked media frame — fills with a thumbnail or a placeholder.',
+    recipe: [['Ratio', 'aspect-ratio 1/1'], ['Fill', '--k-grad / sunken'], ['Radius', '--k-radius-md']],
+    specimen: () => (
+      <div className="aspect aspect--1x1" style={{ maxWidth: 160 }}>
+        <div className="aspect__fill" style={{ background: 'var(--k-grad-1)', display: 'grid', placeItems: 'center', color: 'var(--k-primary-fg, #fff)' }}><Icon name="grid" size={22} /></div>
+      </div>
+    ),
+  },
+  toolbar: {
+    label: 'Toolbar',
+    blurb: 'A control-height row — inputs and buttons share one baseline.',
+    recipe: [['Height', '--k-control-h'], ['Align', 'baseline'], ['Gap', '--k-s-*'], ['Surface', 'transparent']],
+    specimen: () => (
+      <div className="toolbar" style={{ maxWidth: 280 }}>
+        <input className="in" placeholder="Message…" aria-label="Message" style={{ flex: 1 }} />
+        <button type="button" className="btn btn--ghost btn--icon" aria-label="Attach"><Icon name="plus" /></button>
+        <button type="button" className="btn btn--primary btn--icon" aria-label="Send"><Icon name="chevR" /></button>
+      </div>
+    ),
+  },
 }
 
 /** Leaf → component id. Walk UP from the clicked node; the deepest kit class
  *  that matches wins (a .btn inside a .card resolves to button, not card). */
 const CLASS_MAP: Array<[string, string]> = [
+  // Leaf atoms first — a .btn inside a .pricing tier resolves to button, not the
+  // tier (componentAt walks UP and returns the deepest match).
   ['stat-tile', 'stat'],
   ['toggle', 'switch'],
   ['tbl', 'table'],
@@ -167,6 +307,18 @@ const CLASS_MAP: Array<[string, string]> = [
   ['in', 'input'],
   ['btn', 'button'],
   ['list__item', 'list'],
+  // Block-tier containers (Fase J-8) — resolve the distinctive chrome to its real
+  // recipe before the walk-up reaches the generic .card wrapper.
+  ['chart', 'chart'],
+  ['kanban', 'kanban'],
+  ['pricing', 'pricing'],
+  ['tree', 'tree'],
+  ['timeline', 'timeline'],
+  ['dropzone', 'dropzone'],
+  ['dl', 'dl'],
+  ['stepper', 'stepper'],
+  ['aspect', 'aspect'],
+  ['toolbar', 'toolbar'],
   ['card', 'card'],
 ]
 

@@ -11,9 +11,12 @@ import { FoundationsView } from './FoundationsView'
 import type { ViewKind } from '../Stage'
 
 /* Component → gallery tier guess for the specimen's "Open in gallery" jump
- * (Fase J-1). componentAt returns a kit-class id; the stat-tile/table/card
- * patterns live in the Block tier, the rest are Atoms. */
-const COMP_TIER: Record<string, 'atom' | 'block'> = { stat: 'block', table: 'block', card: 'block' }
+ * (Fase J-1). componentAt returns a kit-class id; the block-tier patterns jump to
+ * the Blocks wall, the rest default to Atoms. */
+const COMP_TIER: Record<string, 'atom' | 'block'> = {
+  stat: 'block', table: 'block', card: 'block', chart: 'block', kanban: 'block',
+  pricing: 'block', tree: 'block', timeline: 'block', dropzone: 'block',
+}
 
 /* Manifest block kind → graph wiring (Fase J-2). The manifest uses short names
  * ('stats', 'table'); the segment graph (segments.ts) + the gallery use canonical
