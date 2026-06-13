@@ -46,7 +46,7 @@ const MARKERS = {
   // Block tier — the 18 typed blocks (showcases/blocks.tsx)
   StatTile: 'stat-tile', Chart: 'ChartFrame', List: 'list__item', Card: 'card"',
   Thread: 'msg__', Composer: 'toolbar', Input: 'className="in"', Table: 'tbl',
-  Form: 'className="lab"', Pricing: 'pricing__', Prose: 'l-center',
+  Form: 'className="lab"', Pricing: 'pricing__', Prose: 'prose__',
   DescriptionList: 'className="dl"', Chip: 'chip ', Kanban: 'kanban__',
   TreeView: 'tree__row', Timeline: 'timeline__', SettingsRow: 'list--settings',
   Switch: 'toggle', WizardStepper: 'wstepper', Stepper: 'stepper__',

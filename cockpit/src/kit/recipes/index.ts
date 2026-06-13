@@ -5157,4 +5157,46 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
 .msg--me .msg__body { color: inherit; }`,
   },
+  {
+    id: 'prose',
+    section: 'Prose',
+    css: `/* === Prose ===
+   A rich-text container — drop a stream of SEMANTIC tags (h2-h4, p, ul/ol, a)
+   inside and they take the kit's display/body type, rhythm and link colour
+   automatically. The answer for articles, marketing copy, docs and CMS body
+   fields, where you have flowing text rather than discrete components. Pair it
+   with .l-center to cap the measure for readability.
+     .prose          → styles its own headings, paragraphs, lists and links
+     .prose__kicker  → a brand eyebrow above the opening heading */
+.prose { color: var(--k-fg-muted); }
+.prose__kicker {
+  font-size: var(--k-type-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-primary);
+  margin-bottom: var(--k-s-6);
+}
+.prose h2 {
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-h2);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+  margin: 0 0 var(--k-s-12);
+}
+.prose h3 {
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-h3);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+  margin: var(--k-s-20) 0 var(--k-s-8);
+}
+.prose p {
+  font-size: var(--k-type-body);
+  line-height: 1.65;
+  margin: 0 0 var(--k-s-12);
+}
+.prose ul, .prose ol { margin: 0 0 var(--k-s-12); padding-left: var(--k-s-20); }
+.prose li { font-size: var(--k-type-body); line-height: 1.65; margin-bottom: var(--k-s-6); }
+.prose a { color: var(--k-primary); text-decoration: underline; }
+.prose > :last-child { margin-bottom: 0; }`,
+  },
 ]

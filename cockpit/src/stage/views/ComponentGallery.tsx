@@ -98,6 +98,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   // — Blocks / composed —
   FormPanelCard: 'Form panel labeled fields validation action bar',
   ThreadCard: 'Conversation chat message thread bubble comments',
+  ProseCard: 'Article prose rich text body copy changelog docs',
   FilterBarCard: 'Filter bar toolbar facets',
   InboxFilterCard: 'Inbox filter mail messages',
   PricingCardCard: 'Plans pricing tiers subscription',
@@ -185,7 +186,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [PricingCardCard, 'block'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'block'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'block'], [SheetCard, 'block'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'block'], [TrendCard, 'block'],
-    [CmdPaletteCard, 'block'], [DropdownMenuCard, 'atom'], [CarouselCard, 'block'], [ListCard, 'atom'], [ThreadCard, 'block'],
+    [CmdPaletteCard, 'block'], [DropdownMenuCard, 'atom'], [CarouselCard, 'block'], [ListCard, 'atom'], [ThreadCard, 'block'], [ProseCard, 'block'],
     [LoginCard, 'block'], [StatGroupCard, 'block'], [ContextMenuCard, 'atom'], [SignupCard, 'block'], [TimelineCard, 'block'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'block'], [NotificationCenterCard, 'block'], [NavCard, 'block'],
     [FileGridCard, 'block'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
@@ -3523,6 +3524,27 @@ function ThreadCard() {
           <p className="msg__body">Looks good. Sending the redline now.</p>
         </div>
       </div>
+    </Card>
+  )
+}
+
+/* === Prose (Fase J-8) ================================================
+ * A rich-text container — semantic headings/paragraphs/lists take the kit's
+ * type, rhythm and link colour with no per-tag styling. Articles, docs,
+ * marketing copy, CMS body fields. */
+function ProseCard() {
+  return (
+    <Card title="Article" desc="A rich-text container — drop in semantic tags.">
+      <article className="prose">
+        <div className="prose__kicker">Changelog</div>
+        <h2>What’s new in v2.4</h2>
+        <p>A tighter type scale, calmer surfaces and a faster export — everything you ship now derives from one set of tokens.</p>
+        <h3>Highlights</h3>
+        <ul>
+          <li>Block recipes for charts, kanban and timelines.</li>
+          <li>One-click <a href="#changelog">contract.json</a> export.</li>
+        </ul>
+      </article>
     </Card>
   )
 }

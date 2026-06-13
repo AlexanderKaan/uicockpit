@@ -295,6 +295,18 @@ export const COMPONENTS: Record<string, ComponentSpec> = {
       </div>
     ),
   },
+  prose: {
+    label: 'Prose',
+    blurb: 'A rich-text container — semantic tags take the kit type, rhythm and links.',
+    recipe: [['Heading', '--k-font-display'], ['Body', 'fs-body / 1.65'], ['Link', '--k-primary'], ['Measure', '--k-measure-prose']],
+    specimen: () => (
+      <article className="prose" style={{ maxWidth: 280 }}>
+        <div className="prose__kicker">Changelog</div>
+        <h2>What’s new in v2.4</h2>
+        <p>A tighter type scale and a faster export — everything derives from one set of tokens.</p>
+      </article>
+    ),
+  },
   toolbar: {
     label: 'Toolbar',
     blurb: 'A control-height row — inputs and buttons share one baseline.',
@@ -325,6 +337,7 @@ const CLASS_MAP: Array<[string, string]> = [
   ['btn', 'button'],
   ['list__item', 'list'],
   ['msg', 'message'],
+  ['prose', 'prose'],
   // Block-tier containers (Fase J-8) — resolve the distinctive chrome to its real
   // recipe before the walk-up reaches the generic .card wrapper.
   ['chart', 'chart'],

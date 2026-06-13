@@ -131,12 +131,10 @@ export function renderBlock(spec: BlockSpec, key: number) {
       )
     case 'prose':
       return (
-        <article className="l-center" key={key}>
-          {spec.seed.kicker && <div style={{ fontSize: 'var(--k-type-eyebrow)', fontWeight: 'var(--k-weight-semibold)', color: 'var(--k-primary)', marginBottom: 'var(--k-s-6)' }}>{spec.seed.kicker}</div>}
-          <h2 style={{ fontFamily: 'var(--k-font-display)', fontSize: 'var(--k-type-h2)', margin: '0 0 var(--k-s-12)' }}>{spec.seed.title}</h2>
-          {spec.seed.paragraphs.map((p, i) => (
-            <p key={i} style={{ fontSize: 'var(--k-type-body)', lineHeight: 1.65, color: 'var(--k-fg-muted)', margin: '0 0 var(--k-s-12)' }}>{p}</p>
-          ))}
+        <article className="prose l-center" key={key}>
+          {spec.seed.kicker && <div className="prose__kicker">{spec.seed.kicker}</div>}
+          <h2>{spec.seed.title}</h2>
+          {spec.seed.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
         </article>
       )
     case 'dl':

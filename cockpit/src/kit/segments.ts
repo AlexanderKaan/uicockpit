@@ -110,6 +110,8 @@ export const STANDALONE_ATOMS: readonly string[] = [
   'alert', 'banner', 'inline-status-meta-micro-components', 'attachment-chip-family',
   // a chat/comment bubble — self-contained, stacks into a .thread (Fase J-8)
   'message',
+  // a rich-text container — styles raw semantic tags; no single host (Fase J-8)
+  'prose',
   // loading & layout utilities
   'skeleton', 'spinner', 'separator', 'aspect-ratio', 'scroll-area',
   // the Shape Lab mask utility (H5) — attaches to any whitelisted identity

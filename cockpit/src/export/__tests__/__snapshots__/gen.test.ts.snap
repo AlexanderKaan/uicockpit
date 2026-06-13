@@ -426,7 +426,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "radio-card",
         "chip",
         "signature",
-        "message"
+        "message",
+        "prose"
       ],
       "block": [
         "data-table",
@@ -988,6 +989,11 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "message": {
         "tier": "atom",
         "section": "Chat message",
+        "uses": []
+      },
+      "prose": {
+        "tier": "atom",
+        "section": "Prose",
         "uses": []
       }
     },
@@ -1838,6 +1844,12 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "fill"
         ]
       },
+      "prose": {
+        "modifiers": [],
+        "parts": [
+          "kicker"
+        ]
+      },
       "pwinput": {
         "modifiers": [
           "on"
@@ -2257,6 +2269,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "message",
       "navigation-menu",
       "popover",
+      "prose",
       "scroll-area",
       "segmented-control-toggle-group",
       "separator",
@@ -3268,10 +3281,10 @@ body {
  *   the catalog:
  *     Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (51): the reusable elements with real
+ * ATOMS — the bare vocabulary (52): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape, Chat message
+ *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape, Chat message, Prose
  *
  * BLOCKS — stand-alone pieces of app (28), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -8167,6 +8180,45 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .msg--me .msg__time { color: inherit; opacity: 0.7; }
 .msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
 .msg--me .msg__body { color: inherit; }
+
+/* === Prose ===
+   A rich-text container — drop a stream of SEMANTIC tags (h2-h4, p, ul/ol, a)
+   inside and they take the kit's display/body type, rhythm and link colour
+   automatically. The answer for articles, marketing copy, docs and CMS body
+   fields, where you have flowing text rather than discrete components. Pair it
+   with .l-center to cap the measure for readability.
+     .prose          → styles its own headings, paragraphs, lists and links
+     .prose__kicker  → a brand eyebrow above the opening heading */
+.prose { color: var(--k-fg-muted); }
+.prose__kicker {
+  font-size: var(--k-type-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-primary);
+  margin-bottom: var(--k-s-6);
+}
+.prose h2 {
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-h2);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+  margin: 0 0 var(--k-s-12);
+}
+.prose h3 {
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-h3);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+  margin: var(--k-s-20) 0 var(--k-s-8);
+}
+.prose p {
+  font-size: var(--k-type-body);
+  line-height: 1.65;
+  margin: 0 0 var(--k-s-12);
+}
+.prose ul, .prose ol { margin: 0 0 var(--k-s-12); padding-left: var(--k-s-20); }
+.prose li { font-size: var(--k-type-body); line-height: 1.65; margin-bottom: var(--k-s-6); }
+.prose a { color: var(--k-primary); text-decoration: underline; }
+.prose > :last-child { margin-bottom: 0; }
 "
 `;
 
