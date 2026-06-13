@@ -7,6 +7,7 @@ import type { Config } from '../../tokens/types'
 import { setGalleryJump } from '../../state/galleryJump'
 import { COMPONENTS, componentAt } from '../../showcases/components'
 import { usesOf } from '../../kit/segments'
+import { FoundationsView } from './FoundationsView'
 import type { ViewKind } from '../Stage'
 
 /* Component → gallery tier guess for the specimen's "Open in gallery" jump
@@ -67,7 +68,7 @@ const PANE_CLASS = {
   supporting: 'pane pane--fixed pane--supporting',
 } as const
 
-function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange: (v: ViewKind) => void }) {
+function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void }) {
   const [width, setWidth] = useState(m.width)
   // The loupe (Fase J-2): a continuous zoom Page › Block › Atom. `loupe` off is a
   // clean live page (the old "Live"); turning it on reveals the breadcrumb and
@@ -77,6 +78,12 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
   const [loupe, setLoupe] = useState(false)
   const [focus, setFocus] = useState<Focus>({ level: 'page' })
   const [railOpen, setRailOpen] = useState(true)
+  // Fase J-3 — the deepest zoom. Orthogonal to `focus`: any altitude can drill
+  // past it into the All-tokens inspector (the resolved foundation scales). This
+  // is Foundations-as-deepest-zoom, demoting it from a peer tab (J6 removes the
+  // tab). Tokens derive from the live config, so the grid ripples on every change.
+  const [tokensOpen, setTokensOpen] = useState(false)
+  const tokens = useMemo(() => buildTokens(cfg), [cfg])
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
 
   const block = focus.level !== 'page' ? m.panes[focus.pane]?.blocks[focus.idx] : undefined
@@ -102,26 +109,29 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
     if (id) setFocus({ level: 'atom', pane: focus.pane, idx: focus.idx, comp: id })
   }
 
-  const enterLoupe = () => { setLoupe(true); setFocus({ level: 'page' }) }
-  const exitLoupe = () => { setLoupe(false); setFocus({ level: 'page' }) }
+  const enterLoupe = () => { setLoupe(true); setFocus({ level: 'page' }); setTokensOpen(false) }
+  const exitLoupe = () => { setLoupe(false); setFocus({ level: 'page' }); setTokensOpen(false) }
 
   // The breadcrumb spine — one crumb per visited altitude, each a button that
-  // flies back out to its level (the deepest is inert; it's where you are).
+  // flies back out to its level (the deepest is inert; it's where you are). The
+  // All-tokens inspector (J3) appends as the deepest rung whenever it's open.
   const crumbs: Array<{ label: string; go: () => void; on: boolean }> = [
-    { label: `Page · ${m.title}`, go: () => setFocus({ level: 'page' }), on: focus.level === 'page' },
+    { label: `Page · ${m.title}`, go: () => { setTokensOpen(false); setFocus({ level: 'page' }) }, on: !tokensOpen && focus.level === 'page' },
   ]
   if (bInfo && focus.level !== 'page') {
     const { pane, idx } = focus
-    crumbs.push({ label: `Block · ${bInfo.label}`, go: () => setFocus({ level: 'block', pane, idx }), on: focus.level === 'block' })
+    crumbs.push({ label: `Block · ${bInfo.label}`, go: () => { setTokensOpen(false); setFocus({ level: 'block', pane, idx }) }, on: !tokensOpen && focus.level === 'block' })
   }
-  if (comp) crumbs.push({ label: `Atom · ${comp.label}`, go: () => {}, on: true })
+  if (comp) crumbs.push({ label: `Atom · ${comp.label}`, go: () => setTokensOpen(false), on: !tokensOpen && focus.level === 'atom' })
+  if (tokensOpen) crumbs.push({ label: 'All tokens', go: () => {}, on: true })
 
   const hint =
-    focus.level === 'page' ? 'Click any block to zoom in'
-      : focus.level === 'block' ? 'Click any element inside to drill to its atom'
-        : 'Deepest level — the recipe is on the right'
+    tokensOpen ? 'Every resolved token — the foundation behind the kit'
+      : focus.level === 'page' ? 'Click any block to zoom in'
+        : focus.level === 'block' ? 'Click any element inside to drill to its atom'
+          : 'Deepest atom level — open All tokens to see the foundation'
 
-  const stageKey = `${focus.level}-${focus.level !== 'page' ? `${focus.pane}.${focus.idx}` : ''}-${focus.level === 'atom' ? focus.comp : ''}`
+  const stageKey = `${tokensOpen ? 'tokens' : focus.level}-${focus.level !== 'page' ? `${focus.pane}.${focus.idx}` : ''}-${focus.level === 'atom' ? focus.comp : ''}`
   const blockCount = m.panes.reduce((n, p) => n + p.blocks.length, 0)
 
   // Export-as-starter: the manifest IS the starter — download it as JSON.
@@ -138,7 +148,7 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
   return (
     <>
       <div className="lyt__controls">
-        {(!loupe || focus.level === 'page') && (
+        {(!loupe || (focus.level === 'page' && !tokensOpen)) && (
           <label className="lyt__scrub">
             <span className="lyt__scrub-label">Shell width</span>
             <input
@@ -161,9 +171,14 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
           </label>
         )}
         <span className="shc__picker-spacer" />
-        {loupe && (
+        {loupe && !tokensOpen && (
           <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={railOpen} onClick={() => setRailOpen((o) => !o)}>
             {railOpen ? 'Hide recipe' : 'Show recipe'}
+          </button>
+        )}
+        {loupe && (
+          <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={tokensOpen} onClick={() => setTokensOpen((o) => !o)}>
+            <Icon name="grid" />All tokens
           </button>
         )}
         <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={loupe} onClick={() => (loupe ? exitLoupe() : enterLoupe())}>
@@ -198,29 +213,38 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
         </>
       )}
 
-      <div className={`lyt__stage shc__loupebody ${loupe && railOpen ? 'shc__loupebody--rail' : ''}`}>
+      <div className={`lyt__stage shc__loupebody ${loupe && railOpen && !tokensOpen ? 'shc__loupebody--rail' : ''}`}>
         <div className="shc__loupestage" key={stageKey}>
-          {(!loupe || focus.level === 'page') && (
-            <div className={loupe ? 'shc__pickpage' : undefined} onClick={loupe ? pickBlock : undefined}>
-              <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} />
-            </div>
-          )}
-          {loupe && focus.level === 'block' && block && (
-            <div className="shc__focusblock" onClick={pickAtom}>
-              {renderBlock(block, focus.idx)}
-            </div>
-          )}
-          {loupe && focus.level === 'atom' && comp && (
-            <div className="shc__atomstage">{comp.specimen()}</div>
+          {tokensOpen ? (
+            <FoundationsView cfg={cfg} tokens={tokens} />
+          ) : (
+            <>
+              {(!loupe || focus.level === 'page') && (
+                <div className={loupe ? 'shc__pickpage' : undefined} onClick={loupe ? pickBlock : undefined}>
+                  <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} />
+                </div>
+              )}
+              {loupe && focus.level === 'block' && block && (
+                <div className="shc__focusblock" onClick={pickAtom}>
+                  {renderBlock(block, focus.idx)}
+                </div>
+              )}
+              {loupe && focus.level === 'atom' && comp && (
+                <div className="shc__atomstage">{comp.specimen()}</div>
+              )}
+            </>
           )}
         </div>
 
-        {loupe && railOpen && (
+        {loupe && railOpen && !tokensOpen && (
           <aside className="shc__loupe-rail" aria-label="Loupe inspector">
             {focus.level === 'page' && (
               <>
                 <div className="shc__loupe-head">The page</div>
                 <p className="shc__loupe-blurb">A showcase is data: {blockCount} blocks of seeded content across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any block to zoom in.</p>
+                <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>
+                  All tokens <Icon name="chevR" />
+                </button>
               </>
             )}
             {focus.level === 'block' && bInfo && (
@@ -246,13 +270,22 @@ function ShowcaseStage({ m, onViewChange }: { m: ShowcaseManifest; onViewChange:
                   <div className="shc__recipe-row" key={k}><span className="shc__recipe-k">{k}</span><code className="shc__recipe-v">{v}</code></div>
                 ))}
                 <div className="shc__recipe-blurb">{comp.blurb}</div>
-                <button
-                  type="button"
-                  className="btn btn--outline btn--xs"
-                  onClick={() => { setGalleryJump(comp.label.toLowerCase(), COMP_TIER[focus.comp] ?? 'atom'); onViewChange('components') }}
-                >
-                  Open in gallery <Icon name="chevR" />
-                </button>
+                <div className="shc__loupe-actions">
+                  <button
+                    type="button"
+                    className="btn btn--outline btn--xs"
+                    onClick={() => setTokensOpen(true)}
+                  >
+                    All tokens <Icon name="chevR" />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--xs"
+                    onClick={() => { setGalleryJump(comp.label.toLowerCase(), COMP_TIER[focus.comp] ?? 'atom'); onViewChange('components') }}
+                  >
+                    Open in gallery
+                  </button>
+                </div>
               </>
             )}
           </aside>
@@ -458,7 +491,7 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
         </>
       ) : (
         /* key = remount per showcase so width resets to the manifest default */
-        <ShowcaseStage m={m} key={m.id} onViewChange={onViewChange} />
+        <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} />
       )}
     </div>
   )

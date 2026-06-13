@@ -1230,6 +1230,13 @@
   padding: var(--k-s-2) var(--k-s-8);
   border-radius: 999px;
 }
+/* The atom rail's two exits — deepest zoom (All tokens) + sideways (gallery). */
+.shc__loupe-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--k-s-6);
+  margin-top: var(--k-s-10);
+}
 /* The Recipe rows (reused from the I-A specimen) — how the atom derives. */
 .shc__recipe-title {
   font-size: var(--k-type-caption);
