@@ -1263,8 +1263,9 @@
   line-height: 1.5;
 }
 /* The Live · Inspect · Matrix segctrl — icon + label per segment. */
-.shc__viewmode .segctrl__btn { display: inline-flex; align-items: center; gap: var(--k-s-6); }
-.shc__viewmode .segctrl__btn svg { width: 14px; height: 14px; }
+/* Compare-kits action button (J4) — sits where the Page·Matrix segctrl was. */
+.shc__viewmode-btn { flex: none; }
+.shc__viewmode-btn svg { width: 14px; height: 14px; }
 .shc__matrix {
   display: flex;
   flex-wrap: wrap;

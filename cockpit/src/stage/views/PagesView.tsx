@@ -410,9 +410,10 @@ function MatrixCell({ m, cfg, label, scale = 0.42 }: { m: ShowcaseManifest; cfg:
 
 export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
   const [showcaseId, setShowcaseId] = useState(SHOWCASES[0]!.id)
-  // Fase J-1: Live/Inspect/Split collapsed into ONE loupe (ShowcaseStage, with
-  // its own collapsible rail). The only peer view left is Matrix — a single
-  // toggle, not a 4-button mode strip (J4 will pull it out into a Compare action).
+  // Fase J-1/J4: Live/Inspect/Split collapsed into ONE loupe (ShowcaseStage). The
+  // last peer view-mode, Matrix, is no longer a mode at all — it's a "Compare kits"
+  // ACTION (a button, not a segctrl). The page IS the default; comparison is a
+  // place you go and come back from, so the picker stops being a mode switch.
   const [matrix, setMatrix] = useState(false)
   // ×6: the FULL grid — every showcase × every style (the 3×6 money-shot).
   const [matrixAll, setMatrixAll] = useState(false)
@@ -445,16 +446,17 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
           </button>
         ))}
         <span className="shc__picker-spacer" />
-        {/* Two ways to view one manifest: the live Page (the loupe) or the Matrix
-         * comparison. J4 → Matrix becomes a "Compare kits" action. */}
-        <div className="segctrl shc__viewmode" role="radiogroup" aria-label="View">
-          <button type="button" role="radio" aria-checked={!matrix} className={`segctrl__btn ${!matrix ? 'segctrl__btn--on' : ''}`} onClick={() => setMatrix(false)}>
-            <Icon name="card" />Page
+        {/* Compare kits (J4) — not a peer view-mode but an ACTION: the loupe is the
+         * default; "Compare kits" takes you to the matrix and "Back to page" returns. */}
+        {matrix ? (
+          <button type="button" className="btn btn--ghost btn--sm shc__viewmode-btn" onClick={() => setMatrix(false)}>
+            <Icon name="chevL" />Back to page
           </button>
-          <button type="button" role="radio" aria-checked={matrix} className={`segctrl__btn ${matrix ? 'segctrl__btn--on' : ''}`} onClick={() => setMatrix(true)}>
-            <Icon name="grid" />Matrix
+        ) : (
+          <button type="button" className="btn btn--outline btn--sm shc__viewmode-btn" onClick={() => setMatrix(true)}>
+            <Icon name="grid" />Compare kits
           </button>
-        </div>
+        )}
       </div>
 
       {matrix ? (
