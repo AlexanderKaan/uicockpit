@@ -178,8 +178,13 @@ export const RECIPES: readonly Recipe[] = [
  * The recipe references three tokens — they're computed in buildTokens
  * based on the user's finish choice. Spring + hover-lift are constant
  * across all three so every finish feels "alive". */
+/* The LOUD tier — the AIMED ACCENT (CP2 / confident-pro gap #4). Only the
+ * primary and the destructive primary carry a brand fill AND a resting lift +
+ * shadow. That elevation is the "one aimed accent per surface" rule made
+ * structural: in any button row, exactly one control rises off the surface and
+ * wears colour, so the eye lands on THE action without being told. Everything
+ * quieter (secondary/ghost/outline/link) stays flat. */
 .btn--primary,
-.btn--secondary,
 .btn--danger {
   box-shadow: var(--k-btn-shadow, var(--k-shadow-sm));
   transition:
@@ -188,22 +193,33 @@ export const RECIPES: readonly Recipe[] = [
     box-shadow var(--k-dur-fast, 140ms) var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
 }
 .btn--primary:hover:not(:disabled),
-.btn--secondary:hover:not(:disabled),
 .btn--danger:hover:not(:disabled) {
   transform: translateY(var(--k-btn-lift, -1px));
 }
-/* Filled buttons add a Material state-layer (brief darken) on top of the
- * unified scale-press — reads as a real "pressed" surface in light & dark. */
+/* The aimed-accent press — a Material state-layer darken on top of the unified
+ * scale-press, and the resting lift collapses (shadow → press) so the button
+ * physically depresses on the spring curve. The feedback you FEEL (gap #3). */
 .btn--primary:active:not(:disabled),
-.btn--secondary:active:not(:disabled),
 .btn--danger:active:not(:disabled) {
   filter: brightness(0.94);
   box-shadow: var(--k-btn-shadow-press, none);
 }
 .btn--primary { background: var(--k-btn-bg, var(--k-primary)); color: var(--k-btn-fg, var(--k-primary-fg)); }
 .btn--primary:hover { background: var(--k-primary-hover); }
-.btn--secondary { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); }
-.btn--secondary:hover { filter: brightness(1.02); }
+/* The QUIET NEUTRAL tier — secondary is a FLAT GREY button (shadcn's neutral
+ * secondary), not a brand fill. No resting shadow, no lift: it sits beside the
+ * primary without competing for the eye. Hover deepens toward --k-fg (mode-
+ * correct: darkens on light, lightens on dark). This is the change that turns
+ * "brand sprinkled across buttons" into "one aimed accent". */
+.btn--secondary {
+  background: var(--k-neutral);
+  color: var(--k-neutral-fg);
+  transition:
+    background var(--k-dur-fast, 140ms) var(--k-ease, ease),
+    transform var(--k-dur-fast, 120ms) var(--k-ease, ease);
+}
+.btn--secondary:hover:not(:disabled) { background: color-mix(in srgb, var(--k-neutral), var(--k-fg) 7%); }
+.btn--secondary:active:not(:disabled) { filter: brightness(0.97); }
 /* Ghost = the quietest control (toolbar filter, dropdown trigger, secondary icon
    action), NOT a primary button — so it follows the box/field radius, not the
    button-radius. Keeps "Button radius" scoped to actual filled buttons. For a

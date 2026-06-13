@@ -163,6 +163,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-measure-prose": "68ch",
     "--k-measure-wide": "90ch",
     "--k-menu-stagger": "20ms",
+    "--k-neutral": "oklch(95.8% 0.0070 249.9)",
+    "--k-neutral-fg": "oklch(16.0% 0.0140 249.9)",
     "--k-pad": "1.75rem",
     "--k-press-opacity": "1",
     "--k-press-radius": "var(--btn-r, var(--k-radius-button))",
@@ -333,6 +335,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-input-warning-border": "#e4e444",
     "--k-inverse-fg": "oklch(16.0% 0.0140 249.9)",
     "--k-inverse-surface": "oklch(95.8% 0.0070 249.9)",
+    "--k-neutral": "oklch(31.7% 0.0077 249.9)",
+    "--k-neutral-fg": "oklch(94.5% 0.0140 249.9)",
     "--k-primary-hover": "oklch(61.4% 0.1638 253.9)",
     "--k-primary-soft": "oklch(25.4% 0.0372 253.9)",
     "--k-primary-soft-fg": "oklch(84.6% 0.0669 248.6)",
@@ -2572,6 +2576,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-secondary-fg: #ffffff;
   --k-secondary-soft: #dee3f2;
   --k-secondary-soft-fg: #16160c;
+  --k-neutral: oklch(95.8% 0.0070 249.9);
+  --k-neutral-fg: oklch(16.0% 0.0140 249.9);
   --k-success: oklch(72.5% 0.1371 165.8);
   --k-success-fg: #16160c;
   --k-success-soft: oklch(95.8% 0.0079 177.3);
@@ -2858,6 +2864,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-secondary-fg: #ffffff;
   --k-secondary-soft: #263050;
   --k-secondary-soft-fg: #ffffff;
+  --k-neutral: oklch(31.7% 0.0077 249.9);
+  --k-neutral-fg: oklch(94.5% 0.0140 249.9);
   --k-success: oklch(76.9% 0.1174 168.2);
   --k-success-fg: #16160c;
   --k-success-soft: oklch(34.7% 0.0359 170.3);
@@ -3465,8 +3473,13 @@ body {
  * The recipe references three tokens — they're computed in buildTokens
  * based on the user's finish choice. Spring + hover-lift are constant
  * across all three so every finish feels "alive". */
+/* The LOUD tier — the AIMED ACCENT (CP2 / confident-pro gap #4). Only the
+ * primary and the destructive primary carry a brand fill AND a resting lift +
+ * shadow. That elevation is the "one aimed accent per surface" rule made
+ * structural: in any button row, exactly one control rises off the surface and
+ * wears colour, so the eye lands on THE action without being told. Everything
+ * quieter (secondary/ghost/outline/link) stays flat. */
 .btn--primary,
-.btn--secondary,
 .btn--danger {
   box-shadow: var(--k-btn-shadow, var(--k-shadow-sm));
   transition:
@@ -3475,22 +3488,33 @@ body {
     box-shadow var(--k-dur-fast, 140ms) var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
 }
 .btn--primary:hover:not(:disabled),
-.btn--secondary:hover:not(:disabled),
 .btn--danger:hover:not(:disabled) {
   transform: translateY(var(--k-btn-lift, -1px));
 }
-/* Filled buttons add a Material state-layer (brief darken) on top of the
- * unified scale-press — reads as a real "pressed" surface in light & dark. */
+/* The aimed-accent press — a Material state-layer darken on top of the unified
+ * scale-press, and the resting lift collapses (shadow → press) so the button
+ * physically depresses on the spring curve. The feedback you FEEL (gap #3). */
 .btn--primary:active:not(:disabled),
-.btn--secondary:active:not(:disabled),
 .btn--danger:active:not(:disabled) {
   filter: brightness(0.94);
   box-shadow: var(--k-btn-shadow-press, none);
 }
 .btn--primary { background: var(--k-btn-bg, var(--k-primary)); color: var(--k-btn-fg, var(--k-primary-fg)); }
 .btn--primary:hover { background: var(--k-primary-hover); }
-.btn--secondary { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); }
-.btn--secondary:hover { filter: brightness(1.02); }
+/* The QUIET NEUTRAL tier — secondary is a FLAT GREY button (shadcn's neutral
+ * secondary), not a brand fill. No resting shadow, no lift: it sits beside the
+ * primary without competing for the eye. Hover deepens toward --k-fg (mode-
+ * correct: darkens on light, lightens on dark). This is the change that turns
+ * "brand sprinkled across buttons" into "one aimed accent". */
+.btn--secondary {
+  background: var(--k-neutral);
+  color: var(--k-neutral-fg);
+  transition:
+    background var(--k-dur-fast, 140ms) var(--k-ease, ease),
+    transform var(--k-dur-fast, 120ms) var(--k-ease, ease);
+}
+.btn--secondary:hover:not(:disabled) { background: color-mix(in srgb, var(--k-neutral), var(--k-fg) 7%); }
+.btn--secondary:active:not(:disabled) { filter: brightness(0.97); }
 /* Ghost = the quietest control (toolbar filter, dropdown trigger, secondary icon
    action), NOT a primary button — so it follows the box/field radius, not the
    button-radius. Keeps "Button radius" scoped to actual filled buttons. For a
@@ -8948,6 +8972,8 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-secondary": "oklch(68.3% 0.0000 89.9)",
     "--k-secondary-soft": "#303036",
     "--k-secondary-soft-fg": "#ffffff",
+    "--k-neutral": "oklch(31.7% 0.0000 0.0)",
+    "--k-neutral-fg": "oklch(94.5% 0.0000 0.0)",
     "--k-success": "oklch(76.3% 0.1398 155.5)",
     "--k-success-soft": "oklch(34.5% 0.0416 158.0)",
     "--k-success-soft-fg": "#ffffff",

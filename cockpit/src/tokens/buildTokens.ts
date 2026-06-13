@@ -861,6 +861,15 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-secondary-fg': secFg,
       '--k-secondary-soft': secSoftHex,
       '--k-secondary-soft-fg': secSoftFg,
+      // CP2 — the NEUTRAL button fill (confident-pro "one aimed accent" rule,
+      // gap #4). The quiet action beside a primary is a flat grey button, NOT a
+      // brand fill — so the brand colour is reserved for THE single primary CTA
+      // per surface (shadcn's neutral `secondary`). Light: a subtle grey above the
+      // pure-white card (step 2); dark: a raised grey above the card (step 4). The
+      // ink is full-contrast --k-fg. Hover moves toward --k-fg in BOTH modes (mix
+      // is mode-correct: darkens on light, lightens on dark = always "more present").
+      '--k-neutral': dark ? nStep(4) : nStep(2),
+      '--k-neutral-fg': fg.main,
       ...sysVars,
       '--k-border': border,
       '--k-input-border': inputBorder,
