@@ -34,6 +34,9 @@ const CARD_KEYWORDS: Record<string, string> = {
   TagInputCard: 'Topics tags chips tokens',
   ChipsCard: 'Chips assist filter input suggestion facet token chip',
   DateCard: 'Schedule date picker calendar range',
+  CalendarWeekCard: 'Calendar week day view schedule time grid agenda events',
+  CalendarYearCard: 'Calendar year view twelve months overview jump',
+  CalendarRangeCard: 'Calendar range double two months date range booking',
   SlotPickerCard: 'Slot picker time booking availability',
   // — Choice & toggles —
   SwitchCard: 'Notification settings switch toggle on off',
@@ -184,6 +187,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'section'], [ActionPanelCard, 'section'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
+    [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'section'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'section'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -2628,6 +2632,165 @@ function DateCard() {
             </div>
           </div>
         )}
+      </div>
+    </Card>
+  )
+}
+
+// === Calendar variants (Tailwind App-UI: week/day · year · range) ===
+
+function CalendarWeekCard() {
+  // Week & day scheduler on the .calendar-week time-grid. The segctrl flips the
+  // --day modifier (week → single column), demonstrating both views from one
+  // recipe. Events position declaratively via --from (start hour) + --span.
+  const [view, setView] = useState<'week' | 'day'>('week')
+  const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+  const fmtHour = (h: number) => (h === 12 ? '12 PM' : h > 12 ? `${h - 12} PM` : `${h} AM`)
+  const DAYS = [
+    { name: 'Mon', num: 9 }, { name: 'Tue', num: 10 }, { name: 'Wed', num: 11, today: true },
+    { name: 'Thu', num: 12 }, { name: 'Fri', num: 13 }, { name: 'Sat', num: 14 }, { name: 'Sun', num: 15 },
+  ]
+  // events keyed by day index; from = hours after 8 AM, span = hours
+  const EVENTS: Record<number, Array<{ from: number; span: number; title: string; time: string; v?: string }>> = {
+    0: [{ from: 1, span: 1.5, title: 'Standup', time: '9:00', v: '' }],
+    2: [
+      { from: 0.5, span: 1.5, title: 'Design sync', time: '8:30', v: ' calendar-week__event--alt' },
+      { from: 5, span: 2, title: 'Roadmap review', time: '1:00', v: '' },
+    ],
+    3: [{ from: 2, span: 1, title: '1:1 · Priya', time: '10:00', v: ' calendar-week__event--accent' }],
+    4: [{ from: 3.5, span: 2, title: 'Ship review', time: '11:30', v: '' }],
+  }
+  const cols = view === 'day' ? [DAYS[2]!] : DAYS
+  const colIndex = (i: number) => (view === 'day' ? 2 : i)
+  return (
+    <Card title="Schedule" desc="Week & day views — a time-grid with placed events.">
+      <div className="segctrl" role="radiogroup" aria-label="Calendar view" style={{ alignSelf: 'flex-start', marginBottom: 'var(--k-s-10)' }}>
+        {(['week', 'day'] as const).map((v) => (
+          <button key={v} type="button" role="radio" aria-checked={view === v} className={`segctrl__btn ${view === v ? 'segctrl__btn--on' : ''}`} onClick={() => setView(v)} style={{ textTransform: 'capitalize' }}>{v}</button>
+        ))}
+      </div>
+      <div className={`calendar-week ${view === 'day' ? 'calendar-week--day' : ''}`}>
+        <div className="calendar-week__head">
+          <div className="calendar-week__corner" />
+          {cols.map((d, i) => (
+            <div key={i} className={`calendar-week__col-head ${d.today ? 'calendar-week__col-head--today' : ''}`}>
+              <span className="calendar-week__dayname">{d.name}</span>
+              <span className="calendar-week__daynum">{d.num}</span>
+            </div>
+          ))}
+        </div>
+        <div className="calendar-week__body">
+          <div className="calendar-week__rail">
+            {HOURS.map((h) => (
+              <div key={h} className="calendar-week__hour"><span>{fmtHour(h)}</span></div>
+            ))}
+          </div>
+          {cols.map((_, i) => (
+            <div key={i} className="calendar-week__col">
+              {(EVENTS[colIndex(i)] ?? []).map((ev, j) => (
+                <button
+                  key={j}
+                  type="button"
+                  className={`calendar-week__event${ev.v ?? ''}`}
+                  style={{ ['--from' as string]: ev.from, ['--span' as string]: ev.span } as CSSProperties}
+                >
+                  <span className="calendar-week__event-title">{ev.title}</span>
+                  <span className="calendar-week__event-time">{ev.time}</span>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+// Days-of-month → a 35-cell grid (leading blanks via offset). Display-only cells
+// for the year overview (no interaction at this zoom).
+function miniMonthDays(offset: number) {
+  return Array.from({ length: 35 }, (_, i) => i - offset + 1)
+}
+const DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+
+function CalendarYearCard() {
+  // Year-at-a-glance: 12 compact .calendar grids via .calendar-year. June is the
+  // current month (lifted ring); today = the 15th.
+  const MONTHS = [
+    { n: 'Jan', dim: 31 }, { n: 'Feb', dim: 28 }, { n: 'Mar', dim: 31 }, { n: 'Apr', dim: 30 },
+    { n: 'May', dim: 31 }, { n: 'Jun', dim: 30 }, { n: 'Jul', dim: 31 }, { n: 'Aug', dim: 31 },
+    { n: 'Sep', dim: 30 }, { n: 'Oct', dim: 31 }, { n: 'Nov', dim: 30 }, { n: 'Dec', dim: 31 },
+  ]
+  return (
+    <Card title="2026" desc="Year view — twelve months at a glance.">
+      <div className="calendar-year">
+        {MONTHS.map((m, mi) => {
+          const now = m.n === 'Jun'
+          const days = miniMonthDays((mi * 2 + 3) % 7)
+          return (
+            <div key={m.n} className={`calendar-year__month ${now ? 'calendar-year__month--now' : ''}`}>
+              <span className="calendar-year__title">{m.n}</span>
+              <div className="calendar">
+                {DOW.map((d, i) => <span key={i} className="calendar__head">{d}</span>)}
+                {days.map((d, i) => {
+                  const out = d < 1 || d > m.dim
+                  const isToday = now && d === 15
+                  return (
+                    <span key={i} className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${isToday ? 'calendar__cell--on' : ''}`} aria-hidden={out}>
+                      {out ? '' : d}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </Card>
+  )
+}
+
+function CalendarRangeCard() {
+  // Double-month range picker on .calendar-range. A selection spans June 22 →
+  // July 3; the range fill reads as one band across both grids.
+  const rangeCell = (d: number, dim: number, side: 'start' | 'end', bound: number): string => {
+    const parts = ['calendar__cell']
+    if (d < 1 || d > dim) { parts.push('calendar__cell--out'); return parts.join(' ') }
+    if (side === 'start') {
+      if (d === bound) parts.push('calendar__cell--range-start')
+      else if (d > bound) parts.push('calendar__cell--range')
+    } else {
+      if (d === bound) parts.push('calendar__cell--range-end')
+      else if (d < bound) parts.push('calendar__cell--range')
+    }
+    return parts.join(' ')
+  }
+  const Month = ({ title, dim, offset, side, bound, nav }: { title: string; dim: number; offset: number; side: 'start' | 'end'; bound: number; nav: 'prev' | 'next' }) => (
+    <div className="calendar-range__month">
+      <div className="calendar__nav">
+        {nav === 'prev'
+          ? <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Previous month"><Icon name="chevL" /></button>
+          : <span style={{ width: 'var(--k-btn-h-sm, 1.75rem)' }} />}
+        <span className="calendar__nav-title">{title}</span>
+        {nav === 'next'
+          ? <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Next month"><Icon name="chevR" /></button>
+          : <span style={{ width: 'var(--k-btn-h-sm, 1.75rem)' }} />}
+      </div>
+      <div className="calendar">
+        {DOW.map((d, i) => <span key={i} className="calendar__head">{d}</span>)}
+        {miniMonthDays(offset).map((d, i) => (
+          <button key={i} type="button" className={rangeCell(d, dim, side, bound)} disabled={d < 1 || d > dim} aria-label={d >= 1 && d <= dim ? `${title.split(' ')[0]} ${d}` : undefined}>
+            {d >= 1 && d <= dim ? d : ''}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+  return (
+    <Card title="Reporting period" desc="Range picker — two months, one continuous selection.">
+      <div className="calendar-range">
+        <Month title="June 2026" dim={30} offset={0} side="start" bound={22} nav="prev" />
+        <Month title="July 2026" dim={31} offset={2} side="end" bound={3} nav="next" />
       </div>
     </Card>
   )

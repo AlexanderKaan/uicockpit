@@ -62,6 +62,12 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   auth: ['form-primitives', 'passwordinput', 'buttons', 'card'],
   'file-grid': ['card', 'badges-pills'],
   calendar: ['buttons'],
+  // Calendar variant family (Tailwind App-UI calendars): the week/day time-grid,
+  // the year-at-a-glance, and the double-month range picker. Each composes the
+  // month-grid atom + nav buttons; the time-grid adds its own event blocks.
+  'calendar-week': ['calendar', 'buttons'],
+  'calendar-year': ['calendar'],
+  'calendar-range': ['calendar', 'buttons'],
   pricing: ['card', 'buttons', 'badges-pills'],
   'stat-tile': ['card', 'sparkline', 'badges-pills'],
   chart: ['card'],

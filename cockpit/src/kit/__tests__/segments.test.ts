@@ -59,9 +59,10 @@ describe('segment graph integrity', () => {
     // 3 shell sections (scaffold/navsuite/pane) + 4 page-region sections
     // (page-head/section/entity-card/action-panel) + 14 promoted full-page-part
     // sections (data-table/form-panel/filter-bar/stat-tile/timeline/activity-feed/
-    // empty-state/pricing/file-grid/calendar/auth/danger-zone/chart/sidebar) —
+    // empty-state/pricing/file-grid/calendar/auth/danger-zone/chart/sidebar) + 3
+    // calendar-variant sections (calendar-week/calendar-year/calendar-range) —
     // Tailwind-style "a section is a full part of a page" tier.
-    expect(idsByTier('section')).toHaveLength(21)
+    expect(idsByTier('section')).toHaveLength(24)
   })
 
   it('every standalone-blessed id is a real ATOM (not a component/foundation)', () => {

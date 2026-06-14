@@ -473,6 +473,9 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "danger-zone",
         "auth",
         "calendar",
+        "calendar-week",
+        "calendar-year",
+        "calendar-range",
         "chart",
         "stat-tile",
         "timeline",
@@ -692,6 +695,29 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "tier": "section",
         "section": "Calendar",
         "uses": [
+          "buttons"
+        ]
+      },
+      "calendar-week": {
+        "tier": "section",
+        "section": "Calendar week",
+        "uses": [
+          "calendar",
+          "buttons"
+        ]
+      },
+      "calendar-year": {
+        "tier": "section",
+        "section": "Calendar year",
+        "uses": [
+          "calendar"
+        ]
+      },
+      "calendar-range": {
+        "tier": "section",
+        "section": "Calendar range",
+        "uses": [
+          "calendar",
           "buttons"
         ]
       },
@@ -1269,6 +1295,43 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "nav",
           "nav-btns",
           "nav-title"
+        ]
+      },
+      "calendar-range": {
+        "modifiers": [],
+        "parts": [
+          "month"
+        ]
+      },
+      "calendar-week": {
+        "modifiers": [
+          "accent",
+          "alt",
+          "day",
+          "today"
+        ],
+        "parts": [
+          "body",
+          "col",
+          "col-head",
+          "corner",
+          "dayname",
+          "daynum",
+          "event",
+          "event-time",
+          "event-title",
+          "head",
+          "hour",
+          "rail"
+        ]
+      },
+      "calendar-year": {
+        "modifiers": [
+          "now"
+        ],
+        "parts": [
+          "month",
+          "title"
         ]
       },
       "card": {
@@ -3474,11 +3537,11 @@ body {
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
  *     Lightbox, Dialog, Command palette, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Carousel, InfoCard, CodeBlock, WizardStepper
  *
- * SECTIONS — the page-region tier (21): adaptive app frames that ARRANGE
+ * SECTIONS — the page-region tier (24): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
  *   arrangement, never look; components slot into panes; panes assemble into PAGES
  *   (your screens).
- *     Page header, Section, Entity card, Action panel, Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Calendar, Chart, Stat tile, Timeline, Pricing, File grid, Form panel, Filter bar, Adaptive scaffold, Nav suite, Pane
+ *     Page header, Section, Entity card, Action panel, Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Calendar, Calendar week, Calendar year, Calendar range, Chart, Stat tile, Timeline, Pricing, File grid, Form panel, Filter bar, Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
 
 /* === Toolbar ===
@@ -5463,6 +5526,109 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .timefield__sep { font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); }
 .timefield .segctrl { margin-left: var(--k-s-4); }
+
+/* === Calendar - week & day views (time-grid) - SECTION tier ============
+ * A day/week scheduler: a day-header row over a scrollable hour grid, events as
+ * tonal blocks placed across the hours. .calendar-week shows 7 day columns;
+ * .calendar-week--day collapses to one. Events position declaratively - the
+ * consumer sets --from (start hour, 0-based from the grid's first hour) and
+ * --span (duration in hours) as inline custom props; no pixel math. The hour
+ * height is one token (--k-cal-hour) so the whole grid rescales with density.
+ * Anatomy: .calendar-week > .calendar-week__head (.calendar-week__corner +
+ *   .calendar-week__col-head x cols) + .calendar-week__body
+ *   (.calendar-week__rail > .calendar-week__hour x H, then
+ *    .calendar-week__col x cols each holding .calendar-week__event blocks). */
+.calendar-week {
+  --cal-cols: 7;
+  --cal-tpl: var(--k-cal-rail, 3.25rem) repeat(var(--cal-cols), minmax(0, 1fr));
+  background: var(--k-surface);
+  border: 1px solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  overflow: hidden;
+  font-size: var(--k-type-caption);
+}
+.calendar-week--day { --cal-cols: 1; }
+/* header - day name + date chip per column, aligned to the body via the shared
+   column template (the rail-width corner keeps both grids in register). */
+.calendar-week__head { display: grid; grid-template-columns: var(--cal-tpl); border-bottom: var(--k-divider); }
+.calendar-week__corner { border-right: var(--k-divider); }
+.calendar-week__col-head {
+  display: flex; flex-direction: column; align-items: center; gap: var(--k-s-2);
+  padding: var(--k-s-8) var(--k-s-4);
+  border-left: var(--k-divider);
+}
+.calendar-week__dayname { color: var(--k-fg-muted); font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
+.calendar-week__daynum {
+  display: grid; place-items: center;
+  width: 1.75rem; height: 1.75rem; border-radius: var(--k-radius-pill);
+  font-weight: var(--k-weight-medium); color: var(--k-fg); font-variant-numeric: tabular-nums;
+}
+.calendar-week__col-head--today .calendar-week__daynum { background: var(--k-primary); color: var(--k-primary-fg); font-weight: var(--k-weight-semibold); }
+/* body - the scrollable time grid: an hour rail in column 1, then the day
+   columns. Hour lines are drawn by a repeating gradient on the column itself, so
+   no per-cell markup is needed; the rail labels sit at each gridline. */
+.calendar-week__body { display: grid; grid-template-columns: var(--cal-tpl); max-height: 22rem; overflow-y: auto; }
+.calendar-week__rail { display: flex; flex-direction: column; border-right: var(--k-divider); }
+.calendar-week__hour {
+  height: var(--k-cal-hour, 3rem);
+  text-align: right; padding-right: var(--k-s-6);
+  color: var(--k-fg-faint); font-variant-numeric: tabular-nums;
+}
+.calendar-week__hour > span { display: block; transform: translateY(-0.5em); }
+.calendar-week__col {
+  position: relative;
+  border-left: var(--k-divider);
+  background: repeating-linear-gradient(to bottom, var(--k-border) 0, var(--k-border) 1px, transparent 1px, transparent var(--k-cal-hour, 3rem));
+}
+/* an event - placed by --from (start hour) + --span (hours). Soft tonal fill +
+   a leading accent edge = the standard scheduler event. Colour-code by calendar
+   with --alt / --accent. */
+.calendar-week__event {
+  position: absolute; left: var(--k-s-2); right: var(--k-s-2);
+  top: calc(var(--from, 0) * var(--k-cal-hour, 3rem));
+  height: calc(var(--span, 1) * var(--k-cal-hour, 3rem) - var(--k-s-4));
+  margin-top: var(--k-s-2);
+  border-radius: var(--k-radius-sm);
+  background: var(--k-primary-soft); color: var(--k-primary-soft-fg);
+  border-left: 2px solid var(--k-primary);
+  padding: var(--k-s-4) var(--k-s-6);
+  overflow: hidden; display: flex; flex-direction: column; gap: var(--k-s-2);
+  text-align: left; cursor: pointer;
+}
+.calendar-week__event-title { font-weight: var(--k-weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.calendar-week__event-time { opacity: 0.8; }
+.calendar-week__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
+.calendar-week__event--accent { background: var(--k-accent-soft); color: var(--k-accent-soft-fg); border-left-color: var(--k-accent); }
+
+/* === Calendar - year view - SECTION tier ==============================
+ * Twelve mini-months in a responsive grid - the year-at-a-glance / "jump to
+ * month" overview. Each month is a small label + a compact .calendar grid (cells
+ * shrunk by overriding --k-cal-cell at the month scope). Reuses the month-grid
+ * recipe wholesale; this is the wrapper + the small-cell override + the
+ * current-month lift. Anatomy: .calendar-year > .calendar-year__month
+ *   (.calendar-year__title + .calendar). */
+.calendar-year { display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: var(--k-s-20); }
+.calendar-year__month { --k-cal-cell: 1.5rem; display: flex; flex-direction: column; gap: var(--k-s-6); }
+.calendar-year__title { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
+.calendar-year__month .calendar { font-size: var(--k-type-caption); gap: 0; }
+.calendar-year__month .calendar__head { padding: var(--k-s-2) 0; }
+/* the current month is lifted - a soft ring frames its mini-grid. */
+.calendar-year__month--now .calendar { padding: var(--k-s-4); border-radius: var(--k-radius-md); box-shadow: 0 0 0 1px var(--k-primary-soft); }
+
+/* === Calendar - range (double month) - SECTION tier ===================
+ * Two months side by side for date-range selection - the booking / reporting
+ * date-range picker. A flex row of two month panels, each a .calendar__nav +
+ * .calendar; the range fill (.calendar__cell--range/-start/-end) reads as one
+ * band across both. Container-query driven: stacks to one column on a narrow
+ * host. Anatomy: .calendar-range > .calendar-range__month
+ *   (.calendar__nav + .calendar) x 2. */
+.calendar-range { container-type: inline-size; display: flex; gap: var(--k-s-20); flex-wrap: wrap; }
+.calendar-range__month { flex: 1 1 14rem; min-width: 0; }
+/* the divider between the two months makes them read as one picker. */
+.calendar-range__month + .calendar-range__month { padding-left: var(--k-s-20); border-left: var(--k-divider); }
+@container (max-width: 32rem) {
+  .calendar-range__month + .calendar-range__month { padding-left: 0; border-left: 0; }
+}
 
 /* === KBD ===
    Fixed small radius (4px) — Kbd is a tactile metaphor, not a brand
