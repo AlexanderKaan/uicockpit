@@ -1740,11 +1740,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Brand header — app-icon launcher tile + name + the collapse toggle. */
 .sidenav__brand { display: flex; align-items: center; gap: var(--k-s-8); padding: var(--k-s-6) var(--k-s-10) var(--k-s-16); font-weight: var(--k-weight-semibold); }
 .sidenav__icon { width: 26px; height: 26px; border-radius: var(--k-radius-sm); background: var(--k-primary); color: var(--k-primary-fg, #fff); display: grid; place-items: center; flex: none; box-shadow: var(--k-shadow-sm); }
-.sidenav__icon > svg { width: 15px; height: 15px; }
+.sidenav__icon > svg { width: var(--k-icon-md); height: var(--k-icon-md); }
 .sidenav__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--k-font-display); letter-spacing: -0.01em; }
 .sidenav__toggle { display: inline-grid; place-items: center; width: 24px; height: 24px; flex: none; border: 0; border-radius: var(--k-radius-sm, 6px); background: transparent; color: var(--k-fg-faint); cursor: pointer; transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease), color var(--k-dur-fast, 140ms); }
 .sidenav__toggle:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.sidenav__toggle > svg { width: 16px; height: 16px; }
+.sidenav__toggle > svg { width: var(--k-icon-md); height: var(--k-icon-md); }
 /* Pinned footer — Settings + a launcher pushed to the floor of the column. */
 .sidenav__foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--k-s-4); padding-top: var(--k-s-6); }
 /* ---- Rail (collapsed) ---- icon-only; labels, group text, sub-lists, the app
@@ -2454,7 +2454,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .kanban__tag { align-self: flex-start; max-width: 100%; font-size: var(--k-type-caption); font-weight: var(--k-weight-bold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; padding: var(--k-s-2) var(--k-s-6); border-radius: var(--k-radius-sm, 4px); background: var(--k-accent-soft); color: var(--k-accent-soft-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kanban__stats { display: inline-flex; align-items: center; gap: var(--k-s-6); min-width: 0; }
 .kanban__key { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); white-space: nowrap; }
-.kanban__key svg, .kanban__icons svg { width: 14px; height: 14px; flex: none; }
+.kanban__key svg, .kanban__icons svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
 .kanban__pts { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 var(--k-s-4); border-radius: 999px; background: var(--k-surface-sunken); font-size: var(--k-type-caption); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); }
 .kanban__icons { display: inline-flex; align-items: center; gap: var(--k-s-6); color: var(--k-fg-faint); }
 .kanban__prio { display: inline-flex; flex-direction: column; gap: 1.5px; width: 11px; color: var(--k-fg-faint); }
@@ -2780,7 +2780,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   z-index: 1;
   transition: background var(--k-dur, 200ms) var(--k-ease, ease);
 }
-.stepper__dot svg { width: 13px; height: 13px; }
+.stepper__dot svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
 .stepper__step--done .stepper__dot { background: var(--k-primary); color: var(--k-primary-fg); border-color: var(--k-primary); }
 .stepper__step--current .stepper__dot { background: var(--k-surface); color: var(--k-primary); border-color: var(--k-primary); box-shadow: 0 0 0 3px var(--k-primary-soft); }
 .stepper__step--current { color: var(--k-fg); font-weight: var(--k-weight-medium); }
@@ -3516,7 +3516,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .att-chip--link .att-chip__thumb { background: var(--k-info-soft); color: var(--k-info); }
 .att-chip--audio .att-chip__thumb { background: var(--k-warning-soft); color: var(--k-warning); }
 .att-chip--image .att-chip__thumb { background: var(--k-success-soft); color: var(--k-success); }
-.att-chip__thumb svg { width: 13px; height: 13px; }
+.att-chip__thumb svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
 .att-chip__body {
   display: flex;
   flex-direction: column;
@@ -3632,7 +3632,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   flex: none;
   color: var(--k-fg-muted);
 }
-.meta-notif svg { width: 14px; height: 14px; flex: none; }
+.meta-notif svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
 /* Unread indicator — a clean corner DOT, not a number. A count pill would
  * overlap the bell glyph inside the tight 28px button; the count itself lives
  * where there's room (the Inbox row's .badge--count, a "N unread" label). The
@@ -4120,7 +4120,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   cursor: pointer;
 }
-.searchinput__item svg { width: 11px; height: 11px; color: var(--k-fg-muted); flex-shrink: 0; }
+.searchinput__item svg { width: var(--k-icon-xs); height: var(--k-icon-xs); color: var(--k-fg-muted); flex-shrink: 0; }
 .searchinput__item--on,
 .searchinput__item:hover { background: var(--k-state-hover); }`,
   },
@@ -4250,7 +4250,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   background: var(--k-primary-soft);
   color: var(--k-primary-soft-fg);
 }
-.list__lead--icon svg { width: 14px; height: 14px; }
+.list__lead--icon svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
 .list__lead--avatar {
   background: var(--k-secondary-soft);
   color: var(--k-secondary-soft-fg);
@@ -4308,7 +4308,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-muted);
   border-radius: 50%;
 }
-.list__lead--icon-muted svg { width: 15px; height: 15px; }
+.list__lead--icon-muted svg { width: var(--k-icon-md); height: var(--k-icon-md); }
 /* Title size — larger + wrapping, for notification/feed rows */
 .list__title--lg { font-size: var(--k-type-body); white-space: normal; }
 /* Unread row — bold title + trailing dot */
@@ -4356,7 +4356,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-muted);
   margin-top: 1px;
 }
-.timeline__dot svg { width: 11px; height: 11px; }
+.timeline__dot svg { width: var(--k-icon-xs); height: var(--k-icon-xs); }
 .timeline__item--done .timeline__dot {
   background: var(--k-primary);
   border-color: transparent;

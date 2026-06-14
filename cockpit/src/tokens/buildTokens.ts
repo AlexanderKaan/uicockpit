@@ -905,10 +905,14 @@ export function buildTokens(cfg: Config): Tokens {
       // rhythm matches section rhythm by default; a real handle for M3-style
       // margin/gutter/columns layout control.
       '--k-gutter': 'var(--k-space)',
-      // --k-icon-sm — the canonical small inline-glyph size: a field/chip lead
-      // icon, a legend marker. One token instead of the 14/15px literals that
-      // drifted across .searchinput/.in--inline/.chip glyphs.
+      // Icon-glyph scale — three rem-based tiers so inline glyphs track text
+      // (zoom/Scale-aware) instead of the 11/13/14/15/16px literals that drifted
+      // per component. xs = micro marker (timeline/search dot), sm = canonical
+      // small glyph (field/chip lead, list lead, kanban), md = standard control
+      // glyph (sidenav toggle/icon). Off-scale 13/15 literals snap to the tier.
+      '--k-icon-xs': '0.6875rem',
       '--k-icon-sm': '0.875rem',
+      '--k-icon-md': '1rem',
       // Box/container inner padding — cards, dialogs, panels. Floored well above
       // --k-space (default 24 = shadcn p-6, compact 16 = Material/Tailwind p-4) so
       // every box meets the modern minimum without inflating the gap rhythm.
