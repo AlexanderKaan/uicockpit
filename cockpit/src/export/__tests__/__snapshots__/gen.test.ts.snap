@@ -3436,6 +3436,20 @@ body {
   min-height: var(--tb-h);
   height: var(--tb-h);
 }
+/* C8 — the invariant is DEFAULT-ON. The enumerated controls above get an EXACT
+   height; every OTHER direct child of the bar (or a group) gets the bar height
+   as a FLOOR, so a control the kit hasn't listed (numinput, taginput, slider, a
+   future atom) can't silently escape and break the single-height row. Opt-outs
+   are the non-controls: the inline label (text) and the spacer (empty flex). */
+.toolbar > *,
+.toolbar__group > * {
+  min-height: var(--tb-h);
+}
+.toolbar > .toolbar__label,
+.toolbar__group > .toolbar__label,
+.toolbar > .toolbar__spacer {
+  min-height: 0;
+}
 .toolbar__spacer { flex: 1 1 auto; min-width: 0; }
 
 /* === Buttons ===
