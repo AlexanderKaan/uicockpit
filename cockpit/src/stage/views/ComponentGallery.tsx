@@ -119,7 +119,7 @@ const CARD_KEYWORDS: Record<string, string> = {
 const searchText = (C: () => ReactElement) =>
   (labelOf(C) + ' ' + (CARD_KEYWORDS[C.name] ?? '')).toLowerCase()
 
-export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'component' } = {}) {
+export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'component' | 'section' } = {}) {
   // Order strategy: highest brand-impact first, token-neutral utilities last.
   // Users should SEE the result of every token change without scrolling.
   const galleryRef = useRef<HTMLDivElement>(null)
@@ -178,7 +178,10 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   // recipe's tier; composed / showcase / foundation-demo cards (StatGroup, Kanban,
   // Typography, LayoutPrimitives, …) are 'component'. Order is preserved so the no-tier
   // path (the marketing bouquet, `limit`-sliced) renders exactly as before.
-  const CARDS: Array<readonly [() => ReactElement, 'atom' | 'component']> = [
+  const CARDS: Array<readonly [() => ReactElement, 'atom' | 'component' | 'section']> = [
+    // SECTION tier — the page-region wrappers (KIT-COVERAGE-AUDIT): the headers +
+    // identity cards you stack to lay out a screen.
+    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'section'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'component'], [FormPanelCard, 'component'], [FilterBarCard, 'component'],
@@ -214,8 +217,8 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder={`Search ${tier === 'atom' ? 'atoms' : 'components'}…`}
-        aria-label={`Search ${tier === 'atom' ? 'atoms' : 'components'}`}
+        placeholder={`Search ${tier === 'atom' ? 'atoms' : tier === 'section' ? 'sections' : 'components'}…`}
+        aria-label={`Search ${tier === 'atom' ? 'atoms' : tier === 'section' ? 'sections' : 'components'}`}
       />
       {q && (
         <button className="searchinput__clear" onClick={() => setQ('')} aria-label="Clear search">×</button>
@@ -259,7 +262,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
 
   // COMPONENTS view (tier='component') — filterable. The no-tier marketing bouquet
   // path never reaches the search wrap (it renders the bare interleaved wall below).
-  if (tier === 'component') {
+  if (tier === 'component' || tier === 'section') {
     const components = shown.filter(([C]) => matchesQ(C))
     return (
       <div className="gallerywrap">
@@ -3715,6 +3718,75 @@ function PricingCardCard() {
             <li>SLA</li>
           </ul>
           <button className="btn btn--ghost" style={{ width: '100%' }}>Contact sales</button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+/* === SECTION tier — page-region wrappers (KIT-COVERAGE-AUDIT) =============
+ * The header/wrapper grammar you stack to lay out a screen: page-head (screen
+ * header), section (titled region), entity-card (identity + key facts). These
+ * retire the hand-rolled headers the showcases kept re-inventing. */
+function PageHeadCard() {
+  return (
+    <Card wide title="Page header" desc="The screen-level header that opens a page — title, sub, actions. A section, not a card.">
+      <div className="page-head page-head--bordered">
+        <div className="page-head__titles">
+          <span className="page-head__eyebrow">Billing</span>
+          <h2 className="page-head__title">Invoices</h2>
+          <span className="page-head__sub">24 invoices · 3 overdue</span>
+        </div>
+        <div className="page-head__actions">
+          <button className="btn btn--ghost btn--sm" type="button"><Icon name="upload" /> Export</button>
+          <button className="btn btn--primary btn--sm" type="button"><Icon name="plus" /> New invoice</button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function SectionCard() {
+  return (
+    <Card wide title="Section" desc="A titled page region — header (title + actions + divider) then a body. Borderless; --fill tints the head.">
+      <div className="section section--fill">
+        <div className="section__head">
+          <div className="section__titles"><h3 className="section__title">Recent clients</h3></div>
+          <div className="section__actions"><button className="btn btn--link btn--sm" type="button">View all</button></div>
+        </div>
+        <div className="section__body">
+          <span style={{ color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }}>The region's components go here — a table, a grid of cards, a feed.</span>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function EntityCardCard() {
+  return (
+    <Card wide title="Entity card" desc="An identity + a few key facts: mark · name · kebab, full-bleed divider, meta rows. --fill tints the head. Stacks in a .bento.">
+      <div className="bento">
+        <div className="entity-card entity-card--fill">
+          <div className="entity-card__head">
+            <span className="avatar avatar--sm" aria-hidden="true">T</span>
+            <span className="entity-card__name">Tuple, Inc</span>
+            <button className="btn btn--ghost btn--icon btn--sm entity-card__menu" type="button" aria-label="More"><Icon name="dots" /></button>
+          </div>
+          <div className="entity-card__meta">
+            <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Dec 13, 2025</span></div>
+            <div className="entity-card__row"><span className="entity-card__label">Amount</span><span className="entity-card__value">$2,000.00 <span className="badge badge--danger">Overdue</span></span></div>
+          </div>
+        </div>
+        <div className="entity-card">
+          <div className="entity-card__head">
+            <span className="avatar avatar--sm" aria-hidden="true">S</span>
+            <span className="entity-card__name">SavvyCal</span>
+            <button className="btn btn--ghost btn--icon btn--sm entity-card__menu" type="button" aria-label="More"><Icon name="dots" /></button>
+          </div>
+          <div className="entity-card__meta">
+            <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Jan 22, 2026</span></div>
+            <div className="entity-card__row"><span className="entity-card__label">Amount</span><span className="entity-card__value">$14,000.00 <span className="badge badge--success">Paid</span></span></div>
+          </div>
         </div>
       </div>
     </Card>

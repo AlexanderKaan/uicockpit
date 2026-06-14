@@ -34,6 +34,12 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   scaffold: ['navsuite', 'pane'],
   navsuite: [],
   pane: [],
+  // Page-region sections — the wrappers that organize components under a header
+  // (the drift-killers from KIT-COVERAGE-AUDIT). A page = page-head + a stack of
+  // sections; each section arranges component fillers.
+  'page-head': ['buttons'],
+  section: ['buttons'],
+  'entity-card': ['avatar', 'badges-pills', 'buttons'],
 }
 
 /**

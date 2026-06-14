@@ -489,6 +489,68 @@ export const RECIPES: readonly Recipe[] = [
 }`,
   },
   {
+    id: 'page-head',
+    section: "Page header",
+    css: `/* === Page header (SECTION tier) ==========================================
+ * The screen-level header that opens a page: an optional eyebrow, the page
+ * title (h2/display tier), a sub-line, and a trailing actions cluster (a ghost
+ * + the one primary). The first thing on a list / detail / dashboard page.
+ * Compose: .page-head > .page-head__titles (eyebrow/title/sub) + .page-head__actions.
+ * This is a SECTION — a page region, not a contained card. */
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--k-s-16); flex-wrap: wrap; }
+.page-head__titles { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
+.page-head__eyebrow { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted); }
+.page-head__title { font-size: var(--k-type-h2); font-weight: var(--k-weight-bold); font-family: var(--k-font-display); letter-spacing: -0.02em; line-height: 1.15; color: var(--k-fg); margin: 0; }
+.page-head__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.page-head__actions { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
+/* --bordered: a hairline under the whole header (the Tailwind page-heading with
+ * a rule), closing the header band before the content begins. */
+.page-head--bordered { padding-bottom: var(--k-s-16); border-bottom: var(--k-divider); }`,
+  },
+  {
+    id: 'section',
+    section: "Section",
+    css: `/* === Section (SECTION tier) ==============================================
+ * A titled page REGION — the wrapper that organizes components under a header.
+ * The drift-killer: replaces the hand-rolled "title left / link right + a
+ * divider" header that screens kept re-inventing. Borderless by default (a page
+ * region, not a card). Anatomy: .section > .section__head (.section__title [+ .section__sub]
+ * + .section__actions) + .section__body. */
+.section { display: flex; flex-direction: column; gap: var(--k-s-14); }
+.section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); padding-bottom: var(--k-s-10); border-bottom: var(--k-divider); }
+.section__titles { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
+.section__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
+.section__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.section__actions { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
+.section__body { display: flex; flex-direction: column; gap: var(--k-s-12); }
+/* --fill: the compact, slightly-coloured header — the head wears the tactical
+ * --k-surface-fill wash as a band (less tall, tinted), the divider closing it.
+ * The "summary region" signal, the spatial sibling of the one primary action. */
+.section--fill .section__head { background: var(--k-surface-fill); padding: var(--k-s-8) var(--k-s-12); border-radius: var(--k-radius-md) var(--k-radius-md) 0 0; }`,
+  },
+  {
+    id: 'entity-card',
+    section: "Entity card",
+    css: `/* === Entity card (SECTION tier) ==========================================
+ * A card for "a thing with an identity + a few key facts": a logo/avatar + name
+ * + kebab in a compact header, a FULL-BLEED divider, then label/value meta rows.
+ * Reusable for clients, contacts, team members, repos, integrations. Anatomy:
+ * .entity-card > .entity-card__head (mark slot · .entity-card__name · .entity-card__menu)
+ * + .entity-card__meta (.entity-card__row × N: .entity-card__label / .entity-card__value).
+ * Padding lives on the head/meta (not the card) so the header divider is full-bleed. */
+.entity-card { display: flex; flex-direction: column; padding: 0; overflow: hidden; background: var(--k-surface); border: 1px solid var(--k-border); border-radius: var(--k-radius-lg); box-shadow: var(--k-shadow-xs); }
+.entity-card__head { display: flex; align-items: center; gap: var(--k-s-10); padding: var(--k-s-12) var(--k-s-14); border-bottom: var(--k-divider); }
+.entity-card__name { font-weight: var(--k-weight-semibold); color: var(--k-fg); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entity-card__menu { margin-left: auto; flex: none; }
+.entity-card__meta { display: flex; flex-direction: column; gap: var(--k-s-10); padding: var(--k-s-14); }
+.entity-card__row { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-8); }
+.entity-card__label { color: var(--k-fg-muted); font-size: var(--k-type-small); }
+.entity-card__value { font-weight: var(--k-weight-medium); color: var(--k-fg); }
+/* --fill: the compact tinted header Alexander sketched (less tall, slightly
+ * coloured, full-bleed divider) — the head wears --k-surface-fill. */
+.entity-card--fill .entity-card__head { background: var(--k-surface-fill); }`,
+  },
+  {
     id: 'button-group',
     section: "Button group",
     css: `/* === Button group ========================================================

@@ -18,14 +18,15 @@ export type ViewKind = 'components' | 'pages'
  * a showcase Inspect jump pre-selects the tier so the searched part is visible
  * the instant the gallery pops the query. */
 function ComponentsView() {
-  const [tier, setTier] = useState<'atom' | 'component'>(() => peekGalleryJumpTier() ?? 'component')
+  const [tier, setTier] = useState<'atom' | 'component' | 'section'>(() => peekGalleryJumpTier() ?? 'component')
   return (
     <div className="stagewrap">
       <div className="stagewrap__bar">
         <div className="segctrl" role="radiogroup" aria-label="Component altitude">
           {([
-            ['component', 'Components', 'Ready-made sections — tables, forms, dialogs'],
-            ['atom', 'Atoms', 'Bare building blocks — buttons, inputs, badges'],
+            ['atom', 'Atoms', 'Bare primitives — buttons, inputs, badges'],
+            ['component', 'Components', 'Reusable units — tables, forms, dialogs'],
+            ['section', 'Sections', 'Page regions — headers, entity cards, the app frame'],
           ] as const).map(([t, label, sub]) => (
             <button
               key={t}
