@@ -147,6 +147,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-gutter": "var(--k-space)",
     "--k-hairline": "var(--k-bw) solid color-mix(in srgb, var(--k-border), transparent 45%)",
     "--k-icon-chip": "calc(var(--k-in-h-default) + 0.125rem)",
+    "--k-icon-sm": "0.875rem",
     "--k-in-h-default": "2.5rem",
     "--k-info": "oklch(56.8% 0.1572 253.9)",
     "--k-info-fg": "#ffffff",
@@ -2630,6 +2631,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-radius-button: 1rem;
   --k-space: 1.25rem;
   --k-gutter: var(--k-space);
+  --k-icon-sm: 0.875rem;
   --k-pad: 1.75rem;
   --k-gap: 0.625rem;
   --k-stack-gap: var(--k-gap);
@@ -2919,6 +2921,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-radius-button: 1rem;
   --k-space: 1.25rem;
   --k-gutter: var(--k-space);
+  --k-icon-sm: 0.875rem;
   --k-pad: 1.75rem;
   --k-gap: 0.625rem;
   --k-stack-gap: var(--k-gap);
@@ -7028,9 +7031,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .searchinput__field:focus-visible,
 .phoneinput__field:focus,
 .phoneinput__field:focus-visible {
+  /* ONLY suppress the inner outline — padding stays as the rest rule sets it
+     (--k-s-12 floor). Restating padding here (was 0 10px) shifted the caret 2px
+     on focus, since the rest state was bumped to 12px but this wasn't. */
   outline: 0;
-  font-family: var(--k-font-body);
-  padding: 0 var(--k-row-px, 10px);
   min-width: 0;
 }
 
@@ -7164,9 +7168,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding-right: var(--k-s-6);
   gap: var(--k-s-8);
 }
-.searchinput > svg {
-  width: 14px;
-  height: 14px;
+.searchinput > svg,
+.in--inline > svg {
+  width: var(--k-icon-sm);
+  height: var(--k-icon-sm);
+  flex: none;
   color: var(--k-fg-muted);
   flex-shrink: 0;
 }
@@ -7992,7 +7998,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .chip:hover:not(:disabled) { background: var(--k-state-hover); }
 .chip:active:not(:disabled) { background: var(--k-state-press); }
-.chip > svg { width: 14px; height: 14px; flex: none; }
+.chip > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
 .chip--on {
   background: var(--k-secondary-soft);
   border-color: transparent;

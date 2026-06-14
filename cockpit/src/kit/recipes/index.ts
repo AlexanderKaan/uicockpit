@@ -3877,9 +3877,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .searchinput__field:focus-visible,
 .phoneinput__field:focus,
 .phoneinput__field:focus-visible {
+  /* ONLY suppress the inner outline — padding stays as the rest rule sets it
+     (--k-s-12 floor). Restating padding here (was 0 10px) shifted the caret 2px
+     on focus, since the rest state was bumped to 12px but this wasn't. */
   outline: 0;
-  font-family: var(--k-font-body);
-  padding: 0 var(--k-row-px, 10px);
   min-width: 0;
 }`,
   },
@@ -4022,9 +4023,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding-right: var(--k-s-6);
   gap: var(--k-s-8);
 }
-.searchinput > svg {
-  width: 14px;
-  height: 14px;
+.searchinput > svg,
+.in--inline > svg {
+  width: var(--k-icon-sm);
+  height: var(--k-icon-sm);
+  flex: none;
   color: var(--k-fg-muted);
   flex-shrink: 0;
 }
@@ -4892,7 +4895,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .chip:hover:not(:disabled) { background: var(--k-state-hover); }
 .chip:active:not(:disabled) { background: var(--k-state-press); }
-.chip > svg { width: 14px; height: 14px; flex: none; }
+.chip > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
 .chip--on {
   background: var(--k-secondary-soft);
   border-color: transparent;
