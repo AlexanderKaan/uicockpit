@@ -117,6 +117,15 @@ const BORDER_OPTS = [
   { id: 'medium' as const, cap: 'Medium' },
   { id: 'strong' as const, cap: 'Strong' },
 ]
+// Canvas — the page background (--k-bg), exported + usable behind key blocks.
+// White (flat) · Neutral (the muted near-white default) · Brand (a whisper tint)
+// · Gradient (the brand mesh). Outcome-named so the look is predictable.
+const CANVAS_OPTS = [
+  { id: 'white' as const, cap: 'White' },
+  { id: 'neutral' as const, cap: 'Neutral' },
+  { id: 'brand' as const, cap: 'Brand' },
+  { id: 'gradient' as const, cap: 'Gradient' },
+]
 /* Interaction (H2) — the state-layer algebra + press feedback as dials. */
 const STATE_INTENSITY_OPTS = [
   { id: 'whisper' as const, cap: 'Whisper' },
@@ -571,6 +580,19 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       opts: optsFrom(SURFACE_OPTS),
       selected: cfg.surface,
       onPick: pick('surface'),
+    },
+    {
+      // Canvas — the page background (--k-bg). White · Neutral (default muted
+      // near-white) · Brand (whisper tint) · Gradient (brand mesh). Exported, and
+      // applied tactically behind key blocks (e.g. the KPI strip).
+      key: 'canvas',
+      label: 'Background',
+      value: cap(CANVAS_OPTS, cfg.canvas),
+      kind: 'seg',
+      stack: true,
+      opts: optsFrom(CANVAS_OPTS),
+      selected: cfg.canvas,
+      onPick: pick('canvas'),
     },
     {
       key: 'borders',

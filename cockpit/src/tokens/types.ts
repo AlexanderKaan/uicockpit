@@ -85,6 +85,11 @@ export type MotionCurve = 'standard' | 'emphasized' | 'spring'
 /* Background — contrast of the surface grey ramp (soft = flat canvas, crisp =
  * separated layers). Exposed in the panel as "Background". */
 export type Contrast = 'soft' | 'balanced' | 'crisp'
+/* Canvas — the PAGE background (--k-bg): white · a whisper brand tint · a
+ * whisper neutral tint · or the brand gradient mesh. Exported as --k-bg and
+ * usable tactically behind key blocks (a KPI strip, a hero). 'neutral' is the
+ * house default (the muted near-white that makes crisp white cards pop). */
+export type Canvas = 'white' | 'brand' | 'neutral' | 'gradient'
 /* === Interaction states (H2) — the state-layer algebra as dials ==========
  * M3's machine: hover/selected/press are ONE wash at stepped alphas. We expose
  * the two opinions as controls and keep the formula fixed:
@@ -215,6 +220,8 @@ export interface Config {
   shapeJitter: number
   palette: Palette
   neutral: Neutral
+  /* Page canvas / background — see Canvas. Drives --k-bg (exported). */
+  canvas: Canvas
   mode: Mode
 }
 

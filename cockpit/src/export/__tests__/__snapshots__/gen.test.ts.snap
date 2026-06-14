@@ -35,6 +35,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "shapeJitter": 0,
     "palette": "vivid",
     "neutral": "auto",
+    "canvas": "neutral",
     "mode": "light"
   },
   "tokens": {
@@ -8478,6 +8479,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "shapeJitter": 0,
     "palette": "vivid",
     "neutral": "auto",
+    "canvas": "neutral",
     "mode": "light"
   },
   "tokens": {

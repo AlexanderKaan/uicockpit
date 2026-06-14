@@ -46,6 +46,7 @@ export const DEFAULT_CONFIG: Config = {
   shapeJitter: 0,
   palette: 'vivid',
   neutral: 'auto',          // greys auto-tint toward the brand hue (Linear/Vercel)
+  canvas: 'neutral',        // muted near-white page bg (= the prior --k-bg = nStep(1))
   mode: 'light',
 }
 

@@ -680,7 +680,21 @@ export function buildTokens(cfg: Config): Tokens {
   // tinted page makes panels look like floating cards" — was about a STRONG tint;
   // a whisper-tinted near-white canvas reads as deliberate, not configurable.
   // Cards floating on it is the intended modern look, not a bug. [BEAUTY-SPEC §1.1]
-  const pageBg = nStep(1)
+  // Canvas (--k-bg) — the page background, chosen by the Canvas control. 'neutral'
+  // (house default) is the muted near-white (step 1) that makes crisp white cards
+  // pop; 'white' is the lightest base; 'brand' a whisper brand tint; 'gradient'
+  // the brand mesh. Exported as --k-bg → also usable tactically behind key blocks.
+  const pageBg =
+    cfg.canvas === 'white'
+      ? nStep(0)
+      : cfg.canvas === 'brand'
+        ? `color-mix(in srgb, var(--k-primary) 6%, ${nStep(0)})`
+        : cfg.canvas === 'gradient'
+          ? 'radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%),' +
+            ' radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%),' +
+            ' radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%),' +
+            ` ${nStep(1)}`
+          : nStep(1)
 
   // Input border — TRACKS the Border control (Faint→Strong), one neutral step
   // firmer than the decorative --k-border so a field still reads as a field.
