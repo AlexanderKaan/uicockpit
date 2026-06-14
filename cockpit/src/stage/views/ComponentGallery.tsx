@@ -948,7 +948,7 @@ function DialogCard() {
               <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
                 This permanently removes all associated data.
               </p>
-              <div className="card__row" style={{ justifyContent: 'flex-end' }}>
+              <div className="dialog__foot">
                 <button className="btn btn--ghost btn--sm" onClick={() => setOpen(false)}>Cancel</button>
                 <button className="btn btn--danger btn--sm" onClick={() => setOpen(false)}>
                   <Icon name="trash" /> Delete
@@ -3019,7 +3019,7 @@ function AlertDialogCard() {
               <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>
                 This will permanently delete <strong>ai-router</strong>, its history, and 12 deployed environments. Cannot be undone.
               </p>
-              <div className="card__row" style={{ justifyContent: 'flex-end' }}>
+              <div className="dialog__foot">
                 <button className="btn btn--ghost btn--sm" onClick={() => setOpen(false)}>Cancel</button>
                 <button className="btn btn--danger btn--sm" onClick={() => setOpen(false)}>
                   <Icon name="trash" /> Yes, delete

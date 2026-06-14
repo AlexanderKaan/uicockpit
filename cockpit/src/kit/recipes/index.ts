@@ -462,7 +462,17 @@ export const RECIPES: readonly Recipe[] = [
 /* The filled action-bar well (Vercel/Linear settings footer) — same full-bleed
  * frame, a grey-sunken fill so a commit/form footer reads as a closed zone. The
  * recognizable variant; pair the note left + the one primary right. */
-.card__foot--bar { background: var(--k-surface-sunken); }`,
+.card__foot--bar { background: var(--k-surface-sunken); }
+/* C3 — ONE sunken action-bar foot for the whole kit. A block-level panel that
+ * commits (data table, form panel) closes with the SAME footer: top divider +
+ * grey-sunken well + one padding rhythm, so every panel footer is recognizably
+ * the same component. Each panel keeps only its own layout (gap/justify/type)
+ * in its recipe below — the closure treatment lives here, once. */
+.datatable__foot, .formpanel__foot {
+  border-top: var(--k-divider);
+  background: var(--k-surface-sunken);
+  padding: var(--k-s-12) var(--k-s-16);
+}`,
   },
   {
     id: 'button-group',
@@ -1178,7 +1188,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 
 /* Footer band — row range, a rows-per-page .select, and the .pagination atom.
  * Mirrors the header surface, sits below the body inside the frame. */
-.datatable__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; padding: var(--k-s-8) var(--k-s-12); border-top: var(--k-divider); background: var(--k-surface-sunken); font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.datatable__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; font-size: var(--k-type-small); color: var(--k-fg-muted); }
 .datatable__foot-info { margin-right: auto; }
 .datatable__perpage { display: inline-flex; align-items: center; gap: var(--k-s-8); white-space: nowrap; }
 .datatable__perpage .select { width: auto; min-height: var(--k-control-h-sm); }`,
@@ -2046,6 +2056,19 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   /* Scale-in enter — slower than popover (--k-dur-slow), more presence */
   transform-origin: center;
   animation: k-scale-in var(--k-dur-slow, 320ms) var(--k-ease-out, cubic-bezier(.05,.7,.1,1)) backwards;
+}
+/* C3 — the dialog's own footer (it had none; actions floated as a bare row).
+ * Full-bleed like .card__foot: cancels the dialog's --k-pad so the top divider
+ * reaches both edges and CLOSES the box, actions pinned right on the tight gap. */
+.dialog__foot {
+  margin: var(--k-s-4) calc(-1 * var(--k-pad, 24px)) calc(-1 * var(--k-pad, 24px));
+  padding: var(--k-s-16) var(--k-pad, 24px);
+  border-top: var(--k-divider);
+  border-bottom-left-radius: var(--k-radius-lg);
+  border-bottom-right-radius: var(--k-radius-lg);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--k-gap, var(--k-s-8));
 }
 /* Frame for modal demo — overlay backdrop, dialog centered inside */
 .dialog-frame {
@@ -4767,7 +4790,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Footer action bar — mirrors the data-table foot surface for family consistency:
  * a sunken band with a top divider, an optional note on the left, the primary
  * action trailing right. */
-.formpanel__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; padding: var(--k-s-12) var(--k-s-16); border-top: var(--k-divider); background: var(--k-surface-sunken); }
+.formpanel__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; }
 .formpanel__foot-note { margin-right: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); }`,
   },
   {
