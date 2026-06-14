@@ -638,7 +638,7 @@ textarea.in[readonly] {
    * the affordance lives in the focus state (Material-style) + the halo. */
   border-color: var(--k-field-focus-edge);
   border-bottom-color: var(--k-ring);
-  box-shadow: 0 0 0 3px var(--k-ring-halo);
+  box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo);
 }
 /* Bulletproof focus signal — the SINGLE source of focus on a field is its
  * own border+halo, NEVER the global solid :focus-visible outline (line ~56).
@@ -1427,7 +1427,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    track itself carries role="slider" tabindex, so we suppress its default
    outline and put the focus signal on the knob instead (shadcn pattern). */
 .slider:hover .slider__knob {
-  box-shadow: var(--k-shadow-sm), 0 0 0 3px var(--k-ring-halo);
+  box-shadow: var(--k-shadow-sm), 0 0 0 var(--k-ring-w) var(--k-ring-halo);
 }
 .cockpit-preview .slider:focus-visible { outline: none; }
 /* Selection = ONLY the soft halo (--k-ring-halo) around the knob — the SAME
@@ -1442,7 +1442,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   height: calc(var(--k-slider-knob, 16px) + 2px);
   /* LITERALLY the input focus-halo — same as \`.in:focus\` (mail input): just the
      --k-ring-halo band, nothing else. No drop shadow, no border, no white. */
-  box-shadow: 0 0 0 3px var(--k-ring-halo);
+  box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo);
 }
 /* Disabled — dimmed + non-interactive (shadcn parity: opacity-50 +
    pointer-events-none). The component also drops tabindex and the handlers. */
@@ -1590,7 +1590,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .select-trigger.is-error,
 .select-trigger[aria-invalid="true"] {
   border-color: var(--k-input-error-border);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-error-border) 22%, transparent);
+  box-shadow: 0 0 0 var(--k-ring-w) color-mix(in srgb, var(--k-input-error-border) 22%, transparent);
 }
 
 /* Native <select class="select"> as a first-class PREVIEW form control.
@@ -1624,7 +1624,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
      Was an UNDEFINED --k-focus-ring token (silently fell back to a 22% halo) so
      the native select's focus read lighter than every sibling field. */
   border-color: var(--k-ring);
-  box-shadow: 0 0 0 3px var(--k-ring-halo);
+  box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo);
 }`,
   },
   {
@@ -2782,7 +2782,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .stepper__dot svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
 .stepper__step--done .stepper__dot { background: var(--k-primary); color: var(--k-primary-fg); border-color: var(--k-primary); }
-.stepper__step--current .stepper__dot { background: var(--k-surface); color: var(--k-primary); border-color: var(--k-primary); box-shadow: 0 0 0 3px var(--k-primary-soft); }
+.stepper__step--current .stepper__dot { background: var(--k-surface); color: var(--k-primary); border-color: var(--k-primary); box-shadow: 0 0 0 var(--k-ring-w) var(--k-primary-soft); }
 .stepper__step--current { color: var(--k-fg); font-weight: var(--k-weight-medium); }
 .stepper__step + .stepper__step::before {
   content: '';
@@ -2947,7 +2947,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   min-height: var(--k-in-h-default);
   align-items: center;
 }
-.taginput:focus-within { outline: 2px solid transparent; outline-offset: 2px; border-color: var(--k-ring); box-shadow: 0 0 0 3px var(--k-ring-halo); }
+.taginput:focus-within { outline: 2px solid transparent; outline-offset: 2px; border-color: var(--k-ring); box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo); }
 /* Filter-chip pattern (Linear/Vercel-style) — these are user-added
  * filter VALUES, not brand statements. Neutral surface + fg gives
  * legible contrast in both light and dark mode, where the previous
@@ -3341,7 +3341,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   outline: 2px solid transparent;
   outline-offset: 2px;
   border-color: var(--k-ring);
-  box-shadow: 0 0 0 3px var(--k-ring-halo);
+  box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo);
 }
 .otp__sep {
   align-self: center;
@@ -3862,7 +3862,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   outline: 2px solid transparent;
   outline-offset: 2px;
   border-color: var(--k-ring);
-  box-shadow: 0 0 0 3px var(--k-ring-halo);
+  box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo);
 }
 .numinput__field,
 .pwinput__field,

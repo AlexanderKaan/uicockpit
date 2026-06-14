@@ -883,6 +883,11 @@ export function buildTokens(cfg: Config): Tokens {
       // but visually distinct from the border, which created a "double ring"
       // optical effect on focus.)
       '--k-ring-halo': `color-mix(in srgb, ${primary} 28%, transparent)`,
+      // --k-ring-w — the focus-ring spread (the `0 0 0 Npx` halo width). One knob
+      // for every focus ring instead of a 3px literal repeated ~9× across inputs,
+      // buttons, the error ring, and overlays. A px stroke (rings don't scale
+      // with text); shadcn exposes the equivalent.
+      '--k-ring-w': '3px',
       // Hover/selected state border for cards/tiles/rows/nav — a neutral grey
       // (shadcn-default). State emphasis is purely neutral intensity now.
       '--k-state-border': dark ? hsl(t.h, t.s, 60) : hsl(t.h, t.s, 50),
