@@ -522,6 +522,7 @@ function ContextMenuCard() {
           <div className="menu ctxmenu__pop" style={{ left: pos.x, top: pos.y }} role="menu">
             <button className="menu__item" role="menuitem"><Icon name="edit" /> Rename <span className="menu__shortcut">⌘R</span></button>
             <button className="menu__item" role="menuitem"><Icon name="upload" /> Share</button>
+            <button className="menu__item" role="menuitem" aria-disabled="true"><Icon name="file" /> Duplicate <span className="menu__shortcut">Pro</span></button>
             <div className="menu__sep" />
             <button className="menu__item menu__item--danger" role="menuitem"><Icon name="trash" /> Delete</button>
           </div>

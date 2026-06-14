@@ -145,6 +145,19 @@ ${s}:disabled:not(.toggle), ${s}.is-disabled:not(.toggle) {
   cursor: not-allowed;
   pointer-events: none;
 }
+/* Disabled OPTION / menu items — a role="option"/"menuitem" on a <li>/<div>
+   can't take :disabled, so it's marked [aria-disabled="true"]. These get the
+   LIGHT treatment (dim + muted + not-allowed), NOT the solid grey-box of form
+   controls: a disabled option reads as FADED, not filled (Radix/shadcn). */
+${s} .menu__item[aria-disabled="true"],
+${s} .cmdp__item[aria-disabled="true"],
+${s} .combobox__item[aria-disabled="true"],
+${s} .list__row[aria-disabled="true"] {
+  color: var(--k-fg-muted);
+  opacity: var(--k-disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring
