@@ -44,6 +44,7 @@ const BLOCK_INFO: Record<string, { label: string; seg: string; jump: { q: string
   calendar: { label: 'Calendar', seg: 'calendar', jump: { q: 'calendar', tier: 'block' } },
   invoice: { label: 'Invoice', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
   cashflow: { label: 'Cashflow', seg: 'stat-tile', jump: { q: 'stat', tier: 'block' } },
+  invoices: { label: 'Invoices', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
 }
 const blockInfo = (kind: string) =>
   BLOCK_INFO[kind] ?? { label: kind, seg: kind, jump: { q: kind, tier: 'block' as const } }

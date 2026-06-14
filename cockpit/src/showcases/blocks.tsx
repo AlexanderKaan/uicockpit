@@ -380,6 +380,98 @@ export function renderBlock(spec: BlockSpec, key: number) {
         </div>
       )
     }
+    case 'invoices': {
+      const s = spec.seed
+      const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
+      const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
+      const med = 'var(--k-weight-medium)' as CSSProperties['fontWeight']
+      const bold = 'var(--k-weight-bold)' as CSSProperties['fontWeight']
+      const hairline = 'var(--k-hairline, 1px solid var(--k-border))'
+      return (
+        <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
+          {/* Header: title + count · the one aimed action */}
+          <div className="l-cluster" style={{ justifyContent: 'space-between', alignItems: 'flex-end' } as CSSProperties}>
+            <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
+              <span style={{ fontSize: 'var(--k-type-h2)', fontWeight: bold, fontFamily: 'var(--k-font-display)' }}>Invoices</span>
+              <span style={muted}>{s.subtitle}</span>
+            </div>
+            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+              <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
+              <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> New invoice</button>
+            </div>
+          </div>
+
+          {/* Summary band = the ONE Fill zone (var(--k-surface-fill)). Working
+              surfaces below stay --k-surface. Mirrors the cashflow KPI doctrine. */}
+          <div className="card" style={{ padding: 0, overflow: 'hidden', background: 'var(--k-surface-fill)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+              {s.summary.map((k, i) => (
+                <div key={k.label} style={{ flex: '1 1 9rem', minWidth: 0, padding: 'var(--k-s-20) var(--k-s-24)', borderLeft: i ? hairline : undefined }}>
+                  <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+                    <span style={muted}>{k.label}</span>
+                    {k.delta && <span style={{ ...money, fontSize: 'var(--k-type-small)', fontWeight: med, color: k.up ? 'var(--k-success)' : 'var(--k-danger)' }}>{k.delta}</span>}
+                  </div>
+                  <div style={{ ...money, fontSize: 'var(--k-type-h1)', fontWeight: bold, marginTop: 'var(--k-s-4)' }}>{k.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* The list — the .datatable BLOCK (page tier: rows grow to natural
+              height). Filter bar in the __bar, pagination in the __foot. */}
+          <div className="datatable datatable--page">
+            <div className="datatable__bar">
+              <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
+                <div className="segctrl" role="tablist" aria-label="Filter invoices">
+                  {s.filters.map((f, i) => (
+                    <button key={f} type="button" role="tab" aria-selected={i === s.activeFilter} className={`segctrl__btn ${i === s.activeFilter ? 'segctrl__btn--on' : ''}`}>{f}</button>
+                  ))}
+                </div>
+                <span className="toolbar__spacer" />
+                <div className="in in--inline" style={{ maxWidth: 200 }}>
+                  <Icon name="search" />
+                  <input type="search" aria-label="Search invoices" placeholder="Search…" />
+                </div>
+              </div>
+            </div>
+            <div className="datatable__body">
+              <table className="tbl">
+                <thead>
+                  <tr><th>Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  {s.rows.map((r) => (
+                    <tr key={r.number}>
+                      <td><div style={{ fontWeight: med }}>#{r.number}</div><div style={muted}>{r.project}</div></td>
+                      <td>
+                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
+                          <BrandLogo id={r.clientLogo} size={28} />
+                          <span style={{ fontWeight: med }}>{r.client}</span>
+                        </div>
+                      </td>
+                      <td style={muted}>{r.issued}</td>
+                      <td style={muted}>{r.due}</td>
+                      <td className="num" style={{ ...money, fontWeight: med }}>{r.amount}</td>
+                      <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="datatable__foot">
+              <span className="datatable__foot-info">{s.footInfo}</span>
+              <div className="pagination">
+                <button type="button" disabled aria-label="Previous"><Icon name="chevL" /></button>
+                <button type="button" aria-current="true">1</button>
+                <button type="button">2</button>
+                <button type="button">3</button>
+                <button type="button" aria-label="Next"><Icon name="chevR" /></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
     case 'empty':
       // CP6 — end-of-feed / no-results state (the memorable Things 3 / Spotify
       // close). Wraps the existing .empty recipe; one quiet CTA, never a brand fill.

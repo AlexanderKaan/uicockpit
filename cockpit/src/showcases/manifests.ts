@@ -63,6 +63,16 @@ export type BlockSpec =
       groups: Array<{ when: string; rows: Array<{ dir: 'in' | 'out' | 'over'; amount: string; tax: string; status: string; tone: 'success' | 'danger' | 'info'; party: string; partyLogo?: string; desc: string; invoice: string }> }>
       clients: Array<{ name: string; logo: string; lastInvoice: string; amount: string; status: string; tone: 'success' | 'danger' }>
     } }
+  // Flagship (Ledger billing) — the Invoices LIST screen: the third of "3 perfect
+  // examples". A header + the one Fill summary band + a .datatable list (client
+  // logo · amount · status · due) with a filter bar and pagination foot.
+  | { block: 'invoices'; seed: {
+      subtitle: string
+      summary: Array<{ label: string; value: string; delta?: string; up?: boolean }>
+      filters: string[]; activeFilter: number
+      rows: Array<{ number: string; client: string; clientLogo: string; project: string; issued: string; due: string; amount: string; status: string; tone: 'success' | 'warning' | 'danger' | 'info' }>
+      footInfo: string
+    } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -173,6 +183,49 @@ export const SHOWCASES: ShowcaseManifest[] = [
               { name: 'Alex Curren', avatar: P('men', 32), action: 'paid the invoice.', time: '1d ago', me: true },
             ],
             meAvatar: P('women', 68),
+          } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ledger-invoices',
+    title: 'Ledger · Invoices',
+    blurb: 'Billing flagship — the invoices list: a Fill summary band over a filterable .datatable of invoices (client logo · amount · status · due). The third of three perfect screens.',
+    width: 1200,
+    archetype: 'feed',
+    nav: 'topbar',
+    navItems: [
+      { icon: 'home', label: 'Home' },
+      { icon: 'file', label: 'Invoices' },
+      { icon: 'store', label: 'Clients' },
+      { icon: 'card', label: 'Expenses' },
+    ],
+    barTitle: 'Ledger',
+    panes: [
+      {
+        role: 'flex',
+        blocks: [
+          { block: 'invoices', seed: {
+            subtitle: '24 invoices · 3 overdue',
+            summary: [
+              { label: 'Outstanding', value: '$245,988.00', delta: '18 open', up: true },
+              { label: 'Overdue', value: '$12,787.00', delta: '+54.02%', up: false },
+              { label: 'Paid this month', value: '$148,316.00', delta: '+8.10%', up: true },
+            ],
+            filters: ['All', 'Outstanding', 'Overdue', 'Paid'],
+            activeFilter: 0,
+            rows: [
+              { number: '00012', client: COMPANIES.reform.name, clientLogo: COMPANIES.reform.logo, project: 'Website redesign', issued: 'Jan 23, 2026', due: 'Feb 6, 2026', amount: '$7,600.00', status: 'Paid', tone: 'success' },
+              { number: '00011', client: COMPANIES.tuple.name, clientLogo: COMPANIES.tuple.logo, project: 'Brand & web package', issued: 'Jan 23, 2026', due: 'Jan 31, 2026', amount: '$10,560.00', status: 'Paid', tone: 'success' },
+              { number: '00010', client: COMPANIES.savvy.name, clientLogo: COMPANIES.savvy.logo, project: 'Website redesign', issued: 'Jan 22, 2026', due: 'Feb 5, 2026', amount: '$14,000.00', status: 'Paid', tone: 'success' },
+              { number: '00009', client: COMPANIES.tuple.name, clientLogo: COMPANIES.tuple.logo, project: 'Logo design', issued: 'Dec 13, 2025', due: 'Dec 27, 2025', amount: '$2,000.00', status: 'Overdue', tone: 'danger' },
+              { number: '00008', client: COMPANIES.vantage.name, clientLogo: COMPANIES.vantage.logo, project: 'Retail dashboard', issued: 'Dec 9, 2025', due: 'Dec 23, 2025', amount: '$21,400.00', status: 'Overdue', tone: 'danger' },
+              { number: '00007', client: COMPANIES.cedar.name, clientLogo: COMPANIES.cedar.logo, project: 'Care-app sprint', issued: 'Dec 2, 2025', due: 'Dec 16, 2025', amount: '$8,250.00', status: 'Due soon', tone: 'warning' },
+              { number: '00006', client: COMPANIES.loomis.name, clientLogo: COMPANIES.loomis.logo, project: 'Photography set', issued: 'Nov 28, 2025', due: 'Dec 12, 2025', amount: '$3,900.00', status: 'Draft', tone: 'info' },
+              { number: '00005', client: COMPANIES.savvy.name, clientLogo: COMPANIES.savvy.logo, project: 'Calendar widgets', issued: 'Nov 20, 2025', due: 'Dec 4, 2025', amount: '$5,200.00', status: 'Paid', tone: 'success' },
+            ],
+            footInfo: 'Showing 1–8 of 24 invoices',
           } },
         ],
       },
