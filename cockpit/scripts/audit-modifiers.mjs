@@ -42,9 +42,9 @@ const GALLERY_FILES = [
   // primitives + their .l-center--narrow/--wide modifiers) — a real demo surface.
   'src/stage/views/FoundationsView.tsx',
 ]
-// App = the manifest-driven showcase renderer (H3c — SupaDash retired); blocks.tsx
+// App = the manifest-driven showcase renderer (H3c — SupaDash retired); sections.tsx
 // composes EXPORTED kit recipes only. (PagesView is workbench chrome, not "app".)
-const APP_FILES = ['src/showcases/blocks.tsx']
+const APP_FILES = ['src/showcases/sections.tsx']
 
 /* App-FRAME modifier prefixes — the demo shell / viewport chrome is intentionally
  * app-only and not a catalogue component (mirrors audit-parity's FRAME_PREFIXES). */

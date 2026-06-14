@@ -34,10 +34,10 @@ const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm,
 const KIT_DEF_FILES = ['src/kit/recipes/index.ts', 'src/kit/globalLayer.ts']
 const PREVIEW_ONLY_FILE = 'src/styles/preview-only.css'
 // H3c — SupaDash retired. The "app" is now the manifest-driven showcase renderer:
-// blocks.tsx maps every BlockSpec onto EXPORTED kit recipes, so every class it
+// sections.tsx maps every SectionSpec onto EXPORTED kit recipes, so every class it
 // renders must be shipped (or harness-allow-listed). manifests.ts is pure data;
 // PagesView is preview workbench chrome (like LayoutsView), not scanned.
-const APP_FILES = ['src/showcases/blocks.tsx']
+const APP_FILES = ['src/showcases/sections.tsx']
 
 /* PREVIEW-HARNESS allow-list — classes the app may use that are NOT shipped.
  * Keep tight + documented. Two forms:

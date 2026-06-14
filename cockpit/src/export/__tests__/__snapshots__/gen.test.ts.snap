@@ -445,7 +445,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "message",
         "prose"
       ],
-      "block": [
+      "component": [
         "data-table",
         "empty-state",
         "sidebar",
@@ -475,7 +475,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "form-panel",
         "filter-bar"
       ],
-      "shell": [
+      "section": [
         "scaffold",
         "navsuite",
         "pane"
@@ -543,7 +543,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "data-table": {
-        "tier": "block",
+        "tier": "component",
         "section": "Data table",
         "uses": [
           "table",
@@ -583,7 +583,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "empty-state": {
-        "tier": "block",
+        "tier": "component",
         "section": "Empty state",
         "uses": [
           "buttons"
@@ -605,7 +605,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "sidebar": {
-        "tier": "block",
+        "tier": "component",
         "section": "Sidebar",
         "uses": [
           "navigation-row",
@@ -614,7 +614,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "activity-feed": {
-        "tier": "block",
+        "tier": "component",
         "section": "Activity feed",
         "uses": [
           "avatar",
@@ -623,7 +623,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "danger-zone": {
-        "tier": "block",
+        "tier": "component",
         "section": "Danger zone",
         "uses": [
           "card",
@@ -636,7 +636,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "auth": {
-        "tier": "block",
+        "tier": "component",
         "section": "Auth",
         "uses": [
           "form-primitives",
@@ -646,14 +646,14 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "lightbox": {
-        "tier": "block",
+        "tier": "component",
         "section": "Lightbox",
         "uses": [
           "buttons"
         ]
       },
       "calendar": {
-        "tier": "block",
+        "tier": "component",
         "section": "Calendar",
         "uses": [
           "buttons"
@@ -670,7 +670,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "dialog": {
-        "tier": "block",
+        "tier": "component",
         "section": "Dialog",
         "uses": [
           "card",
@@ -678,7 +678,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "command-palette": {
-        "tier": "block",
+        "tier": "component",
         "section": "Command palette",
         "uses": [
           "searchinput",
@@ -697,7 +697,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "chart": {
-        "tier": "block",
+        "tier": "component",
         "section": "Chart",
         "uses": [
           "card"
@@ -709,7 +709,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "usage-meter": {
-        "tier": "block",
+        "tier": "component",
         "section": "Usage meter",
         "uses": [
           "progress"
@@ -731,7 +731,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "menubar": {
-        "tier": "block",
+        "tier": "component",
         "section": "Menubar",
         "uses": [
           "dropdown-menu",
@@ -739,7 +739,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "resizable": {
-        "tier": "block",
+        "tier": "component",
         "section": "Resizable",
         "uses": []
       },
@@ -749,14 +749,14 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "file-upload-dropzone": {
-        "tier": "block",
+        "tier": "component",
         "section": "File upload dropzone",
         "uses": [
           "buttons"
         ]
       },
       "toast-stack": {
-        "tier": "block",
+        "tier": "component",
         "section": "Toast stack",
         "uses": []
       },
@@ -776,7 +776,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "sheet-drawer": {
-        "tier": "block",
+        "tier": "component",
         "section": "Sheet / Drawer",
         "uses": [
           "card",
@@ -804,7 +804,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "alert-dialog": {
-        "tier": "block",
+        "tier": "component",
         "section": "Alert Dialog",
         "uses": [
           "card",
@@ -817,7 +817,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "stat-tile": {
-        "tier": "block",
+        "tier": "component",
         "section": "Stat tile",
         "uses": [
           "card",
@@ -836,7 +836,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "carousel": {
-        "tier": "block",
+        "tier": "component",
         "section": "Carousel",
         "uses": [
           "buttons"
@@ -878,7 +878,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "infocard": {
-        "tier": "block",
+        "tier": "component",
         "section": "InfoCard",
         "uses": [
           "card",
@@ -891,7 +891,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "timeline": {
-        "tier": "block",
+        "tier": "component",
         "section": "Timeline",
         "uses": [
           "avatar",
@@ -899,7 +899,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "codeblock": {
-        "tier": "block",
+        "tier": "component",
         "section": "CodeBlock",
         "uses": [
           "code",
@@ -907,7 +907,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "pricing": {
-        "tier": "block",
+        "tier": "component",
         "section": "Pricing",
         "uses": [
           "card",
@@ -921,7 +921,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "wizardstepper": {
-        "tier": "block",
+        "tier": "component",
         "section": "WizardStepper",
         "uses": [
           "stepper",
@@ -930,7 +930,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "file-grid": {
-        "tier": "block",
+        "tier": "component",
         "section": "File grid",
         "uses": [
           "card",
@@ -943,7 +943,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "form-panel": {
-        "tier": "block",
+        "tier": "component",
         "section": "Form panel",
         "uses": [
           "form",
@@ -957,7 +957,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "filter-bar": {
-        "tier": "block",
+        "tier": "component",
         "section": "Filter bar",
         "uses": [
           "searchinput",
@@ -985,7 +985,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "scaffold": {
-        "tier": "shell",
+        "tier": "section",
         "section": "Adaptive scaffold",
         "uses": [
           "navsuite",
@@ -993,12 +993,12 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "navsuite": {
-        "tier": "shell",
+        "tier": "section",
         "section": "Nav suite",
         "uses": []
       },
       "pane": {
-        "tier": "shell",
+        "tier": "section",
         "section": "Pane",
         "uses": []
       },
@@ -3371,7 +3371,7 @@ body {
 /* ========================================================================
  * UIcockpit kit — the design contract (one config → this whole system)
  *
- * The 4-layer ladder. Style the FOUNDATION once; every layer above inherits it,
+ * The tier ladder. Style the FOUNDATION once; every layer above inherits it,
  * so your UI looks like the configurator preview — not a default.
  *
  * FOUNDATION — the token layer (colour · type · shape · space · motion, in the
@@ -3384,13 +3384,14 @@ body {
  *   are what guarantee a consumer's UI looks like the preview.
  *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape, Chat message, Prose
  *
- * BLOCKS — stand-alone pieces of app (28), composed FROM the atoms — the
+ * COMPONENTS — stand-alone pieces of app (28), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
  *     Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Lightbox, Calendar, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, Pricing, WizardStepper, File grid, Form panel, Filter bar
  *
- * LAYOUTS — the shell tier (3): adaptive app frames that ARRANGE blocks
- *   per container width (scaffold · nav suite · pane). Shells own arrangement,
- *   never look; blocks slot into panes; panes assemble into PAGES (your screens).
+ * SECTIONS — the page-region tier (3): adaptive app frames that ARRANGE
+ *   components per container width (scaffold · nav suite · pane). Sections own
+ *   arrangement, never look; components slot into panes; panes assemble into PAGES
+ *   (your screens).
  *     Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
 

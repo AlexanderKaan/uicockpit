@@ -128,7 +128,7 @@ export function genContract(cfg: Config): string {
 
   // Component graph — the tier model + declared `uses` edges, straight from the
   // segment graph (the single machine source for the component MODEL).
-  const TIERS: Tier[] = ['foundation', 'atom', 'block', 'shell']
+  const TIERS: Tier[] = ['foundation', 'atom', 'component', 'section']
   const tiers = Object.fromEntries(TIERS.map((t) => [t, idsByTier(t)])) as Record<Tier, string[]>
   const recipes: Record<string, { tier: Tier; section: string; uses: string[] }> = {}
   for (const r of RECIPES) {
@@ -149,7 +149,7 @@ export function genContract(cfg: Config): string {
       classes: extractClasses(RECIPES),
       standalone: [...STANDALONE_ATOMS].sort(),
       // The coverage worklist — should be empty for a valid kit (every atom has
-      // a home block or is a blessed standalone primitive).
+      // a home component or is a blessed standalone primitive).
       orphans: orphanAtoms().sort(),
     },
     rules: RULES,

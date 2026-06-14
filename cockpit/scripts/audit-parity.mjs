@@ -38,11 +38,11 @@ const PAGE_FILES = [
   'src/stage/views/ChartFrame.tsx',
   'src/stage/views/apps/AppHelpers.tsx',
 ]
-/* APP = the manifest-driven showcase renderer (H3c — SupaDash retired). blocks.tsx
- * maps every BlockSpec onto EXPORTED kit recipes, so it IS the honest app surface
+/* APP = the manifest-driven showcase renderer (H3c — SupaDash retired). sections.tsx
+ * maps every SectionSpec onto EXPORTED kit recipes, so it IS the honest app surface
  * (manifests.ts is pure data; PagesView is preview workbench chrome, like
  * LayoutsView, and is not treated as "app"). */
-const APP_FILES = ['src/showcases/blocks.tsx']
+const APP_FILES = ['src/showcases/sections.tsx']
 
 /* App-FRAME prefixes — intentionally app-only (the live demo shell + a few
  * page-specific showcase surfaces). These are NOT catalogue components, so the

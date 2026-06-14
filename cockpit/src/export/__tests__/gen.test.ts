@@ -142,8 +142,8 @@ describe('genContract (Fase D1 — the machine-readable contract)', () => {
   it('serialises the component graph + extracted BEM class vocabulary', () => {
     const c = JSON.parse(genContract(sampleCfg))
     // the tier graph + uses edges, straight from segments
-    expect(c.components.tiers.block).toContain('data-table')
-    expect(c.components.recipes['data-table'].tier).toBe('block')
+    expect(c.components.tiers.component).toContain('data-table')
+    expect(c.components.recipes['data-table'].tier).toBe('component')
     expect(c.components.recipes['data-table'].uses).toContain('table')
     // BEM extraction from the static recipe CSS
     expect(c.components.classes.btn).toBeTruthy()

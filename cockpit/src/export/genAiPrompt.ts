@@ -8,15 +8,15 @@ import { ICON_LIBS } from './iconLibs'
 import { genCss } from './genCss'
 import { Z_INDEX, BREAKPOINTS } from '../tokens/extras'
 import { RECIPES } from '../kit'
-import { FOUNDATIONS, BLOCK_USES, STANDALONE_ATOMS, idsByTier } from '../kit/segments'
+import { FOUNDATIONS, COMPONENT_USES, STANDALONE_ATOMS, idsByTier } from '../kit/segments'
 
 /** The composition contract, derived from the segment graph — the structural part
- * an agent must enforce: the 4-layer ladder, which blocks exist and what each
+ * an agent must enforce: the tier ladder, which components exist and what each
  * composes, and which atoms stand alone. Built from `src/kit/segments.ts`, so it
  * never drifts from the kit. */
 function componentModel(): string {
   const label = (id: string) => RECIPES.find((r) => r.id === id)?.section ?? id
-  const blocks = Object.entries(BLOCK_USES)
+  const components = Object.entries(COMPONENT_USES)
     .map(([id, uses]) => `- **${label(id)}** — composes: ${uses.map(label).join(' · ') || '(self-contained)'}`)
     .join('\n')
   const atoms = idsByTier('atom').map(label).join(', ')
@@ -24,8 +24,9 @@ function componentModel(): string {
   const standalone = STANDALONE_ATOMS.map(label).join(', ')
   return `## The component model — the composition contract
 
-This kit is a **4-layer ladder** (Foundation → Atom → Block → Page). Build UP it;
-never invent a parallel structure or re-implement what a block already guarantees.
+This kit is a **tier ladder** (Foundation → Atom → Component → Section → Page). Build
+UP it; never invent a parallel structure or re-implement what a component already
+guarantees.
 
 **FOUNDATION** — the tokens (above) + layout grammar (${foundations}). Use the
 layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
@@ -37,22 +38,25 @@ layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
 **ATOMS** — the bare vocabulary; only meaningful inside something larger:
 ${atoms}.
 
-**BLOCKS** — stand-alone pieces of app. Each IS its surface; build it by COMPOSING
+**COMPONENTS** — stand-alone pieces of app. Each IS its surface; build it by COMPOSING
 the atoms listed, not by hand-rolling them inside a bare card:
-${blocks}
+${components}
 
-**STANDALONE atoms** — attach to anything; use directly, no host block needed:
+**SECTIONS** — page-region scaffolds (scaffold · nav suite · pane) that ARRANGE
+components per container width; they own arrangement, never look, and assemble into PAGES.
+
+**STANDALONE atoms** — attach to anything; use directly, no host component needed:
 ${standalone}.
 
-**The rule of reach:** need a data surface? → the **Data table** block (it owns
+**The rule of reach:** need a data surface? → the **Data table** component (it owns
 toolbar + selection + pagination + empty/loading/error). Need a form? → **Form
 panel**. Need to filter a list? → **Filter bar**. Compose from the ladder; don't
-re-implement what a block already guarantees.
+re-implement what a component already guarantees.
 
-**Blocks adapt to their CONTAINER, not the viewport.** The flagship blocks
+**Components adapt to their CONTAINER, not the viewport.** The flagship components
 (data-table, form-panel, filter-bar) carry CSS container queries keyed to their
 own width, so they reflow correctly wherever you drop them — full-bleed, in a
-narrow sidebar, or on mobile — with no per-page media queries. Drop the block and
+narrow sidebar, or on mobile — with no per-page media queries. Drop the component and
 trust it; don't wrap it in your own breakpoints.`
 }
 
@@ -441,9 +445,9 @@ Context menu (\`.ctxmenu\` — right-click drop area; popup reuses \`.menu\`).
 Slot picker (\`.slotpicker\` of \`.slot\` — bookable time/option pills; available /
 selected / disabled states).
 
-## Layout grammar — the shell tier (arrange screens with this, not ad-hoc CSS)
+## Layout grammar — the section tier (arrange screens with this, not ad-hoc CSS)
 
-The kit ships an ADAPTIVE SHELL layer above the blocks. Use it to frame whole
+The kit ships an ADAPTIVE SECTION layer above the components. Use it to frame whole
 screens instead of inventing app-frame CSS:
 
 - \`.scaffold\` > \`.scaffold__frame\` > \`.scaffold__bar\` + \`.scaffold__nav\` +

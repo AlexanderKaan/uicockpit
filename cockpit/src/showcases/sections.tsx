@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
-import type { BlockSpec } from './manifests'
+import type { SectionSpec } from './manifests'
 import { BrandLogo } from './logos'
 
 /** Photo avatar with a graceful initial fallback — the flagship's "real app"
@@ -47,17 +47,17 @@ function SummaryBand({ items }: { items: Array<{ label: string; value: string; d
 }
 
 /**
- * H3b — the block renderer: BlockSpec (data) → KIT recipes (markup).
+ * H3b — the section renderer: SectionSpec (data) → KIT recipes (markup).
  *
  * The deal that makes manifests honest: every renderer below composes
  * EXPORTED kit classes (plus the catalogued ChartFrame presenter) — no
- * showcase-only component CSS. If a block can't be built from the kit, the
+ * showcase-only component CSS. If a section can't be built from the kit, the
  * kit is missing a recipe, and THAT is the bug to fix (gallery first), not
- * something to patch here. Seeds are typed by the BlockSpec union, so a
+ * something to patch here. Seeds are typed by the SectionSpec union, so a
  * manifest typo fails tsc instead of rendering garbage.
  */
-export function renderBlock(spec: BlockSpec, key: number) {
-  switch (spec.block) {
+export function renderSection(spec: SectionSpec, key: number) {
+  switch (spec.kind) {
     case 'stats':
       return (
         <div className="stat-tile-grid" key={key}>

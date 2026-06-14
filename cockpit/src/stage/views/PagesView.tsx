@@ -1,7 +1,7 @@
 import { useMemo, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { Icon } from '../../icons/Icon'
-import { SHOWCASES, type BlockSpec, type ShowcaseManifest } from '../../showcases/manifests'
-import { renderBlock } from '../../showcases/blocks'
+import { SHOWCASES, type SectionSpec, type ShowcaseManifest } from '../../showcases/manifests'
+import { renderSection } from '../../showcases/sections'
 import { buildTokens } from '../../tokens/buildTokens'
 import type { Config } from '../../tokens/types'
 import { setGalleryJump } from '../../state/galleryJump'
@@ -11,45 +11,45 @@ import { FoundationsView } from './FoundationsView'
 import type { ViewKind } from '../Stage'
 
 /* Component → gallery tier guess for the specimen's "Open in gallery" jump
- * (Fase J-1). componentAt returns a kit-class id; the block-tier patterns jump to
- * the Blocks wall, the rest default to Atoms. */
-const COMP_TIER: Record<string, 'atom' | 'block'> = {
-  stat: 'block', table: 'block', card: 'block', chart: 'block', kanban: 'block',
-  pricing: 'block', tree: 'block', timeline: 'block', dropzone: 'block',
+ * (Fase J-1). componentAt returns a kit-class id; the component-tier patterns jump
+ * to the Components wall, the rest default to Atoms. */
+const COMP_TIER: Record<string, 'atom' | 'component'> = {
+  stat: 'component', table: 'component', card: 'component', chart: 'component', kanban: 'component',
+  pricing: 'component', tree: 'component', timeline: 'component', dropzone: 'component',
 }
 
-/* Manifest block kind → graph wiring (Fase J-2). The manifest uses short names
+/* Manifest section kind → graph wiring (Fase J-2). The manifest uses short names
  * ('stats', 'table'); the segment graph (segments.ts) + the gallery use canonical
  * ids ('stat-tile', 'data-table'). This bridge powers the breadcrumb label, the
- * "composes these atoms" rail (usesOf), and the block→gallery jump. */
-const BLOCK_INFO: Record<string, { label: string; seg: string; jump: { q: string; tier: 'atom' | 'block' } }> = {
-  stats: { label: 'Stats', seg: 'stat-tile', jump: { q: 'stat', tier: 'block' } },
-  chart: { label: 'Chart', seg: 'chart', jump: { q: 'chart', tier: 'block' } },
+ * "composes these atoms" rail (usesOf), and the section→gallery jump. */
+const SECTION_INFO: Record<string, { label: string; seg: string; jump: { q: string; tier: 'atom' | 'component' } }> = {
+  stats: { label: 'Stats', seg: 'stat-tile', jump: { q: 'stat', tier: 'component' } },
+  chart: { label: 'Chart', seg: 'chart', jump: { q: 'chart', tier: 'component' } },
   list: { label: 'List', seg: 'activity-feed', jump: { q: 'list', tier: 'atom' } },
-  thread: { label: 'Thread', seg: 'thread', jump: { q: 'thread', tier: 'block' } },
+  thread: { label: 'Thread', seg: 'thread', jump: { q: 'thread', tier: 'component' } },
   composer: { label: 'Composer', seg: 'composer', jump: { q: 'composer', tier: 'atom' } },
-  table: { label: 'Table', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
-  form: { label: 'Form', seg: 'form-panel', jump: { q: 'form panel', tier: 'block' } },
-  pricing: { label: 'Pricing', seg: 'pricing', jump: { q: 'pricing', tier: 'block' } },
-  prose: { label: 'Prose', seg: 'prose', jump: { q: 'two column', tier: 'block' } },
+  table: { label: 'Table', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
+  form: { label: 'Form', seg: 'form-panel', jump: { q: 'form panel', tier: 'component' } },
+  pricing: { label: 'Pricing', seg: 'pricing', jump: { q: 'pricing', tier: 'component' } },
+  prose: { label: 'Prose', seg: 'prose', jump: { q: 'two column', tier: 'component' } },
   dl: { label: 'Details', seg: 'description-list', jump: { q: 'description list', tier: 'atom' } },
   chips: { label: 'Chips', seg: 'chip', jump: { q: 'chip', tier: 'atom' } },
-  kanban: { label: 'Kanban', seg: 'kanban', jump: { q: 'kanban', tier: 'block' } },
-  tree: { label: 'Tree', seg: 'tree', jump: { q: 'tree', tier: 'block' } },
-  timeline: { label: 'Timeline', seg: 'timeline', jump: { q: 'timeline', tier: 'block' } },
+  kanban: { label: 'Kanban', seg: 'kanban', jump: { q: 'kanban', tier: 'component' } },
+  tree: { label: 'Tree', seg: 'tree', jump: { q: 'tree', tier: 'component' } },
+  timeline: { label: 'Timeline', seg: 'timeline', jump: { q: 'timeline', tier: 'component' } },
   settings: { label: 'Settings', seg: 'settings', jump: { q: 'settings', tier: 'atom' } },
-  wizard: { label: 'Wizard', seg: 'wizardstepper', jump: { q: 'wizard', tier: 'block' } },
-  dropzone: { label: 'Dropzone', seg: 'file-upload-dropzone', jump: { q: 'upload', tier: 'block' } },
-  media: { label: 'Media', seg: 'file-grid', jump: { q: 'file grid', tier: 'block' } },
-  calendar: { label: 'Calendar', seg: 'calendar', jump: { q: 'calendar', tier: 'block' } },
-  invoice: { label: 'Invoice', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
-  cashflow: { label: 'Cashflow', seg: 'stat-tile', jump: { q: 'stat', tier: 'block' } },
-  invoices: { label: 'Invoices', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
-  clients: { label: 'Clients', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
-  expenses: { label: 'Expenses', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
+  wizard: { label: 'Wizard', seg: 'wizardstepper', jump: { q: 'wizard', tier: 'component' } },
+  dropzone: { label: 'Dropzone', seg: 'file-upload-dropzone', jump: { q: 'upload', tier: 'component' } },
+  media: { label: 'Media', seg: 'file-grid', jump: { q: 'file grid', tier: 'component' } },
+  calendar: { label: 'Calendar', seg: 'calendar', jump: { q: 'calendar', tier: 'component' } },
+  invoice: { label: 'Invoice', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
+  cashflow: { label: 'Cashflow', seg: 'stat-tile', jump: { q: 'stat', tier: 'component' } },
+  invoices: { label: 'Invoices', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
+  clients: { label: 'Clients', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
+  expenses: { label: 'Expenses', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
 }
-const blockInfo = (kind: string) =>
-  BLOCK_INFO[kind] ?? { label: kind, seg: kind, jump: { q: kind, tier: 'block' as const } }
+const sectionInfo = (kind: string) =>
+  SECTION_INFO[kind] ?? { label: kind, seg: kind, jump: { q: kind, tier: 'component' as const } }
 
 /* Archetype → a tiny human caption (the one quiet line that gives a showcase its
  * identity, in place of the old standing intro + per-page blurb — Fase J-7). */
@@ -60,21 +60,21 @@ const ARCH_LABEL: Record<string, string> = {
   workspace: 'Workspace',
 }
 
-/* The loupe's altitude. page → block → atom is a continuous zoom; each level is
+/* The loupe's altitude. page → section → atom is a continuous zoom; each level is
  * a breadcrumb crumb you can click to fly back out (Fase J-2). */
 type Focus =
   | { level: 'page' }
-  | { level: 'block'; pane: number; idx: number }
+  | { level: 'section'; pane: number; idx: number }
   | { level: 'atom'; pane: number; idx: number; comp: string }
 
 /**
  * Pages — the loupe (H3b manifest model · Fase J).
  *
- * A page is DATA: archetype × nav × panes of seeded blocks (src/showcases/
+ * A page is DATA: archetype × nav × panes of seeded sections (src/showcases/
  * manifests.ts), rendered through the same kit recipes the export ships. The view
  * is deliberately content-first (Fase J-7): chips → preview, with every control
  * pushed into a slim bottom dock or one click away. Inspect turns the preview into
- * a continuous zoom — Page › Block › Atom › All tokens — with a breadcrumb spine.
+ * a continuous zoom — Page › Section › Atom › All tokens — with a breadcrumb spine.
  */
 
 const PANE_CLASS = {
@@ -86,9 +86,9 @@ const PANE_CLASS = {
 
 function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void }) {
   const [width, setWidth] = useState(m.width)
-  // The loupe (Fase J-2): a continuous zoom Page › Block › Atom. `loupe` off is a
-  // clean live page; turning it on reveals the breadcrumb and makes blocks
-  // pickable. Click a block → it isolates and enlarges (atoms inside clickable);
+  // The loupe (Fase J-2): a continuous zoom Page › Section › Atom. `loupe` off is a
+  // clean live page; turning it on reveals the breadcrumb and makes sections
+  // pickable. Click a section → it isolates and enlarges (atoms inside clickable);
   // click an atom → its specimen + recipe; All tokens → the foundation grid.
   const [loupe, setLoupe] = useState(false)
   const [focus, setFocus] = useState<Focus>({ level: 'page' })
@@ -102,25 +102,25 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
   // breakpoints (see the `@container scaffold` queries in recipes).
   const navState = m.nav === 'suite' ? (width < 600 ? 'Bottom bar' : width < 1200 ? 'Rail' : 'Sidebar') : null
 
-  const block = focus.level !== 'page' ? m.panes[focus.pane]?.blocks[focus.idx] : undefined
-  const bInfo = block ? blockInfo(block.block) : undefined
+  const section = focus.level !== 'page' ? m.panes[focus.pane]?.sections[focus.idx] : undefined
+  const sInfo = section ? sectionInfo(section.kind) : undefined
   const comp = focus.level === 'atom' ? COMPONENTS[focus.comp] : undefined
 
-  // Page → Block: walk up from the clicked node to the block wrapper (carries its
-  // pane/idx as data-attrs), then isolate it.
-  const pickBlock = (e: ReactMouseEvent) => {
+  // Page → Section: walk up from the clicked node to the section wrapper (carries
+  // its pane/idx as data-attrs), then isolate it.
+  const pickSection = (e: ReactMouseEvent) => {
     let el = e.target as HTMLElement | null
     while (el && el !== e.currentTarget) {
       if (el.dataset && el.dataset.idx != null) {
-        setFocus({ level: 'block', pane: +el.dataset.pane!, idx: +el.dataset.idx })
+        setFocus({ level: 'section', pane: +el.dataset.pane!, idx: +el.dataset.idx })
         return
       }
       el = el.parentElement
     }
   }
-  // Block → Atom: the existing leaf-pick, now scoped to the isolated block.
+  // Section → Atom: the existing leaf-pick, now scoped to the isolated section.
   const pickAtom = (e: ReactMouseEvent) => {
-    if (focus.level !== 'block') return
+    if (focus.level !== 'section') return
     const id = componentAt(e.target as Element)
     if (id) setFocus({ level: 'atom', pane: focus.pane, idx: focus.idx, comp: id })
   }
@@ -134,21 +134,21 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
   const crumbs: Array<{ label: string; go: () => void; on: boolean }> = [
     { label: `Page · ${m.title}`, go: () => { setTokensOpen(false); setFocus({ level: 'page' }) }, on: !tokensOpen && focus.level === 'page' },
   ]
-  if (bInfo && focus.level !== 'page') {
+  if (sInfo && focus.level !== 'page') {
     const { pane, idx } = focus
-    crumbs.push({ label: `Block · ${bInfo.label}`, go: () => { setTokensOpen(false); setFocus({ level: 'block', pane, idx }) }, on: !tokensOpen && focus.level === 'block' })
+    crumbs.push({ label: `Section · ${sInfo.label}`, go: () => { setTokensOpen(false); setFocus({ level: 'section', pane, idx }) }, on: !tokensOpen && focus.level === 'section' })
   }
   if (comp) crumbs.push({ label: `Atom · ${comp.label}`, go: () => setTokensOpen(false), on: !tokensOpen && focus.level === 'atom' })
   if (tokensOpen) crumbs.push({ label: 'All tokens', go: () => {}, on: true })
 
   const hint =
     tokensOpen ? 'Every resolved token — the foundation behind the kit'
-      : focus.level === 'page' ? 'Click any block to zoom in'
-        : focus.level === 'block' ? 'Click any element to drill to its atom'
+      : focus.level === 'page' ? 'Click any section to zoom in'
+        : focus.level === 'section' ? 'Click any element to drill to its atom'
           : 'Deepest atom level'
 
   const stageKey = `${tokensOpen ? 'tokens' : focus.level}-${focus.level !== 'page' ? `${focus.pane}.${focus.idx}` : ''}-${focus.level === 'atom' ? focus.comp : ''}`
-  const blockCount = m.panes.reduce((n, p) => n + p.blocks.length, 0)
+  const sectionCount = m.panes.reduce((n, p) => n + p.sections.length, 0)
   const caption = `${ARCH_LABEL[m.archetype] ?? m.archetype} · ${m.nav === 'suite' ? 'adaptive nav' : 'top nav'}`
   const showWidth = !loupe || (focus.level === 'page' && !tokensOpen)
 
@@ -190,13 +190,13 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
           ) : (
             <>
               {(!loupe || focus.level === 'page') && (
-                <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickBlock : undefined}>
+                <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickSection : undefined}>
                   <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} />
                 </div>
               )}
-              {loupe && focus.level === 'block' && block && (
+              {loupe && focus.level === 'section' && section && (
                 <div className="shc__focusblock" onClick={pickAtom}>
-                  {renderBlock(block, focus.idx)}
+                  {renderSection(section, focus.idx)}
                 </div>
               )}
               {loupe && focus.level === 'atom' && comp && (
@@ -211,23 +211,23 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
             {focus.level === 'page' && (
               <>
                 <div className="shc__loupe-head">The page</div>
-                <p className="shc__loupe-blurb">A showcase is data: {blockCount} blocks across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any block to zoom in.</p>
+                <p className="shc__loupe-blurb">A showcase is data: {sectionCount} sections across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any section to zoom in.</p>
                 <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>
                   All tokens <Icon name="chevR" />
                 </button>
               </>
             )}
-            {focus.level === 'block' && bInfo && (
+            {focus.level === 'section' && sInfo && (
               <>
-                <div className="shc__loupe-head">Block · {bInfo.label}</div>
+                <div className="shc__loupe-head">Section · {sInfo.label}</div>
                 <p className="shc__loupe-blurb">Composes these atoms — click any element to drill into it:</p>
                 <ul className="shc__uses">
-                  {(usesOf(bInfo.seg).length ? usesOf(bInfo.seg) : ['(self-contained)']).map((u) => <li key={u}>{u}</li>)}
+                  {(usesOf(sInfo.seg).length ? usesOf(sInfo.seg) : ['(self-contained)']).map((u) => <li key={u}>{u}</li>)}
                 </ul>
                 <button
                   type="button"
                   className="btn btn--outline btn--xs"
-                  onClick={() => { setGalleryJump(bInfo.jump.q, bInfo.jump.tier); onViewChange('components') }}
+                  onClick={() => { setGalleryJump(sInfo.jump.q, sInfo.jump.tier); onViewChange('components') }}
                 >
                   Open in gallery <Icon name="chevR" />
                 </button>
@@ -317,13 +317,13 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
 function ShowcaseShell({
   m,
   width,
-  renderBlockFn = renderBlock,
+  renderSectionFn = renderSection,
   pickable = false,
 }: {
   m: ShowcaseManifest
   width: number
-  renderBlockFn?: (b: BlockSpec, key: number) => ReactNode
-  /** Loupe page-level: wrap each block in a hover-pickable target carrying its
+  renderSectionFn?: (b: SectionSpec, key: number) => ReactNode
+  /** Loupe page-level: wrap each section in a hover-pickable target carrying its
    *  pane/idx (Fase J-2). The stage delegates the click and walks up to read it. */
   pickable?: boolean
 }) {
@@ -365,16 +365,16 @@ function ShowcaseShell({
         <div className="scaffold__body">
           {m.panes.map((pane, i) => (
             <section className={`${PANE_CLASS[pane.role]} shc__pane`} key={i} aria-label={`${m.title} ${pane.role} pane`}>
-              {pane.blocks.map((b, j) =>
+              {pane.sections.map((b, j) =>
                 pickable ? (
-                  <div className="shc__pick" key={j} data-pane={i} data-idx={j} data-label={blockInfo(b.block).label}>
-                    {renderBlockFn(b, j)}
+                  <div className="shc__pick" key={j} data-pane={i} data-idx={j} data-label={sectionInfo(b.kind).label}>
+                    {renderSectionFn(b, j)}
                   </div>
                 ) : (
-                  // key = the block's own index (unique among the pane's children);
-                  // passing the PANE index here collided all blocks onto one key,
+                  // key = the section's own index (unique among the pane's children);
+                  // passing the PANE index here collided all sections onto one key,
                   // leaving a stale duplicate when Inspect re-wrapped them (Fase J-8).
-                  renderBlockFn(b, j)
+                  renderSectionFn(b, j)
                 ),
               )}
             </section>

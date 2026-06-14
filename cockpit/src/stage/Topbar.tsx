@@ -104,15 +104,15 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
       </div>
       <div className="topbar__center">
         {/* The two modi (Fase J-6) — the loupe IA settled to TWO tabs. The old
-         * Foundations + Shells rungs live INSIDE the Pages loupe now (Foundations
-         * = the deepest "All tokens" zoom; Shells = the width slider's nav morph),
+         * Foundations + Sections rungs live INSIDE the Pages loupe now (Foundations
+         * = the deepest "All tokens" zoom; Sections = the width slider's nav morph),
          * so the topbar is just the vocabulary and the screens that use it. */}
         <div className="view-toggle" role="tablist" aria-label="View">
           {/* Tooltips bridge the taxonomy to plain language for the vibe-coder
            * audience (C7) — the meaning is one hover away. */}
           {([
-            ['components', 'Components', Boxes, 'The vocabulary — Atoms (bare) & Blocks (ready-made sections)'],
-            ['pages', 'Pages', AppWindow, 'Full screens — drill a showcase Page › Block › Atom › All tokens'],
+            ['components', 'Components', Boxes, 'The vocabulary — Atoms (bare) & Components (ready-made sections)'],
+            ['pages', 'Pages', AppWindow, 'Full screens — drill a showcase Page › Section › Atom › All tokens'],
           ] as [ViewKind, string, typeof Palette, string][]).map(([k, label, Ico, sub]) => (
             <button
               key={k}

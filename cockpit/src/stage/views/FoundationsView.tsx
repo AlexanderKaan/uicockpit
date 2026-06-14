@@ -36,7 +36,7 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
     return m ? `${Math.round(parseFloat(m[1] ?? '0') * 16)}px` : s
   }
 
-  // Same interlocking masonry as the Blocks gallery: each section reserves as many
+  // Same interlocking masonry as the Components gallery: each section reserves as many
   // 1px grid-auto-rows as its measured height needs (dense flow packs them tight,
   // wide cards span two columns). Re-measures on resize + late content via ResizeObserver.
   const gridRef = useRef<HTMLDivElement>(null)
@@ -65,7 +65,7 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
     <div className="fnd">
       {/* Sections mirror the side-panel groups 1:1 — same names, same grouping:
           Color · Scale · Typography · Shape · Surface · Motion & icons. They pack into
-          the same interlocking masonry as the Blocks gallery (row-span by height). */}
+          the same interlocking masonry as the Components gallery (row-span by height). */}
       <div className="fnd__grid" ref={gridRef}>
         <Section title="Color" hint={`${cap(cfg.colorTheme)} · ${cap(cfg.palette)}`} wide>
           <SwGroup label="Brand" items={[['--k-primary', 'Primary'], ['--k-primary-soft', 'Primary soft'], ['--k-secondary', 'Secondary'], ['--k-secondary-soft', 'Secondary soft'], ['--k-accent', 'Accent'], ['--k-accent-soft', 'Accent soft']]} val={val} />

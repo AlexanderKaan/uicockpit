@@ -1,12 +1,12 @@
 // Internal dev screenshot helper (not part of the build/export).
 // Usage: node scripts/shoot.mjs <view> <theme> <out.png> [collapse]
-//   view:   foundations | atoms | blocks | pages
+//   view:   foundations | atoms | components | pages
 //   theme:  mono | cobalt | rose | jade | ...   (clicks the Brand flyout)
 //   out:    output PNG path
 //   collapse: "collapse" to hide the panel for clean full-stage shots
 import { chromium } from '@playwright/test'
 
-const [, , view = 'blocks', theme = 'cobalt', out = '/tmp/shot.png', collapse = ''] = process.argv
+const [, , view = 'components', theme = 'cobalt', out = '/tmp/shot.png', collapse = ''] = process.argv
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, deviceScaleFactor: 2 })

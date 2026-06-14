@@ -2,7 +2,7 @@
 /**
  * audit-layout.mjs — the layout contract gate (the "stop guessing placement" tool).
  *
- * WHY: the app surface (blocks.tsx) is built from KIT recipes only. Layout is no
+ * WHY: the app surface (sections.tsx) is built from KIT recipes only. Layout is no
  * exception — a block must COMPOSE the layout primitives (.bento / .l-grid /
  * .l-stack / .l-cluster / panes) instead of hand-rolling a grid inline. A
  * hand-rolled `gridTemplateColumns` in a block is an un-tokenized, un-themed,
@@ -10,7 +10,7 @@
  * problem. This flags any inline grid-track definition in the app surface so the
  * placement contract can't silently rot.
  *
- * Gate: fails if blocks.tsx declares an inline gridTemplate* (rewire to .bento /
+ * Gate: fails if sections.tsx declares an inline gridTemplate* (rewire to .bento /
  * .l-grid). Simple flex/centering idioms (display:flex, place-items) are allowed
  * — the law is "don't author grid TRACKS by hand", not "never use display".
  */
@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(HERE, '..')
-const APP_FILES = ['src/showcases/blocks.tsx']
+const APP_FILES = ['src/showcases/sections.tsx']
 // Inline grid-track authoring — the hand-rolled-layout smell.
 const BANNED = /gridTemplate(Columns|Rows)?\s*:/g
 

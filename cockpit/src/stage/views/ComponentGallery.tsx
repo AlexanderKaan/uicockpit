@@ -119,7 +119,7 @@ const CARD_KEYWORDS: Record<string, string> = {
 const searchText = (C: () => ReactElement) =>
   (labelOf(C) + ' ' + (CARD_KEYWORDS[C.name] ?? '')).toLowerCase()
 
-export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'block' } = {}) {
+export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'component' } = {}) {
   // Order strategy: highest brand-impact first, token-neutral utilities last.
   // Users should SEE the result of every token change without scrolling.
   const galleryRef = useRef<HTMLDivElement>(null)
@@ -172,28 +172,28 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   // passes a small limit and never mounts the ~80 cards below the fold; the app
   // passes no limit → the whole gallery renders. (Function components are
   // hoisted, so referencing them here before their declarations is fine.)
-  // Each card carries its segment TIER (atom | block), mirroring the graph in
-  // src/kit/segments.ts — so the 4-layer-ladder front-end can split the wall into
-  // the Atoms view and the Blocks view. Cards that map 1:1 to a recipe take that
+  // Each card carries its segment TIER (atom | component), mirroring the graph in
+  // src/kit/segments.ts — so the tier-ladder front-end can split the wall into
+  // the Atoms view and the Components view. Cards that map 1:1 to a recipe take that
   // recipe's tier; composed / showcase / foundation-demo cards (StatGroup, Kanban,
-  // Typography, LayoutPrimitives, …) are 'block'. Order is preserved so the no-tier
+  // Typography, LayoutPrimitives, …) are 'component'. Order is preserved so the no-tier
   // path (the marketing bouquet, `limit`-sliced) renders exactly as before.
-  const CARDS: Array<readonly [() => ReactElement, 'atom' | 'block']> = [
-    [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'block'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
-    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'block'], [DateCard, 'block'],
-    [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'block'], [FormPanelCard, 'block'], [FilterBarCard, 'block'],
-    [ComboboxCard, 'atom'], [DialogCard, 'block'], [KanbanCard, 'block'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'block'],
-    [PricingCardCard, 'block'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'block'], [TooltipCard, 'atom'],
-    [CodeBlockCard, 'block'], [SheetCard, 'block'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
-    [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'block'], [TrendCard, 'block'],
-    [CmdPaletteCard, 'block'], [DropdownMenuCard, 'atom'], [CarouselCard, 'block'], [ListCard, 'atom'], [ThreadCard, 'block'], [ProseCard, 'block'],
-    [LoginCard, 'block'], [StatGroupCard, 'block'], [ContextMenuCard, 'atom'], [SignupCard, 'block'], [TimelineCard, 'block'], [NavMenuCard, 'atom'],
-    [PaginationCard, 'atom'], [TreeViewCard, 'block'], [NotificationCenterCard, 'block'], [NavCard, 'block'],
-    [FileGridCard, 'block'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
-    [BreadcrumbCard, 'atom'], [ProgressCard, 'atom'], [UsageMeterCard, 'block'], [InteractiveCardCard, 'atom'], [MenubarCard, 'block'], [ResizableCard, 'block'],
-    [StatusPageCard, 'block'], [InboxFilterCard, 'block'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
-    [EmptyStateCard, 'block'], [InfoCardCard, 'block'], [ToastStackCard, 'block'], [LightboxCard, 'block'],
-    [WizardStepperCard, 'block'], [DangerZoneCard, 'block'], [FaqCard, 'block'], [TwoColumnLayoutCard, 'block'],
+  const CARDS: Array<readonly [() => ReactElement, 'atom' | 'component']> = [
+    [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
+    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
+    [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'component'], [FormPanelCard, 'component'], [FilterBarCard, 'component'],
+    [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
+    [PricingCardCard, 'component'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
+    [CodeBlockCard, 'component'], [SheetCard, 'component'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
+    [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'component'],
+    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ThreadCard, 'component'], [ProseCard, 'component'],
+    [LoginCard, 'component'], [StatGroupCard, 'component'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
+    [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'component'],
+    [FileGridCard, 'component'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
+    [BreadcrumbCard, 'atom'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
+    [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
+    [EmptyStateCard, 'component'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
+    [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
     [AttachmentChipCard, 'atom'], [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], [AspectRatioCard, 'atom'], [ScrollAreaCard, 'atom'],
   ]
   const filtered = tier ? CARDS.filter(([, t]) => t === tier) : CARDS
@@ -201,8 +201,8 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
 
   // The Atoms view groups the bare atoms into bordered CATEGORY cards (like the
   // Foundations sections): the frame lives on the GROUP, so atoms get structure
-  // without each looking like a standalone block. Covers all atom-tier cards.
-  // Search/filter bar (C5) — only in the cockpit Atoms/Blocks views (tier set),
+  // without each looking like a standalone component. Covers all atom-tier cards.
+  // Search/filter bar (C5) — only in the cockpit Atoms/Components views (tier set),
   // never in the marketing bouquet. Themed by the kit (lives in .cockpit-preview).
   // Dogfoods the kit's own .searchinput component (house-style focus halo +
   // ghost clear button); .gallery-search adds only layout (width + centring).
@@ -214,8 +214,8 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder={`Search ${tier === 'atom' ? 'atoms' : 'blocks'}…`}
-        aria-label={`Search ${tier === 'atom' ? 'atoms' : 'blocks'}`}
+        placeholder={`Search ${tier === 'atom' ? 'atoms' : 'components'}…`}
+        aria-label={`Search ${tier === 'atom' ? 'atoms' : 'components'}`}
       />
       {q && (
         <button className="searchinput__clear" onClick={() => setQ('')} aria-label="Clear search">×</button>
@@ -257,18 +257,18 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     )
   }
 
-  // BLOCKS view (tier='block') — filterable. The no-tier marketing bouquet path
-  // never reaches the search wrap (it renders the bare interleaved wall below).
-  if (tier === 'block') {
-    const blocks = shown.filter(([C]) => matchesQ(C))
+  // COMPONENTS view (tier='component') — filterable. The no-tier marketing bouquet
+  // path never reaches the search wrap (it renders the bare interleaved wall below).
+  if (tier === 'component') {
+    const components = shown.filter(([C]) => matchesQ(C))
     return (
       <div className="gallerywrap">
-        {searchBar(blocks.length, shown.length)}
-        {blocks.length === 0 ? (
-          <div className="gallery-empty">No blocks match “{q}”.</div>
+        {searchBar(components.length, shown.length)}
+        {components.length === 0 ? (
+          <div className="gallery-empty">No components match “{q}”.</div>
         ) : (
           <div className="gallery" ref={galleryRef}>
-            {blocks.map(([C], i) => <C key={i} />)}
+            {components.map(([C], i) => <C key={i} />)}
           </div>
         )}
       </div>

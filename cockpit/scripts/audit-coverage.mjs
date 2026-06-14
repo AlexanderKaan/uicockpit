@@ -28,7 +28,7 @@ const REPORT = process.argv.includes('--report')
 
 const VIEWS = resolve(ROOT, 'src/stage/views')
 // H3c — SupaDash retired. The product surface is now the manifest-driven showcase
-// layer ONLY: blocks.tsx (BlockSpec → kit recipes) + manifests.ts (the seeds) +
+// layer ONLY: sections.tsx (SectionSpec → kit recipes) + manifests.ts (the seeds) +
 // PagesView.tsx (the theater's shell chrome) + ChartFrame (the chart presenter
 // blocks compose). Coverage now tracks what the SHOWCASES demonstrate — a smaller,
 // honest set than the old 58-deep SupaDash surface (a deliberate trade, recorded
@@ -41,9 +41,9 @@ const FILES = [
 const HAYSTACK = FILES.map((f) => readFileSync(f, 'utf8')).join('\n')
 
 // component → a marker substring proving it renders in a manifest-driven showcase.
-// This is the showcase BLOCK vocabulary + the shell tier the theater composes.
+// This is the showcase COMPONENT vocabulary + the section tier the theater composes.
 const MARKERS = {
-  // Block tier — the 18 typed blocks (showcases/blocks.tsx)
+  // Component tier — the 18 typed components (showcases/sections.tsx)
   StatTile: 'stat-tile', Chart: 'ChartFrame', List: 'list__item', Card: 'card"',
   Thread: 'msg__', Composer: 'toolbar', Input: 'className="in"', Table: 'tbl',
   Form: 'className="lab"', Pricing: 'pricing__', Prose: 'prose__',
@@ -51,7 +51,7 @@ const MARKERS = {
   TreeView: 'tree__row', Timeline: 'timeline__', SettingsRow: 'list--settings',
   Switch: 'toggle', WizardStepper: 'wstepper', Stepper: 'stepper__',
   Dropzone: 'dropzone', Media: 'aspect--1x1', Badge: 'badge badge--',
-  // Shell tier — the adaptive scaffold the showcase theater renders (PagesView)
+  // Section tier — the adaptive scaffold the showcase theater renders (PagesView)
   Scaffold: 'scaffold scaffold--', NavSuite: 'navsuite', Pane: 'PANE_CLASS',
   Avatar: 'avatar avatar--', Tab: 'tab ', Segmented: 'segctrl',
 }

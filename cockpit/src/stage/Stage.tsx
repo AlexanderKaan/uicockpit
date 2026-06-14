@@ -5,26 +5,26 @@ import { ComponentGallery } from './views/ComponentGallery'
 import { PagesView } from './views/PagesView'
 import { peekGalleryJumpTier } from '../state/galleryJump'
 
-/* The two modi (Fase J-6 — the loupe IA settles to TWO tabs; the 5-rung graph
+/* The two modi (Fase J-6 — the loupe IA settles to TWO tabs; the tier graph
  * lives as altitudes inside them, capacity intact):
- *   components → the vocabulary: one gallery, Atom/Block is a sub-toggle
- *   pages      → the loupe: Showcases you drill Page › Block › Atom › All tokens.
- *                Foundations is the deepest zoom (J3), not a peer tab; Shells
+ *   components → the vocabulary: one gallery, Atom/Component is a sub-toggle
+ *   pages      → the loupe: Showcases you drill Page › Section › Atom › All tokens.
+ *                Foundations is the deepest zoom (J3), not a peer tab; Sections
  *                folded into the width slider (J5). */
 export type ViewKind = 'components' | 'pages'
 
-/* Components — the merged Atom/Block altitude. One gallery; the tier is an
+/* Components — the merged Atom/Component altitude. One gallery; the tier is an
  * inline segctrl (dogfoods the kit) instead of two top-level tabs. Arriving via
  * a showcase Inspect jump pre-selects the tier so the searched part is visible
  * the instant the gallery pops the query. */
 function ComponentsView() {
-  const [tier, setTier] = useState<'atom' | 'block'>(() => peekGalleryJumpTier() ?? 'block')
+  const [tier, setTier] = useState<'atom' | 'component'>(() => peekGalleryJumpTier() ?? 'component')
   return (
     <div className="stagewrap">
       <div className="stagewrap__bar">
         <div className="segctrl" role="radiogroup" aria-label="Component altitude">
           {([
-            ['block', 'Blocks', 'Ready-made sections — tables, forms, dialogs'],
+            ['component', 'Components', 'Ready-made sections — tables, forms, dialogs'],
             ['atom', 'Atoms', 'Bare building blocks — buttons, inputs, badges'],
           ] as const).map(([t, label, sub]) => (
             <button

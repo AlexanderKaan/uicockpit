@@ -19,33 +19,34 @@ export { globalLayer } from './globalLayer'
 export { RECIPES } from './recipes'
 
 /**
- * Component MODEL — the 4-layer ladder. The full graph (tiers + `uses` edges +
+ * Component MODEL — the tier ladder. The full graph (tiers + `uses` edges +
  * the orphan-atom worklist) lives in `./segments`; re-exported here so consumers
  * import the kit's model from one place.
  *   - FOUNDATION → tokens + token/motion/layout glue, upstream of the catalog.
  *   - ATOM       → the bare vocabulary; only meaningful inside something larger.
- *   - BLOCK      → stands on its own as a piece of app; the surface IS the
+ *   - COMPONENT  → stands on its own as a piece of app; the surface IS the
  *                  component, composed FROM atoms (its declared `uses`).
- *   - PAGE       → an assembly of blocks = a realistic screen (external SupaDash).
+ *   - SECTION    → a page-region scaffold that ARRANGES components (nav suite · pane).
+ *   - PAGE       → an assembly of components/sections = a realistic screen.
  */
 export type { Tier } from './segments'
-export { tierOf, usesOf, idsByTier, orphanAtoms, FOUNDATIONS, BLOCK_USES, SHELL_USES } from './segments'
+export { tierOf, usesOf, idsByTier, orphanAtoms, FOUNDATIONS, COMPONENT_USES, SECTION_USES } from './segments'
 
 /** A human-readable manifest banner that heads the assembled CSS, so anyone
- * reading the shipped kit sees the ladder — Foundation / Atom / Block — at a
+ * reading the shipped kit sees the ladder — Foundation / Atom / Component — at a
  * glance, without reordering the cascade. Derived from the segment graph. */
 function manifest(recipes: readonly Recipe[]): string {
-  const sectionsFor = (t: 'foundation' | 'atom' | 'block' | 'shell') =>
+  const sectionsFor = (t: 'foundation' | 'atom' | 'component' | 'section') =>
     idsByTier(t, recipes)
       .map((id) => recipes.find((r) => r.id === id)?.section)
       .filter(Boolean)
       .join(', ')
-  const found = sectionsFor('foundation'), atoms = sectionsFor('atom'), blocks = sectionsFor('block'), shells = sectionsFor('shell')
+  const found = sectionsFor('foundation'), atoms = sectionsFor('atom'), components = sectionsFor('component'), sections = sectionsFor('section')
   const n = (s: string) => (s ? s.split(', ').length : 0)
   return `/* ========================================================================
  * UIcockpit kit — the design contract (one config → this whole system)
  *
- * The 4-layer ladder. Style the FOUNDATION once; every layer above inherits it,
+ * The tier ladder. Style the FOUNDATION once; every layer above inherits it,
  * so your UI looks like the configurator preview — not a default.
  *
  * FOUNDATION — the token layer (colour · type · shape · space · motion, in the
@@ -58,14 +59,15 @@ function manifest(recipes: readonly Recipe[]): string {
  *   are what guarantee a consumer's UI looks like the preview.
  *     ${atoms}
  *
- * BLOCKS — stand-alone pieces of app (${n(blocks)}), composed FROM the atoms — the
+ * COMPONENTS — stand-alone pieces of app (${n(components)}), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
- *     ${blocks}
+ *     ${components}
  *
- * LAYOUTS — the shell tier (${n(shells)}): adaptive app frames that ARRANGE blocks
- *   per container width (scaffold · nav suite · pane). Shells own arrangement,
- *   never look; blocks slot into panes; panes assemble into PAGES (your screens).
- *     ${shells}
+ * SECTIONS — the page-region tier (${n(sections)}): adaptive app frames that ARRANGE
+ *   components per container width (scaffold · nav suite · pane). Sections own
+ *   arrangement, never look; components slot into panes; panes assemble into PAGES
+ *   (your screens).
+ *     ${sections}
  * ======================================================================== */`
 }
 
