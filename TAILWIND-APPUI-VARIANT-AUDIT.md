@@ -26,18 +26,18 @@ composable from existing atoms/components.
 - [x] **Table · condensed density** — `.tbl--condensed`. (001c39c)
 - [x] **Table · responsive** — `.tbl-responsive` + `.tbl--stack` + `.tbl__col--optional` (container-query: drop cols, then reflow to label/value cards). (001c39c)
 
-### Tier 2 — distinct patterns
-- [ ] **Empty state · with action grid** — empty-state + a `.bento` of "starting point" / template cards.
-- [ ] **Labeled divider** — a centered label/title/"OR" on the hairline (`.divider--label` or a `.divider` recipe; today `.sep` is plain).
-- [ ] **"Well" variant** — sunken/recessed surface for `card` + `action-panel` (`--well`, uses `--k-surface-sunken`). (Tailwind: Cards "Well", Action panels "Simple well / With well".)
-- [ ] **Input add-ons** — leading/trailing add-on (prefix `https://`, suffix `.com`) + **inset label** + **overlapping label** input variants. Atom-level (`.in` variants).
-- [ ] **Section/Page header · with tabs** — a sub-nav tab row in the header (`.section`/`.page-head` + `.tabs`). Tailwind: Section headings "With tabs / With actions and tabs / With inline tabs".
-- [ ] **Page header · breadcrumb slot** + **banner-image** header variant.
-- [ ] **Form · labels-on-left** — horizontal label layout (`.form-panel--horizontal` / `.lab--left`).
-- [ ] **Stacked list · two-column** + **sticky group headings** (`.list` variants).
+### Tier 2 — distinct patterns ✅ DONE (commits 71fea24 · 47757fe · 2c94bd0 · e26228c)
+- [x] **Empty state · with action grid** — `.empty__grid` of `.card--interactive` template tiles. (e26228c)
+- [x] **Labeled divider** — ALREADY COVERED (`.sep--labeled` + `.divider-or`); NOT rebuilt (would be a 2nd version).
+- [x] **"Well" variant** — `.card--well` (covers card + action-panel-with-well). (71fea24)
+- [x] **Input add-ons** — `.in-group`/`.in-group__addon` (prefix/suffix) + `.in__affix` + `.in--inset` + `.in-field`/`.in__overlap`. (47757fe)
+- [x] **Page header · with tabs** — `.page-head__tabs` slot. (2c94bd0)
+- [x] **Page header · breadcrumb slot** + **banner-image** — `.page-head__crumb` + `.page-head--banner`/`__banner`/`__overlap`. (2c94bd0)
+- [x] **Form · labels-on-left** — `.formpanel--horizontal`. (71fea24)
+- [x] **Stacked list · two-column** + **sticky group headings** — `.list--cols` + `.list--sticky`. (e26228c)
 
-### Tier 3 — minor
-- [ ] **Color picker** — radio swatches (`radio-group` "Color picker" variant).
+### Tier 3 — minor ✅ DONE (commit f6e3b04)
+- [x] **Color picker** — `.swatch-picker`/`.swatch-picker__opt` radio swatches (`:has(input:checked)` ring). (f6e3b04)
 
 ### Per-item checklist (every recipe)
 recipe (tokens only, match `.page-head`/`.section`/`.entity-card` quality) → tier
@@ -102,11 +102,23 @@ Coverage key: ✓ covered (modifier/composition) · ⚠ partial · ❌ GAP (in b
 
 ---
 
-## RESUME POINT (post-compaction)
-Tier-1 build not started. Begin with **Calendar week/day/year/range**, then
-**Table grouped/summary/condensed/responsive**, then Tier-2, then Tier-3.
-Chrome MCP "Browser 1" (deviceId `2a6c8428-9997-4932-a5fa-f156d5844a1f`) can
-re-read any Tailwind page if a variant's exact anatomy is needed. The kit's
-tier model: Atom · Component · Section · Page; new page-parts → `section` tier in
-`src/kit/segments.ts` (`SECTION_USES`); recipes in `src/kit/recipes/index.ts`;
-gallery cards in `ComponentGallery.tsx` tagged `'section'`/`'atom'`.
+## ✅ BUILD COMPLETE (Tier 1 + 2 + 3 all shipped — 2026-06-15)
+Every gap in this audit is built, verified live, and committed (10 batches,
+`4c2cd1f`…`f6e3b04`). The kit now covers the Tailwind Application-UI variant set
+at the variant level. New recipes added: calendar-week/year/range, table
+grouped/summary/condensed/responsive, card--well, formpanel--horizontal,
+page-head crumb/tabs/banner, in-group/affix/inset/overlap, empty__grid,
+list--cols/--sticky, swatch-picker. Sections wall 21→24; ~10 new gallery cards.
+
+**NEXT (the deferred consumer phase, per [[kit-coverage-audit]]):** wire the section
+set into the REAL Ledger screens — replace the 16 hand-rolled headers with
+page-head/section/entity-card/action-panel — then turn on the **structural-inline
+ratchet** (ban inline padding/bg/border/radius/shadow in `sections.tsx`; baseline
+only goes down). That's the "stop drift once and for all" enforcement.
+
+Method notes: Chrome MCP "Browser 1" (deviceId `2a6c8428-9997-4932-a5fa-f156d5844a1f`)
+re-reads any gated Tailwind page. Tier model: Atom · Component · Section · Page;
+page-parts → `section` in `src/kit/segments.ts` (`SECTION_USES`); recipes in
+`src/kit/recipes/index.ts`; section gallery cards tagged `'section'` in CARDS; atom
+cards must ALSO be added to `ATOM_GROUPS` (the Atoms wall renders from there, not
+the CARDS atom-filter).
