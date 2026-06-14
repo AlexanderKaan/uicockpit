@@ -1457,6 +1457,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "text"
         ]
       },
+      "com": {
+        "modifiers": [],
+        "parts": []
+      },
       "combobox": {
         "modifiers": [
           "inline",
@@ -1644,9 +1648,24 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       },
       "in": {
         "modifiers": [
-          "inline"
+          "inline",
+          "inset"
         ],
+        "parts": [
+          "affix",
+          "label",
+          "overlap"
+        ]
+      },
+      "in-field": {
+        "modifiers": [],
         "parts": []
+      },
+      "in-group": {
+        "modifiers": [],
+        "parts": [
+          "addon"
+        ]
       },
       "indeterminate": {
         "modifiers": [],
@@ -4433,6 +4452,43 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-radius: 50%;
   background: var(--k-primary);
   transform: translate(-50%, -50%);
+}
+
+/* === Input add-ons + inset / overlapping labels (Tailwind input groups) ====
+ * Four field embellishments that all build on .in:
+ *   .in-group        a segmented field — a filled add-on butts against the input
+ *                    (https:// prefix, .com suffix). Fused edges (the .btn-group
+ *                    idiom); the input keeps its focus halo, lifted above neighbours.
+ *   .in__affix       an inline unit INSIDE the field ($ … USD), as a muted span in
+ *                    an .in--inline wrapper.
+ *   .in--inset       the label lives inside the field at the top, input below.
+ *   .in-field + .in__overlap   the label straddles the top border in a surface chip. */
+.in-group { display: flex; align-items: stretch; width: 100%; }
+.in-group > * { border-radius: 0; }
+.in-group > *:not(:first-child) { margin-left: -1px; }
+.in-group > *:first-child { border-top-left-radius: var(--k-in-radius, var(--k-radius-md)); border-bottom-left-radius: var(--k-in-radius, var(--k-radius-md)); }
+.in-group > *:last-child { border-top-right-radius: var(--k-in-radius, var(--k-radius-md)); border-bottom-right-radius: var(--k-in-radius, var(--k-radius-md)); }
+.in-group > .in { width: auto; flex: 1; }
+.in-group > .in:focus, .in-group > .in:focus-within { position: relative; z-index: 1; }
+.in-group__addon {
+  display: inline-flex; align-items: center; white-space: nowrap; flex: none;
+  padding-inline: var(--k-s-10);
+  background: var(--k-surface-sunken); color: var(--k-fg-muted);
+  border: var(--k-bw, 1px) solid var(--k-input-border, var(--k-border));
+  font-size: var(--k-type-small);
+}
+.in__affix { color: var(--k-fg-muted); flex: none; user-select: none; }
+.in--inset {
+  flex-direction: column; align-items: stretch; justify-content: center; gap: var(--k-s-2);
+  min-height: calc(var(--k-in-h-default, 40px) * 1.35); padding-block: var(--k-s-6);
+}
+.in--inset .in__label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted); }
+.in--inset input { background: transparent; border: 0; outline: 0; padding: 0; font: inherit; color: inherit; width: 100%; }
+.in-field { position: relative; }
+.in__overlap {
+  position: absolute; top: 0; left: var(--k-s-8); transform: translateY(-50%);
+  padding: 0 var(--k-s-4); background: var(--k-surface); line-height: 1;
+  font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted);
 }
 
 /* === Badges & pills ===

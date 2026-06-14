@@ -27,6 +27,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   NumberInputCard: 'Quantity number stepper spinner',
   PhoneInputCard: 'Phone number country code',
   InputOtpCard: 'Verify your email OTP one-time code PIN 2FA',
+  InputAddonsCard: 'Input add-ons prefix suffix inline unit inset overlapping label group https',
   // — Pickers & selects —
   DateFieldCard: 'Due date field date picker',
   ComboboxCard: 'Framework combobox autocomplete typeahead',
@@ -191,7 +192,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'section'],
-    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'],
+    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'section'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -300,7 +301,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
 // Atom category taxonomy — every atom-tier card bucketed into a matching group.
 // Order = how the groups read top-to-bottom; the masonry packs them by height.
 const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElement>]> = [
-  ['Text inputs', [FormCard, SearchInputCard, PasswordInputCard, NumberInputCard, PhoneInputCard, InputOtpCard]],
+  ['Text inputs', [FormCard, SearchInputCard, InputAddonsCard, PasswordInputCard, NumberInputCard, PhoneInputCard, InputOtpCard]],
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
   ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
@@ -2905,6 +2906,39 @@ function HorizontalFormCard() {
           <button type="button" className="btn btn--ghost btn--sm">Cancel</button>
           <button type="button" className="btn btn--primary btn--sm">Save</button>
         </div>
+      </div>
+    </Card>
+  )
+}
+
+function InputAddonsCard() {
+  // Input groups: a fused add-on segment (.in-group), an inline unit (.in__affix),
+  // an inset label (.in--inset), and an overlapping label (.in-field/.in__overlap).
+  return (
+    <Card title="Input add-ons" desc="Add-ons, inline units, and inset / overlapping labels.">
+      <label className="lab">
+        <span>Website</span>
+        <span className="in-group">
+          <span className="in-group__addon">https://</span>
+          <input className="in" defaultValue="acme" aria-label="Website" />
+          <span className="in-group__addon">.com</span>
+        </span>
+      </label>
+      <label className="lab">
+        <span>Price</span>
+        <span className="in in--inline">
+          <span className="in__affix">$</span>
+          <input inputMode="decimal" defaultValue="24.00" aria-label="Price" />
+          <span className="in__affix">USD</span>
+        </span>
+      </label>
+      <label className="in in--inset">
+        <span className="in__label">Quantity</span>
+        <input inputMode="numeric" defaultValue="12" aria-label="Quantity" />
+      </label>
+      <div className="in-field" style={{ marginTop: 'var(--k-s-4)' }}>
+        <span className="in__overlap">Email</span>
+        <input className="in" type="email" defaultValue="mara@acme.com" aria-label="Email" />
       </div>
     </Card>
   )
