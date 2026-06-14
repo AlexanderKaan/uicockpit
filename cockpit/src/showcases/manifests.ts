@@ -73,6 +73,16 @@ export type BlockSpec =
       rows: Array<{ number: string; client: string; clientLogo: string; project: string; issued: string; due: string; amount: string; status: string; tone: 'success' | 'warning' | 'danger' | 'info' }>
       footInfo: string
     } }
+  // Flagship (Ledger billing) — the Clients directory (rebuilt from the CRM
+  // archetype into the one Ledger app): the Fill summary band + a .datatable of
+  // accounts (logo · contact photo · billed · outstanding · status).
+  | { block: 'clients'; seed: {
+      subtitle: string
+      summary: Array<{ label: string; value: string; delta?: string; up?: boolean }>
+      filters: string[]; activeFilter: number
+      rows: Array<{ company: string; logo: string; contact: string; contactAvatar: string; billed: string; outstanding: string; status: string; tone: 'success' | 'warning' | 'danger' | 'info' }>
+      footInfo: string
+    } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -221,6 +231,42 @@ export const SHOWCASES: ShowcaseManifest[] = [
               { number: '00005', client: COMPANIES.savvy.name, clientLogo: COMPANIES.savvy.logo, project: 'Calendar widgets', issued: 'Nov 20, 2025', due: 'Dec 4, 2025', amount: '$5,200.00', status: 'Paid', tone: 'success' },
             ],
             footInfo: 'Showing 1–8 of 24 invoices',
+          } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ledger-clients',
+    title: 'Ledger · Clients',
+    blurb: 'Billing flagship — the clients directory (the CRM archetype, rebuilt into the one Ledger app): a Fill summary band over a filterable .datatable of accounts with contact photos.',
+    width: 1200,
+    archetype: 'feed',
+    nav: 'topbar',
+    navItems: LEDGER_NAV,
+    barTitle: 'Ledger',
+    panes: [
+      {
+        role: 'flex',
+        blocks: [
+          { block: 'clients', seed: {
+            subtitle: '18 active · 3 overdue',
+            summary: [
+              { label: 'Active clients', value: '18', delta: '+3 this qtr', up: true },
+              { label: 'Billed (YTD)', value: '$1,240,500.00', delta: '+12.4%', up: true },
+              { label: 'Outstanding', value: '$245,988.00', delta: '−1.39%', up: false },
+            ],
+            filters: ['All', 'Active', 'Overdue', 'Archived'],
+            activeFilter: 0,
+            rows: [
+              { company: COMPANIES.tuple.name, logo: COMPANIES.tuple.logo, contact: 'Alex Curren', contactAvatar: P('men', 32), billed: '$312,000.00', outstanding: '$2,000.00', status: 'Overdue', tone: 'danger' },
+              { company: COMPANIES.savvy.name, logo: COMPANIES.savvy.logo, contact: 'Chelsea Hagon', contactAvatar: P('women', 44), billed: '$268,400.00', outstanding: '$0.00', status: 'Active', tone: 'success' },
+              { company: COMPANIES.reform.name, logo: COMPANIES.reform.logo, contact: 'Michael Foster', contactAvatar: P('men', 41), billed: '$184,200.00', outstanding: '$7,600.00', status: 'Active', tone: 'success' },
+              { company: COMPANIES.vantage.name, logo: COMPANIES.vantage.logo, contact: 'Tom Cook', contactAvatar: P('men', 75), billed: '$156,900.00', outstanding: '$21,400.00', status: 'Overdue', tone: 'danger' },
+              { company: COMPANIES.loomis.name, logo: COMPANIES.loomis.logo, contact: 'Priya Nair', contactAvatar: P('women', 68), billed: '$94,750.00', outstanding: '$3,900.00', status: 'Due soon', tone: 'warning' },
+              { company: COMPANIES.cedar.name, logo: COMPANIES.cedar.logo, contact: 'Dana Reuel', contactAvatar: P('women', 65), billed: '$73,250.00', outstanding: '$8,250.00', status: 'Active', tone: 'success' },
+            ],
+            footInfo: 'Showing 1–6 of 18 clients',
           } },
         ],
       },

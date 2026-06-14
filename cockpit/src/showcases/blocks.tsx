@@ -25,6 +25,27 @@ function PhotoAvatar({ url, name, sm }: { url: string; name: string; sm?: boolea
   )
 }
 
+/** The summary band — the kit's .stat-tile-strip with the --fill modifier (cells
+ *  take var(--k-surface-fill)). The ONE focal "state at a glance" zone per Ledger
+ *  screen (flagship doctrine). Shared by every list screen so the band is ONE
+ *  thing, never re-rolled. Label + delta on a row, value below — canonical
+ *  .stat-tile sub-parts. */
+function SummaryBand({ items }: { items: Array<{ label: string; value: string; delta?: string; up?: boolean }> }) {
+  return (
+    <div className="stat-tile-strip stat-tile-strip--fill">
+      {items.map((k) => (
+        <div className="stat-tile-strip__cell" key={k.label}>
+          <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+            <span className="stat-tile__label">{k.label}</span>
+            {k.delta && <span className={`stat-tile__delta ${k.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{k.delta}</span>}
+          </div>
+          <span className="stat-tile__value">{k.value}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /**
  * H3b — the block renderer: BlockSpec (data) → KIT recipes (markup).
  *
@@ -311,22 +332,9 @@ export function renderBlock(spec: BlockSpec, key: number) {
             <button type="button" className="btn btn--primary"><Icon name="plus" /> New invoice</button>
           </div>
 
-          {/* KPI strip = the SUMMARY BAND — the kit's .stat-tile-strip wearing the
-              tactical Fill (--fill ⇒ cells take var(--k-surface-fill)). Brand/Gradient
-              washes behind the stats like the Tailwind reference; working surfaces
-              below stay --k-surface. The strip is a real recipe, not a hand-rolled
-              flex — same component the gallery demos. */}
-          <div className="stat-tile-strip stat-tile-strip--fill">
-            {s.kpis.map((k) => (
-              <div className="stat-tile-strip__cell" key={k.label}>
-                <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-                  <span className="stat-tile__label">{k.label}</span>
-                  <span className={`stat-tile__delta ${k.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{k.delta}</span>
-                </div>
-                <span className="stat-tile__value">{k.value}</span>
-              </div>
-            ))}
-          </div>
+          {/* KPI strip = the SUMMARY BAND (shared SummaryBand → .stat-tile-strip--fill).
+              The one focal "state at a glance" zone; working surfaces below stay white. */}
+          <SummaryBand items={s.kpis} />
 
           {/* Recent activity — grouped transaction feed */}
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -400,20 +408,9 @@ export function renderBlock(spec: BlockSpec, key: number) {
             </div>
           </div>
 
-          {/* Summary band = the ONE Fill zone — the kit's .stat-tile-strip with the
-              --fill modifier (cells take var(--k-surface-fill)). Working surfaces
-              below stay --k-surface. Same recipe as the cashflow KPI band. */}
-          <div className="stat-tile-strip stat-tile-strip--fill">
-            {s.summary.map((k) => (
-              <div className="stat-tile-strip__cell" key={k.label}>
-                <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-                  <span className="stat-tile__label">{k.label}</span>
-                  {k.delta && <span className={`stat-tile__delta ${k.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{k.delta}</span>}
-                </div>
-                <span className="stat-tile__value">{k.value}</span>
-              </div>
-            ))}
-          </div>
+          {/* Summary band = the ONE Fill zone (shared SummaryBand). Working
+              surfaces below stay --k-surface. */}
+          <SummaryBand items={s.summary} />
 
           {/* The list — the .datatable BLOCK (page tier: rows grow to natural
               height). Filter bar in the __bar, pagination in the __foot. */}
@@ -463,6 +460,84 @@ export function renderBlock(spec: BlockSpec, key: number) {
                 <button type="button" aria-current="true">1</button>
                 <button type="button">2</button>
                 <button type="button">3</button>
+                <button type="button" aria-label="Next"><Icon name="chevR" /></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    case 'clients': {
+      const s = spec.seed
+      const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
+      const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
+      const med = 'var(--k-weight-medium)' as CSSProperties['fontWeight']
+      const bold = 'var(--k-weight-bold)' as CSSProperties['fontWeight']
+      return (
+        <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
+          {/* Header: title + count · the one aimed action */}
+          <div className="l-cluster" style={{ justifyContent: 'space-between', alignItems: 'flex-end' } as CSSProperties}>
+            <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
+              <span style={{ fontSize: 'var(--k-type-h2)', fontWeight: bold, fontFamily: 'var(--k-font-display)' }}>Clients</span>
+              <span style={muted}>{s.subtitle}</span>
+            </div>
+            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+              <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
+              <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> Add client</button>
+            </div>
+          </div>
+
+          <SummaryBand items={s.summary} />
+
+          <div className="datatable datatable--page">
+            <div className="datatable__bar">
+              <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
+                <div className="segctrl" role="tablist" aria-label="Filter clients">
+                  {s.filters.map((f, i) => (
+                    <button key={f} type="button" role="tab" aria-selected={i === s.activeFilter} className={`segctrl__btn ${i === s.activeFilter ? 'segctrl__btn--on' : ''}`}>{f}</button>
+                  ))}
+                </div>
+                <span className="toolbar__spacer" />
+                <div className="in in--inline" style={{ maxWidth: 200 }}>
+                  <Icon name="search" />
+                  <input type="search" aria-label="Search clients" placeholder="Search…" />
+                </div>
+              </div>
+            </div>
+            <div className="datatable__body">
+              <table className="tbl">
+                <thead>
+                  <tr><th>Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  {s.rows.map((r) => (
+                    <tr key={r.company}>
+                      <td>
+                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
+                          <BrandLogo id={r.logo} size={28} />
+                          <span style={{ fontWeight: med }}>{r.company}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+                          <PhotoAvatar url={r.contactAvatar} name={r.contact} sm />
+                          <span>{r.contact}</span>
+                        </div>
+                      </td>
+                      <td className="num" style={money}>{r.billed}</td>
+                      <td className="num" style={{ ...money, fontWeight: med }}>{r.outstanding}</td>
+                      <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="datatable__foot">
+              <span className="datatable__foot-info">{s.footInfo}</span>
+              <div className="pagination">
+                <button type="button" disabled aria-label="Previous"><Icon name="chevL" /></button>
+                <button type="button" aria-current="true">1</button>
+                <button type="button">2</button>
                 <button type="button" aria-label="Next"><Icon name="chevR" /></button>
               </div>
             </div>
