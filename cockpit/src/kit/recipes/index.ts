@@ -2032,8 +2032,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     css: `/* === Dialog === */
 .dialog {
   border-radius: var(--k-radius-lg);
-  border: 1px solid var(--k-border);
-  background: var(--k-surface-raised);
+  border: var(--k-hairline, 1px solid var(--k-border));
+  background: var(--k-surface-overlay, var(--k-surface-raised));
   /* Never exceed the viewport on a narrow phone (a content-sized dialog has no
      intrinsic width cap otherwise). The frame demo's 90% rule still wins inside it. */
   max-width: calc(100vw - 2rem);
@@ -2077,8 +2077,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    section labels with clear top-space so each group reads as its own block. */
 .cmdp {
   border-radius: var(--k-radius-lg);
-  border: 1px solid var(--k-border);
-  background: var(--k-surface-raised);
+  border: var(--k-hairline, 1px solid var(--k-border));
+  background: var(--k-surface-overlay, var(--k-surface-raised));
   box-shadow: var(--k-shadow-lg);
   overflow: hidden;
 }
@@ -2850,8 +2850,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   align-items: flex-start;
   gap: var(--k-s-10);
   padding: var(--k-s-10) var(--k-s-12);
-  background: var(--k-surface-raised);
-  border: 1px solid var(--k-border);
+  background: var(--k-surface-overlay, var(--k-surface-raised));
+  border: var(--k-hairline, 1px solid var(--k-border));
   border-radius: var(--k-radius-md);
   box-shadow: var(--k-shadow-md);
   font-size: var(--k-type-small);
@@ -2983,8 +2983,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   left: 0;
   min-width: 200px;
   padding: var(--k-s-12);
-  background: var(--k-surface-raised);
-  border: 1px solid var(--k-border);
+  background: var(--k-surface-overlay, var(--k-surface-raised));
+  border: var(--k-hairline, 1px solid var(--k-border));
   border-radius: var(--k-radius-lg);
   box-shadow: var(--k-shadow-lg);
   font-size: var(--k-type-small);
@@ -3001,7 +3001,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   left: 16px;
   width: 10px;
   height: 10px;
-  background: var(--k-surface-raised);
+  background: var(--k-surface-overlay, var(--k-surface-raised));
   border-top: var(--k-divider);
   border-left: var(--k-divider);
   transform: rotate(45deg);
@@ -3028,8 +3028,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   left: 0;
   min-width: 240px;
   padding: var(--k-s-12);
-  background: var(--k-surface-raised);
-  border: 1px solid var(--k-border);
+  background: var(--k-surface-overlay, var(--k-surface-raised));
+  border: var(--k-hairline, 1px solid var(--k-border));
   border-radius: var(--k-radius-lg);
   box-shadow: var(--k-shadow-lg);
   font-size: var(--k-type-small);
@@ -3076,7 +3076,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   width: var(--sheet-w);
   /* Never wider than the viewport — a 360px sheet must not overflow a 320px phone. */
   max-width: 100vw;
-  background: var(--k-surface-raised);
+  background: var(--k-surface-overlay, var(--k-surface-raised));
   border-left: var(--k-divider);
   box-shadow: var(--k-shadow-lg);
   display: flex;
