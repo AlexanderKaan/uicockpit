@@ -3745,6 +3745,31 @@ function StatGroupCard() {
           <div className="stat-tile__label">Median TTFB</div>
         </div>
       </div>
+      {/* --fill: the summary-band variant — cells wear the tactical --k-surface-fill
+          wash (label + delta on a row, value below). The "state at a glance" strip. */}
+      <div className="stat-tile-strip stat-tile-strip--fill" style={{ marginTop: 12 }}>
+        <div className="stat-tile-strip__cell">
+          <div className="card__row" style={{ justifyContent: 'space-between', gap: 8 }}>
+            <span className="stat-tile__label">Revenue</span>
+            <span className="stat-tile__delta stat-tile__delta--up">+4.8%</span>
+          </div>
+          <div className="stat-tile__value">$405K</div>
+        </div>
+        <div className="stat-tile-strip__cell">
+          <div className="card__row" style={{ justifyContent: 'space-between', gap: 8 }}>
+            <span className="stat-tile__label">Overdue</span>
+            <span className="stat-tile__delta stat-tile__delta--down">+54%</span>
+          </div>
+          <div className="stat-tile__value">$12.7K</div>
+        </div>
+        <div className="stat-tile-strip__cell">
+          <div className="card__row" style={{ justifyContent: 'space-between', gap: 8 }}>
+            <span className="stat-tile__label">Paid this month</span>
+            <span className="stat-tile__delta stat-tile__delta--up">+8.1%</span>
+          </div>
+          <div className="stat-tile__value">$148K</div>
+        </div>
+      </div>
       <div className="card__row" style={{ alignItems: 'center', gap: 8, marginTop: 8 }}>
         <span className="avatar-group">
           <span className="avatar avatar--sm">AB</span>

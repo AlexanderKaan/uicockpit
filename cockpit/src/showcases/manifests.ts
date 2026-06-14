@@ -94,6 +94,16 @@ export interface ShowcaseManifest {
 
 const P = (g: 'men' | 'women', n: number) => `https://randomuser.me/api/portraits/${g}/${n}.jpg`
 
+/** The ONE Ledger menu — shared by every Ledger screen so the app reads as a
+ *  single product (Catalyst-style: one nav, many pages). Add a screen → it joins
+ *  this menu; never re-declare nav per manifest. */
+const LEDGER_NAV: Array<{ icon: IconName; label: string }> = [
+  { icon: 'home', label: 'Home' },
+  { icon: 'file', label: 'Invoices' },
+  { icon: 'store', label: 'Clients' },
+  { icon: 'card', label: 'Expenses' },
+]
+
 export const SHOWCASES: ShowcaseManifest[] = [
   // ── FLAGSHIP: Ledger (billing) — the Invoice-detail screen, built to the bar.
   //    One coherent product · a recurring cast w/ real portraits + designed logos ·
@@ -106,12 +116,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
     width: 1200,
     archetype: 'feed',
     nav: 'topbar',
-    navItems: [
-      { icon: 'home', label: 'Home' },
-      { icon: 'file', label: 'Invoices' },
-      { icon: 'store', label: 'Clients' },
-      { icon: 'card', label: 'Expenses' },
-    ],
+    navItems: LEDGER_NAV,
     barTitle: 'Ledger',
     panes: [
       {
@@ -151,12 +156,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
     width: 1200,
     archetype: 'feed',
     nav: 'topbar',
-    navItems: [
-      { icon: 'home', label: 'Home' },
-      { icon: 'file', label: 'Invoices' },
-      { icon: 'store', label: 'Clients' },
-      { icon: 'card', label: 'Expenses' },
-    ],
+    navItems: LEDGER_NAV,
     barTitle: 'Ledger',
     panes: [
       {
@@ -195,12 +195,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
     width: 1200,
     archetype: 'feed',
     nav: 'topbar',
-    navItems: [
-      { icon: 'home', label: 'Home' },
-      { icon: 'file', label: 'Invoices' },
-      { icon: 'store', label: 'Clients' },
-      { icon: 'card', label: 'Expenses' },
-    ],
+    navItems: LEDGER_NAV,
     barTitle: 'Ledger',
     panes: [
       {

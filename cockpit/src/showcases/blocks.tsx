@@ -311,21 +311,21 @@ export function renderBlock(spec: BlockSpec, key: number) {
             <button type="button" className="btn btn--primary"><Icon name="plus" /> New invoice</button>
           </div>
 
-          {/* KPI strip = the SUMMARY BAND — the one focal block that wears the
-              tactical Fill (var(--k-surface-fill)); Brand/Gradient washes behind the
-              stats like the Tailwind reference. Working surfaces below stay --k-surface. */}
-          <div className="card" style={{ padding: 0, overflow: 'hidden', background: 'var(--k-surface-fill)' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-              {s.kpis.map((k, i) => (
-                <div key={k.label} style={{ flex: '1 1 9rem', minWidth: 0, padding: 'var(--k-s-20) var(--k-s-24)', borderLeft: i ? hairline : undefined }}>
-                  <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-                    <span style={muted}>{k.label}</span>
-                    <span style={{ ...money, fontSize: 'var(--k-type-small)', fontWeight: med, color: k.up ? 'var(--k-success)' : 'var(--k-danger)' }}>{k.delta}</span>
-                  </div>
-                  <div style={{ ...money, fontSize: 'var(--k-type-h1)', fontWeight: 'var(--k-weight-bold)' as CSSProperties['fontWeight'], marginTop: 'var(--k-s-4)' }}>{k.value}</div>
+          {/* KPI strip = the SUMMARY BAND — the kit's .stat-tile-strip wearing the
+              tactical Fill (--fill ⇒ cells take var(--k-surface-fill)). Brand/Gradient
+              washes behind the stats like the Tailwind reference; working surfaces
+              below stay --k-surface. The strip is a real recipe, not a hand-rolled
+              flex — same component the gallery demos. */}
+          <div className="stat-tile-strip stat-tile-strip--fill">
+            {s.kpis.map((k) => (
+              <div className="stat-tile-strip__cell" key={k.label}>
+                <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+                  <span className="stat-tile__label">{k.label}</span>
+                  <span className={`stat-tile__delta ${k.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{k.delta}</span>
                 </div>
-              ))}
-            </div>
+                <span className="stat-tile__value">{k.value}</span>
+              </div>
+            ))}
           </div>
 
           {/* Recent activity — grouped transaction feed */}
@@ -386,7 +386,6 @@ export function renderBlock(spec: BlockSpec, key: number) {
       const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
       const med = 'var(--k-weight-medium)' as CSSProperties['fontWeight']
       const bold = 'var(--k-weight-bold)' as CSSProperties['fontWeight']
-      const hairline = 'var(--k-hairline, 1px solid var(--k-border))'
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
           {/* Header: title + count · the one aimed action */}
@@ -401,20 +400,19 @@ export function renderBlock(spec: BlockSpec, key: number) {
             </div>
           </div>
 
-          {/* Summary band = the ONE Fill zone (var(--k-surface-fill)). Working
-              surfaces below stay --k-surface. Mirrors the cashflow KPI doctrine. */}
-          <div className="card" style={{ padding: 0, overflow: 'hidden', background: 'var(--k-surface-fill)' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-              {s.summary.map((k, i) => (
-                <div key={k.label} style={{ flex: '1 1 9rem', minWidth: 0, padding: 'var(--k-s-20) var(--k-s-24)', borderLeft: i ? hairline : undefined }}>
-                  <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-                    <span style={muted}>{k.label}</span>
-                    {k.delta && <span style={{ ...money, fontSize: 'var(--k-type-small)', fontWeight: med, color: k.up ? 'var(--k-success)' : 'var(--k-danger)' }}>{k.delta}</span>}
-                  </div>
-                  <div style={{ ...money, fontSize: 'var(--k-type-h1)', fontWeight: bold, marginTop: 'var(--k-s-4)' }}>{k.value}</div>
+          {/* Summary band = the ONE Fill zone — the kit's .stat-tile-strip with the
+              --fill modifier (cells take var(--k-surface-fill)). Working surfaces
+              below stay --k-surface. Same recipe as the cashflow KPI band. */}
+          <div className="stat-tile-strip stat-tile-strip--fill">
+            {s.summary.map((k) => (
+              <div className="stat-tile-strip__cell" key={k.label}>
+                <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+                  <span className="stat-tile__label">{k.label}</span>
+                  {k.delta && <span className={`stat-tile__delta ${k.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{k.delta}</span>}
                 </div>
-              ))}
-            </div>
+                <span className="stat-tile__value">{k.value}</span>
+              </div>
+            ))}
           </div>
 
           {/* The list — the .datatable BLOCK (page tier: rows grow to natural
