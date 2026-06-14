@@ -913,6 +913,10 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-icon-xs': '0.6875rem',
       '--k-icon-sm': '0.875rem',
       '--k-icon-md': '1rem',
+      // --k-marker — the decorative series dot/swatch (chart legend, donut key,
+      // tooltip dot). One size so a legend dot and its swatch read as the same
+      // marker (was 8/9/8px drift).
+      '--k-marker': '0.5rem',
       // Box/container inner padding — cards, dialogs, panels. Floored well above
       // --k-space (default 24 = shadcn p-6, compact 16 = Material/Tailwind p-4) so
       // every box meets the modern minimum without inflating the gap rhythm.

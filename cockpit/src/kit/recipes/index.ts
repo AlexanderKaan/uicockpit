@@ -2357,7 +2357,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Legend — series swatch + label row under a categorical chart */
 .chart-legend { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); margin-top: var(--k-s-12); }
 .chart-legend__item { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
-.chart-legend__dot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.chart-legend__dot { width: var(--k-marker); height: var(--k-marker); border-radius: 2px; flex: none; }
 
 /* ChartFrame — presentational chart family on the --k-chart-1..6 palette.
  * One container, five render modes (line / area / bar / stacked / donut).
@@ -2371,7 +2371,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .chart__donut-cap { font-size: var(--k-type-caption); fill: var(--k-fg-faint); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
 .chart__legend { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); margin-top: var(--k-s-10); }
 .chart__legend-item { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
-.chart__swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.chart__swatch { width: var(--k-marker); height: var(--k-marker); border-radius: 2px; flex: none; }
 /* Gridlines — faint horizontal guides behind the marks. Baseline reuses
  * .chart__axis (stronger). Both are non-scaling so they stay 1px under the
  * stretched (preserveAspectRatio:none) viewBox. */
@@ -2390,7 +2390,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .chart__tip { position: absolute; top: var(--k-s-2); transform: translateX(-50%); min-width: 116px; max-width: 180px; padding: var(--k-s-6) var(--k-s-8); background: var(--k-surface-overlay, var(--k-surface-raised)); border: var(--k-hairline, 1px solid var(--k-border)); border-radius: var(--k-radius-sm); box-shadow: var(--k-shadow-md); font-size: var(--k-type-caption); pointer-events: none; z-index: 3; }
 .chart__tip-label { font-weight: var(--k-weight-semibold); color: var(--k-fg); margin-bottom: var(--k-s-4); }
 .chart__tip-row { display: flex; align-items: center; gap: var(--k-s-4); line-height: 1.5; }
-.chart__tip-dot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.chart__tip-dot { width: var(--k-marker); height: var(--k-marker); border-radius: 2px; flex: none; }
 .chart__tip-name { color: var(--k-fg-muted); }
 .chart__tip-val { margin-left: auto; font-weight: var(--k-weight-semibold); color: var(--k-fg); font-variant-numeric: tabular-nums; }
 
