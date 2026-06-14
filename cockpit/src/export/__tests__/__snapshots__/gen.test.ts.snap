@@ -465,6 +465,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "page-head",
         "section",
         "entity-card",
+        "action-panel",
         "data-table",
         "empty-state",
         "sidebar",
@@ -526,6 +527,15 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "avatar",
           "badges-pills",
           "buttons"
+        ]
+      },
+      "action-panel": {
+        "tier": "section",
+        "section": "Action panel",
+        "uses": [
+          "card",
+          "buttons",
+          "switch-toggle"
         ]
       },
       "button-group": {
@@ -1044,6 +1054,17 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "modifiers": [],
         "parts": [
           "chevron"
+        ]
+      },
+      "action-panel": {
+        "modifiers": [
+          "danger"
+        ],
+        "parts": [
+          "action",
+          "body",
+          "desc",
+          "title"
         ]
       },
       "activity": {
@@ -3453,11 +3474,11 @@ body {
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
  *     Lightbox, Dialog, Command palette, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Carousel, InfoCard, CodeBlock, WizardStepper
  *
- * SECTIONS — the page-region tier (20): adaptive app frames that ARRANGE
+ * SECTIONS — the page-region tier (21): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
  *   arrangement, never look; components slot into panes; panes assemble into PAGES
  *   (your screens).
- *     Page header, Section, Entity card, Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Calendar, Chart, Stat tile, Timeline, Pricing, File grid, Form panel, Filter bar, Adaptive scaffold, Nav suite, Pane
+ *     Page header, Section, Entity card, Action panel, Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Calendar, Chart, Stat tile, Timeline, Pricing, File grid, Form panel, Filter bar, Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
 
 /* === Toolbar ===
@@ -3974,6 +3995,24 @@ body {
 /* --fill: the compact tinted header Alexander sketched (less tall, slightly
  * coloured, full-bleed divider) — the head wears --k-surface-fill. */
 .entity-card--fill .entity-card__head { background: var(--k-surface-fill); }
+
+/* === Action panel (SECTION tier) =========================================
+ * Tailwind "action panels": a card that states ONE thing and offers ONE action
+ * — a heading, a description, and an action zone (a button, a toggle, or an
+ * inline input + button). The settings-screen workhorse. Built on .card.
+ * Anatomy: .card.action-panel > .action-panel__body (.action-panel__title +
+ * .action-panel__desc) + .action-panel__action. Inline by default — the action
+ * trails on the right and wraps below the body on a narrow container. */
+.action-panel { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--k-s-16); }
+.action-panel__body { display: flex; flex-direction: column; gap: var(--k-s-4); flex: 1 1 22rem; min-width: 0; }
+.action-panel__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
+.action-panel__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.45; }
+.action-panel__action { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
+/* --danger: the destructive variant (the "Delete account" panel) — a danger
+ * hairline frames the card and the title takes the danger role. Pair the action
+ * with a .btn--danger. */
+.action-panel--danger { border-color: var(--k-danger); }
+.action-panel--danger .action-panel__title { color: var(--k-danger); }
 
 /* === Button group ========================================================
  * A row of buttons fused into one control — shared edges, outer corners follow

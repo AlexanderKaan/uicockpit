@@ -181,7 +181,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   const CARDS: Array<readonly [() => ReactElement, 'atom' | 'component' | 'section']> = [
     // SECTION tier — the page-region wrappers (KIT-COVERAGE-AUDIT): the headers +
     // identity cards you stack to lay out a screen.
-    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'section'],
+    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'section'], [ActionPanelCard, 'section'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
@@ -3787,6 +3787,33 @@ function EntityCardCard() {
             <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Jan 22, 2026</span></div>
             <div className="entity-card__row"><span className="entity-card__label">Amount</span><span className="entity-card__value">$14,000.00 <span className="badge badge--success">Paid</span></span></div>
           </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+/* Action panel (Tailwind App-UI "Action panels") — a card stating one thing +
+ * one action: a button, a toggle, or an inline input. The settings workhorse. */
+function ActionPanelCard() {
+  return (
+    <Card wide title="Action panel" desc="A heading + description + one action — a button, a toggle, or an inline input. The settings-screen workhorse; --danger for destructive.">
+      <div className="l-stack" style={{ '--l-gap': 'var(--k-s-12)' } as CSSProperties}>
+        <div className="card action-panel">
+          <div className="action-panel__body"><h3 className="action-panel__title">Renew subscription</h3><p className="action-panel__desc">Your plan renews Jul 1. Update payment to avoid interruption.</p></div>
+          <div className="action-panel__action"><button type="button" className="btn btn--primary btn--sm">Update payment</button></div>
+        </div>
+        <div className="card action-panel">
+          <div className="action-panel__body"><h3 className="action-panel__title">Email receipts</h3><p className="action-panel__desc">Send a receipt after every payment.</p></div>
+          <div className="action-panel__action"><div className="toggle toggle--on" role="switch" aria-checked="true" aria-label="Email receipts"><div className="toggle__knob" /></div></div>
+        </div>
+        <div className="card action-panel">
+          <div className="action-panel__body"><h3 className="action-panel__title">Custom domain</h3><p className="action-panel__desc">Point your domain at our servers.</p></div>
+          <div className="action-panel__action"><div className="in in--inline" style={{ maxWidth: 180 }}><input placeholder="app.acme.com" aria-label="Domain" /></div><button type="button" className="btn btn--secondary btn--sm">Add</button></div>
+        </div>
+        <div className="card action-panel action-panel--danger">
+          <div className="action-panel__body"><h3 className="action-panel__title">Delete account</h3><p className="action-panel__desc">Permanently remove your account and all data.</p></div>
+          <div className="action-panel__action"><button type="button" className="btn btn--danger btn--sm">Delete</button></div>
         </div>
       </div>
     </Card>

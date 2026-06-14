@@ -56,11 +56,12 @@ describe('segment graph integrity', () => {
     expect(idsByTier('section')).toHaveLength(Object.keys(SECTION_USES).length)
     expect(idsByTier('foundation')).toHaveLength(4)
     expect(idsByTier('component')).toHaveLength(14)
-    // 3 shell sections (scaffold/navsuite/pane) + 3 page-region sections
-    // (page-head/section/entity-card) + 14 promoted full-page-part sections
-    // (data-table/form-panel/filter-bar/stat-tile/timeline/activity-feed/empty-state/
-    // pricing/file-grid/calendar/auth/danger-zone/chart/sidebar) — Tailwind-style tier.
-    expect(idsByTier('section')).toHaveLength(20)
+    // 3 shell sections (scaffold/navsuite/pane) + 4 page-region sections
+    // (page-head/section/entity-card/action-panel) + 14 promoted full-page-part
+    // sections (data-table/form-panel/filter-bar/stat-tile/timeline/activity-feed/
+    // empty-state/pricing/file-grid/calendar/auth/danger-zone/chart/sidebar) —
+    // Tailwind-style "a section is a full part of a page" tier.
+    expect(idsByTier('section')).toHaveLength(21)
   })
 
   it('every standalone-blessed id is a real ATOM (not a component/foundation)', () => {

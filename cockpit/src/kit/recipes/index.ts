@@ -551,6 +551,27 @@ export const RECIPES: readonly Recipe[] = [
 .entity-card--fill .entity-card__head { background: var(--k-surface-fill); }`,
   },
   {
+    id: 'action-panel',
+    section: "Action panel",
+    css: `/* === Action panel (SECTION tier) =========================================
+ * Tailwind "action panels": a card that states ONE thing and offers ONE action
+ * — a heading, a description, and an action zone (a button, a toggle, or an
+ * inline input + button). The settings-screen workhorse. Built on .card.
+ * Anatomy: .card.action-panel > .action-panel__body (.action-panel__title +
+ * .action-panel__desc) + .action-panel__action. Inline by default — the action
+ * trails on the right and wraps below the body on a narrow container. */
+.action-panel { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--k-s-16); }
+.action-panel__body { display: flex; flex-direction: column; gap: var(--k-s-4); flex: 1 1 22rem; min-width: 0; }
+.action-panel__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
+.action-panel__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.45; }
+.action-panel__action { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
+/* --danger: the destructive variant (the "Delete account" panel) — a danger
+ * hairline frames the card and the title takes the danger role. Pair the action
+ * with a .btn--danger. */
+.action-panel--danger { border-color: var(--k-danger); }
+.action-panel--danger .action-panel__title { color: var(--k-danger); }`,
+  },
+  {
     id: 'button-group',
     section: "Button group",
     css: `/* === Button group ========================================================

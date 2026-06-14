@@ -40,6 +40,9 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   'page-head': ['buttons'],
   section: ['buttons'],
   'entity-card': ['avatar', 'badges-pills', 'buttons'],
+  // The Tailwind "action panels" family — a card that states one thing + offers
+  // one action (a button, a toggle, or an inline input). The settings workhorse.
+  'action-panel': ['card', 'buttons', 'switch-toggle'],
   // Promoted to the section tier (Tailwind-style "a section is a full part of a
   // page"): each is a complete page-region surface, not a bare component. Their
   // `uses` edges are unchanged — they still parent the same atoms (see the
