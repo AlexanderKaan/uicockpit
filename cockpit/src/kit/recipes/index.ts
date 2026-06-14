@@ -1763,7 +1763,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .empty__icon > svg { width: var(--k-icon, 18px); height: var(--k-icon, 18px); }
 .empty__title { font-weight: var(--k-weight-semibold); font-size: var(--k-type-small); }
-.empty__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); max-width: 32ch; }`,
+.empty__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); max-width: 32ch; }
+/* --- Action grid (Tailwind "empty state with templates / starting points") ---
+   A grid of "starting point" cards below the empty copy — pick a template instead
+   of facing a blank canvas. Pair with .card--interactive tiles. */
+.empty__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--k-s-10); width: 100%; margin-top: var(--k-s-6); }`,
   },
   {
     id: 'select-trigger',
@@ -4648,7 +4652,18 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .list__title--lg { font-size: var(--k-type-body); white-space: normal; }
 /* Unread row — bold title + trailing dot */
 .list__item--unread .list__title { font-weight: var(--k-weight-bold); }
-.list__dot { width: var(--k-dot); height: var(--k-dot); border-radius: 50%; background: var(--k-primary); flex: none; align-self: center; }`,
+.list__dot { width: var(--k-dot); height: var(--k-dot); border-radius: 50%; background: var(--k-primary); flex: none; align-self: center; }
+/* --cols: two-column stacked list (Tailwind "stacked list, two columns") — rows
+   flow into two columns on a wide container, one when narrow; section headings
+   span the full width. Reset the row's negative inline margin so the hover bg
+   doesn't bleed into the column gutter. */
+.list--cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); column-gap: var(--k-s-24); margin: 0; }
+.list--cols .list__item { margin-inline: 0; }
+.list--cols .list__section { grid-column: 1 / -1; }
+/* --sticky: section headings pin to the top while their group scrolls past
+   (Tailwind "stacked list with sticky headings"). Put the list in a scroll
+   container; the heading gets a surface fill so rows don't show through it. */
+.list--sticky .list__section { position: sticky; top: 0; z-index: 1; background: var(--k-surface); }`,
   },
   {
     id: 'timeline',

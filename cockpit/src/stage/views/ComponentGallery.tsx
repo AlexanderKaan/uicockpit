@@ -85,6 +85,8 @@ const CARD_KEYWORDS: Record<string, string> = {
   ResponsiveTableCard: 'Responsive table stacked mobile hidden columns label value cards',
   HorizontalFormCard: 'Profile form labels on left horizontal layout settings dense',
   HeaderVariantsCard: 'Page header breadcrumb tabs banner image cover profile section heading',
+  EmptyTemplatesCard: 'Empty state templates starting points action grid blank project create',
+  TwoColumnListCard: 'Two column stacked list directory sticky group headings members',
   DataTableProCard: 'Data table pro grid sort filter select',
   ListCard: 'Library list rows items',
   DescriptionListCard: 'Subscription description list key value',
@@ -193,7 +195,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'section'],
-    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'],
+    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'section'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -309,7 +311,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
-  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, ListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard, SignatureShapeCard]],
+  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard, SignatureShapeCard]],
   ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
 ]
 
@@ -2952,6 +2954,83 @@ function HeaderVariantsCard() {
               <button type="button" className="btn btn--primary btn--sm">Follow</button>
             </div>
           </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function EmptyTemplatesCard() {
+  // Empty state with a starting-point template grid (.empty__grid) — pick a
+  // template instead of a blank canvas. Tiles are real .card--interactive.
+  const TEMPLATES = [
+    { icon: 'file' as const, name: 'Blank', desc: 'Start from scratch' },
+    { icon: 'cal' as const, name: 'Roadmap', desc: 'Timeline + milestones' },
+    { icon: 'cog' as const, name: 'Ops board', desc: 'Triage + on-call' },
+  ]
+  return (
+    <Card title="Create a project" desc="Empty state with starting-point templates.">
+      <div className="empty">
+        <span className="empty__icon"><Icon name="file" /></span>
+        <div className="empty__title">No projects yet</div>
+        <div className="empty__sub">Start from a template, or create a blank project.</div>
+        <div className="empty__grid">
+          {TEMPLATES.map((t) => (
+            <button key={t.name} type="button" className="card card--interactive" style={{ padding: 'var(--k-s-12)', gap: 'var(--k-s-6)', alignItems: 'flex-start' }}>
+              <span className="empty__icon"><Icon name={t.icon} /></span>
+              <span style={{ fontWeight: 'var(--k-weight-semibold)', fontSize: 'var(--k-type-small)' }}>{t.name}</span>
+              <span style={{ fontSize: 'var(--k-type-eyebrow)', color: 'var(--k-fg-muted)' }}>{t.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function TwoColumnListCard() {
+  // Stacked-list variants: a two-column directory (.list--cols) and sticky group
+  // headings (.list--sticky) inside a scroll container.
+  const MEMBERS = [
+    ['Engineering', 'Priya Rao', 'Staff engineer'], ['Engineering', 'Jonas Ek', 'Senior engineer'],
+    ['Design', 'Mara Vidic', 'Lead designer'], ['Design', 'Tom Healy', 'Product designer'],
+  ] as const
+  const DIRECTORY = [
+    ['A', 'Ana Cole'], ['A', 'Aaron Diaz'], ['B', 'Bea Lund'], ['B', 'Ben Ortiz'],
+    ['C', 'Cara Voss'], ['C', 'Cole Park'], ['D', 'Dana Ito'], ['D', 'Drew Han'],
+  ] as const
+  const initials = (n: string) => n.split(' ').map((w) => w[0]).join('')
+  return (
+    <Card wide title="Members" desc="Two-column directory (wide), and sticky group headings.">
+      <div className="list list--cols">
+        {['Engineering', 'Design'].map((team) => (
+          <Fragment key={team}>
+            <div className="list__section">{team}</div>
+            {MEMBERS.filter((m) => m[0] === team).map((m) => (
+              <button key={m[1]} type="button" className="list__item">
+                <span className="list__lead list__lead--avatar">{initials(m[1])}</span>
+                <div className="list__body">
+                  <div className="list__title">{m[1]}</div>
+                  <div className="list__sub">{m[2]}</div>
+                </div>
+              </button>
+            ))}
+          </Fragment>
+        ))}
+      </div>
+      <div className="scroll-area" style={{ maxHeight: 160, overflow: 'auto', marginTop: 'var(--k-s-12)' }}>
+        <div className="list list--sticky">
+          {['A', 'B', 'C', 'D'].map((letter) => (
+            <Fragment key={letter}>
+              <div className="list__section">{letter}</div>
+              {DIRECTORY.filter((d) => d[0] === letter).map((d) => (
+                <button key={d[1]} type="button" className="list__item">
+                  <span className="list__lead list__lead--avatar">{initials(d[1])}</span>
+                  <div className="list__body"><div className="list__title">{d[1]}</div></div>
+                </button>
+              ))}
+            </Fragment>
+          ))}
         </div>
       </div>
     </Card>
