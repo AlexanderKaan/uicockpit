@@ -403,7 +403,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
             <input
               type="range"
               min={0}
-              max={200}
+              max={150}
               step={5}
               value={cfg.expression}
               onChange={(e) => {

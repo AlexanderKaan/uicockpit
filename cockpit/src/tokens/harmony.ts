@@ -7,9 +7,12 @@
  *                      deliberate deviation from M3 Expressive (which rotates
  *                      the seed itself by +240°): a user's brand color is
  *                      sacred; harmony governs the relatives only.
- *   expression 0–200%  chroma multiplier on the derived family INCLUDING the
+ *   expression 0–150%  chroma multiplier on the derived family INCLUDING the
  *                      neutral surface tint (→ chromatic surfaces at the high
- *                      end, the M3-2025 direction).
+ *                      end, the M3-2025 direction). CP-guardrail caps it at 150%
+ *                      (boldest preset = 140%); beyond ~150 it goes neon/garish.
+ *                      Enforced in BOTH the slider AND resolveHarmony (so a
+ *                      hand-edited URL hash can't escape the band).
  *
  * The presets are pre-enumerated harmony space (M3 ships 9 scheme variants as
  * constants; we ship 4 presets + the live dials underneath):
@@ -41,6 +44,9 @@ export function resolveHarmony(cfg: Pick<Config, 'spread' | 'expression'>): { sp
   const expression = Number.isFinite(cfg.expression) ? cfg.expression : HARMONY_PRESETS.tonal.expression
   return {
     spreadDeg: Math.max(0, Math.min(180, spread)),
-    exprMul: Math.max(0, Math.min(2, expression / 100)),
+    // CP-guardrail: cap chroma at 1.5×. The boldest preset (expressive) is 1.4×;
+    // beyond ~1.5 the derived family + tinted surfaces go neon/garish. Clamped
+    // HERE (not just the slider) so a hand-edited URL hash can't escape the band.
+    exprMul: Math.max(0, Math.min(1.5, expression / 100)),
   }
 }
