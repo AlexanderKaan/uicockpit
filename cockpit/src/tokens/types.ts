@@ -222,6 +222,11 @@ export interface Config {
   neutral: Neutral
   /* Page canvas / background — see Canvas. Drives --k-bg (exported). */
   canvas: Canvas
+  /* Fill — the tactical tint for the SUMMARY BAND (the one top-of-screen
+   * state-at-a-glance zone: KPI strips, hero metric, amount card). Same palette
+   * as Canvas; drives --k-fill (exported). House rule: apply only to the focal
+   * summary block, never to working surfaces (tables/forms/lists stay white). */
+  fill: Canvas
   mode: Mode
 }
 

@@ -595,6 +595,19 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       onPick: pick('canvas'),
     },
     {
+      // Fill — the tactical tint for the summary band (KPI strip / hero / amount).
+      // Same palette as Background; White = no wash. Applied to the focal block
+      // only (background: var(--k-fill)); working surfaces stay white.
+      key: 'fill',
+      label: 'Block fill',
+      value: cap(CANVAS_OPTS, cfg.fill),
+      kind: 'seg',
+      stack: true,
+      opts: optsFrom(CANVAS_OPTS),
+      selected: cfg.fill,
+      onPick: pick('fill'),
+    },
+    {
       key: 'borders',
       label: 'Border',
       value: cap(BORDER_OPTS, cfg.borders),

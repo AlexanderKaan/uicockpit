@@ -311,10 +311,10 @@ export function renderBlock(spec: BlockSpec, key: number) {
             <button type="button" className="btn btn--primary"><Icon name="plus" /> New invoice</button>
           </div>
 
-          {/* KPI strip — edge-to-edge, hairline-divided columns, big tabular values.
-              Tactical canvas: sits on --k-bg so the chosen Background (esp. Gradient
-              / Brand) washes behind the stats, like the Tailwind reference. */}
-          <div className="card" style={{ padding: 0, overflow: 'hidden', background: 'var(--k-bg)' }}>
+          {/* KPI strip = the SUMMARY BAND — the one focal block that wears the
+              tactical Fill (var(--k-surface-fill)); Brand/Gradient washes behind the
+              stats like the Tailwind reference. Working surfaces below stay --k-surface. */}
+          <div className="card" style={{ padding: 0, overflow: 'hidden', background: 'var(--k-surface-fill)' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
               {s.kpis.map((k, i) => (
                 <div key={k.label} style={{ flex: '1 1 9rem', minWidth: 0, padding: 'var(--k-s-20) var(--k-s-24)', borderLeft: i ? hairline : undefined }}>

@@ -696,6 +696,22 @@ export function buildTokens(cfg: Config): Tokens {
             ` ${nStep(1)}`
           : nStep(1)
 
+  // Fill (--k-fill) — the tactical tint for the SUMMARY BAND only (the focal
+  // top-of-screen KPI/hero/amount zone; house rule: never on working surfaces).
+  // Same palette as Canvas, but 'white' = the plain card surface (no wash) so a
+  // block can opt out. Default 'brand' = a whisper brand wash on the summary band.
+  const fillBg =
+    cfg.fill === 'white'
+      ? 'var(--k-surface)'
+      : cfg.fill === 'brand'
+        ? `color-mix(in srgb, var(--k-primary) 6%, ${nStep(0)})`
+        : cfg.fill === 'gradient'
+          ? 'radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%),' +
+            ' radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%),' +
+            ' radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%),' +
+            ` ${nStep(1)}`
+          : nStep(1)
+
   // Input border — TRACKS the Border control (Faint→Strong), one neutral step
   // firmer than the decorative --k-border so a field still reads as a field.
   // Intentionally NO hard 3:1 floor (the old behaviour clamped Faint/Subtle/
@@ -715,6 +731,11 @@ export function buildTokens(cfg: Config): Tokens {
     vars: {
       ...sVars,
       '--k-bg': pageBg,
+      // Summary-band fill — the tactical tint for the ONE focal "state at a
+      // glance" block per screen (KPI strip / hero metric / amount). Apply via
+      // `background: var(--k-surface-fill)` on that block only; working surfaces
+      // stay --k-surface. (Distinct from --k-fill, the solid directional fill.)
+      '--k-surface-fill': fillBg,
       // Brand canvas (Fase I-D) — the premium mesh you see behind the cockpit
       // preview, shipped so a consumer can sit their app shell on the same
       // brand-derived atmosphere: `background: var(--k-canvas)`. Self-referential
