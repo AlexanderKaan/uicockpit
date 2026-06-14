@@ -84,6 +84,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   GroupedTableCard: 'Grouped table rows summary total row condensed density section headers',
   ResponsiveTableCard: 'Responsive table stacked mobile hidden columns label value cards',
   HorizontalFormCard: 'Profile form labels on left horizontal layout settings dense',
+  HeaderVariantsCard: 'Page header breadcrumb tabs banner image cover profile section heading',
   DataTableProCard: 'Data table pro grid sort filter select',
   ListCard: 'Library list rows items',
   DescriptionListCard: 'Subscription description list key value',
@@ -192,7 +193,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'section'],
-    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'],
+    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'section'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -2905,6 +2906,52 @@ function HorizontalFormCard() {
           <span className="formpanel__foot-note">Changes apply to your account only.</span>
           <button type="button" className="btn btn--ghost btn--sm">Cancel</button>
           <button type="button" className="btn btn--primary btn--sm">Save</button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function HeaderVariantsCard() {
+  // Page-header slots: a breadcrumb above the title, a sub-nav tab row below, and
+  // the --banner cover-image variant with title/actions overlapping the strip.
+  return (
+    <Card wide title="Page headers" desc="Breadcrumb + tabs, and the banner-image header variant.">
+      <div className="l-stack" style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
+        <div className="page-head">
+          <div className="page-head__titles">
+            <nav className="breadcrumb page-head__crumb" aria-label="Breadcrumb">
+              <a href="#">Projects</a><Icon name="chevR" />
+              <span aria-current="page" style={{ color: 'var(--k-fg)' }}>Northwind</span>
+            </nav>
+            <h2 className="page-head__title">Northwind</h2>
+            <p className="page-head__sub">12 members · 4 active sprints</p>
+          </div>
+          <div className="page-head__actions">
+            <button type="button" className="btn btn--ghost btn--sm">Share</button>
+            <button type="button" className="btn btn--primary btn--sm">New issue</button>
+          </div>
+          <div className="page-head__tabs">
+            <div className="tabs" role="tablist" aria-label="Sections">
+              <button type="button" className="tab tab--on" role="tab" aria-selected="true"><span>Overview</span></button>
+              <button type="button" className="tab" role="tab" aria-selected="false"><span>Issues</span></button>
+              <button type="button" className="tab" role="tab" aria-selected="false"><span>Board</span></button>
+              <button type="button" className="tab" role="tab" aria-selected="false"><span>Settings</span></button>
+            </div>
+          </div>
+        </div>
+        <div className="page-head page-head--banner">
+          <div className="page-head__banner" style={{ backgroundImage: 'linear-gradient(135deg, var(--k-primary-soft), var(--k-accent-soft))' }} />
+          <div className="page-head__overlap">
+            <div className="page-head__titles">
+              <h2 className="page-head__title">Mara Vidic</h2>
+              <p className="page-head__sub">Product designer · Amsterdam</p>
+            </div>
+            <div className="page-head__actions">
+              <button type="button" className="btn btn--secondary btn--sm">Message</button>
+              <button type="button" className="btn btn--primary btn--sm">Follow</button>
+            </div>
+          </div>
         </div>
       </div>
     </Card>

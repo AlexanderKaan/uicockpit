@@ -511,7 +511,23 @@ export const RECIPES: readonly Recipe[] = [
 .page-head__actions { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
 /* --bordered: a hairline under the whole header (the Tailwind page-heading with
  * a rule), closing the header band before the content begins. */
-.page-head--bordered { padding-bottom: var(--k-s-16); border-bottom: var(--k-divider); }`,
+.page-head--bordered { padding-bottom: var(--k-s-16); border-bottom: var(--k-divider); }
+/* --- Header slots (Tailwind page/section headings: breadcrumb · tabs · banner) ---
+ * breadcrumb: a trail above the title — the FIRST child of .page-head__titles
+ *   (which is already a column), so it stacks over the eyebrow/title. Pair with
+ *   the .breadcrumb atom. */
+.page-head__crumb { margin-bottom: var(--k-s-4); }
+/* tabs: a sub-nav tab row below the header — wraps to its own full-width line
+ *   (.page-head is already flex-wrap). Pair with the .tabs atom. */
+.page-head__tabs { flex-basis: 100%; margin-top: var(--k-s-12); }
+/* --banner: a cover-image header — a banner strip with the title block + actions
+ *   overlapping its lower edge (the profile / project / workspace header).
+ *   Anatomy: .page-head.page-head--banner > .page-head__banner (set the image via
+ *   background-image) + .page-head__overlap (.page-head__titles + .page-head__actions). */
+.page-head--banner { display: block; }
+.page-head__banner { height: 8rem; border-radius: var(--k-radius-lg); background: var(--k-surface-sunken) center / cover no-repeat; }
+.page-head__overlap { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--k-s-16); flex-wrap: wrap; padding: 0 var(--k-s-16); margin-top: calc(-1 * var(--k-s-24)); }
+.page-head__overlap .page-head__title { line-height: 1.1; }`,
   },
   {
     id: 'section',
