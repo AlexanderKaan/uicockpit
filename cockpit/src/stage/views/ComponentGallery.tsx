@@ -190,26 +190,28 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
   // Typography, LayoutPrimitives, …) are 'component'. Order is preserved so the no-tier
   // path (the marketing bouquet, `limit`-sliced) renders exactly as before.
   const CARDS: Array<readonly [() => ReactElement, 'atom' | 'component' | 'section']> = [
-    // SECTION tier — the page-region wrappers (KIT-COVERAGE-AUDIT): the headers +
-    // identity cards you stack to lay out a screen.
-    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'section'], [ActionPanelCard, 'section'],
-    [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
-    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
-    [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'section'],
+    // SECTION tier — full-width page SLABS only (post the 2026-06-15 slab-vs-widget
+    // re-audit): headers/region wrappers + data-table/form-panel/pricing/sidebar/
+    // empty-state/file-grid + the stats band + calendar VIEWS. Widgets (date picker,
+    // chart, timeline, danger-zone, auth card, stat tile…) are 'component'.
+    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [ActionPanelCard, 'component'],
+    [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
+    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
+    [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
     [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
-    [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
-    [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'section'],
+    [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
+    [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'component'], [SheetCard, 'component'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
-    [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'section'],
+    [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'component'],
     [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ThreadCard, 'component'], [ProseCard, 'component'],
-    [LoginCard, 'section'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'section'], [TimelineCard, 'section'], [NavMenuCard, 'atom'],
-    [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'section'], [NavCard, 'section'],
+    [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
+    [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
     [BreadcrumbCard, 'atom'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
-    [StatusPageCard, 'component'], [InboxFilterCard, 'section'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
+    [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
-    [WizardStepperCard, 'component'], [DangerZoneCard, 'section'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
+    [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
     [AttachmentChipCard, 'atom'], [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], [AspectRatioCard, 'atom'], [ScrollAreaCard, 'atom'],
   ]
   const filtered = tier ? CARDS.filter(([, t]) => t === tier) : CARDS

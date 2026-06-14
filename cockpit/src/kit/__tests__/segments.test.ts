@@ -50,19 +50,21 @@ describe('segment graph integrity', () => {
     expect(f + a + b + sh).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 4 · Component 14 · Section 20 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 4 · Component 25 · Section 13 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('component')).toHaveLength(Object.keys(COMPONENT_USES).length)
     expect(idsByTier('section')).toHaveLength(Object.keys(SECTION_USES).length)
     expect(idsByTier('foundation')).toHaveLength(4)
-    expect(idsByTier('component')).toHaveLength(14)
-    // 3 shell sections (scaffold/navsuite/pane) + 4 page-region sections
-    // (page-head/section/entity-card/action-panel) + 14 promoted full-page-part
-    // sections (data-table/form-panel/filter-bar/stat-tile/timeline/activity-feed/
-    // empty-state/pricing/file-grid/calendar/auth/danger-zone/chart/sidebar) + 3
-    // calendar-variant sections (calendar-week/calendar-year/calendar-range) —
-    // Tailwind-style "a section is a full part of a page" tier.
-    expect(idsByTier('section')).toHaveLength(24)
+    expect(idsByTier('component')).toHaveLength(25)
+    // The 2026-06-15 "slab vs widget" re-audit: a SECTION is a full-width page slab
+    // (its own job + heading; stacked to build a page); a COMPONENT is a widget you
+    // drop INSIDE one. 13 sections = 3 shell regions (scaffold/navsuite/pane) + 2
+    // header/region wrappers (page-head/section) + 8 slabs (data-table/form-panel/
+    // pricing/sidebar/empty-state/file-grid + the calendar-week/calendar-year VIEWS).
+    // The ~11 widgets we'd over-promoted (calendar picker/range, chart, timeline,
+    // activity-feed, stat-tile, action-panel, danger-zone, entity-card, filter-bar,
+    // auth) moved back to COMPONENT_USES.
+    expect(idsByTier('section')).toHaveLength(13)
   })
 
   it('every standalone-blessed id is a real ATOM (not a component/foundation)', () => {

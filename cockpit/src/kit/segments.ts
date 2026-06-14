@@ -31,49 +31,36 @@ export type Tier = 'foundation' | 'atom' | 'component' | 'section' | 'page'
  * (Future page-region recipes also live in this tier.)
  */
 export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
+  // Shell regions — the app frame.
   scaffold: ['navsuite', 'pane'],
   navsuite: [],
   pane: [],
-  // Page-region sections — the wrappers that organize components under a header
-  // (the drift-killers from KIT-COVERAGE-AUDIT). A page = page-head + a stack of
-  // sections; each section arranges component fillers.
+  // Header / region wrappers — the grammar a page is built FROM. A page =
+  // page-head + a stack of titled .section regions; each arranges component fillers.
   'page-head': ['buttons'],
   section: ['buttons'],
-  'entity-card': ['avatar', 'badges-pills', 'buttons'],
-  // The Tailwind "action panels" family — a card that states one thing + offers
-  // one action (a button, a toggle, or an inline input). The settings workhorse.
-  'action-panel': ['card', 'buttons', 'switch-toggle'],
-  // Promoted to the section tier (Tailwind-style "a section is a full part of a
-  // page"): each is a complete page-region surface, not a bare component. Their
-  // `uses` edges are unchanged — they still parent the same atoms (see the
-  // parentedAtoms() union below, which keeps coverage green after the move).
-  // The flagship: a complete data surface. Composes the table atom with a toolbar
-  // header, a rows-per-page select and pagination — matrix-complete across
-  // empty / loading / error. Adopting these four was the orphan worklist's lead.
+  // Full-width page SLABS — each is a self-contained region of a page with its
+  // own job + (usually) a heading. The test: would you put an <h2> above it and
+  // call it a region of the screen? Then it's a section. A widget you drop INSIDE
+  // such a region is a COMPONENT (see COMPONENT_USES) — that's the line that the
+  // 2026-06-15 re-audit corrected (we'd over-promoted ~11 widgets to section).
+  // The flagship data surface: the table atom + toolbar header + rows-per-page
+  // select + pagination, matrix-complete across empty / loading / error.
   'data-table': ['table', 'toolbar', 'pagination-breadcrumb', 'select-trigger'],
   // The editing surface: a titled panel of labelled fields on a responsive grid,
   // with validation + a footer action bar. Composes the field atoms it lays out.
   'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'phoneinput', 'switch-toggle', 'radio-card'],
-  // The query surface: a filter/search toolbar above a list or table. Composes the
-  // querying atoms — search + autocomplete + tag chips + faceted selects + a range.
-  'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons', 'chip'],
+  // Pricing table, file gallery, the empty-content region, the nav rail — each a
+  // full-width slab you stack into a page.
+  pricing: ['card', 'buttons', 'badges-pills'],
   sidebar: ['navigation-row', 'avatar', 'badges-pills'],
   'empty-state': ['buttons'],
-  auth: ['form-primitives', 'passwordinput', 'buttons', 'card'],
   'file-grid': ['card', 'badges-pills'],
-  calendar: ['buttons'],
-  // Calendar variant family (Tailwind App-UI calendars): the week/day time-grid,
-  // the year-at-a-glance, and the double-month range picker. Each composes the
-  // month-grid atom + nav buttons; the time-grid adds its own event blocks.
+  // Calendar VIEWS — the main content region of a calendar app (a week scheduler,
+  // a year-at-a-glance). DISTINCT from the date/range PICKERS (calendar /
+  // calendar-range), which are widgets → components.
   'calendar-week': ['calendar', 'buttons'],
   'calendar-year': ['calendar'],
-  'calendar-range': ['calendar', 'buttons'],
-  pricing: ['card', 'buttons', 'badges-pills'],
-  'stat-tile': ['card', 'sparkline', 'badges-pills'],
-  chart: ['card'],
-  timeline: ['avatar', 'badges-pills'],
-  'activity-feed': ['avatar', 'badges-pills', 'list'],
-  'danger-zone': ['card', 'buttons'],
 }
 
 /**
@@ -111,6 +98,19 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   codeblock: ['code', 'buttons'],
   menubar: ['dropdown-menu', 'buttons'],
   resizable: [],
+  // Widgets you drop INSIDE a section (the 2026-06-15 re-audit demoted these from
+  // section → component: each is a part of a page-part, not a full-width slab).
+  'entity-card': ['avatar', 'badges-pills', 'buttons'], // a card for one entity
+  'action-panel': ['card', 'buttons', 'switch-toggle'], // heading + one action (incl. danger-zone)
+  'danger-zone': ['card', 'buttons'], // the destructive action panel
+  'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons', 'chip'], // a query toolbar — part of a data section
+  auth: ['form-primitives', 'passwordinput', 'buttons', 'card'], // the sign-in form card
+  calendar: ['buttons'], // the month-grid date picker
+  'calendar-range': ['calendar', 'buttons'], // the double-month range picker
+  'stat-tile': ['card', 'sparkline', 'badges-pills'], // a single metric tile
+  chart: ['card'], // a chart widget (lives in a card)
+  timeline: ['avatar', 'badges-pills'], // an event list
+  'activity-feed': ['avatar', 'badges-pills', 'list'], // a feed list
 }
 
 /**
