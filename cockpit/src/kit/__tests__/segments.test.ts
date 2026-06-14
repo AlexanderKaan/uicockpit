@@ -50,15 +50,17 @@ describe('segment graph integrity', () => {
     expect(f + a + b + sh).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 4 · Component 28 · Section 6 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 4 · Component 14 · Section 20 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('component')).toHaveLength(Object.keys(COMPONENT_USES).length)
     expect(idsByTier('section')).toHaveLength(Object.keys(SECTION_USES).length)
     expect(idsByTier('foundation')).toHaveLength(4)
-    expect(idsByTier('component')).toHaveLength(28)
+    expect(idsByTier('component')).toHaveLength(14)
     // 3 shell sections (scaffold/navsuite/pane) + 3 page-region sections
-    // (page-head/section/entity-card) — KIT-COVERAGE-AUDIT.
-    expect(idsByTier('section')).toHaveLength(6)
+    // (page-head/section/entity-card) + 14 promoted full-page-part sections
+    // (data-table/form-panel/filter-bar/stat-tile/timeline/activity-feed/empty-state/
+    // pricing/file-grid/calendar/auth/danger-zone/chart/sidebar) — Tailwind-style tier.
+    expect(idsByTier('section')).toHaveLength(20)
   })
 
   it('every standalone-blessed id is a real ATOM (not a component/foundation)', () => {

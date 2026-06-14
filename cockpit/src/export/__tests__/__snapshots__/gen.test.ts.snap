@@ -446,17 +446,9 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "prose"
       ],
       "component": [
-        "data-table",
-        "empty-state",
-        "sidebar",
-        "activity-feed",
-        "danger-zone",
-        "auth",
         "lightbox",
-        "calendar",
         "dialog",
         "command-palette",
-        "chart",
         "usage-meter",
         "menubar",
         "resizable",
@@ -464,21 +456,29 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "toast-stack",
         "sheet-drawer",
         "alert-dialog",
-        "stat-tile",
         "carousel",
         "infocard",
-        "timeline",
         "codeblock",
-        "pricing",
-        "wizardstepper",
-        "file-grid",
-        "form-panel",
-        "filter-bar"
+        "wizardstepper"
       ],
       "section": [
         "page-head",
         "section",
         "entity-card",
+        "data-table",
+        "empty-state",
+        "sidebar",
+        "activity-feed",
+        "danger-zone",
+        "auth",
+        "calendar",
+        "chart",
+        "stat-tile",
+        "timeline",
+        "pricing",
+        "file-grid",
+        "form-panel",
+        "filter-bar",
         "scaffold",
         "navsuite",
         "pane"
@@ -569,7 +569,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "data-table": {
-        "tier": "component",
+        "tier": "section",
         "section": "Data table",
         "uses": [
           "table",
@@ -609,7 +609,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "empty-state": {
-        "tier": "component",
+        "tier": "section",
         "section": "Empty state",
         "uses": [
           "buttons"
@@ -631,7 +631,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "sidebar": {
-        "tier": "component",
+        "tier": "section",
         "section": "Sidebar",
         "uses": [
           "navigation-row",
@@ -640,7 +640,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "activity-feed": {
-        "tier": "component",
+        "tier": "section",
         "section": "Activity feed",
         "uses": [
           "avatar",
@@ -649,7 +649,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "danger-zone": {
-        "tier": "component",
+        "tier": "section",
         "section": "Danger zone",
         "uses": [
           "card",
@@ -662,7 +662,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "auth": {
-        "tier": "component",
+        "tier": "section",
         "section": "Auth",
         "uses": [
           "form-primitives",
@@ -679,7 +679,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "calendar": {
-        "tier": "component",
+        "tier": "section",
         "section": "Calendar",
         "uses": [
           "buttons"
@@ -723,7 +723,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "chart": {
-        "tier": "component",
+        "tier": "section",
         "section": "Chart",
         "uses": [
           "card"
@@ -843,7 +843,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "stat-tile": {
-        "tier": "component",
+        "tier": "section",
         "section": "Stat tile",
         "uses": [
           "card",
@@ -917,7 +917,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "timeline": {
-        "tier": "component",
+        "tier": "section",
         "section": "Timeline",
         "uses": [
           "avatar",
@@ -933,7 +933,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "pricing": {
-        "tier": "component",
+        "tier": "section",
         "section": "Pricing",
         "uses": [
           "card",
@@ -956,7 +956,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "file-grid": {
-        "tier": "component",
+        "tier": "section",
         "section": "File grid",
         "uses": [
           "card",
@@ -969,7 +969,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": []
       },
       "form-panel": {
-        "tier": "component",
+        "tier": "section",
         "section": "Form panel",
         "uses": [
           "form",
@@ -983,7 +983,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "filter-bar": {
-        "tier": "component",
+        "tier": "section",
         "section": "Filter bar",
         "uses": [
           "searchinput",
@@ -3449,15 +3449,15 @@ body {
  *   are what guarantee a consumer's UI looks like the preview.
  *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape, Chat message, Prose
  *
- * COMPONENTS — stand-alone pieces of app (28), composed FROM the atoms — the
+ * COMPONENTS — stand-alone pieces of app (14), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
- *     Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Lightbox, Calendar, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, Pricing, WizardStepper, File grid, Form panel, Filter bar
+ *     Lightbox, Dialog, Command palette, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Carousel, InfoCard, CodeBlock, WizardStepper
  *
- * SECTIONS — the page-region tier (6): adaptive app frames that ARRANGE
+ * SECTIONS — the page-region tier (20): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
  *   arrangement, never look; components slot into panes; panes assemble into PAGES
  *   (your screens).
- *     Page header, Section, Entity card, Adaptive scaffold, Nav suite, Pane
+ *     Page header, Section, Entity card, Data table, Empty state, Sidebar, Activity feed, Danger zone, Auth, Calendar, Chart, Stat tile, Timeline, Pricing, File grid, Form panel, Filter bar, Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
 
 /* === Toolbar ===

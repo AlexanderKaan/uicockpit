@@ -40,6 +40,31 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   'page-head': ['buttons'],
   section: ['buttons'],
   'entity-card': ['avatar', 'badges-pills', 'buttons'],
+  // Promoted to the section tier (Tailwind-style "a section is a full part of a
+  // page"): each is a complete page-region surface, not a bare component. Their
+  // `uses` edges are unchanged — they still parent the same atoms (see the
+  // parentedAtoms() union below, which keeps coverage green after the move).
+  // The flagship: a complete data surface. Composes the table atom with a toolbar
+  // header, a rows-per-page select and pagination — matrix-complete across
+  // empty / loading / error. Adopting these four was the orphan worklist's lead.
+  'data-table': ['table', 'toolbar', 'pagination-breadcrumb', 'select-trigger'],
+  // The editing surface: a titled panel of labelled fields on a responsive grid,
+  // with validation + a footer action bar. Composes the field atoms it lays out.
+  'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'phoneinput', 'switch-toggle', 'radio-card'],
+  // The query surface: a filter/search toolbar above a list or table. Composes the
+  // querying atoms — search + autocomplete + tag chips + faceted selects + a range.
+  'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons', 'chip'],
+  sidebar: ['navigation-row', 'avatar', 'badges-pills'],
+  'empty-state': ['buttons'],
+  auth: ['form-primitives', 'passwordinput', 'buttons', 'card'],
+  'file-grid': ['card', 'badges-pills'],
+  calendar: ['buttons'],
+  pricing: ['card', 'buttons', 'badges-pills'],
+  'stat-tile': ['card', 'sparkline', 'badges-pills'],
+  chart: ['card'],
+  timeline: ['avatar', 'badges-pills'],
+  'activity-feed': ['avatar', 'badges-pills', 'list'],
+  'danger-zone': ['card', 'buttons'],
 }
 
 /**
@@ -63,37 +88,16 @@ export const FOUNDATIONS: readonly string[] = [
  * no other catalog segment, e.g. toast-stack, resizable.)
  */
 export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
-  // The flagship: a complete data surface. Composes the table atom with a toolbar
-  // header, a rows-per-page select and pagination — matrix-complete across
-  // empty / loading / error. Adopting these four was the orphan worklist's lead.
-  'data-table': ['table', 'toolbar', 'pagination-breadcrumb', 'select-trigger'],
-  // The editing surface: a titled panel of labelled fields on a responsive grid,
-  // with validation + a footer action bar. Composes the field atoms it lays out.
-  'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'phoneinput', 'switch-toggle', 'radio-card'],
-  // The query surface: a filter/search toolbar above a list or table. Composes the
-  // querying atoms — search + autocomplete + tag chips + faceted selects + a range.
-  'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons', 'chip'],
-  sidebar: ['navigation-row', 'avatar', 'badges-pills'],
   dialog: ['card', 'buttons'],
   'alert-dialog': ['card', 'buttons'],
   'sheet-drawer': ['card', 'buttons'],
   'command-palette': ['searchinput', 'list', 'kbd'],
   'toast-stack': [],
   lightbox: ['buttons'],
-  'empty-state': ['buttons'],
-  auth: ['form-primitives', 'passwordinput', 'buttons', 'card'],
   wizardstepper: ['stepper', 'form-primitives', 'buttons'],
   'file-upload-dropzone': ['buttons'],
-  'file-grid': ['card', 'badges-pills'],
-  calendar: ['buttons'],
-  pricing: ['card', 'buttons', 'badges-pills'],
-  'stat-tile': ['card', 'sparkline', 'badges-pills'],
   'usage-meter': ['progress'],
-  chart: ['card'],
   infocard: ['card', 'buttons'],
-  timeline: ['avatar', 'badges-pills'],
-  'activity-feed': ['avatar', 'badges-pills', 'list'],
-  'danger-zone': ['card', 'buttons'],
   carousel: ['buttons'],
   codeblock: ['code', 'buttons'],
   menubar: ['dropdown-menu', 'buttons'],
@@ -151,10 +155,14 @@ export const usesOf = (id: string): readonly string[] => COMPONENT_USES[id] ?? S
 export const idsByTier = (t: Tier, recipes: readonly { id: string }[] = RECIPES): string[] =>
   recipes.map((r) => r.id).filter((id) => tierOf(id) === t)
 
-/** The set of atoms that at least one component declares in its `uses`. */
+/** The set of atoms that at least one component OR section declares in its `uses`.
+ * Sections carry rich `uses` edges too (e.g. data-table → table/toolbar/…), so the
+ * coverage contract must read BOTH tiers — otherwise promoting a component to a
+ * section would orphan the atoms it parents. */
 export function parentedAtoms(): Set<string> {
   const parented = new Set<string>()
   for (const id of COMPONENT_SET) for (const u of usesOf(id)) parented.add(u)
+  for (const id of SECTION_SET) for (const u of usesOf(id)) parented.add(u)
   return parented
 }
 

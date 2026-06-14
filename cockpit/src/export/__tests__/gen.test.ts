@@ -141,9 +141,11 @@ describe('genContract (Fase D1 — the machine-readable contract)', () => {
 
   it('serialises the component graph + extracted BEM class vocabulary', () => {
     const c = JSON.parse(genContract(sampleCfg))
-    // the tier graph + uses edges, straight from segments
-    expect(c.components.tiers.component).toContain('data-table')
-    expect(c.components.recipes['data-table'].tier).toBe('component')
+    // the tier graph + uses edges, straight from segments. data-table was promoted
+    // to the SECTION tier (Tailwind-style "a section is a full part of a page"); its
+    // uses edges are unchanged (it still parents the table atom).
+    expect(c.components.tiers.section).toContain('data-table')
+    expect(c.components.recipes['data-table'].tier).toBe('section')
     expect(c.components.recipes['data-table'].uses).toContain('table')
     // BEM extraction from the static recipe CSS
     expect(c.components.classes.btn).toBeTruthy()
