@@ -3852,7 +3852,7 @@ body {
  * A row of buttons fused into one control — shared edges, outer corners follow
  * the button's own radius (--btn-r, set per .btn). Use for split actions or a
  * segmented set of equal-weight buttons. Compose with any .btn variant/size. */
-.btn-group { display: inline-flex; }
+.btn-group { display: inline-flex; align-items: stretch; }
 .btn-group > .btn { border-radius: 0; }
 .btn-group > .btn:not(:first-child) { margin-left: -1px; }
 .btn-group > .btn:first-child { border-top-left-radius: var(--btn-r); border-bottom-left-radius: var(--btn-r); }
