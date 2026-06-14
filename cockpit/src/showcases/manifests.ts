@@ -39,6 +39,9 @@ export type BlockSpec =
   | { block: 'dropzone'; seed: { title: string; hint: string } }
   | { block: 'media'; seed: { title?: string; items: Array<{ name: string; kind: 'image' | 'video' | 'file'; badge?: string; tone?: 'info' | 'success' | 'warning'; hero?: boolean; img?: string; meta?: string }> } }
   | { block: 'empty'; seed: { icon: IconName; title: string; sub: string; cta?: string } }
+  // CP6 Phase 3 — the month grid as a block (wraps the kit's .calendar recipe +
+  // its cell modifiers). firstDow = weekday index (0=Mon … 6=Sun) of day 1.
+  | { block: 'calendar'; seed: { title: string; firstDow: number; days: number; today?: number; selected?: number; events?: number[] } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -441,6 +444,62 @@ export const SHOWCASES: ShowcaseManifest[] = [
           { block: 'list', seed: { title: 'Files', items: [
             { icon: 'file', title: 'Adoption application', sub: 'PDF · 240 KB' },
             { icon: 'grid', title: 'Shelter map', sub: 'PNG · 1.2 MB' },
+          ] } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'calendar',
+    title: 'Calendar',
+    blurb: 'Workspace archetype × nav rail — calendars beside the month grid + the day’s agenda, with an event inspector rail. Time-as-canvas (Cron/Fantastical): the grid is the hero, one aimed accent marks the day. Below 1200 the rail drops; below 840 the calendars list yields.',
+    width: 1280,
+    archetype: 'workspace',
+    nav: 'suite',
+    navItems: [
+      { icon: 'cal', label: 'Calendar' },
+      { icon: 'chat', label: 'Inbox' },
+      { icon: 'check', label: 'Tasks' },
+      { icon: 'cog', label: 'Settings' },
+    ],
+    barTitle: 'Horizon',
+    panes: [
+      {
+        role: 'fixed',
+        blocks: [
+          { block: 'list', seed: { title: 'Calendars', items: [
+            { icon: 'check', title: 'Personal', sub: '3 events', badge: 'info' },
+            { icon: 'grid', title: 'Work', sub: '8 events' },
+            { icon: 'spark', title: 'Team', sub: 'Standups & 1:1s' },
+            { icon: 'cal', title: 'Holidays', sub: 'NL' },
+          ] } },
+        ],
+      },
+      {
+        role: 'detail',
+        blocks: [
+          // The grid is the hero. today = the 14th (ring), selected = the 18th
+          // (filled accent — the day being viewed), event-dotted days alongside.
+          { block: 'calendar', seed: { title: 'June 2026', firstDow: 0, days: 30, today: 14, selected: 18, events: [3, 5, 9, 12, 22, 24, 26] } },
+          { block: 'list', seed: { title: 'Thursday, June 18', items: [
+            { icon: 'spark', title: 'Design review', sub: '10:00 – 11:00 · Studio', trail: 'now', badge: 'info' },
+            { icon: 'chat', title: '1:1 with Priya', sub: '13:30 – 14:00 · Zoom', trail: '1:30' },
+            { icon: 'check', title: 'Ship CP6', sub: 'All day', trail: '' },
+          ] } },
+        ],
+      },
+      {
+        role: 'supporting',
+        blocks: [
+          { block: 'dl', seed: { title: 'Design review', pairs: [
+            ['When', 'Thu 10:00 – 11:00'],
+            ['Where', 'Studio · Floor 3'],
+            ['With', 'Noa, Priya, +3'],
+            ['Calendar', 'Work'],
+          ] } },
+          { block: 'list', seed: { title: 'Up next', items: [
+            { icon: 'cal', title: 'Sprint planning', sub: 'Mon, Jun 22 · 09:30', trail: 'Mon' },
+            { icon: 'spark', title: 'Team offsite', sub: 'Wed, Jun 24 · all day', trail: 'Wed' },
           ] } },
         ],
       },

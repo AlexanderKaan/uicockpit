@@ -101,6 +101,46 @@ export function renderBlock(spec: BlockSpec, key: number) {
           <button type="button" className="btn btn--primary btn--icon" aria-label="Send"><Icon name="chevR" /></button>
         </div>
       )
+    case 'calendar': {
+      // CP6 Phase 3 — the month grid as the page hero (Cron/Fantastical). Wraps
+      // the kit .calendar recipe + its cell modifiers; leading/trailing out-cells
+      // pad the 6-week grid. Event days carry a single inline accent dot (the cell
+      // is position:relative) — composition, no new class. today = ring, selected
+      // = filled accent (the ONE aimed accent per the confident-pro brief).
+      const { title, firstDow, days, today, selected, events = [] } = spec.seed
+      const DOW = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
+      const cells: Array<number | null> = []
+      for (let i = 0; i < firstDow; i++) cells.push(null)
+      for (let d = 1; d <= days; d++) cells.push(d)
+      while (cells.length % 7 !== 0) cells.push(null)
+      return (
+        <div className="card" key={key}>
+          <div className="calendar__nav">
+            <span className="calendar__nav-title">{title}</span>
+            <span className="calendar__nav-btns">
+              <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Previous month"><Icon name="chevL" /></button>
+              <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Next month"><Icon name="chevR" /></button>
+            </span>
+          </div>
+          <div className="calendar">
+            {DOW.map((d, i) => <span key={'h' + i} className="calendar__head">{d}</span>)}
+            {cells.map((d, i) => {
+              if (d === null) return <span key={i} className="calendar__cell calendar__cell--out" aria-hidden="true" />
+              const cls = ['calendar__cell']
+              if (d === selected) cls.push('calendar__cell--on')
+              if (d === today) cls.push('calendar__cell--today')
+              const dot = events.includes(d) && d !== selected
+              return (
+                <button type="button" key={i} className={cls.join(' ')} aria-current={d === today ? 'date' : undefined}>
+                  {d}
+                  {dot && <span aria-hidden="true" style={{ position: 'absolute', bottom: 5, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, borderRadius: '50%', background: 'var(--k-primary)' }} />}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )
+    }
     case 'empty':
       // CP6 — end-of-feed / no-results state (the memorable Things 3 / Spotify
       // close). Wraps the existing .empty recipe; one quiet CTA, never a brand fill.
