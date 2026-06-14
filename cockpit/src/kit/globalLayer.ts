@@ -173,8 +173,25 @@ ${s}.combobox__item:focus-visible,
 ${s}.tree__row:focus-visible,
 ${s}.list__row:focus-visible,
 ${s}.phoneinput__country:focus-visible,
-${s}.fab-stack__btn:focus-visible {
+${s}.fab-stack__btn:focus-visible,
+${s}.chip__remove:focus-visible,
+${s}.taginput__remove:focus-visible,
+${s}.calendar__cell:focus-visible,
+${s}.kanban__card:focus-visible,
+${s}.barchart__bar:focus-visible {
   outline-offset: -2px;
+}
+
+/* Placeholder — a designed state of every text field, not the browser default.
+   Faint tier + opacity:1 (Firefox dims placeholders otherwise) so the empty-field
+   hint is consistent and clears the same quiet contrast everywhere. */
+${s}.in::placeholder,
+${s}.tx::placeholder,
+${s}.searchinput__field::placeholder,
+${s}.numinput__field::placeholder,
+${s}.pwinput__field::placeholder {
+  color: var(--k-fg-muted);
+  opacity: 1;
 }
 
 /* Form validation — combine with the input border (use --k-bw for width):
