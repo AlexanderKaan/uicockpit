@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
 import type { BlockSpec } from './manifests'
@@ -393,7 +394,7 @@ export function renderBlock(spec: BlockSpec, key: number) {
               </div>
             </div>
           ))}
-          <div className="card__row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 'var(--k-s-12)' }}>
+          <div className="bento" style={{ '--bento-min': '7.5rem', '--k-gutter': 'var(--k-s-12)' } as CSSProperties}>
             {spec.seed.items.filter((m) => !m.hero).map((f, i) => (
               <div key={f.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k-s-8)' }}>
                 <div className="aspect aspect--1x1">

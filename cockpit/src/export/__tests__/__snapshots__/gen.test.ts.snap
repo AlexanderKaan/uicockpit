@@ -144,6 +144,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-grad-4": "linear-gradient(135deg, oklch(48.7% 0.2463 281.4), oklch(64.8% 0.1807 305.2))",
     "--k-grad-5": "linear-gradient(135deg, oklch(65.6% 0.1692 41.6), oklch(80.1% 0.1067 76.8))",
     "--k-grad-6": "linear-gradient(135deg, oklch(80.6% 0.2079 150.0), oklch(84.1% 0.1242 169.0))",
+    "--k-gutter": "var(--k-space)",
     "--k-hairline": "var(--k-bw) solid color-mix(in srgb, var(--k-border), transparent 45%)",
     "--k-icon-chip": "calc(var(--k-in-h-default) + 0.125rem)",
     "--k-in-h-default": "2.5rem",
@@ -1146,6 +1147,15 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "parts": [
           "bar",
           "tip"
+        ]
+      },
+      "bento": {
+        "modifiers": [
+          "cols",
+          "hero"
+        ],
+        "parts": [
+          "item"
         ]
       },
       "breadcrumb": {
@@ -2619,6 +2629,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-radius-pill: 999px;
   --k-radius-button: 1rem;
   --k-space: 1.25rem;
+  --k-gutter: var(--k-space);
   --k-pad: 1.75rem;
   --k-gap: 0.625rem;
   --k-stack-gap: var(--k-gap);
@@ -2907,6 +2918,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-radius-pill: 999px;
   --k-radius-button: 1rem;
   --k-space: 1.25rem;
+  --k-gutter: var(--k-space);
   --k-pad: 1.75rem;
   --k-gap: 0.625rem;
   --k-stack-gap: var(--k-gap);
@@ -7936,6 +7948,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .l-center--narrow { --l-measure: var(--k-measure-narrow); }
 .l-center--wide { --l-measure: var(--k-measure-wide); }
 
+/* .bento — the SMART GRID (M3/Apple style). .l-grid above is equal-cell fluid;
+   bento adds art direction: a hero spans the full row (.bento__item--hero), the
+   rest reflow as fluid cells — no media queries. For a fixed column count set
+   --bento-cols (a child then spans --bento-span). Gutter = --k-gutter. This is
+   the internal-layout contract blocks compose instead of hand-rolled grids. */
+.bento { display: grid; gap: var(--k-gutter, var(--k-space)); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--bento-min, 14rem)), 1fr)); align-content: start; }
+.bento > * { min-width: 0; }
+.bento__item--hero { grid-column: 1 / -1; }
+.bento--cols { grid-template-columns: repeat(var(--bento-cols, 2), minmax(0, 1fr)); }
+.bento--cols > * { grid-column: span min(var(--bento-span, 1), var(--bento-cols, 2)); }
+
 /* === Chip — the interactive chip system (H4) ===
    M3's four chip species as ONE atom. Chips are CONTROLS (real buttons) —
    distinct from .badge (passive status) and .taginput__chip (the token
@@ -8223,6 +8246,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    body); --fixed = the M3 fixed pane (360px; 412px once the SHELL is
    extra-large). Widths are structural constants, not density tokens. */
 .pane {
+  /* A pane is a vertical column of blocks. The inter-block RHYTHM ships here in
+     the kit (not the preview harness) so a CDN consumer composing blocks gets
+     the same spacing — and EVERY role (flex/fixed/detail/supporting) closes the
+     gap, so blocks never stack flush. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space);
   container-type: inline-size;
   container-name: pane;
   min-width: 0;

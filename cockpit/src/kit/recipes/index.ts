@@ -4843,7 +4843,18 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * font) instead of an arbitrary px width — the answer to "kill the 375/640px". */
 .l-center { box-sizing: content-box; max-width: var(--l-measure, var(--k-measure-prose)); margin-inline: auto; padding-inline: var(--l-pad, var(--k-s-16)); }
 .l-center--narrow { --l-measure: var(--k-measure-narrow); }
-.l-center--wide { --l-measure: var(--k-measure-wide); }`,
+.l-center--wide { --l-measure: var(--k-measure-wide); }
+
+/* .bento — the SMART GRID (M3/Apple style). .l-grid above is equal-cell fluid;
+   bento adds art direction: a hero spans the full row (.bento__item--hero), the
+   rest reflow as fluid cells — no media queries. For a fixed column count set
+   --bento-cols (a child then spans --bento-span). Gutter = --k-gutter. This is
+   the internal-layout contract blocks compose instead of hand-rolled grids. */
+.bento { display: grid; gap: var(--k-gutter, var(--k-space)); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--bento-min, 14rem)), 1fr)); align-content: start; }
+.bento > * { min-width: 0; }
+.bento__item--hero { grid-column: 1 / -1; }
+.bento--cols { grid-template-columns: repeat(var(--bento-cols, 2), minmax(0, 1fr)); }
+.bento--cols > * { grid-column: span min(var(--bento-span, 1), var(--bento-cols, 2)); }`,
   },
   {
     id: 'chip',
@@ -5147,6 +5158,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    body); --fixed = the M3 fixed pane (360px; 412px once the SHELL is
    extra-large). Widths are structural constants, not density tokens. */
 .pane {
+  /* A pane is a vertical column of blocks. The inter-block RHYTHM ships here in
+     the kit (not the preview harness) so a CDN consumer composing blocks gets
+     the same spacing — and EVERY role (flex/fixed/detail/supporting) closes the
+     gap, so blocks never stack flush. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space);
   container-type: inline-size;
   container-name: pane;
   min-width: 0;

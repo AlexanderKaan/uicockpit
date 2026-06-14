@@ -899,6 +899,12 @@ export function buildTokens(cfg: Config): Tokens {
       // pair pill buttons with soft cards (Airbnb pattern). 'none' = square.
       '--k-radius-button': radius.button,
       '--k-space': space,
+      // --k-gutter — the canonical grid GUTTER: the gap between cells of a layout
+      // grid (.grid / .bento / panes of blocks), distinct from --k-gap (sibling
+      // controls) and --k-pad (box inner padding). Aliased to --k-space so grid
+      // rhythm matches section rhythm by default; a real handle for M3-style
+      // margin/gutter/columns layout control.
+      '--k-gutter': 'var(--k-space)',
       // Box/container inner padding — cards, dialogs, panels. Floored well above
       // --k-space (default 24 = shadcn p-6, compact 16 = Material/Tailwind p-4) so
       // every box meets the modern minimum without inflating the gap rhythm.

@@ -116,6 +116,17 @@ export function FoundationsView({ cfg, tokens }: { cfg: Config; tokens: Tokens }
               <div className="l-grid">{['One', 'Two', 'Three', 'Four', 'Five', 'Six'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}</div>
             </div>
             <div>
+              <div className="fnd__sw-group-label">Bento — the smart grid · a hero spans the row, the rest reflow</div>
+              <div className="bento">
+                <div className="bento__item--hero fnd__l-tile">Hero — spans the full row</div>
+                {['Two', 'Three', 'Four'].map((t) => <div key={t} className="fnd__l-tile">{t}</div>)}
+              </div>
+              <div className="bento bento--cols fnd__bento-cols" style={{ '--bento-cols': 3 } as CSSProperties}>
+                <div className="fnd__l-tile" style={{ '--bento-span': 2 } as CSSProperties}>Span 2 of 3</div>
+                <div className="fnd__l-tile">1</div>
+              </div>
+            </div>
+            <div>
               <div className="fnd__sw-group-label">Sidebar — side 16rem + flexible main</div>
               <div className="l-sidebar">
                 <div className="l-sidebar__side"><div className="fnd__l-tile">Side · 16rem</div></div>

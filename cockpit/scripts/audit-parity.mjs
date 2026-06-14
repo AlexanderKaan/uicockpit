@@ -50,6 +50,8 @@ const APP_FILES = ['src/showcases/blocks.tsx']
 const FRAME_PREFIXES = [
   'l-center',    // foundation layout primitive (centered measure) — the prose block
                  // composes it; it's demonstrated in FoundationsView, not a card.
+  'bento',       // foundation layout primitive (the smart grid) — the media block
+                 // composes it; demonstrated in FoundationsView's Layout section.
 ]
 
 /* Primitives / composition wrappers / sub-parts that legitimately live only in

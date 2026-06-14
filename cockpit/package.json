@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run verify:icons && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && tsc -b && vite build",
+    "build": "npm run verify:icons && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && npm run audit:layout && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
@@ -22,6 +22,7 @@
     "audit:modifiers": "node scripts/audit-modifiers.mjs",
     "audit:provenance": "node scripts/scan-app-provenance.mjs",
     "audit:controls": "node scripts/audit-dead-controls.mjs",
+    "audit:layout": "node scripts/audit-layout.mjs",
     "check": "node scripts/uicockpit-check.mjs"
   },
   "dependencies": {
