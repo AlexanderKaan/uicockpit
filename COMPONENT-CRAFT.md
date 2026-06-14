@@ -28,6 +28,7 @@ the rest need a visual critic.
 | 7 | **Optical balance** | padding *looks* even; icons optically centred; not just mathematically equal | ✕ |
 | 8 | **Motion & feedback** | entrance / press / transition present and restrained | ◑ |
 | 9 | **Content truth** | real data, no lorem; survives long text, zero, overflow | ◑ |
+| 10 | **Closure / footer unity** | a card's footer *closes the box* the same way kit-wide — full-bleed divider/fill to the edges, never an inset hairline floating mid-card | ✅ |
 
 **Grade bands.** A = clears the gold-standard on every applicable law. B = correct
 but loses on 1–2 craft laws (the usual: proximity, height harmony, focal point).
@@ -79,6 +80,16 @@ The two below were the pilot (the user's own two examples). Each card =
 - **Sub-law surfaced:** *in a toolbar, the bar dictates height — children's size-modifiers yield.* (Worth a probe: every control class must be in the invariant selector.)
 
 ---
+
+### Card — Footer / closure (`.card__foot`)
+- **Gold-standard:** shadcn CardFooter · Vercel/Linear settings-card footer well.
+- **Applicable laws:** 10 (closure), 1 (grid), 5 (one primary).
+- **Acceptance:**
+  - **[L10] full-bleed** — the footer's top border (and any fill) reaches the card's edges; the box reads *closed*, not an inset hairline mid-card.
+  - ONE footer family kit-wide: plain `.card__foot` (full-bleed divider) for simple action cards · `.card__foot--bar` (grey-sunken well) for commit/form footers. Same frame, recognizable fill.
+- **Was:** two unrelated footers — `.card__foot` had an **inset** divider (it lived inside the card's padding) → loose, unfinished; only `.formpanel__foot` closed the box (full-bleed grey bar). No unity.
+- **Root cause:** `.card` puts padding on the *card*, so a `.card__foot` child's border-top is inset by that padding. `.formpanel` puts padding on its *sections* (container has none) → its foot is full-bleed.
+- **Fix:** `.card__foot` now cancels the card padding (negative margins) so it's full-bleed + carries the card's bottom radius; added `.card__foot--bar` (grey well = the formpanel quality). Every card footer now closes the box; commit footers wear the well.
 
 ## Part IV — the recurring root-cause: preview-chrome out-specifies the kit
 

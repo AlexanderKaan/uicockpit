@@ -198,7 +198,7 @@ export function renderBlock(spec: BlockSpec, key: number) {
               <input className="in" defaultValue={f.value} placeholder={f.placeholder} />
             </label>
           ))}
-          <div className="card__foot">
+          <div className="card__foot card__foot--bar" style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
             <button type="button" className="btn btn--ghost">Cancel</button>
             <button type="button" className="btn btn--primary">{spec.seed.submit}</button>
           </div>

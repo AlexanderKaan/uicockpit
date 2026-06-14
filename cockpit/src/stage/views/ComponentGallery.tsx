@@ -3460,7 +3460,7 @@ function InfoCardCard() {
           <div style={{ fontSize: 11, color: 'var(--k-fg-muted)', marginTop: 4 }}>You're running the latest.</div>
         </div>
       </div>
-      <div className="card__foot">
+      <div className="card__foot card__foot--bar">
         <button className="btn btn--primary btn--block">
           <Icon name="cog" /> Manage hosting
         </button>

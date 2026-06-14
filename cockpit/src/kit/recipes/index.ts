@@ -444,16 +444,25 @@ export const RECIPES: readonly Recipe[] = [
  * --k-stack-gap so "the gap between two adjacent controls" is axis-independent. */
 .card__row { display: flex; gap: var(--k-stack-gap, 8px); align-items: center; flex-wrap: wrap; }
 .card__col { display: flex; flex-direction: column; gap: var(--k-gap, var(--k-s-8)); }
-/* Footer action zone (shadcn CardFooter) — a hairline divider anchors the CTA
- * row to the floor of the card. Holds full-width block buttons on the tight gap. */
+/* Footer action zone (shadcn CardFooter). ONE footer frame for the whole kit:
+ * FULL-BLEED — it cancels the card's own padding so the divider (and the --bar
+ * fill) reach the card edges and CLOSE the box, instead of an inset hairline
+ * floating mid-card. This is the formpanel__foot quality, now every card's
+ * default. The bottom radius lets the fill respect the rounded corner. */
 .card__foot {
-  margin-top: var(--k-s-16);
-  padding-top: var(--k-s-16);
+  margin: var(--k-s-4) calc(-1 * var(--k-card-pad, var(--k-pad, 24px))) calc(-1 * var(--k-card-pad, var(--k-pad, 24px)));
+  padding: var(--k-s-16) var(--k-card-pad, var(--k-pad, 24px));
   border-top: var(--k-divider);
+  border-bottom-left-radius: var(--k-card-radius, var(--k-radius-lg));
+  border-bottom-right-radius: var(--k-card-radius, var(--k-radius-lg));
   display: flex;
   flex-direction: column;
   gap: var(--k-stack-gap, 8px);
-}`,
+}
+/* The filled action-bar well (Vercel/Linear settings footer) — same full-bleed
+ * frame, a grey-sunken fill so a commit/form footer reads as a closed zone. The
+ * recognizable variant; pair the note left + the one primary right. */
+.card__foot--bar { background: var(--k-surface-sunken); }`,
   },
   {
     id: 'button-group',
