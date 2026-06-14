@@ -22,7 +22,7 @@ const COMP_TIER: Record<string, 'atom' | 'component'> = {
  * ('stats', 'table'); the segment graph (segments.ts) + the gallery use canonical
  * ids ('stat-tile', 'data-table'). This bridge powers the breadcrumb label, the
  * "composes these atoms" rail (usesOf), and the section→gallery jump. */
-const SECTION_INFO: Record<string, { label: string; seg: string; jump: { q: string; tier: 'atom' | 'component' } }> = {
+const SECTION_INFO: Record<string, { label: string; seg: string; jump: { q: string; tier: 'atom' | 'component' | 'section' } }> = {
   stats: { label: 'Stats', seg: 'stat-tile', jump: { q: 'stat', tier: 'component' } },
   chart: { label: 'Chart', seg: 'chart', jump: { q: 'chart', tier: 'component' } },
   list: { label: 'List', seg: 'activity-feed', jump: { q: 'list', tier: 'atom' } },
@@ -47,6 +47,7 @@ const SECTION_INFO: Record<string, { label: string; seg: string; jump: { q: stri
   invoices: { label: 'Invoices', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
   clients: { label: 'Clients', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
   expenses: { label: 'Expenses', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
+  proof: { label: 'Page recipe', seg: 'section', jump: { q: 'section', tier: 'section' } },
 }
 const sectionInfo = (kind: string) =>
   SECTION_INFO[kind] ?? { label: kind, seg: kind, jump: { q: kind, tier: 'component' as const } }

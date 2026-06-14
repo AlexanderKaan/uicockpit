@@ -92,6 +92,11 @@ export type SectionSpec =
       rows: Array<{ vendor: string; logo: string; category: string; date: string; amount: string; status: string; tone: 'success' | 'warning' | 'danger' | 'info' }>
       footInfo: string
     } }
+  // KIT-COVERAGE-AUDIT — the page-assembly PROOF: each archetype is built purely
+  // by STACKING section recipes (page-head/section/entity-card) + component fillers
+  // (data-table/stat-strip/form/timeline/empty). Proves "you can build almost any
+  // page from the kit"; whatever can't assemble cleanly is the next section to add.
+  | { kind: 'proof'; seed: { archetype: 'list' | 'detail' | 'dashboard' | 'settings' | 'feed' | 'empty'; label: string } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -313,6 +318,31 @@ export const SHOWCASES: ShowcaseManifest[] = [
             ],
             footInfo: 'Showing 1–6 of 14 expenses',
           } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'proof',
+    title: 'Page recipes',
+    blurb: 'KIT-COVERAGE-AUDIT — the proof: six common page archetypes, each assembled PURELY by stacking section recipes (page-head/section/entity-card) + component fillers. Build almost any page from the kit.',
+    width: 1100,
+    archetype: 'feed',
+    nav: 'topbar',
+    navItems: [
+      { icon: 'grid', label: 'Recipes' },
+    ],
+    barTitle: 'Page recipes',
+    panes: [
+      {
+        role: 'flex',
+        sections: [
+          { kind: 'proof', seed: { archetype: 'list', label: 'List page — page-head · filter-bar · data-table' } },
+          { kind: 'proof', seed: { archetype: 'detail', label: 'Detail page — page-head · two-column (entity-card · section · timeline)' } },
+          { kind: 'proof', seed: { archetype: 'dashboard', label: 'Dashboard — page-head · stat-strip · section › entity-grid' } },
+          { kind: 'proof', seed: { archetype: 'settings', label: 'Settings — page-head · section › form · section › toggles' } },
+          { kind: 'proof', seed: { archetype: 'feed', label: 'Feed — page-head · section › timeline' } },
+          { kind: 'proof', seed: { archetype: 'empty', label: 'Empty — page-head · empty-state' } },
         ],
       },
     ],
