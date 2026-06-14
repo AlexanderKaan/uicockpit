@@ -5082,7 +5082,22 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .slot:hover { border-color: var(--k-ring); background: var(--k-state-hover); }
 .slot--on { background: var(--k-primary-soft); border-color: var(--k-ring); color: var(--k-primary-soft-fg); font-weight: var(--k-weight-semibold); }
-.slot--off { opacity: 0.4; pointer-events: none; text-decoration: line-through; }`,
+.slot--off { opacity: 0.4; pointer-events: none; text-decoration: line-through; }
+
+/* === Colour picker (Tailwind radio-group "color picker") =================
+ * A radio group rendered as colour swatches — pick a colour; the selected one
+ * gets a ring in its own colour. Each .swatch-picker__opt wraps a visually-hidden
+ * radio <input>; set the swatch colour via the --sw custom property. */
+.swatch-picker { display: flex; flex-wrap: wrap; gap: var(--k-s-10); }
+.swatch-picker__opt {
+  position: relative; display: inline-grid; place-items: center;
+  width: 1.75rem; height: 1.75rem; border-radius: var(--k-radius-pill);
+  background: var(--sw, var(--k-primary)); cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--k-border);
+}
+.swatch-picker__opt > input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.swatch-picker__opt:has(input:checked) { outline: 2px solid var(--sw, var(--k-fg)); outline-offset: 2px; }
+.swatch-picker__opt:has(input:focus-visible) { outline: 2px solid var(--k-ring); outline-offset: 2px; }`,
   },
   {
     id: 'form-panel',

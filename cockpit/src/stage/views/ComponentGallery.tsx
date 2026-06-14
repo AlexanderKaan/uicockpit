@@ -84,6 +84,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   GroupedTableCard: 'Grouped table rows summary total row condensed density section headers',
   ResponsiveTableCard: 'Responsive table stacked mobile hidden columns label value cards',
   HorizontalFormCard: 'Profile form labels on left horizontal layout settings dense',
+  ColorPickerCard: 'Color colour picker radio swatches label accent choice',
   HeaderVariantsCard: 'Page header breadcrumb tabs banner image cover profile section heading',
   EmptyTemplatesCard: 'Empty state templates starting points action grid blank project create',
   TwoColumnListCard: 'Two column stacked list directory sticky group headings members',
@@ -195,7 +196,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'section'],
-    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'],
+    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'section'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -306,7 +307,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
 const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElement>]> = [
   ['Text inputs', [FormCard, SearchInputCard, InputAddonsCard, PasswordInputCard, NumberInputCard, PhoneInputCard, InputOtpCard]],
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
-  ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, SliderCard]],
+  ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, ColorPickerCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
@@ -2878,6 +2879,29 @@ function ResponsiveTableCard() {
             ))}
           </tbody>
         </table>
+      </div>
+    </Card>
+  )
+}
+
+function ColorPickerCard() {
+  // Radio group rendered as colour swatches (.swatch-picker) — the Tailwind
+  // "color picker" radio variant. Each swatch sets --sw; selected gets a ring.
+  const COLORS = [
+    { name: 'Primary', v: 'var(--k-primary)' }, { name: 'Secondary', v: 'var(--k-secondary)' },
+    { name: 'Accent', v: 'var(--k-accent)' }, { name: 'Success', v: 'var(--k-success)' },
+    { name: 'Warning', v: 'var(--k-warning)' }, { name: 'Danger', v: 'var(--k-danger)' },
+    { name: 'Info', v: 'var(--k-info)' },
+  ]
+  const [pick, setPick] = useState('Primary')
+  return (
+    <Card title="Label colour" desc="Radio group as colour swatches.">
+      <div className="swatch-picker" role="radiogroup" aria-label="Label colour">
+        {COLORS.map((c) => (
+          <label key={c.name} className="swatch-picker__opt" style={{ ['--sw' as string]: c.v } as CSSProperties}>
+            <input type="radio" name="label-colour" checked={pick === c.name} onChange={() => setPick(c.name)} aria-label={c.name} />
+          </label>
+        ))}
       </div>
     </Card>
   )
