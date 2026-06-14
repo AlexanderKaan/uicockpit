@@ -1337,7 +1337,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "card": {
         "modifiers": [
           "bar",
-          "interactive"
+          "interactive",
+          "well"
         ],
         "parts": [
           "col",
@@ -1608,7 +1609,9 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "formpanel": {
-        "modifiers": [],
+        "modifiers": [
+          "horizontal"
+        ],
         "parts": [
           "body",
           "desc",
@@ -3972,6 +3975,12 @@ body {
 .card--interactive:hover { border-color: var(--k-state-border, var(--k-fg-faint)); box-shadow: var(--k-shadow-md); }
 .card--interactive:active { transform: translateY(1px); box-shadow: var(--k-shadow-sm); }
 .card--interactive:focus-visible { outline: 2px solid var(--k-ring); outline-offset: 2px; }
+/* --well: a sunken, recessed surface (Tailwind "well" card / action panel). The
+   card sits IN the page instead of floating above it — sunken fill, no shadow, a
+   transparent edge so it reads as inset, not raised. Use for a nested summary, a
+   read-only panel, or an action panel that should recede. Composes with
+   .action-panel (the Tailwind action-panel-with-well). */
+.card--well { background: var(--k-surface-sunken); box-shadow: none; border-color: transparent; }
 /* Header reads as a real product heading (shadcn CardHeader) — sentence-case,
  * full --k-fg, display font. */
 .card__head { display: flex; flex-direction: column; gap: var(--k-s-2); }
@@ -8353,6 +8362,27 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * action trailing right. */
 .formpanel__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; }
 .formpanel__foot-note { margin-right: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); }
+
+/* --horizontal: labels-on-left (Tailwind "form layout with labels on left"). Each
+   .lab row reflows to [label | control] — the label in a fixed leading column, a
+   hairline dividing the rows — the dense settings-form layout. Collapses back to
+   stacked on a narrow container (the label column would crush the control).
+   Override the label width with --k-form-label-w. */
+.formpanel--horizontal .formpanel__body { gap: 0; }
+.formpanel--horizontal .formpanel__grid { display: block; }
+.formpanel--horizontal .lab {
+  display: grid;
+  grid-template-columns: var(--k-form-label-w, 11rem) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--k-s-12);
+  padding: var(--k-s-14) 0;
+  border-top: var(--k-divider);
+}
+.formpanel--horizontal .lab > span:first-child { align-self: center; }
+.formpanel--horizontal .formpanel__grid > .lab:first-of-type { border-top: 0; }
+@container formpanel (max-width: 34rem) {
+  .formpanel--horizontal .lab { grid-template-columns: 1fr; gap: var(--k-s-4); padding: var(--k-s-10) 0; }
+}
 
 /* === Filter bar ===
    The query BLOCK that sits above a list or table: a search field, faceted selects,

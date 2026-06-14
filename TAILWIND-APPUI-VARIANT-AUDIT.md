@@ -16,15 +16,15 @@ composable from existing atoms/components.
 
 ## THE BUILD LIST (build all, in this order)
 
-### Tier 1 — headline (build first)
-- [ ] **Calendar · Week view** — 7-day column grid with an hour rail; events as positioned blocks. NEW pattern (time-grid). Likely a new `.calendar-week` recipe (section tier).
-- [ ] **Calendar · Day view** — single-day hour rail + event blocks. `.calendar-day` (or a `--day` of the week recipe).
-- [ ] **Calendar · Year view** — 12 mini-months in a grid. Compose the existing `.calendar` month grid, smaller (`.calendar-year`).
-- [ ] **Calendar · Double / range** — two months side-by-side for date-range selection.
-- [ ] **Table · grouped rows** — section-header rows that group the body (`<tbody>` group headers). `.tbl` modifier / `.datatable` feature.
-- [ ] **Table · summary / footer row** — a `<tfoot>` totals row.
-- [ ] **Table · condensed density** — a `.tbl--condensed` (tighter cell padding).
-- [ ] **Table · responsive** — stack-columns-on-mobile + hide-columns-on-mobile (container-query driven).
+### Tier 1 — headline (build first) ✅ DONE (commits 4c2cd1f calendars · 001c39c tables)
+- [x] **Calendar · Week view** — `.calendar-week` time-grid (rail + 7 day cols, events by --from/--span). (4c2cd1f)
+- [x] **Calendar · Day view** — `.calendar-week--day` (single column). (4c2cd1f)
+- [x] **Calendar · Year view** — `.calendar-year` (12 mini `.calendar` grids, current-month ring). (4c2cd1f)
+- [x] **Calendar · Double / range** — `.calendar-range` (two months, container-query stack, range band across both). (4c2cd1f)
+- [x] **Table · grouped rows** — `.tbl__group` subheader rows. (001c39c)
+- [x] **Table · summary / footer row** — `<tfoot>` totals (heavier rule + semibold). (001c39c)
+- [x] **Table · condensed density** — `.tbl--condensed`. (001c39c)
+- [x] **Table · responsive** — `.tbl-responsive` + `.tbl--stack` + `.tbl__col--optional` (container-query: drop cols, then reflow to label/value cards). (001c39c)
 
 ### Tier 2 — distinct patterns
 - [ ] **Empty state · with action grid** — empty-state + a `.bento` of "starting point" / template cards.

@@ -82,6 +82,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   TableCard: 'System health table rows',
   GroupedTableCard: 'Grouped table rows summary total row condensed density section headers',
   ResponsiveTableCard: 'Responsive table stacked mobile hidden columns label value cards',
+  HorizontalFormCard: 'Profile form labels on left horizontal layout settings dense',
   DataTableProCard: 'Data table pro grid sort filter select',
   ListCard: 'Library list rows items',
   DescriptionListCard: 'Subscription description list key value',
@@ -190,7 +191,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'section'],
-    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'],
+    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'section'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -2878,6 +2879,37 @@ function ResponsiveTableCard() {
   )
 }
 
+function HorizontalFormCard() {
+  // Labels-on-left form layout (.formpanel--horizontal) — each .lab row reflows to
+  // [label | control] with a hairline between rows. The dense settings form.
+  return (
+    <Card wide title="Profile" desc="Labels-on-left form layout — the dense settings form.">
+      <div className="formpanel formpanel--horizontal">
+        <div className="formpanel__head">
+          <div className="formpanel__title">Profile</div>
+          <div className="formpanel__desc">This information is shown on your public profile.</div>
+        </div>
+        <div className="formpanel__body">
+          <div className="formpanel__grid">
+            <label className="lab"><span>Full name</span><input className="in" defaultValue="Mara Vidic" /></label>
+            <label className="lab"><span>Email</span><input className="in" type="email" defaultValue="mara@acme.com" /></label>
+            <label className="lab"><span>Workspace</span><input className="in" defaultValue="Acme Inc." /></label>
+            <label className="lab">
+              <span>Weekly digest</span>
+              <span className="toggle toggle--on" role="switch" aria-checked="true" aria-label="Weekly digest"><span className="toggle__knob" /></span>
+            </label>
+          </div>
+        </div>
+        <div className="formpanel__foot">
+          <span className="formpanel__foot-note">Changes apply to your account only.</span>
+          <button type="button" className="btn btn--ghost btn--sm">Cancel</button>
+          <button type="button" className="btn btn--primary btn--sm">Save</button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
 // === Round 2: extended shadcn parity ===
 
 function ComboboxCard() {
@@ -4055,6 +4087,10 @@ function ActionPanelCard() {
         <div className="card action-panel">
           <div className="action-panel__body"><h3 className="action-panel__title">Custom domain</h3><p className="action-panel__desc">Point your domain at our servers.</p></div>
           <div className="action-panel__action"><div className="in in--inline" style={{ maxWidth: 180 }}><input placeholder="app.acme.com" aria-label="Domain" /></div><button type="button" className="btn btn--secondary btn--sm">Add</button></div>
+        </div>
+        <div className="card action-panel card--well">
+          <div className="action-panel__body"><h3 className="action-panel__title">Export data</h3><p className="action-panel__desc">Download a copy of everything in your workspace. <code>--well</code>: a sunken, recessed panel.</p></div>
+          <div className="action-panel__action"><button type="button" className="btn btn--secondary btn--sm">Request export</button></div>
         </div>
         <div className="card action-panel action-panel--danger">
           <div className="action-panel__body"><h3 className="action-panel__title">Delete account</h3><p className="action-panel__desc">Permanently remove your account and all data.</p></div>
