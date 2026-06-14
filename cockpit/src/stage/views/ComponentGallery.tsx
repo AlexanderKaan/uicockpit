@@ -80,6 +80,8 @@ const CARD_KEYWORDS: Record<string, string> = {
   NotificationCenterCard: 'Notification center inbox bell',
   // — Data & content —
   TableCard: 'System health table rows',
+  GroupedTableCard: 'Grouped table rows summary total row condensed density section headers',
+  ResponsiveTableCard: 'Responsive table stacked mobile hidden columns label value cards',
   DataTableProCard: 'Data table pro grid sort filter select',
   ListCard: 'Library list rows items',
   DescriptionListCard: 'Subscription description list key value',
@@ -188,6 +190,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'section'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'section'], [DateCard, 'section'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'section'],
+    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'section'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'section'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -303,7 +306,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
-  ['Data & content', [TableCard, ListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard, SignatureShapeCard]],
+  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, ListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard, SignatureShapeCard]],
   ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
 ]
 
@@ -2791,6 +2794,85 @@ function CalendarRangeCard() {
       <div className="calendar-range">
         <Month title="June 2026" dim={30} offset={0} side="start" bound={22} nav="prev" />
         <Month title="July 2026" dim={31} offset={2} side="end" bound={3} nav="next" />
+      </div>
+    </Card>
+  )
+}
+
+// === Table variants (Tailwind App-UI: grouped · summary · condensed · responsive) ===
+
+function GroupedTableCard() {
+  // Grouped rows + a summary footer + condensed density — three .tbl features at
+  // once. .tbl__group rows segment the body by team; <tfoot> totals the seats;
+  // .tbl--condensed tightens the rhythm.
+  const GROUPS = [
+    { team: 'Design', rows: [['Mara Vidic', 'Lead', 3], ['Tom Healy', 'Product', 2]] },
+    { team: 'Engineering', rows: [['Priya Rao', 'Staff', 5], ['Jonas Ek', 'Senior', 4], ['Lin Yu', 'Mid', 2]] },
+  ]
+  const total = GROUPS.flatMap((g) => g.rows).reduce((s, r) => s + (r[2] as number), 0)
+  return (
+    <Card title="Team roster" desc="Grouped rows, a summary total, condensed density.">
+      <table className="tbl tbl--condensed">
+        <thead>
+          <tr><th>Member</th><th>Role</th><th className="num">Seats</th></tr>
+        </thead>
+        <tbody>
+          {GROUPS.map((g) => (
+            <Fragment key={g.team}>
+              <tr className="tbl__group"><td colSpan={3}>{g.team}</td></tr>
+              {g.rows.map((r) => (
+                <tr key={r[0] as string}>
+                  <td className="tbl__name">{r[0]}</td>
+                  <td>{r[1]}</td>
+                  <td className="num">{r[2]}</td>
+                </tr>
+              ))}
+            </Fragment>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr><td colSpan={2}>Total seats</td><td className="num">{total}</td></tr>
+        </tfoot>
+      </table>
+    </Card>
+  )
+}
+
+function ResponsiveTableCard() {
+  // Responsive table: .tbl-responsive (a size container) + .tbl--stack. Below the
+  // stack breakpoint each row reflows to a label/value card (cells read their
+  // header from data-label); the "Method" column is .tbl__col--optional and drops
+  // a step earlier. In the narrow gallery tile this shows the stacked form.
+  const ROWS = [
+    { id: 'INV-2043', amount: '$1,200.00', method: 'Card', status: 'Paid' },
+    { id: 'INV-2044', amount: '$640.00', method: 'Transfer', status: 'Due' },
+    { id: 'INV-2045', amount: '$2,980.00', method: 'Card', status: 'Paid' },
+  ]
+  return (
+    <Card title="Invoices" desc="Responsive — rows reflow to label/value cards when narrow.">
+      <div className="tbl-responsive">
+        <table className="tbl tbl--stack">
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th className="num">Amount</th>
+              <th className="tbl__col--optional">Method</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ROWS.map((r) => (
+              <tr key={r.id}>
+                <td data-label="Invoice" className="tbl__name">{r.id}</td>
+                <td data-label="Amount" className="num">{r.amount}</td>
+                <td data-label="Method" className="tbl__col--optional">{r.method}</td>
+                <td data-label="Status">
+                  <span className={`badge ${r.status === 'Paid' ? 'badge--success' : 'badge--warn'}`}>{r.status}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </Card>
   )

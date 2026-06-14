@@ -1204,7 +1204,60 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 
    The data-table BLOCK (bordered frame + toolbar + selection + footer +
    empty/loading/error states) is its own segment — see the "Data table" recipe,
-   which composes this .tbl atom. */`,
+   which composes this .tbl atom. */
+
+/* --- Grouped rows (Tailwind "with grouped rows") -------------------------
+   A subheader <tr> that segments the body into labelled groups (by team, date,
+   status…). Drop a .tbl__group row before each run of member rows; give its one
+   full-span <td> the colSpan. Reads as a quiet sunken band — eyebrow type, no
+   hover lift — so the groups structure the table without competing with data. */
+.tbl tr.tbl__group > * {
+  background: var(--k-surface-sunken);
+  font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow);
+  font-weight: var(--k-weight-semibold); color: var(--k-fg-muted);
+  padding-top: var(--k-s-6); padding-bottom: var(--k-s-6);
+}
+.tbl tr.tbl__group { border-top: var(--k-divider); }
+.tbl tr.tbl__group:hover > * { background: var(--k-surface-sunken); }
+
+/* --- Summary / total row (Tailwind "with summary row") -------------------
+   A <tfoot> totals line: a heavier top rule sets it off from the body and the
+   figures go semibold. Pair the number cells with .num so the totals align under
+   their columns. No hover (tfoot is outside tbody's hover rule). */
+.tbl tfoot td, .tbl tfoot th {
+  border-top: 2px solid var(--k-border);
+  font-weight: var(--k-weight-semibold); color: var(--k-fg);
+}
+
+/* --- Condensed density (Tailwind "condensed") ----------------------------
+   A tighter row rhythm for data-dense tables (admin grids, financials). Still
+   density-aware — the cell padding stays a fraction of --k-space, just a smaller
+   one — and the type drops to the small tier. */
+.tbl--condensed { font-size: var(--k-type-small); }
+.tbl--condensed th, .tbl--condensed td { padding: calc(var(--k-space, 10px) * 0.32) calc(var(--k-space, 10px) * 0.5); }
+
+/* --- Responsive (Tailwind "hidden columns" + "stacked on mobile") --------
+   Wrap a table in .tbl-responsive (a size container, so it adapts to its own
+   width, not the viewport). Two levers:
+     .tbl__col--optional  drop non-essential columns under a narrow host (mark
+                          BOTH the th and every matching td).
+     .tbl--stack          go further: below the stack breakpoint each row reflows
+                          to a label/value card — the header is visually hidden and
+                          each cell shows its column name from data-label. */
+.tbl-responsive { container-type: inline-size; width: 100%; overflow-x: auto; }
+@container (max-width: 34rem) {
+  .tbl-responsive .tbl__col--optional { display: none; }
+}
+@container (max-width: 26rem) {
+  .tbl-responsive .tbl--stack thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .tbl-responsive .tbl--stack tbody tr { display: block; border: 1px solid var(--k-border); border-radius: var(--k-radius-md); padding: var(--k-s-4); margin-bottom: var(--k-s-8); }
+  .tbl-responsive .tbl--stack tbody tr:hover { background: transparent; }
+  .tbl-responsive .tbl--stack tbody td { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); padding: var(--k-s-4) var(--k-s-6); text-align: right; border: 0; }
+  .tbl-responsive .tbl--stack tbody td::before { content: attr(data-label); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); text-align: left; text-transform: none; letter-spacing: normal; }
+  /* optional columns stay dropped in the stacked form too (higher specificity
+     than the stacked-td display rule above, so they don't reappear as rows). */
+  .tbl-responsive .tbl--stack .tbl__col--optional { display: none; }
+}`,
   },
   {
     id: 'data-table',
