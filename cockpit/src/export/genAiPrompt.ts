@@ -153,6 +153,14 @@ equivalent package (most of these ship for Vue / Svelte / Solid as well).
 4. Surfaces stack: \`--k-bg\` < \`--k-surface-sunken\` < \`--k-surface\` <
    \`--k-surface-2\` < \`--k-surface-raised\` < \`--k-surface-overlay\`.
    Dialogs and popovers always use \`--k-surface-overlay\`.
+   Two page-level tints are exported separately and are LEVERS, not fills to
+   spray: \`--k-bg\` is the page canvas behind everything; \`--k-surface-fill\` is
+   the **summary-band** tint — apply \`background: var(--k-surface-fill)\` to the
+   ONE focal "state at a glance" block per screen (KPI strip / hero metric /
+   amount-due card, always at the TOP), and leave working surfaces (tables,
+   forms, lists, the document body) on \`--k-surface\`. The fill is the spatial
+   sibling of the one primary button + the one display headline: it only reads
+   as emphasis when it's rare. Tinting every card is the failure mode.
    App-shell chrome (sidebar, top bar, app rail) uses \`--k-chrome-bg\` — driven by
    the **Surface** axis (${cfg.surface}): ${cfg.surface === 'filled' ? '`--k-surface-sunken` (Filled — the sidebar is a recessed sunken well; content lifts above the seam)' : '`--k-bg` (Outlined/Plain — sidebar flush with the page, a hairline seam carries the separation, Linear/Vercel/Stripe)'}. Surface also drives the field treatment via \`--k-field-bg / --k-field-border-color / --k-field-underline-color / --k-field-radius\`: Outlined = box+border, Filled = fill-no-border, Plain = transparent + bottom hairline (underline, radius 0).
    Control rails (slider track, toggle-off, segmented track) use \`--k-track\` — a

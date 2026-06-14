@@ -130,6 +130,10 @@ ${genCss(cfg)}
   only — never for decoration. Each has a -fg and a -soft (banner fill) variant.
 - Surfaces stack: sunken < base < surface-2 < raised < overlay.
   Dialogs/popovers always use --k-surface-overlay.
+- Two page-level tints, set from the configurator and exported: --k-bg is the
+  PAGE canvas (the area behind everything); --k-surface-fill is a SUMMARY-BAND
+  tint (a subtle brand/neutral wash). They are levers, not defaults to spray —
+  see the summary-band rule under "Layout composition".
 - App-shell chrome (sidebar, top bar, app rail) → --k-chrome-bg, driven by Surface = ${({ outlined: 'Outlined', filled: 'Filled', plain: 'Plain' } as const)[cfg.surface]} (${cfg.surface === 'filled' ? 'Filled — the sidebar is a sunken well (--k-chrome-bg = surface-sunken), flush + one seam, content lifts above it' : 'Outlined/Plain — flush with the page bg, a hairline seam carries the separation (Linear/Vercel/Stripe)'}). Surface also drives fields via --k-field-bg / --k-field-border-color / --k-field-underline-color / --k-field-radius (Outlined box · Filled fill-no-border · Plain underline).
 - Control rails (slider track, toggle-off, segmented track) use --k-track — a fixed muted grey (≈ shadcn --input), NOT --k-surface-2 — so a white knob/pill stays legible at any Elevation. Slider/range thumb = a SOLID --k-primary circle (no border), sized = the toggle knob; focus/drag adds the field focus-halo (0 0 0 3px var(--k-ring-halo), same as .in:focus).
 - Shape lock: round-by-metaphor (NEVER follows Box radius) = toggle track+knob, radio, slider/range thumb, spinner, avatar. Box-radius-following (square at None) = cards, buttons, inputs, checkbox (capped 4px), badges.
@@ -211,6 +215,15 @@ cover the composition layer that tokens can't:
   \`--k-primary\` fill — the affirmative / destination action. Everything else
   is \`--ghost\` or secondary. Two primaries next to each other means the
   hierarchy is undecided; pick one.
+- **One filled summary band per screen.** \`--k-surface-fill\` is the *spatial*
+  sibling of the one primary button and the one display-tier headline: a single
+  focal tint marking the "state at a glance" zone — the KPI strip, the hero
+  metric, the amount-due card that sits at the TOP of a screen. Apply it with
+  \`background: var(--k-surface-fill)\` on that ONE block. Working surfaces below
+  it — tables, forms, lists, the document body — stay \`--k-surface\` (white).
+  Tinting every card is the failure mode: the wash only reads as emphasis when
+  it's rare, exactly like the primary button. \`--k-bg\` is the separate page
+  canvas; don't reach for either to decorate ordinary content.
 - **Group, then separate.** Related controls sit adjacent (small gap);
   unrelated groups are split by a spacer, not scattered evenly. Left =
   context/filters, right = primary actions is the default reading order.
