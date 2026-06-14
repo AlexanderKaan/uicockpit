@@ -287,6 +287,97 @@ export function renderBlock(spec: BlockSpec, key: number) {
         </div>
       )
     }
+    case 'cashflow': {
+      const s = spec.seed
+      const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
+      const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
+      const semib = 'var(--k-weight-semibold)' as CSSProperties['fontWeight']
+      const med = 'var(--k-weight-medium)' as CSSProperties['fontWeight']
+      const hairline = 'var(--k-hairline, 1px solid var(--k-border))'
+      const dirIcon = { in: 'check', out: 'upload', over: 'bell' } as const
+      const dirTone = { in: 'var(--k-success)', out: 'var(--k-fg-muted)', over: 'var(--k-warning)' } as const
+      return (
+        <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
+          {/* Header: title · period segmented · the one aimed action */}
+          <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}>
+            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
+              <span style={{ fontSize: 'var(--k-type-h3)', fontWeight: semib, fontFamily: 'var(--k-font-display)' }}>Cashflow</span>
+              <div className="segctrl">
+                <button type="button" className="segctrl__btn segctrl__btn--on">Last 7 days</button>
+                <button type="button" className="segctrl__btn">Last 30 days</button>
+                <button type="button" className="segctrl__btn">All-time</button>
+              </div>
+            </div>
+            <button type="button" className="btn btn--primary"><Icon name="plus" /> New invoice</button>
+          </div>
+
+          {/* KPI strip — edge-to-edge, hairline-divided columns, big tabular values */}
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+              {s.kpis.map((k, i) => (
+                <div key={k.label} style={{ flex: '1 1 9rem', minWidth: 0, padding: 'var(--k-s-20) var(--k-s-24)', borderLeft: i ? hairline : undefined }}>
+                  <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+                    <span style={muted}>{k.label}</span>
+                    <span style={{ ...money, fontSize: 'var(--k-type-small)', fontWeight: med, color: k.up ? 'var(--k-success)' : 'var(--k-danger)' }}>{k.delta}</span>
+                  </div>
+                  <div style={{ ...money, fontSize: 'var(--k-type-h1)', fontWeight: 'var(--k-weight-bold)' as CSSProperties['fontWeight'], marginTop: 'var(--k-s-4)' }}>{k.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent activity — grouped transaction feed */}
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: 'var(--k-s-16) var(--k-s-20)' }}><span className="card__title">Recent activity</span></div>
+            {s.groups.map((g) => (
+              <div key={g.when}>
+                <div style={{ padding: 'var(--k-s-6) var(--k-s-20)', background: 'var(--k-surface-sunken)', fontSize: 'var(--k-type-eyebrow)', fontWeight: semib, letterSpacing: 'var(--k-track-eyebrow)', textTransform: 'uppercase', color: 'var(--k-fg-muted)', borderTop: hairline }}>{g.when}</div>
+                {g.rows.map((r, i) => (
+                  <div key={i} className="l-cluster" style={{ justifyContent: 'space-between', padding: 'var(--k-s-12) var(--k-s-20)', borderTop: hairline, '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
+                    <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-12)', flex: '1 1 16rem' } as CSSProperties}>
+                      <span style={{ display: 'inline-grid', placeItems: 'center', width: '2rem', height: '2rem', borderRadius: '50%', flex: 'none', color: dirTone[r.dir], background: `color-mix(in srgb, ${dirTone[r.dir]} 14%, transparent)` }}><Icon name={dirIcon[r.dir]} /></span>
+                      <div>
+                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}><span style={{ ...money, fontWeight: med }}>{r.amount}</span><span className={`badge badge--${r.tone}`}>{r.status}</span></div>
+                        <div style={muted}>{r.tax} tax</div>
+                      </div>
+                    </div>
+                    <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)', flex: '1 1 12rem' } as CSSProperties}>
+                      {r.partyLogo && <BrandLogo id={r.partyLogo} size={28} />}
+                      <div><div style={{ fontWeight: med }}>{r.party}</div><div style={muted}>{r.desc}</div></div>
+                    </div>
+                    <div style={{ textAlign: 'right', flex: 'none' }}>
+                      <button type="button" className="btn btn--link btn--sm" style={{ padding: 0 }}>View transaction</button>
+                      <div style={muted}>Invoice {r.invoice}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Recent clients */}
+          <div className="l-stack" style={{ '--l-gap': 'var(--k-s-12)' } as CSSProperties}>
+            <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}>
+              <span className="card__title">Recent clients</span>
+              <button type="button" className="btn btn--link btn--sm" style={{ padding: 0 }}>View all</button>
+            </div>
+            <div className="bento" style={{ '--bento-min': '15rem' } as CSSProperties}>
+              {s.clients.map((c) => (
+                <div key={c.name} className="card">
+                  <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}>
+                    <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}><BrandLogo id={c.logo} size={36} /><span style={{ fontWeight: semib }}>{c.name}</span></div>
+                    <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="More"><Icon name="dots" /></button>
+                  </div>
+                  <hr className="sep" />
+                  <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}><span style={muted}>Last invoice</span><span style={{ fontWeight: med }}>{c.lastInvoice}</span></div>
+                  <div className="l-cluster" style={{ justifyContent: 'space-between', marginTop: 'var(--k-s-8)' } as CSSProperties}><span style={muted}>Amount</span><span className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}><span style={{ ...money, fontWeight: med }}>{c.amount}</span><span className={`badge badge--${c.tone}`}>{c.status}</span></span></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )
+    }
     case 'empty':
       // CP6 — end-of-feed / no-results state (the memorable Things 3 / Spotify
       // close). Wraps the existing .empty recipe; one quiet CTA, never a brand fill.

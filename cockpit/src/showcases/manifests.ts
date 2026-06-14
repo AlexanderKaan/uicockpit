@@ -1,4 +1,5 @@
 import type { IconName } from '../icons/concepts'
+import { COMPANIES } from './fixtures'
 
 /**
  * H3b — the MANIFEST model: a page stops being bespoke TSX and becomes DATA.
@@ -55,6 +56,13 @@ export type BlockSpec =
       activity: Array<{ name: string; avatar: string; action: string; time: string; comment?: string; me?: boolean }>
       meAvatar: string
     } }
+  // Flagship (Ledger billing) — the Cashflow / Home screen: a KPI strip, a grouped
+  // transaction feed, and recent-client cards. Shares the fixtures cast.
+  | { block: 'cashflow'; seed: {
+      kpis: Array<{ label: string; value: string; delta: string; up?: boolean }>
+      groups: Array<{ when: string; rows: Array<{ dir: 'in' | 'out' | 'over'; amount: string; tax: string; status: string; tone: 'success' | 'danger' | 'info'; party: string; partyLogo?: string; desc: string; invoice: string }> }>
+      clients: Array<{ name: string; logo: string; lastInvoice: string; amount: string; status: string; tone: 'success' | 'danger' }>
+    } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -81,6 +89,51 @@ export const SHOWCASES: ShowcaseManifest[] = [
   //    One coherent product · a recurring cast w/ real portraits + designed logos ·
   //    restraint (white, hairlines, one accent, tabular money). See
   //    flagship-billing-pilot memory. Replaces the "9 mediocre archetypes" model.
+  {
+    id: 'ledger-home',
+    title: 'Ledger · Home',
+    blurb: 'Billing flagship — the cashflow home: a KPI strip, a grouped transaction feed, and recent clients. Same app, same cast as the invoice screen.',
+    width: 1200,
+    archetype: 'feed',
+    nav: 'topbar',
+    navItems: [
+      { icon: 'home', label: 'Home' },
+      { icon: 'file', label: 'Invoices' },
+      { icon: 'store', label: 'Clients' },
+      { icon: 'card', label: 'Expenses' },
+    ],
+    barTitle: 'Ledger',
+    panes: [
+      {
+        role: 'flex',
+        blocks: [
+          { block: 'cashflow', seed: {
+            kpis: [
+              { label: 'Revenue', value: '$405,091.00', delta: '+4.75%', up: true },
+              { label: 'Overdue invoices', value: '$12,787.00', delta: '+54.02%', up: false },
+              { label: 'Outstanding invoices', value: '$245,988.00', delta: '−1.39%', up: false },
+              { label: 'Expenses', value: '$30,156.00', delta: '+10.18%', up: false },
+            ],
+            groups: [
+              { when: 'Today', rows: [
+                { dir: 'in', amount: '$7,600.00', tax: '$500.00', status: 'Paid', tone: 'success', party: COMPANIES.reform.name, partyLogo: COMPANIES.reform.logo, desc: 'Website redesign', invoice: '#00012' },
+                { dir: 'out', amount: '$10,000.00', tax: '$0.00', status: 'Withdraw', tone: 'info', party: 'Salary', desc: 'Tom Cook', invoice: '#00011' },
+                { dir: 'over', amount: '$2,000.00', tax: '$130.00', status: 'Overdue', tone: 'danger', party: COMPANIES.tuple.name, partyLogo: COMPANIES.tuple.logo, desc: 'Logo design', invoice: '#00009' },
+              ] },
+              { when: 'Yesterday', rows: [
+                { dir: 'in', amount: '$14,000.00', tax: '$900.00', status: 'Paid', tone: 'success', party: COMPANIES.savvy.name, partyLogo: COMPANIES.savvy.logo, desc: 'Website redesign', invoice: '#00010' },
+              ] },
+            ],
+            clients: [
+              { name: COMPANIES.tuple.name, logo: COMPANIES.tuple.logo, lastInvoice: 'December 13, 2025', amount: '$2,000.00', status: 'Overdue', tone: 'danger' },
+              { name: COMPANIES.savvy.name, logo: COMPANIES.savvy.logo, lastInvoice: 'January 22, 2026', amount: '$14,000.00', status: 'Paid', tone: 'success' },
+              { name: COMPANIES.reform.name, logo: COMPANIES.reform.logo, lastInvoice: 'January 23, 2026', amount: '$7,600.00', status: 'Paid', tone: 'success' },
+            ],
+          } },
+        ],
+      },
+    ],
+  },
   {
     id: 'ledger',
     title: 'Ledger · Invoice',
