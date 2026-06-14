@@ -43,6 +43,29 @@ const MARKS: Record<string, Mark> = {
     tint: '#16a34a',
     glyph: <path d="M12.5 7l4 5h-2.4l2.4 3.5H8l2.4-3.5H8z" fill="currentColor" />,
   },
+  // Generic VENDOR marks for the Expenses ledger — same invented-geometric style
+  // (not real brand logos), one muted tint per category of spend.
+  cloudhost: {
+    tint: '#0ea5e9',
+    glyph: <path d="M9 16a3 3 0 0 1 .4-6 4 4 0 0 1 7.5 1.2A2.6 2.6 0 0 1 16.5 16z" fill="currentColor" />,
+  },
+  designtool: {
+    tint: '#db2777',
+    glyph: (
+      <>
+        <circle cx="10" cy="10" r="2.6" fill="currentColor" />
+        <circle cx="15.5" cy="13.5" r="2.6" fill="currentColor" opacity="0.55" />
+      </>
+    ),
+  },
+  workspace: {
+    tint: '#d97706',
+    glyph: <path d="M7.5 16.5V10l5-3 5 3v6.5h-3.2v-3.6h-3.6v3.6z" fill="currentColor" />,
+  },
+  payroll: {
+    tint: '#059669',
+    glyph: <path d="M12.5 7v11M9.6 9.2h4.3a1.9 1.9 0 0 1 0 3.8h-2.8a1.9 1.9 0 0 0 0 3.8h4.3" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />,
+  },
 }
 
 const FALLBACK: Mark = { tint: '#4f46e5', glyph: <rect x="8" y="8" width="9" height="9" rx="2" fill="currentColor" /> }

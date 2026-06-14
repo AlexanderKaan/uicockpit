@@ -83,6 +83,15 @@ export type BlockSpec =
       rows: Array<{ company: string; logo: string; contact: string; contactAvatar: string; billed: string; outstanding: string; status: string; tone: 'success' | 'warning' | 'danger' | 'info' }>
       footInfo: string
     } }
+  // Flagship (Ledger billing) — the Expenses ledger: the Fill summary band + a
+  // .datatable of spend (vendor mark · category badge · date · amount · status).
+  | { block: 'expenses'; seed: {
+      subtitle: string
+      summary: Array<{ label: string; value: string; delta?: string; up?: boolean }>
+      filters: string[]; activeFilter: number
+      rows: Array<{ vendor: string; logo: string; category: string; date: string; amount: string; status: string; tone: 'success' | 'warning' | 'danger' | 'info' }>
+      footInfo: string
+    } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -267,6 +276,42 @@ export const SHOWCASES: ShowcaseManifest[] = [
               { company: COMPANIES.cedar.name, logo: COMPANIES.cedar.logo, contact: 'Dana Reuel', contactAvatar: P('women', 65), billed: '$73,250.00', outstanding: '$8,250.00', status: 'Active', tone: 'success' },
             ],
             footInfo: 'Showing 1–6 of 18 clients',
+          } },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ledger-expenses',
+    title: 'Ledger · Expenses',
+    blurb: 'Billing flagship — the expenses ledger: a Fill summary band over a filterable .datatable of spend (vendor mark · category · amount · status). Completes the Ledger menu.',
+    width: 1200,
+    archetype: 'feed',
+    nav: 'topbar',
+    navItems: LEDGER_NAV,
+    barTitle: 'Ledger',
+    panes: [
+      {
+        role: 'flex',
+        blocks: [
+          { block: 'expenses', seed: {
+            subtitle: 'March 2026 · 14 expenses',
+            summary: [
+              { label: 'Spent this month', value: '$30,156.00', delta: '+10.18%', up: false },
+              { label: 'vs budget', value: '$34,000.00', delta: '88% used', up: true },
+              { label: 'Pending approval', value: '$4,820.00', delta: '3 items', up: false },
+            ],
+            filters: ['All', 'Pending', 'Approved', 'Reimbursed'],
+            activeFilter: 0,
+            rows: [
+              { vendor: 'Northwind Cloud', logo: 'cloudhost', category: 'Infrastructure', date: 'Mar 28, 2026', amount: '$8,240.00', status: 'Approved', tone: 'success' },
+              { vendor: 'Loomis Studio', logo: 'loomis', category: 'Contractors', date: 'Mar 24, 2026', amount: '$3,900.00', status: 'Pending', tone: 'warning' },
+              { vendor: 'Prism Design', logo: 'designtool', category: 'Software', date: 'Mar 22, 2026', amount: '$540.00', status: 'Approved', tone: 'success' },
+              { vendor: 'Halcyon Works', logo: 'workspace', category: 'Office', date: 'Mar 18, 2026', amount: '$6,500.00', status: 'Approved', tone: 'success' },
+              { vendor: 'Meridian Payroll', logo: 'payroll', category: 'Payroll', date: 'Mar 15, 2026', amount: '$9,800.00', status: 'Reimbursed', tone: 'info' },
+              { vendor: 'Prism Design', logo: 'designtool', category: 'Software', date: 'Mar 11, 2026', amount: '$280.00', status: 'Pending', tone: 'warning' },
+            ],
+            footInfo: 'Showing 1–6 of 14 expenses',
           } },
         ],
       },

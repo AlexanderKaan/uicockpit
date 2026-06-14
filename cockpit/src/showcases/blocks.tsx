@@ -545,6 +545,79 @@ export function renderBlock(spec: BlockSpec, key: number) {
         </div>
       )
     }
+    case 'expenses': {
+      const s = spec.seed
+      const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
+      const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
+      const med = 'var(--k-weight-medium)' as CSSProperties['fontWeight']
+      const bold = 'var(--k-weight-bold)' as CSSProperties['fontWeight']
+      return (
+        <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
+          {/* Header: title + count · the one aimed action */}
+          <div className="l-cluster" style={{ justifyContent: 'space-between', alignItems: 'flex-end' } as CSSProperties}>
+            <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
+              <span style={{ fontSize: 'var(--k-type-h2)', fontWeight: bold, fontFamily: 'var(--k-font-display)' }}>Expenses</span>
+              <span style={muted}>{s.subtitle}</span>
+            </div>
+            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+              <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
+              <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> Add expense</button>
+            </div>
+          </div>
+
+          <SummaryBand items={s.summary} />
+
+          <div className="datatable datatable--page">
+            <div className="datatable__bar">
+              <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
+                <div className="segctrl" role="tablist" aria-label="Filter expenses">
+                  {s.filters.map((f, i) => (
+                    <button key={f} type="button" role="tab" aria-selected={i === s.activeFilter} className={`segctrl__btn ${i === s.activeFilter ? 'segctrl__btn--on' : ''}`}>{f}</button>
+                  ))}
+                </div>
+                <span className="toolbar__spacer" />
+                <div className="in in--inline" style={{ maxWidth: 200 }}>
+                  <Icon name="search" />
+                  <input type="search" aria-label="Search expenses" placeholder="Search…" />
+                </div>
+              </div>
+            </div>
+            <div className="datatable__body">
+              <table className="tbl">
+                <thead>
+                  <tr><th>Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  {s.rows.map((r) => (
+                    <tr key={r.vendor + r.date}>
+                      <td>
+                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
+                          <BrandLogo id={r.logo} size={28} />
+                          <span style={{ fontWeight: med }}>{r.vendor}</span>
+                        </div>
+                      </td>
+                      <td><span className="badge badge--info">{r.category}</span></td>
+                      <td style={muted}>{r.date}</td>
+                      <td className="num" style={{ ...money, fontWeight: med }}>{r.amount}</td>
+                      <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="datatable__foot">
+              <span className="datatable__foot-info">{s.footInfo}</span>
+              <div className="pagination">
+                <button type="button" disabled aria-label="Previous"><Icon name="chevL" /></button>
+                <button type="button" aria-current="true">1</button>
+                <button type="button">2</button>
+                <button type="button" aria-label="Next"><Icon name="chevR" /></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
     case 'empty':
       // CP6 — end-of-feed / no-results state (the memorable Things 3 / Spotify
       // close). Wraps the existing .empty recipe; one quiet CTA, never a brand fill.
