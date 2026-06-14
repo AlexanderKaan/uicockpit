@@ -1434,7 +1434,7 @@ function FilterBarCard() {
   return (
     <Card wide title="Filter bar" desc="Search, facets, range & active-filter chips — the query block.">
       <div className="filterbar">
-        <div className="toolbar toolbar--sm">
+        <div className="toolbar">
           <div className="searchinput" style={{ maxWidth: 200 }}>
             <Icon name="search" />
             <input className="searchinput__field" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" aria-label="Search" />
@@ -1451,7 +1451,7 @@ function FilterBarCard() {
             <div style={{ width: 116 }}><InteractiveSlider value={score} ariaLabel="Minimum score" onChange={setScore} /></div>
           </div>
           <span className="toolbar__spacer" />
-          <button className="btn btn--secondary btn--sm"><Icon name="plus" /> Save view</button>
+          <button className="btn btn--secondary"><Icon name="plus" /> Save view</button>
         </div>
         {chips.length > 0 && (
           <div className="filterbar__active">

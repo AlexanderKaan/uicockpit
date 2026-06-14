@@ -107,14 +107,6 @@ export function ChartFrame({ type, series, labels, height = H, showLegend = true
               {/* tracking cursor */}
               {hover !== null && <line className="chart__cursor" x1={(colPct(hover) / 100) * W} y1={PAD} x2={(colPct(hover) / 100) * W} y2={H - PAD} />}
             </svg>
-            {/* x-axis labels */}
-            {labels && (
-              <div className="chart__xlabels" aria-hidden="true">
-                {labels.map((l, i) => (
-                  <span key={l + i} className={`chart__xlabel ${hover === i ? 'chart__xlabel--on' : ''}`}>{l}</span>
-                ))}
-              </div>
-            )}
             {/* tooltip */}
             {hover !== null && (
               <div className="chart__tip" style={{ left: `${colPct(hover)}%` }} role="tooltip">
@@ -133,6 +125,15 @@ export function ChartFrame({ type, series, labels, height = H, showLegend = true
           <Donut series={series[0]} labels={labels} />
         )}
       </div>
+      {/* x-axis labels — a flow sibling of the canvas (NOT inside its fixed-height
+          box), so they extend the column instead of overflowing onto the legend. */}
+      {cartesian && labels && (
+        <div className="chart__xlabels" aria-hidden="true">
+          {labels.map((l, i) => (
+            <span key={l + i} className={`chart__xlabel ${hover === i ? 'chart__xlabel--on' : ''}`}>{l}</span>
+          ))}
+        </div>
+      )}
       {showLegend && (
         <div className="chart__legend">
           {(type === 'donut' ? (series[0]?.values ?? []).map((_, i) => ({ name: labels?.[i] ?? `Slice ${i + 1}`, i })) : series.map((s, i) => ({ name: s.name, i }))).map(

@@ -3377,12 +3377,16 @@ body {
    a group, so grouping never breaks the one-height invariant. */
 .toolbar > .btn,
 .toolbar > .in,
+.toolbar > .searchinput,
 .toolbar > .select,
 .toolbar > .select-trigger,
+.toolbar > .segctrl,
 .toolbar__group > .btn,
 .toolbar__group > .in,
+.toolbar__group > .searchinput,
 .toolbar__group > .select,
-.toolbar__group > .select-trigger {
+.toolbar__group > .select-trigger,
+.toolbar__group > .segctrl {
   min-height: var(--tb-h);
   height: var(--tb-h);
 }
@@ -5521,7 +5525,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .barchart--series .barchart__bar:nth-child(5) { background: var(--k-chart-5); }
 .barchart--series .barchart__bar:nth-child(6) { background: var(--k-chart-6); }
 /* Legend — series swatch + label row under a categorical chart */
-.chart-legend { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); margin-top: var(--k-s-10); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); margin-top: var(--k-s-12); }
 .chart-legend__item { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
 .chart-legend__dot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
 
@@ -7856,7 +7860,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 /* A labelled control cluster inside the bar (e.g. "Score" + a slider) — the eyebrow
  * names the control without stealing height from the toolbar's one-row invariant. */
-.filterbar__group { display: inline-flex; align-items: center; gap: var(--k-gap, var(--k-s-8)); white-space: nowrap; }
+/* The slider/label cluster is a control in the bar — give it the bar's height
+   (inherited --tb-h) so its thin track centers on the one-height row. */
+.filterbar__group { display: inline-flex; align-items: center; gap: var(--k-gap, var(--k-s-8)); white-space: nowrap; min-height: var(--tb-h, var(--k-control-h-sm)); }
 .filterbar__group-label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
 /* Active-filter row — divider above, the current facets as removable chips, a
  * trailing result count, and a text "Clear all". Hidden until something is filtered. */
