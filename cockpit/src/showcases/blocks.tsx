@@ -81,6 +81,7 @@ export function renderBlock(spec: BlockSpec, key: number) {
       if (spec.seed.hero) {
         return (
           <div className="card" key={key} style={{ gap: 'var(--k-s-10)' }}>
+            {spec.seed.greeting && <h2 className="t-display" style={{ margin: 0 }}>{spec.seed.greeting}</h2>}
             {spec.seed.suggestions && spec.seed.suggestions.length > 0 && (
               <div className="card__row" style={{ flexWrap: 'wrap' }}>
                 {spec.seed.suggestions.map((s) => <span className="chip" key={s}>{s}</span>)}
@@ -167,11 +168,20 @@ export function renderBlock(spec: BlockSpec, key: number) {
             </thead>
             <tbody>
               {spec.seed.rows.map((r, i) => (
-                <tr key={i}>{r.map((cell, j) => (
-                  <td key={j} className={spec.seed.numericCols?.includes(j) ? 'num' : undefined}>
-                    {spec.seed.badgeCols?.includes(j) ? <span className="badge">{cell}</span> : cell}
-                  </td>
-                ))}</tr>
+                <tr key={i}>{r.map((cell, j) => {
+                  // CP6 P5 — stage pills inherit a per-value tone (the Attio/Salesforce
+                  // legibility tell); owner cells lead with an initialed avatar atom.
+                  const tone = spec.seed.badgeCols?.includes(j) ? spec.seed.badgeToneByValue?.[cell] : undefined
+                  return (
+                    <td key={j} className={spec.seed.numericCols?.includes(j) ? 'num' : undefined}>
+                      {spec.seed.badgeCols?.includes(j)
+                        ? <span className={'badge' + (tone ? ' badge--' + tone : '')}>{cell}</span>
+                        : spec.seed.avatarCols?.includes(j)
+                          ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--k-s-6)' }}><span className={`avatar avatar--sm avatar--a${(i % 6) + 1}`} aria-hidden="true">{cell.slice(0, 1)}</span>{cell}</span>
+                          : cell}
+                    </td>
+                  )
+                })}</tr>
               ))}
             </tbody>
           </table>
@@ -231,7 +241,7 @@ export function renderBlock(spec: BlockSpec, key: number) {
       )
       if (!spec.seed.hero) return <div key={key}>{article}</div>
       return (
-        <div key={key} style={{ background: 'var(--k-canvas)', border: '1px solid var(--k-border)', borderRadius: 'var(--k-radius-lg)', padding: 'clamp(var(--k-s-24), 6vw, var(--k-s-32))', textAlign: 'center' }}>
+        <div key={key} style={{ background: 'var(--k-canvas)', border: '1px solid var(--k-border)', borderRadius: 'var(--k-radius-lg)', padding: 'clamp(var(--k-s-24), 6vw, var(--k-s-32))', textAlign: 'center', animation: 'var(--k-anim-rise)' }}>
           {article}
         </div>
       )

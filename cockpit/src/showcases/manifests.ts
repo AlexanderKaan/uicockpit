@@ -23,8 +23,8 @@ export type BlockSpec =
   | { block: 'chart'; seed: { title: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> } }
   | { block: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
   | { block: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean; avatar?: string }> } }
-  | { block: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[] } }
-  | { block: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[] } }
+  | { block: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[]; greeting?: string } }
+  | { block: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[]; badgeToneByValue?: Record<string, 'success' | 'warning' | 'danger' | 'info'>; avatarCols?: number[] } }
   | { block: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string } }
   | { block: 'pricing'; seed: { tiers: Array<{ name: string; price: string; period: string; feats: string[]; featured?: boolean; cta: string }> } }
   | { block: 'prose'; seed: { title: string; kicker?: string; paragraphs: string[]; hero?: boolean; ctas?: string[] } }
@@ -129,11 +129,11 @@ export const SHOWCASES: ShowcaseManifest[] = [
         role: 'detail',
         blocks: [
           { block: 'thread', seed: { messages: [
-            { name: 'You', time: '14:02', body: 'Draft a rollout timeline for the Q3 launch — beta in July, GA in September.', me: true },
-            { name: 'Aria', time: '14:02', body: 'Here is a three-phase timeline: July 7 closed beta (50 design partners), August 11 open beta with pricing page live, September 9 GA with the launch post and lifecycle emails. Want me to expand any phase into tasks?' },
-            { name: 'You', time: '14:05', body: 'Expand the closed beta phase into a checklist.', me: true },
+            { name: 'You', time: '14:02', avatar: 'AK', body: 'Draft a rollout timeline for the Q3 launch — beta in July, GA in September.', me: true },
+            { name: 'Aria', time: '14:02', avatar: 'A', body: 'Here is a three-phase timeline: July 7 closed beta (50 design partners), August 11 open beta with pricing page live, September 9 GA with the launch post and lifecycle emails. Want me to expand any phase into tasks?' },
+            { name: 'You', time: '14:05', avatar: 'AK', body: 'Expand the closed beta phase into a checklist.', me: true },
           ] } },
-          { block: 'composer', seed: { placeholder: 'Ask Aria anything — ⏎ to send, ⇧⏎ for a new line', hero: true, suggestions: ['Summarize a PR', 'Explain this error', 'Draft a SQL query', 'Write a test'] } },
+          { block: 'composer', seed: { greeting: 'Good afternoon, Alex', placeholder: 'Ask Aria anything — ⏎ to send, ⇧⏎ for a new line', hero: true, suggestions: ['Summarize a PR', 'Explain this error', 'Draft a SQL query', 'Write a test'] } },
         ],
       },
     ],
@@ -172,7 +172,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { label: 'Won (Q2)', value: '$310k', delta: '+22%', up: true },
             { label: 'Avg. cycle', value: '34d', delta: '+3d', up: false },
           ] } },
-          { block: 'table', seed: { title: 'Hot accounts', numericCols: [3], badgeCols: [2], sortableCols: [0, 3], columns: ['Account', 'Owner', 'Stage', 'Value', 'Next step'], rows: [
+          { block: 'table', seed: { title: 'Hot accounts', numericCols: [3], badgeCols: [2], avatarCols: [1], sortableCols: [0, 3], badgeToneByValue: { Discovery: 'info', Proposal: 'warning', Negotiation: 'success' }, columns: ['Account', 'Owner', 'Stage', 'Value', 'Next step'], rows: [
             ['Brightwave', 'Lena', 'Negotiation', '$120k', 'Contract review · Fri'],
             ['Cedar Health', 'Sam', 'Proposal', '$86k', 'Demo follow-up · Tue'],
             ['Halcyon Labs', 'Ravi', 'Discovery', '$54k', 'Stakeholder call · Mon'],
@@ -251,9 +251,9 @@ export const SHOWCASES: ShowcaseManifest[] = [
           ] } },
           // H3c: Settings' activity timeline, harvested into Portal.
           { block: 'timeline', seed: { events: [
-            { title: 'Plan upgraded to Pro', time: 'Jun 1', desc: 'by finance@acme.io', state: 'done' },
-            { title: 'Seat added — ravi@acme.io', time: 'Jun 6', state: 'done' },
-            { title: 'Renewal upcoming', time: 'Jul 1', desc: '$24/mo · auto-renew', state: 'current' },
+            { title: 'Plan upgraded to Pro', time: 'Jun 1', desc: 'by finance@lumenstudio.io', state: 'done' },
+            { title: 'Seat added — ravi@lumenstudio.io', time: 'Jun 6', state: 'done' },
+            { title: 'Renewal upcoming', time: 'Jul 1', desc: '€24/mo · auto-renew', state: 'current' },
           ] } },
         ],
       },
