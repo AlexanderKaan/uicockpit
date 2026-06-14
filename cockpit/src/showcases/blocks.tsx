@@ -2,6 +2,28 @@ import type { CSSProperties } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
 import type { BlockSpec } from './manifests'
+import { BrandLogo } from './logos'
+
+/** Photo avatar with a graceful initial fallback — the flagship's "real app"
+ *  tell. Real portrait via .avatar__img; on load error, swap to the initial. */
+function PhotoAvatar({ url, name, sm }: { url: string; name: string; sm?: boolean }) {
+  return (
+    <span className={`avatar ${sm ? 'avatar--sm' : ''}`} aria-hidden="true">
+      <img
+        className="avatar__img"
+        src={url}
+        alt=""
+        loading="lazy"
+        onError={(e) => {
+          const img = e.currentTarget
+          img.style.display = 'none'
+          const host = img.parentElement
+          if (host && !host.textContent) host.textContent = name.charAt(0)
+        }}
+      />
+    </span>
+  )
+}
 
 /**
  * H3b — the block renderer: BlockSpec (data) → KIT recipes (markup).
@@ -139,6 +161,128 @@ export function renderBlock(spec: BlockSpec, key: number) {
                 </button>
               )
             })}
+          </div>
+        </div>
+      )
+    }
+    case 'invoice': {
+      const s = spec.seed
+      const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
+      const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
+      const eyebrow: CSSProperties = { fontSize: 'var(--k-type-eyebrow)', fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'], letterSpacing: 'var(--k-track-eyebrow)', textTransform: 'uppercase', color: 'var(--k-fg-muted)' }
+      return (
+        <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
+          {/* Header: client mark + invoice no. + the ONE aimed action (Send) */}
+          <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-12)' } as CSSProperties}>
+            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-12)' } as CSSProperties}>
+              <BrandLogo id={s.clientLogo} size={44} />
+              <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
+                <span style={muted}>Invoice #{s.number}</span>
+                <span style={{ fontSize: 'var(--k-type-h3)', fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'], fontFamily: 'var(--k-font-display)' }}>{s.client}</span>
+              </div>
+            </div>
+            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+              <button type="button" className="btn btn--ghost btn--sm">Copy URL</button>
+              <button type="button" className="btn btn--ghost btn--sm">Edit</button>
+              <button type="button" className="btn btn--primary btn--sm"><Icon name="chevR" /> Send</button>
+            </div>
+          </div>
+
+          {/* Document (wide) + rail (narrow) */}
+          <div className="l-sidebar" style={{ '--l-side': '19rem', '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
+            {/* ── The invoice document */}
+            <div className="l-sidebar__main">
+              <div className="card" style={{ padding: 'var(--k-s-32)' }}>
+                <div className="l-stack" style={{ '--l-gap': 'var(--k-s-24)' } as CSSProperties}>
+                  <div className="l-cluster" style={{ justifyContent: 'space-between', alignItems: 'flex-start' } as CSSProperties}>
+                    <span style={{ fontSize: 'var(--k-type-h3)', fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'], fontFamily: 'var(--k-font-display)' }}>Invoice</span>
+                    <span className="badge badge--success"><span className="badge__dot" />{s.status}</span>
+                  </div>
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-32)' } as CSSProperties}>
+                    <div><div style={muted}>Issued on</div><div style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{s.issued}</div></div>
+                    <div><div style={muted}>Due on</div><div style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{s.due}</div></div>
+                  </div>
+                  <hr className="sep" style={{ margin: 0 }} />
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-48)', alignItems: 'flex-start' } as CSSProperties}>
+                    <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
+                      <span style={eyebrow}>From</span>
+                      <span style={{ fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'] }}>{s.fromName}</span>
+                      {s.fromLines.map((l) => <span key={l} style={muted}>{l}</span>)}
+                    </div>
+                    <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
+                      <span style={eyebrow}>To</span>
+                      <span style={{ fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'] }}>{s.toName}</span>
+                      {s.toLines.map((l) => <span key={l} style={muted}>{l}</span>)}
+                    </div>
+                  </div>
+                  <table className="tbl">
+                    <thead><tr><th>Project</th><th className="num">Hours</th><th className="num">Rate</th><th className="num">Price</th></tr></thead>
+                    <tbody>
+                      {s.items.map((it) => (
+                        <tr key={it.title}>
+                          <td><div style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{it.title}</div><div style={muted}>{it.desc}</div></td>
+                          <td className="num" style={money}>{it.hours}</td>
+                          <td className="num" style={money}>{it.rate}</td>
+                          <td className="num" style={money}>{it.price}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="l-cluster" style={{ justifyContent: 'flex-end' } as CSSProperties}>
+                    <div className="l-stack" style={{ '--l-gap': 'var(--k-s-8)', minWidth: '15rem' } as CSSProperties}>
+                      <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}><span style={muted}>Subtotal</span><span style={money}>{s.subtotal}</span></div>
+                      <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}><span style={muted}>Tax</span><span style={money}>{s.tax}</span></div>
+                      <hr className="sep" style={{ margin: 0 }} />
+                      <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}><span style={{ fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'] }}>Total</span><span style={{ ...money, fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'] }}>{s.total}</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── The rail: amount + live activity */}
+            <div className="l-sidebar__side l-stack" style={{ '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
+              <div className="card" style={{ padding: 0, overflow: 'hidden', background: 'var(--k-surface-sunken)' }}>
+                <div className="l-stack" style={{ '--l-gap': 'var(--k-s-4)', padding: 'var(--k-s-20)' } as CSSProperties}>
+                  <span style={muted}>Amount</span>
+                  <div className="l-cluster" style={{ justifyContent: 'space-between', alignItems: 'baseline' } as CSSProperties}>
+                    <span style={{ ...money, fontSize: 'var(--k-type-display)', fontWeight: 'var(--k-weight-bold)' as CSSProperties['fontWeight'], lineHeight: 1 }}>{s.amount}</span>
+                    <span className="badge badge--success"><span className="badge__dot" />{s.status}</span>
+                  </div>
+                </div>
+                <hr className="sep" style={{ margin: 0 }} />
+                <div className="l-stack" style={{ '--l-gap': 'var(--k-s-12)', padding: 'var(--k-s-20)' } as CSSProperties}>
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}><PhotoAvatar url={s.payerAvatar} name={s.payer} sm /><span style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{s.payer}</span></div>
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}><Icon name="cal" /><span>{s.paidDate}</span></div>
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}><Icon name="card" /><span>{s.method}</span></div>
+                </div>
+                <hr className="sep" style={{ margin: 0 }} />
+                <button type="button" className="btn btn--link" style={{ margin: 'var(--k-s-16) var(--k-s-20)' }}>Download receipt <Icon name="chevR" /></button>
+              </div>
+
+              <div className="card">
+                <div className="card__head"><span className="card__title">Activity</span></div>
+                <ol className="timeline">
+                  {s.activity.map((a, i) => (
+                    <li className="timeline__item" key={i}>
+                      <span className="timeline__dot" style={{ padding: 0, overflow: 'hidden' }}><PhotoAvatar url={a.avatar} name={a.name} sm /></span>
+                      <div className="timeline__body">
+                        <div className="timeline__head">
+                          <span className="timeline__title"><strong>{a.name}</strong> <span style={muted}>{a.action}</span></span>
+                          <span className="timeline__time">{a.time}</span>
+                        </div>
+                        {a.comment && <div className="timeline__desc" style={{ marginTop: 'var(--k-s-6)', background: 'var(--k-surface-sunken)', padding: 'var(--k-s-10) var(--k-s-12)', borderRadius: 'var(--k-radius-md)' }}>{a.comment}</div>}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <div className="toolbar" style={{ marginTop: 'var(--k-s-8)' }}>
+                  <PhotoAvatar url={s.meAvatar} name="You" sm />
+                  <input className="in" placeholder="Add your comment…" aria-label="Add a comment" style={{ flex: 1 }} />
+                  <button type="button" className="btn btn--primary btn--sm">Comment</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )

@@ -52,6 +52,9 @@ const FRAME_PREFIXES = [
                  // composes it; it's demonstrated in FoundationsView, not a card.
   'bento',       // foundation layout primitive (the smart grid) — the media block
                  // composes it; demonstrated in FoundationsView's Layout section.
+  'l-stack',     // every-layout primitives (stack/cluster/sidebar) — the flagship
+  'l-cluster',   // Ledger invoice block composes them; demonstrated in
+  'l-sidebar',   // FoundationsView's Layout section, not as catalogue cards.
 ]
 
 /* Primitives / composition wrappers / sub-parts that legitimately live only in

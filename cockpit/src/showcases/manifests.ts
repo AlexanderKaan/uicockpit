@@ -42,6 +42,19 @@ export type BlockSpec =
   // CP6 Phase 3 — the month grid as a block (wraps the kit's .calendar recipe +
   // its cell modifiers). firstDow = weekday index (0=Mon … 6=Sun) of day 1.
   | { block: 'calendar'; seed: { title: string; firstDow: number; days: number; today?: number; selected?: number; events?: number[] } }
+  // Flagship (Ledger billing) — the Invoice-detail screen as one bespoke block:
+  // doc (From/To + line items + totals) + a side rail (amount · payment · activity).
+  // avatar = a portrait URL (real-photo look) or a 1-letter initial fallback.
+  | { block: 'invoice'; seed: {
+      number: string; status: string; client: string; clientLogo: string
+      issued: string; due: string
+      fromName: string; fromLines: string[]; toName: string; toLines: string[]
+      items: Array<{ title: string; desc: string; hours: string; rate: string; price: string }>
+      subtotal: string; tax: string; total: string; amount: string
+      payer: string; payerAvatar: string; paidDate: string; method: string
+      activity: Array<{ name: string; avatar: string; action: string; time: string; comment?: string; me?: boolean }>
+      meAvatar: string
+    } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'
@@ -61,7 +74,57 @@ export interface ShowcaseManifest {
   panes: PaneSpec[]
 }
 
+const P = (g: 'men' | 'women', n: number) => `https://randomuser.me/api/portraits/${g}/${n}.jpg`
+
 export const SHOWCASES: ShowcaseManifest[] = [
+  // ── FLAGSHIP: Ledger (billing) — the Invoice-detail screen, built to the bar.
+  //    One coherent product · a recurring cast w/ real portraits + designed logos ·
+  //    restraint (white, hairlines, one accent, tabular money). See
+  //    flagship-billing-pilot memory. Replaces the "9 mediocre archetypes" model.
+  {
+    id: 'ledger',
+    title: 'Ledger · Invoice',
+    blurb: 'Billing flagship — an invoice detail: the document, the amount, and the live activity, in one restrained two-column screen.',
+    width: 1200,
+    archetype: 'feed',
+    nav: 'topbar',
+    navItems: [
+      { icon: 'home', label: 'Home' },
+      { icon: 'file', label: 'Invoices' },
+      { icon: 'store', label: 'Clients' },
+      { icon: 'card', label: 'Expenses' },
+    ],
+    barTitle: 'Ledger',
+    panes: [
+      {
+        role: 'flex',
+        blocks: [
+          { block: 'invoice', seed: {
+            number: '00011', status: 'Paid', client: 'Tuple, Inc', clientLogo: 'tuple',
+            issued: 'January 23, 2026', due: 'January 31, 2026',
+            fromName: 'Acme, Inc.', fromLines: ['7363 Cynthia Pass', 'Toronto, ON N3Y 4H8'],
+            toName: 'Tuple, Inc', toLines: ['886 Walter Street', 'New York, NY 12345'],
+            items: [
+              { title: 'Logo redesign', desc: 'New logo and digital asset playbook.', hours: '20.0', rate: '$100.00', price: '$2,000.00' },
+              { title: 'Website redesign', desc: 'Design and program the new company website.', hours: '52.0', rate: '$100.00', price: '$5,200.00' },
+              { title: 'Business cards', desc: 'Design and production of 3.5" × 2.0" cards.', hours: '12.0', rate: '$100.00', price: '$1,200.00' },
+              { title: 'T-shirt design', desc: 'Three t-shirt design concepts.', hours: '4.0', rate: '$100.00', price: '$400.00' },
+            ],
+            subtotal: '$8,800.00', tax: '$1,760.00', total: '$10,560.00', amount: '$10,560.00',
+            payer: 'Alex Curren', payerAvatar: P('men', 32), paidDate: 'January 31, 2026', method: 'Paid with MasterCard',
+            activity: [
+              { name: 'Chelsea Hagon', avatar: P('women', 44), action: 'created the invoice.', time: '7d ago' },
+              { name: 'Chelsea Hagon', avatar: P('women', 44), action: 'sent the invoice.', time: '6d ago' },
+              { name: 'Chelsea Hagon', avatar: P('women', 44), action: 'commented', time: '3d ago', comment: 'Called the client — they reassured me the invoice would be paid by the 25th.' },
+              { name: 'Alex Curren', avatar: P('men', 32), action: 'viewed the invoice.', time: '2d ago' },
+              { name: 'Alex Curren', avatar: P('men', 32), action: 'paid the invoice.', time: '1d ago', me: true },
+            ],
+            meAvatar: P('women', 68),
+          } },
+        ],
+      },
+    ],
+  },
   {
     id: 'dashboard',
     title: 'Dashboard',

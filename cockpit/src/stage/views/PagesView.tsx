@@ -42,6 +42,7 @@ const BLOCK_INFO: Record<string, { label: string; seg: string; jump: { q: string
   dropzone: { label: 'Dropzone', seg: 'file-upload-dropzone', jump: { q: 'upload', tier: 'block' } },
   media: { label: 'Media', seg: 'file-grid', jump: { q: 'file grid', tier: 'block' } },
   calendar: { label: 'Calendar', seg: 'calendar', jump: { q: 'calendar', tier: 'block' } },
+  invoice: { label: 'Invoice', seg: 'data-table', jump: { q: 'data table', tier: 'block' } },
 }
 const blockInfo = (kind: string) =>
   BLOCK_INFO[kind] ?? { label: kind, seg: kind, jump: { q: kind, tier: 'block' as const } }
