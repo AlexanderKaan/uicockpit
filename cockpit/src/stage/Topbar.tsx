@@ -111,8 +111,8 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
           {/* Tooltips bridge the taxonomy to plain language for the vibe-coder
            * audience (C7) — the meaning is one hover away. */}
           {([
-            ['components', 'Components', Boxes, 'The vocabulary — Atoms (bare) & Components (ready-made sections)'],
-            ['pages', 'Pages', AppWindow, 'Full screens — drill a showcase Page › Section › Atom › All tokens'],
+            ['components', 'Components', Boxes, 'The catalog — Atoms · Components · Sections · Pages'],
+            ['pages', 'Showcases', AppWindow, 'Real screens — drill a showcase Screen › Section › Atom › All tokens'],
           ] as [ViewKind, string, typeof Palette, string][]).map(([k, label, Ico, sub]) => (
             <button
               key={k}

@@ -6,6 +6,21 @@ import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, us
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 import { popGalleryJump } from '../../state/galleryJump'
+import { renderSection } from '../../showcases/sections'
+
+// PAGE tier — the full-bleed page TEMPLATES (the former "Page recipes" showcase,
+// rehoused here as the catalog's 4th wall). Each is a whole screen composed from
+// section slabs; renderSection's 'proof' case assembles one per archetype. The
+// label doubles as the recipe ("List page — page-head · filter-bar · data-table"),
+// so the wall is self-documenting and needs no per-card search.
+const PAGE_ARCHETYPES = [
+  { archetype: 'list', label: 'List page — page-head · filter-bar · data-table' },
+  { archetype: 'detail', label: 'Detail page — page-head · two-column (entity-card · section · timeline)' },
+  { archetype: 'dashboard', label: 'Dashboard — page-head · stat-strip · section › entity-grid' },
+  { archetype: 'settings', label: 'Settings — page-head · section › form + toggles' },
+  { archetype: 'feed', label: 'Feed — page-head · section › timeline' },
+  { archetype: 'empty', label: 'Empty — page-head · empty-state' },
+] as const
 
 // Human label from a card component's function name (the component TYPE):
 // FormCard → "Form", DataTableProCard → "Data Table Pro". (C5)
@@ -130,7 +145,7 @@ const CARD_KEYWORDS: Record<string, string> = {
 const searchText = (C: () => ReactElement) =>
   (labelOf(C) + ' ' + (CARD_KEYWORDS[C.name] ?? '')).toLowerCase()
 
-export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'component' | 'section' } = {}) {
+export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'component' | 'section' | 'page' } = {}) {
   // Order strategy: highest brand-impact first, token-neutral utilities last.
   // Users should SEE the result of every token change without scrolling.
   const galleryRef = useRef<HTMLDivElement>(null)
@@ -241,6 +256,22 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
       <span className="gallery-search__count">{query ? `${count} of ${total}` : `${total}`}</span>
     </div>
   )
+
+  if (tier === 'page') {
+    // PAGE wall — the full-bleed page templates, stacked one per row (not the
+    // masonry; these are whole screens, not cards). Each renders via the proof
+    // case in sections.tsx, which carries its own eyebrow label, so the wall is
+    // self-documenting and needs no search bar.
+    return (
+      <div className="gallerywrap">
+        <div className="l-stack" style={{ '--l-gap': 'var(--k-s-32)' } as CSSProperties}>
+          {PAGE_ARCHETYPES.map((a, i) =>
+            renderSection({ kind: 'proof', seed: { archetype: a.archetype, label: a.label } }, i),
+          )}
+        </div>
+      </div>
+    )
+  }
 
   if (tier === 'atom') {
     // A group whose NAME matches (e.g. "navigation", "overlays") shows all its

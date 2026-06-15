@@ -47,7 +47,6 @@ const SECTION_INFO: Record<string, { label: string; seg: string; jump: { q: stri
   invoices: { label: 'Invoices', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
   clients: { label: 'Clients', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
   expenses: { label: 'Expenses', seg: 'data-table', jump: { q: 'data table', tier: 'component' } },
-  proof: { label: 'Page recipe', seg: 'section', jump: { q: 'section', tier: 'section' } },
 }
 const sectionInfo = (kind: string) =>
   SECTION_INFO[kind] ?? { label: kind, seg: kind, jump: { q: kind, tier: 'component' as const } }
