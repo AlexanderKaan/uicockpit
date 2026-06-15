@@ -344,6 +344,8 @@ function ShowcaseShell({
 }) {
   // Cosmetic nav state — only used for legacy standalone manifests (no appNav).
   const [active, setActive] = useState(0)
+  // The topbar account menu — a real `.menu` dropdown under the avatar.
+  const [acctOpen, setAcctOpen] = useState(false)
   const onDetail = appNav ? appNav.current !== appNav.highlight : false
   // List → detail: clicking an invoice row on the Invoices screen opens the
   // invoice-detail screen (the believable list→detail verb). Delegated so it
@@ -369,8 +371,41 @@ function ShowcaseShell({
             </nav>
           )}
           <span className="shc__bar-spacer" />
-          <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Search"><Icon name="search" /></button>
-          <span className="avatar avatar--sm">A</span>
+          {appNav ? (
+            // Topbar built from REAL atoms — the searchinput, a notification button
+            // with a count badge, and a photo avatar that opens a real .menu.
+            <>
+              <div className="searchinput shc__topsearch" role="search">
+                <Icon name="search" />
+                <input className="searchinput__field" type="search" placeholder="Search invoices, clients…" aria-label="Search Ledger" />
+              </div>
+              <button type="button" className="btn btn--ghost btn--icon btn--sm shc__bellbtn" aria-label="Notifications, 2 unread">
+                <Icon name="bell" />
+                <span className="badge badge--solid-primary badge--count">2</span>
+              </button>
+              <div className="shc__acct">
+                <button type="button" className="shc__acctbtn" aria-haspopup="menu" aria-expanded={acctOpen} aria-label="Account menu" onClick={() => setAcctOpen((o) => !o)}>
+                  <span className="avatar avatar--sm" aria-hidden="true">
+                    <img className="avatar__img" src="https://randomuser.me/api/portraits/women/68.jpg" alt="" loading="lazy" />
+                  </span>
+                </button>
+                {acctOpen && (
+                  <div className="menu shc__acctmenu" role="menu">
+                    <div className="menu__label">Priya Nair · Acme, Inc.</div>
+                    <button type="button" className="menu__item" role="menuitem"><Icon name="home" /> Profile</button>
+                    <button type="button" className="menu__item" role="menuitem"><Icon name="cog" /> Settings <span className="menu__shortcut">⌘,</span></button>
+                    <div className="menu__sep" />
+                    <button type="button" className="menu__item" role="menuitem"><Icon name="upload" /> Sign out</button>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Search"><Icon name="search" /></button>
+              <span className="avatar avatar--sm">A</span>
+            </>
+          )}
         </div>
         {appNav ? (
           // The ONE Ledger side menu — the REAL `.sidenav` component (brand header,

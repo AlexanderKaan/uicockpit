@@ -1,8 +1,32 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
 import type { SectionSpec } from './manifests'
 import { BrandLogo } from './logos'
+
+/** Per-row actions — the real `.menu` dropdown (kebab → View · Send reminder ·
+ *  Duplicate · Delete), self-contained so each table row owns its open state.
+ *  Only kit classes (.btn / .menu); positioning is inline LAYOUT (never structural). */
+function RowMenu() {
+  const [open, setOpen] = useState(false)
+  return (
+    // stopPropagation so a menu click doesn't trip the invoice row→detail handler.
+    <span style={{ position: 'relative', display: 'inline-flex' }} onClick={(e) => e.stopPropagation()}>
+      <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-haspopup="menu" aria-expanded={open} aria-label="Row actions" onClick={() => setOpen((o) => !o)}>
+        <Icon name="dots" />
+      </button>
+      {open && (
+        <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', zIndex: 'var(--k-z-popover, 50)', minWidth: '11rem' }}>
+          <button type="button" className="menu__item" role="menuitem"><Icon name="file" /> View</button>
+          <button type="button" className="menu__item" role="menuitem"><Icon name="bell" /> Send reminder</button>
+          <button type="button" className="menu__item" role="menuitem"><Icon name="plus" /> Duplicate</button>
+          <div className="menu__sep" />
+          <button type="button" className="menu__item menu__item--danger" role="menuitem"><Icon name="trash" /> Delete</button>
+        </div>
+      )}
+    </span>
+  )
+}
 
 /** Photo avatar with a graceful initial fallback — the flagship's "real app"
  *  tell. Real portrait via .avatar__img; on load error, swap to the initial. */
@@ -335,6 +359,15 @@ export function renderSection(spec: SectionSpec, key: number) {
       const dirTone = { in: 'var(--k-success)', out: 'var(--k-fg-muted)', over: 'var(--k-warning)' } as const
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
+          {/* Overdue alert — the real .banner recipe carrying the one status that
+              wants the screen's attention (numbers match the Overdue KPI below). */}
+          <div className="banner banner--warn" role="status">
+            <Icon name="bell" />
+            <div className="banner__body">
+              <strong>3 invoices are overdue</strong> — $12,787.00 past due. <a className="banner__link" href="#">Send reminders</a>
+            </div>
+          </div>
+
           {/* Header: title · period segmented · the one aimed action */}
           <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}>
             <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
@@ -445,7 +478,7 @@ export function renderSection(spec: SectionSpec, key: number) {
             <div className="datatable__body">
               <table className="tbl">
                 <thead>
-                  <tr><th>Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th></tr>
+                  <tr><th>Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>
                 </thead>
                 <tbody>
                   {s.rows.map((r) => (
@@ -461,6 +494,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                       <td style={muted}>{r.due}</td>
                       <td className="num" style={{ ...money, fontWeight: med }}>{r.amount}</td>
                       <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                      <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -511,7 +545,7 @@ export function renderSection(spec: SectionSpec, key: number) {
             <div className="datatable__body">
               <table className="tbl">
                 <thead>
-                  <tr><th>Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th></tr>
+                  <tr><th>Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th><th aria-label="Actions" /></tr>
                 </thead>
                 <tbody>
                   {s.rows.map((r) => (
@@ -531,6 +565,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                       <td className="num" style={money}>{r.billed}</td>
                       <td className="num" style={{ ...money, fontWeight: med }}>{r.outstanding}</td>
                       <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                      <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -563,6 +598,21 @@ export function renderSection(spec: SectionSpec, key: number) {
 
           <SummaryBand items={s.summary} />
 
+          {/* Budget burn — the real .usage meter (numbers match the "vs budget" KPI). */}
+          <div className="usage usage--warn">
+            <div className="usage__head">
+              <span className="usage__title">March budget</span>
+              <span className="usage__pct">$30,156.00 of $34,000.00 (88%)</span>
+            </div>
+            <div className="usage__bar" role="progressbar" aria-valuenow={88} aria-valuemin={0} aria-valuemax={100} aria-label="March budget">
+              <div className="usage__fill" style={{ width: '88%' }} />
+            </div>
+            <div className="usage__foot">
+              <span className="usage__hint">12 days left in the period</span>
+              <button type="button" className="btn btn--ghost btn--sm">Adjust budget</button>
+            </div>
+          </div>
+
           <div className="datatable datatable--page">
             <div className="datatable__bar">
               <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
@@ -581,7 +631,7 @@ export function renderSection(spec: SectionSpec, key: number) {
             <div className="datatable__body">
               <table className="tbl">
                 <thead>
-                  <tr><th>Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th></tr>
+                  <tr><th>Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>
                 </thead>
                 <tbody>
                   {s.rows.map((r) => (
@@ -596,6 +646,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                       <td style={muted}>{r.date}</td>
                       <td className="num" style={{ ...money, fontWeight: med }}>{r.amount}</td>
                       <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                      <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
                     </tr>
                   ))}
                 </tbody>
