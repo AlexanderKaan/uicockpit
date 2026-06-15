@@ -118,15 +118,30 @@ export interface ShowcaseManifest {
 
 const P = (g: 'men' | 'women', n: number) => `https://randomuser.me/api/portraits/${g}/${n}.jpg`
 
-/** The ONE Ledger menu — shared by every Ledger screen so the app reads as a
- *  single product (Catalyst-style: one nav, many pages). Add a screen → it joins
- *  this menu; never re-declare nav per manifest. */
-const LEDGER_NAV: Array<{ icon: IconName; label: string }> = [
-  { icon: 'home', label: 'Home' },
-  { icon: 'file', label: 'Invoices' },
-  { icon: 'store', label: 'Clients' },
-  { icon: 'card', label: 'Expenses' },
+/** The ONE Ledger sidebar — the single source of truth for the app's nav
+ *  (Catalyst-style: one side menu, many screens). Each entry maps a nav item to a
+ *  screen manifest by `id`; the app frame (PagesView → LedgerApp) renders this as a
+ *  persistent sidebar and swaps the body to the matching manifest on click. Add a
+ *  screen → add a row here; never re-declare nav per manifest. Order = sidebar order. */
+export interface LedgerScreen { id: string; icon: IconName; label: string }
+export const LEDGER_SCREENS: LedgerScreen[] = [
+  { id: 'ledger-home', icon: 'home', label: 'Home' },
+  { id: 'ledger-invoices', icon: 'file', label: 'Invoices' },
+  { id: 'ledger-clients', icon: 'store', label: 'Clients' },
+  { id: 'ledger-expenses', icon: 'card', label: 'Expenses' },
+  { id: 'ledger-reports', icon: 'chart', label: 'Reports' },
+  { id: 'ledger-documents', icon: 'grid', label: 'Documents' },
+  { id: 'ledger-assistant', icon: 'spark', label: 'Assistant' },
+  { id: 'ledger-plans', icon: 'cog', label: 'Plans & billing' },
 ]
+/** Detail screens that aren't sidebar peers — they're reached FROM a list screen
+ *  (e.g. click an invoice row) and highlight their parent's nav item. */
+export const LEDGER_DETAIL_PARENT: Record<string, string> = {
+  ledger: 'ledger-invoices', // the invoice-detail screen lives under Invoices
+}
+/** The nav items as the manifests carry them (icon+label) — keeps each manifest's
+ *  JSON honest about the real menu without duplicating the id wiring. */
+const LEDGER_NAV: Array<{ icon: IconName; label: string }> = LEDGER_SCREENS.map(({ icon, label }) => ({ icon, label }))
 
 export const SHOWCASES: ShowcaseManifest[] = [
   // ── FLAGSHIP: Ledger (billing) — the Invoice-detail screen, built to the bar.
@@ -139,7 +154,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
     blurb: 'Billing flagship — the cashflow home: a KPI strip, a grouped transaction feed, and recent clients. Same app, same cast as the invoice screen.',
     width: 1200,
     archetype: 'feed',
-    nav: 'topbar',
+    nav: 'suite',
     navItems: LEDGER_NAV,
     barTitle: 'Ledger',
     panes: [
@@ -179,7 +194,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
     blurb: 'Billing flagship — an invoice detail: the document, the amount, and the live activity, in one restrained two-column screen.',
     width: 1200,
     archetype: 'feed',
-    nav: 'topbar',
+    nav: 'suite',
     navItems: LEDGER_NAV,
     barTitle: 'Ledger',
     panes: [
@@ -218,7 +233,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
     blurb: 'Billing flagship — the invoices list: a Fill summary band over a filterable .datatable of invoices (client logo · amount · status · due). The third of three perfect screens.',
     width: 1200,
     archetype: 'feed',
-    nav: 'topbar',
+    nav: 'suite',
     navItems: LEDGER_NAV,
     barTitle: 'Ledger',
     panes: [
@@ -256,7 +271,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
     blurb: 'Billing flagship — the clients directory (the CRM archetype, rebuilt into the one Ledger app): a Fill summary band over a filterable .datatable of accounts with contact photos.',
     width: 1200,
     archetype: 'feed',
-    nav: 'topbar',
+    nav: 'suite',
     navItems: LEDGER_NAV,
     barTitle: 'Ledger',
     panes: [
@@ -292,7 +307,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
     blurb: 'Billing flagship — the expenses ledger: a Fill summary band over a filterable .datatable of spend (vendor mark · category · amount · status). Completes the Ledger menu.',
     width: 1200,
     archetype: 'feed',
-    nav: 'topbar',
+    nav: 'suite',
     navItems: LEDGER_NAV,
     barTitle: 'Ledger',
     panes: [
@@ -322,444 +337,122 @@ export const SHOWCASES: ShowcaseManifest[] = [
       },
     ],
   },
+  // ── Reports — folds the old Dashboard surface into the one Ledger app.
   {
-    id: 'dashboard',
-    title: 'Dashboard',
-    blurb: 'Feed archetype × nav rail — KPI strip, a revenue chart and an activity feed in one flexible pane.',
-    width: 1100,
+    id: 'ledger-reports',
+    title: 'Ledger · Reports',
+    blurb: 'Billing flagship — Reports: a KPI strip, the invoiced-vs-collected revenue chart, and a live activity feed. Same cast, same restraint.',
+    width: 1200,
     archetype: 'feed',
     nav: 'suite',
-    navItems: [
-      { icon: 'home', label: 'Overview' },
-      { icon: 'chart', label: 'Reports' },
-      { icon: 'bell', label: 'Alerts' },
-      { icon: 'cog', label: 'Settings' },
-    ],
-    barTitle: 'Meridian',
+    navItems: LEDGER_NAV,
+    barTitle: 'Ledger',
     panes: [
       {
         role: 'flex',
         sections: [
           { kind: 'stats', seed: { items: [
-            { label: 'Net revenue', value: '$312,480', delta: '+9.2%', up: true, hero: true },
-            { label: 'Active accounts', value: '1,284', delta: '+3.4%', up: true },
-            { label: 'Runway', value: '18 mo', delta: '+2 mo', up: true },
+            { label: 'Net revenue', value: '$405,091.00', delta: '+4.75%', up: true, hero: true },
+            { label: 'Collected (Mar)', value: '$148,316.00', delta: '+8.10%', up: true },
+            { label: 'Avg. days to pay', value: '19 days', delta: '−2 days', up: true },
+            { label: 'Active clients', value: '18', delta: '+3 qtr', up: true },
           ] } },
-          { kind: 'chart', seed: { title: 'Net revenue — last 6 months', type: 'area', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
-            { name: 'Subscriptions', values: [186, 204, 198, 241, 273, 312] },
-            { name: 'Services', values: [42, 38, 51, 47, 58, 64] },
+          { kind: 'chart', seed: { title: 'Invoiced vs collected — last 6 months', type: 'area', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
+            { name: 'Invoiced', values: [186, 204, 198, 241, 273, 312] },
+            { name: 'Collected', values: [142, 188, 176, 214, 248, 286] },
           ] } },
           { kind: 'list', seed: { title: 'Recent activity', items: [
-            { icon: 'check', title: 'Payout to Loomis Studio', sub: 'ACH · $4,200', trail: '2m', badge: 'success' },
-            { icon: 'bell', title: 'Card spend at 81%', sub: 'September limit — $40k', trail: '1h', badge: 'warning' },
-            { icon: 'plus', title: 'New treasury account', sub: 'Opened by Priya N. · USD', trail: '3h' },
-            { icon: 'upload', title: 'Statement ready', sub: 'august-2026.pdf · 2.1 MB', trail: '5h' },
+            { icon: 'check', title: 'Payment received — SavvyCal', sub: 'Invoice #00010 · $14,000.00', trail: '2m', badge: 'success' },
+            { icon: 'bell', title: 'Reminder sent — Tuple, Inc', sub: 'Invoice #00009 · 14 days overdue', trail: '1h', badge: 'warning' },
+            { icon: 'plus', title: 'New invoice drafted — Reform', sub: 'Website redesign · $7,600.00', trail: '3h' },
+            { icon: 'upload', title: 'March statement ready', sub: 'march-2026.pdf · 2.1 MB', trail: '5h' },
           ] } },
         ],
       },
     ],
   },
+  // ── Documents — folds the old Studio surface into the one Ledger app.
   {
-    id: 'ai-assist',
-    title: 'AI-assistent',
-    blurb: 'List-detail archetype × nav rail — thread list beside the conversation + composer. Below 840px the list owns the width (selection navigates).',
+    id: 'ledger-documents',
+    title: 'Ledger · Documents',
+    blurb: 'Billing flagship — Documents: the receipts & contracts vault as a media grid with an upload dropzone. Folds the old Studio surface into the one app.',
     width: 1200,
-    archetype: 'list-detail',
+    archetype: 'feed',
     nav: 'suite',
-    navItems: [
-      { icon: 'chat', label: 'Chats' },
-      { icon: 'spark', label: 'Agents' },
-      { icon: 'file', label: 'Files' },
-      { icon: 'cog', label: 'Settings' },
-    ],
-    barTitle: 'Aria',
-    panes: [
-      {
-        role: 'fixed',
-        sections: [
-          { kind: 'list', seed: { items: [
-            { icon: 'spark', title: 'Q3 launch plan', sub: 'Draft the rollout timeline…', trail: 'now' },
-            { icon: 'chat', title: 'SQL query help', sub: 'Window functions for cohort…', trail: '2h' },
-            { icon: 'chat', title: 'Press release tone', sub: 'Make it warmer, less corporate', trail: '1d' },
-            { icon: 'chat', title: 'Bug triage notes', sub: 'Summarize the flaky-test thread', trail: '3d' },
-          ] } },
-        ],
-      },
-      {
-        role: 'detail',
-        sections: [
-          { kind: 'thread', seed: { messages: [
-            { name: 'You', time: '14:02', avatar: 'AK', body: 'Draft a rollout timeline for the Q3 launch — beta in July, GA in September.', me: true },
-            { name: 'Aria', time: '14:02', avatar: 'A', body: 'Here is a three-phase timeline: July 7 closed beta (50 design partners), August 11 open beta with pricing page live, September 9 GA with the launch post and lifecycle emails. Want me to expand any phase into tasks?' },
-            { name: 'You', time: '14:05', avatar: 'AK', body: 'Expand the closed beta phase into a checklist.', me: true },
-          ] } },
-          { kind: 'composer', seed: { greeting: 'Good afternoon, Alex', placeholder: 'Ask Aria anything — ⏎ to send, ⇧⏎ for a new line', hero: true, suggestions: ['Summarize a PR', 'Explain this error', 'Draft a SQL query', 'Write a test'] } },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'crm',
-    title: 'CRM / Data',
-    blurb: 'List-detail archetype × expanded rail — saved views beside a data table with pipeline stats.',
-    width: 1300,
-    archetype: 'list-detail',
-    nav: 'suite',
-    navItems: [
-      { icon: 'grid', label: 'Accounts' },
-      { icon: 'chart', label: 'Forecast' },
-      { icon: 'cal', label: 'Tasks' },
-      { icon: 'cog', label: 'Settings' },
-    ],
-    barTitle: 'PipelineHQ',
-    panes: [
-      {
-        role: 'fixed',
-        sections: [
-          { kind: 'list', seed: { title: 'Saved views', items: [
-            { icon: 'grid', title: 'All accounts', trail: '248' },
-            { icon: 'spark', title: 'Hot — closing this month', trail: '12' },
-            { icon: 'bell', title: 'At risk', trail: '7' },
-            { icon: 'check', title: 'Closed won · Q2', trail: '31' },
-          ] } },
-        ],
-      },
-      {
-        role: 'detail',
-        sections: [
-          { kind: 'stats', seed: { items: [
-            { label: 'Pipeline', value: '$1.24M', delta: '+8%', up: true, hero: true },
-            { label: 'Won (Q2)', value: '$310k', delta: '+22%', up: true },
-            { label: 'Avg. cycle', value: '34d', delta: '+3d', up: false },
-          ] } },
-          { kind: 'table', seed: { title: 'Hot accounts', numericCols: [3], badgeCols: [2], avatarCols: [1], sortableCols: [0, 3], badgeToneByValue: { Discovery: 'info', Proposal: 'warning', Negotiation: 'success' }, columns: ['Account', 'Owner', 'Stage', 'Value', 'Next step'], rows: [
-            ['Brightwave', 'Lena', 'Negotiation', '$120k', 'Contract review · Fri'],
-            ['Cedar Health', 'Sam', 'Proposal', '$86k', 'Demo follow-up · Tue'],
-            ['Halcyon Labs', 'Ravi', 'Discovery', '$54k', 'Stakeholder call · Mon'],
-            ['Vantage Retail', 'Mia', 'Negotiation', '$210k', 'Security review · Thu'],
-          ] } },
-          // CP6 — the CRM signal a deal-board can't give: where the quarter lands.
-          // Committed vs best-case forecast (Attio/Salesforce's focal chart).
-          { kind: 'chart', seed: { title: 'Forecast — next 4 quarters', type: 'area', labels: ['Q1', 'Q2', 'Q3', 'Q4'], series: [
-            { name: 'Committed', values: [310, 420, 480, 560] },
-            { name: 'Best case', values: [380, 520, 610, 720] },
-          ] } },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'portal',
-    title: 'Portal',
-    blurb: 'Supporting-pane archetype × topbar — a settings form and plan picker with help content alongside. Below 840px the supporting pane folds into the flow.',
-    width: 1100,
-    archetype: 'supporting',
-    nav: 'topbar',
-    navItems: [
-      { icon: 'home', label: 'Home' },
-      { icon: 'card', label: 'Billing' },
-      { icon: 'cog', label: 'Account' },
-    ],
-    barTitle: 'Customer portal',
+    navItems: LEDGER_NAV,
+    barTitle: 'Ledger',
     panes: [
       {
         role: 'flex',
         sections: [
-          // CP6 — a customer portal opens on the number that matters: amount due.
-          // The hero stat deploys the display tier; one focused upgrade card, not a
-          // 3-tier marketing wall (you're already a customer).
-          { kind: 'stats', seed: { items: [
-            { label: 'Amount due', value: '€288.00', hero: true },
-            { label: 'Due date', value: 'Jul 1' },
-            { label: 'Current plan', value: 'Pro · annual' },
+          { kind: 'media', seed: { title: 'Receipts & contracts · 6 files', items: [
+            { name: 'Master services agreement — Tuple', kind: 'file', hero: true, badge: 'Signed', tone: 'success', meta: 'MSA-tuple-2026.pdf · 480 KB · added by Chelsea' },
+            { name: 'Receipt — Northwind Cloud', kind: 'image', badge: '$8,240', tone: 'info' },
+            { name: 'invoice-00011.pdf', kind: 'file' },
+            { name: 'Receipt — Prism Design', kind: 'image' },
+            { name: 'W-9 — Loomis Studio', kind: 'file', badge: 'On file', tone: 'warning' },
+            { name: 'statement-mar-2026.pdf', kind: 'file' },
           ] } },
-          { kind: 'form', seed: { title: 'Organization', intro: 'These details appear on your invoices.', fields: [
-            { label: 'Company name', value: 'Lumen Studio' },
+          { kind: 'dropzone', seed: { title: 'Drop receipts or click to browse', hint: 'PDF, PNG, JPG — up to 25 MB per file' } },
+        ],
+      },
+    ],
+  },
+  // ── Assistant — folds the old AI-assistant surface into the one Ledger app.
+  {
+    id: 'ledger-assistant',
+    title: 'Ledger · Assistant',
+    blurb: 'Billing flagship — the finance copilot: ask about overdue invoices, draft reminders, forecast cashflow. Folds the AI-assistant surface into the one app.',
+    width: 1200,
+    archetype: 'feed',
+    nav: 'suite',
+    navItems: LEDGER_NAV,
+    barTitle: 'Ledger',
+    panes: [
+      {
+        role: 'flex',
+        sections: [
+          { kind: 'thread', seed: { messages: [
+            { name: 'You', time: '09:14', avatar: 'AK', body: 'Which invoices are overdue, and how much is outstanding?', me: true },
+            { name: 'Ledger AI', time: '09:14', avatar: 'L', body: 'Two invoices are overdue: #00009 (Tuple, Inc — $2,000.00, 14 days) and #00008 (Vantage Retail — $21,400.00, 8 days). Total outstanding across all open invoices is $245,988.00. Want me to draft reminders for the two overdue ones?' },
+            { name: 'You', time: '09:15', avatar: 'AK', body: 'Yes — draft a friendly reminder for Tuple.', me: true },
+          ] } },
+          { kind: 'composer', seed: { greeting: 'Good morning, Alex', placeholder: 'Ask Ledger AI — ⏎ to send, ⇧⏎ for a new line', hero: true, suggestions: ['Draft a payment reminder', 'Which invoices are overdue?', 'Forecast next month', 'Summarize March expenses'] } },
+        ],
+      },
+    ],
+  },
+  // ── Plans & billing — folds the old Portal + Site pricing into the one Ledger app.
+  {
+    id: 'ledger-plans',
+    title: 'Ledger · Plans & billing',
+    blurb: 'Billing flagship — Plans & billing: the org details, the current plan + upgrade, and notification preferences. Folds the Portal + Site pricing surfaces into the one app.',
+    width: 1200,
+    archetype: 'feed',
+    nav: 'suite',
+    navItems: LEDGER_NAV,
+    barTitle: 'Ledger',
+    panes: [
+      {
+        role: 'flex',
+        sections: [
+          { kind: 'stats', seed: { items: [
+            { label: 'Current plan', value: 'Scale · annual', hero: true },
+            { label: 'Seats', value: '4 of 5 used' },
+            { label: 'Renews', value: 'Jul 1, 2026' },
+          ] } },
+          { kind: 'form', seed: { title: 'Billing details', intro: 'These appear on every invoice you send.', fields: [
+            { label: 'Legal name', value: 'Acme, Inc.' },
             { label: 'VAT number', placeholder: 'EU123456789' },
-            { label: 'Billing email', value: 'finance@lumenstudio.io' },
+            { label: 'Billing email', value: 'finance@acme.inc' },
           ], submit: 'Save changes' } },
           { kind: 'pricing', seed: { tiers: [
-            { name: 'Scale', price: '€96', period: '/mo', feats: ['Audit log & SSO', 'SLA 99.9%', 'Dedicated CSM'], featured: true, cta: 'Upgrade plan' },
+            { name: 'Scale', price: '$96', period: '/mo', feats: ['Unlimited invoices', 'Audit log & SSO', 'Dedicated CSM'], featured: true, cta: 'Current plan' },
           ] } },
-          // H3c: Settings' toggle rows, harvested into Portal (account preferences).
           { kind: 'settings', seed: { title: 'Notifications', rows: [
-            { title: 'Product updates', sub: 'New features and changelog highlights.', on: true },
-            { title: 'Billing receipts', sub: 'Email a receipt after every payment.', on: true },
-            { title: 'Usage alerts', sub: 'Warn me before I hit a plan limit.', on: false },
-          ] } },
-        ],
-      },
-      {
-        role: 'supporting',
-        sections: [
-          { kind: 'dl', seed: { title: 'Your plan', pairs: [
-            ['Plan', 'Pro · annual'],
-            ['Seats', '4 of 5 used'],
-            ['Renewal', 'July 1, 2026'],
-            ['Invoices', '12 paid'],
-          ] } },
-          // H3c: Docs' tree-nav, harvested into Portal (knowledge & account).
-          { kind: 'tree', seed: { label: 'Help center', groups: [
-            { name: 'Getting started', items: [
-              { title: 'Set up your workspace' },
-              { title: 'Invite your team', on: true },
-            ] },
-            { name: 'Billing', items: [
-              { title: 'VAT & receipts' },
-              { title: 'Change your plan' },
-            ] },
-          ] } },
-          // H3c: Settings' activity timeline, harvested into Portal.
-          { kind: 'timeline', seed: { events: [
-            { title: 'Plan upgraded to Pro', time: 'Jun 1', desc: 'by finance@lumenstudio.io', state: 'done' },
-            { title: 'Seat added — ravi@lumenstudio.io', time: 'Jun 6', state: 'done' },
-            { title: 'Renewal upcoming', time: 'Jul 1', desc: '€24/mo · auto-renew', state: 'current' },
-          ] } },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'consumer',
-    title: 'Consumer',
-    blurb: 'Expressive consumer app at compact width — a music/events feed that leans into the kit’s harmony + signature shape. The non-SaaS surface; the nav suite docks as a bottom bar below 600px.',
-    width: 390,
-    archetype: 'feed',
-    nav: 'suite',
-    navItems: [
-      { icon: 'home', label: 'For you' },
-      { icon: 'search', label: 'Discover' },
-      { icon: 'spark', label: 'Live' },
-      { icon: 'home', label: 'Profile' },
-    ],
-    barTitle: 'Tonight',
-    panes: [
-      {
-        role: 'flex',
-        sections: [
-          { kind: 'chips', seed: { label: 'Browse', options: ['For you', 'Nearby', 'This week', 'Free'], active: 0 } },
-          { kind: 'media', seed: { title: 'Featured tonight', items: [
-            { name: 'Serafina — live set', kind: 'image', hero: true, badge: 'LIVE 9:30', tone: 'info', meta: 'Paradiso, Amsterdam · doors 21:00 · 312 going' },
-            { name: 'Echo Bridge rooftop', kind: 'image', badge: 'Going', tone: 'success' },
-            { name: 'Vinyl night · De School', kind: 'image', badge: '€8', tone: 'warning' },
-            { name: 'Sunrise set · NDSM', kind: 'image' },
-          ] } },
-          { kind: 'list', seed: { title: 'Your week', items: [
-            { icon: 'spark', title: 'Serafina', sub: 'Paradiso · doors 21:00', trail: 'Fri', badge: 'info' },
-            { icon: 'home', title: 'Echo Bridge', sub: 'Hosted by Odette · 78 going', trail: 'Sat' },
-            { icon: 'chat', title: 'Group chat', sub: 'Mia: making a shared album…', trail: '2m' },
-          ] } },
-          { kind: 'empty', seed: { icon: 'search', title: 'That’s everything near you tonight', sub: 'Try Nearby to catch shows in Rotterdam & Utrecht.', cta: 'Widen search' } },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'site',
-    title: 'Site',
-    blurb: 'Prose/feed archetype × topbar — an article column and a pricing band; content-site composition from the same kit.',
-    width: 1280,
-    archetype: 'feed',
-    nav: 'topbar',
-    navItems: [
-      { icon: 'home', label: 'Product' },
-      { icon: 'card', label: 'Pricing' },
-      { icon: 'file', label: 'Docs' },
-      { icon: 'chat', label: 'Blog' },
-    ],
-    barTitle: 'Fieldnotes',
-    panes: [
-      {
-        role: 'flex',
-        sections: [
-          { kind: 'prose', seed: {
-            hero: true,
-            kicker: 'The design-system configurator',
-            title: 'Ship a design system with conviction.',
-            paragraphs: [
-              'Compose a coherent, opinionated kit in minutes — brand, type, shape, motion — then export framework-neutral tokens and a machine-readable contract your agent actually follows. No lock-in, no component zoo, no accounts.',
-            ],
-            ctas: ['Start free', 'Read the docs'],
-          } },
-          { kind: 'prose', seed: {
-            kicker: 'Changelog · June 2026',
-            title: 'Design tokens, now with a contract',
-            paragraphs: [
-              'Your design system is only as real as the things that enforce it. This release ships the contract artefact alongside the tokens: the tiers, the uses-graph and the composition rules as machine-readable data.',
-              'Point your agent at the contract and it stops inventing one-off components — every surface it builds maps onto a recipe the kit already exports, in your brand, at your scale.',
-            ],
-          } },
-          { kind: 'pricing', seed: { tiers: [
-            { name: 'Hobby', price: '$0', period: 'forever', feats: ['1 kit', 'CDN link'], cta: 'Start free' },
-            { name: 'Team', price: '$12', period: '/mo', feats: ['Unlimited kits', 'Versioned lanes', 'Checks in CI'], featured: true, cta: 'Start trial' },
-          ] } },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'studio',
-    title: 'Studio',
-    blurb: 'Content / DAM archetype × list-detail — a folder tree beside a media grid with an upload dropzone and a publish wizard. The non-SaaS, content-product surface.',
-    width: 1280,
-    archetype: 'list-detail',
-    nav: 'suite',
-    navItems: [
-      { icon: 'grid', label: 'Library' },
-      { icon: 'upload', label: 'Uploads' },
-      { icon: 'spark', label: 'Collections' },
-      { icon: 'cog', label: 'Settings' },
-    ],
-    barTitle: 'Studio',
-    panes: [
-      {
-        role: 'fixed',
-        sections: [
-          { kind: 'tree', seed: { label: 'Folders', groups: [
-            { name: 'Campaigns', items: [
-              { title: 'Spring launch', on: true },
-              { title: 'Brand refresh' },
-            ] },
-            { name: 'Stock', items: [
-              { title: 'Photography' },
-              { title: 'Illustration' },
-            ] },
-          ] } },
-        ],
-      },
-      {
-        role: 'detail',
-        sections: [
-          // CP6 — the asset IS the UI: a hero cover leads, the contact sheet
-          // follows, metadata sits beside it. Dropzone + publish wizard are the
-          // working chrome below the focal asset.
-          { kind: 'media', seed: { title: 'Spring launch · 6 assets', items: [
-            { name: 'Spring launch — hero', kind: 'image', hero: true, badge: 'New', tone: 'success', meta: 'hero-wide.jpg · 4000×2250 · 3.4 MB · added by Noa' },
-            { name: 'teaser.mp4', kind: 'video', badge: '0:28', tone: 'info' },
-            { name: 'lookbook.pdf', kind: 'file' },
-            { name: 'badge-set.png', kind: 'image' },
-            { name: 'palette.png', kind: 'image' },
-            { name: 'brief.pdf', kind: 'file', badge: 'Final', tone: 'warning' },
-          ] } },
-          { kind: 'dl', seed: { title: 'Asset details', pairs: [
-            ['Dimensions', '4000 × 2250'],
-            ['Format', 'JPEG · sRGB'],
-            ['Uploaded', 'Jun 11 · by Noa'],
-            ['Collection', 'Spring launch'],
-          ] } },
-          { kind: 'dropzone', seed: { title: 'Drop files or click to browse', hint: 'Images, PDFs, video — up to 100 MB per file' } },
-          { kind: 'wizard', seed: { steps: ['Select', 'Crop', 'Caption', 'Publish'], active: 2, title: 'Caption', sub: 'Add alt text and a caption before publishing.' } },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'workspace',
-    title: 'Workspace',
-    blurb: 'The 3-pane workspace archetype — spaces, a live thread and an agenda/files rail, all visible at once on wide screens. Below 1200 the rail drops out; below 840 the spaces list yields and the thread owns the width. One markup, three breakpoints — the densest composition the shell tier holds.',
-    width: 1440,
-    archetype: 'workspace',
-    nav: 'suite',
-    navItems: [
-      { icon: 'chat', label: 'Chat' },
-      { icon: 'bell', label: 'Activity' },
-      { icon: 'cal', label: 'Meet' },
-      { icon: 'grid', label: 'Spaces' },
-    ],
-    barTitle: 'Teamspace',
-    panes: [
-      {
-        role: 'fixed',
-        sections: [
-          { kind: 'list', seed: { title: 'Spaces', items: [
-            { icon: 'chat', title: 'Adoption volunteering', sub: '22 members', trail: '3', badge: 'info' },
-            { icon: 'grid', title: 'Museum field trip', sub: 'Casey, +6' },
-            { icon: 'spark', title: 'Annual spring hike', sub: 'Planning' },
-            { icon: 'home', title: 'Lunch break', sub: 'Renée, +4' },
-            { icon: 'file', title: 'Project Sunrise', sub: 'Files & tasks' },
-          ] } },
-        ],
-      },
-      {
-        role: 'detail',
-        sections: [
-          { kind: 'thread', seed: { messages: [
-            { name: 'Elle Petersen', time: '14:02', avatar: 'EP', body: 'The shelter on Maple needs dog-walkers Sat AM — want to sign up together?' },
-            { name: 'Dagmar Bachmann', time: '14:05', avatar: 'DB', body: 'I’m adopting the scruffy one — his name is Otto 🐶' },
-            { name: 'Priya Nadar', time: '14:05', avatar: 'PN', body: 'I can drive — fits 4 + crates.' },
-            { name: 'You', time: '14:06', body: 'Amazing. I’ll book the 9:00 slot for six of us.', me: true },
-            { name: 'Marco Bauer', time: '14:11', avatar: 'MB', body: 'Bringing leashes + treats.' },
-          ] } },
-          { kind: 'composer', seed: { placeholder: 'Message the space — ⇧⏎ for a new line' } },
-        ],
-      },
-      {
-        role: 'supporting',
-        sections: [
-          { kind: 'timeline', seed: { events: [
-            { title: 'Teaching workshop', time: '9:00', desc: '9:00 – 12:00', state: 'done' },
-            { title: 'Lunch', time: '13:00', desc: '13:00 – 14:00', state: 'current' },
-            { title: 'Curriculum review', time: '16:00', desc: '16:00 – 17:00' },
-          ] } },
-          { kind: 'list', seed: { title: 'Files', items: [
-            { icon: 'file', title: 'Adoption application', sub: 'PDF · 240 KB' },
-            { icon: 'grid', title: 'Shelter map', sub: 'PNG · 1.2 MB' },
-          ] } },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'calendar',
-    title: 'Calendar',
-    blurb: 'Workspace archetype × nav rail — calendars beside the month grid + the day’s agenda, with an event inspector rail. Time-as-canvas (Cron/Fantastical): the grid is the hero, one aimed accent marks the day. Below 1200 the rail drops; below 840 the calendars list yields.',
-    width: 1280,
-    archetype: 'workspace',
-    nav: 'suite',
-    navItems: [
-      { icon: 'cal', label: 'Calendar' },
-      { icon: 'chat', label: 'Inbox' },
-      { icon: 'check', label: 'Tasks' },
-      { icon: 'cog', label: 'Settings' },
-    ],
-    barTitle: 'Horizon',
-    panes: [
-      {
-        role: 'fixed',
-        sections: [
-          { kind: 'list', seed: { title: 'Calendars', items: [
-            { icon: 'check', title: 'Personal', sub: '3 events', badge: 'info' },
-            { icon: 'grid', title: 'Work', sub: '8 events' },
-            { icon: 'spark', title: 'Team', sub: 'Standups & 1:1s' },
-            { icon: 'cal', title: 'Holidays', sub: 'NL' },
-          ] } },
-        ],
-      },
-      {
-        role: 'detail',
-        sections: [
-          // The grid is the hero. today = the 14th (ring), selected = the 18th
-          // (filled accent — the day being viewed), event-dotted days alongside.
-          { kind: 'calendar', seed: { title: 'June 2026', firstDow: 0, days: 30, today: 14, selected: 18, events: [3, 5, 9, 12, 22, 24, 26] } },
-          { kind: 'list', seed: { title: 'Thursday, June 18', items: [
-            { icon: 'spark', title: 'Design review', sub: '10:00 – 11:00 · Studio', trail: 'now', badge: 'info' },
-            { icon: 'chat', title: '1:1 with Priya', sub: '13:30 – 14:00 · Zoom', trail: '1:30' },
-            { icon: 'check', title: 'Ship CP6', sub: 'All day', trail: '' },
-          ] } },
-        ],
-      },
-      {
-        role: 'supporting',
-        sections: [
-          { kind: 'dl', seed: { title: 'Design review', pairs: [
-            ['When', 'Thu 10:00 – 11:00'],
-            ['Where', 'Studio · Floor 3'],
-            ['With', 'Noa, Priya, +3'],
-            ['Calendar', 'Work'],
-          ] } },
-          { kind: 'list', seed: { title: 'Up next', items: [
-            { icon: 'cal', title: 'Sprint planning', sub: 'Mon, Jun 22 · 09:30', trail: 'Mon' },
-            { icon: 'spark', title: 'Team offsite', sub: 'Wed, Jun 24 · all day', trail: 'Wed' },
+            { title: 'Payment received', sub: 'Email me when a client pays an invoice.', on: true },
+            { title: 'Overdue reminders', sub: 'Auto-remind clients 3 days after the due date.', on: true },
+            { title: 'Weekly summary', sub: 'A Monday digest of cashflow and outstanding.', on: false },
           ] } },
         ],
       },

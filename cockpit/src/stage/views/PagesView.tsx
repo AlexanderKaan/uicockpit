@@ -1,6 +1,6 @@
 import { useMemo, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { Icon } from '../../icons/Icon'
-import { SHOWCASES, type SectionSpec, type ShowcaseManifest } from '../../showcases/manifests'
+import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
 import { renderSection } from '../../showcases/sections'
 import { buildTokens } from '../../tokens/buildTokens'
 import type { Config } from '../../tokens/types'
@@ -84,7 +84,18 @@ const PANE_CLASS = {
   supporting: 'pane pane--fixed pane--supporting',
 } as const
 
-function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void }) {
+/** The app's side menu, lifted to the theater so it DRIVES which screen renders
+ *  (Catalyst-style: one sidebar, many pages). `current` = the rendered manifest
+ *  id (may be a detail like 'ledger'); `highlight` = the nav item to light up
+ *  (a detail highlights its parent). */
+export interface AppNav {
+  screens: LedgerScreen[]
+  current: string
+  highlight: string
+  onNavigate: (id: string) => void
+}
+
+function ShowcaseStage({ m, cfg, onViewChange, appNav }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void; appNav?: AppNav }) {
   const [width, setWidth] = useState(m.width)
   // The loupe (Fase J-2): a continuous zoom Page › Section › Atom. `loupe` off is a
   // clean live page; turning it on reveals the breadcrumb and makes sections
@@ -191,7 +202,7 @@ function ShowcaseStage({ m, cfg, onViewChange }: { m: ShowcaseManifest; cfg: Con
             <>
               {(!loupe || focus.level === 'page') && (
                 <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickSection : undefined}>
-                  <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} />
+                  <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} appNav={appNav} />
                 </div>
               )}
               {loupe && focus.level === 'section' && section && (
@@ -319,6 +330,7 @@ function ShowcaseShell({
   width,
   renderSectionFn = renderSection,
   pickable = false,
+  appNav,
 }: {
   m: ShowcaseManifest
   width: number
@@ -326,14 +338,30 @@ function ShowcaseShell({
   /** Loupe page-level: wrap each section in a hover-pickable target carrying its
    *  pane/idx (Fase J-2). The stage delegates the click and walks up to read it. */
   pickable?: boolean
+  /** When part of the single Ledger app: the side menu DRIVES the rendered screen
+   *  (Catalyst-style). Replaces the cosmetic per-manifest nav. */
+  appNav?: AppNav
 }) {
+  // Cosmetic nav state — only used for legacy standalone manifests (no appNav).
   const [active, setActive] = useState(0)
+  const onDetail = appNav ? appNav.current !== appNav.highlight : false
+  // List → detail: clicking an invoice row on the Invoices screen opens the
+  // invoice-detail screen (the believable list→detail verb). Delegated so it
+  // doesn't touch renderSection. Suppressed in loupe pick mode.
+  const onBodyClick = (e: ReactMouseEvent) => {
+    if (!appNav || pickable) return
+    if (appNav.current !== 'ledger-invoices') return
+    if ((e.target as HTMLElement).closest('tbody tr')) appNav.onNavigate('ledger')
+  }
   return (
-    <div className={`scaffold scaffold--${m.archetype}`} style={{ width, maxWidth: '100%' }}>
+    <div className={`scaffold scaffold--${m.archetype} ${appNav ? 'shc__app' : ''}`} data-screen={appNav?.current} style={{ width, maxWidth: '100%' }}>
       <div className="scaffold__frame shc__frame">
         <div className="scaffold__bar shc__bar">
+          {onDetail && (
+            <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Back to Invoices" onClick={() => appNav!.onNavigate(appNav!.highlight)}><Icon name="chevL" /></button>
+          )}
           <span className="shc__bar-title">{m.barTitle}</span>
-          {m.nav === 'topbar' && (
+          {!appNav && m.nav === 'topbar' && (
             <nav className="shc__bar-links" aria-label={`${m.title} navigation`}>
               {m.navItems.map((it, i) => (
                 <button key={it.label} type="button" className={`tab ${i === active ? 'tab--on' : ''}`} onClick={() => setActive(i)}>{it.label}</button>
@@ -344,7 +372,26 @@ function ShowcaseShell({
           <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Search"><Icon name="search" /></button>
           <span className="avatar avatar--sm">A</span>
         </div>
-        {m.nav === 'suite' && (
+        {appNav ? (
+          // The ONE Ledger side menu — the navsuite recipe as a persistent sidebar,
+          // each item swapping the body to its screen manifest.
+          <nav className="scaffold__nav" aria-label="Ledger">
+            <div className="navsuite navsuite--expanded">
+              {appNav.screens.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`navsuite__item ${s.id === appNav.highlight ? 'navsuite__item--on' : ''}`}
+                  aria-current={s.id === appNav.highlight ? 'page' : undefined}
+                  onClick={pickable ? undefined : () => appNav.onNavigate(s.id)}
+                >
+                  <span className="navsuite__icon"><Icon name={s.icon} size={18} /></span>
+                  <span className="navsuite__label">{s.label}</span>
+                </button>
+              ))}
+            </div>
+          </nav>
+        ) : m.nav === 'suite' && (
           <nav className="scaffold__nav" aria-label={`${m.title} navigation`}>
             <div className="navsuite">
               {m.navItems.map((it, i) => (
@@ -362,7 +409,7 @@ function ShowcaseShell({
             </div>
           </nav>
         )}
-        <div className="scaffold__body">
+        <div className="scaffold__body" onClick={onBodyClick}>
           {m.panes.map((pane, i) => (
             <section className={`${PANE_CLASS[pane.role]} shc__pane`} key={i} aria-label={`${m.title} ${pane.role} pane`}>
               {pane.sections.map((b, j) =>
@@ -386,32 +433,24 @@ function ShowcaseShell({
 }
 
 export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
-  const [showcaseId, setShowcaseId] = useState(SHOWCASES[0]!.id)
-  const m = SHOWCASES.find((s) => s.id === showcaseId)!
+  // Showcases = ONE believable product (Ledger), not a grab-bag of half-apps. A
+  // single side menu (LEDGER_SCREENS) wraps every screen and DRIVES which one
+  // renders — Catalyst-style. `screenId` is the rendered manifest (may be a detail
+  // like the invoice, reached by clicking an invoice row); the sidebar highlights
+  // its parent. The old per-app chip picker is gone — the sidebar IS the picker.
+  const [screenId, setScreenId] = useState(LEDGER_SCREENS[0]!.id)
+  const m = SHOWCASES.find((s) => s.id === screenId)!
+  const appNav: AppNav = {
+    screens: LEDGER_SCREENS,
+    current: screenId,
+    highlight: LEDGER_DETAIL_PARENT[screenId] ?? screenId,
+    onNavigate: setScreenId,
+  }
 
-  // Content-first (Fase J-7): the chips ARE the header. No standing intro, no
-  // per-page blurb, no Compare-kits matrix — the live re-tint on every config
-  // change already proves style is orthogonal to structure. Controls live in the
-  // dock at the bottom of ShowcaseStage.
   return (
-    <div className="lyt shc">
-      <div className="shc__picker" role="radiogroup" aria-label="Showcase">
-        {SHOWCASES.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            role="radio"
-            aria-checked={s.id === showcaseId}
-            className={`chip ${s.id === showcaseId ? 'chip--on' : ''}`}
-            onClick={() => setShowcaseId(s.id)}
-          >
-            {s.title}
-          </button>
-        ))}
-      </div>
-
-      {/* key = remount per showcase so width resets to the manifest default */}
-      <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} />
+    <div className="lyt shc shc--app">
+      {/* key = remount per screen so the loupe + width reset to the screen default */}
+      <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} appNav={appNav} />
     </div>
   )
 }

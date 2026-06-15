@@ -1005,6 +1005,9 @@
 .shc__bar-links { display: inline-flex; gap: var(--k-s-4); margin-left: var(--k-s-12); min-width: 0; overflow: hidden; }
 .shc__bar-spacer { flex: 1; }
 .shc__pane { min-width: 0; }
+/* The single Ledger app — invoice rows open the detail screen (list → detail),
+   so they read as interactive only on the Invoices screen. */
+.shc__app[data-screen="ledger-invoices"] .datatable--page tbody tr { cursor: pointer; }
 /* Detail/flex panes stack their blocks; the composer rides the bottom. */
 .shc__pane.pane--flex,
 .shc__pane.pane--fixed {
