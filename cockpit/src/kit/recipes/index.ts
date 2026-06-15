@@ -1911,7 +1911,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .navsub__item { display: flex; align-items: center; gap: var(--k-s-8); width: 100%; min-height: var(--k-row-h-sm, 28px); padding: 0 var(--k-row-px, 10px); border-radius: var(--k-row-radius, 6px); font-size: var(--k-type-body); color: var(--k-fg-muted); cursor: pointer; font-weight: var(--k-ui-weight, 500); text-align: left; text-decoration: none; background: none; border: 0; font-family: inherit; appearance: none; -webkit-appearance: none; }
 .navsub__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
 .navsub__item--on { color: var(--k-state-selected-fg, var(--k-primary)); font-weight: var(--k-weight-semibold); }
-.nav-group { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-faint); padding: 0 var(--k-row-px, 10px); margin: var(--k-s-14) 0 var(--k-s-4); }`,
+.nav-group { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-faint); padding: 0 var(--k-row-px, 10px); margin: calc(var(--k-space) * 0.875) 0 var(--k-s-4); }`,
   },
   {
     id: 'sidebar',
@@ -1928,7 +1928,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   flex-direction: column;
   box-sizing: border-box;
   gap: var(--k-s-4);
-  padding: var(--k-s-14) var(--k-s-10);
+  /* Container padding + the brand/group separations breathe with Density (--k-space),
+   * like cards do — the row HEIGHTS stay row-grammar (--k-row-h-*, deliberate touch
+   * targets). Multipliers chosen so the default (space=16) is pixel-identical to the
+   * old 14/10 fixed steps. */
+  padding: calc(var(--k-space) * 0.875) calc(var(--k-space) * 0.625);
   background: var(--k-chrome-bg, var(--k-bg));
   border-right: var(--k-divider);
   transition:
@@ -1951,7 +1955,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   box-shadow: var(--k-shadow-sm);
 }
 /* Brand header — app-icon launcher tile + name + the collapse toggle. */
-.sidenav__brand { display: flex; align-items: center; gap: var(--k-s-8); padding: var(--k-s-6) var(--k-s-10) var(--k-s-16); font-weight: var(--k-weight-semibold); }
+.sidenav__brand { display: flex; align-items: center; gap: var(--k-s-8); padding: var(--k-s-6) var(--k-s-10) var(--k-space); font-weight: var(--k-weight-semibold); }
 .sidenav__icon { width: 26px; height: 26px; border-radius: var(--k-radius-sm); background: var(--k-primary); color: var(--k-primary-fg, #fff); display: grid; place-items: center; flex: none; box-shadow: var(--k-shadow-sm); }
 .sidenav__icon > svg { width: var(--k-icon-md); height: var(--k-icon-md); }
 .sidenav__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--k-font-display); letter-spacing: -0.01em; }

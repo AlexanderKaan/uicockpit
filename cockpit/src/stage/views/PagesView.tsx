@@ -95,8 +95,11 @@ export interface AppNav {
   onNavigate: (id: string) => void
 }
 
-function ShowcaseStage({ m, cfg, onViewChange, appNav }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void; appNav?: AppNav }) {
-  const [width, setWidth] = useState(m.width)
+function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void; appNav?: AppNav; width: number; onWidth: (w: number) => void }) {
+  // Width is OWNED by the parent (the one app) so it PERSISTS across screen
+  // switches — the manifests share width 1200, but the slider value shouldn't snap
+  // back on every nav click. Loupe/focus stay local (they SHOULD reset per screen).
+  const setWidth = onWidth
   // The loupe (Fase J-2): a continuous zoom Page › Section › Atom. `loupe` off is a
   // clean live page; turning it on reveals the breadcrumb and makes sections
   // pickable. Click a section → it isolates and enlarges (atoms inside clickable);
@@ -527,6 +530,9 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
   // like the invoice, reached by clicking an invoice row); the sidebar highlights
   // its parent. The old per-app chip picker is gone — the sidebar IS the picker.
   const [screenId, setScreenId] = useState(LEDGER_SCREENS[0]!.id)
+  // Width lives here (the app level) so it survives screen switches — ShowcaseStage
+  // still remounts per screen (key) to reset the loupe, but reads width from here.
+  const [width, setWidth] = useState(1200)
   const m = SHOWCASES.find((s) => s.id === screenId)!
   const appNav: AppNav = {
     screens: LEDGER_SCREENS,
@@ -538,7 +544,7 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
   return (
     <div className="lyt shc shc--app">
       {/* key = remount per screen so the loupe + width reset to the screen default */}
-      <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} appNav={appNav} />
+      <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} appNav={appNav} width={width} onWidth={setWidth} />
     </div>
   )
 }
