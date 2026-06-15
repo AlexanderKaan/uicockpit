@@ -146,17 +146,16 @@ export type Palette = 'pastel' | 'vivid' | 'bright'
  * Drives --k-field-* + --k-menu-* tokens + --k-chrome-bg. */
 export type Surface = 'outlined' | 'filled' | 'plain'
 
-/* Surface depth — purely about ELEVATION: how much surfaces lift off the page
- * via shadow, plus the neutral ramp contrast that supports that read. It does
- * NOT touch the app-chrome (that's the separate Chrome axis — flush vs panel)
- * nor the border prominence (the separate Border control). Resolved via the
- * DEPTH table → contrast + elevation only. Shadows auto-tint toward the brand.
- *   flat    → Linear/Vercel: minimal ramp, ZERO shadow (the border carries it)
- *   soft    → shadcn-default: subtle ramp, gentle shadow
- *   raised  → moderate ramp, balanced drop shadow
- *   layered → Notion/Material: crisp ramp, deep shadow.
+/* Elevation — purely the SHADOW LADDER: how much surfaces lift off the page.
+ * Decoupled (June 2026) from the neutral-ramp contrast (now owned by Borders +
+ * Surface) — so changing Elevation only changes shadow, never the grey ramp.
+ * 3 honest steps (the old 'raised' duplicated 'soft'; collapsed). Shadows
+ * auto-tint toward the brand. Does NOT touch app-chrome or border prominence.
+ *   flat → Linear/Vercel: ZERO shadow (the border carries it)
+ *   soft → shadcn/Stripe: subtle two-layer shadow (DEFAULT)
+ *   deep → Notion/Material: real drop shadows.
  *   (Contrast/Elevation are INTERNAL resolution types, not user-facing.) */
-export type SurfaceDepth = 'flat' | 'soft' | 'raised' | 'layered'
+export type SurfaceDepth = 'flat' | 'soft' | 'deep'
 
 export type Hex = string
 

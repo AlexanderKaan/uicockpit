@@ -13,7 +13,7 @@ import type { Config } from '../../tokens/types'
  * round + cobalt variant that diverges from DEFAULT_CONFIG on the facet
  * controls (Style presets were removed — facets are individual now). */
 const sampleCfg: Config = applyColorTheme(
-  { ...DEFAULT_CONFIG, scale: 'comfortable', radius: 'round', surfaceDepth: 'layered' },
+  { ...DEFAULT_CONFIG, scale: 'comfortable', radius: 'round', surfaceDepth: 'deep' },
   'cobalt',
 )
 

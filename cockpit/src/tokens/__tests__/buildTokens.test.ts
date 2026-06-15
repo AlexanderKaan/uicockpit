@@ -80,21 +80,38 @@ describe('buildTokens — invariants', () => {
     const strong = String(buildTokens({ ...DEFAULT_CONFIG, borders: 'strong' }).vars['--k-border'])
     // strong = darker (lower L) = more visible than faint
     expect(okL(strong)).toBeLessThan(okL(faint))
-    // and it does NOT depend on surface depth (same border at flat vs layered)
+    // and it does NOT depend on surface depth (same border at flat vs deep)
     const flatBorder = buildTokens({ ...DEFAULT_CONFIG, borders: 'medium', surfaceDepth: 'flat' }).vars['--k-border']
-    const layeredBorder = buildTokens({ ...DEFAULT_CONFIG, borders: 'medium', surfaceDepth: 'layered' }).vars['--k-border']
-    expect(flatBorder).toBe(layeredBorder)
+    const deepBorder = buildTokens({ ...DEFAULT_CONFIG, borders: 'medium', surfaceDepth: 'deep' }).vars['--k-border']
+    expect(flatBorder).toBe(deepBorder)
   })
 
-  it('layered surface depth produces real drop shadows', () => {
-    const cfg: Config = { ...DEFAULT_CONFIG, surfaceDepth: 'layered' }
+  it('deep surface depth produces real drop shadows', () => {
+    const cfg: Config = { ...DEFAULT_CONFIG, surfaceDepth: 'deep' }
     const tk = buildTokens(cfg)
     expect(tk.vars['--k-shadow-md']).not.toBe('none')
     expect(tk.vars['--k-bw']).toBe('1px')
   })
 
+  it('Elevation is decoupled from the ramp — flat/soft/deep share the surface greys', () => {
+    const base = buildTokens({ ...DEFAULT_CONFIG, surfaceDepth: 'soft' }).vars['--k-surface']
+    const flat = buildTokens({ ...DEFAULT_CONFIG, surfaceDepth: 'flat' }).vars['--k-surface']
+    const deep = buildTokens({ ...DEFAULT_CONFIG, surfaceDepth: 'deep' }).vars['--k-surface']
+    expect(flat).toBe(base)
+    expect(deep).toBe(base)
+  })
+
+  it('retired surfaceDepth keys fall back gracefully (raised→soft, layered→deep)', () => {
+    const soft = JSON.stringify(buildTokens({ ...DEFAULT_CONFIG, surfaceDepth: 'soft' }).vars)
+    const raised = JSON.stringify(buildTokens({ ...DEFAULT_CONFIG, surfaceDepth: 'raised' as never }).vars)
+    expect(raised).toBe(soft)
+    const deep = String(buildTokens({ ...DEFAULT_CONFIG, surfaceDepth: 'deep' }).vars['--k-shadow-md'])
+    const layered = String(buildTokens({ ...DEFAULT_CONFIG, surfaceDepth: 'layered' as never }).vars['--k-shadow-md'])
+    expect(layered).toBe(deep)
+  })
+
   it('shadows are tinted toward the brand hue (not generic black) in light mode', () => {
-    const cfg: Config = { ...DEFAULT_CONFIG, color: 'tone', cPrimary: '#2563EB', surfaceDepth: 'layered' }
+    const cfg: Config = { ...DEFAULT_CONFIG, color: 'tone', cPrimary: '#2563EB', surfaceDepth: 'deep' }
     const tk = buildTokens(cfg)
     // shadowFor interpolates the brand-hued shTone via hsl(H S% L% / a)
     expect(tk.vars['--k-shadow-md']).toContain('hsl(')

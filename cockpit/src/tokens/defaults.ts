@@ -15,9 +15,10 @@ export const DEFAULT_CONFIG: Config = {
   fontDisplay: 'Inter',
   fontBody: 'Inter',
   iconSet: 'line',
-  // 'raised' resolves to the former default combo (balanced ramp · subtle
-  // borders · layered chrome · soft shadow), so the default look is unchanged.
-  surfaceDepth: 'raised',
+  // 'soft' = the shadcn/Stripe subtle two-layer shadow on a balanced ramp — the
+  // former default combo, unchanged. (Elevation is now shadow-only; 'raised' was
+  // a dead duplicate of 'soft' and is retired, old hashes fall back to it.)
+  surfaceDepth: 'soft',
   surface: 'outlined',         // box-with-border fields + flush hairline-seam sidebar (= the previous default look)
   borders: 'subtle',
   motion: 'smooth',

@@ -15,7 +15,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "fontDisplay": "Inter",
     "fontBody": "Inter",
     "iconSet": "line",
-    "surfaceDepth": "layered",
+    "surfaceDepth": "deep",
     "surface": "outlined",
     "borders": "subtle",
     "motion": "smooth",
@@ -252,7 +252,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-surface-fill": "color-mix(in srgb, var(--k-primary) 6%, oklch(99.5% 0.0056 249.9))",
     "--k-surface-overlay": "oklch(100% 0 0)",
     "--k-surface-raised": "oklch(100% 0 0)",
-    "--k-surface-sunken": "oklch(91.6% 0.0077 249.9)",
+    "--k-surface-sunken": "oklch(93.7% 0.0077 249.9)",
     "--k-toggle-h-default": "1.375rem",
     "--k-toggle-w-default": "2.5rem",
     "--k-touch-target": "44px",
@@ -319,7 +319,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-disabled-bg": "oklch(28.5% 0.0077 249.9)",
     "--k-fg": "oklch(94.5% 0.0140 249.9)",
     "--k-fg-muted": "oklch(77.5% 0.0140 249.9)",
-    "--k-glass-bg": "hsl(210.12244897959184 14% 14.6% / 0.72)",
+    "--k-glass-bg": "hsl(210.12244897959184 14% 12.9% / 0.72)",
     "--k-glass-edge": "inset 0 1px 0 hsl(0 0% 100% / 0.08)",
     "--k-grad-1": "linear-gradient(135deg, oklch(63.7% 0.1493 251.8), oklch(64.1% 0.1434 271.1))",
     "--k-grad-2": "linear-gradient(135deg, oklch(65.5% 0.2511 332.6), oklch(69.5% 0.1669 345.2))",
@@ -2737,7 +2737,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-canvas: radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%), radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%), radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%), var(--k-bg);
   --k-chrome-bg: oklch(98.0% 0.0063 249.9);
   --k-surface: oklch(100% 0 0);
-  --k-surface-sunken: oklch(91.6% 0.0077 249.9);
+  --k-surface-sunken: oklch(93.7% 0.0077 249.9);
   --k-surface-2: oklch(98.0% 0.0063 249.9);
   --k-surface-container-lowest: oklch(100% 0 0);
   --k-surface-container-low: oklch(98.0% 0.0063 249.9);
@@ -3247,7 +3247,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-anim-pulse: k-pulse 1.8s cubic-bezier(.4, 0, .2, 1) infinite;
   --k-anim-shimmer: k-shimmer 1.6s linear infinite;
   --k-anim-fade-through: k-fade-through 200ms cubic-bezier(.2,0,0,1) both;
-  --k-glass-bg: hsl(210.12244897959184 14% 14.6% / 0.72);
+  --k-glass-bg: hsl(210.12244897959184 14% 12.9% / 0.72);
   --k-glass-blur: saturate(180%) blur(12px);
   --k-glass-edge: inset 0 1px 0 hsl(0 0% 100% / 0.08);
 }
@@ -9048,7 +9048,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "fontDisplay": "Inter",
     "fontBody": "Inter",
     "iconSet": "line",
-    "surfaceDepth": "raised",
+    "surfaceDepth": "soft",
     "surface": "outlined",
     "borders": "subtle",
     "motion": "smooth",
@@ -9816,7 +9816,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "chart-3": "oklch(86.5% 0.1907 119.3)",
       "chart-4": "oklch(48.7% 0.2463 281.4)",
       "chart-5": "oklch(65.6% 0.1692 41.6)",
-      "sidebar": "oklch(91.6% 0.0077 249.9)",
+      "sidebar": "oklch(93.7% 0.0077 249.9)",
       "sidebar-foreground": "oklch(16.0% 0.0140 249.9)",
       "sidebar-primary": "oklch(56.4% 0.1689 253.9)",
       "sidebar-primary-foreground": "#ffffff",
@@ -9894,7 +9894,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-muted: oklch(50.3% 0.0140 249.9);
   --color-faint: oklch(64.0% 0.0112 249.9);
   --color-surface: oklch(100% 0 0);
-  --color-surface-sunken: oklch(91.6% 0.0077 249.9);
+  --color-surface-sunken: oklch(93.7% 0.0077 249.9);
   --color-surface-2: oklch(98.0% 0.0063 249.9);
   --color-surface-raised: oklch(100% 0 0);
   --color-surface-overlay: oklch(100% 0 0);

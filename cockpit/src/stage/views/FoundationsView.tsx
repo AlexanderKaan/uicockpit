@@ -13,12 +13,12 @@ import { Icon } from '../../icons/Icon'
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-/* The panel shows outcome-named caps that differ from the raw enum (surfaceDepth
- * 'layered' → "Deep", iconSet 'hairline' → "Iconoir"). Mirror those caps here so the
- * Foundations view reads identically to the control that drives it. Keep in sync with
- * the *_OPTS arrays in src/panel/Panel.tsx. */
+/* The panel shows outcome-named caps that differ from the raw enum (iconSet
+ * 'hairline' → "Iconoir"). Mirror those caps here so the Foundations view reads
+ * identically to the control that drives it. Keep in sync with the *_OPTS arrays
+ * in src/panel/Panel.tsx. */
 const LABELS: Record<string, Record<string, string>> = {
-  surfaceDepth: { flat: 'Flat', soft: 'Subtle', raised: 'Raised', layered: 'Deep' },
+  surfaceDepth: { flat: 'Flat', soft: 'Soft', deep: 'Deep' },
   iconSet: { hairline: 'Iconoir', line: 'Lucide', rounded: 'Phosphor', bold: 'Phosphor Bold', solid: 'Heroicons' },
   surface: { outlined: 'Outlined', filled: 'Filled', plain: 'Plain' },
   borders: { faint: 'Faint', subtle: 'Subtle', medium: 'Medium', strong: 'Strong' },

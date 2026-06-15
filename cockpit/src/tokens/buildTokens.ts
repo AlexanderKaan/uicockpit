@@ -210,19 +210,25 @@ function shadowFor(elevation: Elevation, shTone: string): { xs: string; sm: stri
   }
 }
 
-/* Surface-depth macro → purely ELEVATION: the ramp contrast + drop shadow that
- * together say "how much do surfaces lift off the page". App-chrome separation
- * (flush vs panel) is its OWN axis now — not bundled here — so 'depth' honestly
- * means depth. 'raised' keeps the historical shadow default. */
-const DEPTH: Record<
-  SurfaceDepth,
-  { contrast: Contrast; elevation: Elevation }
-> = {
-  flat: { contrast: 'soft', elevation: 'flat' },
-  soft: { contrast: 'balanced', elevation: 'soft' },
-  raised: { contrast: 'balanced', elevation: 'soft' },
-  layered: { contrast: 'crisp', elevation: 'default' },
+/* Elevation → the shadow ladder ONLY (decoupled June 2026). It used to be a
+ * macro that ALSO drove the neutral-ramp contrast, but surface SEPARATION is
+ * already owned by the Borders + Surface controls, so the coupling was muddy
+ * (and 'soft'/'raised' resolved identically — a dead duplicate). Now Elevation
+ * is honestly one thing: how much surfaces LIFT off the page via shadow. The
+ * grey ramp sits at a fixed 'balanced' contrast (the historical default).
+ *   flat → Linear/Vercel: zero shadow, borders carry it
+ *   soft → shadcn/Stripe: subtle two-layer shadow (DEFAULT)
+ *   deep → Notion/Material: real drop shadows. */
+const SHADOW_LEVEL: Record<SurfaceDepth, Elevation> = {
+  flat: 'flat',
+  soft: 'soft',
+  deep: 'default',
 }
+// Back-compat: old URL hashes may carry the retired 'raised'/'layered' keys.
+const normalizeDepth = (d: string): SurfaceDepth =>
+  d === 'flat' || d === 'soft' || d === 'deep' ? d
+    : d === 'layered' ? 'deep'
+    : 'soft' // 'raised' (== old soft) and any unknown fall back to soft
 
 // Border prominence → neutral-ladder step (higher = darker = more visible). Its
 // OWN control (not coupled to depth or crisp), so a Layered card can have a
@@ -234,9 +240,9 @@ const BORDER_STEP: Record<Borders, [number, number]> = {
   strong: [7, 5],
 }
 
-/** Resolve the surface-depth macro into its four facets — for exports/handoff
- *  docs that need to name the underlying ramp/borders/chrome/shadow. */
-export const resolveDepth = (d: SurfaceDepth) => DEPTH[d]
+/** Resolve Elevation for exports/handoff docs. Ramp contrast is fixed at
+ *  'balanced' now (decoupled); only the shadow level varies. */
+export const resolveDepth = (d: SurfaceDepth) => ({ contrast: 'balanced' as Contrast, elevation: SHADOW_LEVEL[normalizeDepth(d)] })
 
 export function buildTokens(cfg: Config): Tokens {
   const mono = cfg.color === 'mono'
@@ -260,9 +266,11 @@ export function buildTokens(cfg: Config): Tokens {
   const dark = cfg.mode === 'dark'
   // Resolve the surface-depth macro into the four internal facets. (Named to
   // avoid colliding with the imported WCAG `contrast()`.)
-  const depth = DEPTH[cfg.surfaceDepth]
-  const rampContrast = depth.contrast
-  const elevationMode = depth.elevation
+  // Elevation drives the shadow ladder ONLY. The neutral-ramp contrast is now
+  // fixed at the historical 'balanced' default (spread 1, emph 0) — decoupled
+  // June 2026, since surface separation is owned by the Borders + Surface
+  // controls. So `spread`/`emph` are constants, not a depth expression.
+  const elevationMode = SHADOW_LEVEL[normalizeDepth(cfg.surfaceDepth)]
   // Sidebar treatment — its own axis (seamless / recessed / floating), independent
   // Surface=Filled gives the nav a SUNKEN tint (--k-chrome-bg = surf.sunken) — the
   // recessed well. Outlined/Plain keep it flush (a hairline seam carries it). The
@@ -271,7 +279,7 @@ export function buildTokens(cfg: Config): Tokens {
   const surfaceFilled = cfg.surface === 'filled'
   const surfacePlain = cfg.surface === 'plain'
   const chromeSunkenNav = surfaceFilled
-  const spread = rampContrast === 'soft' ? 0.62 : rampContrast === 'crisp' ? 1.32 : 1
+  const spread = 1 // balanced ramp (Elevation decoupled from contrast)
 
   // Neutral 12-step OKLCH ladder (Radix-contract; perceptually-even). Surfaces,
   // borders and text now map onto FIXED steps of ONE even scale instead of
@@ -282,7 +290,7 @@ export function buildTokens(cfg: Config): Tokens {
   // at 2 they read perceivably chromatic (M3-2025 "Expressive" surfaces).
   const N = okNeutralScale(t.h, t.s, dark, mono, exprMul)
   const nStep = (i: number): string => N[Math.max(0, Math.min(11, Math.round(i)))]!
-  const emph = rampContrast === 'soft' ? -1 : rampContrast === 'crisp' ? 1 : 0
+  const emph = 0 // balanced ramp (Elevation decoupled from contrast)
 
   // Surface elevation — the CARD surface is FILLED a notch off the page so it
   // lifts off the canvas (the page tint no longer washes over everything). Light:

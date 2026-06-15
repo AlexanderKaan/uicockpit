@@ -93,14 +93,14 @@ const SCALE_OPTS = [
   { id: 'default' as const, cap: 'Default' },
   { id: 'comfortable' as const, cap: 'Comfortable' },
 ]
-// Elevation (internal key: surfaceDepth) — how far cards/surfaces lift off the
-// canvas (contrast ramp + shadow). Flat = Linear/Vercel hairline; Deep = Notion.
-// Outcome-named caps so a user can predict the look before clicking.
+// Elevation (internal key: surfaceDepth) — the SHADOW ladder: how far cards/
+// surfaces lift off the canvas. Decoupled from ramp contrast (June 2026), so
+// it's purely shadow now. Flat = Linear/Vercel (no shadow); Soft = shadcn/Stripe
+// (default); Deep = Notion. Outcome-named caps so the look is predictable.
 const SURFACE_DEPTH_OPTS = [
   { id: 'flat' as const, cap: 'Flat' },
-  { id: 'soft' as const, cap: 'Subtle' },
-  { id: 'raised' as const, cap: 'Raised' },
-  { id: 'layered' as const, cap: 'Deep' },
+  { id: 'soft' as const, cap: 'Soft' },
+  { id: 'deep' as const, cap: 'Deep' },
 ]
 // Surface — the structural separation axis (replaces the over-specific Sidebar).
 // One choice that drives every contained surface (fields, menus, sidebar seam):

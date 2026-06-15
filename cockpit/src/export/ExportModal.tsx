@@ -429,7 +429,7 @@ const CHOICE_CAP: Record<string, Record<string, string>> = {
   motion: { none: 'None', snappy: 'Snappy', smooth: 'Smooth', playful: 'Playful' },
   motionTempo: { snappy: 'Snappy', normal: 'Normal', generous: 'Generous' },
   iconSet: { hairline: 'Iconoir', line: 'Lucide', rounded: 'Phosphor', bold: 'Phosphor Bold', solid: 'Heroicons' },
-  surfaceDepth: { flat: 'Flat', soft: 'Subtle', raised: 'Raised', layered: 'Deep' },
+  surfaceDepth: { flat: 'Flat', soft: 'Soft', deep: 'Deep' },
   surface: { outlined: 'Outlined', filled: 'Filled', plain: 'Plain' },
   borders: { faint: 'Faint', subtle: 'Subtle', medium: 'Medium', strong: 'Strong' },
 }
