@@ -900,12 +900,9 @@
   padding: 0;
   overflow-x: auto;
 }
-/* Pages canvas — the app now paints its own --k-bg (Background control), so the
- * stage canvas behind it must NOT also be --k-bg (that duplication is what made the
- * frame-in-frame ambiguous). Drop it to a neutral sunken workbench so the app
- * window's --k-bg reads as THE app surface. Scoped to Pages via :has so the
- * Components gallery keeps its --k-bg premium canvas. */
-.cockpit-preview:has(.shc__loupebody) { background: var(--k-surface-sunken); }
+/* (The Pages canvas neutral-workbench fill now lives on the shared .cockpit-preview
+ * base in stage.css — both views use --k-surface-sunken, so "Background: White"
+ * reads identically in Pages and Components.) */
 .lyt__stage .scaffold {
   margin: 0 auto;
   border: var(--k-bw) solid var(--k-border);

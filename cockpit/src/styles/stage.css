@@ -465,7 +465,12 @@
 .cockpit-preview {
   width: 100%;
   max-width: none;
-  background: var(--k-bg);
+  /* The CANVAS = a neutral workbench (--k-surface-sunken), NOT the app's --k-bg.
+   * Background is now painted by the content itself — the app window (.scaffold)
+   * in Pages, the cards (.card) in Components — so the canvas must NOT duplicate
+   * --k-bg, or the same "Background: White" reads two different ways across views.
+   * Sunken keeps white content popping consistently and is still kit-derived. */
+  background: var(--k-surface-sunken);
   color: var(--k-fg);
   font-family: var(--k-font-body, system-ui);
   border-radius: 16px;
