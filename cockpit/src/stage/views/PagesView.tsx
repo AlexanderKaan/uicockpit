@@ -1,4 +1,4 @@
-import { useMemo, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
+import { Fragment, useMemo, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
 import { renderSection } from '../../showcases/sections'
@@ -373,24 +373,12 @@ function ShowcaseShell({
           <span className="avatar avatar--sm">A</span>
         </div>
         {appNav ? (
-          // The ONE Ledger side menu — the navsuite recipe as a persistent sidebar,
-          // each item swapping the body to its screen manifest.
-          <nav className="scaffold__nav" aria-label="Ledger">
-            <div className="navsuite navsuite--expanded">
-              {appNav.screens.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  className={`navsuite__item ${s.id === appNav.highlight ? 'navsuite__item--on' : ''}`}
-                  aria-current={s.id === appNav.highlight ? 'page' : undefined}
-                  onClick={pickable ? undefined : () => appNav.onNavigate(s.id)}
-                >
-                  <span className="navsuite__icon"><Icon name={s.icon} size={18} /></span>
-                  <span className="navsuite__label">{s.label}</span>
-                </button>
-              ))}
-            </div>
-          </nav>
+          // The ONE Ledger side menu — the REAL `.sidenav` component (brand header,
+          // `.nav-group` labels, `.navrow` rows, a `.badge--count`, a pinned
+          // `.sidenav__foot`, and the `--rail` collapse), driving the screen.
+          <div className="scaffold__nav">
+            <LedgerSidebar appNav={appNav} pickable={pickable} />
+          </div>
         ) : m.nav === 'suite' && (
           <nav className="scaffold__nav" aria-label={`${m.title} navigation`}>
             <div className="navsuite">
@@ -429,6 +417,71 @@ function ShowcaseShell({
         </div>
       </div>
     </div>
+  )
+}
+
+/** The Ledger app's side menu = the REAL exported `.sidenav` recipe (the same one
+ *  the gallery's "Side navigation" card demos), driven by `appNav`. Screens bucket
+ *  into `.nav-group` labels; `group:'footer'` pins to `.sidenav__foot`; a `badge`
+ *  renders a `.badge--count`. The brand header carries the `--rail` collapse toggle. */
+function LedgerSidebar({ appNav, pickable }: { appNav: AppNav; pickable: boolean }) {
+  const [rail, setRail] = useState(false)
+  const go = (id: string) => (pickable ? undefined : () => appNav.onNavigate(id))
+  const groups: string[] = []
+  for (const s of appNav.screens) if (s.group !== 'footer' && !groups.includes(s.group)) groups.push(s.group)
+  const foot = appNav.screens.filter((s) => s.group === 'footer')
+  const Row = (s: LedgerScreen) => (
+    <button
+      key={s.id}
+      type="button"
+      className={`navrow ${s.id === appNav.highlight ? 'navrow--on' : ''}`}
+      data-tip={s.label}
+      aria-label={s.label}
+      aria-current={s.id === appNav.highlight ? 'page' : undefined}
+      onClick={go(s.id)}
+    >
+      <Icon name={s.icon} />
+      <span className="navrow__label">{s.label}</span>
+      {s.badge && <span className="badge badge--solid-primary badge--count">{s.badge}</span>}
+    </button>
+  )
+  return (
+    <nav className={`sidenav ${rail ? 'sidenav--rail' : ''}`} aria-label="Ledger">
+      <div className="sidenav__brand">
+        <span className="sidenav__icon" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="1" y="1" width="6" height="6" rx="1.8" />
+            <rect x="9" y="1" width="6" height="6" rx="1.8" />
+            <rect x="1" y="9" width="6" height="6" rx="1.8" />
+            <rect x="9" y="9" width="6" height="6" rx="1.8" />
+          </svg>
+        </span>
+        <span className="sidenav__name">Ledger</span>
+        <button
+          type="button"
+          className="sidenav__toggle"
+          aria-label={rail ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-pressed={rail}
+          data-tip="Expand"
+          onClick={() => setRail((r) => !r)}
+        >
+          <Icon name={rail ? 'chevR' : 'chevL'} />
+        </button>
+      </div>
+      {groups.map((g) => (
+        <Fragment key={g}>
+          <div className="nav-group">{g}</div>
+          {appNav.screens.filter((s) => s.group === g).map(Row)}
+        </Fragment>
+      ))}
+      <div className="sidenav__foot">
+        {foot.map(Row)}
+        <button type="button" className="navrow" data-tip="Quick actions" aria-label="Quick actions">
+          <span className="kbd">⌘K</span>
+          <span className="navrow__label">Quick actions</span>
+        </button>
+      </div>
+    </nav>
   )
 }
 

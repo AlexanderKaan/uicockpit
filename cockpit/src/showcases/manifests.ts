@@ -123,16 +123,19 @@ const P = (g: 'men' | 'women', n: number) => `https://randomuser.me/api/portrait
  *  screen manifest by `id`; the app frame (PagesView → LedgerApp) renders this as a
  *  persistent sidebar and swaps the body to the matching manifest on click. Add a
  *  screen → add a row here; never re-declare nav per manifest. Order = sidebar order. */
-export interface LedgerScreen { id: string; icon: IconName; label: string }
+/** `group` buckets the screens under the real `.sidenav` recipe's `.nav-group`
+ *  labels; `group: 'footer'` pins a screen to `.sidenav__foot`. `badge` renders a
+ *  real `.badge--count` (e.g. Invoices · 3 overdue). */
+export interface LedgerScreen { id: string; icon: IconName; label: string; group: string; badge?: string }
 export const LEDGER_SCREENS: LedgerScreen[] = [
-  { id: 'ledger-home', icon: 'home', label: 'Home' },
-  { id: 'ledger-invoices', icon: 'file', label: 'Invoices' },
-  { id: 'ledger-clients', icon: 'store', label: 'Clients' },
-  { id: 'ledger-expenses', icon: 'card', label: 'Expenses' },
-  { id: 'ledger-reports', icon: 'chart', label: 'Reports' },
-  { id: 'ledger-documents', icon: 'grid', label: 'Documents' },
-  { id: 'ledger-assistant', icon: 'spark', label: 'Assistant' },
-  { id: 'ledger-plans', icon: 'cog', label: 'Plans & billing' },
+  { id: 'ledger-home', icon: 'home', label: 'Home', group: 'Overview' },
+  { id: 'ledger-reports', icon: 'chart', label: 'Reports', group: 'Overview' },
+  { id: 'ledger-invoices', icon: 'file', label: 'Invoices', group: 'Billing', badge: '3' },
+  { id: 'ledger-clients', icon: 'store', label: 'Clients', group: 'Billing' },
+  { id: 'ledger-expenses', icon: 'card', label: 'Expenses', group: 'Billing' },
+  { id: 'ledger-documents', icon: 'grid', label: 'Documents', group: 'Workspace' },
+  { id: 'ledger-assistant', icon: 'spark', label: 'Assistant', group: 'Workspace' },
+  { id: 'ledger-plans', icon: 'cog', label: 'Plans & billing', group: 'footer' },
 ]
 /** Detail screens that aren't sidebar peers — they're reached FROM a list screen
  *  (e.g. click an invoice row) and highlight their parent's nav item. */

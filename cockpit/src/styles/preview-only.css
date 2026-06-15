@@ -1008,6 +1008,11 @@
 /* The single Ledger app — invoice rows open the detail screen (list → detail),
    so they read as interactive only on the Invoices screen. */
 .shc__app[data-screen="ledger-invoices"] .datatable--page tbody tr { cursor: pointer; }
+/* The Ledger app uses the REAL `.sidenav` component as its side menu (not the
+   adaptive navsuite). The nav grid-slot is a plain wrapper; the sidenav owns the
+   width as a full-height column. Its own `--rail` modifier collapses it to 64px. */
+.shc__app .scaffold__nav { display: block; }
+.shc__app .scaffold__nav .sidenav { width: 248px; height: 100%; }
 /* Detail/flex panes stack their blocks; the composer rides the bottom. */
 .shc__pane.pane--flex,
 .shc__pane.pane--fixed {
