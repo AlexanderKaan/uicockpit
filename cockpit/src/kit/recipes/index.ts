@@ -166,15 +166,10 @@ export const RECIPES: readonly Recipe[] = [
   border: max(1px, var(--k-bw)) solid transparent;
   cursor: pointer;
 }
-/* Unified press (#212 → H2 Press dial) — what :active does is now the
- * --k-press-* token trio (None / Opacity / Scale 0.96 = default / Morph =
- * radius squish, the M3-Expressive 2025 signature). Generic so ghost/
- * outline/link get it too; border-radius transitions via the spring curve
- * so the morph reads springy, not snappy. */
+/* Unified press — what :active does: a 0.96 scale squish (the house feel).
+ * Generic so ghost/outline/link get it too. */
 .btn:active:not(:disabled) {
-  transform: scale(var(--k-press-scale, 0.96));
-  opacity: var(--k-press-opacity, 1);
-  border-radius: var(--k-press-radius, var(--btn-r));
+  transform: scale(0.96);
 }
 /* SVG icons inside buttons should never shrink and should render as a
  * standalone flex item, not as inline-text-baseline content. Most preview

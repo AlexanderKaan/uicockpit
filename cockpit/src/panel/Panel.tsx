@@ -126,7 +126,7 @@ const CANVAS_OPTS = [
   { id: 'brand' as const, cap: 'Brand' },
   { id: 'gradient' as const, cap: 'Gradient' },
 ]
-/* Interaction (H2) — the state-layer algebra + press feedback as dials. */
+/* Interaction (H2) — the state-layer algebra as dials. */
 const STATE_INTENSITY_OPTS = [
   { id: 'whisper' as const, cap: 'Whisper' },
   { id: 'standard' as const, cap: 'Standard' },
@@ -136,12 +136,6 @@ const STATE_TINT_OPTS = [
   { id: 'neutral' as const, cap: 'Neutral' },
   { id: 'brand' as const, cap: 'Brand' },
   { id: 'accent' as const, cap: 'Accent' },
-]
-const PRESS_OPTS = [
-  { id: 'none' as const, cap: 'None' },
-  { id: 'opacity' as const, cap: 'Fade' },
-  { id: 'scale' as const, cap: 'Scale' },
-  { id: 'morph' as const, cap: 'Morph' },
 ]
 const MOTION_SCHEME_OPTS = [
   { id: 'standard' as const, cap: 'Standard' },
@@ -617,8 +611,8 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       onPick: pick('borders'),
     },
     {
-      // Interaction (H2) — hover/selected/press as ONE formula with two dials,
-      // plus the press-feedback character. Defaults = the calibrated house look.
+      // Interaction (H2) — hover/selected/press as ONE formula with two dials.
+      // Defaults = the calibrated house look.
       sec: 'Interaction',
       key: 'stateIntensity',
       label: 'States',
@@ -636,16 +630,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
       opts: optsFrom(STATE_TINT_OPTS),
       selected: cfg.stateTint,
       onPick: pick('stateTint'),
-    },
-    {
-      key: 'press',
-      label: 'Press',
-      value: cap(PRESS_OPTS, cfg.press),
-      kind: 'seg',
-      stack: true,
-      opts: optsFrom(PRESS_OPTS),
-      selected: cfg.press,
-      onPick: pick('press'),
     },
     {
       sec: 'Motion & icons',

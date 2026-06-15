@@ -574,19 +574,6 @@ export function buildTokens(cfg: Config): Tokens {
   const spFast = springLinear(...springSet.fast)
   const spDef = springLinear(...springSet.def)
   const spSlow = springLinear(...springSet.slow)
-  // Press feedback (H2) — the --k-press-* trio the button family's :active
-  // consumes. 'scale' (0.96) is the existing house squish; 'morph' is the M3-
-  // Expressive radius squish: a pill squares off a touch while pressed (the
-  // min() clamp makes it visible on pills without distorting square buttons).
-  const pressMode = cfg.press ?? 'scale'
-  const pressVars = {
-    '--k-press-scale': pressMode === 'scale' ? '0.96' : '1',
-    '--k-press-opacity': pressMode === 'opacity' ? '0.85' : '1',
-    '--k-press-radius':
-      pressMode === 'morph'
-        ? 'min(calc(var(--btn-r, var(--k-radius-button)) * 0.5), 10px)'
-        : 'var(--btn-r, var(--k-radius-button))',
-  }
   // Shape Lab (H5) — resolve the four dials into the signature path + mask.
   // Jitter is seeded FROM the dials themselves, so the same kit hash always
   // produces the same organic wobble (deterministic, URL-round-trippable).
@@ -1134,7 +1121,6 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-spring-dur-fast': `${spFast.durMs}ms`,
       '--k-spring-dur': `${spDef.durMs}ms`,
       '--k-spring-dur-slow': `${spSlow.durMs}ms`,
-      ...pressVars,
       // Signature shape (H5 Shape Lab) — ONE parametric shape from four dials
       // (points/depth/softness/jitter), emitted as a scalable SVG mask. Apply
       // via the .sig recipe ONLY on the signature territory (avatar masks,

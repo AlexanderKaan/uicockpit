@@ -23,7 +23,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "motionCurve": "standard",
     "stateIntensity": "whisper",
     "stateTint": "neutral",
-    "press": "scale",
     "motionScheme": "standard",
     "cPrimary": "#0A84FF",
     "harmony": "tonal",
@@ -173,9 +172,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-neutral": "oklch(95.8% 0.0070 249.9)",
     "--k-neutral-fg": "oklch(16.0% 0.0140 249.9)",
     "--k-pad": "1.75rem",
-    "--k-press-opacity": "1",
-    "--k-press-radius": "var(--btn-r, var(--k-radius-button))",
-    "--k-press-scale": "0.96",
     "--k-primary": "oklch(56.4% 0.1689 253.9)",
     "--k-primary-fg": "#ffffff",
     "--k-primary-hover": "oklch(51.4% 0.1638 253.9)",
@@ -2915,9 +2911,6 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-spring-dur-fast: 205ms;
   --k-spring-dur: 290ms;
   --k-spring-dur-slow: 443ms;
-  --k-press-scale: 0.96;
-  --k-press-opacity: 1;
-  --k-press-radius: var(--btn-r, var(--k-radius-button));
   --k-shape-signature: url("data:image/svg+xml,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox%3D'0 0 100 100'%3E%3Cpath d%3D'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z' fill%3D'black'%2F%3E%3C%2Fsvg%3E");
   --k-shape-signature-path: 'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z';
   --k-ease: cubic-bezier(.4,0,.2,1);
@@ -3210,9 +3203,6 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-spring-dur-fast: 205ms;
   --k-spring-dur: 290ms;
   --k-spring-dur-slow: 443ms;
-  --k-press-scale: 0.96;
-  --k-press-opacity: 1;
-  --k-press-radius: var(--btn-r, var(--k-radius-button));
   --k-shape-signature: url("data:image/svg+xml,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox%3D'0 0 100 100'%3E%3Cpath d%3D'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z' fill%3D'black'%2F%3E%3C%2Fsvg%3E");
   --k-shape-signature-path: 'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z';
   --k-ease: cubic-bezier(.4,0,.2,1);
@@ -3755,15 +3745,10 @@ body {
   border: max(1px, var(--k-bw)) solid transparent;
   cursor: pointer;
 }
-/* Unified press (#212 → H2 Press dial) — what :active does is now the
- * --k-press-* token trio (None / Opacity / Scale 0.96 = default / Morph =
- * radius squish, the M3-Expressive 2025 signature). Generic so ghost/
- * outline/link get it too; border-radius transitions via the spring curve
- * so the morph reads springy, not snappy. */
+/* Unified press — what :active does: a 0.96 scale squish (the house feel).
+ * Generic so ghost/outline/link get it too. */
 .btn:active:not(:disabled) {
-  transform: scale(var(--k-press-scale, 0.96));
-  opacity: var(--k-press-opacity, 1);
-  border-radius: var(--k-press-radius, var(--btn-r));
+  transform: scale(0.96);
 }
 /* SVG icons inside buttons should never shrink and should render as a
  * standalone flex item, not as inline-text-baseline content. Most preview
@@ -9073,7 +9058,6 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "motionCurve": "standard",
     "stateIntensity": "whisper",
     "stateTint": "neutral",
-    "press": "scale",
     "motionScheme": "standard",
     "cPrimary": "#3b3b42",
     "harmony": "tonal",

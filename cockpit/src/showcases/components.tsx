@@ -23,7 +23,7 @@ export const COMPONENTS: Record<string, ComponentSpec> = {
   button: {
     label: 'Button',
     blurb: 'One shape, the brand fill; press squashes on the spring.',
-    recipe: [['Height', '--btn-h'], ['Radius', '--btn-r'], ['Padding', 'u × 2.5'], ['Press', 'scale --k-press-scale']],
+    recipe: [['Height', '--btn-h'], ['Radius', '--btn-r'], ['Padding', 'u × 2.5'], ['Press', 'scale(0.96) on :active']],
     specimen: () => (
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <button type="button" className="btn btn--primary">Primary</button>

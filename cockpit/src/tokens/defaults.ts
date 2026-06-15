@@ -28,7 +28,6 @@ export const DEFAULT_CONFIG: Config = {
   // springs). The dials open the M3 state algebra without moving the default.
   stateIntensity: 'whisper',
   stateTint: 'neutral',
-  press: 'scale',
   motionScheme: 'standard',
   cPrimary: '#0A84FF',      // Cobalt — matches COLOR_THEMES.cobalt (keep in sync)
   // Harmony (H1): Tonal is the house default — the M3-TonalSpot recipe (accent

@@ -529,8 +529,8 @@ scalable SVG mask; raw path in \`--k-shape-signature-path\`). Apply it with the
   signature — content must stay rectangular-readable.
 - **Signature** (\`.sig\`) — whitelist only: avatar masks, image/media crops,
   loaders, empty-state illustration, hero decoration. One or two per screen.
-- **Interactive** — press/toggle morphs read the \`--k-press-*\` tokens, not
-  this mask.
+- **Interactive** — press feedback is a fixed 0.96 \`:active\` scale squish on the
+  button family; the signature mask is never used for it.
 Inline-SVG consumers can morph between two dial states of the path (same
 point count + order) for an expressive loader.
 

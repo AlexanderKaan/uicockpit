@@ -27,7 +27,6 @@ const CURVES = ['standard', 'emphasized', 'spring'] as const
 const PALETTES = ['pastel', 'vivid', 'bright'] as const
 const STATE_INTENSITIES = ['whisper', 'standard', 'vivid'] as const
 const STATE_TINTS = ['neutral', 'brand', 'accent'] as const
-const PRESSES = ['none', 'opacity', 'scale', 'morph'] as const
 const MOTION_SCHEMES = ['standard', 'expressive'] as const
 const NEUTRALS = ['auto', 'cool', 'neutral', 'warm'] as const
 // Harmony rolls a vetted PRESET (never random raw slider values) — each preset
@@ -65,7 +64,6 @@ export function randomKit(current: Config, rnd: () => number = Math.random): Con
     motionCurve: pick(CURVES, rnd),
     stateIntensity: pick(STATE_INTENSITIES, rnd),
     stateTint: pick(STATE_TINTS, rnd),
-    press: pick(PRESSES, rnd),
     motionScheme: pick(MOTION_SCHEMES, rnd),
     palette: pick(PALETTES, rnd),
     neutral: pick(NEUTRALS, rnd),

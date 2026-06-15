@@ -5,11 +5,10 @@ import type { Config } from '../types'
 
 /* H2 — the interaction-state algebra + motion schemes. Contract:
  *  1. ONE formula: hover = base alpha (per intensity), selected +.05, press +.10.
- *  2. The default (whisper · neutral · scale · standard) is the calibrated
- *     house look — hover alpha 0.05, press scale 0.96.
+ *  2. The default (whisper · neutral · standard) is the calibrated house look
+ *     — hover alpha 0.05; press is a fixed 0.96 :active scale (baked in the recipe).
  *  3. State tint switches the wash's hue source without touching intensity.
- *  4. Press dial drives the --k-press-* trio (morph = radius squish).
- *  5. Motion schemes emit true spring linear() easings + settle durations;
+ *  4. Motion schemes emit true spring linear() easings + settle durations;
  *     expressive ≠ standard. */
 
 const at = (patch: Partial<Config>): Config => ({ ...DEFAULT_CONFIG, ...patch })
@@ -34,21 +33,6 @@ describe('H2 — state-layer algebra', () => {
     const chromaOf = (s: string): number => parseFloat(s.match(/oklch\([\d.]+% ([\d.]+)/)![1]!)
     expect(chromaOf(String(brand['--k-state-hover']))).toBeGreaterThan(chromaOf(String(neutral['--k-state-hover'])) * 3)
     expect(Number.isFinite(hueOf(String(brand['--k-state-hover'])))).toBe(true)
-  })
-})
-
-describe('H2 — press feedback', () => {
-  it('default (scale) keeps the house 0.96 squish; none/opacity/morph re-route it', () => {
-    const scale = buildTokens(DEFAULT_CONFIG).vars
-    expect(scale['--k-press-scale']).toBe('0.96')
-    expect(scale['--k-press-opacity']).toBe('1')
-    const none = buildTokens(at({ press: 'none' })).vars
-    expect(none['--k-press-scale']).toBe('1')
-    const fade = buildTokens(at({ press: 'opacity' })).vars
-    expect(fade['--k-press-opacity']).toBe('0.85')
-    const morph = buildTokens(at({ press: 'morph' })).vars
-    expect(String(morph['--k-press-radius'])).toContain('min(')
-    expect(morph['--k-press-scale']).toBe('1')
   })
 })
 

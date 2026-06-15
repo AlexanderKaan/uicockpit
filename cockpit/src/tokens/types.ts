@@ -101,11 +101,6 @@ export type Canvas = 'white' | 'brand' | 'neutral' | 'gradient'
  *               "feel" lever in the state system (M3 uses the on-color).   */
 export type StateIntensity = 'whisper' | 'standard' | 'vivid'
 export type StateTint = 'neutral' | 'brand' | 'accent'
-/* Press feedback (H2) — what :active does to a pressable, via the --k-press-*
- * tokens consumed by the button family. 'scale' (0.96 squish) is the existing
- * house default; 'morph' is the 2025 M3-Expressive signature (radius squish:
- * a pill squares off a touch while pressed). Pure CSS, no JS runtime. */
-export type Press = 'none' | 'opacity' | 'scale' | 'morph'
 /* Motion scheme (H2) — M3's spring physics, pre-sampled into CSS linear()
  * easings at build time (the 12 spring params; effects never bounce). Standard
  * = composed, Expressive = bouncier/faster. Emits --k-spring-* tokens. */
@@ -195,10 +190,9 @@ export interface Config {
   motion: Motion
   motionTempo: MotionTempo
   motionCurve: MotionCurve
-  /* Interaction-state dials (H2) — see StateIntensity/StateTint/Press. */
+  /* Interaction-state dials (H2) — see StateIntensity/StateTint. */
   stateIntensity: StateIntensity
   stateTint: StateTint
-  press: Press
   /* Spring scheme (H2) — drives the pre-sampled --k-spring-* easings. */
   motionScheme: MotionScheme
   /* Single brand hue. Secondary + accent are DERIVED from this in buildTokens
