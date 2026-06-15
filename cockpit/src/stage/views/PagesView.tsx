@@ -373,7 +373,7 @@ function ShowcaseShell({
               ))}
             </nav>
           )}
-          <span className="shc__bar-spacer" />
+          <span className="appbar__spacer" />
           {appNav ? (
             // Topbar built from REAL atoms — the searchinput, a notification button
             // with a count badge, and a photo avatar that opens a real .menu.
