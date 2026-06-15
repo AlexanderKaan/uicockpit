@@ -406,16 +406,10 @@
   display: grid;
   place-items: start center;
   min-width: 0;
-  /* Fase I-D — the gradient canvas. Three soft brand-derived blobs (primary /
-   * secondary / accent, supplied as --canvas-* from Stage.tsx) wash over the
-   * flat chrome bg so the framed preview floats on a premium surface. Anchored
-   * to the scroll viewport (background doesn't scroll with content), kept very
-   * low-alpha so it reads as atmosphere, never decoration. */
-  background:
-    radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--canvas-1, transparent) 18%, transparent), transparent 70%),
-    radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--canvas-2, transparent) 14%, transparent), transparent 68%),
-    radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--canvas-3, transparent) 12%, transparent), transparent 72%),
-    var(--app-bg);
+  /* Flat canvas — the framed preview floats on the plain chrome bg (the brand
+   * gradient mesh was removed per Alexander; the kit's own surfaces carry the
+   * colour now). */
+  background: var(--app-bg);
 }
 /* The framed preview lifts off the canvas with a soft shadow (premium float). */
 .cockpit-preview {
