@@ -993,8 +993,12 @@
   gap: var(--k-s-8);
   margin-bottom: var(--k-s-12);
 }
-/* Showcases carry real content — taller shell than the wireframe workbench. */
-.shc .lyt__stage .scaffold { height: 640px; }
+/* Showcases carry real content, so the shell FILLS the stage height (like a real
+   app) instead of floating at a fixed 640px with a dead band below it. The shell
+   is `100vh` minus the chrome above/around it: topbar (52) + stage padding (2×28)
+   + the loupe/preview chrome around the scaffold (~169) ≈ 280px. Clamp floors it
+   for short laptops (scrolls rather than crushes) and caps it on tall monitors. */
+.shc .lyt__stage .scaffold { height: clamp(560px, calc(100vh - 280px), 1040px); }
 .shc__frame { height: 100%; }
 /* The app's top bar is the REAL `.appbar` recipe now (kit), not preview chrome.
    `.shc__bar-links` stays only for the legacy non-appNav manifest path. */
