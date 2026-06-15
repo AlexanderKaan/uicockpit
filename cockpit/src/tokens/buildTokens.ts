@@ -11,7 +11,6 @@ import type {
   MotionTempo,
   MotionCurve,
   Radius,
-  StateIntensity,
   SystemColor,
   Tokens,
   TypeScale,
@@ -131,12 +130,12 @@ const EMPHASIZED = {
   accel:    'cubic-bezier(.3,0,.8,.15)',
   decel:    'cubic-bezier(.05,.7,.1,1)',
 }
-// Hover/selected/press wash intensity (H2 state algebra): ONE base alpha per
-// StateIntensity step; selected steps +0.05 and press +0.10 above it — the
-// whole interaction-state system is one formula with one dial. 'whisper'
-// (0.05) is the calibrated house default (the old fixed constant); 'standard'
-// is the M3 8% figure; 'vivid' for data-dense selection-heavy apps.
-const STATE_ALPHA: Record<StateIntensity, number> = { whisper: 0.05, standard: 0.08, vivid: 0.12 }
+// Hover/selected/press wash intensity (H2 state algebra): ONE base alpha,
+// selected steps +0.05 and press +0.10 above it — the whole interaction-state
+// system is one formula. The base is BAKED at 0.05 ('whisper'): every benchmark
+// (shadcn/Radix/Linear/Vercel/Tailwind UI) ships one subtle neutral wash, so the
+// former intensity dial was removed. (M3's heavier 8%/12% was the outlier.)
+const STATE_BASE_ALPHA = 0.05
 
 /* === Spring physics → CSS linear() pre-sampler (H2 motion schemes) ========
  * M3 Expressive's motion is 12 spring params (damping, stiffness) per scheme.
@@ -595,7 +594,7 @@ export function buildTokens(cfg: Config): Tokens {
     easeOut: cfg.motion === 'none' ? 'linear' : curveSet.easeOut,
     easeIn: cfg.motion === 'none' ? 'linear' : curveSet.easeIn,
   }
-  const sla = STATE_ALPHA[cfg.stateIntensity ?? 'whisper']
+  const sla = STATE_BASE_ALPHA
   // Hover / selected wash — a NEUTRAL overlay scaling with Emphasis. NOT pure
   // black/white: at L 0%/100% the Neutrals hue/sat vanish, so the warm/cool
   // tint wouldn't carry into the grey. So we use a near-black (light) /
@@ -607,15 +606,13 @@ export function buildTokens(cfg: Config): Tokens {
   // over-saturated the overlay (→ selection ran ~1.9× warmer/cooler than the bg
   // at the warm/cool neutrals); dropping it makes the ratio consistent across
   // cool/neutral/warm so selection + background read as one temperature.
-  // Wash color source (H2 State tint): neutral (default) keeps selection a
-  // pure intensity read; brand/accent tint the wash toward the family — the
-  // M3 on-color feel. Saturation capped so the wash stays a wash, not a fill.
-  const [stH, stS] =
-    cfg.stateTint === 'brand' && !mono
-      ? [ph, Math.min(psat, 60)]
-      : cfg.stateTint === 'accent' && !mono
-        ? [ah, Math.min(accentSat, 60)]
-        : [t.h, t.s]
+  // Wash color source: BAKED NEUTRAL — the wash takes the Neutrals ramp's hue
+  // and saturation (t.h/t.s), so its temperature follows the Neutral control
+  // (auto/cool/warm) automatically. The former State-tint dial (brand/accent
+  // on-color) was removed: every benchmark uses a neutral hover/selection wash;
+  // a global brand-tinted wash was the unusual choice. Selection stays a pure
+  // intensity read.
+  const [stH, stS] = [t.h, t.s]
   const stL = dark ? 86 : 14
   const stateHover = hslA(stH, stS, stL, sla)
   // Selected fill — a notch stronger than hover so a selected item reads above

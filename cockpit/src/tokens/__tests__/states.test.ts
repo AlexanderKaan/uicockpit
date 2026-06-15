@@ -4,35 +4,33 @@ import { DEFAULT_CONFIG } from '../defaults'
 import type { Config } from '../types'
 
 /* H2 — the interaction-state algebra + motion schemes. Contract:
- *  1. ONE formula: hover = base alpha (per intensity), selected +.05, press +.10.
- *  2. The default (whisper · neutral · standard) is the calibrated house look
- *     — hover alpha 0.05; press is a fixed 0.96 :active scale (baked in the recipe).
- *  3. State tint switches the wash's hue source without touching intensity.
- *  4. Motion schemes emit true spring linear() easings + settle durations;
+ *  1. ONE fixed formula (no dials): hover = 0.05, selected +.05, press +.10.
+ *  2. The wash source is BAKED NEUTRAL — it follows the Neutrals ramp, so its
+ *     temperature tracks the Neutral control (auto/cool/warm). Press is a fixed
+ *     0.96 :active scale (baked in the recipe). The former States + State-tint
+ *     dials were removed (every benchmark bakes one subtle neutral wash).
+ *  3. Motion schemes emit true spring linear() easings + settle durations;
  *     expressive ≠ standard. */
 
 const at = (patch: Partial<Config>): Config => ({ ...DEFAULT_CONFIG, ...patch })
 const alphaOf = (s: string): number => parseFloat(s.match(/\/ ([\d.]+)\)/)?.[1] ?? 'NaN')
-const hueOf = (s: string): number => parseFloat(s.match(/oklch\([\d.]+% [\d.]+ ([\d.]+)/)?.[1] ?? 'NaN')
+const chromaOf = (s: string): number => parseFloat(s.match(/oklch\([\d.]+% ([\d.]+)/)?.[1] ?? 'NaN')
 
-describe('H2 — state-layer algebra', () => {
-  it('intensity steps the whole ladder from one base alpha', () => {
-    for (const [intensity, base] of [['whisper', 0.05], ['standard', 0.08], ['vivid', 0.12]] as const) {
-      const v = buildTokens(at({ stateIntensity: intensity })).vars
-      expect(alphaOf(String(v['--k-state-hover'])), `${intensity} hover`).toBeCloseTo(base, 5)
-      expect(alphaOf(String(v['--k-state-selected-bg'])), `${intensity} selected`).toBeCloseTo(base + 0.05, 5)
-      expect(alphaOf(String(v['--k-state-press'])), `${intensity} press`).toBeCloseTo(base + 0.1, 5)
-    }
+describe('H2 — state-layer algebra (fixed house formula)', () => {
+  it('the ladder steps from a baked 0.05 base: hover .05, selected .10, press .15', () => {
+    const v = buildTokens(DEFAULT_CONFIG).vars
+    expect(alphaOf(String(v['--k-state-hover'])), 'hover').toBeCloseTo(0.05, 5)
+    expect(alphaOf(String(v['--k-state-selected-bg'])), 'selected').toBeCloseTo(0.1, 5)
+    expect(alphaOf(String(v['--k-state-press'])), 'press').toBeCloseTo(0.15, 5)
   })
 
-  it('state tint switches the wash hue source (neutral → brand) at the same alpha', () => {
-    const neutral = buildTokens(at({ stateTint: 'neutral' })).vars
-    const brand = buildTokens(at({ stateTint: 'brand' })).vars
-    expect(alphaOf(String(brand['--k-state-hover']))).toBeCloseTo(alphaOf(String(neutral['--k-state-hover'])), 5)
-    // The brand wash carries far more chroma than the neutral whisper.
-    const chromaOf = (s: string): number => parseFloat(s.match(/oklch\([\d.]+% ([\d.]+)/)![1]!)
-    expect(chromaOf(String(brand['--k-state-hover']))).toBeGreaterThan(chromaOf(String(neutral['--k-state-hover'])) * 3)
-    expect(Number.isFinite(hueOf(String(brand['--k-state-hover'])))).toBe(true)
+  it('the wash source is neutral and tracks the Neutrals ramp (cool ≠ warm hue)', () => {
+    const cool = buildTokens(at({ neutral: 'cool' })).vars
+    const warm = buildTokens(at({ neutral: 'warm' })).vars
+    // A neutral wash carries only a whisper of chroma — never a brand-strength fill.
+    expect(chromaOf(String(cool['--k-state-hover']))).toBeLessThan(0.03)
+    // But its hue follows the Neutral temperature control: cool and warm differ.
+    expect(String(cool['--k-state-hover'])).not.toBe(String(warm['--k-state-hover']))
   })
 })
 
