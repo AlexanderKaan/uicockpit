@@ -264,7 +264,12 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     // self-documenting and needs no search bar.
     return (
       <div className="gallerywrap">
-        <div className="l-stack" style={{ '--l-gap': 'var(--k-s-32)' } as CSSProperties}>
+        {/* .pagestack (preview chrome) spaces via real container `gap` = the
+            gallery gutter (40px), so page-block spacing matches the cards on the
+            other sub-walls. NOT .l-stack here: its child-margin rule reads the
+            CHILD's --l-gap, and each proof block is itself an .l-stack (0.625rem)
+            — which shadowed the override. Container gap resolves on .pagestack. */}
+        <div className="pagestack">
           {PAGE_ARCHETYPES.map((a, i) =>
             renderSection({ kind: 'proof', seed: { archetype: a.archetype, label: a.label } }, i),
           )}

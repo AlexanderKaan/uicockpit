@@ -135,16 +135,25 @@
  * centered, framed preview. */
 /* Components view (the card wall) — inset by one full gutter (40px) so the
    edge-to-card spacing equals the gap BETWEEN cards → spacing reads evenly all
-   round. Targeted via :has(.gallery) so ONLY the components preview is affected
-   (the app view has no .gallery and keeps its --k-space padding). max-width:none
-   is already inherited from the base .cockpit-preview. */
-.cockpit-preview:has(.gallery) {
+   round. Targeted via :has(.gallerywrap) — the wrapper EVERY sub-wall renders
+   (Atoms/Components/Sections AND the Pages wall, which has no inner .gallery).
+   Keying on .gallery alone dropped the padding on the Pages wall, so the whole
+   sub-toggle bar jumped left when switching to Pages. The app view has no
+   .gallerywrap and keeps its --k-space padding. max-width:none is already
+   inherited from the base .cockpit-preview. */
+.cockpit-preview:has(.gallerywrap) {
   padding: var(--gallery-gap, 40px);
 }
 
 /* Gallery search/filter (C5) — filters the Atoms/Blocks wall by component name.
    Lives inside .cockpit-preview, so it's themed live by the kit. */
 .gallerywrap { width: 100%; }
+/* Pages sub-wall — stack the full-bleed page templates with a real container
+   `gap` equal to the gallery gutter, so the inter-block spacing matches the
+   other sub-walls. (Container gap resolves --gallery-gap here on .pagestack —
+   not in scope, so the 40px fallback — unlike .l-stack's child-margin, which
+   would read each proof block's own --l-gap and collapse to ~10px.) */
+.pagestack { display: flex; flex-direction: column; gap: var(--gallery-gap, 40px); }
 /* Layout-only — the visual styling (filled bg, border, focus halo, hover, ghost
    clear) comes from the kit's own .searchinput recipe, which this element ALSO
    wears (class="searchinput gallery-search"), so the gallery filter dogfoods the
