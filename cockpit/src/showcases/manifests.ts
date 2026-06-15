@@ -20,8 +20,11 @@ export type ShowcaseArchetype = 'feed' | 'list-detail' | 'supporting' | 'workspa
 export type ShowcaseNav = 'suite' | 'topbar'
 
 export type SectionSpec =
-  | { kind: 'stats'; seed: { items: Array<{ label: string; value: string; delta?: string; up?: boolean; hero?: boolean }> } }
+  | { kind: 'stats'; seed: { items: Array<{ label: string; value: string; delta?: string; up?: boolean; hero?: boolean; spark?: number[] }> } }
   | { kind: 'chart'; seed: { title: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> } }
+  // Tabbed chart — a real .tabs strip switching between named chart views (each a
+  // ChartFrame with its own data). The Reports screen's metric switcher.
+  | { kind: 'chartTabs'; seed: { tabs: Array<{ label: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> }> } }
   | { kind: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
   | { kind: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean; avatar?: string }> } }
   | { kind: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[]; greeting?: string } }
@@ -39,6 +42,9 @@ export type SectionSpec =
   | { kind: 'wizard'; seed: { steps: string[]; active: number; title: string; sub?: string } }
   | { kind: 'dropzone'; seed: { title: string; hint: string } }
   | { kind: 'media'; seed: { title?: string; items: Array<{ name: string; kind: 'image' | 'video' | 'file'; badge?: string; tone?: 'info' | 'success' | 'warning'; hero?: boolean; img?: string; meta?: string }> } }
+  // The real `.filegrid` recipe — a grid of file tiles; clicking one opens the
+  // real `.lightbox` preview (Documents vault).
+  | { kind: 'filegrid'; seed: { title: string; files: Array<{ name: string; ext: string; size: string; tone: 'success' | 'danger' | 'warn' | 'info'; image?: boolean }> } }
   | { kind: 'empty'; seed: { icon: IconName; title: string; sub: string; cta?: string } }
   // CP6 Phase 3 — the month grid as a section (wraps the kit's .calendar recipe +
   // its cell modifiers). firstDow = weekday index (0=Mon … 6=Sun) of day 1.
@@ -355,14 +361,22 @@ export const SHOWCASES: ShowcaseManifest[] = [
         role: 'flex',
         sections: [
           { kind: 'stats', seed: { items: [
-            { label: 'Net revenue', value: '$405,091.00', delta: '+4.75%', up: true, hero: true },
-            { label: 'Collected (Mar)', value: '$148,316.00', delta: '+8.10%', up: true },
-            { label: 'Avg. days to pay', value: '19 days', delta: '−2 days', up: true },
-            { label: 'Active clients', value: '18', delta: '+3 qtr', up: true },
+            { label: 'Net revenue', value: '$405,091.00', delta: '+4.75%', up: true, hero: true, spark: [186, 204, 198, 241, 273, 312] },
+            { label: 'Collected (Mar)', value: '$148,316.00', delta: '+8.10%', up: true, spark: [120, 132, 128, 140, 137, 148] },
+            { label: 'Avg. days to pay', value: '19 days', delta: '−2 days', up: true, spark: [27, 26, 24, 23, 21, 19] },
+            { label: 'Active clients', value: '18', delta: '+3 qtr', up: true, spark: [12, 13, 14, 15, 17, 18] },
           ] } },
-          { kind: 'chart', seed: { title: 'Invoiced vs collected — last 6 months', type: 'area', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
-            { name: 'Invoiced', values: [186, 204, 198, 241, 273, 312] },
-            { name: 'Collected', values: [142, 188, 176, 214, 248, 286] },
+          { kind: 'chartTabs', seed: { tabs: [
+            { label: 'Cashflow', type: 'area', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
+              { name: 'Invoiced', values: [186, 204, 198, 241, 273, 312] },
+              { name: 'Collected', values: [142, 188, 176, 214, 248, 286] },
+            ] },
+            { label: 'Expenses', type: 'bar', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
+              { name: 'Spend', values: [22, 26, 30, 24, 28, 31] },
+            ] },
+            { label: 'Aging', type: 'bar', labels: ['Current', '1–30', '31–60', '61–90', '90+'], series: [
+              { name: 'Outstanding', values: [148, 56, 24, 12, 6] },
+            ] },
           ] } },
           { kind: 'list', seed: { title: 'Recent activity', items: [
             { icon: 'check', title: 'Payment received — SavvyCal', sub: 'Invoice #00010 · $14,000.00', trail: '2m', badge: 'success' },
@@ -388,13 +402,13 @@ export const SHOWCASES: ShowcaseManifest[] = [
       {
         role: 'flex',
         sections: [
-          { kind: 'media', seed: { title: 'Receipts & contracts · 6 files', items: [
-            { name: 'Master services agreement — Tuple', kind: 'file', hero: true, badge: 'Signed', tone: 'success', meta: 'MSA-tuple-2026.pdf · 480 KB · added by Chelsea' },
-            { name: 'Receipt — Northwind Cloud', kind: 'image', badge: '$8,240', tone: 'info' },
-            { name: 'invoice-00011.pdf', kind: 'file' },
-            { name: 'Receipt — Prism Design', kind: 'image' },
-            { name: 'W-9 — Loomis Studio', kind: 'file', badge: 'On file', tone: 'warning' },
-            { name: 'statement-mar-2026.pdf', kind: 'file' },
+          { kind: 'filegrid', seed: { title: 'Receipts & contracts · 6 files', files: [
+            { name: 'MSA-tuple-2026.pdf', ext: 'PDF', size: '480 KB', tone: 'danger' },
+            { name: 'receipt-northwind.png', ext: 'PNG', size: '1.2 MB', tone: 'success', image: true },
+            { name: 'invoice-00011.pdf', ext: 'PDF', size: '96 KB', tone: 'danger' },
+            { name: 'receipt-prism.jpg', ext: 'JPG', size: '840 KB', tone: 'success', image: true },
+            { name: 'W-9-loomis.pdf', ext: 'PDF', size: '210 KB', tone: 'warn' },
+            { name: 'statement-mar-2026.pdf', ext: 'PDF', size: '2.1 MB', tone: 'danger' },
           ] } },
           { kind: 'dropzone', seed: { title: 'Drop receipts or click to browse', hint: 'PDF, PNG, JPG — up to 25 MB per file' } },
         ],

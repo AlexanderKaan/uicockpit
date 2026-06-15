@@ -1,8 +1,62 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
+import { useModal } from '../stage/views/apps/AppHelpers'
 import type { SectionSpec } from './manifests'
 import { BrandLogo } from './logos'
+
+/** The Documents vault — the real `.filegrid` tiles; clicking a tile opens the real
+ *  `.lightbox` preview (modal contract via useModal; arrow keys cycle files). */
+function FileGridSection({ title, files }: { title: string; files: Array<{ name: string; ext: string; size: string; tone: 'success' | 'danger' | 'warn' | 'info'; image?: boolean }> }) {
+  const [open, setOpen] = useState<number | null>(null)
+  const lbRef = useModal<HTMLDivElement>(open !== null, () => setOpen(null))
+  const n = files.length
+  const f = open !== null ? files[open]! : null
+  return (
+    <div className="section">
+      <div className="section__head"><div className="section__titles"><span className="section__title">{title}</span></div></div>
+      <div className="section__body">
+        <div className="filegrid filegrid--3">
+          {files.map((file, i) => (
+            <button key={file.name} type="button" className="filegrid__tile" onClick={() => setOpen(i)}>
+              <div className="filegrid__cover"><Icon name={file.image ? 'grid' : 'file'} /></div>
+              <div className="filegrid__row">
+                <span className="filegrid__name">{file.name}</span>
+                <span className={`badge badge--${file.tone}`}>{file.ext}</span>
+              </div>
+              <span className="filegrid__meta">{file.size}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      {f && open !== null && (
+        <div
+          className="lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="File preview"
+          ref={lbRef}
+          tabIndex={-1}
+          onClick={() => setOpen(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowLeft') { e.preventDefault(); setOpen((open + n - 1) % n) }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); setOpen((open + 1) % n) }
+          }}
+        >
+          <div className="lightbox__stage card" onClick={(e) => e.stopPropagation()} style={{ width: '46%', maxWidth: 520, display: 'grid', placeItems: 'center', gap: 'var(--k-s-10)', aspectRatio: '4 / 3' }}>
+            <Icon name={f.image ? 'grid' : 'file'} />
+            <span style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{f.name}</span>
+            <span className={`badge badge--${f.tone}`}>{f.ext} · {f.size}</span>
+          </div>
+          <button type="button" className="lightbox__btn lightbox__btn--close" onClick={() => setOpen(null)} aria-label="Close"><Icon name="x" /></button>
+          <button type="button" className="lightbox__btn lightbox__btn--prev" onClick={(e) => { e.stopPropagation(); setOpen((open + n - 1) % n) }} aria-label="Previous"><Icon name="chevL" /></button>
+          <button type="button" className="lightbox__btn lightbox__btn--next" onClick={(e) => { e.stopPropagation(); setOpen((open + 1) % n) }} aria-label="Next"><Icon name="chevR" /></button>
+          <div className="lightbox__count">{open + 1} / {n}</div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 /** Per-row actions — the real `.menu` dropdown (kebab → View · Send reminder ·
  *  Duplicate · Delete), self-contained so each table row owns its open state.
@@ -25,6 +79,40 @@ function RowMenu() {
         </div>
       )}
     </span>
+  )
+}
+
+/** Inline trend hint — the real `.sparkline` recipe. A normalized polyline (the
+ *  line) + a closed polygon (the tinted area), stretched to the tile width. */
+function Sparkline({ data }: { data: number[] }) {
+  const n = data.length
+  const min = Math.min(...data)
+  const span = Math.max(...data) - min || 1
+  const pts = data.map((v, i) => `${(i / (n - 1)) * 100},${29 - ((v - min) / span) * 27}`).join(' ')
+  return (
+    <svg className="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
+      <polygon className="sparkline__area" points={`${pts} 100,30 0,30`} />
+      <polyline className="sparkline__path" points={pts} />
+    </svg>
+  )
+}
+
+/** Tabbed chart — a real `.tabs` strip switching between named ChartFrame views.
+ *  The ChartFrame is keyed by the active tab so its draw-in animation replays. */
+function ChartTabs({ tabs }: { tabs: Array<{ label: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> }> }) {
+  const [active, setActive] = useState(0)
+  const t = tabs[active]!
+  return (
+    <div className="card">
+      <div className="card__head">
+        <div className="tabs" role="tablist" aria-label="Report view">
+          {tabs.map((tab, i) => (
+            <button key={tab.label} type="button" role="tab" aria-selected={i === active} className={`tab ${i === active ? 'tab--on' : ''}`} onClick={() => setActive(i)}>{tab.label}</button>
+          ))}
+        </div>
+      </div>
+      <ChartFrame key={active} type={t.type} labels={t.labels} series={t.series} />
+    </div>
   )
 }
 
@@ -110,6 +198,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                   <span className={`stat-tile__delta ${s.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{s.delta}</span>
                 </div>
               )}
+              {s.spark && <Sparkline data={s.spark} />}
             </div>
           ))}
         </div>
@@ -121,6 +210,10 @@ export function renderSection(spec: SectionSpec, key: number) {
           <ChartFrame type={spec.seed.type} labels={spec.seed.labels} series={spec.seed.series} />
         </div>
       )
+    case 'chartTabs':
+      return <ChartTabs key={key} tabs={spec.seed.tabs} />
+    case 'filegrid':
+      return <FileGridSection key={key} title={spec.seed.title} files={spec.seed.files} />
     case 'list':
       return (
         <div className="card" key={key}>
@@ -233,6 +326,13 @@ export function renderSection(spec: SectionSpec, key: number) {
       const eyebrow: CSSProperties = { fontSize: 'var(--k-type-eyebrow)', fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'], letterSpacing: 'var(--k-track-eyebrow)', textTransform: 'uppercase', color: 'var(--k-fg-muted)' }
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
+          {/* Trail back to the list — the real .breadcrumb recipe. */}
+          <nav className="breadcrumb" aria-label="Breadcrumb">
+            <a href="#">Ledger</a><Icon name="chevR" />
+            <a href="#">Invoices</a><Icon name="chevR" />
+            <span aria-current="page">#{s.number}</span>
+          </nav>
+
           {/* Header: client mark + invoice no. + the ONE aimed action (Send) */}
           <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-12)' } as CSSProperties}>
             <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-12)' } as CSSProperties}>
