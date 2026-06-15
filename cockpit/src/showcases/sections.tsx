@@ -46,6 +46,22 @@ function SummaryBand({ items }: { items: Array<{ label: string; value: string; d
   )
 }
 
+/** The screen-level header — the kit's `.page-head` SECTION recipe (eyebrow/title/
+ *  sub + a trailing actions cluster). ONE helper so every Ledger screen opens the
+ *  same way and the title type comes from `.page-head__title`, never a hand-rolled
+ *  inline `font-size/weight/family` (the drift the section tier was built to kill). */
+function PageHead({ title, sub, actions }: { title: string; sub?: string; actions?: ReactNode }) {
+  return (
+    <div className="page-head">
+      <div className="page-head__titles">
+        <h2 className="page-head__title">{title}</h2>
+        {sub && <span className="page-head__sub">{sub}</span>}
+      </div>
+      {actions && <div className="page-head__actions">{actions}</div>}
+    </div>
+  )
+}
+
 /**
  * H3b — the section renderer: SectionSpec (data) → KIT recipes (markup).
  *
@@ -365,24 +381,29 @@ export function renderSection(spec: SectionSpec, key: number) {
             ))}
           </div>
 
-          {/* Recent clients */}
-          <div className="l-stack" style={{ '--l-gap': 'var(--k-s-12)' } as CSSProperties}>
-            <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}>
-              <span className="card__title">Recent clients</span>
-              <button type="button" className="btn btn--link btn--sm" style={{ padding: 0 }}>View all</button>
+          {/* Recent clients — a .section region of .entity-card tiles (the kit
+              recipes finally consumed; was a hand-rolled card header + .sep + rows) */}
+          <div className="section">
+            <div className="section__head">
+              <div className="section__titles"><span className="section__title">Recent clients</span></div>
+              <div className="section__actions"><button type="button" className="btn btn--link btn--sm" style={{ padding: 0 }}>View all</button></div>
             </div>
-            <div className="bento" style={{ '--bento-min': '15rem' } as CSSProperties}>
-              {s.clients.map((c) => (
-                <div key={c.name} className="card">
-                  <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}>
-                    <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}><BrandLogo id={c.logo} size={36} /><span style={{ fontWeight: semib }}>{c.name}</span></div>
-                    <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="More"><Icon name="dots" /></button>
+            <div className="section__body">
+              <div className="bento" style={{ '--bento-min': '15rem' } as CSSProperties}>
+                {s.clients.map((c) => (
+                  <div key={c.name} className="entity-card">
+                    <div className="entity-card__head">
+                      <BrandLogo id={c.logo} size={36} />
+                      <span className="entity-card__name">{c.name}</span>
+                      <button type="button" className="entity-card__menu btn btn--ghost btn--icon btn--sm" aria-label="More"><Icon name="dots" /></button>
+                    </div>
+                    <div className="entity-card__meta">
+                      <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">{c.lastInvoice}</span></div>
+                      <div className="entity-card__row"><span className="entity-card__label">Amount</span><span className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}><span style={{ ...money, fontWeight: med }}>{c.amount}</span><span className={`badge badge--${c.tone}`}>{c.status}</span></span></div>
+                    </div>
                   </div>
-                  <hr className="sep" />
-                  <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}><span style={muted}>Last invoice</span><span style={{ fontWeight: med }}>{c.lastInvoice}</span></div>
-                  <div className="l-cluster" style={{ justifyContent: 'space-between', marginTop: 'var(--k-s-8)' } as CSSProperties}><span style={muted}>Amount</span><span className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}><span style={{ ...money, fontWeight: med }}>{c.amount}</span><span className={`badge badge--${c.tone}`}>{c.status}</span></span></div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -393,20 +414,12 @@ export function renderSection(spec: SectionSpec, key: number) {
       const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
       const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
       const med = 'var(--k-weight-medium)' as CSSProperties['fontWeight']
-      const bold = 'var(--k-weight-bold)' as CSSProperties['fontWeight']
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
-          {/* Header: title + count · the one aimed action */}
-          <div className="l-cluster" style={{ justifyContent: 'space-between', alignItems: 'flex-end' } as CSSProperties}>
-            <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
-              <span style={{ fontSize: 'var(--k-type-h2)', fontWeight: bold, fontFamily: 'var(--k-font-display)' }}>Invoices</span>
-              <span style={muted}>{s.subtitle}</span>
-            </div>
-            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-              <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
-              <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> New invoice</button>
-            </div>
-          </div>
+          <PageHead title="Invoices" sub={s.subtitle} actions={<>
+            <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
+            <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> New invoice</button>
+          </>} />
 
           {/* Summary band = the ONE Fill zone (shared SummaryBand). Working
               surfaces below stay --k-surface. */}
@@ -470,22 +483,13 @@ export function renderSection(spec: SectionSpec, key: number) {
     case 'clients': {
       const s = spec.seed
       const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
-      const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
       const med = 'var(--k-weight-medium)' as CSSProperties['fontWeight']
-      const bold = 'var(--k-weight-bold)' as CSSProperties['fontWeight']
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
-          {/* Header: title + count · the one aimed action */}
-          <div className="l-cluster" style={{ justifyContent: 'space-between', alignItems: 'flex-end' } as CSSProperties}>
-            <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
-              <span style={{ fontSize: 'var(--k-type-h2)', fontWeight: bold, fontFamily: 'var(--k-font-display)' }}>Clients</span>
-              <span style={muted}>{s.subtitle}</span>
-            </div>
-            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-              <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
-              <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> Add client</button>
-            </div>
-          </div>
+          <PageHead title="Clients" sub={s.subtitle} actions={<>
+            <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
+            <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> Add client</button>
+          </>} />
 
           <SummaryBand items={s.summary} />
 
@@ -550,20 +554,12 @@ export function renderSection(spec: SectionSpec, key: number) {
       const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
       const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
       const med = 'var(--k-weight-medium)' as CSSProperties['fontWeight']
-      const bold = 'var(--k-weight-bold)' as CSSProperties['fontWeight']
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-20)' } as CSSProperties}>
-          {/* Header: title + count · the one aimed action */}
-          <div className="l-cluster" style={{ justifyContent: 'space-between', alignItems: 'flex-end' } as CSSProperties}>
-            <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
-              <span style={{ fontSize: 'var(--k-type-h2)', fontWeight: bold, fontFamily: 'var(--k-font-display)' }}>Expenses</span>
-              <span style={muted}>{s.subtitle}</span>
-            </div>
-            <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-              <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
-              <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> Add expense</button>
-            </div>
-          </div>
+          <PageHead title="Expenses" sub={s.subtitle} actions={<>
+            <button type="button" className="btn btn--ghost btn--sm"><Icon name="upload" /> Export</button>
+            <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> Add expense</button>
+          </>} />
 
           <SummaryBand items={s.summary} />
 
