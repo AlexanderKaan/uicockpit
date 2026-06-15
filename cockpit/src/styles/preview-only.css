@@ -987,23 +987,9 @@
 /* Showcases carry real content — taller shell than the wireframe workbench. */
 .shc .lyt__stage .scaffold { height: 640px; }
 .shc__frame { height: 100%; }
-.shc__bar {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-10);
-  padding: var(--k-s-8) var(--k-s-16);
-  border-bottom: var(--k-bw) solid var(--k-border);
-  background: var(--k-chrome-bg);
-  min-height: 48px;
-}
-.shc__bar-title {
-  font-family: var(--k-font-display);
-  font-size: var(--k-type-small);
-  font-weight: var(--k-weight-semibold);
-  white-space: nowrap;
-}
+/* The app's top bar is the REAL `.appbar` recipe now (kit), not preview chrome.
+   `.shc__bar-links` stays only for the legacy non-appNav manifest path. */
 .shc__bar-links { display: inline-flex; gap: var(--k-s-4); margin-left: var(--k-s-12); min-width: 0; overflow: hidden; }
-.shc__bar-spacer { flex: 1; }
 .shc__pane { min-width: 0; }
 /* The single Ledger app — invoice rows open the detail screen (list → detail),
    so they read as interactive only on the Invoices screen. */

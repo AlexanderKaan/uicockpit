@@ -361,11 +361,11 @@ function ShowcaseShell({
   return (
     <div className={`scaffold scaffold--${m.archetype} ${appNav ? 'shc__app' : ''}`} data-screen={appNav?.current} style={{ width, maxWidth: '100%' }}>
       <div className="scaffold__frame shc__frame">
-        <div className="scaffold__bar shc__bar">
+        <div className="scaffold__bar appbar">
           {onDetail && (
             <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Back to Invoices" onClick={() => appNav!.onNavigate(appNav!.highlight)}><Icon name="chevL" /></button>
           )}
-          <span className="shc__bar-title">{m.barTitle}</span>
+          <span className="appbar__title">{m.barTitle}</span>
           {!appNav && m.nav === 'topbar' && (
             <nav className="shc__bar-links" aria-label={`${m.title} navigation`}>
               {m.navItems.map((it, i) => (

@@ -221,7 +221,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'component'],
     [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ThreadCard, 'component'], [ProseCard, 'component'],
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
-    [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'],
+    [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
     [BreadcrumbCard, 'atom'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
@@ -2250,6 +2250,43 @@ function NavRow({ icon, label, active }: { icon: IconName; label: string; active
       <Icon name={icon} />
       <span className="navrow__label">{label}</span>
     </button>
+  )
+}
+
+// App bar — the top app-shell header recipe (.appbar): the SIBLING of the sidebar.
+// A title on the lead, a flexible spacer, then a trailing cluster of REAL atoms —
+// .searchinput · a .btn with a .badge--count · an .avatar that opens a real .menu.
+// The live Ledger app (Showcases) dogfoods this exact recipe as its top bar.
+function AppBarCard() {
+  const [open, setOpen] = useState(false)
+  return (
+    <Card wide title="App bar" desc="The top app-shell header — a title, a flexible spacer, and a trailing cluster of real atoms (search · notifications · account menu). Pairs with the Sidebar.">
+      <div className="appbar" style={{ borderRadius: 'var(--k-radius-md)', border: '1px solid var(--k-border)' }}>
+        <span className="appbar__title">Ledger</span>
+        <span className="appbar__spacer" />
+        <div className="searchinput" role="search" style={{ maxWidth: 200 }}>
+          <Icon name="search" />
+          <input className="searchinput__field" type="search" placeholder="Search…" aria-label="Search" />
+        </div>
+        <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Notifications, 2 unread" style={{ position: 'relative' }}>
+          <Icon name="bell" />
+          <span className="badge badge--solid-primary badge--count" style={{ position: 'absolute', top: 0, right: 0, transform: 'translate(35%,-35%)' }}>2</span>
+        </button>
+        <div style={{ position: 'relative' }}>
+          <button type="button" aria-haspopup="menu" aria-expanded={open} aria-label="Account" onClick={() => setOpen((o) => !o)} style={{ border: 0, background: 'none', padding: 0, cursor: 'pointer' }}>
+            <span className="avatar avatar--sm avatar--a3">PN</span>
+          </button>
+          {open && (
+            <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 50, minWidth: 180 }}>
+              <div className="menu__label">Priya Nair</div>
+              <button type="button" className="menu__item" role="menuitem"><Icon name="cog" /> Settings</button>
+              <div className="menu__sep" />
+              <button type="button" className="menu__item" role="menuitem"><Icon name="upload" /> Sign out</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </Card>
   )
 }
 

@@ -35,6 +35,9 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   scaffold: ['navsuite', 'pane'],
   navsuite: [],
   pane: [],
+  // The top app-shell header — sibling of the sidebar; composes the trailing
+  // atoms (search · a notification button · the account avatar/menu).
+  appbar: ['searchinput', 'avatar', 'dropdown-menu', 'badges-pills', 'buttons'],
   // Header / region wrappers — the grammar a page is built FROM. A page =
   // page-head + a stack of titled .section regions; each arranges component fillers.
   'page-head': ['buttons'],

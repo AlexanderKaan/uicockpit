@@ -1992,6 +1992,38 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }`,
   },
   {
+    id: 'appbar',
+    section: "App bar",
+    css: `/* === App bar — the top app-shell header ==================================
+ * The sibling of .sidenav: a horizontal bar on the Chrome plane carrying the
+ * app/page title on the lead, a flexible spacer, then the trailing cluster
+ * (search, icon buttons, the account avatar/menu). Compose real atoms into it —
+ * .searchinput, .btn, .avatar, .menu, .badge. The horizontal padding breathes
+ * with Density (--k-space); the height comes from the content + a fixed block
+ * padding (a bar is a row-grammar surface, not a card). */
+.appbar {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-10);
+  padding: var(--k-s-10) var(--k-space);
+  background: var(--k-chrome-bg, var(--k-bg));
+  border-bottom: var(--k-bw) solid var(--k-border);
+  min-width: 0;
+}
+.appbar__title {
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* The flexible gap that pushes the trailing cluster to the end. */
+.appbar__spacer { flex: 1; min-width: var(--k-s-8); }`,
+  },
+  {
     id: 'activity-feed',
     section: "Activity feed",
     css: `/* === Activity feed ======================================================

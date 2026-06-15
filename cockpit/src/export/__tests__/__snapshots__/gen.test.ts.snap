@@ -478,6 +478,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "data-table",
         "empty-state",
         "sidebar",
+        "appbar",
         "calendar-week",
         "calendar-year",
         "pricing",
@@ -650,6 +651,17 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "navigation-row",
           "avatar",
           "badges-pills"
+        ]
+      },
+      "appbar": {
+        "tier": "section",
+        "section": "App bar",
+        "uses": [
+          "searchinput",
+          "avatar",
+          "dropdown-menu",
+          "badges-pills",
+          "buttons"
         ]
       },
       "activity-feed": {
@@ -1120,6 +1132,13 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ],
         "parts": [
           "badge"
+        ]
+      },
+      "appbar": {
+        "modifiers": [],
+        "parts": [
+          "spacer",
+          "title"
         ]
       },
       "aspect": {
@@ -3583,11 +3602,11 @@ body {
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
  *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
  *
- * SECTIONS — the page-region tier (13): adaptive app frames that ARRANGE
+ * SECTIONS — the page-region tier (14): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
  *   arrangement, never look; components slot into panes; panes assemble into PAGES
  *   (your screens).
- *     Page header, Section, Data table, Empty state, Sidebar, Calendar week, Calendar year, Pricing, File grid, Form panel, Adaptive scaffold, Nav suite, Pane
+ *     Page header, Section, Data table, Empty state, Sidebar, App bar, Calendar week, Calendar year, Pricing, File grid, Form panel, Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
 
 /* === Toolbar ===
@@ -5482,6 +5501,35 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   .sidenav--rail .navrow[data-tip]::after,
   .sidenav--rail .sidenav__toggle[data-tip]::after { transition: none; }
 }
+
+/* === App bar — the top app-shell header ==================================
+ * The sibling of .sidenav: a horizontal bar on the Chrome plane carrying the
+ * app/page title on the lead, a flexible spacer, then the trailing cluster
+ * (search, icon buttons, the account avatar/menu). Compose real atoms into it —
+ * .searchinput, .btn, .avatar, .menu, .badge. The horizontal padding breathes
+ * with Density (--k-space); the height comes from the content + a fixed block
+ * padding (a bar is a row-grammar surface, not a card). */
+.appbar {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-10);
+  padding: var(--k-s-10) var(--k-space);
+  background: var(--k-chrome-bg, var(--k-bg));
+  border-bottom: var(--k-bw) solid var(--k-border);
+  min-width: 0;
+}
+.appbar__title {
+  font-family: var(--k-font-display);
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* The flexible gap that pushes the trailing cluster to the end. */
+.appbar__spacer { flex: 1; min-width: var(--k-s-8); }
 
 /* === Activity feed ======================================================
  * A vertical event stream — a status-coloured dot, the event text, and a

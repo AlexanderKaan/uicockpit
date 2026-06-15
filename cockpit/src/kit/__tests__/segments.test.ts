@@ -58,13 +58,13 @@ describe('segment graph integrity', () => {
     expect(idsByTier('component')).toHaveLength(25)
     // The 2026-06-15 "slab vs widget" re-audit: a SECTION is a full-width page slab
     // (its own job + heading; stacked to build a page); a COMPONENT is a widget you
-    // drop INSIDE one. 13 sections = 3 shell regions (scaffold/navsuite/pane) + 2
-    // header/region wrappers (page-head/section) + 8 slabs (data-table/form-panel/
-    // pricing/sidebar/empty-state/file-grid + the calendar-week/calendar-year VIEWS).
-    // The ~11 widgets we'd over-promoted (calendar picker/range, chart, timeline,
-    // activity-feed, stat-tile, action-panel, danger-zone, entity-card, filter-bar,
-    // auth) moved back to COMPONENT_USES.
-    expect(idsByTier('section')).toHaveLength(13)
+    // drop INSIDE one. 14 sections = 4 shell regions (scaffold/navsuite/pane + the
+    // appbar app-header) + 2 header/region wrappers (page-head/section) + 8 slabs
+    // (data-table/form-panel/pricing/sidebar/empty-state/file-grid + the
+    // calendar-week/calendar-year VIEWS). The ~11 widgets we'd over-promoted (calendar
+    // picker/range, chart, timeline, activity-feed, stat-tile, action-panel,
+    // danger-zone, entity-card, filter-bar, auth) moved back to COMPONENT_USES.
+    expect(idsByTier('section')).toHaveLength(14)
   })
 
   it('every standalone-blessed id is a real ATOM (not a component/foundation)', () => {
