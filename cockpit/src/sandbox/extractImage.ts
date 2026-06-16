@@ -36,6 +36,10 @@ function rgbToHsl(r: number, g: number, b: number): HSL {
   return { h, s: s * 100, l: l * 100 }
 }
 
+function median(a: number[]): number {
+  const s = [...a].sort((x, y) => x - y); const m = Math.floor(s.length / 2)
+  return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2
+}
 function circularMean(degs: number[]): number {
   const x = degs.reduce((a, d) => a + Math.cos((d * Math.PI) / 180), 0)
   const y = degs.reduce((a, d) => a + Math.sin((d * Math.PI) / 180), 0)
@@ -82,6 +86,7 @@ export function extractFoundationFromPixels(px: Pixels): Extraction {
   // a brand vote), whereas delta cleanly separates grey from colour everywhere.
   const freq = new Map<string, { hsl: HSL; n: number }>()
   const greys: number[] = []
+  const lights: number[] = []
   let sampled = 0
   // Step a few pixels for speed; each pixel = 4 bytes (RGBA).
   for (let i = 0; i < d.length; i += 4 * 2) {
@@ -91,12 +96,23 @@ export function extractFoundationFromPixels(px: Pixels): Extraction {
     const delta = Math.max(r, g, b) - Math.min(r, g, b)
     const hsl = rgbToHsl(r, g, b)
     sampled++
+    lights.push(hsl.l) // every pixel counts toward the light-vs-dark verdict
     if (delta <= 18) { if (delta >= 3 && hsl.l > 8 && hsl.l < 96) greys.push(hsl.h); continue }
     if (delta < 40) continue // muted/ambiguous — neither a clean grey nor a clean brand
     if (hsl.l < 8 || hsl.l > 92) continue
     const key = `${Math.round(hsl.h / 12)}-${Math.round(hsl.s / 15)}`
     const e = freq.get(key)
     if (e) { e.n++ } else freq.set(key, { hsl, n: 1 })
+  }
+
+  // MODE — light vs dark, from the screenshot's overall lightness. The page
+  // background dominates the pixel count, so the median lightness is a robust
+  // read: a dark UI sits well below 50%. (This is THE thing that makes a dark
+  // app's board look like the app instead of a stranger.)
+  if (lights.length >= 50) {
+    const medL = median(lights)
+    config.mode = medL < 42 ? 'dark' : 'light'
+    notes.push(`mode: median pixel lightness ${medL.toFixed(0)}% → '${config.mode}'`)
   }
 
   // BRAND — the most-voted chromatic bucket. Pixel-based ⇒ always 'low' conf.

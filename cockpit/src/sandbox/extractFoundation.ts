@@ -176,6 +176,31 @@ export function extractFoundation(cssText: string): Extraction {
     notes.push(`neutral: ${greys.length} greys, avg hue ${avg.toFixed(0)} → '${temp}'`)
   }
 
+  /* ---- MODE (light / dark) -------------------------------------------- */
+  // Read the page BACKGROUND token's lightness. A dark theme (shadcn
+  // `--background: 222 47% 11%`) sits well below 50% — this is what makes a
+  // dark app's board render dark instead of a jarring white.
+  const bgVal = (pred: RegExp): HSL | null => {
+    for (const dcl of decls) {
+      if (!pred.test(dcl.name) || /-(fg|foreground|text|ink|on)($|-)/.test(dcl.name)) continue
+      const tok = dcl.value.match(COLOR_RE)?.[0]
+      let hsl = tok ? parseColor(tok) : null
+      if (!hsl) { const t = dcl.value.match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/); if (t) hsl = { h: +t[1]!, s: +t[2]!, l: +t[3]! } }
+      if (hsl) return hsl
+    }
+    return null
+  }
+  let bg = bgVal(/(^|-)(background|bg|canvas|surface|base)($|-)/)
+  if (!bg) {
+    const m = css.match(/(?:^|[\s,;}])(?:html|body)\b[^{]*\{[^}]*\bbackground(?:-color)?\s*:\s*([^;}]+)[;}]/i)
+    const tok = m?.[1]?.match(COLOR_RE)?.[0]
+    bg = tok ? parseColor(tok) : null
+  }
+  if (bg) {
+    config.mode = bg.l < 40 ? 'dark' : 'light'
+    notes.push(`mode: background lightness ${bg.l.toFixed(0)}% → '${config.mode}'`)
+  }
+
   /* ---- RADIUS ---------------------------------------------------------- */
   const radii: number[] = []
   for (const m of css.matchAll(/border-radius\s*:\s*([^;}]+)[;}]/g)) radii.push(...pxValues(m[1]!))

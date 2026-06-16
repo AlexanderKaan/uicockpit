@@ -40,6 +40,15 @@ describe('extractFoundationFromPixels', () => {
     expect(config.neutral).toBe('cool')
   })
 
+  it('detects dark mode from a dark screenshot, light from a light one', () => {
+    // Mostly near-black with a red accent band → dark.
+    const dark = makePixels(24, 24, (x) => (x < 4 ? [220, 40, 40] : [18, 18, 22]))
+    expect(extractFoundationFromPixels(dark).config.mode).toBe('dark')
+    // Mostly white → light.
+    const light = makePixels(24, 24, (x) => (x < 4 ? [220, 40, 40] : [250, 250, 252]))
+    expect(extractFoundationFromPixels(light).config.mode).toBe('light')
+  })
+
   it('never claims radius/font/density from pixels', () => {
     const px = makePixels(16, 16, () => [124, 58, 237])
     const { confidence } = extractFoundationFromPixels(px)

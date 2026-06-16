@@ -119,6 +119,11 @@ describe('extractFoundation — real-world traps (from the dogfood run)', () => 
     const { config } = extractFoundation('body{font-family:<value>} h1{font-family:"Sohne",sans-serif} p{font-family:"Sohne"}')
     expect(config.fontDisplay).toBe('Sohne')
   })
+  it('reads dark mode from a dark --background token', () => {
+    expect(extractFoundation(':root{--background:222 47% 11%;--primary:262 83% 58%}').config.mode).toBe('dark')
+    expect(extractFoundation(':root{--background:0 0% 100%}').config.mode).toBe('light')
+    expect(extractFoundation('body{background:#0b0b10;color:#eee}').config.mode).toBe('dark')
+  })
 })
 
 describe('extractFoundation — greyscale app → mono', () => {

@@ -49,18 +49,21 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
   const [dragging, setDragging] = useState(false)
   const [extraction, setExtraction] = useState<Extraction | null>(null)
   const [content, setContent] = useState<Content>({ menu: [] })
-  const [useColors, setUseColors] = useState(false) // default = pure UICockpit look
+  const [useColors, setUseColors] = useState(true) // default = show their app faithfully (their colours + mode)
   const [busy, setBusy] = useState(false)
   const [progress, setProgress] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const phase: 'input' | 'result' = extraction ? 'result' : 'input'
   const summary = useMemo(() => (extraction ? readSummary(extraction) : []), [extraction])
-  // The board's foundation: their extracted colours, or our house defaults.
-  const boardCfg = useMemo(
-    () => (useColors && extraction ? seedConfig(extraction, cfg) : DEFAULT_CONFIG),
-    [useColors, extraction, cfg],
-  )
+  // The board's foundation. "Your colours" = their full extraction. "UICockpit
+  // look" = our house palette/shape, but still in THEIR light/dark mode — a dark
+  // app must stay dark under both, or the comparison is jarring (not their app).
+  const boardCfg = useMemo(() => {
+    if (!extraction) return DEFAULT_CONFIG
+    if (useColors) return seedConfig(extraction, cfg)
+    return { ...DEFAULT_CONFIG, mode: extraction.config.mode ?? DEFAULT_CONFIG.mode }
+  }, [useColors, extraction, cfg])
 
   /* Route dropped files: an IMAGE goes to the pixel/OCR pipeline; everything else
    * is read as text and appended (concatenating style files is fine — the
