@@ -871,3 +871,61 @@
   font-size: 12px;
   color: var(--app-accent);
 }
+
+/* ============================================================================
+   Sandbox VIEW (.sbxview) — the third MODE (not a modal). Upload card centred in
+   the stage; after a read, the board fills the stage and the Foundation panel
+   tunes it live. Chrome-styled (--app-*) for the upload step; the board carries
+   its own kit tokens.
+   ========================================================================== */
+.sbxview { height: 100%; min-height: 480px; display: flex; flex-direction: column; }
+
+/* upload step */
+.sbxview--upload { align-items: center; justify-content: center; padding: 24px; }
+.sbxview__card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--app-shadow-lg);
+}
+.sbxview__title { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; color: var(--app-fg); }
+.sbxview__title svg { color: var(--app-accent); }
+.sbxview__lede { margin: 0; font-size: 13px; line-height: 1.55; color: var(--app-fg-muted); }
+.sbxview__lede strong { color: var(--app-fg); font-weight: 600; }
+.sbxview__lede code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: .92em; padding: 1px 5px; border-radius: 5px;
+  background: var(--app-hover); color: var(--app-fg);
+}
+
+/* board step */
+.sbxview--board { padding: 0; }
+.sbxview__bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-bg);
+}
+.sbxview__tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--app-accent); }
+.sbxview__hint { font-size: 12px; color: var(--app-fg-faint); }
+.sbxview__restart {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 7px;
+  border: 1px solid var(--app-border); background: var(--app-surface);
+  color: var(--app-fg); font-size: 12px; font-weight: 500;
+}
+.sbxview__restart:hover { background: var(--app-hover); }
+.sbxview__board { flex: 1; min-height: 420px; }
+.sbxview__board .sbx-board,
+.sbxview__board .sbx-board > .scaffold,
+.sbxview__board .sbx-board > .scaffold > .scaffold__frame { height: 100%; }

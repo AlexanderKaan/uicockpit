@@ -6,14 +6,12 @@ import { CommandPalette } from './stage/CommandPalette'
 import { useConfig } from './state/useConfig'
 import { randomKit } from './state/randomKit'
 import { Toast } from './export/Toast'
+import type { Config } from './tokens/types'
+import type { Content } from './sandbox/extractContent'
 
 // Lazy-load — export generators + modal only ship when user opens it
 const ExportModal = lazy(() =>
   import('./export/ExportModal').then((m) => ({ default: m.ExportModal })),
-)
-// Lazy-load — the sandbox (extractor + modal) only ships when opened.
-const SandboxModal = lazy(() =>
-  import('./sandbox/SandboxModal').then((m) => ({ default: m.SandboxModal })),
 )
 
 interface CockpitAppProps {
@@ -44,7 +42,10 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const [view, setView] = useState<ViewKind>('components')
   const [saved, setSaved] = useState(true)
   const [exportOpen, setExportOpen] = useState(false)
-  const [sandboxOpen, setSandboxOpen] = useState(false)
+  // Sandbox (third mode): the words extracted from the user's app. Foundation is
+  // seeded into the live config (REPLACE) so the panel tweaks it; only the
+  // content lives here, for the board to wear.
+  const [sandboxContent, setSandboxContent] = useState<Content | null>(null)
   const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
@@ -112,7 +113,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onHome={onHome}
-        onSandbox={() => setSandboxOpen(true)}
         onUndo={undo}
         onRedo={redo}
         canUndo={canUndo}
@@ -128,7 +128,20 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
             onRandomize={onRandomize}
           />
         )}
-        <Stage cfg={cfg} tokens={tokens} view={view} onViewChange={handleViewChange} />
+        <Stage
+          cfg={cfg}
+          tokens={tokens}
+          view={view}
+          onViewChange={handleViewChange}
+          sandboxContent={sandboxContent}
+          onSandboxRead={(seeded: Config, content: Content) => {
+            // Seed the live config (REPLACE → undoable) + stash the words; the
+            // panel now tweaks the result in place.
+            dispatch({ type: 'REPLACE', cfg: seeded })
+            setSandboxContent(content)
+          }}
+          onSandboxReset={() => setSandboxContent(null)}
+        />
       </div>
       {exportOpen && (
         <Suspense fallback={null}>
@@ -136,21 +149,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
             cfg={cfg}
             onClose={() => setExportOpen(false)}
             onToast={(m) => setToast(m)}
-          />
-        </Suspense>
-      )}
-      {sandboxOpen && (
-        <Suspense fallback={null}>
-          <SandboxModal
-            cfg={cfg}
-            onClose={() => setSandboxOpen(false)}
-            onApply={(seeded, summary) => {
-              // Seed the cockpit exactly like Shuffle (REPLACE → undoable with ⌘Z).
-              dispatch({ type: 'REPLACE', cfg: seeded })
-              setSandboxOpen(false)
-              const read = summary.length
-              setToast(read ? `✨ Kit seeded from your app — ${read} facet${read > 1 ? 's' : ''} applied · ⌘Z to undo` : 'Kit seeded from your app · ⌘Z to undo')
-            }}
           />
         </Suspense>
       )}
