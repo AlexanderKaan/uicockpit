@@ -105,15 +105,23 @@ export function extractFoundation(cssText: string): Extraction {
   // 1) Prefer an explicit semantic token. Priority: primary/brand > accent > ring.
   const BRAND_NAME = /(^|-)(primary|brand)($|-)/
   const ACCENT_NAME = /(^|-)(accent|ring|theme)($|-)/
+  // A real brand colour is a saturated MID-TONE. A token literally named
+  // `--color-primary` is often a near-WHITE tint (e.g. Stripe `#f5f5ff`, a
+  // `primary-50` surface) — the dogfood run snapped those to a theme at HIGH
+  // confidence, the worst kind of wrong. So a named candidate must clear this
+  // gate; otherwise we keep scanning (then fall through to frequency).
+  const isBrandable = (c: HSL): boolean => c.s >= 16 && c.l >= 16 && c.l <= 84
   const namedColor = (pred: RegExp): HSL | null => {
     for (const d of decls) {
       if (!pred.test(d.name)) continue
       const tok = d.value.match(COLOR_RE)?.[0]
-      const hsl = tok ? parseColor(tok) : null
+      let hsl = tok ? parseColor(tok) : null
       // shadcn often stores raw "H S% L%" without hsl() — try that too.
-      if (hsl) return hsl
-      const triplet = d.value.match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/)
-      if (triplet) return { h: +triplet[1]!, s: +triplet[2]!, l: +triplet[3]! }
+      if (!hsl) {
+        const triplet = d.value.match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/)
+        if (triplet) hsl = { h: +triplet[1]!, s: +triplet[2]!, l: +triplet[3]! }
+      }
+      if (hsl && isBrandable(hsl)) return hsl // skip near-white/black/grey tints
     }
     return null
   }
@@ -182,18 +190,19 @@ export function extractFoundation(cssText: string): Extraction {
   }
 
   /* ---- FONT ------------------------------------------------------------ */
-  const families: string[] = []
-  for (const m of css.matchAll(/font-family\s*:\s*([^;}]+)[;}]/g)) {
-    const fam = firstConcreteFamily(m[1]!)
-    if (fam) families.push(fam)
-  }
-  for (const d of decls) if (/(^|-)font($|-)/.test(d.name)) { const f = firstConcreteFamily(d.value); if (f) families.push(f) }
-  if (families.length) {
-    const uniq = [...new Set(families)]
-    config.fontDisplay = uniq[0]
-    config.fontBody = uniq[1] ?? uniq[0] // a 2nd distinct family ≈ body
+  // Pick by FREQUENCY, not first-seen: a big site's first font-family is often a
+  // code-block mono (Vercel grabbed 'Roboto Mono'); the body face is the one used
+  // most. Count concrete families, the most common wins display+body.
+  const famFreq = new Map<string, number>()
+  const addFam = (f?: string) => { if (f) famFreq.set(f, (famFreq.get(f) ?? 0) + 1) }
+  for (const m of css.matchAll(/font-family\s*:\s*([^;}]+)[;}]/g)) addFam(firstConcreteFamily(m[1]!))
+  for (const d of decls) if (/(^|-)font($|-)/.test(d.name)) addFam(firstConcreteFamily(d.value))
+  const ranked = [...famFreq.entries()].sort((a, b) => b[1] - a[1]).map((e) => e[0])
+  if (ranked.length) {
+    config.fontDisplay = ranked[0]
+    config.fontBody = ranked[0] // no reliable display↔body split from CSS; use the dominant face for both
     confidence.font = 'high'
-    notes.push(`font: display '${config.fontDisplay}'${uniq[1] ? `, body '${config.fontBody}'` : ''}`)
+    notes.push(`font: '${ranked[0]}' (×${famFreq.get(ranked[0]!)}${ranked[1] ? `, also '${ranked[1]}'` : ''})`)
   }
 
   /* ---- TYPE SIZE ------------------------------------------------------- */
@@ -264,7 +273,11 @@ function circularMean(degs: number[]): number {
 function firstConcreteFamily(decl: string): string | undefined {
   const first = decl.split(',')[0]!.trim().replace(/^["']|["']$/g, '')
   const generic = /^(sans-serif|serif|monospace|system-ui|ui-sans-serif|ui-serif|ui-monospace|-apple-system|blinkmacsystemfont|inherit|initial|unset|var\()/i
-  if (!first || generic.test(first)) return undefined
+  if (!first) return undefined
+  if (/[<>(){}]/.test(first)) return undefined                       // placeholders / interpolation (Tailwind's "<value>")
+  if (/^[\d.]/.test(first) || /(rem|px|em|%|vh|vw|pt|ex|ch)$/i.test(first)) return undefined // a font-SIZE leaked from --font-size-*
+  if (/^(normal|bold|bolder|lighter|italic|oblique|\d{2,3})$/i.test(first)) return undefined // a font-WEIGHT/style leaked from --font-weight-*
+  if (generic.test(first)) return undefined
   return first
 }
 function bodyFontSize(css: string): number | undefined {

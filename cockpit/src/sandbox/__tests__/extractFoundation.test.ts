@@ -103,6 +103,24 @@ describe('extractFoundation — elevation buckets', () => {
   })
 })
 
+describe('extractFoundation — real-world traps (from the dogfood run)', () => {
+  it('rejects a near-white token named --primary (Stripe #f5f5ff trap)', () => {
+    // The light tint must NOT become the brand; the real indigo wins via frequency.
+    const { config } = extractFoundation(':root{--primary:#f5f5ff}.btn{background:#635bff}.a{color:#635bff}.b{border-color:#635bff}')
+    expect(config.colorTheme).not.toBe('mono')
+    expect(['indigo', 'violet', 'cobalt']).toContain(config.colorTheme)
+    expect(config.cPrimary && parseColor(config.cPrimary)!.l).toBeLessThan(80) // not near-white
+  })
+  it('picks the most-frequent font, not a stray code-block mono (Vercel trap)', () => {
+    const css = `.code{font-family:"Roboto Mono",monospace} body{font-family:"Geist",sans-serif} h1{font-family:"Geist",sans-serif} p{font-family:"Geist",sans-serif}`
+    expect(extractFoundation(css).config.fontDisplay).toBe('Geist')
+  })
+  it('ignores a <value> placeholder font (Tailwind trap)', () => {
+    const { config } = extractFoundation('body{font-family:<value>} h1{font-family:"Sohne",sans-serif} p{font-family:"Sohne"}')
+    expect(config.fontDisplay).toBe('Sohne')
+  })
+})
+
 describe('extractFoundation — greyscale app → mono', () => {
   const { config } = extractFoundation('.a{color:#111}.b{background:#f5f5f5}.c{border-color:#999}')
   it('falls back to mono when no chromatic colour', () => {
