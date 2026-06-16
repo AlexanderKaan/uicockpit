@@ -17,10 +17,11 @@
  */
 import { decode } from '../src/state/hash'
 import { genCss } from '../src/export/genCss'
+import { handleVision, type VisionEnv } from './vision'
 
 const CORS = {
   'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, OPTIONS',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
 } as const
 
 const cssResponse = (css: string, init: ResponseInit = {}): Response =>
@@ -34,10 +35,13 @@ const cssResponse = (css: string, init: ResponseInit = {}): Response =>
   })
 
 export default {
-  fetch(request: Request): Response {
+  fetch(request: Request, env: VisionEnv): Response | Promise<Response> {
     if (request.method === 'OPTIONS') return new Response(null, { headers: CORS })
 
     const { pathname } = new URL(request.url)
+
+    // Sandbox vision: POST /vision  →  screenshot → blocks + foundation + content.
+    if (pathname === '/vision') return handleVision(request, env)
 
     // Stateless kit: /k/<hash>.css  →  genCss(decode(hash))
     const stateless = pathname.match(/^\/k\/(.+)\.css$/)

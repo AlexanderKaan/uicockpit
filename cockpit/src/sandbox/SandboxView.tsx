@@ -5,6 +5,7 @@ import { extractFoundation, type Extraction } from './extractFoundation'
 import { extractContent, type Content } from './extractContent'
 import { extractFoundationFromPixels, loadImageData } from './extractImage'
 import { ocrContent } from './ocr'
+import { detectFromImage, visionConfigured } from './detectFromImage'
 import { seedConfig } from './seedConfig'
 import { SandboxBoard, type BlockKind } from './SandboxBoard'
 import { detectBlocks } from './detectBlocks'
@@ -62,10 +63,17 @@ export function SandboxView({ cfg, result, onRead, onReset }: SandboxViewProps) 
 
   const read = useCallback(async () => {
     if (image) {
-      // SCREENSHOT — foundation from pixels + words from OCR. Block detection for
-      // images needs the vision model (Phase 2); until then images use the default
-      // board layout (blocks: []).
-      setBusy(true); setProgress('Reading colours…')
+      setBusy(true)
+      // PREFERRED — one vision call reads structure (blocks) + foundation + words.
+      if (visionConfigured) {
+        setProgress('Looking at your screenshot…')
+        const v = await detectFromImage(image.file)
+        if (v) { setBusy(false); setProgress(''); onRead(seedConfig(v.extraction, cfg), { content: v.content, blocks: v.blocks }); return }
+        // vision failed → fall through to the offline pipeline.
+      }
+      // FALLBACK — foundation from pixels + words from OCR + default board layout
+      // (no block detection without the vision model).
+      setProgress('Reading colours…')
       let ex: Extraction
       try { ex = extractFoundationFromPixels(await loadImageData(image.file)) }
       catch { setBusy(false); setProgress(''); return }
