@@ -1,8 +1,11 @@
 import { useCallback, useMemo, useRef, useState, type DragEvent } from 'react'
 import { ArrowRight, Check, FileCode, Sparkles, UploadCloud, X } from 'lucide-react'
 import type { Config } from '../tokens/types'
+import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { extractFoundation, type Extraction } from './extractFoundation'
+import { extractContent, type Content } from './extractContent'
 import { seedConfig, readSummary, type ReadRow } from './seedConfig'
+import { SandboxBoard } from './SandboxBoard'
 
 /* Sandbox — "Start from your app." The third on-ramp into the cockpit: drop or
  * paste your app's CSS/Tailwind, we read its FOUNDATION (brand · corners · type ·
@@ -42,11 +45,17 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
   const [source, setSource] = useState('')
   const [dragging, setDragging] = useState(false)
   const [extraction, setExtraction] = useState<Extraction | null>(null)
-  const [traceOpen, setTraceOpen] = useState(false)
+  const [content, setContent] = useState<Content>({ menu: [] })
+  const [useColors, setUseColors] = useState(false) // default = pure UICockpit look
   const fileRef = useRef<HTMLInputElement>(null)
 
   const phase: 'input' | 'result' = extraction ? 'result' : 'input'
   const summary = useMemo(() => (extraction ? readSummary(extraction) : []), [extraction])
+  // The board's foundation: their extracted colours, or our house defaults.
+  const boardCfg = useMemo(
+    () => (useColors && extraction ? seedConfig(extraction, cfg) : DEFAULT_CONFIG),
+    [useColors, extraction, cfg],
+  )
 
   /* Read dropped/picked files as text and append — concatenating multiple style
    * files is fine, the extractor scans the whole blob. We only read text; binary
@@ -69,10 +78,10 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
   const read = useCallback(() => {
     if (!source.trim()) return
     setExtraction(extractFoundation(source))
-    setTraceOpen(false)
+    setContent(extractContent(source).content)
   }, [source])
 
-  const startOver = useCallback(() => setExtraction(null), [])
+  const startOver = useCallback(() => { setExtraction(null); setContent({ menu: [] }) }, [])
 
   const apply = useCallback(() => {
     if (!extraction) return
@@ -81,7 +90,7 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal sbx" role="dialog" aria-label="Start from your app" onClick={(e) => e.stopPropagation()}>
+      <div className={`modal sbx ${phase === 'result' ? 'sbx--result' : ''}`} role="dialog" aria-label="Start from your app" onClick={(e) => e.stopPropagation()}>
         <div className="modal__head">
           <span className="modal__title sbx__title">
             <Sparkles size={15} strokeWidth={2} />
@@ -146,12 +155,23 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
           </div>
         ) : (
           <div className="sbx__body">
-            <p className="sbx__lede sbx__lede--result">
-              <span className="sbx__read-tag"><FileCode size={13} strokeWidth={2} /> We read your app</span>
-              Here's the foundation we found. Apply it and the entire kit re-themes — tune any of it live in the panel.
-            </p>
+            <div className="sbx__result-head">
+              <span className="sbx__read-tag"><FileCode size={13} strokeWidth={2} /> Your app, our craft</span>
+              {/* The before/after: same content + components, their foundation
+                  vs ours. Default = the UICockpit look (the literal "what would
+                  it look like in your design language"). */}
+              <div className="sbx__seg" role="radiogroup" aria-label="Foundation">
+                <button type="button" role="radio" aria-checked={!useColors} className={`sbx__seg-btn ${!useColors ? 'sbx__seg-btn--on' : ''}`} onClick={() => setUseColors(false)}>UICockpit look</button>
+                <button type="button" role="radio" aria-checked={useColors} className={`sbx__seg-btn ${useColors ? 'sbx__seg-btn--on' : ''}`} onClick={() => setUseColors(true)}>Your colours</button>
+              </div>
+            </div>
 
-            {summary.length ? (
+            <div className="sbx__stage">
+              <SandboxBoard cfg={boardCfg} content={content} />
+            </div>
+
+            {/* The foundation reading — condensed chips beneath the board. */}
+            {summary.length > 0 && (
               <div className="sbx__chips">
                 {summary.map((row) => (
                   <div key={row.facet} className={`sbx__chip ${row.confidence === 'low' ? 'sbx__chip--guess' : ''}`}>
@@ -162,29 +182,19 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
                   </div>
                 ))}
               </div>
-            ) : (
-              <p className="sbx__empty">We couldn't read a clear foundation from that. Try a stylesheet with colours and a <code>--radius</code> / <code>border-radius</code>, or a Tailwind <code>@theme</code> block.</p>
             )}
 
-            {extraction!.notes.length > 0 && (
-              <div className="sbx__trace">
-                <button type="button" className="sbx__trace-toggle" onClick={() => setTraceOpen((v) => !v)} aria-expanded={traceOpen}>
-                  {traceOpen ? 'Hide' : 'Show'} how we read it
-                </button>
-                {traceOpen && (
-                  <ul className="sbx__trace-list">
-                    {extraction!.notes.map((n, i) => <li key={i}>{n}</li>)}
-                  </ul>
-                )}
-              </div>
-            )}
-
-            <p className="sbx__honest">Your components, in your style — not your app rebuilt. Motion &amp; icons keep the kit defaults.</p>
+            <p className="sbx__honest">
+              {content.appName || content.menu.length
+                ? <>We pulled your brand &amp; words from the markup. </>
+                : <>No app text found — a pure SPA returns an empty shell, so drop a <strong>screenshot</strong> (or server-rendered HTML) to bring your words in. </>}
+              Your components in your style, not your app rebuilt — motion &amp; icons keep the kit defaults.
+            </p>
 
             <div className="sbx__foot">
               <button type="button" className="sbx__ghost" onClick={startOver}>Start over</button>
               <button type="button" className="sbx__cta" onClick={apply} disabled={!summary.length}>
-                Apply to cockpit
+                Apply your colours
                 <ArrowRight size={15} strokeWidth={2} />
               </button>
             </div>

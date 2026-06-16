@@ -775,3 +775,46 @@
   max-height: 160px;
   overflow-y: auto;
 }
+
+/* ---- Slice 3: result board + foundation toggle ---- */
+.sbx--result { max-width: 1000px; }
+.sbx__result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.sbx__seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+}
+.sbx__seg-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-fg-muted);
+  transition: background var(--app-dur, 140ms) var(--app-ease, ease), color var(--app-dur, 140ms) var(--app-ease, ease);
+}
+.sbx__seg-btn--on {
+  background: var(--app-surface);
+  color: var(--app-fg);
+  box-shadow: var(--app-shadow-sm);
+}
+/* The themed island — a fixed window the board renders inside (its own
+ * `.cockpit-preview` root carries the kit + tokens). */
+.sbx__stage {
+  height: 460px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--app-bg);
+}
+.sbx__stage .sbx-board { height: 100%; }
+.sbx__stage .sbx-board > .scaffold,
+.sbx__stage .sbx-board > .scaffold > .scaffold__frame { height: 100%; }
