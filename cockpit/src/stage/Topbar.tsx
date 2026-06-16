@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
+import { AppWindow, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sparkles, Sun, Undo2 } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -23,6 +23,9 @@ interface TopbarProps {
   onToggleMenu: () => void
   /** Brand click → back to the marketing home. */
   onHome?: () => void
+  /** Open the "Start from your app" sandbox (the third on-ramp — seed the kit
+   *  from an uploaded app's CSS). */
+  onSandbox: () => void
   /** Undo/redo (C2) — config history. Buttons mirror ⌘Z / ⇧⌘Z. */
   onUndo: () => void
   onRedo: () => void
@@ -30,7 +33,7 @@ interface TopbarProps {
   canRedo: boolean
 }
 
-export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
+export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onSandbox, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -88,6 +91,16 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
           title={menuOpen ? 'Hide controls' : 'Show controls'}
         >
           <PanelLeft size={15} strokeWidth={1.75} />
+        </button>
+        {/* Third on-ramp — seed the whole kit from an uploaded app's CSS. */}
+        <button
+          type="button"
+          className="topbar__btn topbar__btn--with-icon topbar__btn--sandbox"
+          onClick={onSandbox}
+          title="Start from your app — extract your style from your CSS"
+        >
+          <Sparkles size={13} strokeWidth={2} />
+          Your app
         </button>
         <span className="topbar__save" aria-live="polite">
           {saved ? 'Saved to URL' : 'Saving…'}

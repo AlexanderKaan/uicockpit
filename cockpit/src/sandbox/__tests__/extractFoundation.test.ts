@@ -90,6 +90,17 @@ describe('extractFoundation — plain CSS (frequency fallback)', () => {
     expect(confidence.density).toBe('low')
     expect(confidence.elevation).toBe('low')
   })
+  it('reads blur past a unitless 0 offset → deep (0 4px 16px)', () => {
+    // offsetX is unitless `0`; blur (16px, 3rd length) must still win → deep.
+    expect(config.surfaceDepth).toBe('deep')
+  })
+})
+
+describe('extractFoundation — elevation buckets', () => {
+  it('a tiny shadow → soft, no shadow → flat', () => {
+    expect(extractFoundation('.c{box-shadow:0 1px 2px rgba(0,0,0,.05)}').config.surfaceDepth).toBe('soft')
+    expect(extractFoundation('.c{box-shadow:none}').config.surfaceDepth).toBe('flat')
+  })
 })
 
 describe('extractFoundation — greyscale app → mono', () => {

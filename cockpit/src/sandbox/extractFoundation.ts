@@ -279,7 +279,12 @@ function bodyFontSize(css: string): number | undefined {
   return sizes.length ? median(sizes) : undefined
 }
 function maxBlur(shadow: string): number {
-  // shadow lengths: offsetX offsetY blur spread — grab the 3rd number.
-  const nums = [...shadow.matchAll(/(-?[0-9.]+)px/g)].map((m) => parseFloat(m[1]!))
+  // shadow lengths: offsetX offsetY blur spread — grab the 3rd (blur).
+  // Strip the colour function first (its rgba/hsl numbers aren't lengths), then
+  // read positional length tokens. Crucially offsetX is almost always a UNITLESS
+  // `0` (e.g. `0 8px 24px`), so we must accept bare numbers too — matching only
+  // `<n>px` would drop it and shift blur out of position.
+  const lengths = shadow.replace(/(rgba?|hsla?|oklch|color)\([^)]*\)/g, ' ')
+  const nums = [...lengths.matchAll(/-?[0-9.]+/g)].map((m) => parseFloat(m[0]))
   return nums[2] ?? 0
 }

@@ -11,6 +11,10 @@ import { Toast } from './export/Toast'
 const ExportModal = lazy(() =>
   import('./export/ExportModal').then((m) => ({ default: m.ExportModal })),
 )
+// Lazy-load — the sandbox (extractor + modal) only ships when opened.
+const SandboxModal = lazy(() =>
+  import('./sandbox/SandboxModal').then((m) => ({ default: m.SandboxModal })),
+)
 
 interface CockpitAppProps {
   /** Called when user clicks the brand — sends them back to /. */
@@ -40,6 +44,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const [view, setView] = useState<ViewKind>('components')
   const [saved, setSaved] = useState(true)
   const [exportOpen, setExportOpen] = useState(false)
+  const [sandboxOpen, setSandboxOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
@@ -107,6 +112,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onHome={onHome}
+        onSandbox={() => setSandboxOpen(true)}
         onUndo={undo}
         onRedo={redo}
         canUndo={canUndo}
@@ -130,6 +136,21 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
             cfg={cfg}
             onClose={() => setExportOpen(false)}
             onToast={(m) => setToast(m)}
+          />
+        </Suspense>
+      )}
+      {sandboxOpen && (
+        <Suspense fallback={null}>
+          <SandboxModal
+            cfg={cfg}
+            onClose={() => setSandboxOpen(false)}
+            onApply={(seeded, summary) => {
+              // Seed the cockpit exactly like Shuffle (REPLACE → undoable with ⌘Z).
+              dispatch({ type: 'REPLACE', cfg: seeded })
+              setSandboxOpen(false)
+              const read = summary.length
+              setToast(read ? `✨ Kit seeded from your app — ${read} facet${read > 1 ? 's' : ''} applied · ⌘Z to undo` : 'Kit seeded from your app · ⌘Z to undo')
+            }}
           />
         </Suspense>
       )}
