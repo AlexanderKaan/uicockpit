@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState, type Dispatch, type ReactNode } from 'react'
-import { Check, ChevronRight, PanelLeftClose } from 'lucide-react'
+import { Check, ChevronRight, PanelLeftClose, Shuffle } from 'lucide-react'
 import { BODY_FONTS, DISPLAY_GROUPS, customFontFamily, isCustomFont, type FontGroup } from '../tokens/fonts'
 import { nameColor } from '../tokens/color'
 import { COLOR_THEMES } from '../tokens/stylesAndThemes'
@@ -39,6 +39,8 @@ interface PanelProps {
   dispatch: Dispatch<ConfigAction>
   /** Collapse the floating menu — drops back to the full-width preview. */
   onCollapse: () => void
+  /** Roll a fresh guardrail-aware kit (the "Shuffle" footer button). */
+  onRandomize: () => void
 }
 
 /* Option arrays — the single source for each control's choices + captions. */
@@ -235,7 +237,7 @@ interface RowDef {
  * Essentials/Advanced tiering. */
 const ESSENTIAL_KEYS = new Set(['colorTheme', 'scale', 'fontDisplay', 'radius'])
 
-export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
+export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize }: PanelProps) {
   const set = <K extends keyof Config>(field: K, value: Config[K]) =>
     dispatch({ type: 'SET', patch: { [field]: value } as Partial<Config> })
 
@@ -715,6 +717,12 @@ export function Panel({ cfg, tokens, dispatch, onCollapse }: PanelProps) {
           })}
         </div>
       </div>
+      {/* Shuffle — roll a fresh guardrail-aware kit. Lives here (with the kit
+          controls it acts on), not in the top bar. ⌘K mirrors it. */}
+      <button type="button" className="panel__shuffle" onClick={onRandomize} title="Shuffle — roll a fresh random kit">
+        <Shuffle size={15} strokeWidth={1.75} />
+        <span>Shuffle</span>
+      </button>
     </aside>
   )
 }

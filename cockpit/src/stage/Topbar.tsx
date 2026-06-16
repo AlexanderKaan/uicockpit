@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, Boxes, Check, ChevronDown, Code, Dices, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
+import { AppWindow, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -28,11 +28,9 @@ interface TopbarProps {
   onRedo: () => void
   canUndo: boolean
   canRedo: boolean
-  /** Randomize (C4) — roll a fresh guardrail-aware kit. */
-  onRandomize: () => void
 }
 
-export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo, onRandomize }: TopbarProps) {
+export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -130,16 +128,6 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         </div>
       </div>
       <div className="topbar__right">
-        {/* Surprise me (C4) — roll a fresh guardrail-aware kit. */}
-        <button
-          type="button"
-          className="topbar__icon-btn"
-          onClick={onRandomize}
-          aria-label="Surprise me — randomize the kit"
-          title="Surprise me (random kit)"
-        >
-          <Dices size={15} strokeWidth={1.75} />
-        </button>
         {/* Undo / redo (C2) — config history; mirrors ⌘Z / ⇧⌘Z. */}
         <button
           type="button"

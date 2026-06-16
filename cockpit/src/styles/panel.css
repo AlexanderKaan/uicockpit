@@ -20,6 +20,32 @@
   overflow: visible;
 }
 
+/* Shuffle — a full-width footer action below the menu card (roll a fresh kit).
+ * Lives with the controls it acts on; separated from the card by a small gap so
+ * it reads as an action, not a setting. Matches the card chrome (surface +
+ * hairline + shadow). */
+.panel__shuffle {
+  margin-top: 10px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow-sm);
+  color: var(--app-fg);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease), box-shadow var(--app-dur) var(--app-ease);
+}
+.panel__shuffle:hover { background: var(--app-hover); box-shadow: var(--app-shadow-md); }
+.panel__shuffle:active { transform: scale(0.99); }
+.panel__shuffle svg { color: var(--app-fg-muted); }
+
 /* === Floating control menu (.fmenu) ===
  * A nested accordion: category rows → setting recap-rows → the real visual
  * picker. Same engine as the old flat panel, compact floating shell. */

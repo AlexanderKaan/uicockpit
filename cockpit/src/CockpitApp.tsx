@@ -111,7 +111,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         onRedo={redo}
         canUndo={canUndo}
         canRedo={canRedo}
-        onRandomize={onRandomize}
       />
       <div className="app__body">
         {menuOpen && (
@@ -120,6 +119,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
             tokens={tokens}
             dispatch={dispatch}
             onCollapse={() => setMenuOpen(false)}
+            onRandomize={onRandomize}
           />
         )}
         <Stage cfg={cfg} tokens={tokens} view={view} onViewChange={handleViewChange} />
