@@ -1,0 +1,7 @@
+# Drop your own apps' CSS / globals.css / compiled Tailwind here, then run:
+#   npx vitest run extractFoundation
+# to see what the extractor reads from YOUR apps (config + confidence + trace).
+# These stay LOCAL — never committed (privacy: your code never leaves your machine).
+*.css
+*.scss
+!.gitignore
