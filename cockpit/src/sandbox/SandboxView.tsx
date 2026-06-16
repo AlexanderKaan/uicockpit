@@ -6,7 +6,10 @@ import { extractContent, type Content } from './extractContent'
 import { extractFoundationFromPixels, loadImageData } from './extractImage'
 import { ocrContent } from './ocr'
 import { seedConfig } from './seedConfig'
-import { SandboxBoard } from './SandboxBoard'
+import { SandboxBoard, type BlockKind } from './SandboxBoard'
+import { detectBlocks } from './detectBlocks'
+
+export interface SandboxResult { content: Content; blocks: BlockKind[] }
 
 /* Sandbox — the THIRD mode (peer of Components / Showcases). Upload your app's
  * CSS / Tailwind / HTML / screenshot; we read its foundation + words, SEED the
@@ -17,10 +20,10 @@ import { SandboxBoard } from './SandboxBoard'
 interface SandboxViewProps {
   /** Live config — drives the board; the Foundation panel edits it in place. */
   cfg: Config
-  /** Extracted words (nav/app-name/heading). null until a read happens. */
-  content: Content | null
-  /** Seed the live config + stash the extracted content (parent dispatches REPLACE). */
-  onRead: (seeded: Config, content: Content) => void
+  /** Extracted content + detected blocks. null until a read happens. */
+  result: SandboxResult | null
+  /** Seed the live config + stash the extraction (parent dispatches REPLACE). */
+  onRead: (seeded: Config, result: SandboxResult) => void
   /** Clear back to the upload step. */
   onReset: () => void
 }
@@ -36,7 +39,7 @@ body { font-family: "Plus Jakarta Sans", sans-serif; font-size: 15px; }
 .card { box-shadow: 0 8px 24px rgba(17,17,26,.06); }
 `
 
-export function SandboxView({ cfg, content, onRead, onReset }: SandboxViewProps) {
+export function SandboxView({ cfg, result, onRead, onReset }: SandboxViewProps) {
   const [source, setSource] = useState('')
   const [image, setImage] = useState<{ file: File; url: string } | null>(null)
   const [dragging, setDragging] = useState(false)
@@ -59,6 +62,9 @@ export function SandboxView({ cfg, content, onRead, onReset }: SandboxViewProps)
 
   const read = useCallback(async () => {
     if (image) {
+      // SCREENSHOT — foundation from pixels + words from OCR. Block detection for
+      // images needs the vision model (Phase 2); until then images use the default
+      // board layout (blocks: []).
       setBusy(true); setProgress('Reading colours…')
       let ex: Extraction
       try { ex = extractFoundationFromPixels(await loadImageData(image.file)) }
@@ -66,11 +72,12 @@ export function SandboxView({ cfg, content, onRead, onReset }: SandboxViewProps)
       setProgress('Reading text…')
       const c = await ocrContent(image.file, (p) => setProgress(`Reading text… ${Math.round(p * 100)}%`))
       setBusy(false); setProgress('')
-      onRead(seedConfig(ex, cfg), c)
+      onRead(seedConfig(ex, cfg), { content: c, blocks: [] })
       return
     }
+    // CODE / MARKUP — foundation + content + BLOCKS, all read from the text.
     if (!source.trim()) return
-    onRead(seedConfig(extractFoundation(source), cfg), extractContent(source).content)
+    onRead(seedConfig(extractFoundation(source), cfg), { content: extractContent(source).content, blocks: detectBlocks(source) })
   }, [image, source, cfg, onRead])
 
   const startOver = useCallback(() => {
@@ -80,7 +87,7 @@ export function SandboxView({ cfg, content, onRead, onReset }: SandboxViewProps)
   }, [onReset])
 
   // ── RESULT: the board, themed by the LIVE cfg (tune it in the panel). ──────
-  if (content) {
+  if (result) {
     return (
       <div className="sbxview sbxview--board">
         <div className="sbxview__bar">
@@ -89,7 +96,7 @@ export function SandboxView({ cfg, content, onRead, onReset }: SandboxViewProps)
           <button type="button" className="sbxview__restart" onClick={startOver}><RotateCcw size={13} strokeWidth={2} /> Start over</button>
         </div>
         <div className="sbxview__board">
-          <SandboxBoard cfg={cfg} content={content} />
+          <SandboxBoard cfg={cfg} content={result.content} blocks={result.blocks} />
         </div>
       </div>
     )

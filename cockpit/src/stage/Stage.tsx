@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, type CSSProperties } from 'react'
 import type { Config, Tokens } from '../tokens/types'
-import type { Content } from '../sandbox/extractContent'
+import type { SandboxResult } from '../sandbox/SandboxView'
 import { IconProvider } from '../icons/Icon'
 import { ComponentGallery } from './views/ComponentGallery'
 import { PagesView } from './views/PagesView'
@@ -60,13 +60,13 @@ interface StageProps {
   view: ViewKind
   /** Cross-view jumps (H3b: showcase inspect tag → gallery card). */
   onViewChange: (v: ViewKind) => void
-  /** Sandbox (third mode) — extracted content + seed/reset callbacks. */
-  sandboxContent: Content | null
-  onSandboxRead: (seeded: Config, content: Content) => void
+  /** Sandbox (third mode) — extracted result (content + blocks) + callbacks. */
+  sandboxResult: SandboxResult | null
+  onSandboxRead: (seeded: Config, result: SandboxResult) => void
   onSandboxReset: () => void
 }
 
-export function Stage({ cfg, tokens, view, onViewChange, sandboxContent, onSandboxRead, onSandboxReset }: StageProps) {
+export function Stage({ cfg, tokens, view, onViewChange, sandboxResult, onSandboxRead, onSandboxReset }: StageProps) {
   const previewStyle = tokens.vars as CSSProperties
 
   return (
@@ -80,7 +80,7 @@ export function Stage({ cfg, tokens, view, onViewChange, sandboxContent, onSandb
                 {view === 'pages' && <PagesView cfg={cfg} onViewChange={onViewChange} />}
                 {view === 'sandbox' && (
                   <Suspense fallback={null}>
-                    <SandboxView cfg={cfg} content={sandboxContent} onRead={onSandboxRead} onReset={onSandboxReset} />
+                    <SandboxView cfg={cfg} result={sandboxResult} onRead={onSandboxRead} onReset={onSandboxReset} />
                   </Suspense>
                 )}
               </div>
