@@ -1,7 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
-import { useModal } from '../stage/views/apps/AppHelpers'
+import { useModal, useDropdown } from '../stage/views/apps/AppHelpers'
 import type { SectionSpec } from './manifests'
 import { BrandLogo } from './logos'
 
@@ -59,26 +59,29 @@ function FileGridSection({ title, files }: { title: string; files: Array<{ name:
 }
 
 /** Per-row actions — the real `.menu` dropdown (kebab → View · Send reminder ·
- *  Duplicate · Delete), self-contained so each table row owns its open state.
+ *  Duplicate · Delete). useDropdown gives the menu-button contract: outside-click
+ *  + Escape close + focus-return. Crucially its outside-click listener also means
+ *  opening one row's menu CLOSES any other that's open (the second kebab's
+ *  mousedown lands outside the first menu) — so only one is ever open at a time.
  *  Only kit classes (.btn / .menu); positioning is inline LAYOUT (never structural). */
 function RowMenu() {
-  const [open, setOpen] = useState(false)
+  const { open, setOpen, ref } = useDropdown()
+  // stopPropagation so a menu click doesn't trip the invoice row→detail handler.
   return (
-    // stopPropagation so a menu click doesn't trip the invoice row→detail handler.
-    <span style={{ position: 'relative', display: 'inline-flex' }} onClick={(e) => e.stopPropagation()}>
+    <div ref={ref} style={{ position: 'relative', display: 'inline-flex' }} onClick={(e) => e.stopPropagation()}>
       <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-haspopup="menu" aria-expanded={open} aria-label="Row actions" onClick={() => setOpen((o) => !o)}>
         <Icon name="dots" />
       </button>
       {open && (
         <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', zIndex: 'var(--k-z-popover, 50)', minWidth: '11rem' }}>
-          <button type="button" className="menu__item" role="menuitem"><Icon name="file" /> View</button>
-          <button type="button" className="menu__item" role="menuitem"><Icon name="bell" /> Send reminder</button>
-          <button type="button" className="menu__item" role="menuitem"><Icon name="plus" /> Duplicate</button>
+          <button type="button" className="menu__item" role="menuitem" onClick={() => setOpen(false)}><Icon name="file" /> View</button>
+          <button type="button" className="menu__item" role="menuitem" onClick={() => setOpen(false)}><Icon name="bell" /> Send reminder</button>
+          <button type="button" className="menu__item" role="menuitem" onClick={() => setOpen(false)}><Icon name="plus" /> Duplicate</button>
           <div className="menu__sep" />
-          <button type="button" className="menu__item menu__item--danger" role="menuitem"><Icon name="trash" /> Delete</button>
+          <button type="button" className="menu__item menu__item--danger" role="menuitem" onClick={() => setOpen(false)}><Icon name="trash" /> Delete</button>
         </div>
       )}
-    </span>
+    </div>
   )
 }
 
