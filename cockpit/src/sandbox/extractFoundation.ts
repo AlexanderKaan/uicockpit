@@ -82,7 +82,7 @@ const THEME_HUES: Array<{ id: ColorTheme; h: number }> = (Object.keys(COLOR_THEM
   .filter((id) => id !== 'mono')
   .map((id) => { const [h] = hexToHsl(COLOR_THEMES[id].cPrimary); return { id, h } })
 
-function nearestTheme(h: number): ColorTheme {
+export function nearestTheme(h: number): ColorTheme {
   let best = THEME_HUES[0]!
   for (const t of THEME_HUES) if (hueDist(h, t.h) < hueDist(h, best.h)) best = t
   return best.id
@@ -236,7 +236,7 @@ export function extractFoundation(cssText: string): Extraction {
 }
 
 /* ── small helpers ──────────────────────────────────────────────────────── */
-function hslToHexLocal(h: number, s: number, l: number): string {
+export function hslToHexLocal(h: number, s: number, l: number): string {
   // local HSL→hex (avoid importing the token-emitting hsl()); standard formula.
   const a = (s / 100) * Math.min(l / 100, 1 - l / 100)
   const f = (n: number) => {

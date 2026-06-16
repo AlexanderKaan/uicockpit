@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useRef, useState, type DragEvent } from 'react'
-import { ArrowRight, Check, FileCode, Sparkles, UploadCloud, X } from 'lucide-react'
+import { ArrowRight, Check, FileCode, Loader2, Sparkles, UploadCloud, X } from 'lucide-react'
 import type { Config } from '../tokens/types'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { extractFoundation, type Extraction } from './extractFoundation'
 import { extractContent, type Content } from './extractContent'
+import { extractFoundationFromPixels, loadImageData } from './extractImage'
+import { ocrContent } from './ocr'
 import { seedConfig, readSummary, type ReadRow } from './seedConfig'
 import { SandboxBoard } from './SandboxBoard'
 
@@ -43,10 +45,13 @@ body { font-family: "Plus Jakarta Sans", sans-serif; font-size: 15px; }
 
 export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
   const [source, setSource] = useState('')
+  const [image, setImage] = useState<{ file: File; url: string } | null>(null)
   const [dragging, setDragging] = useState(false)
   const [extraction, setExtraction] = useState<Extraction | null>(null)
   const [content, setContent] = useState<Content>({ menu: [] })
   const [useColors, setUseColors] = useState(false) // default = pure UICockpit look
+  const [busy, setBusy] = useState(false)
+  const [progress, setProgress] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const phase: 'input' | 'result' = extraction ? 'result' : 'input'
@@ -57,14 +62,18 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
     [useColors, extraction, cfg],
   )
 
-  /* Read dropped/picked files as text and append — concatenating multiple style
-   * files is fine, the extractor scans the whole blob. We only read text; binary
-   * (a screenshot) is a later slice, so non-text just yields nothing useful. */
+  /* Route dropped files: an IMAGE goes to the pixel/OCR pipeline; everything else
+   * is read as text and appended (concatenating style files is fine — the
+   * extractor scans the whole blob). First image wins. */
   const ingestFiles = useCallback(async (files: FileList | null) => {
     if (!files || !files.length) return
-    const texts = await Promise.all(
-      Array.from(files).map((f) => f.text().catch(() => '')),
-    )
+    const list = Array.from(files)
+    const img = list.find((f) => f.type.startsWith('image/'))
+    if (img) {
+      setImage((prev) => { if (prev) URL.revokeObjectURL(prev.url); return { file: img, url: URL.createObjectURL(img) } })
+      return
+    }
+    const texts = await Promise.all(list.map((f) => f.text().catch(() => '')))
     const joined = texts.filter(Boolean).join('\n\n')
     if (joined) setSource((prev) => (prev ? `${prev}\n\n${joined}` : joined))
   }, [])
@@ -75,13 +84,31 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
     void ingestFiles(e.dataTransfer.files)
   }, [ingestFiles])
 
-  const read = useCallback(() => {
+  const read = useCallback(async () => {
+    // IMAGE path — colours from pixels (instant), words from OCR (a few seconds).
+    // Show the themed board immediately, then pop the words in when OCR resolves.
+    if (image) {
+      setBusy(true); setProgress('Reading colours…')
+      let ex: Extraction
+      try { ex = extractFoundationFromPixels(await loadImageData(image.file)) }
+      catch { setBusy(false); setProgress(''); return }
+      setExtraction(ex); setContent({ menu: [] })
+      setProgress('Reading text…')
+      const c = await ocrContent(image.file, (p) => setProgress(`Reading text… ${Math.round(p * 100)}%`))
+      setContent(c); setBusy(false); setProgress('')
+      return
+    }
+    // TEXT path — synchronous.
     if (!source.trim()) return
     setExtraction(extractFoundation(source))
     setContent(extractContent(source).content)
-  }, [source])
+  }, [image, source])
 
-  const startOver = useCallback(() => { setExtraction(null); setContent({ menu: [] }) }, [])
+  const startOver = useCallback(() => {
+    setExtraction(null); setContent({ menu: [] })
+    setImage((prev) => { if (prev) URL.revokeObjectURL(prev.url); return null })
+    setBusy(false); setProgress('')
+  }, [])
 
   const apply = useCallback(() => {
     if (!extraction) return
@@ -104,9 +131,9 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
         {phase === 'input' ? (
           <div className="sbx__body">
             <p className="sbx__lede">
-              Drop your <strong>CSS</strong>, <strong>Tailwind config</strong>, or <code>globals.css</code> —
-              or paste it below. We read your foundation (brand colour, corners, type, density) and dress the
-              whole kit in it.
+              Drop your <strong>CSS</strong>, <strong>Tailwind config</strong>, <code>globals.css</code> — or a
+              <strong> screenshot</strong>. We read your foundation (brand colour, corners, type) and your words,
+              and dress the whole kit in them. A screenshot is the way in for an SPA (its HTML is empty).
             </p>
 
             <label
@@ -119,36 +146,50 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
                 ref={fileRef}
                 type="file"
                 multiple
-                accept=".css,.scss,.sass,.less,.txt,.js,.ts,.html,text/*"
+                accept=".css,.scss,.sass,.less,.txt,.js,.ts,.html,text/*,image/png,image/jpeg,image/webp"
                 className="sbx__file"
                 onChange={(e) => { void ingestFiles(e.target.files); e.target.value = '' }}
               />
               <UploadCloud size={26} strokeWidth={1.5} />
               <span className="sbx__drop-main">Drop files here or <span className="sbx__link">browse</span></span>
-              <span className="sbx__drop-sub">.css · globals.css · tailwind.config · a compiled stylesheet</span>
+              <span className="sbx__drop-sub">.css · globals.css · tailwind.config · or a screenshot (PNG/JPG)</span>
             </label>
 
-            <div className="sbx__or"><span>or paste</span></div>
+            {image && (
+              <div className="sbx__thumb">
+                <img src={image.url} alt="Your screenshot" className="sbx__thumb-img" />
+                <span className="sbx__thumb-name">{image.file.name} — colours + text will be read from this screenshot</span>
+                <button type="button" className="sbx__thumb-x" aria-label="Remove screenshot" onClick={() => setImage((p) => { if (p) URL.revokeObjectURL(p.url); return null })}>
+                  <X size={14} strokeWidth={2} />
+                </button>
+              </div>
+            )}
 
-            <textarea
-              className="sbx__paste"
-              value={source}
-              onChange={(e) => setSource(e.target.value)}
-              placeholder={":root { --primary: 221 83% 53%; --radius: 0.5rem; }\nbody { font-family: \"Inter\", sans-serif; }"}
-              spellCheck={false}
-            />
+            {!image && (
+              <>
+                <div className="sbx__or"><span>or paste</span></div>
+                <textarea
+                  className="sbx__paste"
+                  value={source}
+                  onChange={(e) => setSource(e.target.value)}
+                  placeholder={":root { --primary: 221 83% 53%; --radius: 0.5rem; }\nbody { font-family: \"Inter\", sans-serif; }"}
+                  spellCheck={false}
+                />
+              </>
+            )}
 
             <div className="sbx__foot">
               <span className="sbx__privacy">
                 <Check size={13} strokeWidth={2.5} /> Runs in your browser — your code never leaves this page.
               </span>
               <div className="sbx__foot-actions">
-                <button type="button" className="sbx__ghost" onClick={() => setSource(SAMPLE_CSS)}>
-                  Try a sample
-                </button>
-                <button type="button" className="sbx__cta" onClick={read} disabled={!source.trim()}>
-                  Read my app
-                  <ArrowRight size={15} strokeWidth={2} />
+                {!image && (
+                  <button type="button" className="sbx__ghost" onClick={() => setSource(SAMPLE_CSS)}>
+                    Try a sample
+                  </button>
+                )}
+                <button type="button" className="sbx__cta" onClick={read} disabled={busy || !(source.trim() || image)}>
+                  {busy ? <><Loader2 size={15} strokeWidth={2} className="sbx__spin" /> {progress || 'Reading…'}</> : <>Read my app <ArrowRight size={15} strokeWidth={2} /></>}
                 </button>
               </div>
             </div>
@@ -160,9 +201,12 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
               {/* The before/after: same content + components, their foundation
                   vs ours. Default = the UICockpit look (the literal "what would
                   it look like in your design language"). */}
-              <div className="sbx__seg" role="radiogroup" aria-label="Foundation">
-                <button type="button" role="radio" aria-checked={!useColors} className={`sbx__seg-btn ${!useColors ? 'sbx__seg-btn--on' : ''}`} onClick={() => setUseColors(false)}>UICockpit look</button>
-                <button type="button" role="radio" aria-checked={useColors} className={`sbx__seg-btn ${useColors ? 'sbx__seg-btn--on' : ''}`} onClick={() => setUseColors(true)}>Your colours</button>
+              <div className="sbx__result-tools">
+                {busy && <span className="sbx__reading"><Loader2 size={13} strokeWidth={2} className="sbx__spin" /> {progress || 'Reading your text…'}</span>}
+                <div className="sbx__seg" role="radiogroup" aria-label="Foundation">
+                  <button type="button" role="radio" aria-checked={!useColors} className={`sbx__seg-btn ${!useColors ? 'sbx__seg-btn--on' : ''}`} onClick={() => setUseColors(false)}>UICockpit look</button>
+                  <button type="button" role="radio" aria-checked={useColors} className={`sbx__seg-btn ${useColors ? 'sbx__seg-btn--on' : ''}`} onClick={() => setUseColors(true)}>Your colours</button>
+                </div>
               </div>
             </div>
 
@@ -185,9 +229,11 @@ export function SandboxModal({ cfg, onApply, onClose }: SandboxModalProps) {
             )}
 
             <p className="sbx__honest">
-              {content.appName || content.menu.length
-                ? <>We pulled your brand &amp; words from the markup. </>
-                : <>No app text found — a pure SPA returns an empty shell, so drop a <strong>screenshot</strong> (or server-rendered HTML) to bring your words in. </>}
+              {busy
+                ? <>Reading the text from your screenshot… </>
+                : content.appName || content.menu.length
+                  ? <>We pulled your brand &amp; words from your app. </>
+                  : <>No app text found — for an SPA, drop a <strong>screenshot</strong> (or server-rendered HTML) to bring your words in. </>}
               Your components in your style, not your app rebuilt — motion &amp; icons keep the kit defaults.
             </p>
 
