@@ -516,9 +516,27 @@
 .export-ov__reveal > .export-ov__choices { padding: 14px 14px 0; margin-bottom: 0; }
 .export-ov__reveal > .export-ov__a11y { padding: 14px; }
 
-/* Other-formats drawer — the eject-to-files path. */
+/* Left-rail group label — separates the install pane from the raw-file list. */
+.modal__navgroup {
+  margin: 14px 10px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--app-fg-faint);
+}
+
+/* A single format file pane (picked from the rail). */
+.export-fmt__head { margin-bottom: 14px; }
+.export-fmt__name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
 .export-fmt__hint {
-  margin: 10px 0 16px;
+  display: block;
+  margin-top: 2px;
   font-size: 11.5px;
   color: var(--app-fg-muted);
 }

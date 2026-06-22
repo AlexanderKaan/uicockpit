@@ -44,7 +44,9 @@ import { zipSync } from './zip'
  *  to the download. LIVE on Cloudflare at the branded custom domain. */
 const KIT_CDN_BASE = 'https://kit.uicockpit.com'
 
-type View = 'kit' | 'formats'
+// The left-rail destinations: the install pane, then each format file 1:1 (flat —
+// no sub-picker). The format ids match FmtId below.
+type View = 'kit' | 'css' | 'tailwind' | 'shadcn'
 
 /* ── The "Other formats" drawer — the 3 that map to a real stack ──────────────
  * tokens.css · Tailwind v4 · shadcn/ui. (tokens.json + shadcn-registry were CUT:
@@ -197,7 +199,6 @@ interface ExportModalProps {
 
 export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
   const [view, setView] = useState<View>('kit')
-  const [fmt, setFmt] = useState<FmtId>('css')
   const [agent, setAgent] = useState<Agent>('claude')
   const [framework, setFramework] = useState<Framework>('next')
   const [pm, setPm] = useState<Pm>('pnpm')
@@ -210,11 +211,6 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const NAV: ReadonlyArray<{ id: View; label: string; hint: string; icon: Fmt['icon'] }> = [
-    { id: 'kit', label: 'Quick install', hint: 'One link + the agent pack', icon: Sparkles },
-    { id: 'formats', label: 'Other formats', hint: 'tokens.css · Tailwind · shadcn', icon: FileCode },
-  ]
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal modal--wide" onClick={(e) => e.stopPropagation()}>
@@ -226,37 +222,19 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
         </div>
         <div className="modal__split">
           <nav className="modal__nav" role="tablist" aria-label="Export">
-            {NAV.map((n) => {
-              const Cmp = n.icon
-              return (
-                <button
-                  key={n.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={n.id === view}
-                  aria-label={n.label}
-                  className={`modal__navitem ${n.id === view ? 'modal__navitem--on' : ''}`}
-                  onClick={() => setView(n.id)}
-                >
-                  <span className="modal__navitem-icon">
-                    <Cmp size={15} strokeWidth={1.75} />
-                  </span>
-                  <span className="modal__navitem-body">
-                    <span className="modal__navitem-label">{n.label}</span>
-                    <span className="modal__navitem-hint">{n.hint}</span>
-                  </span>
-                </button>
-              )
-            })}
+            <NavBtn id="kit" label="Quick install" hint="One link + the agent pack" Icon={Sparkles} view={view} onView={setView} />
+            <div className="modal__navgroup">Other formats</div>
+            {FORMATS.map((f) => (
+              <NavBtn key={f.id} id={f.id} label={f.label} hint={f.hint} Icon={f.icon} view={view} onView={setView} />
+            ))}
           </nav>
           <div className="modal__pane">
             {view === 'kit' ? (
-              <KitPane cfg={cfg} agent={agent} onAgent={setAgent} onToast={onToast} onEject={() => setView('formats')} />
+              <KitPane cfg={cfg} agent={agent} onAgent={setAgent} onToast={onToast} onEject={() => setView('css')} />
             ) : (
               <FormatsPane
                 cfg={cfg}
-                fmt={fmt}
-                onFmt={setFmt}
+                fmt={view}
                 framework={framework}
                 pm={pm}
                 onFramework={setFramework}
@@ -271,12 +249,38 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
   )
 }
 
-/* ── The "Other formats" drawer — the eject-to-files path. Sub-picker over the 3
- * stack formats + the install guide + the code. Stack-aware via the framework picker. */
+/** A left-rail destination button (the install pane or a format file). */
+function NavBtn({ id, label, hint, Icon, view, onView }: {
+  id: View
+  label: string
+  hint: string
+  Icon: Fmt['icon']
+  view: View
+  onView: (v: View) => void
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={id === view}
+      aria-label={label}
+      className={`modal__navitem ${id === view ? 'modal__navitem--on' : ''}`}
+      onClick={() => onView(id)}
+    >
+      <span className="modal__navitem-icon"><Icon size={15} strokeWidth={1.75} /></span>
+      <span className="modal__navitem-body">
+        <span className="modal__navitem-label">{label}</span>
+        <span className="modal__navitem-hint">{hint}</span>
+      </span>
+    </button>
+  )
+}
+
+/* ── One format file (picked from the left rail, no sub-picker) — actions + the
+ * stack-aware install guide + the code. The eject-to-files path. */
 function FormatsPane({
   cfg,
   fmt,
-  onFmt,
   framework,
   pm,
   onFramework,
@@ -285,7 +289,6 @@ function FormatsPane({
 }: {
   cfg: Config
   fmt: FmtId
-  onFmt: (f: FmtId) => void
   framework: Framework
   pm: Pm
   onFramework: (f: Framework) => void
@@ -310,8 +313,10 @@ function FormatsPane({
 
   return (
     <div className="export-fmt">
-      <Seg options={FORMATS.map((f) => ({ id: f.id, cap: f.label }))} value={fmt} onChange={onFmt} />
-      <p className="export-fmt__hint">{current.hint}</p>
+      <div className="export-fmt__head">
+        <span className="export-fmt__name">{current.label}</span>
+        <span className="export-fmt__hint">{current.hint}</span>
+      </div>
       <div className="modal__actions">
         <span className="modal__filename">{current.filename}</span>
         <div className="modal__btn-row">
