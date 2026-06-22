@@ -14,7 +14,7 @@ import { FOUNDATIONS, COMPONENT_USES, STANDALONE_ATOMS, idsByTier } from '../kit
  * an agent must enforce: the tier ladder, which components exist and what each
  * composes, and which atoms stand alone. Built from `src/kit/segments.ts`, so it
  * never drifts from the kit. */
-function componentModel(): string {
+export function componentModel(): string {
   const label = (id: string) => RECIPES.find((r) => r.id === id)?.section ?? id
   const components = Object.entries(COMPONENT_USES)
     .map(([id, uses]) => `- **${label(id)}** — composes: ${uses.map(label).join(' · ') || '(self-contained)'}`)

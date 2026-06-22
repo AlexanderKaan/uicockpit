@@ -5,6 +5,8 @@ import { genTailwind } from '../genTailwind'
 import { genBrief } from '../genBrief'
 import { genRegistry } from '../genRegistry'
 import { genContract } from '../genContract'
+import { genDesignMd } from '../genDesignMd'
+import { genSkill } from '../genSkill'
 import { DEFAULT_CONFIG } from '../../tokens/defaults'
 import { applyColorTheme } from '../../tokens/stylesAndThemes'
 import type { Config } from '../../tokens/types'
@@ -166,5 +168,46 @@ describe('genContract (Fase D1 — the machine-readable contract)', () => {
 
   it('matches snapshot for soft + cobalt sample', () => {
     expect(genContract(sampleCfg)).toMatchSnapshot()
+  })
+})
+
+describe('genDesignMd', () => {
+  it('embeds the human spec (genBrief) and the agent appendix', () => {
+    const out = genDesignMd(sampleCfg)
+    expect(out).toContain('# UI Kit Brief') // genBrief body
+    expect(out).toContain('## For your AI agent') // the delimited appendix
+    expect(out).toContain('The component model') // componentModel composition contract
+    expect(out).toContain('npx uicockpit check') // the verify step
+  })
+
+  it('embeds the tokens exactly once (no double dump)', () => {
+    const out = genDesignMd(sampleCfg)
+    expect(out.match(/--k-primary:/g)?.length).toBeGreaterThan(0)
+    // genBrief embeds tokens.css once; the agent appendix must NOT re-dump them.
+    expect(out.split('## Design tokens (light + dark)').length).toBe(2)
+  })
+
+  it('matches snapshot for soft + cobalt sample', () => {
+    expect(genDesignMd(sampleCfg)).toMatchSnapshot()
+  })
+})
+
+describe('genSkill', () => {
+  it('reads as imperative always/never rules with a verify loop', () => {
+    const out = genSkill(sampleCfg)
+    expect(out).toContain('## Always')
+    expect(out).toContain('## Never')
+    expect(out).toContain('npx uicockpit check')
+    expect(out).toContain('var(--k-primary)')
+  })
+
+  it('carries this kit\'s resolved facts (brand hex + scale)', () => {
+    const out = genSkill(sampleCfg)
+    expect(out).toContain('comfortable') // sampleCfg.scale
+    expect(out).toContain('40px') // comfortable control height
+  })
+
+  it('matches snapshot for soft + cobalt sample', () => {
+    expect(genSkill(sampleCfg)).toMatchSnapshot()
   })
 })
