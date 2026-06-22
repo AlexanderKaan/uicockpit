@@ -1,7 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
-import { useModal, useDropdown } from '../stage/views/apps/AppHelpers'
+import { useModal, useDropdown, Toggle, MenuButton } from '../stage/views/apps/AppHelpers'
 import type { SectionSpec } from './manifests'
 import { BrandLogo } from './logos'
 
@@ -82,6 +82,25 @@ function RowMenu() {
         </div>
       )}
     </div>
+  )
+}
+
+/** Entity-card kebab — the real `.menu` dropdown on an `.entity-card__menu`
+ *  trigger (keeps the card-head styling, gains a working menu via MenuButton). */
+function CardMenu({ name }: { name: string }) {
+  return (
+    <MenuButton
+      icon={<Icon name="dots" />}
+      ariaLabel={`Actions for ${name}`}
+      triggerClass="entity-card__menu btn btn--ghost btn--icon btn--sm"
+      align="right"
+      items={[
+        { label: 'View', icon: <Icon name="file" /> },
+        { label: 'Send reminder', icon: <Icon name="bell" /> },
+        { label: 'Duplicate', icon: <Icon name="plus" /> },
+        { label: 'Delete', icon: <Icon name="trash" />, danger: true },
+      ]}
+    />
   )
 }
 
@@ -531,7 +550,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                     <div className="entity-card__head">
                       <BrandLogo id={c.logo} size={36} />
                       <span className="entity-card__name">{c.name}</span>
-                      <button type="button" className="entity-card__menu btn btn--ghost btn--icon btn--sm" aria-label="More"><Icon name="dots" /></button>
+                      <CardMenu name={c.name} />
                     </div>
                     <div className="entity-card__meta">
                       <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">{c.lastInvoice}</span></div>
@@ -791,7 +810,7 @@ export function renderSection(spec: SectionSpec, key: number) {
       )
       const entity = (name: string, amount: string, status: string, tone: string, fill?: boolean) => (
         <div className={`entity-card ${fill ? 'entity-card--fill' : ''}`}>
-          <div className="entity-card__head"><span className="avatar avatar--sm" aria-hidden="true">{name.charAt(0)}</span><span className="entity-card__name">{name}</span><button type="button" className="btn btn--ghost btn--icon btn--sm entity-card__menu" aria-label="More"><Icon name="dots" /></button></div>
+          <div className="entity-card__head"><span className="avatar avatar--sm" aria-hidden="true">{name.charAt(0)}</span><span className="entity-card__name">{name}</span><CardMenu name={name} /></div>
           <div className="entity-card__meta">
             <div className="entity-card__row"><span className="entity-card__label">Amount</span><span className="entity-card__value" style={money}>{amount}</span></div>
             <div className="entity-card__row"><span className="entity-card__label">Status</span><span className={`badge badge--${tone}`}><span className="badge__dot" />{status}</span></div>
@@ -847,8 +866,8 @@ export function renderSection(spec: SectionSpec, key: number) {
         </div></div>
         <div className="section"><div className="section__head"><div className="section__titles"><h3 className="section__title">Notifications</h3></div></div><div className="section__body">
           <div className="list list--settings">
-            <div className="list__item"><div className="list__body"><div className="list__title">Billing receipts</div><div className="list__sub">Email a receipt after every payment.</div></div><div className="toggle toggle--on" role="switch" aria-checked="true" aria-label="Billing receipts"><div className="toggle__knob" /></div></div>
-            <div className="list__item"><div className="list__body"><div className="list__title">Usage alerts</div><div className="list__sub">Warn me before I hit a plan limit.</div></div><div className="toggle" role="switch" aria-checked="false" aria-label="Usage alerts"><div className="toggle__knob" /></div></div>
+            <div className="list__item"><div className="list__body"><div className="list__title">Billing receipts</div><div className="list__sub">Email a receipt after every payment.</div></div><Toggle defaultOn label="Billing receipts" /></div>
+            <div className="list__item"><div className="list__body"><div className="list__title">Usage alerts</div><div className="list__sub">Warn me before I hit a plan limit.</div></div><Toggle label="Usage alerts" /></div>
           </div>
         </div></div>
       </>)
@@ -1072,7 +1091,7 @@ export function renderSection(spec: SectionSpec, key: number) {
             {spec.seed.rows.map((r) => (
               <div className="list__item" key={r.title}>
                 <div className="list__body"><div className="list__title">{r.title}</div><div className="list__sub">{r.sub}</div></div>
-                <div className={`toggle ${r.on ? 'toggle--on' : ''}`} role="switch" aria-checked={r.on} aria-label={r.title}><div className="toggle__knob" /></div>
+                <Toggle defaultOn={r.on} label={r.title} />
               </div>
             ))}
           </div>

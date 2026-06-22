@@ -126,6 +126,46 @@ export function useModal<T extends HTMLElement = HTMLElement>(open: boolean, onC
   return ref
 }
 
+/* Toggle — a STATEFUL switch built on the `.toggle` recipe (WAI-ARIA `switch`).
+ * Uncontrolled by default (owns its on/off via `defaultOn`); pass `on` + `onChange`
+ * to control it. The single answer to "the demo toggles don't flip" — a static
+ * `<div role="switch" aria-checked>` in a showcase becomes this and actually works,
+ * with the same markup the kit exports. */
+export function Toggle({
+  defaultOn = false, on, onChange, label, size, disabled = false,
+}: {
+  defaultOn?: boolean
+  on?: boolean
+  onChange?: (next: boolean) => void
+  label: string
+  size?: 'sm' | 'lg'
+  disabled?: boolean
+}) {
+  const [self, setSelf] = useState(defaultOn)
+  const value = on ?? self
+  const cls = ['toggle', value && 'toggle--on', size && `toggle--${size}`, disabled && 'toggle--disabled']
+    .filter(Boolean).join(' ')
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={value}
+      aria-label={label}
+      aria-disabled={disabled || undefined}
+      disabled={disabled}
+      className={cls}
+      onClick={() => {
+        if (disabled) return
+        const next = !value
+        if (on === undefined) setSelf(next)
+        onChange?.(next)
+      }}
+    >
+      <span className="toggle__knob" />
+    </button>
+  )
+}
+
 /* InteractiveSlider — drag-to-change value slider die de bestaande
  * .slider styling reuse't. Supports mouse + touch + click-to-seek + keyboard. */
 export function InteractiveSlider({

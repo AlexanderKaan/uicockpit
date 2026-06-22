@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSPropert
 import type { KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
-import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar, Resizable } from './apps/AppHelpers'
+import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar, Resizable, Toggle } from './apps/AppHelpers'
 import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 import { popGalleryJump } from '../../state/galleryJump'
@@ -2999,7 +2999,7 @@ function HorizontalFormCard() {
             <label className="lab"><span>Workspace</span><input className="in" defaultValue="Acme Inc." /></label>
             <label className="lab">
               <span>Weekly digest</span>
-              <span className="toggle toggle--on" role="switch" aria-checked="true" aria-label="Weekly digest"><span className="toggle__knob" /></span>
+              <Toggle defaultOn label="Weekly digest" />
             </label>
           </div>
         </div>
@@ -4306,7 +4306,7 @@ function EntityCardCard() {
           <div className="entity-card__head">
             <span className="avatar avatar--sm" aria-hidden="true">T</span>
             <span className="entity-card__name">Tuple, Inc</span>
-            <button className="btn btn--ghost btn--icon btn--sm entity-card__menu" type="button" aria-label="More"><Icon name="dots" /></button>
+            <MenuButton icon={<Icon name="dots" />} ariaLabel="Actions for Tuple, Inc" triggerClass="entity-card__menu btn btn--ghost btn--icon btn--sm" align="right" items={[{ label: 'View', icon: <Icon name="file" /> }, { label: 'Send reminder', icon: <Icon name="bell" /> }, { label: 'Duplicate', icon: <Icon name="plus" /> }, { label: 'Delete', icon: <Icon name="trash" />, danger: true }]} />
           </div>
           <div className="entity-card__meta">
             <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Dec 13, 2025</span></div>
@@ -4317,7 +4317,7 @@ function EntityCardCard() {
           <div className="entity-card__head">
             <span className="avatar avatar--sm" aria-hidden="true">S</span>
             <span className="entity-card__name">SavvyCal</span>
-            <button className="btn btn--ghost btn--icon btn--sm entity-card__menu" type="button" aria-label="More"><Icon name="dots" /></button>
+            <MenuButton icon={<Icon name="dots" />} ariaLabel="Actions for SavvyCal" triggerClass="entity-card__menu btn btn--ghost btn--icon btn--sm" align="right" items={[{ label: 'View', icon: <Icon name="file" /> }, { label: 'Send reminder', icon: <Icon name="bell" /> }, { label: 'Duplicate', icon: <Icon name="plus" /> }, { label: 'Delete', icon: <Icon name="trash" />, danger: true }]} />
           </div>
           <div className="entity-card__meta">
             <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Jan 22, 2026</span></div>
@@ -4341,7 +4341,7 @@ function ActionPanelCard() {
         </div>
         <div className="card action-panel">
           <div className="action-panel__body"><h3 className="action-panel__title">Email receipts</h3><p className="action-panel__desc">Send a receipt after every payment.</p></div>
-          <div className="action-panel__action"><div className="toggle toggle--on" role="switch" aria-checked="true" aria-label="Email receipts"><div className="toggle__knob" /></div></div>
+          <div className="action-panel__action"><Toggle defaultOn label="Email receipts" /></div>
         </div>
         <div className="card action-panel">
           <div className="action-panel__body"><h3 className="action-panel__title">Custom domain</h3><p className="action-panel__desc">Point your domain at our servers.</p></div>
