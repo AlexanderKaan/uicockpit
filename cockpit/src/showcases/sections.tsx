@@ -92,7 +92,8 @@ function CardMenu({ name }: { name: string }) {
     <MenuButton
       icon={<Icon name="dots" />}
       ariaLabel={`Actions for ${name}`}
-      triggerClass="entity-card__menu btn btn--ghost btn--icon btn--sm"
+      triggerClass="btn btn--ghost btn--icon btn--sm"
+      wrapClass="entity-card__menu"
       align="right"
       items={[
         { label: 'View', icon: <Icon name="file" /> },

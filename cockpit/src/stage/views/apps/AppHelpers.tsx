@@ -396,6 +396,7 @@ export function MenuButton({
   icon,
   items,
   triggerClass = 'btn btn--ghost',
+  wrapClass,
   align = 'left',
   ariaLabel,
 }: {
@@ -403,6 +404,10 @@ export function MenuButton({
   icon?: ReactNode
   items: Array<{ label: string; icon?: ReactNode; danger?: boolean; onClick?: () => void }>
   triggerClass?: string
+  /** Class on the OUTER wrapper (the flex child) — for layout the trigger can't
+   *  own, e.g. `entity-card__menu`'s `margin-left:auto` to push the kebab to the
+   *  card edge. The wrapper, not the button, is the flex item of its parent. */
+  wrapClass?: string
   align?: 'left' | 'right'
   ariaLabel?: string
 }) {
@@ -413,7 +418,7 @@ export function MenuButton({
     if (open) menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus()
   }, [open])
   return (
-    <div ref={ref} style={{ position: 'relative', display: 'inline-flex' }}>
+    <div ref={ref} className={wrapClass} style={{ position: 'relative', display: 'inline-flex' }}>
       <button
         className={triggerClass}
         onClick={(e) => { e.stopPropagation(); setOpen(!open) }}

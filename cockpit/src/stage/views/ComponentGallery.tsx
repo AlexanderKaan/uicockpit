@@ -4306,7 +4306,7 @@ function EntityCardCard() {
           <div className="entity-card__head">
             <span className="avatar avatar--sm" aria-hidden="true">T</span>
             <span className="entity-card__name">Tuple, Inc</span>
-            <MenuButton icon={<Icon name="dots" />} ariaLabel="Actions for Tuple, Inc" triggerClass="entity-card__menu btn btn--ghost btn--icon btn--sm" align="right" items={[{ label: 'View', icon: <Icon name="file" /> }, { label: 'Send reminder', icon: <Icon name="bell" /> }, { label: 'Duplicate', icon: <Icon name="plus" /> }, { label: 'Delete', icon: <Icon name="trash" />, danger: true }]} />
+            <MenuButton icon={<Icon name="dots" />} ariaLabel="Actions for Tuple, Inc" triggerClass="btn btn--ghost btn--icon btn--sm" wrapClass="entity-card__menu" align="right" items={[{ label: 'View', icon: <Icon name="file" /> }, { label: 'Send reminder', icon: <Icon name="bell" /> }, { label: 'Duplicate', icon: <Icon name="plus" /> }, { label: 'Delete', icon: <Icon name="trash" />, danger: true }]} />
           </div>
           <div className="entity-card__meta">
             <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Dec 13, 2025</span></div>
@@ -4317,7 +4317,7 @@ function EntityCardCard() {
           <div className="entity-card__head">
             <span className="avatar avatar--sm" aria-hidden="true">S</span>
             <span className="entity-card__name">SavvyCal</span>
-            <MenuButton icon={<Icon name="dots" />} ariaLabel="Actions for SavvyCal" triggerClass="entity-card__menu btn btn--ghost btn--icon btn--sm" align="right" items={[{ label: 'View', icon: <Icon name="file" /> }, { label: 'Send reminder', icon: <Icon name="bell" /> }, { label: 'Duplicate', icon: <Icon name="plus" /> }, { label: 'Delete', icon: <Icon name="trash" />, danger: true }]} />
+            <MenuButton icon={<Icon name="dots" />} ariaLabel="Actions for SavvyCal" triggerClass="btn btn--ghost btn--icon btn--sm" wrapClass="entity-card__menu" align="right" items={[{ label: 'View', icon: <Icon name="file" /> }, { label: 'Send reminder', icon: <Icon name="bell" /> }, { label: 'Duplicate', icon: <Icon name="plus" /> }, { label: 'Delete', icon: <Icon name="trash" />, danger: true }]} />
           </div>
           <div className="entity-card__meta">
             <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Jan 22, 2026</span></div>
