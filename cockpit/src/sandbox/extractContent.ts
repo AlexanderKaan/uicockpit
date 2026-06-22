@@ -25,6 +25,8 @@ export interface Content {
   rows?: string[][]
   /** KPI tiles: value + label (vision path only). */
   stats?: Array<{ value: string; label: string }>
+  /** Filter-bar chip labels (vision path only). No counts — never fabricated. */
+  filters?: string[]
 }
 
 export interface ContentExtraction {

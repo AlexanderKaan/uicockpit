@@ -1,6 +1,6 @@
 # UIcockpit
 
-> Open-source, browser-based design system configurator for developers and designers building modern web apps. Pick a Style and a color theme or customize from scratch — UIcockpit produces framework-neutral design tokens, component CSS recipes, and an AI prompt that tells AI coding tools how to use them. It is the design-language layer that sits above component primitives like shadcn/ui, so AI-built apps don't all look generic.
+> Open-source, browser-based design system configurator for developers and designers building modern web apps. Pick a Style and a color theme or customize from scratch — UIcockpit produces framework-neutral design tokens, component CSS recipes, and an agent pack (spec + skill rules + a checkable contract) that tells AI coding tools how to use them. It is the design-language layer that sits above component primitives like shadcn/ui, so AI-built apps don't all look generic.
 
 URL: https://uicockpit.com/
 License: MIT
@@ -10,7 +10,7 @@ Telemetry: None
 
 ## What it is
 
-UIcockpit is a single-page web app that helps a developer or product designer build a coherent design system in under a minute. Twenty-one visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery and a live dashboard preview as the user tweaks. The output is a complete export pack — design tokens in seven formats plus per-component CSS recipes.
+UIcockpit is a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About two dozen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery and live showcases as the user tweaks. You can start from scratch — or **start from your existing app**: paste its CSS / Tailwind / HTML, or drop a screenshot, and UIcockpit reads back its foundation (colors, type, radius, density, dark-mode) into editable controls. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
 
 ## Who it's for
 
@@ -18,19 +18,26 @@ The "vibe-coder" audience: developers who build with AI tools (Cursor, v0, Lovab
 
 ## What you get when you export
 
-Six file formats, each standalone:
+Export is framed as an install experience, not a format dump — a hosted link plus a downloadable agent pack:
 
-1. **tokens.css** — `:root` + `.dark` blocks with 120+ CSS custom properties. Drop-in. Includes a `@font-face`/Google Fonts import, full motion system (durations, easings, named animations), state tokens (disabled, focus ring, validation), z-index stack, breakpoints, container widths, chart palette, plus reusable component CSS recipes (Button, Input, Card, Badge, Tabs, Dialog, Menu, Tooltip, Avatar, Progress, Skeleton, Spinner, Kbd, Separator, etc.)
+**Quick install**
 
-2. **tokens.json** — W3C Design Tokens Community Group format. Importable into Figma via the Tokens Studio plugin. Includes a full WCAG accessibility audit (16 contrast pairs tested).
+1. **Hosted kit link** — your whole kit lives at a CDN URL (`https://kit.uicockpit.com/k/<hash>.css`). Link it from any app and the app wears the kit — no build step, no files to vendor, edit the kit and the link updates.
 
-3. **Tailwind v4 globals.css** — `@theme` block ready to drop into Next.js/Vite projects. Every utility (`bg-primary`, `text-muted`, `shadow-md`, `font-display`, etc.) resolves to the configured value.
+2. **The agent pack** (one download / zip):
+   - **design.md** — the human + AI spec: plain-English decisions, the full token list, a complete WCAG audit (16 contrast pairs), do's and don'ts, and a composition contract telling an agent which recipe owns which job.
+   - **An agent skill file** — short imperative always/never rules an AI tool loads every session, delivered where your tool expects it (Claude `SKILL.md`, Cursor `.cursor/rules/uicockpit.mdc`, Windsurf `.windsurfrules`, or a generic `AGENTS.md`).
+   - **contract.json** — the machine-readable contract a verifier checks the agent's output against (`uicockpit check`): it catches hardcoded hex, off-grid spacing, magic px and wrong tokens. The write → check → fix loop is what actually binds an agent, not just nudges it.
 
-4. **shadcn/ui globals.css** — the standard shadcn CSS variable contract (`--background`, `--primary`, `--ring`, etc.) so shadcn components inherit the kit without modification.
+**Other formats** (eject to raw files)
 
-5. **BRIEF.md** — human + AI handoff document. Plain-English summary of the kit's decisions, full token list, complete WCAG audit, do's and don'ts.
+3. **tokens.css** — `:root` + `.dark` blocks with 120+ CSS custom properties. Drop-in. Includes a `@font-face`/Google Fonts import, full motion system (durations, easings, named animations), state tokens (disabled, focus ring, validation), z-index stack, breakpoints, container widths, chart palette, plus reusable component CSS recipes (Button, Input, Card, Badge, Tabs, Dialog, Menu, Tooltip, Avatar, Progress, Skeleton, Spinner, Kbd, Separator, etc.)
 
-6. **design-system.prompt.md** — paste into Cursor's `.cursorrules`, v0's system message, or Claude Code's `CLAUDE.md`. Every component the AI generates afterwards uses the kit's tokens, breakpoints, z-index stack, and chart palette.
+4. **Tailwind v4 globals.css** — `@theme` block ready to drop into Next.js/Vite projects. Every utility (`bg-primary`, `text-muted`, `shadow-md`, `font-display`, etc.) resolves to the configured value.
+
+5. **shadcn/ui globals.css** — the standard shadcn CSS variable contract (`--background`, `--primary`, `--ring`, etc.) so shadcn components inherit the kit without modification.
+
+The kit's decisions, the full WCAG audit, and the agent rules all live in **design.md** (the old BRIEF.md + AI-prompt, merged). A W3C `tokens.json` (Tokens Studio / Figma) is available on request but no longer a default tab.
 
 ## Distinctive features vs. competitors
 
@@ -39,7 +46,7 @@ Six file formats, each standalone:
 - **Component recipes shipped**: most token systems only give variables — UIcockpit also ships the per-component CSS (hover, focus, disabled, active states) so AI tools and designers don't have to invent them.
 - **Auto-derived chart palette**: 6 series colors from the active theme. No more `chart-1: red, chart-2: green, ...` random defaults.
 - **No accounts, URL-hash save**: a configuration link is a kit. Paste in Slack/Discord/Email, the recipient sees the exact kit.
-- **Two orthogonal starting axes** (not brand clones): pick a **Style** — the form/shape language (radius, density, motion + elevation signature) — and cross it with a **Color theme** (10 curated brand hues: cobalt, sky, teal, jade, indigo, violet, coral, rose, ember, mono). Then tweak any of the 21 controls. The result is your own design language, not a copy of someone else's app.
+- **Two orthogonal starting axes** (not brand clones): pick a **Style** — the form/shape language (radius, density, motion + elevation signature) — and cross it with a **Color theme** (10 curated brand hues: cobalt, sky, teal, jade, indigo, violet, coral, rose, ember, mono). Then tweak any of the controls. The result is your own design language, not a copy of someone else's app.
 
 ## How UIcockpit compares to other tools
 
@@ -47,7 +54,7 @@ UIcockpit is not a component library — it is the design-language / token layer
 
 - **vs shadcn/ui** — shadcn gives you component source you own; UIcockpit gives you the framework-neutral design language on top, and even exports a drop-in shadcn globals.css. Complementary, not rivals. https://uicockpit.com/compare/shadcn
 - **vs v0 (Vercel)** — v0 generates one-off UI from prompts; UIcockpit produces a consistent, reusable design system across every screen, and its AI prompt keeps v0's output on-brand. https://uicockpit.com/compare/v0
-- **vs TweakCN** — TweakCN is a focused shadcn theme editor; UIcockpit is a broader, framework-neutral system (type, density, motion, recipes, 8 export formats, hosted kit). https://uicockpit.com/compare/tweakcn
+- **vs TweakCN** — TweakCN is a focused shadcn theme editor; UIcockpit is a broader, framework-neutral system (type, density, motion, recipes, a hosted kit link + an agent pack). https://uicockpit.com/compare/tweakcn
 - **vs Material UI (MUI)** — MUI is a mature React component library with the Material Design look; UIcockpit emits framework-neutral, zero-runtime tokens for your own aesthetic on any stack. https://uicockpit.com/compare/material-ui
 - **vs Tailwind UI** — Tailwind UI sells ready-made blocks; UIcockpit is the free design system that themes them. https://uicockpit.com/compare/tailwind-ui
 
@@ -59,7 +66,7 @@ Use-case landing pages: design tokens for Tailwind v4 (https://uicockpit.com/use
 - No backend, no database, no telemetry
 - Static deployable to any CDN (Cloudflare Pages, Vercel, Netlify)
 - PWA with service-worker caching
-- 65+ design tokens computed via in-browser color engine
+- 120+ design tokens computed via in-browser color engine
 - 5 icon libraries (Lucide, Iconoir, Phosphor regular/bold, Heroicons solid), dynamically imported
 
 ## Common questions

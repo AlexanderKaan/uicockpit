@@ -43,6 +43,7 @@ const PROMPT = `You are analysing a SCREENSHOT of a web-app UI. Identify the lay
 - "columns": the data table's column header labels, in order, max 6.
 - "rows": up to 6 data rows; each row is an array of the cell texts in column order (max 6 cells). Transcribe the real cell text; skip icon-only cells.
 - "stats": up to 4 KPI tiles as {"value":"...","label":"..."} — ONLY if metric tiles are actually visible.
+- "filters": the filter/segment chip labels in a filter bar (the pill row above a list, e.g. "All", "Active", "Archived"), in order, max 5 — the chip TEXT only. NEVER invent counts. Omit if there is no filter bar.
 Omit any key you cannot read confidently — a missing key is better than a guessed one. Output JSON only.`
 
 /** Pull the first JSON object out of a model reply (tolerates stray prose/fences). */

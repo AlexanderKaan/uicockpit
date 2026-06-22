@@ -49,7 +49,6 @@ const ROWS: Array<{ name: string; status: string; tone: 'success' | 'warn' | 'in
   { name: 'Umbrella', status: 'Review', tone: 'info' },
 ]
 const FILTERS = ['All', 'Active', 'Pending', 'Archived']
-const COUNTS = [128, 64, 12, 41]
 
 /** Guess a badge tone from a status cell's text (EN + a little NL), so a detected
  *  "Status" column reads like a real app table. Falls back to a neutral info tone. */
@@ -82,6 +81,7 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
   const realStats = content.stats?.length ? content.stats : null
   const realCols = content.columns?.length ? content.columns : null
   const realRows = content.rows?.length ? content.rows : null
+  const realFilters = content.filters?.length ? content.filters : null
   const tableTitle = content.tableTitle || heading
 
   const hasSidebar = list.includes('sidebar')
@@ -107,16 +107,20 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
             <input className="searchinput__field" type="search" placeholder={`Search ${appName}…`} aria-label={`Search ${appName}`} />
           </div>
         )
-      case 'filterbar':
+      case 'filterbar': {
+        // Real chips from vision when present; otherwise generic structural
+        // placeholders — never fabricated counts (the old "All 128" was a lie).
+        const chips = realFilters ?? FILTERS
         return (
           <div className="toolbar" key={k}>
-            {FILTERS.map((f, i) => (
+            {chips.map((f, i) => (
               <button key={f} type="button" className={`chip ${i === 0 ? 'chip--on' : ''}`}>
-                {f} <span className="badge badge--count">{COUNTS[i]}</span>
+                {f}
               </button>
             ))}
           </div>
         )
+      }
       case 'statstrip': {
         const tiles = realStats ?? STATS.map((s) => ({ value: s.v, label: s.l }))
         return (
