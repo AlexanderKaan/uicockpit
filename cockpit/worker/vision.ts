@@ -28,13 +28,13 @@ const CORS = {
 const json = (data: unknown, status = 200): Response =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', ...CORS } })
 
-const BLOCKS = 'sidebar, appbar, toolbar, tabnav, searchbar, filterbar, statstrip, datatable, cardgrid, form'
+const BLOCKS = 'sidebar, appbar, toolbar, tabnav, searchbar, filterbar, statstrip, datatable, list, banner, cardgrid, form'
 
 const PROMPT = `You are analysing a SCREENSHOT of a web-app UI. Identify the layout BLOCKS it is built from, read its design foundation, and transcribe its key TEXT. Reply with ONLY a JSON object (no prose, no markdown fence). Keys:
 - "mode": "light" or "dark" (the page background).
 - "brandHex": the primary/accent colour as #rrggbb (the brand button or logo colour). Omit if greyscale.
 - "neutral": "cool", "warm", or "neutral" (the grey tint).
-- "blocks": ordered top-to-bottom array, ONLY from this vocabulary: [${BLOCKS}]. Include ONLY blocks that are actually visible — do NOT add "statstrip" unless you can see metric/KPI tiles, or "datatable" unless there are tabular rows. Use "sidebar" for a left nav rail (else "tabnav" for top tabs). Order matters.
+- "blocks": ordered top-to-bottom array, ONLY from this vocabulary: [${BLOCKS}]. Include ONLY blocks that are actually visible — do NOT add "statstrip" unless you can see metric/KPI tiles. Use "list" for a feed / activity / transaction STREAM (rows of icon+title with a status or amount, NOT a columnar grid) and "datatable" ONLY for a real table with column headers. Use "banner" for an info/notice strip above the content. Use "sidebar" for a left nav rail (else "tabnav" for top tabs). Order matters.
 - "appName": the product/brand name as readable TEXT only. If the logo is a glyph/icon with no readable wordmark, OMIT this key. NEVER transcribe decorative symbols (e.g. ©, =, the hamburger, a coloured dot).
 - "nav": the sidebar or top-nav item labels, in order, max 6. Each entry is ONE COMPLETE label exactly as shown — a label may be several words (e.g. "Onderweg naar mij"); never split one label into multiple entries, and never include table column headers or bare icons.
 - "heading": the main page title — the bold H1 above the main content or in the top bar. OMIT if there is no clear single title.
@@ -45,6 +45,8 @@ const PROMPT = `You are analysing a SCREENSHOT of a web-app UI. Identify the lay
 - "stats": up to 4 KPI tiles as {"value":"...","label":"..."} — ONLY if metric tiles are actually visible.
 - "filters": the filter/segment chip labels in a filter bar (the pill row above a list, e.g. "All", "Active", "Archived"), in order, max 5 — the chip TEXT only. NEVER invent counts. Omit if there is no filter bar.
 - "cards": if a CARD GRID is visible (a grid of project/file/entity tiles, not a table), up to 6 as {"title":"...","meta":"..."} — title = the card's heading text, meta = a short status/subtitle if shown (else omit meta). Real text only. Omit the key entirely if there is no card grid.
+- "rows": if the main content is a "list" feed (not a table), STILL fill rows — each row = [title, sub/desc, status-or-amount] — so the list renders the real items.
+- "notice": the text of an info/notice banner if one is shown (e.g. "4 new documents ready to add"), ONE short line, real text only. Omit if there is no banner.
 Omit any key you cannot read confidently — a missing key is better than a guessed one. Output JSON only.`
 
 /** Pull the first JSON object out of a model reply (tolerates stray prose/fences). */

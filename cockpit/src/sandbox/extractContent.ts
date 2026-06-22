@@ -29,6 +29,8 @@ export interface Content {
   filters?: string[]
   /** Card-grid tiles: title + optional meta/subtitle (vision path only). */
   cards?: Array<{ title: string; meta: string }>
+  /** Info/notice banner text (vision path only) — drives the `banner` block. */
+  notice?: string
 }
 
 export interface ContentExtraction {

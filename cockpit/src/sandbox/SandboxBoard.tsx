@@ -23,6 +23,8 @@ export type BlockKind =
   | 'filterbar'  // filter chips with counts (.chip+.badge)  — body
   | 'statstrip'  // KPI tiles (.stat-tile-strip)             — body
   | 'datatable'  // rows table (.tbl)                        — body
+  | 'list'       // feed / activity / transaction list (.list) — body
+  | 'banner'     // info / notice strip (.banner)            — body
   | 'cardgrid'   // entity card grid (.card)                 — body
   | 'form'       // a small form (.field/.in)                — body
 
@@ -36,7 +38,7 @@ interface SandboxBoardProps {
 const DEFAULT_BLOCKS: BlockKind[] = ['sidebar', 'appbar', 'statstrip', 'datatable']
 /** Blocks that stack in the page body (everything but the structural sidebar/
  *  appbar/toolbar). Rendered in the DETECTED order so the layout follows the app. */
-const BODY_KINDS = new Set<BlockKind>(['tabnav', 'searchbar', 'filterbar', 'statstrip', 'datatable', 'cardgrid', 'form'])
+const BODY_KINDS = new Set<BlockKind>(['tabnav', 'searchbar', 'filterbar', 'statstrip', 'datatable', 'list', 'banner', 'cardgrid', 'form'])
 const NAV_ICONS: IconName[] = ['home', 'grid', 'chart', 'file', 'cal', 'cog']
 
 const STATS = [
@@ -173,6 +175,60 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
           </div>
         )
       }
+      case 'list': {
+        // A feed / activity / transaction list — the right answer for screens
+        // that are a stream of rows (icon + title + sub + a trailing status or
+        // amount), NOT a columnar grid. Real rows fill it; else the demo rows.
+        if (realCols && realRows) {
+          const statusIdx = realCols.findIndex((c) => /status|state|fase|stage|stadium/i.test(c))
+          const amountIdx = realCols.findIndex((c) => /amount|total|bedrag|price|sum|saldo|value|paid|due/i.test(c))
+          const subIdx = realCols.findIndex((_, i) => i > 0 && i !== statusIdx && i !== amountIdx)
+          return (
+            <div className="card" key={k}>
+              {tableTitle && <div className="card__head"><h3 className="card__title">{tableTitle}</h3></div>}
+              <div className="list">
+                {realRows.map((row, ri) => {
+                  const title = row[0] || '—'
+                  const sub = subIdx >= 0 ? (row[subIdx] ?? '') : ''
+                  const status = statusIdx >= 0 ? (row[statusIdx] ?? '') : ''
+                  const amount = amountIdx >= 0 ? (row[amountIdx] ?? '') : ''
+                  return (
+                    <div className="list__item" key={ri}>
+                      <span className="avatar avatar--sm" aria-hidden="true">{title.charAt(0).toUpperCase()}</span>
+                      <div className="list__body">
+                        <div className="list__title">{title}</div>
+                        {sub && <div className="list__sub">{sub}</div>}
+                      </div>
+                      {status && <StatusBadge tone={statusTone(status)} label={status} />}
+                      {amount && <span className="list__trail list__trail--text">{amount}</span>}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        }
+        return (
+          <div className="card" key={k}>
+            <div className="list">
+              {ROWS.map((r) => (
+                <div className="list__item" key={r.name}>
+                  <span className="avatar avatar--sm" aria-hidden="true">{r.name.charAt(0)}</span>
+                  <div className="list__body"><div className="list__title">{r.name}</div><div className="list__sub">Updated recently</div></div>
+                  <StatusBadge tone={r.tone} label={r.status} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      }
+      case 'banner':
+        return (
+          <div className="banner banner--info" role="status" key={k}>
+            <Icon name="bell" />
+            <div className="banner__body">{content.notice || `New activity in ${appName}`}</div>
+          </div>
+        )
       case 'cardgrid': {
         // Real card titles from vision when present (meta = a plain subtitle, no
         // fabricated status tone); otherwise the demo tiles with status badges.

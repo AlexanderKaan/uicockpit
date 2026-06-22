@@ -32,6 +32,7 @@ export interface VisionResult {
   stats?: Array<{ value?: string; label?: string }>
   filters?: string[]
   cards?: Array<{ title?: string; meta?: string }>
+  notice?: string
 }
 
 /** Clamp a model-returned 2-D array to rows×cells, coercing every cell to a string. */
@@ -105,6 +106,7 @@ export async function detectFromImage(file: File): Promise<DetectedFromImage | n
         stats: stats && stats.length ? stats : undefined,
         filters: toStrs(v.filters, 5),
         cards: cards && cards.length ? cards : undefined,
+        notice: typeof v.notice === 'string' && v.notice.trim() ? v.notice.trim() : undefined,
       },
       blocks: Array.isArray(v.blocks) ? v.blocks : [],
     }
