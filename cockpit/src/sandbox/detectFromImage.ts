@@ -31,6 +31,7 @@ export interface VisionResult {
   rows?: string[][]
   stats?: Array<{ value?: string; label?: string }>
   filters?: string[]
+  cards?: Array<{ title?: string; meta?: string }>
 }
 
 /** Clamp a model-returned 2-D array to rows×cells, coercing every cell to a string. */
@@ -87,6 +88,10 @@ export async function detectFromImage(file: File): Promise<DetectedFromImage | n
       ? v.stats.map((s) => ({ value: String(s?.value ?? ''), label: String(s?.label ?? '') }))
           .filter((s) => s.value || s.label).slice(0, 4)
       : undefined
+    const cards = Array.isArray(v.cards)
+      ? v.cards.map((c) => ({ title: String(c?.title ?? ''), meta: String(c?.meta ?? '') }))
+          .filter((c) => c.title).slice(0, 6)
+      : undefined
     return {
       extraction: toExtraction(v),
       content: {
@@ -99,6 +104,7 @@ export async function detectFromImage(file: File): Promise<DetectedFromImage | n
         rows: toRows(v.rows, 6, 6),
         stats: stats && stats.length ? stats : undefined,
         filters: toStrs(v.filters, 5),
+        cards: cards && cards.length ? cards : undefined,
       },
       blocks: Array.isArray(v.blocks) ? v.blocks : [],
     }

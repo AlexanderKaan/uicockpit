@@ -27,6 +27,8 @@ export interface Content {
   stats?: Array<{ value: string; label: string }>
   /** Filter-bar chip labels (vision path only). No counts — never fabricated. */
   filters?: string[]
+  /** Card-grid tiles: title + optional meta/subtitle (vision path only). */
+  cards?: Array<{ title: string; meta: string }>
 }
 
 export interface ContentExtraction {

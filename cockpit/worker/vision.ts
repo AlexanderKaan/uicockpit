@@ -44,6 +44,7 @@ const PROMPT = `You are analysing a SCREENSHOT of a web-app UI. Identify the lay
 - "rows": up to 6 data rows; each row is an array of the cell texts in column order (max 6 cells). Transcribe the real cell text; skip icon-only cells.
 - "stats": up to 4 KPI tiles as {"value":"...","label":"..."} — ONLY if metric tiles are actually visible.
 - "filters": the filter/segment chip labels in a filter bar (the pill row above a list, e.g. "All", "Active", "Archived"), in order, max 5 — the chip TEXT only. NEVER invent counts. Omit if there is no filter bar.
+- "cards": if a CARD GRID is visible (a grid of project/file/entity tiles, not a table), up to 6 as {"title":"...","meta":"..."} — title = the card's heading text, meta = a short status/subtitle if shown (else omit meta). Real text only. Omit the key entirely if there is no card grid.
 Omit any key you cannot read confidently — a missing key is better than a guessed one. Output JSON only.`
 
 /** Pull the first JSON object out of a model reply (tolerates stray prose/fences). */

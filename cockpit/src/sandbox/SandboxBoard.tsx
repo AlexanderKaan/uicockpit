@@ -82,6 +82,7 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
   const realCols = content.columns?.length ? content.columns : null
   const realRows = content.rows?.length ? content.rows : null
   const realFilters = content.filters?.length ? content.filters : null
+  const realCards = content.cards?.length ? content.cards : null
   const tableTitle = content.tableTitle || heading
 
   const hasSidebar = list.includes('sidebar')
@@ -172,20 +173,27 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
           </div>
         )
       }
-      case 'cardgrid':
+      case 'cardgrid': {
+        // Real card titles from vision when present (meta = a plain subtitle, no
+        // fabricated status tone); otherwise the demo tiles with status badges.
+        const cards = realCards
+          ? realCards.map((c) => ({ title: c.title, meta: c.meta, tone: null as null }))
+          : ROWS.map((r) => ({ title: r.name, meta: r.status, tone: r.tone as typeof r.tone | null }))
         return (
           <div className="sbx-cardgrid" key={k} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 'var(--k-gap, 16px)' }}>
-            {ROWS.map((r) => (
-              <div className="card" key={r.name}>
-                <div className="card__head"><h3 className="card__title">{r.name}</h3></div>
+            {cards.map((c, i) => (
+              <div className="card" key={i}>
+                <div className="card__head"><h3 className="card__title">{c.title}</h3></div>
                 <div className="card__row" style={{ justifyContent: 'space-between' }}>
-                  <StatusBadge tone={r.tone} label={r.status} />
+                  {c.tone ? <StatusBadge tone={c.tone} label={c.meta} />
+                    : <span style={{ color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }}>{c.meta}</span>}
                   <button className="btn btn--ghost btn--sm">Open</button>
                 </div>
               </div>
             ))}
           </div>
         )
+      }
       case 'form':
         return (
           <div className="card" key={k} style={{ maxWidth: 460 }}>
