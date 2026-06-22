@@ -30,16 +30,20 @@ const json = (data: unknown, status = 200): Response =>
 
 const BLOCKS = 'sidebar, appbar, toolbar, tabnav, searchbar, filterbar, statstrip, datatable, cardgrid, form'
 
-const PROMPT = `You are analysing a SCREENSHOT of a web app UI. Identify which layout BLOCKS it is built from and read its design foundation + key text. Reply with ONLY a JSON object (no prose, no markdown fence), with these keys:
+const PROMPT = `You are analysing a SCREENSHOT of a web-app UI. Identify the layout BLOCKS it is built from, read its design foundation, and transcribe its key TEXT. Reply with ONLY a JSON object (no prose, no markdown fence). Keys:
 - "mode": "light" or "dark" (the page background).
-- "brandHex": the primary/accent colour as #rrggbb (the brand button / logo colour). Omit if greyscale.
+- "brandHex": the primary/accent colour as #rrggbb (the brand button or logo colour). Omit if greyscale.
 - "neutral": "cool", "warm", or "neutral" (the grey tint).
-- "blocks": an ordered top-to-bottom array drawn ONLY from this vocabulary: [${BLOCKS}]. Use "sidebar" for a left nav rail (else "tabnav" for top tabs). Include every block you see; order matters.
-- "appName": the product/brand name (short).
-- "nav": up to 6 navigation labels, in order.
-- "heading": the main page heading.
+- "blocks": ordered top-to-bottom array, ONLY from this vocabulary: [${BLOCKS}]. Include ONLY blocks that are actually visible — do NOT add "statstrip" unless you can see metric/KPI tiles, or "datatable" unless there are tabular rows. Use "sidebar" for a left nav rail (else "tabnav" for top tabs). Order matters.
+- "appName": the product/brand name as readable TEXT only. If the logo is a glyph/icon with no readable wordmark, OMIT this key. NEVER transcribe decorative symbols (e.g. ©, =, the hamburger, a coloured dot).
+- "nav": the sidebar or top-nav item labels, in order, max 6. Each entry is ONE COMPLETE label exactly as shown — a label may be several words (e.g. "Onderweg naar mij"); never split one label into multiple entries, and never include table column headers or bare icons.
+- "heading": the main page title — the bold H1 above the main content or in the top bar. OMIT if there is no clear single title.
 - "primaryBtn": the most prominent call-to-action button label.
-Omit any key you cannot read. Output JSON only.`
+- "tableTitle": the title of the main data table or list, if one is present.
+- "columns": the data table's column header labels, in order, max 6.
+- "rows": up to 6 data rows; each row is an array of the cell texts in column order (max 6 cells). Transcribe the real cell text; skip icon-only cells.
+- "stats": up to 4 KPI tiles as {"value":"...","label":"..."} — ONLY if metric tiles are actually visible.
+Omit any key you cannot read confidently — a missing key is better than a guessed one. Output JSON only.`
 
 /** Pull the first JSON object out of a model reply (tolerates stray prose/fences). */
 function parseJson(text: string): unknown {
@@ -61,8 +65,8 @@ export async function handleVision(request: Request, env: VisionEnv): Promise<Re
   const mediaType = m[1] === 'image/jpg' ? 'image/jpeg' : m[1]
 
   const body = {
-    model: env.VISION_MODEL || 'claude-sonnet-4-6',
-    max_tokens: 700,
+    model: env.VISION_MODEL || 'claude-opus-4-8',
+    max_tokens: 1024,
     messages: [{
       role: 'user',
       content: [

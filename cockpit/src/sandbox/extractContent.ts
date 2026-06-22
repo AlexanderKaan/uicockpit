@@ -18,6 +18,13 @@ export interface Content {
   primaryBtn?: string
   /** A page heading (h1) → the appbar title / page lead. */
   heading?: string
+  /** Data table: title + column headers + a few rows (vision path only —
+   *  the static markup path leaves these undefined and the board uses demo data). */
+  tableTitle?: string
+  columns?: string[]
+  rows?: string[][]
+  /** KPI tiles: value + label (vision path only). */
+  stats?: Array<{ value: string; label: string }>
 }
 
 export interface ContentExtraction {

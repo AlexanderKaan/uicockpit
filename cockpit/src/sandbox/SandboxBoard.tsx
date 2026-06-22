@@ -51,6 +51,15 @@ const ROWS: Array<{ name: string; status: string; tone: 'success' | 'warn' | 'in
 const FILTERS = ['All', 'Active', 'Pending', 'Archived']
 const COUNTS = [128, 64, 12, 41]
 
+/** Guess a badge tone from a status cell's text (EN + a little NL), so a detected
+ *  "Status" column reads like a real app table. Falls back to a neutral info tone. */
+function statusTone(label: string): 'success' | 'warn' | 'info' {
+  const s = label.toLowerCase()
+  if (/(active|online|paid|done|live|approved|success|complete|delivered|actief|geleverd|voltooid|betaald)/.test(s)) return 'success'
+  if (/(pending|review|processing|waiting|queued|onderweg|open|in behandeling|wacht|aangemeld)/.test(s)) return 'warn'
+  return 'info'
+}
+
 function BrandMark() {
   return (
     <span className="sidenav__icon" aria-hidden="true">
@@ -69,6 +78,11 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
   const menu = content.menu.length ? content.menu : ['Overview', 'Customers', 'Reports', 'Settings']
   const heading = content.heading || menu[0] || 'Dashboard'
   const primaryBtn = content.primaryBtn || 'New'
+  // Vision can now read the real table + KPIs; fall back to demo data when absent.
+  const realStats = content.stats?.length ? content.stats : null
+  const realCols = content.columns?.length ? content.columns : null
+  const realRows = content.rows?.length ? content.rows : null
+  const tableTitle = content.tableTitle || heading
 
   const hasSidebar = list.includes('sidebar')
   const hasToolbar = list.includes('toolbar')
@@ -103,21 +117,46 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
             ))}
           </div>
         )
-      case 'statstrip':
+      case 'statstrip': {
+        const tiles = realStats ?? STATS.map((s) => ({ value: s.v, label: s.l }))
         return (
           <div className="stat-tile-strip" key={k}>
-            {STATS.map((s) => (
-              <div className="stat-tile-strip__cell" key={s.l}>
-                <div className="stat-tile__value">{s.v}</div>
-                <div className="stat-tile__label">{s.l}</div>
+            {tiles.map((s, i) => (
+              <div className="stat-tile-strip__cell" key={i}>
+                <div className="stat-tile__value">{s.value}</div>
+                <div className="stat-tile__label">{s.label}</div>
               </div>
             ))}
           </div>
         )
-      case 'datatable':
+      }
+      case 'datatable': {
+        // Real columns + rows from vision → render THEIR table; else demo data.
+        if (realCols && realRows) {
+          const statusIdx = realCols.findIndex((c) => /status|state|fase|stage|stadium/i.test(c))
+          return (
+            <div className="card" key={k}>
+              <div className="card__head"><h3 className="card__title">{tableTitle}</h3></div>
+              <table className="tbl">
+                <thead><tr>{realCols.map((c, i) => <th key={i}>{c}</th>)}<th></th></tr></thead>
+                <tbody>
+                  {realRows.map((row, ri) => (
+                    <tr key={ri}>
+                      {realCols.map((_, ci) => {
+                        const cell = row[ci] ?? ''
+                        return <td key={ci}>{ci === statusIdx && cell ? <StatusBadge tone={statusTone(cell)} label={cell} /> : cell}</td>
+                      })}
+                      <td><Icon name="dots" /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        }
         return (
           <div className="card" key={k}>
-            <div className="card__head"><h3 className="card__title">{heading}</h3></div>
+            <div className="card__head"><h3 className="card__title">{tableTitle}</h3></div>
             <table className="tbl">
               <thead><tr><th>Name</th><th>Status</th><th></th></tr></thead>
               <tbody>
@@ -128,6 +167,7 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
             </table>
           </div>
         )
+      }
       case 'cardgrid':
         return (
           <div className="sbx-cardgrid" key={k} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 'var(--k-gap, 16px)' }}>

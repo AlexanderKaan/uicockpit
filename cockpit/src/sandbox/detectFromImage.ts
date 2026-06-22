@@ -26,7 +26,21 @@ export interface VisionResult {
   nav?: string[]
   heading?: string
   primaryBtn?: string
+  tableTitle?: string
+  columns?: string[]
+  rows?: string[][]
+  stats?: Array<{ value?: string; label?: string }>
 }
+
+/** Clamp a model-returned 2-D array to rows×cells, coercing every cell to a string. */
+function toRows(v: unknown, maxRows: number, maxCells: number): string[][] | undefined {
+  if (!Array.isArray(v)) return undefined
+  const rows = v.filter(Array.isArray).slice(0, maxRows)
+    .map((row) => (row as unknown[]).slice(0, maxCells).map((c) => String(c ?? '')))
+  return rows.length ? rows : undefined
+}
+const toStrs = (v: unknown, n: number): string[] | undefined =>
+  Array.isArray(v) ? v.map((s) => String(s ?? '')).filter(Boolean).slice(0, n) : undefined
 
 export interface DetectedFromImage { extraction: Extraction; content: Content; blocks: BlockKind[] }
 
@@ -68,9 +82,22 @@ export async function detectFromImage(file: File): Promise<DetectedFromImage | n
     if (!r.ok) return null
     const v = (await r.json()) as VisionResult
     if (!v || typeof v !== 'object') return null
+    const stats = Array.isArray(v.stats)
+      ? v.stats.map((s) => ({ value: String(s?.value ?? ''), label: String(s?.label ?? '') }))
+          .filter((s) => s.value || s.label).slice(0, 4)
+      : undefined
     return {
       extraction: toExtraction(v),
-      content: { appName: v.appName, menu: Array.isArray(v.nav) ? v.nav.slice(0, 6) : [], heading: v.heading, primaryBtn: v.primaryBtn },
+      content: {
+        appName: v.appName,
+        menu: toStrs(v.nav, 6) ?? [],
+        heading: v.heading,
+        primaryBtn: v.primaryBtn,
+        tableTitle: v.tableTitle,
+        columns: toStrs(v.columns, 6),
+        rows: toRows(v.rows, 6, 6),
+        stats: stats && stats.length ? stats : undefined,
+      },
       blocks: Array.isArray(v.blocks) ? v.blocks : [],
     }
   } catch {
