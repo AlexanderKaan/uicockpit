@@ -1361,6 +1361,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * (no cramped inner well). The 240px cap stays for the compact gallery tile. */
 .datatable__body { max-height: 240px; overflow: auto; }
 .datatable--page .datatable__body { max-height: none; overflow: visible; }
+/* Narrow screens: a wide page table would crush its columns and clip the last
+   one. Keep a sane min width and scroll the body horizontally instead — the
+   universal mobile-table affordance (the toolbar stacks separately below). */
+@container datatable (max-width: 40rem) {
+  .datatable--page .datatable__body { overflow-x: auto; }
+  .datatable--page .tbl { min-width: 34rem; }
+}
 .datatable .tbl thead th {
   position: sticky; top: 0; z-index: 1;
   background: var(--k-surface);
@@ -2004,6 +2011,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   background: var(--k-chrome-bg, var(--k-bg));
   border-bottom: var(--k-bw) solid var(--k-border);
   min-width: 0;
+  /* Narrow screens: let the trailing cluster (search + actions) drop below the
+     title instead of overflowing the bar. No-op while there's room. */
+  flex-wrap: wrap;
 }
 .appbar__title {
   font-family: var(--k-font-display);
@@ -3507,8 +3517,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
      Surface, not the fill. Tabs (.tab underline) stay their own semantic choice;
      Surface never swaps segmented ↔ underline. */
   border: 1px solid var(--k-field-border-color);
+  /* Like .tabs: a too-wide track (many filters on a narrow screen) scrolls
+     horizontally rather than crushing or wrapping its pills. Scrollbar hidden. */
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.segctrl::-webkit-scrollbar { display: none; }
 .segctrl__btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
   padding: var(--k-s-4) var(--k-s-12);
   border: 0;
   background: transparent;
