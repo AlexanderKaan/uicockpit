@@ -37,6 +37,7 @@ import { genShadcn } from './genShadcn'
 import { genContract } from './genContract'
 import { genDesignMd } from './genDesignMd'
 import { genSkill } from './genSkill'
+import { zipSync } from './zip'
 
 /** Base URL of the Live Kit CDN Worker (cockpit/worker). The stateless lane
  *  `${BASE}/k/<hash>.css` serves genCss(decode(hash)) — the full kit, byte-identical
@@ -64,23 +65,47 @@ const FORMATS: Fmt[] = [
   { id: 'shadcn', label: 'shadcn/ui', hint: '--background, --primary, …', filename: 'shadcn-globals.css', icon: Layers, generator: genShadcn },
 ]
 
-/* ── The pack — three named artifacts (the hosted link is the 1st, rendered as the
- * hero). design.md = the spec; the skill = the enforcement layer; contract.json is
- * bundled for `uicockpit check`. The skill's delivery filename gets an agent picker
- * in Slice 3; for now a neutral AGENTS.md default. */
-interface PackItem {
-  key: string
+/* ── The pack — named artifacts (the hosted link is the 1st, rendered as the hero).
+ * design.md = the spec; the skill = the enforcement layer; contract.json bundled for
+ * `uicockpit check`. A precomputed text + filename per row (so the same row renders
+ * the agent-specific skill file). */
+interface PackEntry {
   label: string
   hint: string
   filename: string
   icon: React.ComponentType<{ size?: number; strokeWidth?: number }>
-  generator: (cfg: Config) => string
+  text: string
 }
-const PACK: PackItem[] = [
-  { key: 'design', label: 'design.md', hint: 'The spec — values, rules + your AI-agent appendix', filename: 'design.md', icon: FileText, generator: genDesignMd },
-  { key: 'skill', label: 'Agent rules', hint: 'The enforcement layer — always / never + verify loop', filename: 'AGENTS.md', icon: Sparkles, generator: genSkill },
-  { key: 'contract', label: 'contract.json', hint: 'Bundled — what `npx uicockpit check` verifies', filename: 'uicockpit.contract.json', icon: ShieldCheck, generator: genContract },
+
+/* ── Agent picker — the skill body is agent-agnostic (genSkill); only the delivery
+ * filename + any frontmatter differ per tool. */
+type Agent = 'claude' | 'cursor' | 'windsurf' | 'generic'
+const AGENTS: ReadonlyArray<{ id: Agent; cap: string }> = [
+  { id: 'claude', cap: 'Claude' },
+  { id: 'cursor', cap: 'Cursor' },
+  { id: 'windsurf', cap: 'Windsurf' },
+  { id: 'generic', cap: 'AGENTS.md' },
 ]
+const AGENT_FILE: Record<Agent, string> = {
+  claude: 'SKILL.md',
+  cursor: '.cursor/rules/uicockpit.mdc',
+  windsurf: '.windsurfrules',
+  generic: 'AGENTS.md',
+}
+/** The skill file for a given agent: the shared body + the right filename and any
+ *  tool-specific frontmatter (Claude skill metadata; Cursor .mdc always-apply). */
+function skillFile(agent: Agent, cfg: Config): { filename: string; text: string } {
+  const body = genSkill(cfg)
+  if (agent === 'claude') {
+    const fm = '---\nname: uicockpit-design-system\ndescription: Apply the configured UICockpit design system — token commandments + a verify loop. Use whenever building or restyling UI in this project.\n---\n\n'
+    return { filename: AGENT_FILE.claude, text: fm + body }
+  }
+  if (agent === 'cursor') {
+    const fm = '---\ndescription: UICockpit design-system rules\nalwaysApply: true\n---\n\n'
+    return { filename: AGENT_FILE.cursor, text: fm + body }
+  }
+  return { filename: AGENT_FILE[agent], text: body }
+}
 
 /* === Install layer — framework + package-manager pickers ============
  * shadcn/create's lesson: don't just dump code, tell the user how to
@@ -173,6 +198,7 @@ interface ExportModalProps {
 export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
   const [view, setView] = useState<View>('kit')
   const [fmt, setFmt] = useState<FmtId>('css')
+  const [agent, setAgent] = useState<Agent>('claude')
   const [framework, setFramework] = useState<Framework>('next')
   const [pm, setPm] = useState<Pm>('pnpm')
 
@@ -225,7 +251,7 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
           </nav>
           <div className="modal__pane">
             {view === 'kit' ? (
-              <KitPane cfg={cfg} onToast={onToast} onEject={() => setView('formats')} />
+              <KitPane cfg={cfg} agent={agent} onAgent={setAgent} onToast={onToast} onEject={() => setView('formats')} />
             ) : (
               <FormatsPane
                 cfg={cfg}
@@ -407,33 +433,32 @@ function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ 
 }
 
 /** A pack row — one named artifact with copy + download. */
-function PackRow({ item, cfg, onToast }: { item: PackItem; cfg: Config; onToast: (m: string) => void }) {
-  const Cmp = item.icon
-  const text = () => item.generator(cfg)
+function PackRow({ entry, onToast }: { entry: PackEntry; onToast: (m: string) => void }) {
+  const Cmp = entry.icon
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(text())
-      onToast(`${item.filename} copied`)
+      await navigator.clipboard.writeText(entry.text)
+      onToast(`${entry.filename} copied`)
     } catch {
       onToast('Copy failed — select & copy manually')
     }
   }
   const download = () => {
-    downloadText(text(), item.filename)
-    onToast(`${item.filename} downloaded`)
+    downloadText(entry.text, entry.filename)
+    onToast(`${entry.filename} downloaded`)
   }
   return (
     <div className="export-pack__row">
       <span className="export-pack__ic" aria-hidden="true"><Cmp size={16} strokeWidth={1.75} /></span>
       <div className="export-pack__body">
-        <div className="export-pack__label">{item.label} <span className="export-pack__file">{item.filename}</span></div>
-        <div className="export-pack__hint">{item.hint}</div>
+        <div className="export-pack__label">{entry.label} <span className="export-pack__file">{entry.filename}</span></div>
+        <div className="export-pack__hint">{entry.hint}</div>
       </div>
       <div className="export-pack__actions">
-        <button type="button" className="modal__btn" onClick={copy} aria-label={`Copy ${item.filename}`}>
+        <button type="button" className="modal__btn" onClick={copy} aria-label={`Copy ${entry.filename}`}>
           <Copy size={13} strokeWidth={1.75} />
         </button>
-        <button type="button" className="modal__btn" onClick={download} aria-label={`Download ${item.filename}`}>
+        <button type="button" className="modal__btn" onClick={download} aria-label={`Download ${entry.filename}`}>
           <Download size={13} strokeWidth={1.75} />
         </button>
       </div>
@@ -444,12 +469,36 @@ function PackRow({ item, cfg, onToast }: { item: PackItem; cfg: Config; onToast:
 /** Use-this-kit pane — the install experience. Hosted <link> as the headline, then
  *  the pack (design.md · skill · contract), then "what's in your kit" (choices +
  *  WCAG + recipes). */
-function KitPane({ cfg, onToast, onEject }: { cfg: Config; onToast: (msg: string) => void; onEject: () => void }) {
+function KitPane({
+  cfg,
+  agent,
+  onAgent,
+  onToast,
+  onEject,
+}: {
+  cfg: Config
+  agent: Agent
+  onAgent: (a: Agent) => void
+  onToast: (msg: string) => void
+  onEject: () => void
+}) {
   const tk = useMemo(() => buildTokens(cfg), [cfg])
   const a11y = useMemo(() => auditContrast(tk), [tk])
   const a11yPass = a11y.filter((p) => p.passes).length
   const a11yTotal = a11y.length
   const choices = buildChoices(cfg, tk)
+
+  // The pack artifacts — precomputed once per cfg/agent. The skill row's filename +
+  // frontmatter follow the picked agent; design.md + contract.json are agent-agnostic.
+  const skill = useMemo(() => skillFile(agent, cfg), [agent, cfg])
+  const entries: PackEntry[] = useMemo(
+    () => [
+      { label: 'design.md', hint: 'The spec — values, rules + your AI-agent appendix', filename: 'design.md', icon: FileText, text: genDesignMd(cfg) },
+      { label: 'Agent rules', hint: 'The enforcement layer — always / never + verify loop', filename: skill.filename, icon: Sparkles, text: skill.text },
+      { label: 'contract.json', hint: 'Bundled — what `npx uicockpit check` verifies', filename: 'uicockpit.contract.json', icon: ShieldCheck, text: genContract(cfg) },
+    ],
+    [cfg, skill],
+  )
 
   // The hosted-kit CDN <link> — the front door. Built from the SAME share-key the
   // app uses (encode(cfg)); the Worker serves genCss(decode(key)) at this URL,
@@ -465,11 +514,23 @@ function KitPane({ cfg, onToast, onEject }: { cfg: Config; onToast: (msg: string
     }
   }
 
-  // "Download pack" — all three pack files (the flat multi-file fallback; Slice 3
-  // upgrades this to a single zip). Stagger so browsers don't drop rapid downloads.
+  // "Download pack" — one zip: the link snippet + design.md + the agent skill file
+  // (right filename/frontmatter) + tokens.css + contract.json.
   const downloadPack = () => {
-    PACK.forEach((item, i) => setTimeout(() => downloadText(item.generator(cfg), item.filename), i * 150))
-    onToast('Downloading pack…')
+    const blob = zipSync([
+      { name: 'kit-link.txt', text: `${kitSnippet}\n` },
+      { name: 'design.md', text: entries[0]!.text },
+      { name: skill.filename, text: skill.text },
+      { name: 'tokens.css', text: genCss(cfg) },
+      { name: 'uicockpit.contract.json', text: entries[2]!.text },
+    ])
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'uicockpit-kit.zip'
+    a.click()
+    URL.revokeObjectURL(url)
+    onToast('Pack downloaded (.zip)')
   }
 
   return (
@@ -512,8 +573,12 @@ function KitPane({ cfg, onToast, onEject }: { cfg: Config; onToast: (msg: string
             Download pack
           </button>
         </div>
-        {PACK.map((item) => (
-          <PackRow key={item.key} item={item} cfg={cfg} onToast={onToast} />
+        <div className="export-pack__agent">
+          <span className="export-pack__agent-label">Agent rules for</span>
+          <Seg options={AGENTS} value={agent} onChange={onAgent} />
+        </div>
+        {entries.map((e) => (
+          <PackRow key={e.label} entry={e} onToast={onToast} />
         ))}
       </div>
 
