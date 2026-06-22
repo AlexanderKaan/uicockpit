@@ -211,7 +211,7 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
   }, [onClose])
 
   const NAV: ReadonlyArray<{ id: View; label: string; hint: string; icon: Fmt['icon'] }> = [
-    { id: 'kit', label: 'Use this kit', hint: 'The install — one link + the pack', icon: Sparkles },
+    { id: 'kit', label: 'Quick install', hint: 'One link + the agent pack', icon: Sparkles },
     { id: 'formats', label: 'Other formats', hint: 'tokens.css · Tailwind · shadcn', icon: FileCode },
   ]
 
@@ -536,10 +536,10 @@ function KitPane({
   return (
     <div className="export-ov">
       <div className="export-ov__head">
-        <div className="export-ov__title">Use this kit</div>
         <p className="export-ov__sub">
-          Drop one hosted <code>&lt;link&gt;</code> in your <code>&lt;head&gt;</code>, then hand
-          your AI agent the pack below — the {choices.length} choices you made, baked in.
+          Two pieces, both built from the {choices.length} choices you made: a{' '}
+          <strong>link</strong> so your app wears the kit, and a <strong>pack</strong> so
+          your AI agent builds new screens in it.
         </p>
       </div>
 
@@ -547,14 +547,14 @@ function KitPane({
       <div className="export-cdn">
         <div className="export-cdn__head">
           <span className="export-cdn__ic" aria-hidden="true"><Link2 size={15} strokeWidth={1.9} /></span>
-          <span className="export-cdn__label">Hosted kit · one link</span>
+          <span className="export-cdn__label">Step 1 · Link — your app wears the kit</span>
           <span className="export-cdn__live"><span className="export-cdn__live-dot" />Live</span>
         </div>
         <div className="export-cdn__snippet">
           <code className="export-cdn__code">{kitSnippet}</code>
           <button type="button" className="export-cdn__copy" onClick={copyKit}>
             <Copy size={13} strokeWidth={1.9} />
-            Copy
+            Copy link
           </button>
         </div>
         <p className="export-cdn__note">
@@ -567,22 +567,33 @@ function KitPane({
           contract.json bundled for `uicockpit check`. */}
       <div className="export-pack">
         <div className="export-pack__head">
-          <span className="export-pack__title">The pack — hand this to your AI agent</span>
+          <span className="export-pack__title">Step 2 · Pack — your agent builds in the kit</span>
           <button type="button" className="modal__btn modal__btn--primary" onClick={downloadPack}>
             <Package size={13} strokeWidth={1.75} />
             Download pack
           </button>
         </div>
         <div className="export-pack__agent">
-          <span className="export-pack__agent-label">Agent rules for</span>
+          <span className="export-pack__agent-label">Building with</span>
           <Seg options={AGENTS} value={agent} onChange={onAgent} />
         </div>
         {entries.map((e) => (
           <PackRow key={e.label} entry={e} onToast={onToast} />
         ))}
+        <div className="export-pack__how">
+          <span className="export-pack__how-title">How to use it</span>
+          <ol className="export-pack__how-steps">
+            <li>Add the <code>&lt;link&gt;</code> above to your app's <code>&lt;head&gt;</code>.</li>
+            <li>Commit <code>design.md</code> + the rules file (<code>{skill.filename}</code>) to your repo.</li>
+            <li>Tell your agent <em>“follow design.md”</em>, then run <code>npx uicockpit check</code> to catch drift.</li>
+          </ol>
+        </div>
       </div>
 
-      {/* What's in your kit — choices recap. */}
+      {/* What's in your kit — proof (choices + WCAG), demoted behind a disclosure
+          so the actions (link + pack) stay above the fold. */}
+      <details className="export-ov__reveal">
+        <summary className="export-ov__reveal-sum">What's in your kit — {choices.length} settings · {a11yPass}/{a11yTotal} WCAG pairs pass</summary>
       <div className="export-ov__choices">
         {choices.map((c) => (
           <div key={c.label} className="export-ov__choice">
@@ -616,6 +627,7 @@ function KitPane({
           ))}
         </div>
       </div>
+      </details>
 
       {/* Component recipes promise + eject to the formats drawer. */}
       <div className="export-ov__recipes">

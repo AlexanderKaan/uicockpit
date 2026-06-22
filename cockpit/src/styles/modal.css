@@ -457,6 +457,65 @@
   flex-shrink: 0;
 }
 
+/* The pack's how-to — the 1-2-3 the primary path was missing. */
+.export-pack__how {
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-sunken);
+}
+.export-pack__how-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--app-fg-faint);
+}
+.export-pack__how-steps {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.export-pack__how-steps li {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--app-fg-muted);
+}
+.export-pack__how-steps code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--app-fg);
+}
+
+/* "What's in your kit" — proof demoted behind a disclosure. */
+.export-ov__reveal {
+  margin-bottom: 24px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+}
+.export-ov__reveal-sum {
+  cursor: pointer;
+  list-style: none;
+  padding: 11px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--app-fg);
+  user-select: none;
+}
+.export-ov__reveal-sum::-webkit-details-marker { display: none; }
+.export-ov__reveal-sum::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--app-fg-faint);
+  transition: transform 150ms ease;
+}
+.export-ov__reveal[open] .export-ov__reveal-sum::before { transform: rotate(90deg); }
+.export-ov__reveal[open] .export-ov__reveal-sum { border-bottom: 1px solid var(--app-border); }
+.export-ov__reveal > .export-ov__choices { padding: 14px 14px 0; margin-bottom: 0; }
+.export-ov__reveal > .export-ov__a11y { padding: 14px; }
+
 /* Other-formats drawer — the eject-to-files path. */
 .export-fmt__hint {
   margin: 10px 0 16px;
