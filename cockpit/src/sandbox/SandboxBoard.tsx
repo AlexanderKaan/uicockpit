@@ -22,6 +22,7 @@ export type BlockKind =
   | 'searchbar'  // prominent search field (.searchinput)    — body
   | 'filterbar'  // filter chips with counts (.chip+.badge)  — body
   | 'statstrip'  // KPI tiles (.stat-tile-strip)             — body
+  | 'summary'    // overview cards w/ label+value rows (.card+.dl) — body
   | 'datatable'  // rows table (.tbl)                        — body
   | 'list'       // feed / activity / transaction list (.list) — body
   | 'banner'     // info / notice strip (.banner)            — body
@@ -38,7 +39,7 @@ interface SandboxBoardProps {
 const DEFAULT_BLOCKS: BlockKind[] = ['sidebar', 'appbar', 'statstrip', 'datatable']
 /** Blocks that stack in the page body (everything but the structural sidebar/
  *  appbar/toolbar). Rendered in the DETECTED order so the layout follows the app. */
-const BODY_KINDS = new Set<BlockKind>(['tabnav', 'searchbar', 'filterbar', 'statstrip', 'datatable', 'list', 'banner', 'cardgrid', 'form'])
+const BODY_KINDS = new Set<BlockKind>(['tabnav', 'searchbar', 'filterbar', 'statstrip', 'summary', 'datatable', 'list', 'banner', 'cardgrid', 'form'])
 const NAV_ICONS: IconName[] = ['home', 'grid', 'chart', 'file', 'cal', 'cog']
 
 const STATS = [
@@ -85,6 +86,8 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
   const realRows = content.rows?.length ? content.rows : null
   const realFilters = content.filters?.length ? content.filters : null
   const realCards = content.cards?.length ? content.cards : null
+  const realSummary = content.summary?.length ? content.summary : null
+  const navGroups = content.navGroups?.length ? content.navGroups : null
   const tableTitle = content.tableTitle || heading
 
   const hasSidebar = list.includes('sidebar')
@@ -131,6 +134,31 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
               <div className="stat-tile-strip__cell" key={i}>
                 <div className="stat-tile__value">{s.value}</div>
                 <div className="stat-tile__label">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        )
+      }
+      case 'summary': {
+        // Overview cards (Bank / Invoices / Income) — each a .card with a head +
+        // a .dl of label/value rows. Real cards from vision; else a default trio.
+        const cards = realSummary ?? [
+          { title: 'Balance', rows: [{ label: 'Available', value: '$24,500' }, { label: 'Pending', value: '$1,280' }] },
+          { title: 'Invoices', rows: [{ label: 'Outstanding', value: '$7,233' }, { label: 'Overdue', value: '$2,787' }] },
+          { title: 'Expenses', rows: [{ label: 'This month', value: '$4,120' }, { label: 'Budget left', value: '$3,844' }] },
+        ]
+        return (
+          <div className="sbx-summary" key={k} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--k-gap, 16px)' }}>
+            {cards.map((c, i) => (
+              <div className="card" key={i}>
+                <div className="card__head"><h3 className="card__title">{c.title}</h3></div>
+                <dl className="dl">
+                  {c.rows.map((r, ri) => (
+                    <span key={ri} style={{ display: 'contents' }}>
+                      <dt>{r.label}</dt><dd>{r.value}</dd>
+                    </span>
+                  ))}
+                </dl>
               </div>
             ))}
           </div>
@@ -294,12 +322,31 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
               <div className="scaffold__nav">
                 <nav className="sidenav" aria-label={`${appName} navigation`}>
                   <div className="sidenav__brand"><BrandMark /><span className="sidenav__name">{appName}</span></div>
-                  <div className="nav-group">Workspace</div>
-                  {menu.map((label, i) => (
-                    <button key={label} type="button" className={`navrow ${i === 0 ? 'navrow--on' : ''}`} data-tip={label} aria-current={i === 0 ? 'page' : undefined}>
-                      <Icon name={NAV_ICONS[i % NAV_ICONS.length]!} /><span className="navrow__label">{label}</span>
-                    </button>
-                  ))}
+                  {navGroups ? (
+                    // Grouped nav — section header + its items (Overzicht › Feed…).
+                    navGroups.map((g, gi) => (
+                      <div key={g.label}>
+                        <div className="nav-group">{g.label}</div>
+                        {g.items.map((label, i) => {
+                          const on = gi === 0 && i === 0
+                          return (
+                            <button key={label} type="button" className={`navrow ${on ? 'navrow--on' : ''}`} data-tip={label} aria-current={on ? 'page' : undefined}>
+                              <Icon name={NAV_ICONS[(gi + i) % NAV_ICONS.length]!} /><span className="navrow__label">{label}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      <div className="nav-group">Workspace</div>
+                      {menu.map((label, i) => (
+                        <button key={label} type="button" className={`navrow ${i === 0 ? 'navrow--on' : ''}`} data-tip={label} aria-current={i === 0 ? 'page' : undefined}>
+                          <Icon name={NAV_ICONS[i % NAV_ICONS.length]!} /><span className="navrow__label">{label}</span>
+                        </button>
+                      ))}
+                    </>
+                  )}
                   <div className="sidenav__foot">
                     <button type="button" className="navrow" data-tip="Settings"><Icon name="cog" /><span className="navrow__label">Settings</span></button>
                     <button type="button" className="navrow" data-tip="Collapse"><Icon name="chevL" /><span className="navrow__label">Collapse</span></button>

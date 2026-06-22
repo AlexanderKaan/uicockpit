@@ -33,6 +33,8 @@ export interface VisionResult {
   filters?: string[]
   cards?: Array<{ title?: string; meta?: string }>
   notice?: string
+  navGroups?: Array<{ label?: string; items?: string[] }>
+  summary?: Array<{ title?: string; rows?: Array<{ label?: string; value?: string }> }>
 }
 
 /** Clamp a model-returned 2-D array to rows×cells, coercing every cell to a string. */
@@ -93,6 +95,18 @@ export async function detectFromImage(file: File): Promise<DetectedFromImage | n
       ? v.cards.map((c) => ({ title: String(c?.title ?? ''), meta: String(c?.meta ?? '') }))
           .filter((c) => c.title).slice(0, 6)
       : undefined
+    const navGroups = Array.isArray(v.navGroups)
+      ? v.navGroups.map((g) => ({ label: String(g?.label ?? ''), items: (toStrs(g?.items, 8) ?? []) }))
+          .filter((g) => g.label && g.items.length).slice(0, 6)
+      : undefined
+    const summary = Array.isArray(v.summary)
+      ? v.summary.map((c) => ({
+          title: String(c?.title ?? ''),
+          rows: (Array.isArray(c?.rows)
+            ? c.rows.map((r) => ({ label: String(r?.label ?? ''), value: String(r?.value ?? '') })).filter((r) => r.label || r.value).slice(0, 4)
+            : []),
+        })).filter((c) => c.title && c.rows.length).slice(0, 4)
+      : undefined
     return {
       extraction: toExtraction(v),
       content: {
@@ -107,6 +121,8 @@ export async function detectFromImage(file: File): Promise<DetectedFromImage | n
         filters: toStrs(v.filters, 5),
         cards: cards && cards.length ? cards : undefined,
         notice: typeof v.notice === 'string' && v.notice.trim() ? v.notice.trim() : undefined,
+        navGroups: navGroups && navGroups.length ? navGroups : undefined,
+        summary: summary && summary.length ? summary : undefined,
       },
       blocks: Array.isArray(v.blocks) ? v.blocks : [],
     }

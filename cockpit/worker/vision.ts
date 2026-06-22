@@ -28,14 +28,14 @@ const CORS = {
 const json = (data: unknown, status = 200): Response =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', ...CORS } })
 
-const BLOCKS = 'sidebar, appbar, toolbar, tabnav, searchbar, filterbar, statstrip, datatable, list, banner, cardgrid, form'
+const BLOCKS = 'sidebar, appbar, toolbar, tabnav, searchbar, filterbar, statstrip, summary, datatable, list, banner, cardgrid, form'
 
 const PROMPT = `You are analysing a SCREENSHOT of a web-app UI. Identify the layout BLOCKS it is built from, read its design foundation, and transcribe its key TEXT. Reply with ONLY a JSON object (no prose, no markdown fence). Keys:
 - "mode": "light" or "dark" (the page background).
 - "brandHex": the primary/accent colour as #rrggbb (the brand button or logo colour). Omit if greyscale.
 - "neutral": "cool", "warm", or "neutral" (the grey tint).
-- "blocks": ordered top-to-bottom array, ONLY from this vocabulary: [${BLOCKS}]. Include ONLY blocks that are actually visible — do NOT add "statstrip" unless you can see metric/KPI tiles. Use "list" for a feed / activity / transaction STREAM (rows of icon+title with a status or amount, NOT a columnar grid) and "datatable" ONLY for a real table with column headers. Use "banner" for an info/notice strip above the content. Use "sidebar" for a left nav rail (else "tabnav" for top tabs). Order matters.
-- "appName": the product/brand name as readable TEXT only. If the logo is a glyph/icon with no readable wordmark, OMIT this key. NEVER transcribe decorative symbols (e.g. ©, =, the hamburger, a coloured dot).
+- "blocks": ordered top-to-bottom array, ONLY from this vocabulary: [${BLOCKS}]. Include ONLY blocks that are actually visible — do NOT add "statstrip" unless you can see metric/KPI tiles. Use "list" for a feed / activity / transaction STREAM (rows of icon+title with a status or amount, NOT a columnar grid) and "datatable" ONLY for a real table with column headers. Use "banner" for an info/notice strip above the content. Use "summary" for a ROW OF OVERVIEW CARDS each holding a few label+value lines (e.g. Bank / Invoices / Income cards) — NOT a flat KPI strip (that is "statstrip"). Use "sidebar" for a left nav rail (else "tabnav" for top tabs). Order matters.
+- "appName": the product/brand WORDMARK only, as readable TEXT (e.g. "moneybird"). Do NOT append a workspace/organisation switcher pill or account name sitting next to the logo. If the logo is a glyph/icon with no readable wordmark, OMIT this key. NEVER transcribe decorative symbols (e.g. ©, =, the hamburger, a coloured dot).
 - "nav": the sidebar or top-nav item labels, in order, max 6. Each entry is ONE COMPLETE label exactly as shown — a label may be several words (e.g. "Onderweg naar mij"); never split one label into multiple entries, and never include table column headers or bare icons.
 - "heading": the main page title — the bold H1 above the main content or in the top bar. OMIT if there is no clear single title.
 - "primaryBtn": the most prominent call-to-action button label.
@@ -47,6 +47,8 @@ const PROMPT = `You are analysing a SCREENSHOT of a web-app UI. Identify the lay
 - "cards": if a CARD GRID is visible (a grid of project/file/entity tiles, not a table), up to 6 as {"title":"...","meta":"..."} — title = the card's heading text, meta = a short status/subtitle if shown (else omit meta). Real text only. Omit the key entirely if there is no card grid.
 - "rows": if the main content is a "list" feed (not a table), STILL fill rows — each row = [title, sub/desc, status-or-amount] — so the list renders the real items.
 - "notice": the text of an info/notice banner if one is shown (e.g. "4 new documents ready to add"), ONE short line, real text only. Omit if there is no banner.
+- "navGroups": if the sidebar groups items under SECTION HEADERS, return [{"label":"Overzicht","items":["Feed","Doelen"]}, …] in order (max 6 groups, the real header + item text). Omit if the nav is a flat list (then "nav" already covers it).
+- "summary": if a row of OVERVIEW CARDS is shown (e.g. Bank / Invoices / Income), up to 4 as {"title":"...","rows":[{"label":"...","value":"..."}]} — each card's heading + its 1-3 label/value lines. Real text only. Omit if there are no such cards.
 Omit any key you cannot read confidently — a missing key is better than a guessed one. Output JSON only.`
 
 /** Pull the first JSON object out of a model reply (tolerates stray prose/fences). */

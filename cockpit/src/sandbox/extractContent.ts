@@ -31,6 +31,11 @@ export interface Content {
   cards?: Array<{ title: string; meta: string }>
   /** Info/notice banner text (vision path only) — drives the `banner` block. */
   notice?: string
+  /** Sidebar section groups (vision path) — a label + its nav items. Renders a
+   *  grouped sidebar; falls back to the flat `menu` when absent. */
+  navGroups?: Array<{ label: string; items: string[] }>
+  /** Overview/summary cards (vision path) — title + label/value rows each. */
+  summary?: Array<{ title: string; rows: Array<{ label: string; value: string }> }>
 }
 
 export interface ContentExtraction {
