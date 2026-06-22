@@ -1,7 +1,13 @@
-# UICockpit — Live Kit CDN Worker.
-# Serves a kit as CSS via genCss(decode(hash)), the same pure pipeline the app's
-# download export uses. Local dev: `npx wrangler dev` → http://localhost:8787.
-# Production deploy + custom domain (kit.uicockpit.com) land with #106.
+# UICockpit — Live Kit CDN Worker (THE canonical worker config — dev AND prod).
+# worker/index.ts serves two routes:
+#   GET  /k/<hash>.css  → genCss(decode(hash)), the same pure pipeline the app's
+#                         download export uses.
+#   POST /vision        → sandbox screenshot → blocks + foundation + content (one
+#                         Anthropic vision call; the key is a Worker SECRET, never here).
+# Local dev:  from cockpit/, `npx wrangler dev`  → http://localhost:8787
+#             (key in cockpit/.dev.vars, gitignored).
+# Prod:       from cockpit/, `npx wrangler deploy`  → uicockpit-kit / kit.uicockpit.com.
+#             Set the key once:  `npx wrangler secret put ANTHROPIC_API_KEY`.
 name = "uicockpit-kit"
 main = "worker/index.ts"
 compatibility_date = "2026-06-05"

@@ -55,8 +55,10 @@ export async function handleVision(request: Request, env: VisionEnv): Promise<Re
 
   let image = ''
   try { image = (await request.json<{ image?: string }>()).image ?? '' } catch { return json({ error: 'bad body' }, 400) }
-  const m = image.match(/^data:(image\/(?:png|jpeg|jpg|webp));base64,(.+)$/)
+  const m = image.match(/^data:(image\/(?:png|jpeg|jpg|webp|gif));base64,(.+)$/)
   if (!m) return json({ error: 'expected a base64 image data URL' }, 400)
+  // The Messages API only accepts image/jpeg (not image/jpg).
+  const mediaType = m[1] === 'image/jpg' ? 'image/jpeg' : m[1]
 
   const body = {
     model: env.VISION_MODEL || 'claude-sonnet-4-6',
@@ -64,7 +66,7 @@ export async function handleVision(request: Request, env: VisionEnv): Promise<Re
     messages: [{
       role: 'user',
       content: [
-        { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } },
+        { type: 'image', source: { type: 'base64', media_type: mediaType, data: m[2] } },
         { type: 'text', text: PROMPT },
       ],
     }],
@@ -80,7 +82,10 @@ export async function handleVision(request: Request, env: VisionEnv): Promise<Re
       },
       body: JSON.stringify(body),
     })
-    if (!resp.ok) return json({ error: `model ${resp.status}` }, 502)
+    if (!resp.ok) {
+      const detail = await resp.text().catch(() => '')
+      return json({ error: `model ${resp.status}`, detail: detail.slice(0, 400) }, 502)
+    }
     const data = await resp.json<{ content?: Array<{ text?: string }> }>()
     const text = data.content?.[0]?.text ?? ''
     return json(parseJson(text))

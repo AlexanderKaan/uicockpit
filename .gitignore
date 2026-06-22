@@ -29,6 +29,10 @@ ROADMAP.md
 .env
 .env.*
 !.env.example
+# .env.production holds only the PUBLIC prod vision-worker URL (no secrets) —
+# committed so `npm run build` bakes the right endpoint. Secrets stay in
+# .dev.vars (local) / `wrangler secret put` (prod), both still ignored above.
+!.env.production
 
 # OS / editor
 .DS_Store

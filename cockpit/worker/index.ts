@@ -22,6 +22,9 @@ import { handleVision, type VisionEnv } from './vision'
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, OPTIONS',
+  // The /vision POST sends content-type: application/json, so the preflight asks
+  // for this header — it must be echoed or Chrome rejects the (200) preflight.
+  'access-control-allow-headers': 'content-type',
 } as const
 
 const cssResponse = (css: string, init: ResponseInit = {}): Response =>
