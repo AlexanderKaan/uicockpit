@@ -104,6 +104,55 @@ function CardMenu({ name }: { name: string }) {
   )
 }
 
+/** A filterable `.datatable` BLOCK — the segctrl chips now DRIVE state: clicking
+ *  a chip moves the active highlight AND filters rows whose status matches the
+ *  label (case-insensitive). Broad/semantic labels with no exact row match
+ *  ("Outstanding", "Active", "All") gracefully keep every row rather than
+ *  emptying the table. head/row/foot are passed so each archetype keeps its own
+ *  columns + pagination. */
+function FilterTable<T extends { status: string }>({
+  filters, activeInit, rows, ariaLabel, searchLabel, head, row, foot,
+}: {
+  filters: string[]
+  activeInit: number
+  rows: readonly T[]
+  ariaLabel: string
+  searchLabel: string
+  head: ReactNode
+  row: (r: T) => ReactNode
+  foot: ReactNode
+}) {
+  const [active, setActive] = useState(activeInit)
+  const label = (filters[active] ?? 'All').toLowerCase()
+  const matched = active === 0 ? rows : rows.filter((r) => r.status.toLowerCase() === label)
+  const visible = matched.length ? matched : rows
+  return (
+    <div className="datatable datatable--page">
+      <div className="datatable__bar">
+        <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
+          <div className="segctrl" role="tablist" aria-label={ariaLabel}>
+            {filters.map((f, i) => (
+              <button key={f} type="button" role="tab" aria-selected={i === active} className={`segctrl__btn ${i === active ? 'segctrl__btn--on' : ''}`} onClick={() => setActive(i)}>{f}</button>
+            ))}
+          </div>
+          <span className="toolbar__spacer" />
+          <div className="in in--inline" style={{ maxWidth: 200 }}>
+            <Icon name="search" />
+            <input type="search" aria-label={searchLabel} placeholder="Search…" />
+          </div>
+        </div>
+      </div>
+      <div className="datatable__body">
+        <table className="tbl">
+          <thead>{head}</thead>
+          <tbody>{visible.map(row)}</tbody>
+        </table>
+      </div>
+      {foot}
+    </div>
+  )
+}
+
 /** Inline trend hint — the real `.sparkline` recipe. A normalized polyline (the
  *  line) + a closed polygon (the tinted area), stretched to the tile width. */
 function Sparkline({ data }: { data: number[] }) {
@@ -582,47 +631,27 @@ export function renderSection(spec: SectionSpec, key: number) {
 
           {/* The list — the .datatable BLOCK (page tier: rows grow to natural
               height). Filter bar in the __bar, pagination in the __foot. */}
-          <div className="datatable datatable--page">
-            <div className="datatable__bar">
-              <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
-                <div className="segctrl" role="tablist" aria-label="Filter invoices">
-                  {s.filters.map((f, i) => (
-                    <button key={f} type="button" role="tab" aria-selected={i === s.activeFilter} className={`segctrl__btn ${i === s.activeFilter ? 'segctrl__btn--on' : ''}`}>{f}</button>
-                  ))}
-                </div>
-                <span className="toolbar__spacer" />
-                <div className="in in--inline" style={{ maxWidth: 200 }}>
-                  <Icon name="search" />
-                  <input type="search" aria-label="Search invoices" placeholder="Search…" />
-                </div>
-              </div>
-            </div>
-            <div className="datatable__body">
-              <table className="tbl">
-                <thead>
-                  <tr><th>Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>
-                </thead>
-                <tbody>
-                  {s.rows.map((r) => (
-                    <tr key={r.number}>
-                      <td><div style={{ fontWeight: med }}>#{r.number}</div><div style={muted}>{r.project}</div></td>
-                      <td>
-                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
-                          <BrandLogo id={r.clientLogo} size={28} />
-                          <span style={{ fontWeight: med }}>{r.client}</span>
-                        </div>
-                      </td>
-                      <td style={muted}>{r.issued}</td>
-                      <td style={muted}>{r.due}</td>
-                      <td className="num" style={{ ...money, fontWeight: med }}>{r.amount}</td>
-                      <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
-                      <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="datatable__foot">
+          <FilterTable
+            filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
+            ariaLabel="Filter invoices" searchLabel="Search invoices"
+            head={<tr><th>Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
+            row={(r) => (
+              <tr key={r.number}>
+                <td><div style={{ fontWeight: med }}>#{r.number}</div><div style={muted}>{r.project}</div></td>
+                <td>
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
+                    <BrandLogo id={r.clientLogo} size={28} />
+                    <span style={{ fontWeight: med }}>{r.client}</span>
+                  </div>
+                </td>
+                <td style={muted}>{r.issued}</td>
+                <td style={muted}>{r.due}</td>
+                <td className="num" style={{ ...money, fontWeight: med }}>{r.amount}</td>
+                <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
+              </tr>
+            )}
+            foot={<div className="datatable__foot">
               <span className="datatable__foot-info">{s.footInfo}</span>
               <div className="pagination">
                 <button type="button" disabled aria-label="Previous"><Icon name="chevL" /></button>
@@ -631,8 +660,8 @@ export function renderSection(spec: SectionSpec, key: number) {
                 <button type="button">3</button>
                 <button type="button" aria-label="Next"><Icon name="chevR" /></button>
               </div>
-            </div>
-          </div>
+            </div>}
+          />
         </div>
       )
     }
@@ -649,51 +678,31 @@ export function renderSection(spec: SectionSpec, key: number) {
 
           <SummaryBand items={s.summary} />
 
-          <div className="datatable datatable--page">
-            <div className="datatable__bar">
-              <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
-                <div className="segctrl" role="tablist" aria-label="Filter clients">
-                  {s.filters.map((f, i) => (
-                    <button key={f} type="button" role="tab" aria-selected={i === s.activeFilter} className={`segctrl__btn ${i === s.activeFilter ? 'segctrl__btn--on' : ''}`}>{f}</button>
-                  ))}
-                </div>
-                <span className="toolbar__spacer" />
-                <div className="in in--inline" style={{ maxWidth: 200 }}>
-                  <Icon name="search" />
-                  <input type="search" aria-label="Search clients" placeholder="Search…" />
-                </div>
-              </div>
-            </div>
-            <div className="datatable__body">
-              <table className="tbl">
-                <thead>
-                  <tr><th>Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th><th aria-label="Actions" /></tr>
-                </thead>
-                <tbody>
-                  {s.rows.map((r) => (
-                    <tr key={r.company}>
-                      <td>
-                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
-                          <BrandLogo id={r.logo} size={28} />
-                          <span style={{ fontWeight: med }}>{r.company}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-                          <PhotoAvatar url={r.contactAvatar} name={r.contact} sm />
-                          <span>{r.contact}</span>
-                        </div>
-                      </td>
-                      <td className="num" style={money}>{r.billed}</td>
-                      <td className="num" style={{ ...money, fontWeight: med }}>{r.outstanding}</td>
-                      <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
-                      <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="datatable__foot">
+          <FilterTable
+            filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
+            ariaLabel="Filter clients" searchLabel="Search clients"
+            head={<tr><th>Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th><th aria-label="Actions" /></tr>}
+            row={(r) => (
+              <tr key={r.company}>
+                <td>
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
+                    <BrandLogo id={r.logo} size={28} />
+                    <span style={{ fontWeight: med }}>{r.company}</span>
+                  </div>
+                </td>
+                <td>
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
+                    <PhotoAvatar url={r.contactAvatar} name={r.contact} sm />
+                    <span>{r.contact}</span>
+                  </div>
+                </td>
+                <td className="num" style={money}>{r.billed}</td>
+                <td className="num" style={{ ...money, fontWeight: med }}>{r.outstanding}</td>
+                <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
+              </tr>
+            )}
+            foot={<div className="datatable__foot">
               <span className="datatable__foot-info">{s.footInfo}</span>
               <div className="pagination">
                 <button type="button" disabled aria-label="Previous"><Icon name="chevL" /></button>
@@ -701,8 +710,8 @@ export function renderSection(spec: SectionSpec, key: number) {
                 <button type="button">2</button>
                 <button type="button" aria-label="Next"><Icon name="chevR" /></button>
               </div>
-            </div>
-          </div>
+            </div>}
+          />
         </div>
       )
     }
@@ -735,46 +744,26 @@ export function renderSection(spec: SectionSpec, key: number) {
             </div>
           </div>
 
-          <div className="datatable datatable--page">
-            <div className="datatable__bar">
-              <div className="toolbar toolbar--sm" style={{ flex: 1 }}>
-                <div className="segctrl" role="tablist" aria-label="Filter expenses">
-                  {s.filters.map((f, i) => (
-                    <button key={f} type="button" role="tab" aria-selected={i === s.activeFilter} className={`segctrl__btn ${i === s.activeFilter ? 'segctrl__btn--on' : ''}`}>{f}</button>
-                  ))}
-                </div>
-                <span className="toolbar__spacer" />
-                <div className="in in--inline" style={{ maxWidth: 200 }}>
-                  <Icon name="search" />
-                  <input type="search" aria-label="Search expenses" placeholder="Search…" />
-                </div>
-              </div>
-            </div>
-            <div className="datatable__body">
-              <table className="tbl">
-                <thead>
-                  <tr><th>Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>
-                </thead>
-                <tbody>
-                  {s.rows.map((r) => (
-                    <tr key={r.vendor + r.date}>
-                      <td>
-                        <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
-                          <BrandLogo id={r.logo} size={28} />
-                          <span style={{ fontWeight: med }}>{r.vendor}</span>
-                        </div>
-                      </td>
-                      <td><span className="badge badge--info">{r.category}</span></td>
-                      <td style={muted}>{r.date}</td>
-                      <td className="num" style={{ ...money, fontWeight: med }}>{r.amount}</td>
-                      <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
-                      <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="datatable__foot">
+          <FilterTable
+            filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
+            ariaLabel="Filter expenses" searchLabel="Search expenses"
+            head={<tr><th>Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
+            row={(r) => (
+              <tr key={r.vendor + r.date}>
+                <td>
+                  <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
+                    <BrandLogo id={r.logo} size={28} />
+                    <span style={{ fontWeight: med }}>{r.vendor}</span>
+                  </div>
+                </td>
+                <td><span className="badge badge--info">{r.category}</span></td>
+                <td style={muted}>{r.date}</td>
+                <td className="num" style={{ ...money, fontWeight: med }}>{r.amount}</td>
+                <td><span className={`badge badge--${r.tone}`}><span className="badge__dot" />{r.status}</span></td>
+                <td style={{ textAlign: 'right', width: '1%', whiteSpace: 'nowrap' }}><RowMenu /></td>
+              </tr>
+            )}
+            foot={<div className="datatable__foot">
               <span className="datatable__foot-info">{s.footInfo}</span>
               <div className="pagination">
                 <button type="button" disabled aria-label="Previous"><Icon name="chevL" /></button>
@@ -782,8 +771,8 @@ export function renderSection(spec: SectionSpec, key: number) {
                 <button type="button">2</button>
                 <button type="button" aria-label="Next"><Icon name="chevR" /></button>
               </div>
-            </div>
-          </div>
+            </div>}
+          />
         </div>
       )
     }
