@@ -1,0 +1,12 @@
+# Wrangler config for the UICockpit worker (CDN kit routes + the sandbox /vision
+# endpoint). Used for `wrangler dev` (local) and `wrangler deploy`.
+#
+# The Anthropic key is a SECRET — never put it here. Local dev reads it from
+# worker/.dev.vars (gitignored); production uses `wrangler secret put ANTHROPIC_API_KEY`.
+name = "uicockpit-worker"
+main = "index.ts"
+compatibility_date = "2025-06-01"
+
+# Optional: override the vision model (defaults to claude-sonnet-4-6 in vision.ts).
+# [vars]
+# VISION_MODEL = "claude-sonnet-4-6"

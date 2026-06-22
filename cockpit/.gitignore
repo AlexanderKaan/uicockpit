@@ -25,3 +25,11 @@ dist-ssr
 
 # Cloudflare Worker local state
 .wrangler/
+
+# Secrets + local env — NEVER commit (Anthropic key for the vision worker lives here)
+.dev.vars
+.dev.vars.*
+worker/.dev.vars
+.env
+.env.local
+.env.*.local
