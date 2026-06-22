@@ -88,7 +88,6 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
   const tableTitle = content.tableTitle || heading
 
   const hasSidebar = list.includes('sidebar')
-  const hasToolbar = list.includes('toolbar')
   const bodyBlocks = [...new Set(list)].filter((k) => BODY_KINDS.has(k))
 
   const renderBody = (k: BlockKind) => {
@@ -279,10 +278,15 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
                   <BrandMark /> {appName}
                 </span>
               )}
-              <span className="appbar__spacer" />
-              {hasToolbar && <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Notifications"><Icon name="bell" /></button>}
-              <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Search"><Icon name="search" /></button>
+              {/* A real search field + account chip — the full app-shell top bar,
+                  not just an icon. Composed from .searchinput + .avatar recipes. */}
+              <div className="searchinput" role="search" style={{ flex: '1 1 auto', maxWidth: 380, marginInline: 'auto' }}>
+                <Icon name="search" />
+                <input className="searchinput__field" type="search" placeholder={`Search ${appName}…`} aria-label={`Search ${appName}`} />
+              </div>
+              <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Notifications"><Icon name="bell" /></button>
               <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> {primaryBtn}</button>
+              <span className="avatar avatar--sm" aria-hidden="true">{appName.charAt(0).toUpperCase()}</span>
             </div>
 
             {/* SIDEBAR — the real `.sidenav`, wearing the brand + their nav. */}
@@ -298,6 +302,7 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
                   ))}
                   <div className="sidenav__foot">
                     <button type="button" className="navrow" data-tip="Settings"><Icon name="cog" /><span className="navrow__label">Settings</span></button>
+                    <button type="button" className="navrow" data-tip="Collapse"><Icon name="chevL" /><span className="navrow__label">Collapse</span></button>
                   </div>
                 </nav>
               </div>
