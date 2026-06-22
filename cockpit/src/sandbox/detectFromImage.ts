@@ -35,6 +35,7 @@ export interface VisionResult {
   notice?: string
   navGroups?: Array<{ label?: string; items?: string[] }>
   summary?: Array<{ title?: string; rows?: Array<{ label?: string; value?: string }> }>
+  feed?: Array<{ title?: string; sub?: string; status?: string; amount?: string }>
 }
 
 /** Clamp a model-returned 2-D array to rows×cells, coercing every cell to a string. */
@@ -107,6 +108,10 @@ export async function detectFromImage(file: File): Promise<DetectedFromImage | n
             : []),
         })).filter((c) => c.title && c.rows.length).slice(0, 4)
       : undefined
+    const feed = Array.isArray(v.feed)
+      ? v.feed.map((f) => ({ title: String(f?.title ?? ''), sub: String(f?.sub ?? ''), status: String(f?.status ?? ''), amount: String(f?.amount ?? '') }))
+          .filter((f) => f.title).slice(0, 8)
+      : undefined
     return {
       extraction: toExtraction(v),
       content: {
@@ -123,6 +128,7 @@ export async function detectFromImage(file: File): Promise<DetectedFromImage | n
         notice: typeof v.notice === 'string' && v.notice.trim() ? v.notice.trim() : undefined,
         navGroups: navGroups && navGroups.length ? navGroups : undefined,
         summary: summary && summary.length ? summary : undefined,
+        feed: feed && feed.length ? feed : undefined,
       },
       blocks: Array.isArray(v.blocks) ? v.blocks : [],
     }

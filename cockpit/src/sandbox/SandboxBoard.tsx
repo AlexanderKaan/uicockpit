@@ -87,10 +87,14 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
   const realFilters = content.filters?.length ? content.filters : null
   const realCards = content.cards?.length ? content.cards : null
   const realSummary = content.summary?.length ? content.summary : null
+  const realFeed = content.feed?.length ? content.feed : null
   const navGroups = content.navGroups?.length ? content.navGroups : null
   const tableTitle = content.tableTitle || heading
 
   const hasSidebar = list.includes('sidebar')
+  // The top bar always carries a search field; if the app ALSO has a prominent
+  // body searchbar, drop the top one so there's only ONE search (no duplicate).
+  const hasBodySearch = list.includes('searchbar')
   const bodyBlocks = [...new Set(list)].filter((k) => BODY_KINDS.has(k))
 
   const renderBody = (k: BlockKind) => {
@@ -205,7 +209,28 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
       case 'list': {
         // A feed / activity / transaction list — the right answer for screens
         // that are a stream of rows (icon + title + sub + a trailing status or
-        // amount), NOT a columnar grid. Real rows fill it; else the demo rows.
+        // amount), NOT a columnar grid. Prefer the dedicated `feed` entries; then
+        // table rows; else demo.
+        if (realFeed) {
+          return (
+            <div className="card" key={k}>
+              {content.tableTitle && <div className="card__head"><h3 className="card__title">{content.tableTitle}</h3></div>}
+              <div className="list">
+                {realFeed.map((f, i) => (
+                  <div className="list__item" key={i}>
+                    <span className="avatar avatar--sm" aria-hidden="true">{(f.title.charAt(0) || '·').toUpperCase()}</span>
+                    <div className="list__body">
+                      <div className="list__title">{f.title}</div>
+                      {f.sub && <div className="list__sub">{f.sub}</div>}
+                    </div>
+                    {f.status && <StatusBadge tone={statusTone(f.status)} label={f.status} />}
+                    {f.amount && <span className="list__trail list__trail--text">{f.amount}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        }
         if (realCols && realRows) {
           const statusIdx = realCols.findIndex((c) => /status|state|fase|stage|stadium/i.test(c))
           const amountIdx = realCols.findIndex((c) => /amount|total|bedrag|price|sum|saldo|value|paid|due/i.test(c))
@@ -307,11 +332,16 @@ export function SandboxBoard({ cfg, content, blocks }: SandboxBoardProps) {
                 </span>
               )}
               {/* A real search field + account chip — the full app-shell top bar,
-                  not just an icon. Composed from .searchinput + .avatar recipes. */}
-              <div className="searchinput" role="search" style={{ flex: '1 1 auto', maxWidth: 380, marginInline: 'auto' }}>
-                <Icon name="search" />
-                <input className="searchinput__field" type="search" placeholder={`Search ${appName}…`} aria-label={`Search ${appName}`} />
-              </div>
+                  not just an icon. Composed from .searchinput + .avatar recipes.
+                  Skipped when a body searchbar block exists (no double search). */}
+              {hasBodySearch ? (
+                <span className="appbar__spacer" />
+              ) : (
+                <div className="searchinput" role="search" style={{ flex: '1 1 auto', maxWidth: 380, marginInline: 'auto' }}>
+                  <Icon name="search" />
+                  <input className="searchinput__field" type="search" placeholder={`Search ${appName}…`} aria-label={`Search ${appName}`} />
+                </div>
+              )}
               <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Notifications"><Icon name="bell" /></button>
               <button type="button" className="btn btn--primary btn--sm"><Icon name="plus" /> {primaryBtn}</button>
               <span className="avatar avatar--sm" aria-hidden="true">{appName.charAt(0).toUpperCase()}</span>

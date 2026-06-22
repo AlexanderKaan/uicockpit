@@ -36,6 +36,9 @@ export interface Content {
   navGroups?: Array<{ label: string; items: string[] }>
   /** Overview/summary cards (vision path) — title + label/value rows each. */
   summary?: Array<{ title: string; rows: Array<{ label: string; value: string }> }>
+  /** Activity/transaction feed items (vision path) — drives the `list` block
+   *  with the user's REAL entries instead of demo rows. */
+  feed?: Array<{ title: string; sub: string; status: string; amount: string }>
 }
 
 export interface ContentExtraction {

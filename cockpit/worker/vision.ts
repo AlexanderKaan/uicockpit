@@ -49,6 +49,7 @@ const PROMPT = `You are analysing a SCREENSHOT of a web-app UI. Identify the lay
 - "notice": the text of an info/notice banner if one is shown (e.g. "4 new documents ready to add"), ONE short line, real text only. Omit if there is no banner.
 - "navGroups": if the sidebar groups items under SECTION HEADERS, return [{"label":"Overzicht","items":["Feed","Doelen"]}, …] in order (max 6 groups, the real header + item text). Omit if the nav is a flat list (then "nav" already covers it).
 - "summary": if a row of OVERVIEW CARDS is shown (e.g. Bank / Invoices / Income), up to 4 as {"title":"...","rows":[{"label":"...","value":"..."}]} — each card's heading + its 1-3 label/value lines. Real text only. Omit if there are no such cards.
+- "feed": WHENEVER you emit a "list" block, fill this — the activity/transaction entries (e.g. "Recent verwerkt"), up to 8 as {"title":"...","sub":"...","amount":"...","status":"..."}: title = the entry's name/company, sub = its description line, amount = the € figure if shown, status = a status pill ("Paid","Overdue"…) if shown. Real text only — this is HOW the list renders.
 Omit any key you cannot read confidently — a missing key is better than a guessed one. Output JSON only.`
 
 /** Pull the first JSON object out of a model reply (tolerates stray prose/fences). */
