@@ -380,6 +380,76 @@
   color: var(--app-fg-muted);
 }
 
+/* The pack — the agent install. A titled group of named-artifact rows
+ * (design.md · agent rules · contract.json) each with copy + download. */
+.export-pack {
+  margin-bottom: 28px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.export-pack__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--app-sunken);
+  border-bottom: 1px solid var(--app-border);
+}
+.export-pack__title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.export-pack__head .modal__btn { margin-left: auto; }
+.export-pack__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+}
+.export-pack__row + .export-pack__row { border-top: 1px solid var(--app-border); }
+.export-pack__ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--app-accent) 12%, transparent);
+  color: var(--app-accent);
+}
+.export-pack__body { flex: 1; min-width: 0; }
+.export-pack__label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.export-pack__file {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--app-fg-faint);
+}
+.export-pack__hint {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--app-fg-muted);
+  margin-top: 1px;
+}
+.export-pack__actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* Other-formats drawer — the eject-to-files path. */
+.export-fmt__hint {
+  margin: 10px 0 16px;
+  font-size: 11.5px;
+  color: var(--app-fg-muted);
+}
+
 /* Choices recap — a 2-col grid of the user's settings: icon (or live brand
  * swatch) + chosen value + setting name. Scannable "here's what you built". */
 .export-ov__choices {

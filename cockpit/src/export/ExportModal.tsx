@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
   Blend,
-  Braces,
   CaseUpper,
   Check,
   Contrast,
@@ -15,6 +14,7 @@ import {
   Link2,
   Moon,
   MousePointerClick,
+  Package,
   Palette,
   Ruler,
   ShieldCheck,
@@ -32,110 +32,59 @@ import { buildTokens } from '../tokens/buildTokens'
 import { auditContrast } from '../tokens/extras'
 import { Seg } from '../panel/primitives/Seg'
 import { genCss } from './genCss'
-import { genJson } from './genJson'
 import { genTailwind } from './genTailwind'
-import { genBrief } from './genBrief'
 import { genShadcn } from './genShadcn'
-import { genRegistry } from './genRegistry'
-import { genAiPrompt } from './genAiPrompt'
 import { genContract } from './genContract'
+import { genDesignMd } from './genDesignMd'
+import { genSkill } from './genSkill'
 
 /** Base URL of the Live Kit CDN Worker (cockpit/worker). The stateless lane
  *  `${BASE}/k/<hash>.css` serves genCss(decode(hash)) — the full kit, byte-identical
  *  to the download. LIVE on Cloudflare at the branded custom domain. */
 const KIT_CDN_BASE = 'https://kit.uicockpit.com'
 
-type TabId = 'overview' | 'ai' | 'brief' | 'css' | 'html' | 'json' | 'tailwind' | 'shadcn' | 'registry' | 'contract'
+type View = 'kit' | 'formats'
 
-interface Tab {
-  id: TabId
+/* ── The "Other formats" drawer — the 3 that map to a real stack ──────────────
+ * tokens.css · Tailwind v4 · shadcn/ui. (tokens.json + shadcn-registry were CUT:
+ * niche / credibility-signal, low ICP use.) The headline values live as the hosted
+ * <link> in the Use-this-kit view; this drawer is the eject-to-files path. */
+type FmtId = 'css' | 'tailwind' | 'shadcn'
+interface Fmt {
+  id: FmtId
   label: string
   hint: string
   filename: string
   icon: React.ComponentType<{ size?: number; strokeWidth?: number }>
   generator: (cfg: Config) => string
 }
+const FORMATS: Fmt[] = [
+  { id: 'css', label: 'tokens.css', hint: ':root + .dark, 60+ vars + recipes', filename: 'tokens.css', icon: FileCode, generator: genCss },
+  { id: 'tailwind', label: 'Tailwind v4', hint: '@theme block, full system', filename: 'tailwind-theme.css', icon: Palette, generator: genTailwind },
+  { id: 'shadcn', label: 'shadcn/ui', hint: '--background, --primary, …', filename: 'shadcn-globals.css', icon: Layers, generator: genShadcn },
+]
 
-const TABS: Tab[] = [
-  {
-    id: 'overview',
-    label: 'Overview',
-    hint: "What's in your kit",
-    filename: '',
-    icon: Gauge,
-    // The overview pane is rendered specially — generator is unused.
-    generator: () => '',
-  },
-  {
-    id: 'ai',
-    label: 'AI prompt',
-    hint: 'For Cursor, v0, Claude, Lovable, Bolt',
-    filename: 'design-system.prompt.md',
-    icon: Sparkles,
-    generator: genAiPrompt,
-  },
-  {
-    id: 'brief',
-    label: 'BRIEF.md',
-    hint: 'Human + AI handoff document',
-    filename: 'BRIEF.md',
-    icon: FileText,
-    generator: genBrief,
-  },
-  {
-    id: 'css',
-    label: 'tokens.css',
-    hint: ':root + .dark blocks, 60+ vars',
-    filename: 'tokens.css',
-    icon: FileCode,
-    generator: genCss,
-  },
-  {
-    id: 'json',
-    label: 'tokens.json',
-    hint: 'W3C design tokens, save format',
-    filename: 'tokens.json',
-    icon: Braces,
-    generator: genJson,
-  },
-  {
-    id: 'tailwind',
-    label: 'Tailwind v4',
-    hint: '@theme block, full system',
-    filename: 'tailwind-theme.css',
-    icon: Palette,
-    generator: genTailwind,
-  },
-  {
-    id: 'shadcn',
-    label: 'shadcn/ui',
-    hint: '--background, --primary, ...',
-    filename: 'shadcn-globals.css',
-    icon: Layers,
-    generator: genShadcn,
-  },
-  {
-    id: 'registry',
-    label: 'shadcn registry',
-    hint: 'npx shadcn add — registry:theme JSON',
-    filename: 'registry-theme.json',
-    icon: Layers,
-    generator: genRegistry,
-  },
-  {
-    id: 'contract',
-    label: 'contract.json',
-    hint: 'Machine-readable — what uicockpit check verifies',
-    filename: 'uicockpit.contract.json',
-    icon: ShieldCheck,
-    generator: genContract,
-  },
+/* ── The pack — three named artifacts (the hosted link is the 1st, rendered as the
+ * hero). design.md = the spec; the skill = the enforcement layer; contract.json is
+ * bundled for `uicockpit check`. The skill's delivery filename gets an agent picker
+ * in Slice 3; for now a neutral AGENTS.md default. */
+interface PackItem {
+  key: string
+  label: string
+  hint: string
+  filename: string
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>
+  generator: (cfg: Config) => string
+}
+const PACK: PackItem[] = [
+  { key: 'design', label: 'design.md', hint: 'The spec — values, rules + your AI-agent appendix', filename: 'design.md', icon: FileText, generator: genDesignMd },
+  { key: 'skill', label: 'Agent rules', hint: 'The enforcement layer — always / never + verify loop', filename: 'AGENTS.md', icon: Sparkles, generator: genSkill },
+  { key: 'contract', label: 'contract.json', hint: 'Bundled — what `npx uicockpit check` verifies', filename: 'uicockpit.contract.json', icon: ShieldCheck, generator: genContract },
 ]
 
 /* === Install layer — framework + package-manager pickers ============
  * shadcn/create's lesson: don't just dump code, tell the user how to
- * adopt it in THEIR stack. We keep the format tabs but add a rendered
- * "Install" block above the code so the how-to isn't buried in comments. */
+ * adopt it in THEIR stack. */
 type Framework = 'next' | 'vite' | 'astro' | 'laravel' | 'plain'
 type Pm = 'pnpm' | 'npm' | 'yarn' | 'bun'
 
@@ -166,8 +115,8 @@ const CSS_IMPORT: Record<Framework, string> = {
 
 interface Install { steps: string[]; command?: string; showFramework: boolean }
 
-function getInstall(tab: TabId, fw: Framework, pm: Pm): Install {
-  switch (tab) {
+function getInstall(fmt: FmtId, fw: Framework, pm: Pm): Install {
+  switch (fmt) {
     case 'css':
       return {
         showFramework: true,
@@ -201,44 +150,18 @@ function getInstall(tab: TabId, fw: Framework, pm: Pm): Install {
           'Every shadcn component now inherits this theme automatically.',
         ],
       }
-    case 'json':
-      return {
-        showFramework: false,
-        steps: [
-          'Save as tokens.json.',
-          'Import into Tokens Studio (Figma) or a Style Dictionary build.',
-          'Or load at runtime and map to your own CSS variables.',
-        ],
-      }
-    case 'brief':
-      return {
-        showFramework: false,
-        steps: [
-          'Hand this Markdown to a designer or developer as the single source of truth.',
-          'Or paste it into your AI tool alongside the AI prompt for full context.',
-        ],
-      }
-    case 'ai':
-      return {
-        showFramework: false,
-        steps: [
-          'Open Cursor, v0, Claude, Lovable, or Bolt.',
-          'Paste this as your first / system message before asking for components.',
-          'The model will build UI that matches your kit\'s tokens exactly.',
-        ],
-      }
-    case 'contract':
-      return {
-        showFramework: false,
-        steps: [
-          'Save as uicockpit.contract.json at your repo root.',
-          'It enumerates every token, the component graph, the BEM vocabulary and the rules as data.',
-          'Run npx uicockpit check against your codebase — it reports drift from this contract with a CI exit code.',
-        ],
-      }
-    default:
-      return { showFramework: false, steps: [] }
   }
+}
+
+/** Download a generated string as a file. Shared by the pack rows + the formats drawer. */
+function downloadText(text: string, filename: string) {
+  const blob = new Blob([text], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 interface ExportModalProps {
@@ -248,7 +171,8 @@ interface ExportModalProps {
 }
 
 export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
-  const [tab, setTab] = useState<TabId>('overview')
+  const [view, setView] = useState<View>('kit')
+  const [fmt, setFmt] = useState<FmtId>('css')
   const [framework, setFramework] = useState<Framework>('next')
   const [pm, setPm] = useState<Pm>('pnpm')
 
@@ -260,28 +184,10 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const current = TABS.find((t) => t.id === tab)!
-  const code = useMemo(() => current.generator(cfg), [current, cfg])
-
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(code)
-      onToast(`${current.filename} copied`)
-    } catch {
-      onToast('Copy failed — select & copy manually')
-    }
-  }
-
-  const onDownload = () => {
-    const blob = new Blob([code], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = current.filename
-    a.click()
-    URL.revokeObjectURL(url)
-    onToast(`${current.filename} downloaded`)
-  }
+  const NAV: ReadonlyArray<{ id: View; label: string; hint: string; icon: Fmt['icon'] }> = [
+    { id: 'kit', label: 'Use this kit', hint: 'The install — one link + the pack', icon: Sparkles },
+    { id: 'formats', label: 'Other formats', hint: 'tokens.css · Tailwind · shadcn', icon: FileCode },
+  ]
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -293,58 +199,44 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
           </button>
         </div>
         <div className="modal__split">
-          <nav className="modal__nav" role="tablist" aria-label="Export formats">
-            {TABS.map((t) => {
-              const Cmp = t.icon
+          <nav className="modal__nav" role="tablist" aria-label="Export">
+            {NAV.map((n) => {
+              const Cmp = n.icon
               return (
                 <button
-                  key={t.id}
+                  key={n.id}
                   type="button"
                   role="tab"
-                  aria-selected={t.id === tab}
-                  aria-label={t.label}
-                  className={`modal__navitem ${t.id === tab ? 'modal__navitem--on' : ''}`}
-                  onClick={() => setTab(t.id)}
+                  aria-selected={n.id === view}
+                  aria-label={n.label}
+                  className={`modal__navitem ${n.id === view ? 'modal__navitem--on' : ''}`}
+                  onClick={() => setView(n.id)}
                 >
                   <span className="modal__navitem-icon">
                     <Cmp size={15} strokeWidth={1.75} />
                   </span>
                   <span className="modal__navitem-body">
-                    <span className="modal__navitem-label">{t.label}</span>
-                    <span className="modal__navitem-hint">{t.hint}</span>
+                    <span className="modal__navitem-label">{n.label}</span>
+                    <span className="modal__navitem-hint">{n.hint}</span>
                   </span>
                 </button>
               )
             })}
           </nav>
           <div className="modal__pane">
-            {tab === 'overview' ? (
-              <OverviewPane cfg={cfg} onPickTab={setTab} onToast={onToast} />
+            {view === 'kit' ? (
+              <KitPane cfg={cfg} onToast={onToast} onEject={() => setView('formats')} />
             ) : (
-              <>
-                <div className="modal__actions">
-                  <span className="modal__filename">{current.filename}</span>
-                  <div className="modal__btn-row">
-                    <button type="button" className="modal__btn" onClick={onCopy}>
-                      <Copy size={13} strokeWidth={1.75} />
-                      Copy
-                    </button>
-                    <button type="button" className="modal__btn modal__btn--primary" onClick={onDownload}>
-                      <Download size={13} strokeWidth={1.75} />
-                      Download
-                    </button>
-                  </div>
-                </div>
-                <InstallGuide
-                  tab={tab}
-                  framework={framework}
-                  pm={pm}
-                  onFramework={setFramework}
-                  onPm={setPm}
-                  onToast={onToast}
-                />
-                <pre className="modal__code">{code}</pre>
-              </>
+              <FormatsPane
+                cfg={cfg}
+                fmt={fmt}
+                onFmt={setFmt}
+                framework={framework}
+                pm={pm}
+                onFramework={setFramework}
+                onPm={setPm}
+                onToast={onToast}
+              />
             )}
           </div>
         </div>
@@ -353,27 +245,83 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
   )
 }
 
-/** Install guide — the "how do I actually use this" layer. Framework picker
- *  (where relevant) + package-manager tabs + rendered numbered steps + an
- *  optional copyable command. Lifts the adoption steps out of code comments
- *  and into the UI. */
-function InstallGuide({
-  tab,
+/* ── The "Other formats" drawer — the eject-to-files path. Sub-picker over the 3
+ * stack formats + the install guide + the code. Stack-aware via the framework picker. */
+function FormatsPane({
+  cfg,
+  fmt,
+  onFmt,
   framework,
   pm,
   onFramework,
   onPm,
   onToast,
 }: {
-  tab: TabId
+  cfg: Config
+  fmt: FmtId
+  onFmt: (f: FmtId) => void
   framework: Framework
   pm: Pm
   onFramework: (f: Framework) => void
   onPm: (p: Pm) => void
   onToast: (msg: string) => void
 }) {
-  const info = getInstall(tab, framework, pm)
-  if (info.steps.length === 0) return null
+  const current = FORMATS.find((f) => f.id === fmt)!
+  const code = useMemo(() => current.generator(cfg), [current, cfg])
+
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      onToast(`${current.filename} copied`)
+    } catch {
+      onToast('Copy failed — select & copy manually')
+    }
+  }
+  const onDownload = () => {
+    downloadText(code, current.filename)
+    onToast(`${current.filename} downloaded`)
+  }
+
+  return (
+    <div className="export-fmt">
+      <Seg options={FORMATS.map((f) => ({ id: f.id, cap: f.label }))} value={fmt} onChange={onFmt} />
+      <p className="export-fmt__hint">{current.hint}</p>
+      <div className="modal__actions">
+        <span className="modal__filename">{current.filename}</span>
+        <div className="modal__btn-row">
+          <button type="button" className="modal__btn" onClick={onCopy}>
+            <Copy size={13} strokeWidth={1.75} />
+            Copy
+          </button>
+          <button type="button" className="modal__btn modal__btn--primary" onClick={onDownload}>
+            <Download size={13} strokeWidth={1.75} />
+            Download
+          </button>
+        </div>
+      </div>
+      <InstallGuide fmt={fmt} framework={framework} pm={pm} onFramework={onFramework} onPm={onPm} onToast={onToast} />
+      <pre className="modal__code">{code}</pre>
+    </div>
+  )
+}
+
+/** Install guide — the "how do I actually use this" layer for the formats drawer. */
+function InstallGuide({
+  fmt,
+  framework,
+  pm,
+  onFramework,
+  onPm,
+  onToast,
+}: {
+  fmt: FmtId
+  framework: Framework
+  pm: Pm
+  onFramework: (f: Framework) => void
+  onPm: (p: Pm) => void
+  onToast: (msg: string) => void
+}) {
+  const info = getInstall(fmt, framework, pm)
 
   const copyCommand = async () => {
     if (!info.command) return
@@ -389,9 +337,7 @@ function InstallGuide({
     <div className="install">
       <div className="install__head">
         <span className="install__title">Install</span>
-        {info.showFramework && (
-          <Seg options={FRAMEWORKS} value={framework} onChange={onFramework} />
-        )}
+        {info.showFramework && <Seg options={FRAMEWORKS} value={framework} onChange={onFramework} />}
       </div>
       <ol className="install__steps">
         {info.steps.map((s, i) => (
@@ -434,10 +380,7 @@ const CHOICE_CAP: Record<string, Record<string, string>> = {
   borders: { faint: 'Faint', subtle: 'Subtle', medium: 'Medium', strong: 'Strong' },
 }
 
-/** Build the "your choices" recap — one entry per setting the user configured,
- *  each with a glanceable icon (or a live swatch for the brand colour) and the
- *  chosen value. This replaces the abstract token counts: the user sees the
- *  system THEY built. */
+/** Build the "your choices" recap — one entry per setting the user configured. */
 function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ icon: ReactNode; label: string; value: string }> {
   const cap = (k: string, v: string) => CHOICE_CAP[k]?.[v] ?? v
   const sw = (hex: string): ReactNode => <span className="export-ov__swatch" style={{ background: hex }} />
@@ -463,31 +406,54 @@ function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ 
   ]
 }
 
-/** Overview pane — shows what the user actually configured before they copy
- *  anything: a recap of every choice (icons + values) + a WCAG audit summary +
- *  jump-buttons to the format tabs. The point: "here's the system YOU built". */
-function OverviewPane({
-  cfg,
-  onPickTab,
-  onToast,
-}: {
-  cfg: Config
-  onPickTab: (id: TabId) => void
-  onToast: (msg: string) => void
-}) {
+/** A pack row — one named artifact with copy + download. */
+function PackRow({ item, cfg, onToast }: { item: PackItem; cfg: Config; onToast: (m: string) => void }) {
+  const Cmp = item.icon
+  const text = () => item.generator(cfg)
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(text())
+      onToast(`${item.filename} copied`)
+    } catch {
+      onToast('Copy failed — select & copy manually')
+    }
+  }
+  const download = () => {
+    downloadText(text(), item.filename)
+    onToast(`${item.filename} downloaded`)
+  }
+  return (
+    <div className="export-pack__row">
+      <span className="export-pack__ic" aria-hidden="true"><Cmp size={16} strokeWidth={1.75} /></span>
+      <div className="export-pack__body">
+        <div className="export-pack__label">{item.label} <span className="export-pack__file">{item.filename}</span></div>
+        <div className="export-pack__hint">{item.hint}</div>
+      </div>
+      <div className="export-pack__actions">
+        <button type="button" className="modal__btn" onClick={copy} aria-label={`Copy ${item.filename}`}>
+          <Copy size={13} strokeWidth={1.75} />
+        </button>
+        <button type="button" className="modal__btn" onClick={download} aria-label={`Download ${item.filename}`}>
+          <Download size={13} strokeWidth={1.75} />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/** Use-this-kit pane — the install experience. Hosted <link> as the headline, then
+ *  the pack (design.md · skill · contract), then "what's in your kit" (choices +
+ *  WCAG + recipes). */
+function KitPane({ cfg, onToast, onEject }: { cfg: Config; onToast: (msg: string) => void; onEject: () => void }) {
   const tk = useMemo(() => buildTokens(cfg), [cfg])
   const a11y = useMemo(() => auditContrast(tk), [tk])
   const a11yPass = a11y.filter((p) => p.passes).length
   const a11yTotal = a11y.length
-
-  // The user's actual choices — a recap of every setting they configured, so
-  // the export opens on "here's the system YOU built", not abstract token counts.
   const choices = buildChoices(cfg, tk)
 
   // The hosted-kit CDN <link> — the front door. Built from the SAME share-key the
-  // app already uses (encode(cfg)); the Worker serves genCss(decode(key)) at this
-  // exact URL, byte-identical to the download below. LIVE on Cloudflare today.
-  // Swap KIT_CDN_BASE to https://kit.uicockpit.com once the custom domain is wired.
+  // app uses (encode(cfg)); the Worker serves genCss(decode(key)) at this URL,
+  // byte-identical to the download.
   const kitHref = `${KIT_CDN_BASE}/k/${encode(cfg)}.css`
   const kitSnippet = `<link rel="stylesheet" href="${kitHref}">`
   const copyKit = async () => {
@@ -499,14 +465,20 @@ function OverviewPane({
     }
   }
 
+  // "Download pack" — all three pack files (the flat multi-file fallback; Slice 3
+  // upgrades this to a single zip). Stagger so browsers don't drop rapid downloads.
+  const downloadPack = () => {
+    PACK.forEach((item, i) => setTimeout(() => downloadText(item.generator(cfg), item.filename), i * 150))
+    onToast('Downloading pack…')
+  }
+
   return (
     <div className="export-ov">
       <div className="export-ov__head">
         <div className="export-ov__title">Use this kit</div>
         <p className="export-ov__sub">
-          Drop one hosted <code>&lt;link&gt;</code> in your <code>&lt;head&gt;</code> —
-          or download the files below. Either way you get the {choices.length} choices
-          you made, baked in.
+          Drop one hosted <code>&lt;link&gt;</code> in your <code>&lt;head&gt;</code>, then hand
+          your AI agent the pack below — the {choices.length} choices you made, baked in.
         </p>
       </div>
 
@@ -526,12 +498,26 @@ function OverviewPane({
         </div>
         <p className="export-cdn__note">
           Serves the full kit (tokens + component recipes) — byte-identical to the
-          download. Published kits get a short, auto-updating link (tweak → your live
-          app restyles) at launch. No account, eject to files anytime.
+          download. No account; eject to files anytime.
         </p>
       </div>
 
-      {/* Choices recap — every setting the user configured, at a glance. */}
+      {/* The pack — the agent install. design.md (spec) + agent rules (enforcement),
+          contract.json bundled for `uicockpit check`. */}
+      <div className="export-pack">
+        <div className="export-pack__head">
+          <span className="export-pack__title">The pack — hand this to your AI agent</span>
+          <button type="button" className="modal__btn modal__btn--primary" onClick={downloadPack}>
+            <Package size={13} strokeWidth={1.75} />
+            Download pack
+          </button>
+        </div>
+        {PACK.map((item) => (
+          <PackRow key={item.key} item={item} cfg={cfg} onToast={onToast} />
+        ))}
+      </div>
+
+      {/* What's in your kit — choices recap. */}
       <div className="export-ov__choices">
         {choices.map((c) => (
           <div key={c.label} className="export-ov__choice">
@@ -566,7 +552,7 @@ function OverviewPane({
         </div>
       </div>
 
-      {/* Bonus: component recipes promise */}
+      {/* Component recipes promise + eject to the formats drawer. */}
       <div className="export-ov__recipes">
         <div className="export-ov__recipes-icon">
           <FileCode size={16} strokeWidth={1.75} />
@@ -574,18 +560,13 @@ function OverviewPane({
         <div>
           <div className="export-ov__recipes-title">Component recipes included</div>
           <div className="export-ov__recipes-sub">
-            tokens.css ships with per-component CSS for Button, Input, Card,
-            Badge, Tabs, Switch, Toggle, Checkbox, Radio, Alert, Progress,
-            Menu, Tooltip, Dialog, Avatar, Skeleton, Spinner, Kbd, Separator
-            — each with full state recipes (hover, focus, disabled, active).
-            Drop it into your project and components match the kit out of the box.
+            The hosted link + tokens.css ship per-component CSS for Button, Input, Card,
+            Badge, Tabs, Switch, Toggle, Checkbox, Radio, Alert, Progress, Menu, Tooltip,
+            Dialog, Avatar, Skeleton, Spinner, Kbd, Separator — each with full state
+            recipes (hover, focus, disabled, active).
           </div>
-          <button
-            type="button"
-            className="export-ov__recipes-link"
-            onClick={() => onPickTab('css')}
-          >
-            See tokens.css →
+          <button type="button" className="export-ov__recipes-link" onClick={onEject}>
+            Eject to files (tokens.css · Tailwind · shadcn) →
           </button>
         </div>
       </div>
