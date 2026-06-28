@@ -747,6 +747,9 @@ export function buildTokens(cfg: Config): Tokens {
       // inverse-emphasis components (the dark tooltip on a light UI).
       '--k-inverse-surface': inverseSurface,
       '--k-inverse-fg': inverseFg,
+      // Muted step for ink ON an inverse surface (secondary text on a dark/brand
+      // face) — the inverse companion to --k-fg-muted (was color-mix'd by hand).
+      '--k-inverse-fg-muted': `color-mix(in srgb, ${inverseFg} 62%, ${inverseSurface})`,
       '--k-inverse-primary': inversePrimary,
       // Input fill — a recessed, BRAND-TINTED neutral (from the same ramp that
       // carries the whisper-of-brand, not a dead grey). Gives form fields a
@@ -1158,6 +1161,15 @@ export function buildTokens(cfg: Config): Tokens {
       // ~15 sites with no token; unified to a single airy-caps value so caps
       // tracking reads consistently and is tunable in one place.
       '--k-track-eyebrow': '0.06em',
+      // Negative tracking for tight headings (--tight) + display figures (--display).
+      // Was copied as raw -0.01em / -0.02em em-literals at every heading/stat/price.
+      '--k-track-tight': '-0.01em',
+      '--k-track-display': '-0.02em',
+      // Line-height scale — display numerals · headings · body. Was a bare literal
+      // (1.05 / 1.25 / 1.5) at every multi-line heading.
+      '--k-leading-tight': '1.05',
+      '--k-leading-snug': '1.25',
+      '--k-leading-normal': '1.5',
       '--k-ui-weight': uiW,
       // Named font-weight scale — the three UI weights as semantic tokens so
       // headings/titles reference a role, not a magic number. medium=labels,

@@ -54,11 +54,26 @@ export const RECIPES: readonly Recipe[] = [
   font-weight: var(--k-weight-semibold);
   font-family: var(--k-font-display);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  letter-spacing: var(--k-track-display);
+  line-height: var(--k-leading-tight);
   color: var(--k-fg);
 }
-.metric__sub { font-size: var(--k-type-caption); color: var(--k-fg-muted); }`,
+.metric__sub { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+
+/* Icon-tile — a soft-tinted square holding an icon (stat-tile marks, list leads,
+   nav glyphs). The tint pair + radius + centering, named once instead of redefined
+   inline at each owner. */
+.icon-tile {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: var(--k-radius-md);
+  background: var(--k-primary-soft);
+  color: var(--k-primary-soft-fg);
+}
+.icon-tile svg { width: var(--k-icon-md); height: var(--k-icon-md); }`,
   },
   {
     id: 'toolbar',
@@ -499,7 +514,7 @@ export const RECIPES: readonly Recipe[] = [
    (card-title had the display font, sheet-title didn't, dialog had no rule at
    all and fell back to an inline-styled <h3>). margin:0 so it's safe on a real
    <h3> element (which carries a UA margin) as well as a <div>/<span>. */
-.card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-semibold); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: -0.01em; line-height: 1.25; margin: 0; }
+.card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-semibold); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: var(--k-track-tight); line-height: var(--k-leading-snug); margin: 0; }
 .card__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.4; }
 /* Inline cluster (adjacent controls) + stacked cluster — both on the canonical
  * --k-stack-gap so "the gap between two adjacent controls" is axis-independent. */
@@ -3921,8 +3936,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-weight: var(--k-weight-semibold);
   font-family: var(--k-font-display);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  letter-spacing: var(--k-track-display);
+  line-height: var(--k-leading-tight);
   color: var(--k-fg);
 }
 /* CP3 — the HERO stat (confident-pro gap #1: one focal point per surface). The
