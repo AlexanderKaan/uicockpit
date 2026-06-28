@@ -34,19 +34,14 @@ describe('H2 — state-layer algebra (fixed house formula)', () => {
   })
 })
 
-describe('H2 — motion schemes (pre-sampled springs)', () => {
-  it('emits linear() easings with settle durations; expressive bounces, standard does not', () => {
-    const std = buildTokens(at({ motionScheme: 'standard' })).vars
-    const exp = buildTokens(at({ motionScheme: 'expressive' })).vars
-    for (const v of [std, exp]) {
-      expect(String(v['--k-spring'])).toMatch(/^linear\(0, /)
-      expect(String(v['--k-spring'])).toMatch(/1\)$/)
-      expect(String(v['--k-spring-dur'])).toMatch(/^\d+ms$/)
-    }
-    expect(std['--k-spring']).not.toBe(exp['--k-spring'])
-    // Expressive fast spring (damping 0.6) overshoots past 1; standard (0.9) ~not.
+describe('H2 — springs (pre-sampled, fixed to the composed standard scheme)', () => {
+  it('emits valid linear() easings with settle durations; the composed scheme does not overshoot', () => {
+    const v = buildTokens(at({})).vars
+    expect(String(v['--k-spring'])).toMatch(/^linear\(0, /)
+    expect(String(v['--k-spring'])).toMatch(/1\)$/)
+    expect(String(v['--k-spring-dur'])).toMatch(/^\d+ms$/)
+    // The 'standard' fast spring (damping 0.9) settles without bouncing past 1.
     const overshoots = (s: string): boolean => s.match(/[\d.]+/g)!.some((n) => parseFloat(n) > 1.01)
-    expect(overshoots(String(exp['--k-spring-fast']))).toBe(true)
-    expect(overshoots(String(std['--k-spring-fast']))).toBe(false)
+    expect(overshoots(String(v['--k-spring-fast']))).toBe(false)
   })
 })

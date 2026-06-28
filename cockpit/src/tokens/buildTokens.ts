@@ -7,7 +7,6 @@ import type {
   Contrast,
   SurfaceDepth,
   Motion,
-  MotionScheme,
   MotionTempo,
   MotionCurve,
   Radius,
@@ -17,7 +16,6 @@ import type {
 } from './types'
 import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
 import { resolveHarmony } from './harmony'
-import { signatureMask, signaturePath, signatureSeed } from './shape'
 import { customFontFamily, isCustomFont, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
 
 // Tailwind/shadcn convention: dimensional tokens emit in REM on a 16px root, so
@@ -160,12 +158,12 @@ function springLinear(damping: number, stiffness: number, points = 24): { easing
   pts[points] = 1
   return { easing: `linear(${pts.join(', ')})`, durMs: Math.round(settle * 1000) }
 }
-// The 12 params, verbatim from androidx StandardMotionTokens/ExpressiveMotionTokens
-// (spatial only — effects are damping-1.0 by spec and never bounce).
-const SPRINGS: Record<MotionScheme, { fast: [number, number]; def: [number, number]; slow: [number, number] }> = {
-  standard:   { fast: [0.9, 1400], def: [0.9, 700], slow: [0.9, 300] },
-  expressive: { fast: [0.6, 800],  def: [0.8, 380], slow: [0.8, 200] },
-}
+// The 12 params, verbatim from androidx StandardMotionTokens (spatial only —
+// effects are damping-1.0 by spec and never bounce). Fixed to the composed
+// 'standard' scheme (the Springs/Expressive knob was culled).
+const SPRINGS = {
+  standard: { fast: [0.9, 1400], def: [0.9, 700], slow: [0.9, 300] },
+} as const
 /* Type scale — [h1, h2, h3, body, small] in px, per S/M/L/XL step.
  * The floor is deliberate: body/nav never drop below the 13–14px that
  * shadcn + Material 3 treat as the UI minimum. h3 (card titles, section
@@ -576,22 +574,12 @@ export function buildTokens(cfg: Config): Tokens {
    * dense pro-tool. */
   const base = MOT_BASE[cfg.motion]
   const mul = TEMPO[cfg.motionTempo]
-  // Spring scheme (H2): pre-sample the spatial springs into linear() easings.
-  const springSet = SPRINGS[cfg.motionScheme ?? 'standard']
+  // Spring physics (H2) — fixed to the composed 'standard' sampling (the Springs
+  // knob was culled). Pre-sample the spatial springs into linear() easings.
+  const springSet = SPRINGS.standard
   const spFast = springLinear(...springSet.fast)
   const spDef = springLinear(...springSet.def)
   const spSlow = springLinear(...springSet.slow)
-  // Shape Lab (H5) — resolve the four dials into the signature path + mask.
-  // Jitter is seeded FROM the dials themselves, so the same kit hash always
-  // produces the same organic wobble (deterministic, URL-round-trippable).
-  const sigShape = {
-    points: cfg.shapePoints ?? 8,
-    depth: cfg.shapeDepth ?? 0.12,
-    softness: cfg.shapeSoft ?? 0.8,
-    jitter: cfg.shapeJitter ?? 0,
-  }
-  const sigPath = signaturePath(sigShape, signatureSeed(sigShape))
-  const sigMask = signatureMask(sigShape, signatureSeed(sigShape))
   const curveSet = CURVE[cfg.motionCurve]
   const ms = (n: number) => `${Math.round(n * mul)}ms`
   const motion = {
@@ -1126,13 +1114,6 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-spring-dur-fast': `${spFast.durMs}ms`,
       '--k-spring-dur': `${spDef.durMs}ms`,
       '--k-spring-dur-slow': `${spSlow.durMs}ms`,
-      // Signature shape (H5 Shape Lab) — ONE parametric shape from four dials
-      // (points/depth/softness/jitter), emitted as a scalable SVG mask. Apply
-      // via the .sig recipe ONLY on the signature territory (avatar masks,
-      // image crops, loaders, empty-states, hero decoration) — never on
-      // structural containers; those stay on the radius role-ladder.
-      '--k-shape-signature': sigMask,
-      '--k-shape-signature-path': `'${sigPath}'`,
       // Easings — split by motion direction (Material 3 pattern):
       //   --k-ease     emphasized standard, default for state changes
       //   --k-ease-out emphasized decelerate, for INCOMING elements (enters)

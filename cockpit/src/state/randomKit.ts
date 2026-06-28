@@ -25,18 +25,10 @@ const MOTIONS = ['snappy', 'smooth', 'playful'] as const // skip 'none' — a ro
 const TEMPOS = ['snappy', 'normal', 'generous'] as const
 const CURVES = ['standard', 'emphasized', 'spring'] as const
 const PALETTES = ['pastel', 'vivid', 'bright'] as const
-const MOTION_SCHEMES = ['standard', 'expressive'] as const
 const NEUTRALS = ['auto', 'cool', 'neutral', 'warm'] as const
 // Harmony rolls a vetted PRESET (never random raw slider values) — each preset
 // is a curated (spread, expression) pair, so the family always reads deliberate.
 const HARMONIES = ['mono', 'tonal', 'complement', 'expressive'] as const satisfies readonly Exclude<Harmony, 'custom'>[]
-/* Shape Lab (H5) — mirror the panel's SIG_PRESETS (petal/burst/star/pebble). */
-const SIGNATURES = [
-  { shapePoints: 8, shapeDepth: 0.12, shapeSoft: 0.8, shapeJitter: 0 },
-  { shapePoints: 12, shapeDepth: 0.5, shapeSoft: 0.3, shapeJitter: 0 },
-  { shapePoints: 5, shapeDepth: 0.5, shapeSoft: 0.1, shapeJitter: 0 },
-  { shapePoints: 7, shapeDepth: 0.05, shapeSoft: 1, shapeJitter: 0.45 },
-] as const
 
 export function randomKit(current: Config, rnd: () => number = Math.random): Config {
   const bodyFonts = ALL_FONTS.filter((f) => f !== SYSTEM_FONT && !SERIF_FONTS.includes(f)) // body = sans only
@@ -60,12 +52,8 @@ export function randomKit(current: Config, rnd: () => number = Math.random): Con
     motion: pick(MOTIONS, rnd),
     motionTempo: pick(TEMPOS, rnd),
     motionCurve: pick(CURVES, rnd),
-    motionScheme: pick(MOTION_SCHEMES, rnd),
     palette: pick(PALETTES, rnd),
     neutral: pick(NEUTRALS, rnd),
-    // Shape Lab (H5) — roll one of the curated signature presets (the same
-    // four the panel offers); free-dial chaos stays a deliberate user act.
-    ...pick(SIGNATURES, rnd),
     mode: current.mode, // preserve light/dark — don't jar the user
   }
 }

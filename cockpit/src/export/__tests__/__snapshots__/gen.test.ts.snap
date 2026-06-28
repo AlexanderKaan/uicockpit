@@ -21,15 +21,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "motion": "smooth",
     "motionTempo": "normal",
     "motionCurve": "standard",
-    "motionScheme": "standard",
     "cPrimary": "#0A84FF",
     "harmony": "tonal",
     "spread": 60,
     "expression": 100,
-    "shapePoints": 8,
-    "shapeDepth": 0.12,
-    "shapeSoft": 0.8,
-    "shapeJitter": 0,
     "palette": "vivid",
     "neutral": "auto",
     "canvas": "neutral",
@@ -218,8 +213,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-shadow-sm": "0 1px 2px hsl(210 16% 18%/.10)",
     "--k-shadow-tactile": "inset 0 1px 0 hsl(0 0% 100% / 0.85), 0 1px 2px hsl(210 16% 18%/.08), 0 0 0 1px hsl(210 16% 18%/.04)",
     "--k-shadow-xs": "0 1px 2px hsl(210 16% 18%/.05)",
-    "--k-shape-signature": "url(\\"data:image/svg+xml,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox%3D'0 0 100 100'%3E%3Cpath d%3D'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z' fill%3D'black'%2F%3E%3C%2Fsvg%3E\\")",
-    "--k-shape-signature-path": "'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z'",
     "--k-slider-knob": "calc(var(--k-toggle-h-default) - 6px)",
     "--k-space": "1.25rem",
     "--k-spring": "linear(0, 0.0423, 0.1399, 0.2612, 0.3863, 0.5041, 0.6085, 0.6974, 0.7708, 0.8297, 0.8759, 0.9115, 0.9384, 0.9582, 0.9726, 0.9828, 0.9898, 0.9946, 0.9977, 0.9996, 1.0007, 1.0013, 1.0015, 1.0015, 1)",
@@ -435,7 +428,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "list",
         "radio-card",
         "chip",
-        "signature",
         "message",
         "prose"
       ],
@@ -1045,11 +1037,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "chip": {
         "tier": "atom",
         "section": "Chip",
-        "uses": []
-      },
-      "signature": {
-        "tier": "atom",
-        "section": "Signature shape",
         "uses": []
       },
       "scaffold": {
@@ -2200,10 +2187,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "toggle"
         ]
       },
-      "sig": {
-        "modifiers": [],
-        "parts": []
-      },
       "sk": {
         "modifiers": [],
         "parts": []
@@ -2519,7 +2502,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "scroll-area",
       "segmented-control-toggle-group",
       "separator",
-      "signature",
       "skeleton",
       "spinner",
       "tabs",
@@ -2909,8 +2891,6 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-spring-dur-fast: 205ms;
   --k-spring-dur: 290ms;
   --k-spring-dur-slow: 443ms;
-  --k-shape-signature: url("data:image/svg+xml,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox%3D'0 0 100 100'%3E%3Cpath d%3D'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z' fill%3D'black'%2F%3E%3C%2Fsvg%3E");
-  --k-shape-signature-path: 'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z';
   --k-ease: cubic-bezier(.4,0,.2,1);
   --k-ease-out: cubic-bezier(.05,.7,.1,1);
   --k-ease-in: cubic-bezier(.3,0,.8,.15);
@@ -3201,8 +3181,6 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-spring-dur-fast: 205ms;
   --k-spring-dur: 290ms;
   --k-spring-dur-slow: 443ms;
-  --k-shape-signature: url("data:image/svg+xml,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox%3D'0 0 100 100'%3E%3Cpath d%3D'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z' fill%3D'black'%2F%3E%3C%2Fsvg%3E");
-  --k-shape-signature-path: 'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z';
   --k-ease: cubic-bezier(.4,0,.2,1);
   --k-ease-out: cubic-bezier(.05,.7,.1,1);
   --k-ease-in: cubic-bezier(.3,0,.8,.15);
@@ -3581,10 +3559,10 @@ body {
  *   the catalog:
  *     Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (52): the reusable elements with real
+ * ATOMS — the bare vocabulary (51): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape, Chat message, Prose
+ *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose
  *
  * COMPONENTS — stand-alone pieces of app (25), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -8696,33 +8674,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .chip__remove:hover { background: var(--k-state-press); color: var(--k-fg); }
 .chip--suggestion { color: var(--k-fg-muted); border-color: var(--k-border); }
 .chip--suggestion:hover:not(:disabled) { color: var(--k-fg); }
-
-/* === Signature shape — the Shape Lab utility (H5) =====================
-   ONE parametric shape (points × depth × softness × jitter → an SVG mask in
-   --k-shape-signature), applied with this utility. THE PLACEMENT GRAMMAR —
-   three shape layers with strict territories (contract rules, not taste):
-     1. STRUCTURAL  — cards/buttons/inputs/dialogs follow the radius
-        role-ladder (--k-radius-*). The signature shape NEVER clips a
-        structural container — content must stay rectangular-readable.
-     2. SIGNATURE   — whitelist ONLY: avatar masks, image/media crops,
-        loaders, empty-state illustration, hero decoration. That's where
-        .sig goes; one or two per screen, never wallpaper.
-     3. INTERACTIVE — morphs (press squish via --k-press-*, toggle corner
-        morph). Those read the H2 tokens, not this mask.
-   The mask scales with the element (data-URI SVG, mask-size 100%), so the
-   same token shapes a 24px avatar and a 480px hero. The raw path is also
-   exported (--k-shape-signature-path) for inline-SVG consumers — two dial
-   states share point count + order, so morphing loaders interpolate free. */
-.sig {
-  -webkit-mask-image: var(--k-shape-signature);
-  mask-image: var(--k-shape-signature);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  /* The mask IS the shape — kill any structural radius underneath. */
-  border-radius: 0;
-}
 
 /* === Adaptive scaffold — the shell tier (H3a) ===
    The app-frame grammar: a self-measuring shell that re-arranges its regions
@@ -9337,8 +9288,6 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-spring-dur-fast: 205ms;
   --k-spring-dur: 290ms;
   --k-spring-dur-slow: 443ms;
-  --k-shape-signature: url("data:image/svg+xml,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox%3D'0 0 100 100'%3E%3Cpath d%3D'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z' fill%3D'black'%2F%3E%3C%2Fsvg%3E");
-  --k-shape-signature-path: 'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z';
   --k-ease: cubic-bezier(.4,0,.2,1);
   --k-ease-out: cubic-bezier(.05,.7,.1,1);
   --k-ease-in: cubic-bezier(.3,0,.8,.15);
@@ -9629,8 +9578,6 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-spring-dur-fast: 205ms;
   --k-spring-dur: 290ms;
   --k-spring-dur-slow: 443ms;
-  --k-shape-signature: url("data:image/svg+xml,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox%3D'0 0 100 100'%3E%3Cpath d%3D'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z' fill%3D'black'%2F%3E%3C%2Fsvg%3E");
-  --k-shape-signature-path: 'M 43.31 5.06 Q 50 2 56.69 5.06 L 60.03 6.59 Q 66.72 9.64 73.61 12.21 L 77.05 13.49 Q 83.94 16.06 86.51 22.95 L 87.79 26.39 Q 90.36 33.28 93.41 39.97 L 94.94 43.31 Q 98 50 94.94 56.69 L 93.41 60.03 Q 90.36 66.72 87.79 73.61 L 86.51 77.05 Q 83.94 83.94 77.05 86.51 L 73.61 87.79 Q 66.72 90.36 60.03 93.41 L 56.69 94.94 Q 50 98 43.31 94.94 L 39.97 93.41 Q 33.28 90.36 26.39 87.79 L 22.95 86.51 Q 16.06 83.94 13.49 77.05 L 12.21 73.61 Q 9.64 66.72 6.59 60.03 L 5.06 56.69 Q 2 50 5.06 43.31 L 6.59 39.97 Q 9.64 33.28 12.21 26.39 L 13.49 22.95 Q 16.06 16.06 22.95 13.49 L 26.39 12.21 Q 33.28 9.64 39.97 6.59 Z';
   --k-ease: cubic-bezier(.4,0,.2,1);
   --k-ease-out: cubic-bezier(.05,.7,.1,1);
   --k-ease-in: cubic-bezier(.3,0,.8,.15);
@@ -10009,10 +9956,10 @@ body {
  *   the catalog:
  *     Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (52): the reusable elements with real
+ * ATOMS — the bare vocabulary (51): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape, Chat message, Prose
+ *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose
  *
  * COMPONENTS — stand-alone pieces of app (25), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -15125,33 +15072,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .chip--suggestion { color: var(--k-fg-muted); border-color: var(--k-border); }
 .chip--suggestion:hover:not(:disabled) { color: var(--k-fg); }
 
-/* === Signature shape — the Shape Lab utility (H5) =====================
-   ONE parametric shape (points × depth × softness × jitter → an SVG mask in
-   --k-shape-signature), applied with this utility. THE PLACEMENT GRAMMAR —
-   three shape layers with strict territories (contract rules, not taste):
-     1. STRUCTURAL  — cards/buttons/inputs/dialogs follow the radius
-        role-ladder (--k-radius-*). The signature shape NEVER clips a
-        structural container — content must stay rectangular-readable.
-     2. SIGNATURE   — whitelist ONLY: avatar masks, image/media crops,
-        loaders, empty-state illustration, hero decoration. That's where
-        .sig goes; one or two per screen, never wallpaper.
-     3. INTERACTIVE — morphs (press squish via --k-press-*, toggle corner
-        morph). Those read the H2 tokens, not this mask.
-   The mask scales with the element (data-URI SVG, mask-size 100%), so the
-   same token shapes a 24px avatar and a 480px hero. The raw path is also
-   exported (--k-shape-signature-path) for inline-SVG consumers — two dial
-   states share point count + order, so morphing loaders interpolate free. */
-.sig {
-  -webkit-mask-image: var(--k-shape-signature);
-  mask-image: var(--k-shape-signature);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  /* The mask IS the shape — kill any structural radius underneath. */
-  border-radius: 0;
-}
-
 /* === Adaptive scaffold — the shell tier (H3a) ===
    The app-frame grammar: a self-measuring shell that re-arranges its regions
    per its OWN width (container queries — never the viewport) at the M3 window
@@ -15523,10 +15443,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   status feedback keeps the toned toasts.
 - Date & time entry ships THREE forms only: docked .calendar · popover picker ·
   typed input (date .in + .timefield for times). No clock-face dials.
-- Signature shape (H5): --k-shape-signature (a scalable SVG mask) via the .sig
-  utility, ONLY on the identity layer — avatars, media crops, loaders,
-  empty-states, hero decoration. Structural containers never wear it; they
-  keep the radius role-ladder.
 - Dark mode: add the class .dark to a parent element.
 
 ## Component decision tree — when to pick which variant
@@ -15892,7 +15808,7 @@ layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
 \`max-width\`).
 
 **ATOMS** — the bare vocabulary; only meaningful inside something larger:
-Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Signature shape, Chat message, Prose.
+Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose.
 
 **COMPONENTS** — stand-alone pieces of app. Each IS its surface; build it by COMPOSING
 the atoms listed, not by hand-rolling them inside a bare card:
@@ -15926,7 +15842,7 @@ the atoms listed, not by hand-rolling them inside a bare card:
 components per container width; they own arrangement, never look, and assemble into PAGES.
 
 **STANDALONE atoms** — attach to anything; use directly, no host component needed:
-Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Signature shape, Description list.
+Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list.
 
 **The rule of reach:** need a data surface? → the **Data table** component (it owns
 toolbar + selection + pagination + empty/loading/error). Need a form? → **Form
@@ -15979,15 +15895,10 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "motion": "smooth",
     "motionTempo": "normal",
     "motionCurve": "standard",
-    "motionScheme": "standard",
     "cPrimary": "#3b3b42",
     "harmony": "tonal",
     "spread": 60,
     "expression": 100,
-    "shapePoints": 8,
-    "shapeDepth": 0.12,
-    "shapeSoft": 0.8,
-    "shapeJitter": 0,
     "palette": "vivid",
     "neutral": "auto",
     "canvas": "neutral",

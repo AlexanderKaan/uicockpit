@@ -99,10 +99,6 @@ export type Canvas = 'white' | 'brand' | 'neutral' | 'gradient'
  *   source = the Neutrals ramp ([t.h, t.s]) — so the wash temperature follows
  *            the Neutral control (auto/cool/warm) for free.
  * The --k-state-* tokens are still emitted + overridable in exports. */
-/* Motion scheme (H2) — M3's spring physics, pre-sampled into CSS linear()
- * easings at build time (the 12 spring params; effects never bounce). Standard
- * = composed, Expressive = bouncier/faster. Emits --k-spring-* tokens. */
-export type MotionScheme = 'standard' | 'expressive'
 /* Neutral temperature. 'auto' (default) tints the grey ladder toward the BRAND
  * hue — the Linear/Vercel "the greys carry a whisper of the brand" trick, pure
  * OKLCH. cool/neutral/warm are explicit overrides; mono falls back to pure grey. */
@@ -187,8 +183,6 @@ export interface Config {
   motion: Motion
   motionTempo: MotionTempo
   motionCurve: MotionCurve
-  /* Spring scheme (H2) — drives the pre-sampled --k-spring-* easings. */
-  motionScheme: MotionScheme
   /* Single brand hue. Secondary + accent are DERIVED from this in buildTokens
    * — one color in, a harmonious family out (shadcn/Linear model). */
   cPrimary: Hex
@@ -198,14 +192,6 @@ export interface Config {
   harmony: Harmony
   spread: number
   expression: number
-  /* Shape Lab (H5) — the parametric SIGNATURE shape (one function, four
-   * dials; see src/tokens/shape.ts). Strictly the signature layer: avatar
-   * masks, image crops, loaders, empty-states, hero decoration — NEVER
-   * structural containers (that's the radius role-ladder's territory). */
-  shapePoints: number
-  shapeDepth: number
-  shapeSoft: number
-  shapeJitter: number
   palette: Palette
   neutral: Neutral
   /* Page canvas / background — see Canvas. Drives --k-bg (exported). */

@@ -110,7 +110,6 @@ const CARD_KEYWORDS: Record<string, string> = {
   AttachmentChipCard: 'Attachments file chip',
   InteractiveCardCard: 'Workspaces interactive card selectable',
   AvatarCard: 'Avatar profile picture user',
-  SignatureShapeCard: 'Signature shape mask clip squircle flower star blob shape lab',
   StatCard: 'Recurring revenue MRR stat metric KPI sparkline',
   StatGroupCard: 'Overview metrics KPIs summary numbers',
   TrendCard: 'Revenue trend chart sparkline delta',
@@ -350,7 +349,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
-  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard, SignatureShapeCard]],
+  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
   ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
 ]
 
@@ -438,25 +437,6 @@ function BreadcrumbCard() {
   )
 }
 
-// Signature shape (H5 Shape Lab) — the parametric mask on its whitelisted
-// territory: an avatar, a media crop and a decorative tile. The mask reads
-// --k-shape-signature live, so the Shape → Signature dials ripple in here.
-function SignatureShapeCard() {
-  return (
-    <Card title="Signature shape" desc="One parametric shape (points · depth · softness · jitter) masks the identity layer — tune it under Shape → Signature.">
-      <div className="card__row" style={{ alignItems: 'center', gap: 'var(--k-s-12)' }}>
-        <span className="avatar avatar--a1 sig" style={{ width: 56, height: 56, fontSize: 16 }}>NW</span>
-        <span className="sig" style={{ width: 72, height: 72, background: 'var(--k-accent-soft)', display: 'grid', placeItems: 'center', color: 'var(--k-accent-soft-fg)' }}>
-          <Icon name="spark" size={26} />
-        </span>
-        <span className="sig" style={{ width: 56, height: 56, background: 'linear-gradient(135deg, var(--k-accent-2), var(--k-accent-4))' }} aria-hidden="true" />
-      </div>
-      <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>
-        Signature territory only: avatars · media crops · loaders · empty states · hero decoration — never structural containers (those keep the radius ladder).
-      </span>
-    </Card>
-  )
-}
 
 function AvatarCard() {
   return (

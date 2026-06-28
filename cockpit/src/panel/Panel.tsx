@@ -131,10 +131,6 @@ const CANVAS_OPTS = [
   { id: 'brand' as const, cap: 'Brand' },
   { id: 'gradient' as const, cap: 'Gradient' },
 ]
-const MOTION_SCHEME_OPTS = [
-  { id: 'standard' as const, cap: 'Standard' },
-  { id: 'expressive' as const, cap: 'Expressive' },
-]
 const ICON_OPTS = [
   { id: 'hairline' as const, cap: 'Iconoir' },
   { id: 'line' as const, cap: 'Lucide' },
@@ -162,36 +158,6 @@ const HARMONY_OPTS = [
   { id: 'complement' as const, cap: 'Complement' },
   { id: 'expressive' as const, cap: 'Expressive' },
 ]
-/* Shape Lab (H5) — presets of the four signature dials (points/depth/
- * softness/jitter). Same model as Harmony: pick a preset = snap the dials;
- * move a dial = the row reads Custom. The signature shape lives ONLY on the
- * whitelist territory (avatars, media crops, loaders, empty-states, hero
- * decoration) via the .sig recipe — never structural containers. */
-const SIG_PRESETS: Record<string, { shapePoints: number; shapeDepth: number; shapeSoft: number; shapeJitter: number }> = {
-  petal: { shapePoints: 8, shapeDepth: 0.12, shapeSoft: 0.8, shapeJitter: 0 },
-  burst: { shapePoints: 12, shapeDepth: 0.5, shapeSoft: 0.3, shapeJitter: 0 },
-  star: { shapePoints: 5, shapeDepth: 0.5, shapeSoft: 0.1, shapeJitter: 0 },
-  pebble: { shapePoints: 7, shapeDepth: 0.05, shapeSoft: 1, shapeJitter: 0.45 },
-}
-const SIGNATURE_OPTS = [
-  { id: 'petal' as const, cap: 'Petal' },
-  { id: 'burst' as const, cap: 'Burst' },
-  { id: 'star' as const, cap: 'Star' },
-  { id: 'pebble' as const, cap: 'Pebble' },
-]
-const sigPresetOf = (cfg: Config): string | null => {
-  for (const [id, p] of Object.entries(SIG_PRESETS)) {
-    if (
-      p.shapePoints === cfg.shapePoints &&
-      Math.abs(p.shapeDepth - cfg.shapeDepth) < 0.005 &&
-      Math.abs(p.shapeSoft - cfg.shapeSoft) < 0.005 &&
-      Math.abs(p.shapeJitter - cfg.shapeJitter) < 0.005
-    )
-      return id
-  }
-  return null
-}
-
 function cap<T extends string>(opts: ReadonlyArray<{ id: T; cap: string }>, id: T): string {
   return opts.find((o) => o.id === id)?.cap ?? String(id)
 }
@@ -473,81 +439,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       onPick: pick('buttonShape'),
     },
     {
-      // Shape Lab (H5) — the parametric SIGNATURE shape. Presets + four live
-      // dials in the flyout foot; a moved dial = Custom. Shapes avatars/media/
-      // empty-states via .sig — structural radii stay on the rows above.
-      key: 'signature',
-      label: 'Signature',
-      value: (() => {
-        const p = sigPresetOf(cfg)
-        return p ? cap(SIGNATURE_OPTS, p as (typeof SIGNATURE_OPTS)[number]['id']) : `Custom · ${cfg.shapePoints}pt`
-      })(),
-      kind: 'opts',
-      opts: optsFrom(SIGNATURE_OPTS),
-      selected: sigPresetOf(cfg) ?? undefined,
-      onPick: (id) => {
-        const preset = SIG_PRESETS[id]
-        if (preset) dispatch({ type: 'SET', patch: preset })
-        close()
-      },
-      footer: (
-        <div className="fmharmony">
-          <label className="fmslider">
-            <span className="fmslider__label">Points</span>
-            <input
-              type="range"
-              min={3}
-              max={16}
-              step={1}
-              value={cfg.shapePoints}
-              onChange={(e) => set('shapePoints', +e.target.value)}
-              aria-label="Signature shape — number of points"
-            />
-            <span className="fmslider__val">{cfg.shapePoints}</span>
-          </label>
-          <label className="fmslider">
-            <span className="fmslider__label">Depth</span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={Math.round(cfg.shapeDepth * 100)}
-              onChange={(e) => set('shapeDepth', +e.target.value / 100)}
-              aria-label="Signature shape — star depth (percent)"
-            />
-            <span className="fmslider__val">{Math.round(cfg.shapeDepth * 100)}%</span>
-          </label>
-          <label className="fmslider">
-            <span className="fmslider__label">Softness</span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={Math.round(cfg.shapeSoft * 100)}
-              onChange={(e) => set('shapeSoft', +e.target.value / 100)}
-              aria-label="Signature shape — corner softness (percent)"
-            />
-            <span className="fmslider__val">{Math.round(cfg.shapeSoft * 100)}%</span>
-          </label>
-          <label className="fmslider">
-            <span className="fmslider__label">Jitter</span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={Math.round(cfg.shapeJitter * 100)}
-              onChange={(e) => set('shapeJitter', +e.target.value / 100)}
-              aria-label="Signature shape — organic jitter (percent, seeded)"
-            />
-            <span className="fmslider__val">{Math.round(cfg.shapeJitter * 100)}%</span>
-          </label>
-        </div>
-      ),
-    },
-    {
       sec: 'Surface',
       key: 'surfaceDepth',
       label: 'Elevation',
@@ -619,16 +510,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(MOTION_OPTS, VIZ_MOTION),
       selected: cfg.motion,
       onPick: pick('motion'),
-    },
-    {
-      // Spring scheme (H2) — pre-sampled M3 spring physics as linear() tokens.
-      key: 'motionScheme',
-      label: 'Springs',
-      value: cap(MOTION_SCHEME_OPTS, cfg.motionScheme),
-      kind: 'seg',
-      opts: optsFrom(MOTION_SCHEME_OPTS),
-      selected: cfg.motionScheme,
-      onPick: pick('motionScheme'),
     },
     {
       key: 'iconSet',
