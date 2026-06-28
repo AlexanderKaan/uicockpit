@@ -5072,7 +5072,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * with a subtle hover). Suppressed on the disabled modifier (pointer-events:none
  * already blocks it, but be explicit). */
 .toggle:not(.toggle--disabled):hover { border-color: var(--k-state-border, var(--k-fg-faint)); }
-.toggle--on:not(.toggle--disabled):hover { filter: brightness(1.05); }
+.toggle--on:not(.toggle--disabled):hover,
+.toggle[aria-checked="true"]:not(.toggle--disabled):hover,
+.toggle[aria-pressed="true"]:not(.toggle--disabled):hover { filter: brightness(1.05); }
 /* Knob is always (track-h − 6px): leaves 2px padding + 1px border breathing room
  * on top and bottom regardless of stature. ON-translate is (track-w − track-h)
  * which lands the knob exactly at the right edge with matching inset. */
@@ -5087,11 +5089,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: transform var(--k-dur) var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
   box-shadow: var(--k-shadow-tactile, var(--k-shadow-sm));
 }
-.toggle--on { background: var(--k-fill, var(--k-primary)); border-color: var(--k-primary); }
-.toggle--on .toggle__knob {
+/* ON state is driven by the class OR the aria attribute, so a consumer that
+ * correctly sets role=switch + aria-checked (the a11y truth) gets the visual for
+ * free — no silent class/aria desync. Same model as .btn--toggle[aria-pressed]. */
+.toggle--on, .toggle[aria-checked="true"], .toggle[aria-pressed="true"] { background: var(--k-fill, var(--k-primary)); border-color: var(--k-primary); }
+.toggle--on .toggle__knob,
+.toggle[aria-checked="true"] .toggle__knob,
+.toggle[aria-pressed="true"] .toggle__knob {
   transform: translateX(calc(var(--tog-w) - var(--tog-h)));
   background: var(--k-primary-fg);
 }
+/* Disabled — the global :disabled rule excludes .toggle, so own it here (a
+ * disabled-ON switch must keep its colour). aria-invalid gets a danger edge. */
+.toggle:disabled, .toggle[aria-disabled="true"] { opacity: var(--k-disabled-opacity, 0.55); pointer-events: none; cursor: not-allowed; }
+.toggle[aria-invalid="true"] { border-color: var(--k-input-error-border); }
 
 /* Toggle size modifiers — explicit overrides for cases where you want a
  * smaller/bigger toggle than the stature default. Only --tog-w / --tog-h
@@ -6969,13 +6980,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .segctrl__btn > svg { flex-shrink: 0; display: block; }
 .segctrl__btn:hover { color: var(--k-fg); }
-.segctrl__btn:not(.segctrl__btn--on):active { background: var(--k-state-press); }
+.segctrl__btn:not(.segctrl__btn--on):not([aria-checked="true"]):not([aria-selected="true"]):active { background: var(--k-state-press); }
 /* Transparent control → fade, don't inherit the global opaque grey :disabled box. */
 .segctrl__btn:disabled, .segctrl__btn.is-disabled, .segctrl__btn[aria-disabled="true"] {
   background: transparent !important; color: var(--k-fg-faint) !important;
   opacity: var(--k-disabled-opacity); cursor: not-allowed;
 }
-.segctrl__btn--on {
+/* Selected = class OR aria (role=radio→aria-checked / role=tab→aria-selected),
+ * so the a11y truth drives the visual — no class/aria desync. */
+.segctrl__btn--on, .segctrl__btn[aria-checked="true"], .segctrl__btn[aria-selected="true"] {
   background: var(--k-surface);
   color: var(--k-fg);
   /* Lift shadow + a layout-neutral inset hairline. The shadow gives elevation;
@@ -7584,7 +7597,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .navmenu__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
 .navmenu__item--on { background: var(--k-state-hover); color: var(--k-fg); }
 .navmenu__group { position: relative; }
-.navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: 184px; z-index: var(--k-z-dropdown); }
+.navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: var(--k-overlay-min, 12rem); z-index: var(--k-z-dropdown); animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }
 
 /* === Context menu (.ctxmenu) — shadcn gap filler =====================
  * A right-click drop area; the popup reuses the .menu component, placed
@@ -11535,7 +11548,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * with a subtle hover). Suppressed on the disabled modifier (pointer-events:none
  * already blocks it, but be explicit). */
 .toggle:not(.toggle--disabled):hover { border-color: var(--k-state-border, var(--k-fg-faint)); }
-.toggle--on:not(.toggle--disabled):hover { filter: brightness(1.05); }
+.toggle--on:not(.toggle--disabled):hover,
+.toggle[aria-checked="true"]:not(.toggle--disabled):hover,
+.toggle[aria-pressed="true"]:not(.toggle--disabled):hover { filter: brightness(1.05); }
 /* Knob is always (track-h − 6px): leaves 2px padding + 1px border breathing room
  * on top and bottom regardless of stature. ON-translate is (track-w − track-h)
  * which lands the knob exactly at the right edge with matching inset. */
@@ -11550,11 +11565,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: transform var(--k-dur) var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1));
   box-shadow: var(--k-shadow-tactile, var(--k-shadow-sm));
 }
-.toggle--on { background: var(--k-fill, var(--k-primary)); border-color: var(--k-primary); }
-.toggle--on .toggle__knob {
+/* ON state is driven by the class OR the aria attribute, so a consumer that
+ * correctly sets role=switch + aria-checked (the a11y truth) gets the visual for
+ * free — no silent class/aria desync. Same model as .btn--toggle[aria-pressed]. */
+.toggle--on, .toggle[aria-checked="true"], .toggle[aria-pressed="true"] { background: var(--k-fill, var(--k-primary)); border-color: var(--k-primary); }
+.toggle--on .toggle__knob,
+.toggle[aria-checked="true"] .toggle__knob,
+.toggle[aria-pressed="true"] .toggle__knob {
   transform: translateX(calc(var(--tog-w) - var(--tog-h)));
   background: var(--k-primary-fg);
 }
+/* Disabled — the global :disabled rule excludes .toggle, so own it here (a
+ * disabled-ON switch must keep its colour). aria-invalid gets a danger edge. */
+.toggle:disabled, .toggle[aria-disabled="true"] { opacity: var(--k-disabled-opacity, 0.55); pointer-events: none; cursor: not-allowed; }
+.toggle[aria-invalid="true"] { border-color: var(--k-input-error-border); }
 
 /* Toggle size modifiers — explicit overrides for cases where you want a
  * smaller/bigger toggle than the stature default. Only --tog-w / --tog-h
@@ -13432,13 +13456,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .segctrl__btn > svg { flex-shrink: 0; display: block; }
 .segctrl__btn:hover { color: var(--k-fg); }
-.segctrl__btn:not(.segctrl__btn--on):active { background: var(--k-state-press); }
+.segctrl__btn:not(.segctrl__btn--on):not([aria-checked="true"]):not([aria-selected="true"]):active { background: var(--k-state-press); }
 /* Transparent control → fade, don't inherit the global opaque grey :disabled box. */
 .segctrl__btn:disabled, .segctrl__btn.is-disabled, .segctrl__btn[aria-disabled="true"] {
   background: transparent !important; color: var(--k-fg-faint) !important;
   opacity: var(--k-disabled-opacity); cursor: not-allowed;
 }
-.segctrl__btn--on {
+/* Selected = class OR aria (role=radio→aria-checked / role=tab→aria-selected),
+ * so the a11y truth drives the visual — no class/aria desync. */
+.segctrl__btn--on, .segctrl__btn[aria-checked="true"], .segctrl__btn[aria-selected="true"] {
   background: var(--k-surface);
   color: var(--k-fg);
   /* Lift shadow + a layout-neutral inset hairline. The shadow gives elevation;
@@ -14047,7 +14073,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .navmenu__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
 .navmenu__item--on { background: var(--k-state-hover); color: var(--k-fg); }
 .navmenu__group { position: relative; }
-.navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: 184px; z-index: var(--k-z-dropdown); }
+.navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: var(--k-overlay-min, 12rem); z-index: var(--k-z-dropdown); animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }
 
 /* === Context menu (.ctxmenu) — shadcn gap filler =====================
  * A right-click drop area; the popup reuses the .menu component, placed
