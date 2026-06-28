@@ -539,13 +539,13 @@ export const RECIPES: readonly Recipe[] = [
  * inverse of the default white .card. Surfaced by the build test: the credit-card
  * reached for .card, got a white box, then hand-hacked the colours. */
 .card--presentation {
-  background: linear-gradient(135deg, var(--k-grad-1), var(--k-grad-3));
+  background: var(--k-primary);
   border: 0;
   box-shadow: var(--k-shadow-lg);
-  color: var(--k-inverse-fg);
+  color: var(--k-primary-fg);
 }
 .card--presentation .card__title,
-.card--presentation .card__desc { color: var(--k-inverse-fg); }`,
+.card--presentation .card__desc { color: var(--k-primary-fg); }`,
   },
   {
     id: 'page-head',
