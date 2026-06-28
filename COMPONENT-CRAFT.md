@@ -102,12 +102,66 @@ property the kit recipe also sets on the same element.
 
 ---
 
-## Worklist (the laws to codify next, highest-leverage)
+## Part V — the Invariant Engine (graded law → enforced guarantee)
 
-1. `audit:craft` — encode **L3** as a source check: every class in the control
-   family must appear in the `.toolbar` height-invariant selector. (Would have
-   caught the filter bar.)
-2. **L2 chart-furniture** sub-component (legend callout + range toggle).
-3. Roll the **two tracks** across the gallery family-by-family (forms → overlays →
-   data → nav → marketing), fixing root-cause laws at the recipe level.
-4. Preview-chrome-vs-kit specificity audit (Part IV).
+> The deeper move behind the worklist (the user's two examples — button-height
+> drift, illegible selected-state — surfaced it). Our guarantees split in two:
+> **structural** (tokens · BEM · provenance · layout) are uniform *and* enforced
+> (build gate + `uicockpit check`); **perceptual / state** (height harmony ·
+> selected-edge · focus · hit-target) are ad-hoc per recipe, **15–70 % applied,
+> and enforced nowhere**. The perceptual class *is* the "you never pixel-fuck"
+> promise — and it leaks both in our own chrome (`.fmseg`, `.topbar__btn`) and in
+> any component an agent hand-rolls. The fix is not N component patches; it's a
+> repeatable lifecycle that turns each mechanizable craft law into a guarantee
+> that **cannot silently regress** — at our build *and* in a consumer's codebase.
+
+**The lifecycle — every mechanizable law rides these 5 rails:**
+
+1. **NAME** — a one-line machine test (from the Part-I rubric).
+2. **PRIMITIVE** — encode the hard-won fix as ONE token / utility / container-rule.
+   Adoption becomes "compose X", never "remember to do X". (e.g. a
+   `--k-selected-edge` inset-ring token; control height enforced by the *container*,
+   not re-stated per control; a single focus primitive.)
+3. **UNIFORM** — retrofit *every* recipe to the primitive; close the 15–70 % → 100 %.
+4. **ENFORCE** — two gates. (a) A build-gate **ratchet audit** — the proven
+   `audit:craft` magic-px pattern (count pinned to a baseline, can only go down;
+   explicit allowlist for deliberate exceptions) so the kit can't regress. (b) A
+   consumer **`check` rule** + promote the matching contract *info*-rule to
+   `check`-backed, so a hand-roll is caught (the moat moves from "no hardcoded hex"
+   to "selected stays legible / controls align"). Heuristic where exact is
+   impossible: a rule that gives `[aria-selected]` / `--on` only a *background*
+   (no border / inset / outline) → warn — it collapses on a flat palette.
+5. **DOGFOOD** — the chrome adopts the same primitive; our own UI becomes the
+   living proof + the forcing function (break an invariant → our UI shows it).
+
+**Status — the perceptual invariants (the first wave).** Coverage + gaps are from
+the 2026-06-29 invariant study; "enforced" tracks rail 4.
+
+| Inv | Law | Primitive (rail 2) | Coverage | Gap families | Enforced |
+|-----|-----|--------------------|----------|--------------|----------|
+| **I1 Height harmony** | L3 | per-control `min-height: var(--k-control-h-*)` + the `.toolbar` container force | ~70 % | `.segctrl` · `.check` · `.radio` · `.toggle` · `.slider` (unbound standalone) | ❌ info-only (`control-height-invariant`) |
+| **I2 Selected-edge** | L5 / L6 | `--k-selected-edge` = `inset 0 0 0 var(--k-bw) var(--k-border)` | **~15 %** | only `.segctrl` honors it; `.tbl` · `.tree` · `.navsub` · `.calendar` · `.cmdp` (+ chrome `.fmseg`) | ❌ not even named |
+| **I3 Focus-visible** | L6 | one focus primitive (stop relying on the *fragile global* only) | ~60 % | `.segctrl` · `.toggle` · `.tab` · `.combobox` · `.badge` · `.avatar` | ❌ |
+| **I4 Hit-target** | L4 | min interactive-size token + documented dense exceptions | ~50 % | `.navsub` · `.tree` · `.combobox` (28px) · `.calendar` · `.check` / `.radio` / `.toggle` | ❌ |
+
+**Phased plan:**
+
+- **Phase 0** — this section: the engine + the status tracker. *(done)*
+- **Phase 1** — **I2 selected-edge** (highest leverage: 15 % coverage, one cheap
+  token) → **I1 height harmony**. *These are the user's two examples, shipped as
+  enforced invariants, not patches.*
+- **Phase 2** — **I3 focus-visible** · **I4 hit-target**.
+- **Phase 3** — **chrome dogfood**: `.fmseg` → the selected-edge token,
+  `.topbar__btn` → the control-height token. Kills our two bugs + proves the engine.
+
+Each phase ships: primitive → uniform retrofit → a ratchet audit → a `check` rule
+where statically detectable.
+
+---
+
+## Worklist — residual / parallel (not on the Invariant-Engine track)
+
+1. **L2 chart-furniture** sub-component (legend callout + range toggle).
+2. Roll the **two tracks** (Part II) across the gallery family-by-family for the
+   *visual-critic* laws (2, 5, 7, 9) that the engine can't mechanize.
+3. Preview-chrome-vs-kit specificity audit (Part IV).
