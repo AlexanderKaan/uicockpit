@@ -116,13 +116,6 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
               See how it works
             </a>
           </div>
-          <div className="mkt__hero-loop" aria-label="Where UIcockpit sits in your workflow">
-            <span><strong>Define</strong> your language</span>
-            <span aria-hidden="true">→</span>
-            <span>your AI <strong>applies</strong> it</span>
-            <span aria-hidden="true">→</span>
-            <span><code>check</code> <strong>verifies</strong> it</span>
-          </div>
         </div>
 
         {/* Hero showcase — the REAL <ComponentGallery/>, full-bleed and brand-blue,
@@ -136,6 +129,83 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
       {/* Stats strip */}
       <section className="mkt__container">
         <MktStats />
+      </section>
+
+      {/* Where it fits — triangulate the stack: what UIcockpit IS, by what it isn't */}
+      <section className="mkt__section" id="fits">
+        <div className="mkt__container">
+          <div className="mkt__section-head">
+            <div className="mkt__eyebrow">
+              <span className="mkt__eyebrow-dot" />
+              Where it fits
+            </div>
+            <h2>Not another component library.</h2>
+            <p className="mkt__section-sub">
+              Tailwind is <em>how</em> you style. shadcn is <em>what</em> you assemble.
+              UIcockpit is the <strong>design language that makes it yours</strong> — the layer
+              that owns how your app looks, and keeps it coherent as it (and your AI) grows.
+            </p>
+          </div>
+          <div className="mkt__triad">
+            <div className="mkt__triad-card">
+              <span className="mkt__triad-have">You have <strong>Tailwind / CSS</strong> — <em>how</em> you write styles.</span>
+              <span className="mkt__triad-is">UIcockpit is the <strong>decisions</strong> those styles encode — the layer above.</span>
+            </div>
+            <div className="mkt__triad-card">
+              <span className="mkt__triad-have">You have <strong>shadcn / Radix</strong> — the components.</span>
+              <span className="mkt__triad-is">UIcockpit is the <strong>design language</strong> that makes any component look like one product.</span>
+            </div>
+            <div className="mkt__triad-card">
+              <span className="mkt__triad-have">You have <strong>Figma / tokens</strong> — the design source.</span>
+              <span className="mkt__triad-is">UIcockpit is that language, but <strong>executable</strong>, framework-neutral, and <strong>self-enforcing</strong>.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Define → Apply → Verify — UIcockpit lives in your build loop, not a folder */}
+      <section className="mkt__section mkt__section--alt" id="loop">
+        <div className="mkt__container">
+          <div className="mkt__section-head">
+            <div className="mkt__eyebrow">
+              <span className="mkt__eyebrow-dot" />
+              In your build loop
+            </div>
+            <h2>One language, three jobs.</h2>
+            <p className="mkt__section-sub">
+              UIcockpit isn't a one-time download — it's a layer in your build loop. Set the
+              language once, let your AI apply it on every screen, and check that nothing drifts
+              as the app grows.
+            </p>
+          </div>
+          <div className="mkt__loop">
+            <div className="mkt__loop-card">
+              <span className="mkt__loop-step"><Palette size={18} strokeWidth={1.9} /> Define</span>
+              <p>
+                Make your taste decisions once in the configurator — colour, type, shape, density —
+                and export framework-neutral <code>--k-*</code> tokens, the component recipes, and a
+                machine-readable contract. Your whole design language, in one artefact.
+              </p>
+            </div>
+            <span className="mkt__loop-arrow" aria-hidden="true">→</span>
+            <div className="mkt__loop-card">
+              <span className="mkt__loop-step"><Sparkles size={18} strokeWidth={1.9} /> Apply</span>
+              <p>
+                Hand the kit to your AI — over MCP, a skill, or your rules file. It builds on-brand
+                UI in one shot, composing real recipes instead of reaching for the same grey default.
+              </p>
+            </div>
+            <span className="mkt__loop-arrow" aria-hidden="true">→</span>
+            <div className="mkt__loop-card">
+              <span className="mkt__loop-step"><ShieldCheck size={18} strokeWidth={1.9} /> Verify</span>
+              <p>
+                Run <code>npx uicockpit check</code>. It catches a hardcoded hex, off-grid spacing,
+                or the wrong token — so what the agent ships stays coherent, screen after screen.
+              </p>
+            </div>
+          </div>
+          <p className="mkt__loop-foot">Define → Apply → Verify — every time the UI changes.</p>
+        </div>
       </section>
 
       {/* Features */}
