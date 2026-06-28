@@ -2440,7 +2440,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       },
       "tt": {
         "modifiers": [
-          "always"
+          "always",
+          "bottom",
+          "left",
+          "right"
         ],
         "parts": [
           "pop"
@@ -4958,6 +4961,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: opacity var(--k-dur-fast, 120ms) var(--k-ease, ease);
   z-index: var(--k-z-tooltip);
 }
+/* Placement — static (no JS collision-flip; pick the side that clears the viewport
+ * edge, or portal it in your framework). Default opens ABOVE, start-aligned. */
+.tt__pop--bottom { top: calc(100% + var(--k-s-6)); bottom: auto; }
+.tt__pop--right { left: calc(100% + var(--k-s-6)); right: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
+.tt__pop--left { right: calc(100% + var(--k-s-6)); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
 .tt:hover .tt__pop,
 .tt:focus-within .tt__pop,
 .tt--always .tt__pop {
@@ -11434,6 +11442,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: opacity var(--k-dur-fast, 120ms) var(--k-ease, ease);
   z-index: var(--k-z-tooltip);
 }
+/* Placement — static (no JS collision-flip; pick the side that clears the viewport
+ * edge, or portal it in your framework). Default opens ABOVE, start-aligned. */
+.tt__pop--bottom { top: calc(100% + var(--k-s-6)); bottom: auto; }
+.tt__pop--right { left: calc(100% + var(--k-s-6)); right: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
+.tt__pop--left { right: calc(100% + var(--k-s-6)); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
 .tt:hover .tt__pop,
 .tt:focus-within .tt__pop,
 .tt--always .tt__pop {
@@ -16874,6 +16887,21 @@ you create or restyle. These are the binding rules — load them every session.
 - Never scale chart bars / sliders / toggle knobs / avatars with the theme radius — those are
   fixed (3–4px or 999px). Never use \`--k-type-small\` (12px) for sentence content.
 - Never rewrite the app's logic to fit the kit — re-skin look/layout/composition only.
+
+## Behaviour contract (what the kit does NOT ship)
+The kit is CSS + tokens — look, layout, composition, a11y *structure*. It ships NO JS
+behaviour runtime; you wire interaction yourself (or use your framework's primitive —
+Radix / Headless UI / cmdk):
+- **State via aria, not just a class.** Selected toggle/segmented/tab → set \`aria-checked\`
+  / \`aria-selected\` / \`aria-pressed\` (the recipe styles off the attribute, so the a11y
+  truth drives the visual). Open menus/dialogs need focus-trap + Esc + focus-return.
+- **Listboxes & custom triggers** (select-trigger · combobox · dropdown · menubar ·
+  navmenu): you own keyboard nav (arrows / typeahead / Esc) + open/close. Prefer the
+  NATIVE \`<select class="select">\` (fully accessible, zero JS) when a native control fits.
+- **OTP / slider:** wire focus-advance+paste / keyboard + \`aria-valuenow\` yourself.
+- **Overlays** (popover · tooltip · hover-card) open ONE static side (placement modifiers
+  e.g. \`.tt__pop--bottom\` / \`--left\` / \`--right\`); there's no JS collision-flip — pick the
+  side that clears the viewport edge, and portal the overlay if a parent clips it.
 
 ## This kit at a glance
 - Brand \`var(--k-primary)\` = #1575d5 · Scale comfortable (control height 40px)

@@ -776,7 +776,7 @@ function TableCard() {
 
 function TooltipCard() {
   return (
-    <Card title="Last sync" desc="Hover the status for details.">
+    <Card title="Last sync" desc="Hover the status — four static placements.">
       <div className="card__row" style={{ paddingTop: 20 }}>
         <span className="tt">
           <span className="tt__pop" role="tooltip" id="tt-lastsync">Saved 2 min ago</span>
@@ -784,6 +784,16 @@ function TooltipCard() {
             <Icon name="info" /> Status
           </button>
         </span>
+      </div>
+      {/* Placement variants — top (default) · bottom · left · right. No JS flip;
+          pick the side that clears the edge. */}
+      <div className="card__row" style={{ justifyContent: 'center', gap: 'var(--k-s-16)', padding: 'var(--k-s-16) 0' }}>
+        {([['', 'Top'], ['tt__pop--bottom', 'Bottom'], ['tt__pop--left', 'Left'], ['tt__pop--right', 'Right']] as const).map(([mod, lbl]) => (
+          <span className="tt" key={lbl}>
+            <span className={`tt__pop ${mod}`} role="tooltip">On the {lbl.toLowerCase()}</span>
+            <button className="btn btn--ghost btn--sm" tabIndex={-1}>{lbl}</button>
+          </span>
+        ))}
       </div>
     </Card>
   )

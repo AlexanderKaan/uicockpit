@@ -51,6 +51,21 @@ you create or restyle. These are the binding rules — load them every session.
   fixed (3–4px or 999px). Never use \`--k-type-small\` (12px) for sentence content.
 - Never rewrite the app's logic to fit the kit — re-skin look/layout/composition only.
 
+## Behaviour contract (what the kit does NOT ship)
+The kit is CSS + tokens — look, layout, composition, a11y *structure*. It ships NO JS
+behaviour runtime; you wire interaction yourself (or use your framework's primitive —
+Radix / Headless UI / cmdk):
+- **State via aria, not just a class.** Selected toggle/segmented/tab → set \`aria-checked\`
+  / \`aria-selected\` / \`aria-pressed\` (the recipe styles off the attribute, so the a11y
+  truth drives the visual). Open menus/dialogs need focus-trap + Esc + focus-return.
+- **Listboxes & custom triggers** (select-trigger · combobox · dropdown · menubar ·
+  navmenu): you own keyboard nav (arrows / typeahead / Esc) + open/close. Prefer the
+  NATIVE \`<select class="select">\` (fully accessible, zero JS) when a native control fits.
+- **OTP / slider:** wire focus-advance+paste / keyboard + \`aria-valuenow\` yourself.
+- **Overlays** (popover · tooltip · hover-card) open ONE static side (placement modifiers
+  e.g. \`.tt__pop--bottom\` / \`--left\` / \`--right\`); there's no JS collision-flip — pick the
+  side that clears the viewport edge, and portal the overlay if a parent clips it.
+
 ## This kit at a glance
 - Brand \`var(--k-primary)\` = ${tk.primaryHex} · Scale ${cfg.scale} (control height ${h})
 - Radius ${cfg.radius} · Button shape ${cfg.buttonShape} · Surface ${cfg.surface} · Elevation ${({ flat: 'Flat', soft: 'Soft', deep: 'Deep' } as const)[cfg.surfaceDepth]}

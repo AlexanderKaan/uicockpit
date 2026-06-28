@@ -1443,6 +1443,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: opacity var(--k-dur-fast, 120ms) var(--k-ease, ease);
   z-index: var(--k-z-tooltip);
 }
+/* Placement — static (no JS collision-flip; pick the side that clears the viewport
+ * edge, or portal it in your framework). Default opens ABOVE, start-aligned. */
+.tt__pop--bottom { top: calc(100% + var(--k-s-6)); bottom: auto; }
+.tt__pop--right { left: calc(100% + var(--k-s-6)); right: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
+.tt__pop--left { right: calc(100% + var(--k-s-6)); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
 .tt:hover .tt__pop,
 .tt:focus-within .tt__pop,
 .tt--always .tt__pop {
