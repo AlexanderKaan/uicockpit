@@ -208,7 +208,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     // re-audit): headers/region wrappers + data-table/form-panel/pricing/sidebar/
     // empty-state/file-grid + the stats band + calendar VIEWS. Widgets (date picker,
     // chart, timeline, danger-zone, auth card, stat tile…) are 'component'.
-    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
+    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [CanvasCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
@@ -4393,6 +4393,29 @@ function PresentationCardCard() {
           <div className="card__desc">Unlimited access · 2026</div>
         </div>
         <span className="num" style={{ fontSize: 'var(--k-type-h3)', fontWeight: 700, letterSpacing: '0.08em' }}>•••• •••• •••• 4242</span>
+      </div>
+    </Card>
+  )
+}
+
+function CanvasCard() {
+  return (
+    <Card title="Canvas" desc="The brand-atmosphere background — sit a hero, landing section or app shell on var(--k-canvas).">
+      <div
+        className="canvas"
+        style={{
+          minHeight: 132,
+          borderRadius: 'var(--k-radius-lg)',
+          border: 'max(1px, var(--k-bw)) solid var(--k-border)',
+          padding: 'var(--k-s-20)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          gap: 'var(--k-s-4)',
+        }}
+      >
+        <span className="eyebrow">Premium</span>
+        <div style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, lineHeight: 'var(--k-leading-tight)' }}>Brand atmosphere</div>
       </div>
     </Card>
   )

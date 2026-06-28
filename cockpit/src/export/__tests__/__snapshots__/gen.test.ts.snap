@@ -1348,6 +1348,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "title"
         ]
       },
+      "canvas": {
+        "modifiers": [],
+        "parts": []
+      },
       "card": {
         "modifiers": [
           "bar",
@@ -3777,6 +3781,13 @@ body {
   box-shadow: var(--k-shadow-sm);
   transform: translate(-50%, -50%);
 }
+
+/* Canvas — the brand-atmosphere background (the radial mesh behind premium heroes,
+   landing sections, app shells). The --k-canvas token is otherwise buried in a
+   token comment; naming it as a class is the discoverability fix — an agent reaches
+   for class="canvas" instead of hand-rolling a gradient off-grammar. Full-bleed:
+   sit content on top; pair with .eyebrow + a headline for a hero. */
+.canvas { background: var(--k-canvas); }
 
 /* === Toolbar ===
    A composition primitive: a horizontal row of controls (search, filters,
@@ -10386,6 +10397,13 @@ body {
   box-shadow: var(--k-shadow-sm);
   transform: translate(-50%, -50%);
 }
+
+/* Canvas — the brand-atmosphere background (the radial mesh behind premium heroes,
+   landing sections, app shells). The --k-canvas token is otherwise buried in a
+   token comment; naming it as a class is the discoverability fix — an agent reaches
+   for class="canvas" instead of hand-rolling a gradient off-grammar. Full-bleed:
+   sit content on top; pair with .eyebrow + a headline for a hero. */
+.canvas { background: var(--k-canvas); }
 
 /* === Toolbar ===
    A composition primitive: a horizontal row of controls (search, filters,

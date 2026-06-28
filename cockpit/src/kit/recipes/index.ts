@@ -92,7 +92,14 @@ export const RECIPES: readonly Recipe[] = [
   border: max(1.5px, var(--k-bw)) solid var(--k-primary);
   box-shadow: var(--k-shadow-sm);
   transform: translate(-50%, -50%);
-}`,
+}
+
+/* Canvas — the brand-atmosphere background (the radial mesh behind premium heroes,
+   landing sections, app shells). The --k-canvas token is otherwise buried in a
+   token comment; naming it as a class is the discoverability fix — an agent reaches
+   for class="canvas" instead of hand-rolling a gradient off-grammar. Full-bleed:
+   sit content on top; pair with .eyebrow + a headline for a hero. */
+.canvas { background: var(--k-canvas); }`,
   },
   {
     id: 'toolbar',
