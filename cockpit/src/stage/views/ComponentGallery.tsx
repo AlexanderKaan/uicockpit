@@ -2646,7 +2646,7 @@ function DateCard() {
 
   return (
     <Card title="Schedule" desc="Pick the dates for your trip.">
-      <div className="popover-wrap" ref={ref} style={{ width: '100%' }}>
+      <div className="popover-wrap" ref={ref} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
         <button
           ref={triggerRef}
           type="button"
@@ -2661,7 +2661,9 @@ function DateCard() {
           <Icon name="chevD" size={13} />
         </button>
         {open && (
-          <div className="popover" role="dialog" aria-label="Choose a date range" style={{ width: 268 }}>
+          // Docked in-flow (not the absolute .popover) so the gallery masonry measures
+          // the card's real height — an open absolute popover overflowed into the card below.
+          <div className="popover" role="dialog" aria-label="Choose a date range" style={{ width: '100%', maxWidth: 300, position: 'static', marginTop: 'var(--k-s-6)' }}>
             <div className="calendar__nav">
               <span className="calendar__nav-title">May 2026</span>
               <span className="calendar__nav-btns">
@@ -2727,7 +2729,7 @@ function CalendarWeekCard() {
   const cols = view === 'day' ? [DAYS[2]!] : DAYS
   const colIndex = (i: number) => (view === 'day' ? 2 : i)
   return (
-    <Card title="Schedule" desc="Week & day views — a time-grid with placed events.">
+    <Card wide title="Schedule" desc="Week & day views — a time-grid with placed events.">
       <div className="segctrl" role="radiogroup" aria-label="Calendar view" style={{ alignSelf: 'flex-start', marginBottom: 'var(--k-s-10)' }}>
         {(['week', 'day'] as const).map((v) => (
           <button key={v} type="button" role="radio" aria-checked={view === v} className={`segctrl__btn ${view === v ? 'segctrl__btn--on' : ''}`} onClick={() => setView(v)} style={{ textTransform: 'capitalize' }}>{v}</button>
@@ -2786,7 +2788,7 @@ function CalendarYearCard() {
     { n: 'Sep', dim: 30 }, { n: 'Oct', dim: 31 }, { n: 'Nov', dim: 30 }, { n: 'Dec', dim: 31 },
   ]
   return (
-    <Card title="2026" desc="Year view — twelve months at a glance.">
+    <Card wide title="2026" desc="Year view — twelve months at a glance.">
       <div className="calendar-year">
         {MONTHS.map((m, mi) => {
           const now = m.n === 'Jun'
@@ -2851,7 +2853,7 @@ function CalendarRangeCard() {
     </div>
   )
   return (
-    <Card title="Reporting period" desc="Range picker — two months, one continuous selection.">
+    <Card wide title="Reporting period" desc="Range picker — two months, one continuous selection.">
       <div className="calendar-range">
         <Month title="June 2026" dim={30} offset={0} side="start" bound={22} nav="prev" />
         <Month title="July 2026" dim={31} offset={2} side="end" bound={3} nav="next" />

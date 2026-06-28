@@ -330,7 +330,9 @@ export function renderSection(spec: SectionSpec, key: number) {
       if (spec.seed.hero) {
         return (
           <div className="card" key={key} style={{ gap: 'var(--k-s-10)' }}>
-            {spec.seed.greeting && <h2 className="t-display" style={{ margin: 0 }}>{spec.seed.greeting}</h2>}
+            {/* Greeting reads as a strong hero line, not a full-page display title —
+                --k-type-h1 (≈30px) balances it against the composer below. */}
+            {spec.seed.greeting && <h2 className="t-display" style={{ margin: 0, fontSize: 'var(--k-type-h1)' }}>{spec.seed.greeting}</h2>}
             {spec.seed.suggestions && spec.seed.suggestions.length > 0 && (
               <div className="card__row" style={{ flexWrap: 'wrap' }}>
                 {spec.seed.suggestions.map((s) => <span className="chip" key={s}>{s}</span>)}
