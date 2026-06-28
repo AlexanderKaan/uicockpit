@@ -27,11 +27,12 @@ npx uicockpit check
 
 ### `uicockpit init <hash> [--force] [--cdn=<url>]`
 
-Fetches the configured kit from the CDN and writes two files to the current
+Fetches the configured kit from the CDN and writes three files to the current
 directory:
 
 - `uicockpit.tokens.css` — the full kit (CSS variables + component recipes)
 - `uicockpit.contract.json` — the machine-checkable contract `check` reads
+- `AGENTS.md` — the always-on agent rules (auto-discovered by Cursor, Claude Code, …)
 
 `--force` overwrites existing files. The hash is the share-key from the
 **"Use this kit"** panel at uicockpit.com.

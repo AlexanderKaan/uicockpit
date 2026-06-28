@@ -11,6 +11,8 @@
  *   GET /k/<hash>.contract.json  → genContract(decode(hash)). The machine-checkable
  *                                  contract `npx uicockpit check` / `init` reads.
  *                                  Same hash → CSS + contract always agree.
+ *   GET /k/<hash>.rules.md       → genSkill(decode(hash)). The agent rules `init`
+ *                                  writes as AGENTS.md (always-on enforcement layer).
  *
  *   (Stateful lanes /kit/<id>.css live+pinned, KV-backed, land with the publish
  *    flow — see ~/.claude/plans/live-kit-cdn.md P2.)
@@ -21,6 +23,7 @@
 import { decode } from '../src/state/hash'
 import { genCss } from '../src/export/genCss'
 import { genContract } from '../src/export/genContract'
+import { genSkill } from '../src/export/genSkill'
 
 const CORS = {
   'access-control-allow-origin': '*',
@@ -59,6 +62,25 @@ export default {
       return new Response(genContract(cfg), {
         headers: {
           'content-type': 'application/json; charset=utf-8',
+          'cache-control': IMMUTABLE,
+          ...CORS,
+        },
+      })
+    }
+
+    // Stateless rules: /k/<hash>.rules.md  →  genSkill(decode(hash))
+    const rulesM = pathname.match(/^\/k\/(.+)\.rules\.md$/)
+    if (rulesM) {
+      const cfg = decode(safeDecodeURIComponent(rulesM[1]))
+      if (!cfg) {
+        return new Response('UICockpit: invalid or empty kit key', {
+          status: 400,
+          headers: { 'content-type': 'text/plain; charset=utf-8', ...CORS },
+        })
+      }
+      return new Response(genSkill(cfg), {
+        headers: {
+          'content-type': 'text/markdown; charset=utf-8',
           'cache-control': IMMUTABLE,
           ...CORS,
         },

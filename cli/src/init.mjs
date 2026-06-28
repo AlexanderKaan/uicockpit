@@ -2,9 +2,10 @@
  * `uicockpit init <hash>` — pull a configured kit into the current project.
  *
  * The hash is the share-key from uicockpit.com (the payload in the app URL and in
- * the hosted `<link>`). The CDN serves both artifacts statelessly from it:
+ * the hosted `<link>`). The CDN serves the artifacts statelessly from it:
  *   GET /k/<hash>.css            → tokens.css (the full kit)
  *   GET /k/<hash>.contract.json  → the machine-checkable contract for `check`
+ *   GET /k/<hash>.rules.md       → the agent rules, written as AGENTS.md
  * So init is a thin fetch-and-write: no engine bundled, the CDN is the source.
  */
 
@@ -43,6 +44,7 @@ export async function runInit(argv) {
   const targets = [
     { file: 'uicockpit.tokens.css', url: `${base}/k/${hash}.css` },
     { file: 'uicockpit.contract.json', url: `${base}/k/${hash}.contract.json` },
+    { file: 'AGENTS.md', url: `${base}/k/${hash}.rules.md` },
   ]
 
   for (const t of targets) {
@@ -67,7 +69,7 @@ export async function runInit(argv) {
 
   console.log('\nKit installed. Next:')
   console.log('  1. Import uicockpit.tokens.css once at your app root (or use the hosted <link>).')
-  console.log('  2. Tell your agent to follow the kit — it themes via the --k-* tokens.')
+  console.log('  2. AGENTS.md holds the rules — your coding agent picks it up automatically.')
   console.log('  3. Run  npx uicockpit check  to catch any drift from the contract.')
   return 0
 }
