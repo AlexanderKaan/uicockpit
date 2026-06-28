@@ -23,6 +23,7 @@ export function checkContract(contract, files) {
   const violations = []
   const tokenSet = new Set(Object.keys(contract.tokens || {}))
   const classes = contract.components?.classes || {}
+  const compositions = contract.compositions || {}
   const ruleBy = {}
   for (const r of contract.rules || []) if (r.check) ruleBy[r.check] = r
   const sev = (check) => ruleBy[check]?.severity || 'warn'
@@ -85,6 +86,45 @@ export function checkContract(contract, files) {
       // font-size-scale (warn) — font-size should use the --k-type-* scale.
       for (const m of text.matchAll(/font-size\s*:\s*([^;]+);/gi)) {
         if (/\d+px/.test(m[1]) && !/var\(/.test(m[1])) add('font-size-scale', path, ln, `font-size: ${m[1].trim()} — use a --k-type-* token`)
+      }
+    }
+
+    // composition-reroll (warn) — the moat hole: a CSS rule that REBUILDS a named
+    // composition utility (.eyebrow, .metric, .icon-tile …) from the right tokens
+    // passes every atom-level rule yet is a silent second version of the bundle.
+    // Fingerprint each leaf rule against the contract's composition signatures.
+    if (isCss && ruleBy['composition-reroll']) {
+      // Blank out CSS comments (keeping newlines so line numbers stay true) — else
+      // a `/* … */` block attaches to the next selector and skews the match.
+      const scan = content.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '))
+      for (const m of scan.matchAll(/([^{}]+)\{([^{}]+)\}/g)) {
+        const selector = m[1].trim()
+        if (!selector || selector.startsWith('@') || selector.startsWith('--')) continue
+        // Normalise this rule's declarations the same way the signatures were built.
+        const decls = new Set()
+        for (const d of m[2].split(';')) {
+          const c = d.indexOf(':')
+          if (c === -1) continue
+          const prop = d.slice(0, c).trim().toLowerCase()
+          const val = d.slice(c + 1).trim()
+          if (prop && val) decls.add(`${prop}:${val.replace(/\s+/g, '').toLowerCase()}`)
+        }
+        if (!decls.size) continue
+        for (const [cls, spec] of Object.entries(compositions)) {
+          // A rule that targets the bundle's OWN class is a legit override, not a
+          // re-roll — skip it (e.g. `.eyebrow { … }`, `.card .eyebrow { … }`).
+          if (new RegExp(`\\.${cls}(?![\\w-])`).test(selector)) continue
+          let hits = 0
+          for (const s of spec.signature) if (decls.has(s)) hits++
+          if (hits >= spec.minMatch) {
+            // Anchor on the `{` (end of selector), not the match start — the
+            // match swallows any blanked leading comment/whitespace.
+            const line = scan.slice(0, m.index + m[1].length).split('\n').length
+            add('composition-reroll', path, line,
+              `'${selector}' re-implements the .${cls} composition utility (${hits}/${spec.signature.length} of its declarations) — use the .${cls} class instead of rebuilding the bundle`)
+            break // one composition warning per rule is enough
+          }
+        }
       }
     }
   }

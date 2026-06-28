@@ -2563,6 +2563,63 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     ],
     "orphans": []
   },
+  "compositions": {
+    "eyebrow": {
+      "selector": ".eyebrow",
+      "signature": [
+        "color:var(--k-fg-muted)",
+        "font-size:var(--k-type-eyebrow)",
+        "font-weight:var(--k-weight-semibold)",
+        "letter-spacing:var(--k-track-eyebrow)",
+        "text-transform:uppercase"
+      ],
+      "minMatch": 3
+    },
+    "metric__label": {
+      "selector": ".metric__label",
+      "signature": [
+        "color:var(--k-fg-muted)",
+        "font-size:var(--k-type-caption)",
+        "font-weight:var(--k-weight-medium)",
+        "letter-spacing:var(--k-track-eyebrow)",
+        "text-transform:uppercase"
+      ],
+      "minMatch": 3
+    },
+    "metric__value": {
+      "selector": ".metric__value",
+      "signature": [
+        "color:var(--k-fg)",
+        "font-family:var(--k-font-display)",
+        "font-size:var(--k-type-h2)",
+        "font-variant-numeric:tabular-nums",
+        "font-weight:var(--k-weight-semibold)",
+        "letter-spacing:var(--k-track-display)",
+        "line-height:var(--k-leading-tight)"
+      ],
+      "minMatch": 5
+    },
+    "icon-tile": {
+      "selector": ".icon-tile",
+      "signature": [
+        "background:var(--k-primary-soft)",
+        "border-radius:var(--k-radius-md)",
+        "color:var(--k-primary-soft-fg)"
+      ],
+      "minMatch": 3
+    },
+    "scrubber__knob": {
+      "selector": ".scrubber__knob",
+      "signature": [
+        "background:var(--k-surface)",
+        "border:max(1.5px,var(--k-bw))solidvar(--k-primary)",
+        "box-shadow:var(--k-shadow-sm)",
+        "height:var(--k-s-12)",
+        "width:var(--k-s-12)"
+      ],
+      "minMatch": 3
+    }
+  },
   "rules": [
     {
       "id": "tokens-exist",
@@ -2599,6 +2656,12 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "severity": "error",
       "check": "known-modifiers",
       "statement": "A kit class written as root--modifier must use a modifier this contract defines."
+    },
+    {
+      "id": "composition-reroll",
+      "severity": "warn",
+      "check": "composition-reroll",
+      "statement": "A CSS rule that reconstructs a named composition utility (.eyebrow, .metric, .icon-tile …) from its tokens is a silent second version — reach for the kit class instead of rebuilding the bundle."
     },
     {
       "id": "primary-never-rotates",

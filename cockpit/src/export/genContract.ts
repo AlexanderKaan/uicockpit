@@ -77,6 +77,61 @@ function extractClasses(recipes: readonly { css: string }[]): Record<string, Cla
   return out
 }
 
+/* Composition signatures — the moat hole the first-customer build test exposed:
+ * `check` polices ATOMS (raw tokens, undefined modifiers) but NOT the COMPOSITION
+ * tier, where drift actually happens. An agent that hand-rebuilds an `.eyebrow`
+ * (caps + tracked + muted micro-label) using the RIGHT tokens passes every other
+ * rule yet ships a silent second version of a named bundle. This emits, per
+ * composition utility, the set of *characteristic* declarations (token-bearing or
+ * a known keyword) that identify it, so the verifier can flag a non-kit rule that
+ * reconstructs that bundle inline. See [[hypertoken-coherence-compiler]] Phase 2. */
+interface CompositionSig { selector: string; signature: string[]; minMatch: number }
+/* A declaration is *characteristic* of a bundle (vs generic layout glue) when it
+ * carries a --k-* token or is one of these identity-bearing keywords. Pure layout
+ * (display / position / width:2rem …) is dropped so the signature stays specific. */
+const CHAR_KEYWORDS = new Set(['text-transform:uppercase', 'font-variant-numeric:tabular-nums'])
+/** Normalise a declaration to `prop:value` with all whitespace stripped + lowered,
+ *  so the contract and the verifier compare declarations identically. */
+function normDecl(prop: string, val: string): string {
+  return `${prop.trim().toLowerCase()}:${val.trim().replace(/\s+/g, '').toLowerCase()}`
+}
+function extractCompositions(recipes: readonly { id: string; css: string }[]): Record<string, CompositionSig> {
+  const comp = recipes.find((r) => r.id === 'composition')
+  if (!comp) return {}
+  const out: Record<string, CompositionSig> = {}
+  // Strip CSS comments first — otherwise a `/* … */` block attaches to the
+  // following selector and the single-class test rejects it (this hid .eyebrow).
+  const css = comp.css.replace(/\/\*[\s\S]*?\*\//g, '')
+  // Match leaf rules `selector { body }` (body has no nested braces).
+  for (const m of css.matchAll(/([^{}]+)\{([^{}]+)\}/g)) {
+    if (!m[1] || !m[2]) continue
+    const selector = m[1].trim()
+    // Only single-class roots (`.eyebrow`, `.metric__value`) — skip descendant /
+    // multi-part selectors (`.icon-tile svg`, `.a .b`) which aren't re-rollable units.
+    if (!/^\.[-A-Za-z_][\w-]*$/.test(selector)) continue
+    const sig: string[] = []
+    for (const d of m[2].split(';')) {
+      const c = d.indexOf(':')
+      if (c === -1) continue
+      const prop = d.slice(0, c).trim().toLowerCase()
+      const val = d.slice(c + 1).trim()
+      if (!prop || !val) continue
+      const decl = normDecl(prop, val)
+      if (val.includes('var(--k-') || CHAR_KEYWORDS.has(decl)) sig.push(decl)
+    }
+    // < 3 characteristic declarations → too generic to fingerprint (e.g. `.num`,
+    // `.scrubber`); only multi-token bundles get a signature.
+    if (sig.length < 3) continue
+    out[selector.slice(1)] = {
+      selector,
+      signature: sig.sort(),
+      // Require a strong majority to match before crying "re-roll", floored at 3.
+      minMatch: Math.max(3, Math.ceil(sig.length * 0.6)),
+    }
+  }
+  return out
+}
+
 /* The system's invariants, as DATA. `check` (when present) names the machine
  * verification `uicockpit check` runs against a consumer codebase; rules without
  * a `check` are contract-of-record (true by construction inside the kit, not
@@ -85,7 +140,7 @@ interface ContractRule {
   id: string
   statement: string
   severity: 'error' | 'warn' | 'info'
-  check?: 'tokens-exist' | 'no-raw-color' | 'spacing-grid' | 'radius-scale' | 'font-size-scale' | 'known-modifiers'
+  check?: 'tokens-exist' | 'no-raw-color' | 'spacing-grid' | 'radius-scale' | 'font-size-scale' | 'known-modifiers' | 'composition-reroll'
 }
 const RULES: ContractRule[] = [
   { id: 'tokens-exist', severity: 'error', check: 'tokens-exist',
@@ -100,6 +155,8 @@ const RULES: ContractRule[] = [
     statement: 'font-size should use the --k-type-* scale, not hardcoded px.' },
   { id: 'known-modifiers', severity: 'error', check: 'known-modifiers',
     statement: 'A kit class written as root--modifier must use a modifier this contract defines.' },
+  { id: 'composition-reroll', severity: 'warn', check: 'composition-reroll',
+    statement: 'A CSS rule that reconstructs a named composition utility (.eyebrow, .metric, .icon-tile …) from its tokens is a silent second version — reach for the kit class instead of rebuilding the bundle.' },
   // Contract-of-record (true by construction inside the kit) ─────────────────
   { id: 'primary-never-rotates', severity: 'info',
     statement: 'The brand primary hue never rotates; Harmony governs only the derived secondary/accent/decorative family.' },
@@ -152,6 +209,9 @@ export function genContract(cfg: Config): string {
       // a home component or is a blessed standalone primitive).
       orphans: orphanAtoms().sort(),
     },
+    // Composition fingerprints — let `check` flag a hand-rebuilt named bundle
+    // (the moat hole in the atom-only checks). Drives the `composition-reroll` rule.
+    compositions: extractCompositions(RECIPES),
     rules: RULES,
     accessibility: {
       pairs: auditContrast(tk).map((p) => ({

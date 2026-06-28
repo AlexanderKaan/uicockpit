@@ -8,11 +8,24 @@ const contract = {
   name: 'test-kit',
   tokens: { '--k-primary': 'oklch(…)', '--k-s-16': '1rem', '--k-radius-md': '0.5rem' },
   components: { classes: { btn: { modifiers: ['primary', 'ghost'], parts: [] } } },
+  compositions: {
+    eyebrow: {
+      selector: '.eyebrow',
+      signature: [
+        'color:var(--k-fg-muted)',
+        'font-size:var(--k-type-eyebrow)',
+        'letter-spacing:var(--k-track-eyebrow)',
+        'text-transform:uppercase',
+      ],
+      minMatch: 3,
+    },
+  },
   rules: [
     { check: 'tokens-exist', severity: 'error' },
     { check: 'known-modifiers', severity: 'error' },
     { check: 'no-raw-color', severity: 'warn' },
     { check: 'spacing-grid', severity: 'warn' },
+    { check: 'composition-reroll', severity: 'warn' },
   ],
 }
 const run = (files) => checkContract(contract, files)
@@ -53,4 +66,19 @@ test('warns on off-grid spacing only', () => {
   const off = v.filter((x) => x.check === 'spacing-grid')
   assert.equal(off.length, 1)
   assert.ok(off[0].message.includes('13px'))
+})
+
+test('warns when a non-kit rule re-rolls a composition utility', () => {
+  // The right tokens, but rebuilt under the consumer's own class = silent 2nd version.
+  const v = run([{ path: 'f.css', content:
+    '.kicker { text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }' }])
+  const w = v.find((x) => x.check === 'composition-reroll')
+  assert.ok(w && w.severity === 'warn')
+  assert.ok(w.message.includes('eyebrow'))
+})
+
+test('does not flag the consumer overriding the kit class itself', () => {
+  const v = run([{ path: 'g.css', content:
+    '.eyebrow { letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted); }' }])
+  assert.deepEqual(v.filter((x) => x.check === 'composition-reroll'), [])
 })

@@ -61,4 +61,36 @@ describe('uicockpit check — the contract verifier (Fase D4)', () => {
     const v = run([{ path: 'tokens.css', content: ':root {\n  --k-bg: #ffffff;\n  --k-fg: #0a0a0a;\n}' }])
     expect(v.filter((x) => x.check === 'no-raw-color')).toEqual([])
   })
+
+  // Phase 2 — the composition-reroll lint (the moat hole). A hand-rebuilt named
+  // bundle using the RIGHT tokens passes every atom-level rule, yet is a silent
+  // second version of the kit's `.eyebrow` / `.metric` / `.icon-tile`.
+  describe('composition-reroll (the silent-second-version lint)', () => {
+    it('warns when a non-kit rule rebuilds the .eyebrow bundle from its tokens', () => {
+      const v = run([{ path: 'app.css', content:
+        `.section-kicker {
+           font-size: var(--k-type-eyebrow);
+           font-weight: var(--k-weight-semibold);
+           letter-spacing: var(--k-track-eyebrow);
+           text-transform: uppercase;
+           color: var(--k-fg-muted);
+         }` }])
+      const w = v.find((x) => x.check === 'composition-reroll')
+      expect(w).toBeTruthy()
+      expect(w!.severity).toBe('warn')
+      expect(w!.message).toContain('eyebrow')
+    })
+
+    it('does NOT flag the consumer overriding the kit class itself', () => {
+      const v = run([{ path: 'app.css', content:
+        `.eyebrow { letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); font-size: var(--k-type-eyebrow); }` }])
+      expect(v.filter((x) => x.check === 'composition-reroll')).toEqual([])
+    })
+
+    it('does NOT flag a rule that only partly overlaps a bundle (below threshold)', () => {
+      const v = run([{ path: 'app.css', content:
+        `.note { color: var(--k-fg-muted); font-size: var(--k-type-eyebrow); }` }])
+      expect(v.filter((x) => x.check === 'composition-reroll')).toEqual([])
+    })
+  })
 })
