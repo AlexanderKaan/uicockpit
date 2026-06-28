@@ -41,7 +41,7 @@ export function genCss(cfg: Config): string {
     '\n  /* --- Window classes (shell thresholds) + pane constants --- */',
     ...Object.entries(WINDOW_CLASSES).map(([k, v]) => `  --k-win-${k}: ${v};`),
     ...Object.entries(PANE_CONSTANTS).map(([k, v]) => `  --k-pane-${k}: ${v};`),
-    '\n  /* --- Extended type scale (derived from --k-type-h1 / --k-type-body) --- */',
+    '\n  /* --- Extended type scale: h4/h5 in-between steps (the rest ship in :root above) --- */',
     ...Object.entries(typeScale).map(([k, v]) => `  --k-type-${k}: ${v};`),
   ].join('\n')
 

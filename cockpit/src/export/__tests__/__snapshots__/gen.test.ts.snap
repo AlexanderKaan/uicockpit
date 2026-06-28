@@ -2974,17 +2974,9 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-pane-margin-compact: 16px;
   --k-pane-margin: 24px;
 
-  /* --- Extended type scale (derived from --k-type-h1 / --k-type-body) --- */
-  --k-type-display: 3px;
-  --k-type-h1: 1.875px;
-  --k-type-h2: 1.375px;
-  --k-type-h3: 1px;
-  --k-type-h4: 1px;
-  --k-type-h5: 1px;
-  --k-type-body: 0.875px;
-  --k-type-small: 0.75px;
-  --k-type-caption: 9.5px;
-  --k-type-eyebrow: 0.6875px;
+  /* --- Extended type scale: h4/h5 in-between steps (the rest ship in :root above) --- */
+  --k-type-h4: 0.938rem;
+  --k-type-h5: 0.919rem;
 }
 
 .dark {
@@ -9371,17 +9363,9 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-pane-margin-compact: 16px;
   --k-pane-margin: 24px;
 
-  /* --- Extended type scale (derived from --k-type-h1 / --k-type-body) --- */
-  --k-type-display: 3px;
-  --k-type-h1: 1.875px;
-  --k-type-h2: 1.375px;
-  --k-type-h3: 1px;
-  --k-type-h4: 1px;
-  --k-type-h5: 1px;
-  --k-type-body: 0.875px;
-  --k-type-small: 0.75px;
-  --k-type-caption: 9.5px;
-  --k-type-eyebrow: 0.6875px;
+  /* --- Extended type scale: h4/h5 in-between steps (the rest ship in :root above) --- */
+  --k-type-h4: 0.938rem;
+  --k-type-h5: 0.919rem;
 }
 
 .dark {
@@ -15714,16 +15698,8 @@ stacked-area / donut without any library at all.
 The configurator surfaces h1, h2, body, small directly; the rest derive
 via a modular ratio so the rhythm stays coherent.
 \`\`\`
---k-type-display: 3px;
---k-type-h1: 1.875px;
---k-type-h2: 1.375px;
---k-type-h3: 1px;
---k-type-h4: 1px;
---k-type-h5: 1px;
---k-type-body: 0.875px;
---k-type-small: 0.75px;
---k-type-caption: 9.5px;
---k-type-eyebrow: 0.6875px;
+--k-type-h4: 0.938rem;
+--k-type-h5: 0.919rem;
 \`\`\`
 
 **Type roles — one role, one token** (don't invent per-component sizes; pick the
@@ -16339,35 +16315,11 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
       }
     },
     "type-scale-extended": {
-      "display": {
-        "value": "3px"
-      },
-      "h1": {
-        "value": "1.875px"
-      },
-      "h2": {
-        "value": "1.375px"
-      },
-      "h3": {
-        "value": "1px"
-      },
       "h4": {
-        "value": "1px"
+        "value": "0.938rem"
       },
       "h5": {
-        "value": "1px"
-      },
-      "body": {
-        "value": "0.875px"
-      },
-      "small": {
-        "value": "0.75px"
-      },
-      "caption": {
-        "value": "9.5px"
-      },
-      "eyebrow": {
-        "value": "0.6875px"
+        "value": "0.919rem"
       }
     },
     "spacing-scale": {
@@ -16914,16 +16866,8 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-accent-6-soft-fg: oklch(45.0% 0.1223 149.2);
   --color-chart-6: oklch(80.6% 0.2079 150.0);
   /* Extended type scale — h3/h4/h5/caption/eyebrow + display */
-  --text-display: 3px;
-  --text-h1: 1.875px;
-  --text-h2: 1.375px;
-  --text-h3: 1px;
-  --text-h4: 1px;
-  --text-h5: 1px;
-  --text-body: 0.875px;
-  --text-small: 0.75px;
-  --text-caption: 9.5px;
-  --text-eyebrow: 0.6875px;
+  --text-h4: 0.938rem;
+  --text-h5: 0.919rem;
   /* Spacing scale — s-0 through s-12 (multiples of --k-space) */
   --spacing-0: 0;
   --spacing-2: 0.125rem;

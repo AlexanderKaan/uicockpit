@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acme — Team &amp; Billing</title>
+  <link rel="stylesheet" href="./uicockpit.tokens.css" />
+  <style>
+    /* Page-shell layout only — no colours, radii, type-sizes or off-grid
+       spacing are introduced here; everything reads from --k-* tokens so the
+       page stays fully themeable. */
+    .page { padding-block: var(--k-s-32); }
+    .screen + .screen { margin-top: var(--k-s-32); padding-top: var(--k-s-32); border-top: var(--k-divider); }
+    /* Members table: keep avatar + name on one baseline. */
+    .member { display: inline-flex; align-items: center; gap: var(--k-s-10); }
+    .member__meta { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
+    .member__name { font-weight: var(--k-weight-medium); color: var(--k-fg); }
+    .member__email { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+  </style>
+</head>
+<!-- .cockpit-preview is the scope the kit expects on app/preview screens
+     (the native <select class="select"> + field focus rules are scoped to it). -->
+<body class="cockpit-preview">
+  <main class="page l-center l-center--wide l-stack" style="--l-gap: var(--k-s-32)">
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 1 — TEAM SETTINGS                                     -->
+    <!-- ============================================================ -->
+    <section class="screen l-stack" style="--l-gap: var(--k-s-24)">
+
+      <!-- Page header (section tier): eyebrow + title + sub + primary action -->
+      <header class="page-head page-head--bordered">
+        <div class="page-head__titles">
+          <span class="page-head__eyebrow">Workspace</span>
+          <h1 class="page-head__title">Team settings</h1>
+          <span class="page-head__sub">Manage your workspace profile, defaults and members.</span>
+        </div>
+        <div class="page-head__actions">
+          <button type="button" class="btn btn--ghost">Cancel</button>
+          <button type="button" class="btn btn--primary">Save changes</button>
+        </div>
+      </header>
+
+      <!-- Settings form panel: titled head + body grid of labelled fields + footer -->
+      <form class="formpanel">
+        <div class="formpanel__head">
+          <div class="formpanel__title">Workspace profile</div>
+          <div class="formpanel__desc">These details appear on invoices and in the member directory.</div>
+        </div>
+
+        <div class="formpanel__body">
+          <div class="formpanel__grid">
+            <!-- Text input -->
+            <div class="field">
+              <label class="field__label" for="ws-name">Workspace name</label>
+              <input class="in" id="ws-name" type="text" value="Acme Industries" />
+              <span class="field__hint">Visible to everyone in your team.</span>
+            </div>
+
+            <!-- Select -->
+            <div class="field">
+              <label class="field__label" for="ws-tz">Default timezone</label>
+              <select class="select" id="ws-tz">
+                <option>(GMT−08:00) Pacific Time</option>
+                <option selected>(GMT−05:00) Eastern Time</option>
+                <option>(GMT+00:00) UTC</option>
+                <option>(GMT+01:00) Central European Time</option>
+              </select>
+              <span class="field__hint">Used for scheduled reports and billing cut-offs.</span>
+            </div>
+
+            <!-- Email (text) input, spanning full width -->
+            <div class="field formpanel__full">
+              <label class="field__label" for="ws-billing">Billing email</label>
+              <input class="in" id="ws-billing" type="email" value="finance@acme.example" />
+            </div>
+          </div>
+
+          <!-- A titled sub-group with switch/toggle rows -->
+          <div class="formpanel__section">
+            <div class="formpanel__section-title">Preferences</div>
+
+            <label class="field" style="flex-direction:row;align-items:center;justify-content:space-between;gap:var(--k-s-12)">
+              <span class="field__label" style="font-weight:var(--k-weight-medium)">Weekly usage digest
+                <span class="field__hint" style="display:block;font-weight:var(--k-weight-normal)">Email a summary every Monday morning.</span>
+              </span>
+              <button type="button" class="toggle toggle--on" role="switch" aria-checked="true" aria-label="Weekly usage digest">
+                <span class="toggle__knob"></span>
+              </button>
+            </label>
+
+            <label class="field" style="flex-direction:row;align-items:center;justify-content:space-between;gap:var(--k-s-12)">
+              <span class="field__label" style="font-weight:var(--k-weight-medium)">Require two-factor for all members
+                <span class="field__hint" style="display:block;font-weight:var(--k-weight-normal)">Members must enrol in 2FA before signing in.</span>
+              </span>
+              <button type="button" class="toggle" role="switch" aria-checked="false" aria-label="Require two-factor for all members">
+                <span class="toggle__knob"></span>
+              </button>
+            </label>
+          </div>
+        </div>
+
+        <div class="formpanel__foot">
+          <span class="formpanel__foot-note">Last saved 12 minutes ago by Dana Whitfield.</span>
+          <button type="button" class="btn btn--ghost">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save changes</button>
+        </div>
+      </form>
+
+      <!-- Members table (data table): avatar + name + role + status badge + row action -->
+      <div class="section">
+        <div class="section__head">
+          <div class="section__titles">
+            <h2 class="section__title">Members</h2>
+            <span class="section__sub">4 people have access to this workspace.</span>
+          </div>
+          <div class="section__actions">
+            <button type="button" class="btn btn--secondary">Invite member</button>
+          </div>
+        </div>
+
+        <div class="datatable datatable--page">
+          <div class="datatable__bar">
+            <div class="toolbar">
+              <label class="searchinput" style="max-width:18rem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input class="searchinput__field" type="search" placeholder="Search members" aria-label="Search members" />
+              </label>
+              <span class="toolbar__spacer"></span>
+              <span class="datatable__count">4 members</span>
+            </div>
+          </div>
+
+          <div class="datatable__body">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th scope="col">Member</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" class="num">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="member">
+                      <span class="avatar avatar--a1" aria-hidden="true">DW</span>
+                      <span class="member__meta">
+                        <span class="member__name">Dana Whitfield</span>
+                        <span class="member__email">dana@acme.example</span>
+                      </span>
+                    </span>
+                  </td>
+                  <td>Owner</td>
+                  <td><span class="badge badge--success"><span class="badge__dot"></span>Active</span></td>
+                  <td class="num"><button type="button" class="btn btn--ghost btn--sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="member">
+                      <span class="avatar avatar--a3" aria-hidden="true">RM</span>
+                      <span class="member__meta">
+                        <span class="member__name">Rafael Mendez</span>
+                        <span class="member__email">rafael@acme.example</span>
+                      </span>
+                    </span>
+                  </td>
+                  <td>Admin</td>
+                  <td><span class="badge badge--success"><span class="badge__dot"></span>Active</span></td>
+                  <td class="num"><button type="button" class="btn btn--ghost btn--sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="member">
+                      <span class="avatar avatar--a5" aria-hidden="true">SK</span>
+                      <span class="member__meta">
+                        <span class="member__name">Sofia Kovač</span>
+                        <span class="member__email">sofia@acme.example</span>
+                      </span>
+                    </span>
+                  </td>
+                  <td>Member</td>
+                  <td><span class="badge badge--warn"><span class="badge__dot"></span>Invited</span></td>
+                  <td class="num"><button type="button" class="btn btn--ghost btn--sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="member">
+                      <span class="avatar avatar--a2" aria-hidden="true">TO</span>
+                      <span class="member__meta">
+                        <span class="member__name">Theo Osei</span>
+                        <span class="member__email">theo@acme.example</span>
+                      </span>
+                    </span>
+                  </td>
+                  <td>Member</td>
+                  <td><span class="badge badge--neutral"><span class="badge__dot"></span>Suspended</span></td>
+                  <td class="num"><button type="button" class="btn btn--ghost btn--sm">Manage</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="datatable__foot">
+            <span class="datatable__foot-info">Showing 1–4 of 4</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger zone: destructive settings fenced off -->
+      <div class="dangerzone">
+        <div class="dangerzone__head">Danger zone</div>
+        <div class="action-panel action-panel--danger">
+          <div class="action-panel__body">
+            <div class="action-panel__title">Delete this workspace</div>
+            <div class="action-panel__desc">Permanently removes Acme Industries, its 4 members and all billing history. This cannot be undone.</div>
+          </div>
+          <div class="action-panel__action">
+            <button type="button" class="btn btn--danger">Delete workspace</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SCREEN 2 — BILLING DASHBOARD                                 -->
+    <!-- ============================================================ -->
+    <section class="screen l-stack" style="--l-gap: var(--k-s-24)">
+
+      <header class="page-head page-head--bordered">
+        <div class="page-head__titles">
+          <span class="page-head__eyebrow">Billing</span>
+          <h1 class="page-head__title">Billing dashboard</h1>
+          <span class="page-head__sub">Revenue, outstanding invoices and recent activity.</span>
+        </div>
+        <div class="page-head__actions">
+          <button type="button" class="btn btn--secondary">Export CSV</button>
+          <button type="button" class="btn btn--primary">New invoice</button>
+        </div>
+      </header>
+
+      <!-- KPI stat tiles -->
+      <div class="stat-tile-grid" style="grid-template-columns:repeat(auto-fit,minmax(12rem,1fr))">
+        <div class="stat-tile">
+          <div class="stat-tile__head">
+            <span class="stat-tile__label">Revenue (MTD)</span>
+          </div>
+          <div class="stat-tile__value">$48,920</div>
+          <div class="stat-tile__foot">
+            <span class="stat-tile__delta stat-tile__delta--up">+12.4%</span>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile__head">
+            <span class="stat-tile__label">Outstanding</span>
+          </div>
+          <div class="stat-tile__value">$9,480</div>
+          <div class="stat-tile__foot">
+            <span class="stat-tile__delta stat-tile__delta--down">+3 overdue</span>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile__head">
+            <span class="stat-tile__label">Paid this month</span>
+          </div>
+          <div class="stat-tile__value">$39,440</div>
+          <div class="stat-tile__foot">
+            <span class="stat-tile__delta stat-tile__delta--up">+8.1%</span>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile__head">
+            <span class="stat-tile__label">Active subscriptions</span>
+          </div>
+          <div class="stat-tile__value">312</div>
+          <div class="stat-tile__foot">
+            <span class="stat-tile__delta stat-tile__delta--up">+5</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter / toolbar bar -->
+      <div class="filterbar">
+        <div class="toolbar">
+          <label class="searchinput" style="max-width:18rem">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input class="searchinput__field" type="search" placeholder="Search invoices" aria-label="Search invoices" />
+          </label>
+          <div class="filterbar__group">
+            <span class="filterbar__group-label">Status</span>
+            <select class="select" aria-label="Filter by status">
+              <option>All statuses</option>
+              <option>Paid</option>
+              <option>Pending</option>
+              <option>Overdue</option>
+            </select>
+          </div>
+          <div class="filterbar__group">
+            <span class="filterbar__group-label">Period</span>
+            <select class="select" aria-label="Filter by period">
+              <option selected>This month</option>
+              <option>Last 30 days</option>
+              <option>This quarter</option>
+            </select>
+          </div>
+          <span class="toolbar__spacer"></span>
+          <button type="button" class="btn btn--ghost">Reset</button>
+        </div>
+        <div class="filterbar__active">
+          <span class="filterbar__active-label">Active</span>
+          <span class="chip chip--filter chip--on">This month<button type="button" class="chip__remove" aria-label="Remove filter">×</button></span>
+          <span class="filterbar__count">14 invoices</span>
+        </div>
+      </div>
+
+      <!-- Invoices data table: status badge column + right-aligned amounts -->
+      <div class="datatable datatable--page">
+        <div class="datatable__bar">
+          <span class="datatable__count">Recent invoices</span>
+          <span class="datatable__spacer"></span>
+        </div>
+        <div class="datatable__body">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th scope="col">Invoice</th>
+                <th scope="col">Client</th>
+                <th scope="col">Issued</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>INV-2041</td>
+                <td>Northwind Traders</td>
+                <td>Jun 24, 2026</td>
+                <td><span class="badge badge--success"><span class="badge__dot"></span>Paid</span></td>
+                <td class="num">$4,200.00</td>
+              </tr>
+              <tr>
+                <td>INV-2040</td>
+                <td>Globex Corp</td>
+                <td>Jun 22, 2026</td>
+                <td><span class="badge badge--warn"><span class="badge__dot"></span>Pending</span></td>
+                <td class="num">$1,850.00</td>
+              </tr>
+              <tr>
+                <td>INV-2039</td>
+                <td>Initech LLC</td>
+                <td>Jun 18, 2026</td>
+                <td><span class="badge badge--danger"><span class="badge__dot"></span>Overdue</span></td>
+                <td class="num">$3,420.00</td>
+              </tr>
+              <tr>
+                <td>INV-2038</td>
+                <td>Stark &amp; Sons</td>
+                <td>Jun 15, 2026</td>
+                <td><span class="badge badge--success"><span class="badge__dot"></span>Paid</span></td>
+                <td class="num">$12,000.00</td>
+              </tr>
+              <tr>
+                <td>INV-2037</td>
+                <td>Umbrella Health</td>
+                <td>Jun 11, 2026</td>
+                <td><span class="badge badge--success"><span class="badge__dot"></span>Paid</span></td>
+                <td class="num">$760.00</td>
+              </tr>
+              <tr>
+                <td>INV-2036</td>
+                <td>Wayne Enterprises</td>
+                <td>Jun 09, 2026</td>
+                <td><span class="badge badge--danger"><span class="badge__dot"></span>Overdue</span></td>
+                <td class="num">$2,210.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="datatable__foot">
+          <span class="datatable__foot-info">Showing 1–6 of 14</span>
+          <div class="datatable__perpage">
+            <span>Rows per page</span>
+            <select class="select" aria-label="Rows per page">
+              <option selected>6</option>
+              <option>12</option>
+              <option>24</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

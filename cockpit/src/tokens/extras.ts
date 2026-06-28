@@ -119,35 +119,25 @@ export function buildPalette(cfg: Config): Record<string, string> {
   return out
 }
 
-/* ───────── Extended type scale ─────────
- * The configurator currently exposes h1, h2, body, small via the TypeScale
- * setting. For a complete design system we also need h3-h5, display,
- * caption, and eyebrow. These derive from the base h1/body via a 1.2-1.25
- * modular ratio (industry-standard "major second" / "major third"). */
+/* ───────── Extended type scale (h4 / h5 only) ─────────
+ * buildTokens() already emits the full first-class scale (display · h1 · h2 · h3 ·
+ * body · small · caption · eyebrow) in REM. This adds ONLY the two in-between
+ * steps a marketing page sometimes needs (h4/h5) — emitted in rem to match.
+ *
+ * ⚠️ The token values from buildTokens are REM strings (e.g. "1.875rem"), so the
+ * parsed numbers ARE rem — re-emit them with `rem`, never `px`. (A prior version
+ * appended `px` to the rem numbers, producing 0.75px-tall text in every export —
+ * the preview was unaffected because it reads buildTokens().vars directly.) */
 export function buildTypeScale(cfg: Config): Record<string, string> {
   const tk = buildTokens(cfg)
   const v = tk.vars as Record<string, string>
-  const num = (k: string) => parseFloat(v[k] ?? '0')
-  // h1/h2/h3/body/small/eyebrow are now first-class scale tokens driven by
-  // the Text size (S/M/L/XL) setting. Display (hero) and h4/h5 (the in-between
-  // steps a marketing page sometimes needs) derive from them.
-  const h1 = num('--k-type-h1')
-  const h2 = num('--k-type-h2')
+  const num = (k: string) => parseFloat(v[k] ?? '0') // rem value (strips the "rem" unit)
+  const rem = (n: number) => `${Math.round(n * 1000) / 1000}rem`
   const h3 = num('--k-type-h3')
   const body = num('--k-type-body')
-  const small = num('--k-type-small')
-  const eyebrow = num('--k-type-eyebrow')
   return {
-    display: Math.round(h1 * 1.6) + 'px',  // CP1 hero tier — matches buildTokens --k-type-display (1.6×)
-    h1: h1 + 'px',
-    h2: h2 + 'px',
-    h3: h3 + 'px',
-    h4: Math.round((h3 + body) / 2) + 'px',  // tween between h3 and body
-    h5: Math.round(body * 1.05) + 'px',
-    body: body + 'px',
-    small: small + 'px',
-    caption: Math.max(9.5, small - 2) + 'px',  // micro tier below small, scales
-    eyebrow: eyebrow + 'px',  // uppercase micro-label — pairs with the .eyebrow role
+    h4: rem((h3 + body) / 2), // tween between h3 and body
+    h5: rem(body * 1.05),
   }
 }
 
