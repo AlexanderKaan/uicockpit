@@ -4,6 +4,9 @@
 
 ### Build a design system you actually like — and keep it in one place.
 
+**Tailwind is how you style. shadcn is what you assemble. UIcockpit is the design language that makes
+it yours — and keeps it that way.**
+
 Make a handful of taste decisions, watch them apply across 74 components, and take the whole thing
 with you: framework-neutral `--k-*` tokens **and** matching components, as one hosted `<link>`, a
 download, Tailwind v4 `@theme`, or shadcn/ui CSS.
@@ -42,17 +45,23 @@ Designers and developers, among friends. I hope it's useful. — **Alexander**
 
 ---
 
-## The idea, in one line
+## Where it sits in the stack
 
-shadcn gives you the components. **UIcockpit gives you the design language on top** — colour, type,
-shape, density, motion — so your app looks *designed*, not defaulted. It doesn't replace shadcn or
-Tailwind; it sits a friendly layer above them.
+Tailwind is *how* you style. shadcn is *what* you assemble. **UIcockpit is the design language that
+makes it yours** — and the only layer that *keeps* it coherent as your app (and your AI) grow. It
+doesn't replace any of them; it sits above them, framework-neutral.
 
-|  | shadcn / Material | **UIcockpit** |
+| You already have… | which is… | so UIcockpit is… |
 |---|---|---|
-| **Stack** | React + Tailwind assumed | **framework-neutral** — pastes over anything |
-| **Output** | components; you bring the style | a coherent **design language**, in one file |
-| **Built for** | humans reading docs | **an AI can apply it in one shot** (tokens + recipes + house rules) |
+| **Tailwind / CSS** | *how* you write styles | the **decisions** those styles encode — the layer above |
+| **shadcn / Radix** | the **components** (+ behaviour) | the **design language** that makes any components look like one product |
+| **Figma / design tokens** | the design **source** (authoring) | the same language, but **executable**, framework-neutral, and **self-enforcing** |
+
+And because it's one artefact an agent can read, UIcockpit lives in your whole build loop:
+**Define** your language → your AI **applies** it → `npx uicockpit check` **verifies** it.
+*(Define → Apply → Verify — not a one-off asset, a layer in the loop.)*
+
+→ The thinking behind this: [`VISION.md`](./VISION.md) · [`POSITIONING.md`](./POSITIONING.md).
 
 ---
 

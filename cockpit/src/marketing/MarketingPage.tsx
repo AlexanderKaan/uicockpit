@@ -102,10 +102,11 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
           </div>
           <h1>Stop shipping the generic AI look.</h1>
           <p className="mkt__hero-sub">
-            Today's AI builders hand every app the same grey defaults. UIcockpit is the
-            design language on top — colour, type, shape and motion as framework-neutral
-            tokens, in one artefact your AI applies in a single shot. Build a kit in 60
-            seconds; come back to tweak it any time.
+            Tailwind is how you style. shadcn is what you assemble.{' '}
+            <strong>UIcockpit is the design language that makes it yours</strong> — colour,
+            type, shape and motion as framework-neutral tokens your AI applies in one shot,
+            plus a checker that keeps every screen coherent as the app grows. Build a kit in
+            60 seconds.
           </p>
           <div className="mkt__hero-ctas">
             <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
@@ -114,6 +115,13 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
             <a href="#how" className="mkt-btn mkt-btn--ghost mkt-btn--lg">
               See how it works
             </a>
+          </div>
+          <div className="mkt__hero-loop" aria-label="Where UIcockpit sits in your workflow">
+            <span><strong>Define</strong> your language</span>
+            <span aria-hidden="true">→</span>
+            <span>your AI <strong>applies</strong> it</span>
+            <span aria-hidden="true">→</span>
+            <span><code>check</code> <strong>verifies</strong> it</span>
           </div>
         </div>
 

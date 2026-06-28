@@ -331,6 +331,26 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+/* Define → Apply → Verify — the "we're in your dev loop" trust strip under the CTAs. */
+.mkt__hero-loop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 28px;
+  font-size: 0.875rem;
+  color: var(--mkt-fg-muted);
+}
+.mkt__hero-loop strong { color: var(--mkt-fg); font-weight: 600; }
+.mkt__hero-loop code {
+  font-family: var(--mkt-mono, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--mkt-surface-2, rgba(127, 127, 127, 0.12));
+}
+.mkt__hero-loop > span[aria-hidden] { color: var(--mkt-fg-faint, var(--mkt-fg-muted)); opacity: 0.6; }
 
 /* === Hero showcase — the component bouquet ===
    Full-bleed wrapper for ComponentBouquet (the real <ComponentGallery/>).
