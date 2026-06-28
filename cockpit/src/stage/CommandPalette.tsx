@@ -31,6 +31,7 @@ interface CommandPaletteProps {
   onShare: () => void
   onExport: () => void
   onRandomize: () => void
+  onReset: () => void
   undo: () => void
   redo: () => void
 }
@@ -46,7 +47,7 @@ const RADII: { id: Config['radius']; label: string }[] = [
   { id: 'none', label: 'None' }, { id: 'subtle', label: 'Subtle' }, { id: 'soft', label: 'Soft' }, { id: 'round', label: 'Round' },
 ]
 
-export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, onShare, onExport, onRandomize, undo, redo }: CommandPaletteProps) {
+export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, onShare, onExport, onRandomize, onReset, undo, redo }: CommandPaletteProps) {
   const [q, setQ] = useState('')
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -89,9 +90,9 @@ export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, 
     cmds.push({ group: 'Actions', label: 'Use this kit — export', icon: Code, run: onExport })
     cmds.push({ group: 'Actions', label: 'Undo', icon: Undo2, hint: '⌘Z', run: undo })
     cmds.push({ group: 'Actions', label: 'Redo', icon: Redo2, hint: '⇧⌘Z', run: redo })
-    cmds.push({ group: 'Actions', label: 'Reset to Mono (greyscale)', icon: RotateCcw, run: () => dispatch({ type: 'APPLY_COLOR_THEME', id: 'mono' }) })
+    cmds.push({ group: 'Actions', label: 'Reset to the default kit', icon: RotateCcw, run: onReset })
     return cmds
-  }, [dispatch, onViewChange, onShare, onExport, onRandomize, undo, redo])
+  }, [dispatch, onViewChange, onShare, onExport, onRandomize, onReset, undo, redo])
 
   // Token-AND filter over (label + group) so "radius round" surfaces "Box radius: Round".
   const matches = useMemo(() => {

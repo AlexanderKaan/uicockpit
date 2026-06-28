@@ -24,27 +24,46 @@
  * Lives with the controls it acts on; separated from the card by a small gap so
  * it reads as an action, not a setting. Matches the card chrome (surface +
  * hairline + shadow). */
-.panel__shuffle {
+.panel__foot {
   margin-top: 10px;
   flex: none;
+  display: flex;
+  gap: 8px;
+}
+.panel__shuffle,
+.panel__reset {
+  flex: 1;
+  min-width: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   height: 38px;
   border-radius: 11px;
-  background: var(--app-surface);
   border: 1px solid var(--app-border);
-  box-shadow: var(--app-shadow-sm);
   color: var(--app-fg);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease), box-shadow var(--app-dur) var(--app-ease);
+  transition: background var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease), box-shadow var(--app-dur) var(--app-ease), opacity var(--app-dur) var(--app-ease);
+}
+.panel__shuffle {
+  background: var(--app-surface);
+  box-shadow: var(--app-shadow-sm);
 }
 .panel__shuffle:hover { background: var(--app-hover); box-shadow: var(--app-shadow-md); }
 .panel__shuffle:active { transform: scale(0.99); }
 .panel__shuffle svg { color: var(--app-fg-muted); }
+
+/* Reset — quieter (ghost) than Shuffle; dims when already on the default kit. */
+.panel__reset {
+  background: transparent;
+  color: var(--app-fg-muted);
+}
+.panel__reset:hover:not(:disabled) { background: var(--app-hover); color: var(--app-fg); }
+.panel__reset:active:not(:disabled) { transform: scale(0.99); }
+.panel__reset svg { color: var(--app-fg-muted); }
+.panel__reset:disabled { opacity: 0.4; cursor: default; }
 
 /* === Floating control menu (.fmenu) ===
  * A nested accordion: category rows → setting recap-rows → the real visual

@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState, type Dispatch, type ReactNode } from 'react'
-import { Check, ChevronRight, PanelLeftClose, Shuffle } from 'lucide-react'
+import { Check, ChevronRight, PanelLeftClose, RotateCcw, Shuffle } from 'lucide-react'
+import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { BODY_FONTS, DISPLAY_GROUPS, customFontFamily, isCustomFont, type FontGroup } from '../tokens/fonts'
 import { nameColor } from '../tokens/color'
 import { COLOR_THEMES } from '../tokens/stylesAndThemes'
@@ -41,6 +42,8 @@ interface PanelProps {
   onCollapse: () => void
   /** Roll a fresh guardrail-aware kit (the "Shuffle" footer button). */
   onRandomize: () => void
+  /** Restore every knob to the curated default kit (the "Reset" footer button). */
+  onReset: () => void
 }
 
 /* Option arrays — the single source for each control's choices + captions. */
@@ -237,7 +240,9 @@ interface RowDef {
  * Essentials/Advanced tiering. */
 const ESSENTIAL_KEYS = new Set(['colorTheme', 'scale', 'fontDisplay', 'radius'])
 
-export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize }: PanelProps) {
+export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset }: PanelProps) {
+  // Already on the curated default? → dim the Reset button (nothing to undo to).
+  const atDefault = (Object.keys(DEFAULT_CONFIG) as (keyof Config)[]).every((k) => cfg[k] === DEFAULT_CONFIG[k])
   const set = <K extends keyof Config>(field: K, value: Config[K]) =>
     dispatch({ type: 'SET', patch: { [field]: value } as Partial<Config> })
 
@@ -717,12 +722,25 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize }: PanelP
           })}
         </div>
       </div>
-      {/* Shuffle — roll a fresh guardrail-aware kit. Lives here (with the kit
-          controls it acts on), not in the top bar. ⌘K mirrors it. */}
-      <button type="button" className="panel__shuffle" onClick={onRandomize} title="Shuffle — roll a fresh random kit">
-        <Shuffle size={15} strokeWidth={1.75} />
-        <span>Shuffle</span>
-      </button>
+      {/* Footer actions — Shuffle (roll a fresh guardrail-aware kit) + Reset (back
+          to the curated default). Live here with the controls they act on, not in
+          the top bar. ⌘K mirrors both; both flow through history so ⌘Z undoes them. */}
+      <div className="panel__foot">
+        <button type="button" className="panel__shuffle" onClick={onRandomize} title="Shuffle — roll a fresh random kit">
+          <Shuffle size={15} strokeWidth={1.75} />
+          <span>Shuffle</span>
+        </button>
+        <button
+          type="button"
+          className="panel__reset"
+          onClick={onReset}
+          disabled={atDefault}
+          title={atDefault ? 'Already on the default kit' : 'Reset every knob to the default kit'}
+        >
+          <RotateCcw size={15} strokeWidth={1.75} />
+          <span>Reset</span>
+        </button>
+      </div>
     </aside>
   )
 }

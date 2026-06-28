@@ -5,6 +5,7 @@ import { Topbar } from './stage/Topbar'
 import { CommandPalette } from './stage/CommandPalette'
 import { useConfig } from './state/useConfig'
 import { randomKit } from './state/randomKit'
+import { DEFAULT_CONFIG } from './tokens/defaults'
 import { Toast } from './export/Toast'
 
 // Lazy-load — export generators + modal only ship when user opens it
@@ -80,6 +81,12 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
     setToast('🎲 Rolled a fresh kit — ⌘Z to undo')
   }, [cfg, dispatch])
 
+  const onReset = useCallback(() => {
+    // Back to the curated default house style. REPLACE → undoable (⌘Z).
+    dispatch({ type: 'REPLACE', cfg: DEFAULT_CONFIG })
+    setToast('↺ Reset to the default kit — ⌘Z to undo')
+  }, [dispatch])
+
   const onShare = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(window.location.href)
@@ -120,6 +127,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
             dispatch={dispatch}
             onCollapse={() => setMenuOpen(false)}
             onRandomize={onRandomize}
+            onReset={onReset}
           />
         )}
         <Stage
@@ -148,6 +156,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         onShare={onShare}
         onExport={() => setExportOpen(true)}
         onRandomize={onRandomize}
+        onReset={onReset}
         undo={undo}
         redo={redo}
       />
