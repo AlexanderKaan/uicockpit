@@ -69,10 +69,30 @@ export async function runInit(argv) {
     console.log(`  ✓ wrote ${t.file}`)
   }
 
+  // Scaffold the adoption config (the shadcn components.json model). It is local +
+  // hand-editable — `check` reads it — so we don't clobber an existing one even on
+  // --force (the fetched artifacts above are the kit; this is the user's settings).
+  if (!existsSync('uicockpit.json')) {
+    const cfg = {
+      $schema: 'https://uicockpit.com/uicockpit.schema.json',
+      kit: hash,
+      prefix: '',
+      tokenStrategy: 'css-vars',
+      darkStrategy: 'class',
+      framework: 'react',
+      aliasMap: {},
+      allowColors: [],
+    }
+    writeFileSync('uicockpit.json', JSON.stringify(cfg, null, 2) + '\n')
+    console.log('  ✓ wrote uicockpit.json')
+  }
+
   console.log('\nKit installed. Next:')
   console.log('  1. Import uicockpit.tokens.css once at your app root (or use the hosted <link>).')
   console.log('  2. AGENTS.md holds the rules; design.md is the full spec + recipe catalog —')
   console.log('     your coding agent picks them up automatically.')
   console.log('  3. Run  npx uicockpit check  to catch any drift from the contract.')
+  console.log('  • uicockpit.json holds adoption settings (allowColors for sanctioned brand')
+  console.log('    colours; prefix / aliasMap / framework for brownfield) — check reads it.')
   return 0
 }

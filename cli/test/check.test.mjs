@@ -82,3 +82,20 @@ test('does not flag the consumer overriding the kit class itself', () => {
     '.eyebrow { letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted); }' }])
   assert.deepEqual(v.filter((x) => x.check === 'composition-reroll'), [])
 })
+
+test('allowColors (uicockpit.json) exempts a sanctioned foreign brand colour', () => {
+  const css = [{ path: 'h.css', content: '.brand { color: #1da1f2; } .oops { color: #ff0000; }' }]
+  // No config → both flagged.
+  assert.equal(checkContract(contract, css).filter((x) => x.check === 'no-raw-color').length, 2)
+  // Sanction one → only the un-sanctioned literal remains.
+  const v = checkContract(contract, css, { allowColors: ['#1DA1F2'] })
+  const w = v.filter((x) => x.check === 'no-raw-color')
+  assert.equal(w.length, 1)
+  assert.ok(w[0].message.includes('#ff0000'))
+})
+
+test('an inline uicockpit-allow-color tag exempts that line', () => {
+  const v = checkContract(contract, [{ path: 'i.css', content:
+    '.brand { color: #1da1f2; } /* uicockpit-allow-color */' }])
+  assert.deepEqual(v.filter((x) => x.check === 'no-raw-color'), [])
+})

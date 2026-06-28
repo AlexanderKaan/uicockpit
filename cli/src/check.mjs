@@ -17,13 +17,20 @@ const GRID = 4
 /** Run the machine-checkable contract rules against a set of files.
  * @param {object} contract  parsed contract.json (from genContract)
  * @param {{path:string, content:string}[]} files
+ * @param {object} [config]  parsed uicockpit.json (adoption config) — optional.
+ *   Recognised here: `allowColors` (string[]) — literal colours sanctioned as a
+ *   deliberate foreign-brand escape hatch, exempt from no-raw-color.
  * @returns {{check:string, severity:string, file:string, line:number, message:string}[]}
  */
-export function checkContract(contract, files) {
+export function checkContract(contract, files, config = {}) {
   const violations = []
   const tokenSet = new Set(Object.keys(contract.tokens || {}))
   const classes = contract.components?.classes || {}
   const compositions = contract.compositions || {}
+  // Sanctioned foreign-brand colours (e.g. a partner logo) — normalised so the
+  // declared list compares against the literal the regex catches.
+  const normColor = (c) => c.replace(/\s+/g, '').toLowerCase()
+  const allowColors = new Set((config.allowColors || []).map(normColor))
   const ruleBy = {}
   for (const r of contract.rules || []) if (r.check) ruleBy[r.check] = r
   const sev = (check) => ruleBy[check]?.severity || 'warn'
@@ -69,7 +76,11 @@ export function checkContract(contract, files) {
       if (!isCss || isDef) continue
 
       // no-raw-color (warn) — prefer --k-* colour tokens over raw literals.
+      // Escape hatch: a sanctioned colour (uicockpit.json `allowColors`) or a line
+      // tagged `uicockpit-allow-color` is a deliberate foreign brand value.
+      const allowLine = text.includes('uicockpit-allow-color')
       for (const m of text.matchAll(/#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)|\bhsla?\([^)]*\)/g)) {
+        if (allowLine || allowColors.has(normColor(m[0]))) continue
         add('no-raw-color', path, ln, `raw colour ${m[0]} — use a --k-* colour token`)
       }
       // spacing-grid (warn) — margin/padding/gap px literals on the 4px grid.
@@ -151,6 +162,17 @@ function findContract(explicit, dir, fs, pathMod) {
   return null
 }
 
+/** Load the optional adoption config (`uicockpit.json`, the shadcn components.json
+ *  model). Absent or malformed → {} (the verifier runs with its defaults). */
+function loadConfig(dir, fs, pathMod) {
+  for (const c of [pathMod.join(dir, 'uicockpit.json'), 'uicockpit.json']) {
+    try {
+      if (fs.existsSync(c)) return JSON.parse(fs.readFileSync(c, 'utf8'))
+    } catch { /* malformed → ignore, fall through to defaults */ }
+  }
+  return {}
+}
+
 /**
  * Discover a contract + the scannable files under `dir`, run the contract, and
  * return a STRUCTURED result (no printing). Shared by the CLI runner and the MCP
@@ -191,7 +213,8 @@ export async function scanAndCheck({ dir = '.', contractPath = null } = {}) {
   }
   walk(dir)
 
-  const violations = checkContract(contract, files)
+  const config = loadConfig(dir, fs, pathMod)
+  const violations = checkContract(contract, files, config)
   return {
     ok: true,
     contractPath: resolved,

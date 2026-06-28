@@ -7,9 +7,21 @@ export interface ContractViolation {
   message: string
 }
 
+/** The adoption config (`uicockpit.json`, the shadcn components.json model). All
+ *  fields optional; `check` honours `allowColors` (sanctioned foreign brand colours). */
+export interface UicockpitConfig {
+  prefix?: string
+  tokenStrategy?: string
+  darkStrategy?: string
+  framework?: string
+  aliasMap?: Record<string, string>
+  allowColors?: string[]
+}
+
 export function checkContract(
   contract: unknown,
   files: { path: string; content: string }[],
+  config?: UicockpitConfig,
 ): ContractViolation[]
 
 export function runCheck(argv: string[]): Promise<number>

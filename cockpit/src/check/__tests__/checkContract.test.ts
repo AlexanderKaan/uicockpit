@@ -93,4 +93,21 @@ describe('uicockpit check — the contract verifier (Fase D4)', () => {
       expect(v.filter((x) => x.check === 'composition-reroll')).toEqual([])
     })
   })
+
+  // Phase 3 — uicockpit.json adoption config (the brownfield escape hatch).
+  describe('allowColors / inline escape hatch (the sanctioned brand colour)', () => {
+    it('exempts a colour declared in uicockpit.json allowColors', () => {
+      const css = [{ path: 'brand.css', content: `.x { color: #1da1f2; } .y { color: #ff0000; }` }]
+      expect(checkContract(contract, css).filter((x: Violation) => x.check === 'no-raw-color').length).toBe(2)
+      const v = checkContract(contract, css, { allowColors: ['#1DA1F2'] }) as Violation[]
+      const w = v.filter((x) => x.check === 'no-raw-color')
+      expect(w.length).toBe(1)
+      expect(w[0]!.message).toContain('#ff0000')
+    })
+
+    it('exempts a line tagged uicockpit-allow-color', () => {
+      const v = run([{ path: 'brand.css', content: `.x { color: #1da1f2; } /* uicockpit-allow-color */` }])
+      expect(v.filter((x) => x.check === 'no-raw-color')).toEqual([])
+    })
+  })
 })
