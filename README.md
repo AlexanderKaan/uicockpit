@@ -111,6 +111,24 @@ breaks too, and we catch it.
 
 ---
 
+## Where this is heading
+
+Here's the thing I keep coming back to: a catalog of components is always finite, and the agent
+building your app isn't. Sooner or later it needs a component I never drew — and it guesses, and the
+guess drifts off your design language.
+
+So the real goal isn't 74 components, or 200. It's the *grammar* underneath them — the named bundles
+every component is quietly made of (a raised surface, a cozy inset, a section-title type set) — handed
+to the agent as building blocks, with `uicockpit check` making sure that whatever it assembles, even
+a component that never existed, is built only from *your* language.
+
+A finite kit can, at best, be "complete." A grammar plus a verifier is *generative* — it covers the
+screens nobody drew. That's the north star: **not a component library, a coherence compiler.**
+
+→ The full thinking lives in [`VISION.md`](./VISION.md).
+
+---
+
 ## Run it locally
 
 ```bash
