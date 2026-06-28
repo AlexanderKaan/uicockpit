@@ -11,3 +11,5 @@ export function checkContract(
   contract: unknown,
   files: { path: string; content: string }[],
 ): ContractViolation[]
+
+export function runCheck(argv: string[]): Promise<number>

@@ -1,0 +1,46 @@
+{
+  "name": "uicockpit",
+  "version": "0.1.0",
+  "description": "Apply and ENFORCE a UICockpit design system in any codebase — generate → apply → check. The wedge nobody else ships.",
+  "type": "module",
+  "bin": {
+    "uicockpit": "bin/uicockpit.mjs"
+  },
+  "exports": {
+    "./check": "./src/check.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node test/check.test.mjs"
+  },
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "css-variables",
+    "shadcn",
+    "tailwind",
+    "linter",
+    "conformance",
+    "ai",
+    "agent",
+    "cli"
+  ],
+  "homepage": "https://uicockpit.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexanderKaan/uicockpit.git",
+    "directory": "cli"
+  },
+  "bugs": {
+    "url": "https://github.com/AlexanderKaan/uicockpit/issues"
+  },
+  "author": "Alexander Kaan",
+  "license": "MIT"
+}
