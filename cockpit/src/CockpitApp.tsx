@@ -6,8 +6,6 @@ import { CommandPalette } from './stage/CommandPalette'
 import { useConfig } from './state/useConfig'
 import { randomKit } from './state/randomKit'
 import { Toast } from './export/Toast'
-import type { Config } from './tokens/types'
-import type { SandboxResult } from './sandbox/SandboxView'
 
 // Lazy-load — export generators + modal only ship when user opens it
 const ExportModal = lazy(() =>
@@ -42,10 +40,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const [view, setView] = useState<ViewKind>('components')
   const [saved, setSaved] = useState(true)
   const [exportOpen, setExportOpen] = useState(false)
-  // Sandbox (third mode): the content + detected blocks from the user's app.
-  // Foundation is seeded into the live config (REPLACE) so the panel tweaks it;
-  // the content + blocks live here, for the board to wear.
-  const [sandboxResult, setSandboxResult] = useState<SandboxResult | null>(null)
   const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
@@ -133,14 +127,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
           tokens={tokens}
           view={view}
           onViewChange={handleViewChange}
-          sandboxResult={sandboxResult}
-          onSandboxRead={(seeded: Config, res: SandboxResult) => {
-            // Seed the live config (REPLACE → undoable) + stash content + blocks;
-            // the panel now tweaks the result in place.
-            dispatch({ type: 'REPLACE', cfg: seeded })
-            setSandboxResult(res)
-          }}
-          onSandboxReset={() => setSandboxResult(null)}
         />
       </div>
       {exportOpen && (

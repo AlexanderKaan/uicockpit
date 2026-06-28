@@ -200,19 +200,6 @@
 }
 .topbar__btn:hover { background: var(--app-hover); border-color: var(--app-fg-muted); }
 
-/* "Your app" on-ramp — a quiet accent tint so it reads as an entry point, not a
- * status chip, without shouting over Share/Use-kit on the right. */
-.topbar__btn--sandbox {
-  color: var(--app-accent);
-  border-color: color-mix(in srgb, var(--app-accent) 32%, var(--app-border));
-  background: color-mix(in srgb, var(--app-accent) 7%, var(--app-surface));
-}
-.topbar__btn--sandbox > svg { color: var(--app-accent); }
-.topbar__btn--sandbox:hover {
-  background: color-mix(in srgb, var(--app-accent) 13%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--app-accent) 50%, var(--app-border));
-}
-
 /* Icon-only quick action (dark/light mode toggle). Square, ghost by
  * default, matches the topbar button height (32px) so it lines up with
  * Share/Export. */
