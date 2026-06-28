@@ -1126,6 +1126,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   align-items: center;
   align-self: flex-start;
   border-radius: var(--k-radius-md);
+  transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease), opacity var(--k-dur-fast, 120ms) var(--k-ease, ease), color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
 .alert__close:hover { opacity: 1; background: var(--k-state-hover); }`,
   },
@@ -3270,6 +3271,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-muted);
   display: inline-flex;
   border-radius: var(--k-radius-md);
+  transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease), opacity var(--k-dur-fast, 120ms) var(--k-ease, ease), color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
 .toast__close:hover { color: var(--k-fg); background: var(--k-state-hover); }
 /* Inline text action ("Undo", "Retry") — sits after the body, before the
@@ -3673,6 +3675,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   opacity: 0.7;
   display: inline-flex;
   border-radius: var(--k-radius-md);
+  transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease), opacity var(--k-dur-fast, 120ms) var(--k-ease, ease), color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
 .banner__close:hover { opacity: 1; background: var(--k-state-hover); }`,
   },
