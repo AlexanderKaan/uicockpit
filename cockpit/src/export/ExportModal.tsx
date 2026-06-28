@@ -9,7 +9,6 @@ import {
   Download,
   FileCode,
   Gauge,
-  Heart,
   Layers,
   Moon,
   MousePointerClick,
@@ -21,14 +20,13 @@ import {
   Square,
   Sun,
   Terminal,
-  Triangle,
   Type,
   Wand2,
-  Wind,
   X,
   Zap,
 } from 'lucide-react'
 import type { Config } from '../tokens/types'
+import { ToolLogo, type ToolLogoId } from '../brand/toolLogos'
 import { encode } from '../state/hash'
 import { buildTokens } from '../tokens/buildTokens'
 import { auditContrast } from '../tokens/extras'
@@ -55,23 +53,22 @@ type IconCmp = React.ComponentType<{ size?: number; strokeWidth?: number }>
  *   agent = coding agents with a terminal: rules file + the kit CSS + the
  *           `uicockpit check` loop (the moat).
  * "Plain files" (css/tailwind/shadcn) stays as the eject-to-files destination. */
-type ToolId = 'v0' | 'lovable' | 'claude' | 'cursor' | 'windsurf' | 'bolt' | 'replit'
+type ToolId = ToolLogoId
 type Track = 'web' | 'agent'
 interface ToolDef {
   id: ToolId
   name: string
   tagline: string
-  Icon: IconCmp
   track: Track
 }
 const TOOLS: ToolDef[] = [
-  { id: 'v0', name: 'v0', tagline: 'Vercel generative UI', Icon: Triangle, track: 'web' },
-  { id: 'lovable', name: 'Lovable', tagline: 'AI app builder', Icon: Heart, track: 'web' },
-  { id: 'claude', name: 'Claude Code', tagline: "Anthropic's CLI agent", Icon: Sparkles, track: 'agent' },
-  { id: 'cursor', name: 'Cursor', tagline: 'AI code editor', Icon: MousePointerClick, track: 'agent' },
-  { id: 'windsurf', name: 'Windsurf', tagline: 'Agentic IDE', Icon: Wind, track: 'agent' },
-  { id: 'bolt', name: 'Bolt', tagline: 'In-browser agent', Icon: Zap, track: 'agent' },
-  { id: 'replit', name: 'Replit', tagline: 'Replit Agent', Icon: Terminal, track: 'agent' },
+  { id: 'v0', name: 'v0', tagline: 'Vercel generative UI', track: 'web' },
+  { id: 'lovable', name: 'Lovable', tagline: 'AI app builder', track: 'web' },
+  { id: 'claude', name: 'Claude Code', tagline: "Anthropic's CLI agent", track: 'agent' },
+  { id: 'cursor', name: 'Cursor', tagline: 'AI code editor', track: 'agent' },
+  { id: 'windsurf', name: 'Windsurf', tagline: 'Agentic IDE', track: 'agent' },
+  { id: 'bolt', name: 'Bolt', tagline: 'In-browser agent', track: 'agent' },
+  { id: 'replit', name: 'Replit', tagline: 'Replit Agent', track: 'agent' },
 ]
 
 /* ── The "Plain files" drawer — the 3 formats that map to a real stack ─────────
@@ -247,15 +244,15 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
           <nav className="modal__nav" role="tablist" aria-label="Pick your tool">
             <div className="modal__navgroup">Web builders</div>
             {TOOLS.filter((t) => t.track === 'web').map((t) => (
-              <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} Icon={t.Icon} view={view} onView={setView} />
+              <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} icon={<ToolLogo id={t.id} size={15} />} view={view} onView={setView} />
             ))}
             <div className="modal__navgroup">Coding agents</div>
             {TOOLS.filter((t) => t.track === 'agent').map((t) => (
-              <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} Icon={t.Icon} view={view} onView={setView} />
+              <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} icon={<ToolLogo id={t.id} size={15} />} view={view} onView={setView} />
             ))}
             <div className="modal__navgroup">Plain files</div>
             {FORMATS.map((f) => (
-              <NavBtn key={f.id} id={f.id} label={f.label} hint={f.hint} Icon={f.icon} view={view} onView={setView} />
+              <NavBtn key={f.id} id={f.id} label={f.label} hint={f.hint} icon={<f.icon size={15} strokeWidth={1.75} />} view={view} onView={setView} />
             ))}
           </nav>
           <div className="modal__pane">
@@ -280,11 +277,11 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
 }
 
 /** A left-rail destination button (a tool or a format file). */
-function NavBtn({ id, label, hint, Icon, view, onView }: {
+function NavBtn({ id, label, hint, icon, view, onView }: {
   id: View
   label: string
   hint: string
-  Icon: IconCmp
+  icon: ReactNode
   view: View
   onView: (v: View) => void
 }) {
@@ -297,7 +294,7 @@ function NavBtn({ id, label, hint, Icon, view, onView }: {
       className={`modal__navitem ${id === view ? 'modal__navitem--on' : ''}`}
       onClick={() => onView(id)}
     >
-      <span className="modal__navitem-icon"><Icon size={15} strokeWidth={1.75} /></span>
+      <span className="modal__navitem-icon">{icon}</span>
       <span className="modal__navitem-body">
         <span className="modal__navitem-label">{label}</span>
         <span className="modal__navitem-hint">{hint}</span>
@@ -468,6 +465,7 @@ function ToolPane({ tool, cfg, onToast }: { tool: ToolDef; cfg: Config; onToast:
   return (
     <div className="tool">
       <div className="tool__head">
+        <span className="tool__logo" aria-hidden="true"><ToolLogo id={tool.id} size={22} /></span>
         <div className="tool__heading">
           <span className="tool__name">{tool.name}</span>
           <span className="tool__tagline">{tool.tagline}</span>

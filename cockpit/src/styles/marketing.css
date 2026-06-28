@@ -807,6 +807,100 @@
   border: 1px solid var(--mkt-border);
 }
 
+/* === Use it in your tool — the distribution router, mirrored === */
+.mkt__tracks {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 20px;
+}
+@media (max-width: 800px) { .mkt__tracks { grid-template-columns: 1fr; } }
+.mkt__track {
+  padding: 28px 26px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 14px;
+  background: var(--mkt-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mkt__track h3 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.011em;
+}
+.mkt__track p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+}
+.mkt__track-tag {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.mkt__track-tag--web { color: #7a3ea8; background: rgba(168, 85, 247, 0.1); }
+.mkt__track-tag--agent { color: var(--mkt-accent); background: rgba(0, 122, 255, 0.09); }
+.mkt__track-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.mkt__tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 9px;
+  background: var(--mkt-sunken);
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--mkt-fg);
+}
+.mkt__tool svg { color: var(--mkt-fg); flex: none; }
+
+.mkt__install {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+@media (max-width: 800px) { .mkt__install { grid-template-columns: 1fr; } }
+.mkt__install-col {
+  padding: 24px 24px 22px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 14px;
+  background: var(--mkt-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mkt__install-head { display: flex; align-items: center; gap: 12px; }
+.mkt__install-head h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.011em; }
+.mkt__install-col .mkt__kit-code {
+  padding: 16px 18px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 10px;
+  background: var(--mkt-sunken);
+  font-size: 13px;
+  white-space: pre;
+  word-break: normal;
+}
+.mkt__install-col p {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+  margin: 0;
+}
+
 /* === Stat strip === */
 .mkt__stats {
   display: grid;

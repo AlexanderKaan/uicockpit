@@ -1,6 +1,7 @@
-import { Sparkles, Palette, Type, FileCode2, Zap, ShieldCheck, BarChart3, Layers3, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check } from 'lucide-react'
+import { Sparkles, Palette, Type, FileCode2, Zap, ShieldCheck, BarChart3, Layers3, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
+import { ToolLogo } from '../brand/toolLogos'
 import { MktFooter } from './MktFooter'
 import { MktStats } from './MktStats'
 // Note: feature icons stay Lucide (decorative). The brand mark uses the
@@ -79,6 +80,7 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
             <a href="#features" className="mkt__nav-link">Features</a>
             <a href="#anatomy" className="mkt__nav-link">Components</a>
             <a href="#livekit" className="mkt__nav-link">Live kit</a>
+            <a href="#usein" className="mkt__nav-link">Use it</a>
             <a href="#how" className="mkt__nav-link">How it works</a>
             <a href="/docs" className="mkt__nav-link" onClick={(e) => { e.preventDefault(); onDocs() }}>Docs</a>
             {/* GitHub link returns when the OSS launch pack ships — see task #86.
@@ -388,6 +390,91 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
               <p>
                 Ownership is a private edit link, not a login. Don't want the CDN? Eject to
                 static files in one click — same kit, byte for byte.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Use it in your tool — the distribution router, mirrored. Two tracks +
+          the CLI/MCP install card (the agent-native, check-loop path). */}
+      <section className="mkt__section" id="usein">
+        <div className="mkt__container">
+          <div className="mkt__section-head">
+            <div className="mkt__eyebrow">
+              <span className="mkt__eyebrow-dot" />
+              Use it in your tool
+            </div>
+            <h2>Hand it to whatever you build with.</h2>
+            <p className="mkt__section-sub">
+              One kit, two tracks. Paste it into a web builder, or wire it into your
+              coding agent with a CLI and an MCP server that keep it consistent.
+            </p>
+          </div>
+
+          <div className="mkt__tracks">
+            <div className="mkt__track">
+              <div className="mkt__track-tag mkt__track-tag--web">
+                <Wand2 size={13} strokeWidth={2} /> Paste · no terminal
+              </div>
+              <h3>Web builders</h3>
+              <p>
+                One paste of the shadcn <code>globals.css</code> themes every component,
+                plus a prompt that keeps new generations on-system.
+              </p>
+              <div className="mkt__track-tools">
+                <span className="mkt__tool"><ToolLogo id="v0" size={18} /> v0</span>
+                <span className="mkt__tool"><ToolLogo id="lovable" size={18} /> Lovable</span>
+              </div>
+            </div>
+
+            <div className="mkt__track">
+              <div className="mkt__track-tag mkt__track-tag--agent">
+                <Terminal size={13} strokeWidth={2} /> Rules + check loop
+              </div>
+              <h3>Coding agents</h3>
+              <p>
+                A rules file, the kit, and the verifier. The agent builds — then
+                <code>uicockpit check</code> catches any drift back to generic.
+              </p>
+              <div className="mkt__track-tools">
+                <span className="mkt__tool"><ToolLogo id="claude" size={18} /> Claude Code</span>
+                <span className="mkt__tool"><ToolLogo id="cursor" size={18} /> Cursor</span>
+                <span className="mkt__tool"><ToolLogo id="windsurf" size={18} /> Windsurf</span>
+                <span className="mkt__tool"><ToolLogo id="bolt" size={18} /> Bolt</span>
+                <span className="mkt__tool"><ToolLogo id="replit" size={18} /> Replit</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mkt__install">
+            <div className="mkt__install-col">
+              <div className="mkt__install-head">
+                <span className="mkt__feature-icon"><Terminal size={18} strokeWidth={1.9} /></span>
+                <h3>CLI — generate → apply → check</h3>
+              </div>
+              <pre className="mkt__kit-code"><code>{`npx uicockpit init <hash>
+npx uicockpit check`}</code></pre>
+              <p>
+                Pulls your kit (tokens + a machine-readable contract), then verifies the
+                code conforms — the loop nobody else ships.
+              </p>
+            </div>
+            <div className="mkt__install-col">
+              <div className="mkt__install-head">
+                <span className="mkt__feature-icon"><Sparkles size={18} strokeWidth={1.9} /></span>
+                <h3>MCP server — native in your agent</h3>
+              </div>
+              <pre className="mkt__kit-code"><code>{`{ "mcpServers": {
+  "uicockpit": {
+    "command": "npx",
+    "args": ["-y", "uicockpit-mcp"]
+  }
+}}`}</code></pre>
+              <p>
+                <code>install_kit</code> · <code>get_design_context</code> ·
+                <code>check_conformance</code> — your agent reads the system and verifies
+                its own work, no copy-paste.
               </p>
             </div>
           </div>
