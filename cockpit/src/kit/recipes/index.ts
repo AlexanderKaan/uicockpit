@@ -2044,9 +2044,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: var(--k-s-8) 0;
   border-bottom: var(--k-divider);
 }
+/* Closure (L10): the last row never trails a dangling hairline. */
+.activity__item:last-child { border-bottom: 0; padding-bottom: 0; }
 .activity__dot {
-  width: 8px;
-  height: 8px;
+  width: var(--k-dot);
+  height: var(--k-dot);
   border-radius: 50%;
   margin-top: var(--k-s-6);
   flex: none;
@@ -2101,7 +2103,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease),
               border-color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
-.list__row:hover { background: var(--k-state-hover); }`,
+.list__row:hover { background: var(--k-state-hover); }
+.list__row:active { background: var(--k-state-press); }`,
   },
   {
     id: 'auth',
@@ -2188,6 +2191,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: relative;
 }
 .calendar__cell:hover { background: var(--k-state-hover); }
+.calendar__cell:active:not(.calendar__cell--out):not(.calendar__cell--disabled) { background: var(--k-state-press); }
 .calendar__cell--on { background: var(--k-primary); color: var(--k-primary-fg); font-weight: var(--k-weight-semibold); }
 .calendar__cell--out { color: var(--k-fg-faint); opacity: 0.4; cursor: default; }
 .calendar__cell--out:hover { background: transparent; }
@@ -2326,7 +2330,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: var(--k-s-4) var(--k-s-6);
   overflow: hidden; display: flex; flex-direction: column; gap: var(--k-s-2);
   text-align: left; cursor: pointer;
+  transition: filter var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
+.calendar-week__event:hover { filter: brightness(0.97); }
+.calendar-week__event:active { filter: brightness(0.94); }
 .calendar-week__event-title { font-weight: var(--k-weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .calendar-week__event-time { opacity: 0.8; }
 .calendar-week__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
@@ -2610,6 +2617,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   align-items: center;
   justify-content: center;
 }
+.pagination button:hover:not(:disabled):not([aria-current='true']) { background: var(--k-state-hover); border-color: var(--k-fg-faint); }
+.pagination button:active:not(:disabled):not([aria-current='true']) { background: var(--k-state-press); }
 .pagination button[aria-current='true'] { background: var(--k-primary); color: var(--k-primary-fg); border-color: var(--k-primary); }
 /* Prev/next at the ends are disabled — a real pager never lets you page past
    the first/last. Greys out + blocks the click instead of silently no-op'ing. */
@@ -3066,7 +3075,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .menubar__item:hover { background: var(--k-state-hover); }
 .menubar__item[aria-expanded="true"] { background: var(--k-state-hover); }
-.menubar__item:focus-visible { outline: var(--k-focus-w, 2px) solid var(--k-ring); outline-offset: -2px; }`,
+.menubar__item:focus-visible { outline: var(--k-ring-w, 2px) solid var(--k-ring); outline-offset: -2px; }`,
   },
   {
     id: 'resizable',
@@ -3107,7 +3116,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .resizable__handle:hover { background: var(--k-state-hover); }
 .resizable__handle:hover::before { background: var(--k-fg-muted); }
-.resizable__handle:focus-visible { outline: var(--k-focus-w, 2px) solid var(--k-ring); outline-offset: -2px; }`,
+.resizable__handle:focus-visible { outline: var(--k-ring-w, 2px) solid var(--k-ring); outline-offset: -2px; }`,
   },
   {
     id: 'stepper',
@@ -3547,6 +3556,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .segctrl__btn > svg { flex-shrink: 0; display: block; }
 .segctrl__btn:hover { color: var(--k-fg); }
+.segctrl__btn:not(.segctrl__btn--on):active { background: var(--k-state-press); }
+/* Transparent control → fade, don't inherit the global opaque grey :disabled box. */
+.segctrl__btn:disabled, .segctrl__btn.is-disabled, .segctrl__btn[aria-disabled="true"] {
+  background: transparent !important; color: var(--k-fg-faint) !important;
+  opacity: var(--k-disabled-opacity); cursor: not-allowed;
+}
 .segctrl__btn--on {
   background: var(--k-surface);
   color: var(--k-fg);
@@ -3717,6 +3732,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-color: var(--k-ring);
   box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo);
 }
+/* Error state — a wrong/expired code reads as danger, like every other field.
+ * Set aria-invalid="true" on each slot (attribute, not a BEM modifier). */
+.otp__slot[aria-invalid="true"] { border-color: var(--k-input-error-border); }
 .otp__sep {
   align-self: center;
   color: var(--k-fg-faint);
@@ -4083,6 +4101,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   background: var(--k-surface); box-shadow: var(--k-shadow-md, 0 2px 8px hsl(0 0% 0% / 0.18));
 }
 .carousel__arrow:hover { background: var(--k-state-hover); }
+.carousel__arrow:active { background: var(--k-state-press); }
 .carousel__arrow--prev { left: var(--k-s-10); }
 .carousel__arrow--next { right: var(--k-s-10); }
 
@@ -5110,6 +5129,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     background var(--k-dur-fast,110ms) var(--k-ease,ease);
 }
 .radio-card:hover:not(.radio-card--on) { border-color: var(--k-state-border); }
+/* The radio input is visually hidden inside the card — surface its keyboard focus
+ * on the card itself (inset ring, mirrors .swatch-picker__opt). */
+.radio-card:has(input:focus-visible) { outline: var(--k-ring-w, 2px) solid var(--k-ring); outline-offset: -2px; }
 .radio-card--on { border-color: var(--k-ring); background: var(--k-primary-soft); }
 .radio-card > .radio { flex: none; }
 .radio-card__body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -5353,6 +5375,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .chip:hover:not(:disabled) { background: var(--k-state-hover); }
 .chip:active:not(:disabled) { background: var(--k-state-press); }
+/* Transparent control → fade, don't inherit the global opaque grey :disabled box. */
+.chip:disabled, .chip.is-disabled, .chip[aria-disabled="true"] {
+  background: transparent !important; color: var(--k-fg-muted) !important;
+  opacity: var(--k-disabled-opacity); cursor: not-allowed;
+}
 .chip > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
 .chip--on {
   background: var(--k-secondary-soft);

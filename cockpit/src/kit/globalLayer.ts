@@ -191,6 +191,9 @@ ${s}.chip__remove:focus-visible,
 ${s}.taginput__remove:focus-visible,
 ${s}.calendar__cell:focus-visible,
 ${s}.kanban__card:focus-visible,
+${s}.navsuite__item:focus-visible,
+${s}.navmenu__item:focus-visible,
+${s}.att-chip__x:focus-visible,
 ${s}.barchart__bar:focus-visible {
   outline-offset: -2px;
 }
@@ -244,17 +247,17 @@ ${s}.numinput--invalid:focus-within,
 ${s}.pwinput--invalid:focus-within,
 ${s}.searchinput--invalid:focus-within {
   border-color: var(--k-input-error-border);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-error-border) 28%, transparent);
+  box-shadow: 0 0 0 var(--k-ring-w, 3px) color-mix(in srgb, var(--k-input-error-border) 28%, transparent);
 }
 ${s}.in.is-success:focus,
 ${s}.in.is-success:focus-within {
   border-color: var(--k-input-success-border);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-success-border) 28%, transparent);
+  box-shadow: 0 0 0 var(--k-ring-w, 3px) color-mix(in srgb, var(--k-input-success-border) 28%, transparent);
 }
 ${s}.in.is-warning:focus,
 ${s}.in.is-warning:focus-within {
   border-color: var(--k-input-warning-border);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-input-warning-border) 28%, transparent);
+  box-shadow: 0 0 0 var(--k-ring-w, 3px) color-mix(in srgb, var(--k-input-warning-border) 28%, transparent);
 }
 /* Pressed / :active tier — the nav families carried a hover wash but no pressed
    state, so a tap jumped hover→release with no tactile confirm. Uses the new
