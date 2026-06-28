@@ -427,11 +427,16 @@ function ChevronSvg({ size = 14 }: { size?: number }) {
 function BreadcrumbCard() {
   return (
     <Card title="Breadcrumb" desc="Hierarchical path to the current page.">
-      <nav className="breadcrumb" aria-label="Breadcrumb">
-        <a href="#">Home</a><Icon name="chevR" />
-        <a href="#">Projects</a><Icon name="chevR" />
-        <a href="#">Northwind</a><Icon name="chevR" />
-        <span style={{ color: 'var(--k-fg)' }} aria-current="page">Settings</span>
+      <nav aria-label="Breadcrumb">
+        <ol className="breadcrumb">
+          <li><a href="#">Home</a></li>
+          <li aria-hidden="true"><Icon name="chevR" /></li>
+          <li><a href="#">Projects</a></li>
+          <li aria-hidden="true"><Icon name="chevR" /></li>
+          <li><a href="#">Northwind</a></li>
+          <li aria-hidden="true"><Icon name="chevR" /></li>
+          <li><span aria-current="page">Settings</span></li>
+        </ol>
       </nav>
     </Card>
   )
@@ -1985,6 +1990,22 @@ function PopoverCard() {
           </div>
         )}
       </div>
+      {/* Placement variants — .popover--top (opens above) · .popover--end (right-aligned).
+          Static, with the arrow repositioned to match. No JS collision-flip. */}
+      <div className="card__row" style={{ gap: 'var(--k-s-16)', paddingTop: 56, justifyContent: 'center' }}>
+        <span className="popover-wrap">
+          <button className="btn btn--ghost btn--sm" tabIndex={-1}>Above</button>
+          <span className="popover popover--top" role="note" style={{ minWidth: 0, padding: 'var(--k-s-8) var(--k-s-12)', fontSize: 11 }}>
+            <span className="popover__arrow" />Opens above
+          </span>
+        </span>
+        <span className="popover-wrap">
+          <button className="btn btn--ghost btn--sm" tabIndex={-1}>End</button>
+          <span className="popover popover--end" role="note" style={{ minWidth: 0, padding: 'var(--k-s-8) var(--k-s-12)', fontSize: 11 }}>
+            <span className="popover__arrow" />Right-aligned
+          </span>
+        </span>
+      </div>
     </Card>
   )
 }
@@ -2013,6 +2034,22 @@ function HoverCardCard() {
           </span>
         </span>{' '}
         to see a profile preview.
+      </div>
+      {/* Placement — .hover-card__pop--top (opens above) · --end (right-aligned). */}
+      <div style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', marginTop: 'var(--k-s-16)' }}>
+        Placement:{' '}
+        <span className="hover-card">
+          @liam
+          <span className="hover-card__pop hover-card__pop--top" style={{ minWidth: 0, padding: 'var(--k-s-8) var(--k-s-12)' }}>
+            <span style={{ fontWeight: 600, color: 'var(--k-fg)' }}>Liam Ortega</span> — opens above
+          </span>
+        </span>{' · '}
+        <span className="hover-card">
+          @noor
+          <span className="hover-card__pop hover-card__pop--end" style={{ minWidth: 0, padding: 'var(--k-s-8) var(--k-s-12)' }}>
+            <span style={{ fontWeight: 600, color: 'var(--k-fg)' }}>Noor Haddad</span> — right-aligned
+          </span>
+        </span>
       </div>
     </Card>
   )
@@ -2120,6 +2157,13 @@ function ResizableCard() {
           </div>
         }
       />
+      {/* Vertical (row) split — .resizable--vertical stacks the panes + turns the
+          grip horizontal. Visual orientation; wire the row-drag like the column one. */}
+      <div className="resizable resizable--vertical" style={{ height: 132, marginTop: 'var(--k-s-12)' }}>
+        <div className="resizable__pane" style={{ padding: 'var(--k-s-12)', fontSize: 'var(--k-type-small)', fontWeight: 600 }}>Preview</div>
+        <div className="resizable__handle" role="separator" aria-orientation="horizontal" aria-label="Resize rows" tabIndex={0} />
+        <div className="resizable__pane" style={{ padding: 'var(--k-s-12)', fontSize: 11.5, fontFamily: 'var(--k-font-mono)', color: 'var(--k-fg-muted)' }}>$ build — done in 4.1s</div>
+      </div>
     </Card>
   )
 }

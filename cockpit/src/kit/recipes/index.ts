@@ -2658,9 +2658,18 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   gap: var(--k-s-4);
   font-size: var(--k-type-small);
   color: var(--k-fg-muted);
+  /* Semantic list reset — use an <ol> with <li> crumbs (SR announces "list, N
+   * items"); display:contents keeps the li layout-neutral so the flex row + gap
+   * still apply to the <a>/<svg> directly. */
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
+.breadcrumb li { display: contents; }
 .breadcrumb a { color: var(--k-fg); }
-.breadcrumb svg { color: var(--k-fg-faint); }`,
+.breadcrumb svg { color: var(--k-fg-faint); }
+/* The current page (last crumb, aria-current="page") reads as the anchor, not a link. */
+.breadcrumb [aria-current="page"] { color: var(--k-fg); font-weight: var(--k-weight-medium); }`,
   },
   {
     id: 'chart',
@@ -3154,7 +3163,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .resizable__handle:hover { background: var(--k-state-hover); }
 .resizable__handle:hover::before { background: var(--k-fg-muted); }
-.resizable__handle:focus-visible { outline: var(--k-ring-w, 2px) solid var(--k-ring); outline-offset: -2px; }`,
+.resizable__handle:focus-visible { outline: var(--k-ring-w, 2px) solid var(--k-ring); outline-offset: -2px; }
+/* Vertical (row) split — stack the panes + turn the grip horizontal. The drag/
+ * keyboard logic is the consumer's (behaviour contract); this is the visual axis. */
+.resizable--vertical { flex-direction: column; }
+.resizable--vertical .resizable__handle { width: auto; height: var(--k-s-10); cursor: row-resize; }
+.resizable--vertical .resizable__handle::before { width: var(--k-s-24, 24px); height: 2px; }`,
   },
   {
     id: 'stepper',
@@ -3416,7 +3430,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .popover-wrap { position: relative; display: inline-flex; }
 .popover {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + var(--k-s-8));
   left: 0;
   min-width: var(--k-overlay-min, 12rem);
   padding: var(--k-s-12);
@@ -3434,15 +3448,21 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Arrow pointing back at the trigger — single rotated square, border-clipped */
 .popover__arrow {
   position: absolute;
-  top: -5px;
-  left: 16px;
-  width: 10px;
-  height: 10px;
+  top: calc(var(--k-s-10) / -2);
+  left: var(--k-s-16);
+  width: var(--k-s-10);
+  height: var(--k-s-10);
   background: var(--k-surface-overlay, var(--k-surface-raised));
   border-top: var(--k-divider);
   border-left: var(--k-divider);
   transform: rotate(45deg);
-}`,
+}
+/* Placement — static (no JS collision-flip; pick the side that clears the edge).
+ * Default opens below, start-aligned. --top opens above; --end right-aligns. */
+.popover--top { top: auto; bottom: calc(100% + var(--k-s-8)); transform-origin: bottom left; }
+.popover--top .popover__arrow { top: auto; bottom: calc(var(--k-s-10) / -2); transform: rotate(225deg); }
+.popover--end { left: auto; right: 0; transform-origin: top right; }
+.popover--end .popover__arrow { left: auto; right: var(--k-s-16); }`,
   },
   {
     id: 'hover-card',
@@ -3484,7 +3504,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
-}`,
+}
+/* Placement — static (no JS collision-flip). Default opens below, start-aligned. */
+.hover-card__pop--top { top: auto; bottom: calc(100% + var(--k-s-8)); }
+.hover-card__pop--end { left: auto; right: 0; }`,
   },
   {
     id: 'sheet-drawer',

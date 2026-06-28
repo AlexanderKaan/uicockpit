@@ -63,8 +63,11 @@ Radix / Headless UI / cmdk):
   NATIVE \`<select class="select">\` (fully accessible, zero JS) when a native control fits.
 - **OTP / slider:** wire focus-advance+paste / keyboard + \`aria-valuenow\` yourself.
 - **Overlays** (popover · tooltip · hover-card) open ONE static side (placement modifiers
-  e.g. \`.tt__pop--bottom\` / \`--left\` / \`--right\`); there's no JS collision-flip — pick the
-  side that clears the viewport edge, and portal the overlay if a parent clips it.
+  e.g. \`.tt__pop--bottom\` / \`--left\` / \`--right\`, \`.popover--top\` / \`--end\`); there's no
+  JS collision-flip — pick the side that clears the viewport edge, and portal the overlay
+  if a parent clips it.
+- **Scroll-area** styles the NATIVE scrollbar (Chromium + Firefox); Safari keeps the OS
+  default — best-effort, degrades gracefully. Don't expect a pixel-identical thumb cross-browser.
 
 ## This kit at a glance
 - Brand \`var(--k-primary)\` = ${tk.primaryHex} · Scale ${cfg.scale} (control height ${h})

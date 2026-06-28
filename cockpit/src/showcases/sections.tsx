@@ -401,10 +401,14 @@ export function renderSection(spec: SectionSpec, key: number) {
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
           {/* Trail back to the list — the real .breadcrumb recipe. */}
-          <nav className="breadcrumb" aria-label="Breadcrumb">
-            <a href="#">Ledger</a><Icon name="chevR" />
-            <a href="#">Invoices</a><Icon name="chevR" />
-            <span aria-current="page">#{s.number}</span>
+          <nav aria-label="Breadcrumb">
+            <ol className="breadcrumb">
+              <li><a href="#">Ledger</a></li>
+              <li aria-hidden="true"><Icon name="chevR" /></li>
+              <li><a href="#">Invoices</a></li>
+              <li aria-hidden="true"><Icon name="chevR" /></li>
+              <li><span aria-current="page">#{s.number}</span></li>
+            </ol>
           </nav>
 
           {/* Header: client mark + invoice no. + the ONE aimed action (Send) */}
