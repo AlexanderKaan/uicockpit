@@ -112,44 +112,36 @@ function findContract(explicit, dir, fs, pathMod) {
 }
 
 /**
- * `uicockpit check [contract.json] [dir] [--strict]` — discover files, run the
- * contract, print violations, return the process exit code.
- * @returns {Promise<number>}  0 conforms · 1 violations · 2 usage/contract error
+ * Discover a contract + the scannable files under `dir`, run the contract, and
+ * return a STRUCTURED result (no printing). Shared by the CLI runner and the MCP
+ * server so the verifier behaves identically everywhere (incl. the kit-file skip).
+ * @param {{dir?: string, contractPath?: string|null}} opts
+ * @returns {Promise<{ok: boolean, error?: string, contractPath?: string, kit?: string,
+ *   fileCount?: number, violations?: object[], errors?: object[], warns?: object[]}>}
  */
-export async function runCheck(argv) {
+export async function scanAndCheck({ dir = '.', contractPath = null } = {}) {
   const fs = await import('node:fs')
   const pathMod = await import('node:path')
   const { readFileSync, readdirSync, statSync } = fs
 
-  const strict = argv.includes('--strict')
-  const positional = argv.filter((a) => !a.startsWith('--'))
-  // A `.json` positional is the contract; anything else is the target dir.
-  const explicitContract = positional.find((a) => a.endsWith('.json')) || null
-  const targetDir = positional.find((a) => !a.endsWith('.json')) || '.'
-
-  const contractPath = findContract(explicitContract, targetDir, fs, pathMod)
-  if (!contractPath) {
-    console.error('✗ no contract found.')
-    console.error('  Expected uicockpit.contract.json at your repo root.')
-    console.error('  Get one with:  npx uicockpit init <kit-hash>')
-    console.error('  …or export it from the "Use this kit" panel at uicockpit.com.')
-    return 2
+  const resolved = findContract(contractPath, dir, fs, pathMod)
+  if (!resolved) {
+    return { ok: false, error: 'no-contract' }
   }
 
   let contract
   try {
-    contract = JSON.parse(readFileSync(contractPath, 'utf8'))
+    contract = JSON.parse(readFileSync(resolved, 'utf8'))
   } catch (err) {
-    console.error(`✗ could not read contract ${contractPath}: ${err.message}`)
-    return 2
+    return { ok: false, error: `bad-contract: ${err.message}`, contractPath: resolved }
   }
 
   const files = []
-  const walk = (dir) => {
+  const walk = (d) => {
     let entries
-    try { entries = readdirSync(dir) } catch { return }
+    try { entries = readdirSync(d) } catch { return }
     for (const name of entries) {
-      const p = pathMod.join(dir, name)
+      const p = pathMod.join(d, name)
       if (SKIP_DIR.test(p)) continue
       let st
       try { st = statSync(p) } catch { continue }
@@ -157,22 +149,54 @@ export async function runCheck(argv) {
       else if (SCAN_EXT.test(p) && !SKIP_FILE.test(p)) files.push({ path: p, content: readFileSync(p, 'utf8') })
     }
   }
-  walk(targetDir)
+  walk(dir)
 
   const violations = checkContract(contract, files)
-  const errors = violations.filter((v) => v.severity === 'error')
-  const warns = violations.filter((v) => v.severity === 'warn')
+  return {
+    ok: true,
+    contractPath: resolved,
+    kit: contract.name || 'kit',
+    fileCount: files.length,
+    violations,
+    errors: violations.filter((v) => v.severity === 'error'),
+    warns: violations.filter((v) => v.severity === 'warn'),
+  }
+}
 
-  for (const v of violations) {
+/**
+ * `uicockpit check [contract.json] [dir] [--strict]` — discover files, run the
+ * contract, print violations, return the process exit code.
+ * @returns {Promise<number>}  0 conforms · 1 violations · 2 usage/contract error
+ */
+export async function runCheck(argv) {
+  const strict = argv.includes('--strict')
+  const positional = argv.filter((a) => !a.startsWith('--'))
+  // A `.json` positional is the contract; anything else is the target dir.
+  const explicitContract = positional.find((a) => a.endsWith('.json')) || null
+  const targetDir = positional.find((a) => !a.endsWith('.json')) || '.'
+
+  const res = await scanAndCheck({ dir: targetDir, contractPath: explicitContract })
+  if (!res.ok) {
+    if (res.error === 'no-contract') {
+      console.error('✗ no contract found.')
+      console.error('  Expected uicockpit.contract.json at your repo root.')
+      console.error('  Get one with:  npx uicockpit init <kit-hash>')
+      console.error('  …or export it from the "Use this kit" panel at uicockpit.com.')
+    } else {
+      console.error(`✗ ${res.error}`)
+    }
+    return 2
+  }
+
+  for (const v of res.violations) {
     const tag = v.severity === 'error' ? 'ERROR' : 'warn '
     console.log(`  ${tag}  ${v.file}:${v.line}  [${v.check}]  ${v.message}`)
   }
-  const kit = contract.name || 'kit'
-  console.log(`\nuicockpit check — ${kit}: scanned ${files.length} files`)
-  console.log(`${errors.length} error · ${warns.length} warn`)
+  console.log(`\nuicockpit check — ${res.kit}: scanned ${res.fileCount} files`)
+  console.log(`${res.errors.length} error · ${res.warns.length} warn`)
 
-  if (errors.length || (strict && warns.length)) {
-    console.log(`✗ ${errors.length + (strict ? warns.length : 0)} violation(s) of your design contract`)
+  if (res.errors.length || (strict && res.warns.length)) {
+    console.log(`✗ ${res.errors.length + (strict ? res.warns.length : 0)} violation(s) of your design contract`)
     return 1
   }
   console.log('✓ conforms to the design contract')

@@ -13,3 +13,14 @@ export function checkContract(
 ): ContractViolation[]
 
 export function runCheck(argv: string[]): Promise<number>
+
+export function scanAndCheck(opts?: { dir?: string; contractPath?: string | null }): Promise<{
+  ok: boolean
+  error?: string
+  contractPath?: string
+  kit?: string
+  fileCount?: number
+  violations?: ContractViolation[]
+  errors?: ContractViolation[]
+  warns?: ContractViolation[]
+}>

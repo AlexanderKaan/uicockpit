@@ -7,7 +7,7 @@
  * `checkContract` (the vitest suite in src/check imports it from here) and
  * delegates the runnable CLI to the package's `runCheck`.
  */
-export { checkContract, runCheck } from '../../cli/src/check.mjs'
+export { checkContract, runCheck, scanAndCheck } from '../../cli/src/check.mjs'
 
 import { runCheck } from '../../cli/src/check.mjs'
 
