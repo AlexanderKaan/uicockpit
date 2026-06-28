@@ -1129,7 +1129,12 @@
 }
 .shc__previewwrap {
   display: flex;
-  justify-content: center;
+  /* `safe center` centers when it fits but falls back to start when the showcase
+   * (min-width 680 on the Ledger shell) is wider than the frame — so on a small
+   * laptop / phone you get a correct, horizontally-scrollable desktop preview
+   * instead of the shell squeezing into a broken half-view. */
+  justify-content: safe center;
+  overflow-x: auto;
   min-width: 0;
 }
 
