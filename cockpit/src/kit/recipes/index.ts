@@ -15,6 +15,29 @@ import type { Recipe } from '../types'
 
 export const RECIPES: readonly Recipe[] = [
   {
+    id: 'composition',
+    section: "Composition utilities",
+    css: `/* === Composition utilities — the mid-tier "phrase book" =================
+   Named bundles that components are quietly made of, promoted to first-class
+   classes so an agent reaches for the bundle instead of re-deriving it from
+   atoms (the coherence-compiler middle tier). Surfaced by the first-customer
+   build test: each was hand-rebuilt across unrelated components. */
+
+/* Eyebrow — the caps / tracked / muted micro-label (section kickers, table
+   heads, nav groups, stat labels). Was copy-pasted ~15× as a property block;
+   this is the canonical bundle (= the former .page-head__eyebrow). */
+.eyebrow {
+  font-size: var(--k-type-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  letter-spacing: var(--k-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--k-fg-muted);
+}
+/* Tabular figures — money, counts, timers, IDs keep their column as the value
+   changes (no horizontal jitter). The single most-reached-for un-named helper. */
+.num { font-variant-numeric: tabular-nums; }`,
+  },
+  {
     id: 'toolbar',
     section: "Toolbar",
     css: `/* === Toolbar ===

@@ -77,6 +77,7 @@ export const FOUNDATIONS: readonly string[] = [
   'roll-down-item-stagger', // a motion behaviour, not a component → motion foundation
   'twocolumnlayout', // a page-scaffold layout primitive → layout foundation
   'layout-primitives', // the Every-Layout set (stack/cluster/switcher/grid/sidebar/center) → layout foundation
+  'composition', // the mid-tier "phrase book" (.eyebrow/.num) — named token bundles upstream of components
 ]
 
 /**

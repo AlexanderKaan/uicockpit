@@ -397,7 +397,6 @@ export function renderSection(spec: SectionSpec, key: number) {
       const s = spec.seed
       const money: CSSProperties = { fontVariantNumeric: 'tabular-nums' }
       const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
-      const eyebrow: CSSProperties = { fontSize: 'var(--k-type-eyebrow)', fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'], letterSpacing: 'var(--k-track-eyebrow)', textTransform: 'uppercase', color: 'var(--k-fg-muted)' }
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
           {/* Trail back to the list — the real .breadcrumb recipe. */}
@@ -444,12 +443,12 @@ export function renderSection(spec: SectionSpec, key: number) {
                   <hr className="sep" style={{ margin: 0 }} />
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-48)', alignItems: 'flex-start' } as CSSProperties}>
                     <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
-                      <span style={eyebrow}>From</span>
+                      <span className="eyebrow">From</span>
                       <span style={{ fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'] }}>{s.fromName}</span>
                       {s.fromLines.map((l) => <span key={l} style={muted}>{l}</span>)}
                     </div>
                     <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
-                      <span style={eyebrow}>To</span>
+                      <span className="eyebrow">To</span>
                       <span style={{ fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'] }}>{s.toName}</span>
                       {s.toLines.map((l) => <span key={l} style={muted}>{l}</span>)}
                     </div>
