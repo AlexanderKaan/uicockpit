@@ -155,8 +155,12 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-input-success-border": "#33c192",
     "--k-input-warning-border": "#e6e60f",
     "--k-inverse-fg": "oklch(94.5% 0.0140 249.9)",
+    "--k-inverse-fg-muted": "color-mix(in srgb, oklch(94.5% 0.0140 249.9) 62%, oklch(25.4% 0.0070 249.9))",
     "--k-inverse-primary": "oklch(56.4% 0.1689 253.9)",
     "--k-inverse-surface": "oklch(25.4% 0.0070 249.9)",
+    "--k-leading-normal": "1.5",
+    "--k-leading-snug": "1.25",
+    "--k-leading-tight": "1.05",
     "--k-marker": "0.5rem",
     "--k-measure-narrow": "48ch",
     "--k-measure-prose": "68ch",
@@ -251,7 +255,9 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-toggle-w-default": "2.5rem",
     "--k-touch-target": "44px",
     "--k-track": "color-mix(in srgb, oklch(16.0% 0.0140 249.9) 5%, oklch(98.0% 0.0063 249.9))",
+    "--k-track-display": "-0.02em",
     "--k-track-eyebrow": "0.06em",
+    "--k-track-tight": "-0.01em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
     "--k-type-display": "3rem",
@@ -331,6 +337,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-input-success-border": "#5ccca6",
     "--k-input-warning-border": "#e4e444",
     "--k-inverse-fg": "oklch(16.0% 0.0140 249.9)",
+    "--k-inverse-fg-muted": "color-mix(in srgb, oklch(16.0% 0.0140 249.9) 62%, oklch(95.8% 0.0070 249.9))",
     "--k-inverse-surface": "oklch(95.8% 0.0070 249.9)",
     "--k-neutral": "oklch(31.7% 0.0077 249.9)",
     "--k-neutral-fg": "oklch(94.5% 0.0140 249.9)",
@@ -374,6 +381,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
   "components": {
     "tiers": {
       "foundation": [
+        "composition",
         "button-finish",
         "roll-down-item-stagger",
         "twocolumnlayout",
@@ -477,6 +485,11 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       ]
     },
     "recipes": {
+      "composition": {
+        "tier": "foundation",
+        "section": "Composition utilities",
+        "uses": []
+      },
       "toolbar": {
         "tier": "atom",
         "section": "Toolbar",
@@ -1339,6 +1352,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "modifiers": [
           "bar",
           "interactive",
+          "presentation",
           "well"
         ],
         "parts": [
@@ -1654,6 +1668,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "pop"
         ]
       },
+      "icon-tile": {
+        "modifiers": [],
+        "parts": []
+      },
       "in": {
         "modifiers": [
           "inline",
@@ -1871,6 +1889,14 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "meta-verified": {
         "modifiers": [],
         "parts": []
+      },
+      "metric": {
+        "modifiers": [],
+        "parts": [
+          "label",
+          "sub",
+          "value"
+        ]
       },
       "msg": {
         "modifiers": [
@@ -2125,6 +2151,13 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "modifiers": [],
         "parts": []
       },
+      "scrubber": {
+        "modifiers": [],
+        "parts": [
+          "fill",
+          "knob"
+        ]
+      },
       "searchinput": {
         "modifiers": [
           "on"
@@ -2368,7 +2401,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "timeline": {
         "modifiers": [
           "current",
-          "done"
+          "done",
+          "upcoming"
         ],
         "parts": [
           "body",
@@ -2748,6 +2782,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-surface-container-highest: oklch(91.6% 0.0077 249.9);
   --k-inverse-surface: oklch(25.4% 0.0070 249.9);
   --k-inverse-fg: oklch(94.5% 0.0140 249.9);
+  --k-inverse-fg-muted: color-mix(in srgb, oklch(94.5% 0.0140 249.9) 62%, oklch(25.4% 0.0070 249.9));
   --k-inverse-primary: oklch(56.4% 0.1689 253.9);
   --k-input-bg: oklch(95.8% 0.0070 249.9);
   --k-field-bg: var(--k-input-bg);
@@ -2930,6 +2965,11 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
+  --k-track-tight: -0.01em;
+  --k-track-display: -0.02em;
+  --k-leading-tight: 1.05;
+  --k-leading-snug: 1.25;
+  --k-leading-normal: 1.5;
   --k-ui-weight: 600;
   --k-weight-medium: 500;
   --k-weight-semibold: 600;
@@ -3031,6 +3071,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-surface-container-highest: oklch(35.5% 0.0077 249.9);
   --k-inverse-surface: oklch(95.8% 0.0070 249.9);
   --k-inverse-fg: oklch(16.0% 0.0140 249.9);
+  --k-inverse-fg-muted: color-mix(in srgb, oklch(16.0% 0.0140 249.9) 62%, oklch(95.8% 0.0070 249.9));
   --k-inverse-primary: oklch(56.4% 0.1689 253.9);
   --k-input-bg: oklch(17.6% 0.0056 249.9);
   --k-field-bg: var(--k-input-bg);
@@ -3213,6 +3254,11 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
+  --k-track-tight: -0.01em;
+  --k-track-display: -0.02em;
+  --k-leading-tight: 1.05;
+  --k-leading-snug: 1.25;
+  --k-leading-normal: 1.5;
   --k-ui-weight: 600;
   --k-weight-medium: 500;
   --k-weight-semibold: 600;
@@ -3572,9 +3618,9 @@ body {
  * so your UI looks like the configurator preview — not a default.
  *
  * FOUNDATION — the token layer (colour · type · shape · space · motion, in the
- *   :root / .dark blocks above) + 4 structural/motion glue upstream of
+ *   :root / .dark blocks above) + 5 structural/motion glue upstream of
  *   the catalog:
- *     Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
+ *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
  * ATOMS — the bare vocabulary (51): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
@@ -3591,6 +3637,83 @@ body {
  *   (your screens).
  *     Page header, Section, Data table, Empty state, Sidebar, App bar, Calendar week, Calendar year, Pricing, File grid, Form panel, Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
+
+/* === Composition utilities — the mid-tier "phrase book" =================
+   Named bundles that components are quietly made of, promoted to first-class
+   classes so an agent reaches for the bundle instead of re-deriving it from
+   atoms (the coherence-compiler middle tier). Surfaced by the first-customer
+   build test: each was hand-rebuilt across unrelated components. */
+
+/* Eyebrow — the caps / tracked / muted micro-label (section kickers, table
+   heads, nav groups, stat labels). Was copy-pasted ~15× as a property block;
+   this is the canonical bundle (= the former .page-head__eyebrow). */
+.eyebrow {
+  font-size: var(--k-type-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  letter-spacing: var(--k-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--k-fg-muted);
+}
+/* Tabular figures — money, counts, timers, IDs keep their column as the value
+   changes (no horizontal jitter). The single most-reached-for un-named helper. */
+.num { font-variant-numeric: tabular-nums; }
+
+/* Metric — the label → tabular-value → sub trio. The extractable CORE of
+   .stat-tile (minus its card + icon chrome), so any KPI, route leg, score, plan
+   figure or flight time drops in without re-composing three tokens by hand.
+   (The build test rebuilt this 4× inside one flight card.) */
+.metric { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
+.metric__label {
+  font-size: var(--k-type-caption);
+  font-weight: var(--k-weight-medium);
+  letter-spacing: var(--k-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--k-fg-muted);
+}
+.metric__value {
+  font-size: var(--k-type-h2);
+  font-weight: var(--k-weight-semibold);
+  font-family: var(--k-font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--k-track-display);
+  line-height: var(--k-leading-tight);
+  color: var(--k-fg);
+}
+.metric__sub { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+
+/* Icon-tile — a soft-tinted square holding an icon (stat-tile marks, list leads,
+   nav glyphs). The tint pair + radius + centering, named once instead of redefined
+   inline at each owner. */
+.icon-tile {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: var(--k-radius-md);
+  background: var(--k-primary-soft);
+  color: var(--k-primary-soft-fg);
+}
+.icon-tile svg { width: var(--k-icon-md); height: var(--k-icon-md); }
+
+/* Scrubber — a media transport progress (audio/video player): a sunken track, a
+   played fill, and a draggable-looking knob at the playhead. The mid-tier media
+   idiom .progress (display-only, no handle) and .slider (a form control) both miss.
+   Visual only — wire the seek/drag + value yourself (behaviour contract). Set the
+   played amount inline: .scrubber__fill width + .scrubber__knob left = the %. */
+.scrubber { position: relative; height: var(--k-s-4); border-radius: 999px; background: var(--k-surface-sunken); cursor: pointer; }
+.scrubber__fill { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: var(--k-primary); }
+.scrubber__knob {
+  position: absolute;
+  top: 50%;
+  width: var(--k-s-12);
+  height: var(--k-s-12);
+  border-radius: 50%;
+  background: var(--k-surface);
+  border: max(1.5px, var(--k-bw)) solid var(--k-primary);
+  box-shadow: var(--k-shadow-sm);
+  transform: translate(-50%, -50%);
+}
 
 /* === Toolbar ===
    A composition primitive: a horizontal row of controls (search, filters,
@@ -4019,7 +4142,7 @@ body {
    (card-title had the display font, sheet-title didn't, dialog had no rule at
    all and fell back to an inline-styled <h3>). margin:0 so it's safe on a real
    <h3> element (which carries a UA margin) as well as a <div>/<span>. */
-.card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-semibold); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: -0.01em; line-height: 1.25; margin: 0; }
+.card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-semibold); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: var(--k-track-tight); line-height: var(--k-leading-snug); margin: 0; }
 .card__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.4; }
 /* Inline cluster (adjacent controls) + stacked cluster — both on the canonical
  * --k-stack-gap so "the gap between two adjacent controls" is axis-independent. */
@@ -4054,6 +4177,18 @@ body {
   background: var(--k-surface-sunken);
   padding: var(--k-s-12) var(--k-s-16);
 }
+/* Presentation card — a card meant to be SEEN (ticket · credit card · brand face):
+ * a saturated brand-gradient face with inverse ink + a deeper lift, the loud
+ * inverse of the default white .card. Surfaced by the build test: the credit-card
+ * reached for .card, got a white box, then hand-hacked the colours. */
+.card--presentation {
+  background: var(--k-primary);
+  border: 0;
+  box-shadow: var(--k-shadow-lg);
+  color: var(--k-primary-fg);
+}
+.card--presentation .card__title,
+.card--presentation .card__desc { color: var(--k-primary-fg); }
 
 /* === Page header (SECTION tier) ==========================================
  * The screen-level header that opens a page: an optional eyebrow, the page
@@ -7243,8 +7378,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-weight: var(--k-weight-semibold);
   font-family: var(--k-font-display);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  letter-spacing: var(--k-track-display);
+  line-height: var(--k-leading-tight);
   color: var(--k-fg);
 }
 /* CP3 — the HERO stat (confident-pro gap #1: one focal point per surface). The
@@ -8209,6 +8344,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-color: var(--k-primary);
   position: relative;
 }
+/* The not-yet / future state (the 3rd checklist step beside --done / --current),
+   so a status tracker reads done › current › upcoming without hand-rolled greys. */
+.timeline__item--upcoming .timeline__title { color: var(--k-fg-muted); }
+.timeline__item--upcoming .timeline__dot { color: var(--k-fg-faint); }
 .timeline__pulse {
   width: 8px;
   height: 8px;
@@ -9252,6 +9391,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-surface-container-highest: oklch(91.6% 0.0077 249.9);
   --k-inverse-surface: oklch(25.4% 0.0070 249.9);
   --k-inverse-fg: oklch(94.5% 0.0140 249.9);
+  --k-inverse-fg-muted: color-mix(in srgb, oklch(94.5% 0.0140 249.9) 62%, oklch(25.4% 0.0070 249.9));
   --k-inverse-primary: oklch(56.4% 0.1689 253.9);
   --k-input-bg: oklch(95.8% 0.0070 249.9);
   --k-field-bg: var(--k-input-bg);
@@ -9434,6 +9574,11 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
+  --k-track-tight: -0.01em;
+  --k-track-display: -0.02em;
+  --k-leading-tight: 1.05;
+  --k-leading-snug: 1.25;
+  --k-leading-normal: 1.5;
   --k-ui-weight: 600;
   --k-weight-medium: 500;
   --k-weight-semibold: 600;
@@ -9535,6 +9680,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-surface-container-highest: oklch(35.5% 0.0077 249.9);
   --k-inverse-surface: oklch(95.8% 0.0070 249.9);
   --k-inverse-fg: oklch(16.0% 0.0140 249.9);
+  --k-inverse-fg-muted: color-mix(in srgb, oklch(16.0% 0.0140 249.9) 62%, oklch(95.8% 0.0070 249.9));
   --k-inverse-primary: oklch(56.4% 0.1689 253.9);
   --k-input-bg: oklch(17.6% 0.0056 249.9);
   --k-field-bg: var(--k-input-bg);
@@ -9717,6 +9863,11 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
+  --k-track-tight: -0.01em;
+  --k-track-display: -0.02em;
+  --k-leading-tight: 1.05;
+  --k-leading-snug: 1.25;
+  --k-leading-normal: 1.5;
   --k-ui-weight: 600;
   --k-weight-medium: 500;
   --k-weight-semibold: 600;
@@ -10076,9 +10227,9 @@ body {
  * so your UI looks like the configurator preview — not a default.
  *
  * FOUNDATION — the token layer (colour · type · shape · space · motion, in the
- *   :root / .dark blocks above) + 4 structural/motion glue upstream of
+ *   :root / .dark blocks above) + 5 structural/motion glue upstream of
  *   the catalog:
- *     Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
+ *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
  * ATOMS — the bare vocabulary (51): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
@@ -10095,6 +10246,83 @@ body {
  *   (your screens).
  *     Page header, Section, Data table, Empty state, Sidebar, App bar, Calendar week, Calendar year, Pricing, File grid, Form panel, Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
+
+/* === Composition utilities — the mid-tier "phrase book" =================
+   Named bundles that components are quietly made of, promoted to first-class
+   classes so an agent reaches for the bundle instead of re-deriving it from
+   atoms (the coherence-compiler middle tier). Surfaced by the first-customer
+   build test: each was hand-rebuilt across unrelated components. */
+
+/* Eyebrow — the caps / tracked / muted micro-label (section kickers, table
+   heads, nav groups, stat labels). Was copy-pasted ~15× as a property block;
+   this is the canonical bundle (= the former .page-head__eyebrow). */
+.eyebrow {
+  font-size: var(--k-type-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  letter-spacing: var(--k-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--k-fg-muted);
+}
+/* Tabular figures — money, counts, timers, IDs keep their column as the value
+   changes (no horizontal jitter). The single most-reached-for un-named helper. */
+.num { font-variant-numeric: tabular-nums; }
+
+/* Metric — the label → tabular-value → sub trio. The extractable CORE of
+   .stat-tile (minus its card + icon chrome), so any KPI, route leg, score, plan
+   figure or flight time drops in without re-composing three tokens by hand.
+   (The build test rebuilt this 4× inside one flight card.) */
+.metric { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
+.metric__label {
+  font-size: var(--k-type-caption);
+  font-weight: var(--k-weight-medium);
+  letter-spacing: var(--k-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--k-fg-muted);
+}
+.metric__value {
+  font-size: var(--k-type-h2);
+  font-weight: var(--k-weight-semibold);
+  font-family: var(--k-font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--k-track-display);
+  line-height: var(--k-leading-tight);
+  color: var(--k-fg);
+}
+.metric__sub { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+
+/* Icon-tile — a soft-tinted square holding an icon (stat-tile marks, list leads,
+   nav glyphs). The tint pair + radius + centering, named once instead of redefined
+   inline at each owner. */
+.icon-tile {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: var(--k-radius-md);
+  background: var(--k-primary-soft);
+  color: var(--k-primary-soft-fg);
+}
+.icon-tile svg { width: var(--k-icon-md); height: var(--k-icon-md); }
+
+/* Scrubber — a media transport progress (audio/video player): a sunken track, a
+   played fill, and a draggable-looking knob at the playhead. The mid-tier media
+   idiom .progress (display-only, no handle) and .slider (a form control) both miss.
+   Visual only — wire the seek/drag + value yourself (behaviour contract). Set the
+   played amount inline: .scrubber__fill width + .scrubber__knob left = the %. */
+.scrubber { position: relative; height: var(--k-s-4); border-radius: 999px; background: var(--k-surface-sunken); cursor: pointer; }
+.scrubber__fill { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: var(--k-primary); }
+.scrubber__knob {
+  position: absolute;
+  top: 50%;
+  width: var(--k-s-12);
+  height: var(--k-s-12);
+  border-radius: 50%;
+  background: var(--k-surface);
+  border: max(1.5px, var(--k-bw)) solid var(--k-primary);
+  box-shadow: var(--k-shadow-sm);
+  transform: translate(-50%, -50%);
+}
 
 /* === Toolbar ===
    A composition primitive: a horizontal row of controls (search, filters,
@@ -10523,7 +10751,7 @@ body {
    (card-title had the display font, sheet-title didn't, dialog had no rule at
    all and fell back to an inline-styled <h3>). margin:0 so it's safe on a real
    <h3> element (which carries a UA margin) as well as a <div>/<span>. */
-.card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-semibold); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: -0.01em; line-height: 1.25; margin: 0; }
+.card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-semibold); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: var(--k-track-tight); line-height: var(--k-leading-snug); margin: 0; }
 .card__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.4; }
 /* Inline cluster (adjacent controls) + stacked cluster — both on the canonical
  * --k-stack-gap so "the gap between two adjacent controls" is axis-independent. */
@@ -10558,6 +10786,18 @@ body {
   background: var(--k-surface-sunken);
   padding: var(--k-s-12) var(--k-s-16);
 }
+/* Presentation card — a card meant to be SEEN (ticket · credit card · brand face):
+ * a saturated brand-gradient face with inverse ink + a deeper lift, the loud
+ * inverse of the default white .card. Surfaced by the build test: the credit-card
+ * reached for .card, got a white box, then hand-hacked the colours. */
+.card--presentation {
+  background: var(--k-primary);
+  border: 0;
+  box-shadow: var(--k-shadow-lg);
+  color: var(--k-primary-fg);
+}
+.card--presentation .card__title,
+.card--presentation .card__desc { color: var(--k-primary-fg); }
 
 /* === Page header (SECTION tier) ==========================================
  * The screen-level header that opens a page: an optional eyebrow, the page
@@ -13747,8 +13987,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-weight: var(--k-weight-semibold);
   font-family: var(--k-font-display);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  letter-spacing: var(--k-track-display);
+  line-height: var(--k-leading-tight);
   color: var(--k-fg);
 }
 /* CP3 — the HERO stat (confident-pro gap #1: one focal point per surface). The
@@ -14713,6 +14953,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-color: var(--k-primary);
   position: relative;
 }
+/* The not-yet / future state (the 3rd checklist step beside --done / --current),
+   so a status tracker reads done › current › upcoming without hand-rolled greys. */
+.timeline__item--upcoming .timeline__title { color: var(--k-fg-muted); }
+.timeline__item--upcoming .timeline__dot { color: var(--k-fg-faint); }
 .timeline__pulse {
   width: 8px;
   height: 8px;
@@ -16026,7 +16270,7 @@ This kit is a **tier ladder** (Foundation → Atom → Component → Section →
 UP it; never invent a parallel structure or re-implement what a component already
 guarantees.
 
-**FOUNDATION** — the tokens (above) + layout grammar (Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives). Use the
+**FOUNDATION** — the tokens (above) + layout grammar (Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives, Composition utilities). Use the
 layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
 \`.l-stack\` (vertical rhythm) · \`.l-cluster\` (wrapping row) · \`.l-switcher\`
 (row→column when tight) · \`.l-grid\` (responsive auto-fit) · \`.l-sidebar\` ·
@@ -16728,6 +16972,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-surface-container-highest": "oklch(35.5% 0.0000 0.0)",
     "--k-inverse-surface": "oklch(95.8% 0.0000 0.0)",
     "--k-inverse-fg": "oklch(16.0% 0.0000 0.0)",
+    "--k-inverse-fg-muted": "color-mix(in srgb, oklch(16.0% 0.0000 0.0) 62%, oklch(95.8% 0.0000 0.0))",
     "--k-inverse-primary": "oklch(23.9% 0.0000 89.9)",
     "--k-input-bg": "oklch(17.6% 0.0000 0.0)",
     "--k-track": "color-mix(in srgb, oklch(94.5% 0.0000 0.0) 5%, oklch(21.3% 0.0000 0.0))",
