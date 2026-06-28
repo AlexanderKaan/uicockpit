@@ -8,21 +8,23 @@ import {
   Copy,
   Download,
   FileCode,
-  FileText,
   Gauge,
+  Heart,
   Layers,
-  Link2,
   Moon,
   MousePointerClick,
   Package,
   Palette,
   Ruler,
-  ShieldCheck,
   Sidebar,
   Sparkles,
   Square,
   Sun,
+  Terminal,
+  Triangle,
   Type,
+  Wand2,
+  Wind,
   X,
   Zap,
 } from 'lucide-react'
@@ -44,21 +46,44 @@ import { zipSync } from './zip'
  *  to the download. LIVE on Cloudflare at the branded custom domain. */
 const KIT_CDN_BASE = 'https://kit.uicockpit.com'
 
-// The left-rail destinations: the install pane, then each format file 1:1 (flat —
-// no sub-picker). The format ids match FmtId below.
-type View = 'kit' | 'css' | 'tailwind' | 'shadcn'
+type IconCmp = React.ComponentType<{ size?: number; strokeWidth?: number }>
 
-/* ── The "Other formats" drawer — the 3 that map to a real stack ──────────────
- * tokens.css · Tailwind v4 · shadcn/ui. (tokens.json + shadcn-registry were CUT:
- * niche / credibility-signal, low ICP use.) The headline values live as the hosted
- * <link> in the Use-this-kit view; this drawer is the eject-to-files path. */
+/* ── The router model — left rail is TOOL-first now (not format-first). Pick the
+ * tool you build with → get the exact 2–3 step for THAT tool. Two tracks:
+ *   web   = paste-only builders (no terminal): the shadcn globals.css IS the hero —
+ *           one paste themes every component — plus a prompt prefix to steer gens.
+ *   agent = coding agents with a terminal: rules file + the kit CSS + the
+ *           `uicockpit check` loop (the moat).
+ * "Plain files" (css/tailwind/shadcn) stays as the eject-to-files destination. */
+type ToolId = 'v0' | 'lovable' | 'claude' | 'cursor' | 'windsurf' | 'bolt' | 'replit'
+type Track = 'web' | 'agent'
+interface ToolDef {
+  id: ToolId
+  name: string
+  tagline: string
+  Icon: IconCmp
+  track: Track
+}
+const TOOLS: ToolDef[] = [
+  { id: 'v0', name: 'v0', tagline: 'Vercel generative UI', Icon: Triangle, track: 'web' },
+  { id: 'lovable', name: 'Lovable', tagline: 'AI app builder', Icon: Heart, track: 'web' },
+  { id: 'claude', name: 'Claude Code', tagline: "Anthropic's CLI agent", Icon: Sparkles, track: 'agent' },
+  { id: 'cursor', name: 'Cursor', tagline: 'AI code editor', Icon: MousePointerClick, track: 'agent' },
+  { id: 'windsurf', name: 'Windsurf', tagline: 'Agentic IDE', Icon: Wind, track: 'agent' },
+  { id: 'bolt', name: 'Bolt', tagline: 'In-browser agent', Icon: Zap, track: 'agent' },
+  { id: 'replit', name: 'Replit', tagline: 'Replit Agent', Icon: Terminal, track: 'agent' },
+]
+
+/* ── The "Plain files" drawer — the 3 formats that map to a real stack ─────────
+ * tokens.css · Tailwind v4 · shadcn/ui. The per-tool panes are the headline path;
+ * this is the framework-aware eject-to-files lane for "any project". */
 type FmtId = 'css' | 'tailwind' | 'shadcn'
 interface Fmt {
   id: FmtId
   label: string
   hint: string
   filename: string
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>
+  icon: IconCmp
   generator: (cfg: Config) => string
 }
 const FORMATS: Fmt[] = [
@@ -66,35 +91,28 @@ const FORMATS: Fmt[] = [
   { id: 'tailwind', label: 'Tailwind v4', hint: '@theme block, full system', filename: 'tailwind-theme.css', icon: Palette, generator: genTailwind },
   { id: 'shadcn', label: 'shadcn/ui', hint: '--background, --primary, …', filename: 'shadcn-globals.css', icon: Layers, generator: genShadcn },
 ]
+type View = ToolId | FmtId
+const isFmt = (v: View): v is FmtId => FORMATS.some((f) => f.id === v)
 
-/* ── The pack — named artifacts (the hosted link is the 1st, rendered as the hero).
- * design.md = the spec; the skill = the enforcement layer; contract.json bundled for
- * `uicockpit check`. A precomputed text + filename per row (so the same row renders
- * the agent-specific skill file). */
-interface PackEntry {
-  label: string
-  hint: string
-  filename: string
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>
-  text: string
-}
-
-/* ── Agent picker — the skill body is agent-agnostic (genSkill); only the delivery
- * filename + any frontmatter differ per tool. */
+/* ── Agent rules — the skill body is agent-agnostic (genSkill); only the delivery
+ * filename + any frontmatter differ per tool. Bolt/Replit fall back to AGENTS.md. */
 type Agent = 'claude' | 'cursor' | 'windsurf' | 'generic'
-const AGENTS: ReadonlyArray<{ id: Agent; cap: string }> = [
-  { id: 'claude', cap: 'Claude' },
-  { id: 'cursor', cap: 'Cursor' },
-  { id: 'windsurf', cap: 'Windsurf' },
-  { id: 'generic', cap: 'AGENTS.md' },
-]
+const TOOL_AGENT: Record<ToolId, Agent> = {
+  v0: 'generic',
+  lovable: 'generic',
+  claude: 'claude',
+  cursor: 'cursor',
+  windsurf: 'windsurf',
+  bolt: 'generic',
+  replit: 'generic',
+}
 const AGENT_FILE: Record<Agent, string> = {
-  claude: 'SKILL.md',
+  claude: '.claude/skills/uicockpit/SKILL.md',
   cursor: '.cursor/rules/uicockpit.mdc',
   windsurf: '.windsurfrules',
   generic: 'AGENTS.md',
 }
-/** The skill file for a given agent: the shared body + the right filename and any
+/** The skill file for a given agent: the shared body + the right path and any
  *  tool-specific frontmatter (Claude skill metadata; Cursor .mdc always-apply). */
 function skillFile(agent: Agent, cfg: Config): { filename: string; text: string } {
   const body = genSkill(cfg)
@@ -109,9 +127,13 @@ function skillFile(agent: Agent, cfg: Config): { filename: string; text: string 
   return { filename: AGENT_FILE[agent], text: body }
 }
 
-/* === Install layer — framework + package-manager pickers ============
- * shadcn/create's lesson: don't just dump code, tell the user how to
- * adopt it in THEIR stack. */
+/* Where a web builder keeps its global stylesheet (the file you paste shadcn into). */
+const WEB_CSS_TARGET: Record<'v0' | 'lovable', string> = {
+  v0: 'app/globals.css',
+  lovable: 'src/index.css',
+}
+
+/* === Install layer (Plain files drawer) — framework + package-manager pickers === */
 type Framework = 'next' | 'vite' | 'astro' | 'laravel' | 'plain'
 type Pm = 'pnpm' | 'npm' | 'yarn' | 'bun'
 
@@ -180,7 +202,7 @@ function getInstall(fmt: FmtId, fw: Framework, pm: Pm): Install {
   }
 }
 
-/** Download a generated string as a file. Shared by the pack rows + the formats drawer. */
+/** Download a generated string as a file. */
 function downloadText(text: string, filename: string) {
   const blob = new Blob([text], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
@@ -191,6 +213,8 @@ function downloadText(text: string, filename: string) {
   URL.revokeObjectURL(url)
 }
 
+const basename = (p: string) => p.split('/').pop() ?? p
+
 interface ExportModalProps {
   cfg: Config
   onClose: () => void
@@ -198,8 +222,7 @@ interface ExportModalProps {
 }
 
 export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
-  const [view, setView] = useState<View>('kit')
-  const [agent, setAgent] = useState<Agent>('claude')
+  const [view, setView] = useState<View>('v0')
   const [framework, setFramework] = useState<Framework>('next')
   const [pm, setPm] = useState<Pm>('pnpm')
 
@@ -221,17 +244,22 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
           </button>
         </div>
         <div className="modal__split">
-          <nav className="modal__nav" role="tablist" aria-label="Export">
-            <NavBtn id="kit" label="Quick install" hint="One link + the agent pack" Icon={Sparkles} view={view} onView={setView} />
-            <div className="modal__navgroup">Other formats</div>
+          <nav className="modal__nav" role="tablist" aria-label="Pick your tool">
+            <div className="modal__navgroup">Web builders</div>
+            {TOOLS.filter((t) => t.track === 'web').map((t) => (
+              <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} Icon={t.Icon} view={view} onView={setView} />
+            ))}
+            <div className="modal__navgroup">Coding agents</div>
+            {TOOLS.filter((t) => t.track === 'agent').map((t) => (
+              <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} Icon={t.Icon} view={view} onView={setView} />
+            ))}
+            <div className="modal__navgroup">Plain files</div>
             {FORMATS.map((f) => (
               <NavBtn key={f.id} id={f.id} label={f.label} hint={f.hint} Icon={f.icon} view={view} onView={setView} />
             ))}
           </nav>
           <div className="modal__pane">
-            {view === 'kit' ? (
-              <KitPane cfg={cfg} agent={agent} onAgent={setAgent} onToast={onToast} onEject={() => setView('css')} />
-            ) : (
+            {isFmt(view) ? (
               <FormatsPane
                 cfg={cfg}
                 fmt={view}
@@ -241,6 +269,8 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
                 onPm={setPm}
                 onToast={onToast}
               />
+            ) : (
+              <ToolPane tool={TOOLS.find((t) => t.id === view)!} cfg={cfg} onToast={onToast} />
             )}
           </div>
         </div>
@@ -249,12 +279,12 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
   )
 }
 
-/** A left-rail destination button (the install pane or a format file). */
+/** A left-rail destination button (a tool or a format file). */
 function NavBtn({ id, label, hint, Icon, view, onView }: {
   id: View
   label: string
   hint: string
-  Icon: Fmt['icon']
+  Icon: IconCmp
   view: View
   onView: (v: View) => void
 }) {
@@ -276,8 +306,194 @@ function NavBtn({ id, label, hint, Icon, view, onView }: {
   )
 }
 
-/* ── One format file (picked from the left rail, no sub-picker) — actions + the
- * stack-aware install guide + the code. The eject-to-files path. */
+/* ════════════════════════ The per-tool install panes ════════════════════════ */
+
+interface ToolStep {
+  n: number
+  title: string
+  desc: ReactNode
+  code: string
+  codeLabel: string
+  /** Render the code as a single inline line (a link / a command) vs a <pre> block. */
+  inline?: boolean
+  /** Optional file to download for this step (may differ from the copied code,
+   *  e.g. copy the live <link> but download the offline tokens.css). */
+  download?: { filename: string; text: string }
+}
+
+/* A one-line, human-readable recap of the kit — used inside the web-builder prompt. */
+function kitSummary(cfg: Config, tk: ReturnType<typeof buildTokens>): string {
+  const cap = (k: string, v: string) => CHOICE_CAP[k]?.[v] ?? v
+  return `${tk.primaryHex.toUpperCase()} brand · ${cap('radius', cfg.radius)} corners · ${cfg.fontDisplay}/${cfg.fontBody} type · ${cap('scale', cfg.scale)} density · ${cap('motion', cfg.motion)} motion`
+}
+
+/* The prompt prefix for chat-based builders — they can't run `check`, so consistency
+ * rides on the shadcn vars + this instruction. Short enough to paste above any prompt. */
+function webPrompt(cfg: Config, tk: ReturnType<typeof buildTokens>): string {
+  return `This project ships a custom design system (UICockpit), themed through the shadcn/ui CSS variables in globals.css. Follow it for every screen you build:
+
+- Use the shadcn/ui tokens — --background, --foreground, --primary, --secondary, --muted, --accent, --border, --ring, --radius — for all colours, radii and spacing. Never hardcode a hex, pixel radius or font size.
+- Compose from the existing shadcn/ui components so they inherit the theme automatically.
+- House style: ${kitSummary(cfg, tk)}.`
+}
+
+function toolSteps(tool: ToolDef, cfg: Config, kitSnippet: string, tk: ReturnType<typeof buildTokens>): ToolStep[] {
+  if (tool.track === 'web') {
+    const target = WEB_CSS_TARGET[tool.id as 'v0' | 'lovable']
+    const shadcn = genShadcn(cfg)
+    const prompt = webPrompt(cfg, tk)
+    return [
+      {
+        n: 1,
+        title: `Paste the theme into ${target}`,
+        desc: <>{tool.name} builds with shadcn/ui. Replace your <code>{target}</code> with this — every component it generates inherits your kit.</>,
+        code: shadcn,
+        codeLabel: target,
+        download: { filename: 'globals.css', text: shadcn },
+      },
+      {
+        n: 2,
+        title: 'Steer new generations',
+        desc: <>Paste this above your prompt so {tool.name} keeps new screens on-system.</>,
+        code: prompt,
+        codeLabel: 'Prompt prefix',
+        download: { filename: 'uicockpit-prompt.txt', text: prompt },
+      },
+    ]
+  }
+  const skill = skillFile(TOOL_AGENT[tool.id], cfg)
+  return [
+    {
+      n: 1,
+      title: 'Add the rules',
+      desc: <>Save as <code>{skill.filename}</code>. {tool.name} loads it so new code follows the system every session.</>,
+      code: skill.text,
+      codeLabel: skill.filename,
+      download: { filename: basename(skill.filename), text: skill.text },
+    },
+    {
+      n: 2,
+      title: 'Wear the kit',
+      desc: <>Add the hosted link to your <code>&lt;head&gt;</code> — live, no install. Or download <code>tokens.css</code> for an offline copy.</>,
+      code: kitSnippet,
+      codeLabel: 'index.html  <head>',
+      inline: true,
+      download: { filename: 'tokens.css', text: genCss(cfg) },
+    },
+    {
+      n: 3,
+      title: 'Keep it consistent',
+      desc: <>After it builds, run the verifier to catch drift — hardcoded hex, off-grid spacing, wrong tokens. This loop is the difference between "themed once" and "stays on-system".</>,
+      code: 'npx uicockpit check',
+      codeLabel: 'terminal',
+      inline: true,
+      download: { filename: 'uicockpit.contract.json', text: genContract(cfg) },
+    },
+  ]
+}
+
+/** One numbered step with its copyable code block (+ optional download). */
+function StepCard({ step, onToast }: { step: ToolStep; onToast: (m: string) => void }) {
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(step.code)
+      onToast(`${step.codeLabel} copied`)
+    } catch {
+      onToast('Copy failed — select & copy manually')
+    }
+  }
+  const dl = step.download
+  return (
+    <div className="toolstep">
+      <span className="toolstep__num" aria-hidden="true">{step.n}</span>
+      <div className="toolstep__body">
+        <div className="toolstep__title">{step.title}</div>
+        <p className="toolstep__desc">{step.desc}</p>
+        <div className="toolstep__codecard">
+          <div className="toolstep__codehead">
+            <span className="toolstep__codelabel">{step.codeLabel}</span>
+            <div className="toolstep__codeacts">
+              <button type="button" className="modal__btn" onClick={copy}>
+                <Copy size={13} strokeWidth={1.75} />
+                Copy
+              </button>
+              {dl && (
+                <button
+                  type="button"
+                  className="modal__btn"
+                  onClick={() => { downloadText(dl.text, dl.filename); onToast(`${dl.filename} downloaded`) }}
+                  aria-label={`Download ${dl.filename}`}
+                  title={`Download ${dl.filename}`}
+                >
+                  <Download size={13} strokeWidth={1.75} />
+                </button>
+              )}
+            </div>
+          </div>
+          {step.inline
+            ? <code className="toolstep__inline">{step.code}</code>
+            : <pre className="toolstep__code">{step.code}</pre>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** A per-tool install pane — tailored steps + the kit proof. */
+function ToolPane({ tool, cfg, onToast }: { tool: ToolDef; cfg: Config; onToast: (m: string) => void }) {
+  const tk = useMemo(() => buildTokens(cfg), [cfg])
+  const kitSnippet = `<link rel="stylesheet" href="${KIT_CDN_BASE}/k/${encode(cfg)}.css">`
+  const steps = useMemo(() => toolSteps(tool, cfg, kitSnippet, tk), [tool, cfg, kitSnippet, tk])
+
+  const downloadAll = () => {
+    const seen = new Set<string>()
+    const files: Array<{ name: string; text: string }> = []
+    for (const s of steps) {
+      if (s.download && !seen.has(s.download.filename)) {
+        seen.add(s.download.filename)
+        files.push({ name: s.download.filename, text: s.download.text })
+      }
+    }
+    if (!seen.has('design.md')) files.push({ name: 'design.md', text: genDesignMd(cfg) })
+    const blob = zipSync(files)
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `uicockpit-${tool.id}.zip`
+    a.click()
+    URL.revokeObjectURL(url)
+    onToast('Files downloaded (.zip)')
+  }
+
+  return (
+    <div className="tool">
+      <div className="tool__head">
+        <div className="tool__heading">
+          <span className="tool__name">{tool.name}</span>
+          <span className="tool__tagline">{tool.tagline}</span>
+        </div>
+        <span className={`tool__track tool__track--${tool.track}`}>
+          {tool.track === 'web'
+            ? <><Wand2 size={12} strokeWidth={2} />Paste · no terminal</>
+            : <><Terminal size={12} strokeWidth={2} />Rules + check loop</>}
+        </span>
+        <button type="button" className="modal__btn modal__btn--primary tool__dl" onClick={downloadAll}>
+          <Package size={13} strokeWidth={1.75} />
+          Download all
+        </button>
+      </div>
+      <div className="tool__steps">
+        {steps.map((s) => (
+          <StepCard key={s.n} step={s} onToast={onToast} />
+        ))}
+      </div>
+      <KitProof cfg={cfg} tk={tk} />
+    </div>
+  )
+}
+
+/* ── One format file (Plain files drawer) — actions + the stack-aware install
+ * guide + the code. The eject-to-files path for any project. */
 function FormatsPane({
   cfg,
   fmt,
@@ -415,7 +631,7 @@ const CHOICE_CAP: Record<string, Record<string, string>> = {
 function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ icon: ReactNode; label: string; value: string }> {
   const cap = (k: string, v: string) => CHOICE_CAP[k]?.[v] ?? v
   const sw = (hex: string): ReactNode => <span className="export-ov__swatch" style={{ background: hex }} />
-  const ic = (El: typeof Palette): ReactNode => <El size={15} strokeWidth={1.9} />
+  const ic = (El: IconCmp): ReactNode => <El size={15} strokeWidth={1.9} />
   return [
     { icon: ic(Palette), label: 'Color theme', value: cap('colorTheme', cfg.colorTheme) },
     { icon: sw(tk.primaryHex), label: 'Brand color', value: tk.primaryHex.toUpperCase() },
@@ -437,168 +653,16 @@ function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ 
   ]
 }
 
-/** A pack row — one named artifact with copy + download. */
-function PackRow({ entry, onToast }: { entry: PackEntry; onToast: (m: string) => void }) {
-  const Cmp = entry.icon
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(entry.text)
-      onToast(`${entry.filename} copied`)
-    } catch {
-      onToast('Copy failed — select & copy manually')
-    }
-  }
-  const download = () => {
-    downloadText(entry.text, entry.filename)
-    onToast(`${entry.filename} downloaded`)
-  }
-  return (
-    <div className="export-pack__row">
-      <span className="export-pack__ic" aria-hidden="true"><Cmp size={16} strokeWidth={1.75} /></span>
-      <div className="export-pack__body">
-        <div className="export-pack__label">{entry.label} <span className="export-pack__file">{entry.filename}</span></div>
-        <div className="export-pack__hint">{entry.hint}</div>
-      </div>
-      <div className="export-pack__actions">
-        <button type="button" className="modal__btn" onClick={copy} aria-label={`Copy ${entry.filename}`}>
-          <Copy size={13} strokeWidth={1.75} />
-        </button>
-        <button type="button" className="modal__btn" onClick={download} aria-label={`Download ${entry.filename}`}>
-          <Download size={13} strokeWidth={1.75} />
-        </button>
-      </div>
-    </div>
-  )
-}
-
-/** Use-this-kit pane — the install experience. Hosted <link> as the headline, then
- *  the pack (design.md · skill · contract), then "what's in your kit" (choices +
- *  WCAG + recipes). */
-function KitPane({
-  cfg,
-  agent,
-  onAgent,
-  onToast,
-  onEject,
-}: {
-  cfg: Config
-  agent: Agent
-  onAgent: (a: Agent) => void
-  onToast: (msg: string) => void
-  onEject: () => void
-}) {
-  const tk = useMemo(() => buildTokens(cfg), [cfg])
+/** "What's in your kit" — proof (choices + WCAG), demoted behind a disclosure so
+ *  the per-tool steps stay above the fold. Shared by every tool pane. */
+function KitProof({ cfg, tk }: { cfg: Config; tk: ReturnType<typeof buildTokens> }) {
   const a11y = useMemo(() => auditContrast(tk), [tk])
   const a11yPass = a11y.filter((p) => p.passes).length
   const a11yTotal = a11y.length
   const choices = buildChoices(cfg, tk)
-
-  // The pack artifacts — precomputed once per cfg/agent. The skill row's filename +
-  // frontmatter follow the picked agent; design.md + contract.json are agent-agnostic.
-  const skill = useMemo(() => skillFile(agent, cfg), [agent, cfg])
-  const entries: PackEntry[] = useMemo(
-    () => [
-      { label: 'design.md', hint: 'The spec — values, rules + your AI-agent appendix', filename: 'design.md', icon: FileText, text: genDesignMd(cfg) },
-      { label: 'Agent rules', hint: 'The enforcement layer — always / never + verify loop', filename: skill.filename, icon: Sparkles, text: skill.text },
-      { label: 'contract.json', hint: 'Bundled — what `npx uicockpit check` verifies', filename: 'uicockpit.contract.json', icon: ShieldCheck, text: genContract(cfg) },
-    ],
-    [cfg, skill],
-  )
-
-  // The hosted-kit CDN <link> — the front door. Built from the SAME share-key the
-  // app uses (encode(cfg)); the Worker serves genCss(decode(key)) at this URL,
-  // byte-identical to the download.
-  const kitHref = `${KIT_CDN_BASE}/k/${encode(cfg)}.css`
-  const kitSnippet = `<link rel="stylesheet" href="${kitHref}">`
-  const copyKit = async () => {
-    try {
-      await navigator.clipboard.writeText(kitSnippet)
-      onToast('Kit <link> copied')
-    } catch {
-      onToast('Copy failed — select & copy manually')
-    }
-  }
-
-  // "Download pack" — one zip: the link snippet + design.md + the agent skill file
-  // (right filename/frontmatter) + tokens.css + contract.json.
-  const downloadPack = () => {
-    const blob = zipSync([
-      { name: 'kit-link.txt', text: `${kitSnippet}\n` },
-      { name: 'design.md', text: entries[0]!.text },
-      { name: skill.filename, text: skill.text },
-      { name: 'tokens.css', text: genCss(cfg) },
-      { name: 'uicockpit.contract.json', text: entries[2]!.text },
-    ])
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'uicockpit-kit.zip'
-    a.click()
-    URL.revokeObjectURL(url)
-    onToast('Pack downloaded (.zip)')
-  }
-
   return (
-    <div className="export-ov">
-      <div className="export-ov__head">
-        <p className="export-ov__sub">
-          Two pieces, both built from the {choices.length} choices you made: a{' '}
-          <strong>link</strong> so your app wears the kit, and a <strong>pack</strong> so
-          your AI agent builds new screens in it.
-        </p>
-      </div>
-
-      {/* CDN hero — the front door. One link, the whole kit. */}
-      <div className="export-cdn">
-        <div className="export-cdn__head">
-          <span className="export-cdn__ic" aria-hidden="true"><Link2 size={15} strokeWidth={1.9} /></span>
-          <span className="export-cdn__label">Step 1 · Link — your app wears the kit</span>
-          <span className="export-cdn__live"><span className="export-cdn__live-dot" />Live</span>
-        </div>
-        <div className="export-cdn__snippet">
-          <code className="export-cdn__code">{kitSnippet}</code>
-          <button type="button" className="export-cdn__copy" onClick={copyKit}>
-            <Copy size={13} strokeWidth={1.9} />
-            Copy link
-          </button>
-        </div>
-        <p className="export-cdn__note">
-          Serves the full kit (tokens + component recipes) — byte-identical to the
-          download. No account; eject to files anytime.
-        </p>
-      </div>
-
-      {/* The pack — the agent install. design.md (spec) + agent rules (enforcement),
-          contract.json bundled for `uicockpit check`. */}
-      <div className="export-pack">
-        <div className="export-pack__head">
-          <span className="export-pack__title">Step 2 · Pack — your agent builds in the kit</span>
-          <button type="button" className="modal__btn modal__btn--primary" onClick={downloadPack}>
-            <Package size={13} strokeWidth={1.75} />
-            Download pack
-          </button>
-        </div>
-        <div className="export-pack__agent">
-          <span className="export-pack__agent-label">Building with</span>
-          <Seg options={AGENTS} value={agent} onChange={onAgent} />
-        </div>
-        {entries.map((e) => (
-          <PackRow key={e.label} entry={e} onToast={onToast} />
-        ))}
-        <div className="export-pack__how">
-          <span className="export-pack__how-title">How to use it</span>
-          <ol className="export-pack__how-steps">
-            <li>Add the <code>&lt;link&gt;</code> above to your app's <code>&lt;head&gt;</code>.</li>
-            <li>Commit <code>design.md</code> + the rules file (<code>{skill.filename}</code>) to your repo.</li>
-            <li>Tell your agent <em>“follow design.md”</em>, then run <code>npx uicockpit check</code> to catch drift.</li>
-          </ol>
-        </div>
-      </div>
-
-      {/* What's in your kit — proof (choices + WCAG), demoted behind a disclosure
-          so the actions (link + pack) stay above the fold. */}
-      <details className="export-ov__reveal">
-        <summary className="export-ov__reveal-sum">What's in your kit — {choices.length} settings · {a11yPass}/{a11yTotal} WCAG pairs pass</summary>
+    <details className="export-ov__reveal tool__proof">
+      <summary className="export-ov__reveal-sum">What's in your kit — {choices.length} settings · {a11yPass}/{a11yTotal} WCAG pairs pass</summary>
       <div className="export-ov__choices">
         {choices.map((c) => (
           <div key={c.label} className="export-ov__choice">
@@ -610,8 +674,6 @@ function KitPane({
           </div>
         ))}
       </div>
-
-      {/* WCAG audit summary */}
       <div className="export-ov__a11y">
         <div className="export-ov__a11y-head">
           <div className="export-ov__a11y-title">Accessibility</div>
@@ -632,26 +694,6 @@ function KitPane({
           ))}
         </div>
       </div>
-      </details>
-
-      {/* Component recipes promise + eject to the formats drawer. */}
-      <div className="export-ov__recipes">
-        <div className="export-ov__recipes-icon">
-          <FileCode size={16} strokeWidth={1.75} />
-        </div>
-        <div>
-          <div className="export-ov__recipes-title">Component recipes included</div>
-          <div className="export-ov__recipes-sub">
-            The hosted link + tokens.css ship per-component CSS for Button, Input, Card,
-            Badge, Tabs, Switch, Toggle, Checkbox, Radio, Alert, Progress, Menu, Tooltip,
-            Dialog, Avatar, Skeleton, Spinner, Kbd, Separator — each with full state
-            recipes (hover, focus, disabled, active).
-          </div>
-          <button type="button" className="export-ov__recipes-link" onClick={onEject}>
-            Eject to files (tokens.css · Tailwind · shadcn) →
-          </button>
-        </div>
-      </div>
-    </div>
+    </details>
   )
 }
