@@ -2140,6 +2140,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     css: `/* === Lightbox — fullscreen image viewer overlay === */
 .lightbox { position: fixed; inset: 0; z-index: var(--k-z-modal); background: var(--k-scrim-strong); display: grid; place-items: center; animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }
 .lightbox__stage { max-width: 78%; max-height: 76%; border-radius: var(--k-radius-md); box-shadow: var(--k-shadow-lg); }
+/* Loading: a light spinner on the scrim while the full-size image fetches (show it
+ * until the <img> onLoad, then swap in .lightbox__stage). */
+.lightbox__loading { width: var(--k-control-h-lg); height: var(--k-control-h-lg); border-radius: 50%; border: var(--k-ring-w, 3px) solid rgba(255, 255, 255, 0.25); border-top-color: #fff; animation: var(--k-anim-spin, k-spin 800ms linear infinite); }
+@media (prefers-reduced-motion: reduce) { .lightbox__loading { animation-duration: 2s; } }
 .lightbox__btn { position: absolute; width: var(--k-icon-chip); height: var(--k-icon-chip); border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.12); color: #fff; display: grid; place-items: center; cursor: pointer; transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease); }
 .lightbox__btn:hover { background: rgba(255, 255, 255, 0.24); }
 .lightbox__btn--close { top: 16px; right: 16px; }
@@ -2969,7 +2973,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    Kebab-triggered menu with sections, separators, checkmarks. Different from
    command palette (no search) and from popover (focused on actions). */
 .menu {
-  min-width: 180px;
+  min-width: var(--k-overlay-min, 12rem);
   padding: var(--k-s-4);
   background: var(--k-surface-overlay, var(--k-surface-raised));
   border: var(--k-hairline, 1px solid var(--k-border));
@@ -3050,6 +3054,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .menu__item--danger:hover { background: var(--k-danger-soft); color: var(--k-danger); }
 .menu__item--check::before {
   content: '✓';
+  /* Same reserved box as --uncheck so checked + unchecked labels share one left edge. */
+  display: inline-block;
+  width: 12px;
+  text-align: center;
   margin-right: var(--k-s-4);
   color: var(--k-primary);
   font-weight: var(--k-weight-semibold);
@@ -3394,7 +3402,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 200px;
+  min-width: var(--k-overlay-min, 12rem);
   padding: var(--k-s-12);
   background: var(--k-surface-overlay, var(--k-surface-raised));
   border: var(--k-hairline, 1px solid var(--k-border));
@@ -3439,7 +3447,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 240px;
+  /* A touch wider than menus/popovers (rich content), but tied to the same knob. */
+  min-width: calc(var(--k-overlay-min, 12rem) + 3rem);
   padding: var(--k-s-12);
   background: var(--k-surface-overlay, var(--k-surface-raised));
   border: var(--k-hairline, 1px solid var(--k-border));
@@ -3661,7 +3670,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    Sits at the very top of the content area. Tone variants mirror alerts. */
 .banner {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--k-s-10);
   padding: var(--k-space, 16px);
   background: var(--k-info-soft);
@@ -4603,14 +4612,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-bottom: var(--k-divider);
 }
 .info-card:last-of-type { border-bottom: 0; }
+/* Emphasis flip (focal point = the data): the label is the quiet descriptor,
+ * the value carries the weight + ink. */
 .info-card__label {
   font-size: var(--k-type-small);
-  font-weight: var(--k-weight-semibold);
-  color: var(--k-fg);
+  color: var(--k-fg-muted);
 }
 .info-card__value {
   font-size: var(--k-type-small);
-  color: var(--k-fg-muted);
+  font-weight: var(--k-weight-medium);
+  color: var(--k-fg);
   text-align: right;
 }
 .info-card__value--link {

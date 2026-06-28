@@ -2512,6 +2512,10 @@ const LB_IMAGES = [
 ]
 function LightboxCard() {
   const [open, setOpen] = useState<number | null>(null)
+  const [loading, setLoading] = useState(false)
+  // Open/navigate → show the loading spinner briefly (simulating the full-size
+  // image fetch a real lightbox awaits via <img> onLoad).
+  const go = (i: number) => { setOpen(i); setLoading(true); window.setTimeout(() => setLoading(false), 500) }
   // Real full-screen overlay → owes the modal contract (trap/Escape/scroll-lock/
   // focus-return). Arrow-nav for prev/next is wired on the dialog below.
   const lbRef = useModal<HTMLDivElement>(open !== null, () => setOpen(null))
@@ -2519,7 +2523,7 @@ function LightboxCard() {
     <Card title="Gallery" desc="Click a thumbnail to open the lightbox.">
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
         {LB_IMAGES.map((g, i) => (
-          <button key={i} onClick={() => setOpen(i)} aria-label={`Open image ${i + 1}`} style={{ aspectRatio: '1', borderRadius: 'var(--k-radius-md)', border: 0, background: g, cursor: 'pointer' }} />
+          <button key={i} onClick={() => go(i)} aria-label={`Open image ${i + 1}`} style={{ aspectRatio: '1', borderRadius: 'var(--k-radius-md)', border: 0, background: g, cursor: 'pointer' }} />
         ))}
       </div>
       {open !== null && (
@@ -2532,14 +2536,16 @@ function LightboxCard() {
           tabIndex={-1}
           onClick={() => setOpen(null)}
           onKeyDown={(e) => {
-            if (e.key === 'ArrowLeft') { e.preventDefault(); setOpen((open + LB_IMAGES.length - 1) % LB_IMAGES.length) }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); setOpen((open + 1) % LB_IMAGES.length) }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); go((open + LB_IMAGES.length - 1) % LB_IMAGES.length) }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); go((open + 1) % LB_IMAGES.length) }
           }}
         >
-          <div className="lightbox__stage" style={{ width: '58%', aspectRatio: '3 / 2', background: LB_IMAGES[open] }} onClick={(e) => e.stopPropagation()} />
+          {loading
+            ? <div className="lightbox__loading" aria-label="Loading image" role="status" />
+            : <div className="lightbox__stage" style={{ width: '58%', aspectRatio: '3 / 2', background: LB_IMAGES[open] }} onClick={(e) => e.stopPropagation()} />}
           <button className="lightbox__btn lightbox__btn--close" onClick={() => setOpen(null)} aria-label="Close"><Icon name="x" /></button>
-          <button className="lightbox__btn lightbox__btn--prev" onClick={(e) => { e.stopPropagation(); setOpen((open + LB_IMAGES.length - 1) % LB_IMAGES.length) }} aria-label="Previous"><Icon name="chevL" /></button>
-          <button className="lightbox__btn lightbox__btn--next" onClick={(e) => { e.stopPropagation(); setOpen((open + 1) % LB_IMAGES.length) }} aria-label="Next"><Icon name="chevR" /></button>
+          <button className="lightbox__btn lightbox__btn--prev" onClick={(e) => { e.stopPropagation(); go((open + LB_IMAGES.length - 1) % LB_IMAGES.length) }} aria-label="Previous"><Icon name="chevL" /></button>
+          <button className="lightbox__btn lightbox__btn--next" onClick={(e) => { e.stopPropagation(); go((open + 1) % LB_IMAGES.length) }} aria-label="Next"><Icon name="chevR" /></button>
           <div className="lightbox__count">{open + 1} / {LB_IMAGES.length}</div>
         </div>
       )}

@@ -1068,6 +1068,9 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-control-h-md': `var(--k-in-h-default)`,
       '--k-control-h-sm': `calc(var(--k-in-h-default) - 0.25rem)`,
       '--k-control-h-lg': `calc(var(--k-in-h-default) + 0.5rem)`,
+      // One min-width for floating menus/popovers/hover-cards so they read as one
+      // overlay family (was 180/200px literals). rem → scales with the root size.
+      '--k-overlay-min': '12rem',
       // WCAG 2.5.5 / 2.5.8 touch-target floor (44px). Fixed px — it must NOT
       // shrink with Scale (a Compact kit still needs tappable controls). The
       // global layer applies it only under `@media (pointer: coarse)`, so dense
