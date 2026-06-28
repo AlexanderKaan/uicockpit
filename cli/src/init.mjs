@@ -6,6 +6,7 @@
  *   GET /k/<hash>.css            → tokens.css (the full kit)
  *   GET /k/<hash>.contract.json  → the machine-checkable contract for `check`
  *   GET /k/<hash>.rules.md       → the agent rules, written as AGENTS.md
+ *   GET /k/<hash>.design.md      → the full spec + recipe catalog, written as design.md
  * So init is a thin fetch-and-write: no engine bundled, the CDN is the source.
  */
 
@@ -45,6 +46,7 @@ export async function runInit(argv) {
     { file: 'uicockpit.tokens.css', url: `${base}/k/${hash}.css` },
     { file: 'uicockpit.contract.json', url: `${base}/k/${hash}.contract.json` },
     { file: 'AGENTS.md', url: `${base}/k/${hash}.rules.md` },
+    { file: 'design.md', url: `${base}/k/${hash}.design.md` },
   ]
 
   for (const t of targets) {
@@ -69,7 +71,8 @@ export async function runInit(argv) {
 
   console.log('\nKit installed. Next:')
   console.log('  1. Import uicockpit.tokens.css once at your app root (or use the hosted <link>).')
-  console.log('  2. AGENTS.md holds the rules — your coding agent picks it up automatically.')
+  console.log('  2. AGENTS.md holds the rules; design.md is the full spec + recipe catalog —')
+  console.log('     your coding agent picks them up automatically.')
   console.log('  3. Run  npx uicockpit check  to catch any drift from the contract.')
   return 0
 }

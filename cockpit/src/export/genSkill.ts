@@ -29,9 +29,13 @@ you create or restyle. These are the binding rules — load them every session.
 - **Primary actions** use \`var(--k-primary)\` bg + \`var(--k-primary-fg)\` text — solid, never a gradient.
 - **Button and input share one height** per the Scale (this kit: ${cfg.scale} → ${h}); an action
   row like \`[input] [Submit]\` sits on one baseline. Never mix \`.btn--sm\` with a default \`.in\`.
-- **Compose the kit's recipes**, one family per pattern: \`.btn\` \`.card\` \`.in\` \`.tbl\` \`.list\`
-  \`.dl\` \`.stat-tile\` \`.segctrl\` \`.menu\` \`.toolbar\` \`.navrow\`. Reach for the component that
-  owns the job (data surface → Data table; form → Form panel; filter a list → Filter bar).
+- **Compose the kit's recipes — don't hand-roll.** ~80 classes cover most jobs:
+  atoms (\`.btn\` \`.in\` \`.select-trigger\` \`.badge\` \`.chip\` \`.avatar\` \`.switch\`/\`.toggle\` \`.radio\`),
+  data (\`.tbl\` \`.datatable\` \`.list\` \`.dl\` \`.stat-tile\`/\`.stat-tile-grid\`), forms (\`.formpanel\` \`.field\`),
+  nav/shell (\`.toolbar\` \`.navrow\` \`.navsuite\` \`.sidenav\` \`.scaffold\` \`.page-head\` \`.section\`),
+  overlays (\`.menu\` \`.dialog\` \`.popover\` \`.toast\`), filters (\`.filterbar\` \`.searchinput\` \`.combobox\`).
+  **The FULL catalog (every class + its modifiers) is in \`contract.json\` → \`components.classes\`;
+  \`design.md\` has each recipe's intent + how to compose it. Consult them before inventing a class.**
 - **Status** uses the system colours (\`--k-success\` / \`-warning\` / \`-danger\` / \`-info\`,
   each with \`-fg\` + \`-soft\`); pair colour with text/icon, never colour alone (WCAG 1.4.1).
 - **Real semantics:** a button is \`<button>\`, a link is \`<a>\`, inputs carry their \`type\`;

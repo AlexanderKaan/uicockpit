@@ -1,104 +1,64 @@
 /**
  * UICockpit — Live Kit CDN Worker.
  *
- * Serves a configured design-system kit as CSS over HTTP, reusing the EXACT same
- * pure pipeline the app's download export uses (`decode` + `genCss`), so the
- * hosted `<link>` is byte-identical to the file you'd download. No engine rewrite.
+ * Serves a configured design-system kit over HTTP, reusing the EXACT same pure
+ * generators the app's download export uses (`decode` + gen*), so the hosted
+ * artefacts are byte-identical to what you'd download. The hash IS the config.
  *
- *   GET /k/<hash>.css            → stateless: genCss(decode(hash)). The hash IS the
- *                                  content (the app's share-URL payload), so the
- *                                  response is immutable and cached hard.
- *   GET /k/<hash>.contract.json  → genContract(decode(hash)). The machine-checkable
- *                                  contract `npx uicockpit check` / `init` reads.
- *                                  Same hash → CSS + contract always agree.
- *   GET /k/<hash>.rules.md       → genSkill(decode(hash)). The agent rules `init`
- *                                  writes as AGENTS.md (always-on enforcement layer).
+ *   GET /k/<hash>.css            → genCss      — tokens.css (the full kit)
+ *   GET /k/<hash>.contract.json  → genContract — the machine-checkable contract (check)
+ *   GET /k/<hash>.rules.md       → genSkill    — agent rules, written as AGENTS.md
+ *   GET /k/<hash>.design.md      → genDesignMd — the full spec + recipe catalog
  *
  *   (Stateful lanes /kit/<id>.css live+pinned, KV-backed, land with the publish
  *    flow — see ~/.claude/plans/live-kit-cdn.md P2.)
  *
  * Local dev:  npx wrangler dev   →  curl 'http://localhost:8787/k/<hash>.css'
- * Deploy lands with #106 (Cloudflare Pages + DNS).
  */
 import { decode } from '../src/state/hash'
 import { genCss } from '../src/export/genCss'
 import { genContract } from '../src/export/genContract'
 import { genSkill } from '../src/export/genSkill'
+import { genDesignMd } from '../src/export/genDesignMd'
+import type { Config } from '../src/tokens/types'
 
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, OPTIONS',
 } as const
 
-const IMMUTABLE = 'public, max-age=31536000, immutable'
+// The hash IS the config, so a URL's output only changes when WE change a
+// generator (a recipe fix, a token change). Cache moderately + serve
+// stale-while-revalidating so our fixes reach already-distributed links within
+// minutes. (NOT `immutable` — that froze the type-scale bug for every consumer
+// for up to a year; correctness-of-fixes beats a few saved origin hits.)
+const CACHE = 'public, max-age=600, stale-while-revalidate=86400'
 
-const cssResponse = (css: string, init: ResponseInit = {}): Response =>
-  new Response(css, {
-    ...init,
-    headers: {
-      'content-type': 'text/css; charset=utf-8',
-      ...CORS,
-      ...(init.headers ?? {}),
-    },
-  })
+interface Route {
+  re: RegExp
+  type: string
+  gen: (cfg: Config) => string
+  bad: string
+}
+const ROUTES: Route[] = [
+  { re: /^\/k\/(.+)\.contract\.json$/, type: 'application/json; charset=utf-8', gen: genContract, bad: '{"error":"invalid or empty kit key"}' },
+  { re: /^\/k\/(.+)\.rules\.md$/, type: 'text/markdown; charset=utf-8', gen: genSkill, bad: 'UICockpit: invalid or empty kit key' },
+  { re: /^\/k\/(.+)\.design\.md$/, type: 'text/markdown; charset=utf-8', gen: genDesignMd, bad: 'UICockpit: invalid or empty kit key' },
+  { re: /^\/k\/(.+)\.css$/, type: 'text/css; charset=utf-8', gen: genCss, bad: '/* UICockpit: invalid or empty kit key */' },
+]
 
 export default {
-  fetch(request: Request): Response | Promise<Response> {
+  fetch(request: Request): Response {
     if (request.method === 'OPTIONS') return new Response(null, { headers: CORS })
 
     const { pathname } = new URL(request.url)
-
-    // Stateless contract: /k/<hash>.contract.json  →  genContract(decode(hash))
-    // (matched before .css so the `.contract.json` suffix wins).
-    const contractM = pathname.match(/^\/k\/(.+)\.contract\.json$/)
-    if (contractM) {
-      const cfg = decode(safeDecodeURIComponent(contractM[1]))
-      if (!cfg) {
-        return new Response('{"error":"invalid or empty kit key"}', {
-          status: 400,
-          headers: { 'content-type': 'application/json; charset=utf-8', ...CORS },
-        })
-      }
-      return new Response(genContract(cfg), {
-        headers: {
-          'content-type': 'application/json; charset=utf-8',
-          'cache-control': IMMUTABLE,
-          ...CORS,
-        },
-      })
-    }
-
-    // Stateless rules: /k/<hash>.rules.md  →  genSkill(decode(hash))
-    const rulesM = pathname.match(/^\/k\/(.+)\.rules\.md$/)
-    if (rulesM) {
-      const cfg = decode(safeDecodeURIComponent(rulesM[1]))
-      if (!cfg) {
-        return new Response('UICockpit: invalid or empty kit key', {
-          status: 400,
-          headers: { 'content-type': 'text/plain; charset=utf-8', ...CORS },
-        })
-      }
-      return new Response(genSkill(cfg), {
-        headers: {
-          'content-type': 'text/markdown; charset=utf-8',
-          'cache-control': IMMUTABLE,
-          ...CORS,
-        },
-      })
-    }
-
-    // Stateless kit: /k/<hash>.css  →  genCss(decode(hash))
-    const stateless = pathname.match(/^\/k\/(.+)\.css$/)
-    if (stateless) {
-      const hash = safeDecodeURIComponent(stateless[1])
-      const cfg = decode(hash)
-      if (!cfg) {
-        return cssResponse('/* UICockpit: invalid or empty kit key */', { status: 400 })
-      }
-      return cssResponse(genCss(cfg), {
-        // hash = content → never changes for this URL → cache forever.
-        headers: { 'cache-control': IMMUTABLE },
-      })
+    for (const r of ROUTES) {
+      const m = pathname.match(r.re)
+      if (!m) continue
+      const headers: Record<string, string> = { 'content-type': r.type, ...CORS }
+      const cfg = decode(safeDecodeURIComponent(m[1]))
+      if (!cfg) return new Response(r.bad, { status: 400, headers })
+      return new Response(r.gen(cfg), { headers: { ...headers, 'cache-control': CACHE } })
     }
 
     return new Response('UICockpit Kit CDN — try /k/<hash>.css', {
