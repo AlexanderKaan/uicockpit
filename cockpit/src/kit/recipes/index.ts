@@ -35,7 +35,30 @@ export const RECIPES: readonly Recipe[] = [
 }
 /* Tabular figures — money, counts, timers, IDs keep their column as the value
    changes (no horizontal jitter). The single most-reached-for un-named helper. */
-.num { font-variant-numeric: tabular-nums; }`,
+.num { font-variant-numeric: tabular-nums; }
+
+/* Metric — the label → tabular-value → sub trio. The extractable CORE of
+   .stat-tile (minus its card + icon chrome), so any KPI, route leg, score, plan
+   figure or flight time drops in without re-composing three tokens by hand.
+   (The build test rebuilt this 4× inside one flight card.) */
+.metric { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
+.metric__label {
+  font-size: var(--k-type-caption);
+  font-weight: var(--k-weight-medium);
+  letter-spacing: var(--k-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--k-fg-muted);
+}
+.metric__value {
+  font-size: var(--k-type-h2);
+  font-weight: var(--k-weight-semibold);
+  font-family: var(--k-font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--k-fg);
+}
+.metric__sub { font-size: var(--k-type-caption); color: var(--k-fg-muted); }`,
   },
   {
     id: 'toolbar',
@@ -510,7 +533,19 @@ export const RECIPES: readonly Recipe[] = [
   border-top: var(--k-divider);
   background: var(--k-surface-sunken);
   padding: var(--k-s-12) var(--k-s-16);
-}`,
+}
+/* Presentation card — a card meant to be SEEN (ticket · credit card · brand face):
+ * a saturated brand-gradient face with inverse ink + a deeper lift, the loud
+ * inverse of the default white .card. Surfaced by the build test: the credit-card
+ * reached for .card, got a white box, then hand-hacked the colours. */
+.card--presentation {
+  background: linear-gradient(135deg, var(--k-grad-1), var(--k-grad-3));
+  border: 0;
+  box-shadow: var(--k-shadow-lg);
+  color: var(--k-inverse-fg);
+}
+.card--presentation .card__title,
+.card--presentation .card__desc { color: var(--k-inverse-fg); }`,
   },
   {
     id: 'page-head',

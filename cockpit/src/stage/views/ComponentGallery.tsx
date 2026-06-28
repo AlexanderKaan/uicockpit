@@ -208,7 +208,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     // re-audit): headers/region wrappers + data-table/form-panel/pricing/sidebar/
     // empty-state/file-grid + the stats band + calendar VIEWS. Widgets (date picker,
     // chart, timeline, danger-zone, auth card, stat tile…) are 'component'.
-    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [ActionPanelCard, 'component'],
+    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [ActionPanelCard, 'component'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
@@ -4363,6 +4363,20 @@ function SectionCard() {
         <div className="section__body">
           <span style={{ color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }}>The region's components go here — a table, a grid of cards, a feed.</span>
         </div>
+      </div>
+    </Card>
+  )
+}
+
+function PresentationCardCard() {
+  return (
+    <Card title="Presentation card" desc="A card meant to be SEEN — a brand face for tickets, passes, credit cards.">
+      <div className="card card--presentation" style={{ padding: 'var(--k-s-20)', minHeight: 124, justifyContent: 'space-between' }}>
+        <div className="card__head">
+          <div className="card__title">Season Pass</div>
+          <div className="card__desc">Unlimited access · 2026</div>
+        </div>
+        <span className="num" style={{ fontSize: 'var(--k-type-h3)', fontWeight: 700, letterSpacing: '0.08em' }}>•••• •••• •••• 4242</span>
       </div>
     </Card>
   )
