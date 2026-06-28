@@ -1148,6 +1148,12 @@
 }
 .shc__dock-spacer { flex: 1; }
 .shc__dock-scrub { flex: 0 1 360px; min-width: 200px; margin: 0; }
+/* Phone: the showcase top-search can't hold a fixed 232px in a ~360 frame, and the
+ * width scrubber wants its own row. */
+@media (max-width: 768px) {
+  .shc__topsearch { width: auto; flex: 1 1 auto; min-width: 0; }
+  .shc__dock-scrub { flex: 1 1 100%; }
+}
 
 /* The body — stage alone, or stage + a sticky inspector rail (Show/Hide recipe). */
 .shc__loupebody {

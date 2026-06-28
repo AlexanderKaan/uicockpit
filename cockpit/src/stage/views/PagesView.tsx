@@ -532,7 +532,15 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
   const [screenId, setScreenId] = useState(LEDGER_SCREENS[0]!.id)
   // Width lives here (the app level) so it survives screen switches — ShowcaseStage
   // still remounts per screen (key) to reset the loupe, but reads width from here.
-  const [width, setWidth] = useState(1200)
+  // On phones, start at the frame width so the kit's own responsive primitives
+  // engage — the scaffold nav morphs to a bottom bar and .l-sidebar stacks —
+  // instead of forcing the 1200px desktop layout into a tiny frame. Desktop
+  // keeps the 1200 default. The width slider still adjusts from here.
+  const [width, setWidth] = useState(() =>
+    typeof window !== 'undefined' && window.innerWidth < 768
+      ? Math.max(360, Math.min(420, window.innerWidth - 16))
+      : 1200,
+  )
   const m = SHOWCASES.find((s) => s.id === screenId)!
   const appNav: AppNav = {
     screens: LEDGER_SCREENS,
