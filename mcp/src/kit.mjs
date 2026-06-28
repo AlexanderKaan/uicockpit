@@ -24,6 +24,24 @@ export const cssUrl = (hash) => `${CDN}/k/${hash}.css`
 export const contractUrl = (hash) => `${CDN}/k/${hash}.contract.json`
 export const linkSnippet = (hash) => `<link rel="stylesheet" href="${cssUrl(hash)}">`
 
+/* Intent → kit phrase-book. The composition utilities + key patterns are easy to
+ * MISS (the gradient/canvas idiom lived only in a token comment), so an agent
+ * hand-rolls them off-grammar. Surfacing "to do X, reach for Y" closes that gap.
+ * Each entry names the class root it `needs`, so we only show intents the kit
+ * actually ships (null = token-only, always shown). */
+const INTENTS = [
+  { needs: 'canvas', line: 'Hero / section / app-shell background (brand atmosphere) → `class="canvas"`' },
+  { needs: 'eyebrow', line: 'Uppercase micro-label / section kicker → `class="eyebrow"`' },
+  { needs: 'metric', line: 'KPI / metric (label → value → sub) → `class="metric"` with `.metric__label` / `__value` / `__sub`' },
+  { needs: 'num', line: 'Tabular figures (money, counts, timers, IDs) → add `class="num"`' },
+  { needs: 'icon-tile', line: 'Soft-tinted icon square (stat mark, list lead) → `class="icon-tile"`' },
+  { needs: 'scrubber', line: 'Media transport / player progress with a playhead → `class="scrubber"`' },
+  { needs: 'card', line: 'Brand face (ticket, pass, membership card) → `class="card card--presentation"`' },
+  { needs: 'toolbar', line: 'A row of mixed controls forced to one height → `class="toolbar"`' },
+  { needs: 'btn', line: 'Primary action → `class="btn btn--primary"`; quiet → `btn btn--ghost`' },
+  { needs: null, line: 'Muted / secondary text → `color: var(--k-fg-muted)`; faint → `var(--k-fg-faint)`' },
+]
+
 /** Group a flat token map (`--k-*: value`) into readable categories for the briefing. */
 function groupTokens(tokens) {
   const groups = new Map()
@@ -94,6 +112,14 @@ export function designContext(contract, hash = null) {
       const mods = classes[root]?.modifiers || []
       lines.push(`- .${root}${mods.length ? ` — modifiers: ${mods.map((m) => `${root}--${m}`).join(', ')}` : ''}`)
     }
+  }
+
+  // Intent → reach-for map, filtered to the classes this kit actually ships.
+  const intents = INTENTS.filter((i) => i.needs == null || i.needs in classes)
+  if (intents.length) {
+    lines.push('')
+    lines.push('## Intent → reach for the kit (don’t hand-roll these)')
+    for (const i of intents) lines.push(`- ${i.line}`)
   }
 
   lines.push('')

@@ -2668,6 +2668,12 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "statement": "A CSS rule that reconstructs a named composition utility (.eyebrow, .metric, .icon-tile …) from its tokens is a silent second version — reach for the kit class instead of rebuilding the bundle."
     },
     {
+      "id": "tokens-imported",
+      "severity": "warn",
+      "check": "tokens-imported",
+      "statement": "If the code uses --k-* tokens or kit classes, the kit stylesheet (uicockpit.tokens.css or the hosted <link>) must be imported once at the app root, or it all renders unstyled."
+    },
+    {
       "id": "primary-never-rotates",
       "severity": "info",
       "statement": "The brand primary hue never rotates; Harmony governs only the derived secondary/accent/decorative family."

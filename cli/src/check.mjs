@@ -43,8 +43,15 @@ export function checkContract(contract, files, config = {}) {
     violations.push({ check, severity: sev(check), file, line, message })
   }
 
+  // Cold-start guard — track whether the kit stylesheet is imported anywhere and
+  // where the kit is first USED, so we can warn when usage exists but the import
+  // is missing (the #1 cold-start failure: kit classes render as unstyled boxes).
+  let importSeen = false
+  let firstUsage = null
+
   for (const { path, content } of files) {
     const isCss = /\.(css|scss|less)$/.test(path)
+    if (!importSeen && (content.includes('uicockpit.tokens.css') || content.includes('kit.uicockpit.com'))) importSeen = true
     const lines = content.split('\n')
     for (let i = 0; i < lines.length; i++) {
       const text = lines[i]
@@ -55,6 +62,7 @@ export function checkContract(contract, files, config = {}) {
 
       // tokens-exist (error) — every var(--k-*) must resolve to a contract token.
       for (const m of text.matchAll(/var\(\s*(--k-[\w-]+)/g)) {
+        if (!firstUsage && !isDef) firstUsage = { path, line: ln }
         if (!tokenSet.has(m[1])) add('tokens-exist', path, ln, `var(${m[1]}) is not a token in this contract`)
       }
 
@@ -63,18 +71,16 @@ export function checkContract(contract, files, config = {}) {
       // (unknown root) are ignored — this only polices the kit's own vocabulary.
       for (const m of text.matchAll(/class(?:Name)?\s*=\s*["'`]([^"'`]+)["'`]/g)) {
         for (const raw of m[1].split(/\s+/)) {
-          const dd = raw.indexOf('--')
-          if (dd === -1) continue
+          if (!raw) continue
           // Strip the configured prefix before reading the kit vocabulary.
           const cls = prefix && raw.startsWith(prefix) ? raw.slice(prefix.length) : raw
-          const cdd = cls.indexOf('--')
-          if (cdd === -1) continue
-          const base = cls.slice(0, cdd)
-          const mod = cls.slice(cdd + 2)
-          const uu = base.indexOf('__')
-          const root = uu === -1 ? base : base.slice(0, uu)
+          const root = cls.split('--')[0].split('__')[0]
           const def = classes[root]
           if (!def) continue // not a kit root → consumer's own class
+          if (!firstUsage) firstUsage = { path, line: ln } // a kit class is in use
+          const dd = cls.indexOf('--')
+          if (dd === -1) continue // no modifier → nothing more to police
+          const mod = cls.slice(dd + 2)
           if (!def.modifiers.includes(mod)) {
             add('known-modifiers', path, ln, `.${raw}: '${mod}' is not a defined modifier of .${prefix}${root}`)
           }
@@ -148,6 +154,14 @@ export function checkContract(contract, files, config = {}) {
       }
     }
   }
+
+  // tokens-imported (warn) — kit is used but its stylesheet is imported nowhere.
+  // One run-level warning, anchored at the first usage so it points somewhere real.
+  if (firstUsage && !importSeen) {
+    add('tokens-imported', firstUsage.path, firstUsage.line,
+      'kit tokens/classes are used but the kit stylesheet is imported nowhere — import uicockpit.tokens.css once at your app root (or add the hosted kit.uicockpit.com <link>), or it all renders unstyled')
+  }
+
   return violations
 }
 

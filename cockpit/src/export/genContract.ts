@@ -140,7 +140,7 @@ interface ContractRule {
   id: string
   statement: string
   severity: 'error' | 'warn' | 'info'
-  check?: 'tokens-exist' | 'no-raw-color' | 'spacing-grid' | 'radius-scale' | 'font-size-scale' | 'known-modifiers' | 'composition-reroll'
+  check?: 'tokens-exist' | 'no-raw-color' | 'spacing-grid' | 'radius-scale' | 'font-size-scale' | 'known-modifiers' | 'composition-reroll' | 'tokens-imported'
 }
 const RULES: ContractRule[] = [
   { id: 'tokens-exist', severity: 'error', check: 'tokens-exist',
@@ -157,6 +157,8 @@ const RULES: ContractRule[] = [
     statement: 'A kit class written as root--modifier must use a modifier this contract defines.' },
   { id: 'composition-reroll', severity: 'warn', check: 'composition-reroll',
     statement: 'A CSS rule that reconstructs a named composition utility (.eyebrow, .metric, .icon-tile …) from its tokens is a silent second version — reach for the kit class instead of rebuilding the bundle.' },
+  { id: 'tokens-imported', severity: 'warn', check: 'tokens-imported',
+    statement: 'If the code uses --k-* tokens or kit classes, the kit stylesheet (uicockpit.tokens.css or the hosted <link>) must be imported once at the app root, or it all renders unstyled.' },
   // Contract-of-record (true by construction inside the kit) ─────────────────
   { id: 'primary-never-rotates', severity: 'info',
     statement: 'The brand primary hue never rotates; Harmony governs only the derived secondary/accent/decorative family.' },

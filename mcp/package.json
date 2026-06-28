@@ -1,6 +1,6 @@
 {
   "name": "uicockpit-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MCP server for UICockpit — give an AI agent a real design system and a check loop: install a kit, read its design context, and verify conformance natively.",
   "type": "module",
   "bin": {
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "uicockpit": "^0.2.0",
+    "uicockpit": "^0.3.0",
     "zod": "^3.23.8"
   },
   "keywords": [

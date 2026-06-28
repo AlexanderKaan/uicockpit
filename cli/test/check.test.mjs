@@ -26,6 +26,7 @@ const contract = {
     { check: 'no-raw-color', severity: 'warn' },
     { check: 'spacing-grid', severity: 'warn' },
     { check: 'composition-reroll', severity: 'warn' },
+    { check: 'tokens-imported', severity: 'warn' },
   ],
 }
 const run = (files) => checkContract(contract, files)
@@ -98,6 +99,30 @@ test('prefix: overriding the prefixed bundle class is not a re-roll', () => {
   const v = checkContract(contract, [{ path: 'g.css', content:
     '.uic-eyebrow { letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted); font-size: var(--k-type-eyebrow); }' }], cfg)
   assert.deepEqual(v.filter((x) => x.check === 'composition-reroll'), [])
+})
+
+test('cold-start: warns when the kit is used but its stylesheet is imported nowhere', () => {
+  // Kit class used, no import anywhere → one tokens-imported warning.
+  const v = checkContract(contract, [{ path: 'App.tsx', content: '<button className="btn btn--primary">Go</button>' }])
+  const w = v.filter((x) => x.check === 'tokens-imported')
+  assert.equal(w.length, 1)
+  assert.ok(/imported nowhere|renders unstyled/.test(w[0].message))
+})
+
+test('cold-start: an import (local file or hosted link) clears the warning', () => {
+  const local = checkContract(contract, [
+    { path: 'main.tsx', content: "import './uicockpit.tokens.css'" },
+    { path: 'App.tsx', content: '<button className="btn">Go</button>' },
+  ])
+  assert.deepEqual(local.filter((x) => x.check === 'tokens-imported'), [])
+  const hosted = checkContract(contract, [{ path: 'index.html', content:
+    '<link rel="stylesheet" href="https://kit.uicockpit.com/k/abc.css"><button class="btn">Go</button>' }])
+  assert.deepEqual(hosted.filter((x) => x.check === 'tokens-imported'), [])
+})
+
+test('cold-start: no kit usage → no warning', () => {
+  const v = checkContract(contract, [{ path: 'App.tsx', content: '<div className="my-own-thing">hi</div>' }])
+  assert.deepEqual(v.filter((x) => x.check === 'tokens-imported'), [])
 })
 
 test('allowColors (uicockpit.json) exempts a sanctioned foreign brand colour', () => {

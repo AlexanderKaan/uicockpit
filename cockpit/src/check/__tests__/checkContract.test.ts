@@ -111,6 +111,19 @@ describe('uicockpit check — the contract verifier (Fase D4)', () => {
     })
   })
 
+  // Cold-start — the kit is used but its stylesheet is imported nowhere.
+  describe('tokens-imported (the unstyled-box guard)', () => {
+    it('warns on kit usage with no import, and clears once imported', () => {
+      const noImport = run([{ path: 'App.tsx', content: `<button className="btn btn--primary">Go</button>` }])
+      expect(noImport.filter((x) => x.check === 'tokens-imported').length).toBe(1)
+      const withImport = run([
+        { path: 'main.tsx', content: `import './uicockpit.tokens.css'` },
+        { path: 'App.tsx', content: `<button className="btn">Go</button>` },
+      ])
+      expect(withImport.filter((x) => x.check === 'tokens-imported')).toEqual([])
+    })
+  })
+
   // Phase 3b — the `prefix` adoption field (class-collision namespacing).
   describe('prefix (brownfield class namespacing)', () => {
     it('still polices modifiers on a prefixed kit class', () => {
