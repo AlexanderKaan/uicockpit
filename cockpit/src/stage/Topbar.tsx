@@ -122,7 +122,7 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
               onClick={() => onViewChange(k)}
             >
               <Ico size={14} strokeWidth={1.75} />
-              {label}
+              <span className="view-toggle__lbl">{label}</span>
             </button>
           ))}
         </div>
@@ -131,7 +131,7 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         {/* Undo / redo (C2) — config history; mirrors ⌘Z / ⇧⌘Z. */}
         <button
           type="button"
-          className="topbar__icon-btn"
+          className="topbar__icon-btn topbar__icon-btn--hist"
           onClick={onUndo}
           disabled={!canUndo}
           aria-label="Undo"
@@ -141,7 +141,7 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         </button>
         <button
           type="button"
-          className="topbar__icon-btn"
+          className="topbar__icon-btn topbar__icon-btn--hist"
           onClick={onRedo}
           disabled={!canRedo}
           aria-label="Redo"

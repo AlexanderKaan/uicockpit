@@ -34,7 +34,11 @@ function startViewTransition(cb: () => void): void {
  *  *floats* over the top-left (absolute), never reserving a column. */
 export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const { cfg, tokens, dispatch, undo, redo, canUndo, canRedo } = useConfig()
-  const [menuOpen, setMenuOpen] = useState(true)
+  // Default closed on phones — there the panel becomes an overlay drawer, so the
+  // stage gets the full width; open inline as a column on desktop.
+  const [menuOpen, setMenuOpen] = useState(() =>
+    typeof window === 'undefined' ? true : window.innerWidth > 768,
+  )
   // Land on Blocks (C7): the ladder runs abstract→concrete, but visitor curiosity
   // runs concrete→abstract — real, instantly-themeable surfaces are the hook;
   // Foundations stays the inspect layer one tab away.
@@ -120,6 +124,10 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         canRedo={canRedo}
       />
       <div className="app__body">
+        {/* Mobile-only backdrop behind the drawer (display:none on desktop). */}
+        {menuOpen && (
+          <div className="app__scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />
+        )}
         {menuOpen && (
           <Panel
             cfg={cfg}
