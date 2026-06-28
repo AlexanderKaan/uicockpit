@@ -158,23 +158,12 @@
 /* A control row: label (left) + current value (right) + chevron. */
 .fmrow { position: relative; }
 .fmrow--open { z-index: 50; }
-/* Essential rows (C9) — Brand / Scale / Display font / Box radius decide ~80% of
- * the look, so they read as PRIMARY: a heavier label + a quiet neutral tick on the
- * left. Neutral on purpose (the panel carries no brand colour), and distinct from
- * the recessed active state (which is a background, not a tick). */
-.fmrow--key > .fmrow__head > .fmrow__label,
-.fmrow--key > .fmrow__inline > .fmrow__label { font-weight: 680; color: var(--app-fg); }
-.fmrow--key::before {
-  content: "";
-  position: absolute;
-  left: 1px;
-  top: 9px;
-  bottom: 9px;
-  width: 2px;
-  border-radius: 2px;
-  background: var(--app-fg-faint, #c2c6cc);
-  opacity: 0.6;
-}
+/* Row labels read as one consistent tier — every control title is the same
+ * semibold (see .fmrow__label below). The old "essential rows" treatment (a
+ * heavier 680 label + a left tick on Brand/Scale/Display font/Box radius) was
+ * dropped: the ticks read as noise (especially in dark mode) and a single, calm
+ * title weight is cleaner than a per-row emphasis split. The .fmrow--key class
+ * stays inert in the markup — group order + section headers carry the structure. */
 .fmrow__head {
   width: 100%;
   display: flex;
@@ -200,7 +189,7 @@
   flex: none;
   white-space: nowrap;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--app-fg);
   letter-spacing: -0.01em;
 }
