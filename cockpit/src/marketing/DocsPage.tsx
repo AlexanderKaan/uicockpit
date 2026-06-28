@@ -14,6 +14,7 @@ const SECTIONS = [
   { id: 'quickstart', label: 'Quick start' },
   { id: 'exports', label: 'The exports' },
   { id: 'livekit', label: 'Live kit (CDN)' },
+  { id: 'adoption', label: 'Agent adoption' },
   { id: 'tokens', label: 'Token model' },
   { id: 'composition', label: 'Composition rules' },
   { id: 'sizing', label: 'Sizing & decision tree' },
@@ -249,6 +250,72 @@ export function DocsPage({ onLaunch, onHome, navigate }: DocsPageProps) {
               {' '}to your agent — all three derive from one config, so they can never
               disagree.
             </p>
+          </section>
+
+          <section id="adoption">
+            <h2>Agent adoption <span className="docs__tag">CLI · MCP</span></h2>
+            <p>
+              The deepest integration isn't a paste — it's handing the kit to the
+              coding agent you already have open, and letting it <strong>apply</strong>
+              {' '}the system and <strong>keep it consistent</strong>. One command pulls
+              the kit into any repo:
+            </p>
+            <pre className="docs__code"><code>{`npx uicockpit init <kit-hash>
+npx uicockpit check        # catch any drift from the contract`}</code></pre>
+            <p><code>init</code> writes five files — the kit, plus everything your agent reads:</p>
+            <ul className="docs__list">
+              <li><strong><code>uicockpit.tokens.css</code></strong> — the full kit (tokens <em>and</em> recipes); import it once at your app root.</li>
+              <li><strong><code>uicockpit.contract.json</code></strong> — the machine-checkable contract <code>check</code> verifies your code against.</li>
+              <li><strong><code>AGENTS.md</code></strong> — the rules, in the file your coding agent picks up automatically.</li>
+              <li><strong><code>design.md</code></strong> — the full human spec + recipe catalog.</li>
+              <li><strong><code>uicockpit.json</code></strong> — your adoption settings (below). Local + hand-editable; <code>init</code> never clobbers it.</li>
+            </ul>
+            <p>
+              <strong><code>check</code> is the moat.</strong> It reads the contract and
+              your code and reports where the two drift — unknown tokens, undefined
+              modifiers, raw colours, off-grid spacing, and a hand-rebuilt composition
+              utility (a silent second version of <code>.eyebrow</code> or
+              <code>.metric</code>). With a CI exit code, so <em>generate → apply → check</em>
+              {' '}is a loop, not a hope.
+            </p>
+
+            <h3>The <code>uicockpit.json</code> config</h3>
+            <p>
+              The adoption file (the shadcn <code>components.json</code> model): how the
+              kit settles into <em>your</em> codebase, especially a brownfield one.
+              {' '}<code>check</code> reads it; <code>init</code> applies the rest.
+            </p>
+            <pre className="docs__code"><code>{`{
+  "prefix": "",
+  "tokenStrategy": "css-vars",
+  "darkStrategy": "class",
+  "framework": "react",
+  "aliasMap": { "--k-primary": "--brand-500" },
+  "allowColors": ["#1da1f2"]
+}`}</code></pre>
+            <ul className="docs__list">
+              <li>
+                <strong><code>aliasMap</code> — adopt your existing palette.</strong>
+                {' '}Map a kit token onto a value you already have. On
+                {' '}<code>init</code> the kit picks up your brand without touching the
+                kit CSS — a <code>--</code> value is wrapped in <code>var()</code>, a
+                literal is used as-is. Append-only, so it's safe and reversible.
+              </li>
+              <li>
+                <strong><code>allowColors</code> — a sanctioned escape hatch.</strong>
+                {' '}A foreign brand colour (a partner logo) you <em>do</em> want to
+                hardcode. List it here, or tag a single line
+                {' '}<code>/* uicockpit-allow-color */</code>, and <code>check</code>
+                {' '}stops flagging it — without muting the rule everywhere.
+              </li>
+              <li>
+                <strong><code>prefix</code> · <code>tokenStrategy</code> ·
+                {' '}<code>darkStrategy</code> · <code>framework</code>.</strong>
+                {' '}Class-collision prefix, the export shape (CSS vars / Tailwind
+                <code>@theme</code> / shadcn globals), how dark is toggled, and the
+                framework your agent writes. Set once; <code>init</code> honours them.
+              </li>
+            </ul>
           </section>
 
           <section id="tokens">

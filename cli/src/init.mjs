@@ -12,6 +12,25 @@
 
 const DEFAULT_CDN = 'https://kit.uicockpit.com'
 
+/**
+ * Build the brownfield `aliasMap` override block (Phase 3b). Each entry maps a kit
+ * token onto a value from the host app, so the kit adopts the existing palette
+ * without editing the kit CSS. Append-only: a trailing `:root` wins over the kit's
+ * `:root` on equal specificity. A value beginning `--` is wrapped in `var(…)`;
+ * anything else (a literal colour, a `var(…)` already, a number) is used verbatim.
+ * @param {Record<string,string>} aliasMap
+ * @returns {string}  the CSS block, or '' when there is nothing to alias.
+ */
+export function aliasBlock(aliasMap) {
+  const entries = Object.entries(aliasMap || {}).filter(([k]) => /^--[\w-]+$/.test(k))
+  if (!entries.length) return ''
+  const lines = entries.map(([k, v]) => {
+    const val = typeof v === 'string' && v.startsWith('--') ? `var(${v})` : String(v)
+    return `  ${k}: ${val};`
+  })
+  return `\n/* uicockpit.json aliasMap — kit tokens adopt your existing values (brownfield).\n   The referenced custom properties must be defined in your own CSS. */\n:root {\n${lines.join('\n')}\n}\n`
+}
+
 async function fetchText(url) {
   let res
   try {
@@ -27,7 +46,7 @@ async function fetchText(url) {
  * @returns {Promise<number>}  0 ok · 2 usage/fetch error
  */
 export async function runInit(argv) {
-  const { writeFileSync, existsSync } = await import('node:fs')
+  const { writeFileSync, existsSync, readFileSync } = await import('node:fs')
 
   const positional = argv.filter((a) => !a.startsWith('--'))
   const hash = positional[0]
@@ -42,8 +61,18 @@ export async function runInit(argv) {
     return 2
   }
 
+  // An existing uicockpit.json is the apply-point for the brownfield aliasMap: the
+  // FIRST init scaffolds it empty, you fill aliasMap, then `init --force` re-applies
+  // (appends the overrides to the fetched tokens.css). Malformed → ignore.
+  let aliasMap = {}
+  if (existsSync('uicockpit.json')) {
+    try { aliasMap = JSON.parse(readFileSync('uicockpit.json', 'utf8')).aliasMap || {} }
+    catch { /* keep {} */ }
+  }
+  const aliases = aliasBlock(aliasMap)
+
   const targets = [
-    { file: 'uicockpit.tokens.css', url: `${base}/k/${hash}.css` },
+    { file: 'uicockpit.tokens.css', url: `${base}/k/${hash}.css`, append: aliases },
     { file: 'uicockpit.contract.json', url: `${base}/k/${hash}.contract.json` },
     { file: 'AGENTS.md', url: `${base}/k/${hash}.rules.md` },
     { file: 'design.md', url: `${base}/k/${hash}.design.md` },
@@ -65,8 +94,9 @@ export async function runInit(argv) {
       console.error('  Check the kit hash, or your network connection.')
       return 2
     }
+    if (t.append) text += t.append
     writeFileSync(t.file, text)
-    console.log(`  ✓ wrote ${t.file}`)
+    console.log(`  ✓ wrote ${t.file}${t.append ? ` (+ ${Object.keys(aliasMap).length} aliasMap override${Object.keys(aliasMap).length === 1 ? '' : 's'})` : ''}`)
   }
 
   // Scaffold the adoption config (the shadcn components.json model). It is local +

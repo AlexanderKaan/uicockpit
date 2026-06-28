@@ -18,7 +18,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node test/check.test.mjs"
+    "test": "node --test \"test/*.test.mjs\""
   },
   "keywords": [
     "design-system",
