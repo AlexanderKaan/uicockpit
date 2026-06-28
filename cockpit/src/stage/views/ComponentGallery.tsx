@@ -208,7 +208,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     // re-audit): headers/region wrappers + data-table/form-panel/pricing/sidebar/
     // empty-state/file-grid + the stats band + calendar VIEWS. Widgets (date picker,
     // chart, timeline, danger-zone, auth card, stat tile…) are 'component'.
-    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [ActionPanelCard, 'component'],
+    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
@@ -4363,6 +4363,22 @@ function SectionCard() {
         <div className="section__body">
           <span style={{ color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }}>The region's components go here — a table, a grid of cards, a feed.</span>
         </div>
+      </div>
+    </Card>
+  )
+}
+
+function ScrubberCard() {
+  const time: CSSProperties = { fontSize: 'var(--k-type-eyebrow)', color: 'var(--k-fg-muted)' }
+  return (
+    <Card title="Scrubber" desc="Media transport progress with a playhead — wire the seek yourself.">
+      <div className="card__row" style={{ gap: 'var(--k-s-12)', alignItems: 'center', paddingTop: 8 }}>
+        <span className="num" style={time}>1:48</span>
+        <div className="scrubber" style={{ flex: 1 }}>
+          <div className="scrubber__fill" style={{ width: '45%' }} />
+          <div className="scrubber__knob" style={{ left: '45%' }} />
+        </div>
+        <span className="num" style={time}>4:22</span>
       </div>
     </Card>
   )

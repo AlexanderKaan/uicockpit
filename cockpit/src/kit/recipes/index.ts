@@ -73,7 +73,26 @@ export const RECIPES: readonly Recipe[] = [
   background: var(--k-primary-soft);
   color: var(--k-primary-soft-fg);
 }
-.icon-tile svg { width: var(--k-icon-md); height: var(--k-icon-md); }`,
+.icon-tile svg { width: var(--k-icon-md); height: var(--k-icon-md); }
+
+/* Scrubber — a media transport progress (audio/video player): a sunken track, a
+   played fill, and a draggable-looking knob at the playhead. The mid-tier media
+   idiom .progress (display-only, no handle) and .slider (a form control) both miss.
+   Visual only — wire the seek/drag + value yourself (behaviour contract). Set the
+   played amount inline: .scrubber__fill width + .scrubber__knob left = the %. */
+.scrubber { position: relative; height: var(--k-s-4); border-radius: 999px; background: var(--k-surface-sunken); cursor: pointer; }
+.scrubber__fill { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: var(--k-primary); }
+.scrubber__knob {
+  position: absolute;
+  top: 50%;
+  width: var(--k-s-12);
+  height: var(--k-s-12);
+  border-radius: 50%;
+  background: var(--k-surface);
+  border: max(1.5px, var(--k-bw)) solid var(--k-primary);
+  box-shadow: var(--k-shadow-sm);
+  transform: translate(-50%, -50%);
+}`,
   },
   {
     id: 'toolbar',
