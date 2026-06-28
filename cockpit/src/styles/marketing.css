@@ -511,41 +511,34 @@
   margin: 0;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 6px 0 20px;
-  perspective: 1500px;
+  align-items: stretch;
+  padding: 4px 0;
 }
+/* A clean, upright stack — no 3D skew. column-reverse renders the DOM order
+ * (markup → tokens → states → a11y → shipped) as a build-UP: foundations at the
+ * bottom, the shipped component on top. */
 .mkt__exploded-stack {
-  position: relative;
-  width: min(358px, 100%);
-  height: 320px;
-  transform-style: preserve-3d;
-  transform: rotateX(4deg) rotateY(-11deg);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  width: min(384px, 100%);
 }
 .mkt__layer {
-  position: absolute;
-  left: 0;
-  right: 0;
   display: flex;
   align-items: center;
-  gap: 11px;
-  height: 60px;
-  padding: 0 14px;
-  border-radius: 14px;
+  gap: 12px;
+  min-height: 58px;
+  padding: 0 16px;
+  border-radius: 13px;
   border: 1px solid var(--mkt-border);
-  background: rgba(255, 255, 255, 0.93);
-  box-shadow: 0 22px 38px -26px rgba(12, 16, 30, 0.5);
+  background: var(--mkt-bg);
+  box-shadow: 0 1px 2px rgba(12, 16, 30, 0.04), 0 6px 16px -12px rgba(12, 16, 30, 0.2);
   font-size: 12.5px;
-  /* fan downward: the shipped component (i=4) sits on top, foundations stack
-   * below it, each pushed down + back + slightly smaller. */
-  transform:
-    translateY(calc((4 - var(--i)) * 58px))
-    translateX(calc((4 - var(--i)) * -6px))
-    scale(calc(1 - (4 - var(--i)) * 0.018));
-  transform-origin: top center;
   opacity: 0;
-  animation: mkt-layer-in 0.5s ease both;
-  animation-delay: calc((4 - var(--i)) * 70ms);
+  transform: translateY(10px);
+  animation: mkt-layer-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  /* stagger from the bottom up — foundations first, shipped last */
+  animation-delay: calc(var(--i) * 80ms);
 }
 .mkt__layer code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -585,9 +578,10 @@
   color: var(--mkt-fg-faint);
 }
 .mkt__layer--final {
+  min-height: 64px;
   background: var(--mkt-fg);
   border-color: var(--mkt-fg);
-  box-shadow: 0 28px 50px -22px rgba(0, 122, 255, 0.55);
+  box-shadow: 0 1px 2px rgba(12, 16, 30, 0.04), 0 18px 36px -20px rgba(0, 122, 255, 0.5);
 }
 .mkt__layer-tag--final { color: rgba(255, 255, 255, 0.62); }
 .mkt__demo-btn {
@@ -605,7 +599,10 @@
   font-family: inherit;
   box-shadow: 0 6px 14px -6px rgba(0, 122, 255, 0.85);
 }
-@keyframes mkt-layer-in { to { opacity: 1; } }
+@keyframes mkt-layer-in { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .mkt__layer { animation-duration: 0.01ms; transform: none; }
+}
 
 .mkt__guarantees {
   list-style: none;

@@ -88,7 +88,7 @@ const FORMATS: Fmt[] = [
   { id: 'tailwind', label: 'Tailwind v4', hint: '@theme block, full system', filename: 'tailwind-theme.css', icon: Palette, generator: genTailwind },
   { id: 'shadcn', label: 'shadcn/ui', hint: '--background, --primary, …', filename: 'shadcn-globals.css', icon: Layers, generator: genShadcn },
 ]
-type View = ToolId | FmtId
+type View = ToolId | FmtId | 'cli'
 const isFmt = (v: View): v is FmtId => FORMATS.some((f) => f.id === v)
 
 /* ── Agent rules — the skill body is agent-agnostic (genSkill); only the delivery
@@ -247,6 +247,7 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
               <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} icon={<ToolLogo id={t.id} size={15} />} view={view} onView={setView} />
             ))}
             <div className="modal__navgroup">Coding agents</div>
+            <NavBtn id="cli" label="CLI + MCP" hint="Any terminal · the check loop" icon={<Terminal size={15} strokeWidth={1.75} />} view={view} onView={setView} />
             {TOOLS.filter((t) => t.track === 'agent').map((t) => (
               <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} icon={<ToolLogo id={t.id} size={15} />} view={view} onView={setView} />
             ))}
@@ -256,7 +257,9 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
             ))}
           </nav>
           <div className="modal__pane">
-            {isFmt(view) ? (
+            {view === 'cli' ? (
+              <CliPane cfg={cfg} onToast={onToast} />
+            ) : isFmt(view) ? (
               <FormatsPane
                 cfg={cfg}
                 fmt={view}
@@ -479,6 +482,65 @@ function ToolPane({ tool, cfg, onToast }: { tool: ToolDef; cfg: Config; onToast:
           <Package size={13} strokeWidth={1.75} />
           Download all
         </button>
+      </div>
+      <div className="tool__steps">
+        {steps.map((s) => (
+          <StepCard key={s.n} step={s} onToast={onToast} />
+        ))}
+      </div>
+      <KitProof cfg={cfg} tk={tk} />
+    </div>
+  )
+}
+
+/** CLI + MCP pane — the tool-agnostic agent-native path: the published `uicockpit`
+ *  CLI (init prefilled with THIS kit's hash + check) and the `uicockpit-mcp` config.
+ *  Surfaces the check-loop (the moat) as a first-class destination, not buried in a
+ *  per-tool step. */
+function CliPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void }) {
+  const tk = useMemo(() => buildTokens(cfg), [cfg])
+  const hash = encode(cfg)
+  const mcpConfig = `{
+  "mcpServers": {
+    "uicockpit": { "command": "npx", "args": ["-y", "uicockpit-mcp"] }
+  }
+}`
+  const steps: ToolStep[] = [
+    {
+      n: 1,
+      title: 'Install the kit',
+      desc: <>Pulls <code>uicockpit.tokens.css</code> + <code>uicockpit.contract.json</code> (this kit's hash is baked in) — the contract is what <code>check</code> verifies.</>,
+      code: `npx uicockpit init ${hash}`,
+      codeLabel: 'terminal',
+      inline: true,
+    },
+    {
+      n: 2,
+      title: 'Build, then verify',
+      desc: <>After you (or your agent) build UI, run the verifier to catch drift — hardcoded hex, off-grid spacing, wrong tokens. Add <code>--strict</code> to fail on warnings in CI.</>,
+      code: 'npx uicockpit check',
+      codeLabel: 'terminal',
+      inline: true,
+    },
+    {
+      n: 3,
+      title: 'Or go native — MCP server',
+      desc: <>Wire the MCP server into Claude Code / Cursor / Windsurf so the agent installs, reads and verifies the kit itself — no copy-paste. Tools: <code>install_kit</code> · <code>get_design_context</code> · <code>check_conformance</code>.</>,
+      code: mcpConfig,
+      codeLabel: '.mcp.json · .cursor/mcp.json · claude_desktop_config.json',
+    },
+  ]
+  return (
+    <div className="tool">
+      <div className="tool__head">
+        <span className="tool__logo" aria-hidden="true"><Terminal size={20} strokeWidth={1.9} /></span>
+        <div className="tool__heading">
+          <span className="tool__name">CLI + MCP</span>
+          <span className="tool__tagline">Any terminal — the agent-native path</span>
+        </div>
+        <span className="tool__track tool__track--agent" style={{ marginLeft: 'auto' }}>
+          <Terminal size={12} strokeWidth={2} />Rules + check loop
+        </span>
       </div>
       <div className="tool__steps">
         {steps.map((s) => (
