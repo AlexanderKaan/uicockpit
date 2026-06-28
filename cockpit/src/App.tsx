@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { CockpitApp } from './CockpitApp'
 import { MarketingPage } from './marketing/MarketingPage'
-import { DocsPage } from './marketing/DocsPage'
 import { SeoPage } from './marketing/SeoPage'
 import { findEntry } from './marketing/seo/seoData'
 import './styles/marketing.css'
@@ -9,8 +8,10 @@ import './styles/marketing.css'
 /**
  * Lightweight pathname-based SPA router — no React Router dependency.
  *   /                    → Marketing landing
- *   /docs                → Documentation ("how to use the system")
  *   /app                 → The configurator (also any /app/* future deep links)
+ *   /docs                → Documentation, now rendered INSIDE the app shell
+ *                          (CockpitApp route="docs") — public + indexable, but
+ *                          no longer a marketing-styled page.
  *   /compare/<slug>      → SEO comparison page  ("UIcockpit vs X")
  *   /alternatives/<slug> → SEO alternative page ("X alternative")
  *   /uses/<slug>         → SEO use-case / keyword landing
@@ -39,9 +40,16 @@ function useRoute() {
 export function App() {
   const { path, navigate } = useRoute()
 
-  if (path.startsWith('/app')) return <CockpitApp onHome={() => navigate('/')} />
-  if (path.startsWith('/docs'))
-    return <DocsPage onLaunch={() => navigate('/app')} onHome={() => navigate('/')} navigate={navigate} />
+  // The configurator owns both /app and /docs (docs renders full-stage inside the
+  // app shell). Same component at the tree root → state survives the toggle.
+  if (path.startsWith('/app') || path.startsWith('/docs'))
+    return (
+      <CockpitApp
+        onHome={() => navigate('/')}
+        route={path.startsWith('/docs') ? 'docs' : 'app'}
+        navigate={navigate}
+      />
+    )
 
   // Data-driven SEO routes (comparison / alternative / use-case).
   if (

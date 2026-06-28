@@ -113,6 +113,34 @@
 /* Mobile backdrop behind the panel drawer — only paints on phones (below). */
 .app__scrim { display: none; }
 
+/* === Docs inside the app shell ================================================
+ * The /docs route now renders full-stage INSIDE the app (topbar persists, the
+ * panel + stage are replaced). The docs markup is authored against --mkt-*
+ * tokens (it began life on the marketing site); alias those onto the app's own
+ * --k-* so the page themes WITH the app — dark mode included — instead of the
+ * marketing palette's light-only lock. */
+.app__docs {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--k-bg);
+  color: var(--k-fg);
+  --mkt-bg: var(--k-bg);
+  --mkt-fg: var(--k-fg);
+  --mkt-fg-muted: var(--k-fg-muted);
+  --mkt-fg-faint: var(--k-fg-faint);
+  --mkt-border: var(--k-border);
+  --mkt-surface: var(--k-surface);
+  --mkt-sunken: var(--k-surface-sunken);
+  --mkt-accent: var(--k-primary);
+  --mkt-accent-hover: var(--k-primary-hover);
+}
+/* The TOC's sticky offset + top padding were tuned for the 60px marketing nav;
+ * inside the app the scroll container starts right under the topbar, so pull
+ * them up. */
+.app__docs .docs { padding-top: 28px; }
+.app__docs .docs__toc { top: 20px; max-height: calc(100vh - 120px); }
+
 /* === Mobile (≤768px) — phone layout ===========================================
  * The desktop shell is a two-column row (panel | stage). On a phone that shoves
  * the stage off-screen, so the panel becomes a slide-in DRAWER overlaying the
@@ -150,7 +178,6 @@
    * Prefixed with .topbar to outrank the base single-class display rules. */
   .topbar { padding: 8px 12px; gap: 8px; }
   .topbar .topbar__brand-name,
-  .topbar .topbar__save,
   .topbar .a11y-badge-wrap,
   .topbar .kits-pop-wrap,
   .topbar .topbar__icon-btn--hist,

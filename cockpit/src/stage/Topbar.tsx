@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
+import { AppWindow, BookOpen, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -9,7 +9,6 @@ import { useSavedKits } from '../state/savedKits'
 interface TopbarProps {
   view: ViewKind
   onViewChange: (v: ViewKind) => void
-  saved: boolean
   mode: 'light' | 'dark'
   onToggleMode: () => void
   onShare: () => void
@@ -23,6 +22,9 @@ interface TopbarProps {
   onToggleMenu: () => void
   /** Brand click → back to the marketing home. */
   onHome?: () => void
+  /** Docs link (left zone) — opens the in-app docs view; `docsActive` toggles back. */
+  onDocs: () => void
+  docsActive: boolean
   /** Undo/redo (C2) — config history. Buttons mirror ⌘Z / ⇧⌘Z. */
   onUndo: () => void
   onRedo: () => void
@@ -30,7 +32,7 @@ interface TopbarProps {
   canRedo: boolean
 }
 
-export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
+export function Topbar({ view, onViewChange, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onDocs, docsActive, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -41,23 +43,11 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
   const total = audit.length
   const allPass = pass === total
 
-  // One-time URL-as-save-file hint (C8) — the app's most elegant concept (your
-  // whole kit lives in the URL) is otherwise invisible. Shown once, then remembered.
-  const [urlHint, setUrlHint] = useState(() => {
-    try { return localStorage.getItem('uic.hint.url') !== '1' } catch { return false }
-  })
-  const dismissUrlHint = () => {
-    try { localStorage.setItem('uic.hint.url', '1') } catch { /* private mode */ }
-    setUrlHint(false)
-  }
-
   return (
     <header className="topbar">
-      {/* Left = ambient status zone. "Saved to URL" tells you your work is
-       *  safe; A11Y tells you the kit is accessible. Both are passive
-       *  indicators — no actions. Grouping them here keeps the right side
-       *  pure-action (Share, Export) and removes the visual competition
-       *  the A11Y badge used to wage against the real CTAs. */}
+      {/* Left = brand · controls toggle · Docs · A11Y. The A11Y badge is a passive
+       *  indicator (no action); Docs is a nav link into the in-app guide. Keeping
+       *  them here leaves the right side pure-action (Share, Use kit). */}
       <div className="topbar__left">
         {/* Brand — runs across the top continuously above the floating menu.
          *  Click returns to the marketing home (Linear/Notion convention). */}
@@ -89,15 +79,16 @@ export function Topbar({ view, onViewChange, saved, mode, onToggleMode, onShare,
         >
           <PanelLeft size={15} strokeWidth={1.75} />
         </button>
-        <span className="topbar__save" aria-live="polite">
-          {saved ? 'Saved to URL' : 'Saving…'}
-        </span>
-        {urlHint && (
-          <div className="urlhint" role="status">
-            <span className="urlhint__text">Your whole kit lives in this URL — copy it any time to save or share. No account needed.</span>
-            <button type="button" className="urlhint__btn" onClick={dismissUrlHint}>Got it</button>
-          </div>
-        )}
+        <button
+          type="button"
+          className={`topbar__doc-link ${docsActive ? 'topbar__doc-link--on' : ''}`}
+          onClick={onDocs}
+          aria-pressed={docsActive}
+          title="How to use UIcockpit"
+        >
+          <BookOpen size={14} strokeWidth={1.75} />
+          <span>Docs</span>
+        </button>
         <A11yBadge audit={audit} pass={pass} total={total} allPass={allPass} />
       </div>
       <div className="topbar__center">

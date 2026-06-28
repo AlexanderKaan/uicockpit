@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { MktFooter } from './MktFooter'
 
-interface DocsPageProps {
-  onLaunch: () => void
-  onHome: () => void
-  navigate: (to: string) => void
+interface DocsBodyProps {
+  /** Click the "/app" links / final CTA → into the configurator. Optional: when
+   *  absent the anchors fall back to a normal navigation. */
+  onLaunch?: () => void
 }
 
 /** Section registry — drives BOTH the sticky TOC and the scroll-spy observer,
@@ -24,12 +23,15 @@ const SECTIONS = [
 ] as const
 
 /**
- * Documentation page at /docs — "how to use the system". A third route next to
- * `/` (marketing) and `/app` (configurator). Evergreen + framework-neutral: it
+ * The docs BODY — "how to use the system". Evergreen + framework-neutral: it
  * explains the SYSTEM, not one generated kit, so nothing here depends on a
  * config. The left TOC is sticky and scroll-spies the active section.
+ *
+ * It renders chrome-less (just the `.docs` grid) so the app shell can host it
+ * full-stage at /docs (the topbar persists). `.app__docs` aliases the --mkt-*
+ * tokens onto --k-* so it themes with the app.
  */
-export function DocsPage({ onLaunch, onHome, navigate }: DocsPageProps) {
+export function DocsBody({ onLaunch }: DocsBodyProps) {
   const [active, setActive] = useState<string>(SECTIONS[0].id)
 
   // Scroll-spy: highlight the TOC entry whose section is near the top of the
@@ -62,25 +64,7 @@ export function DocsPage({ onLaunch, onHome, navigate }: DocsPageProps) {
   }
 
   return (
-    <div className="mkt">
-      {/* Nav — same shell as the landing page for visual continuity. */}
-      <header className="mkt__nav">
-        <div className="mkt__container mkt__nav-inner">
-          <a href="/" className="mkt__brand" onClick={(e) => { e.preventDefault(); onHome() }}>
-            <img src="/logo.svg" alt="" width={28} height={28} className="mkt__brand-logo" />
-            UIcockpit
-          </a>
-          <nav className="mkt__nav-links">
-            <a href="/" className="mkt__nav-link" onClick={(e) => { e.preventDefault(); onHome() }}>Home</a>
-            <a href="/docs" className="mkt__nav-link mkt__nav-link--active" onClick={(e) => e.preventDefault()}>Docs</a>
-          </nav>
-          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
-            Build my UI kit
-          </button>
-        </div>
-      </header>
-
-      <div className="docs">
+    <div className="docs">
         {/* Sticky table of contents */}
         <aside className="docs__toc" aria-label="On this page">
           <div className="docs__toc-head">On this page</div>
@@ -111,7 +95,7 @@ export function DocsPage({ onLaunch, onHome, navigate }: DocsPageProps) {
               keep tweaking (see <a href="#livekit" className="docs__link" onClick={(e) => jump(e, 'livekit')}>Live kit</a>).
               This page explains how the system is built and how to apply it — the
               configurator itself lives at{' '}
-              <a href="/app" className="docs__link" onClick={(e) => { e.preventDefault(); onLaunch() }}>/app</a>.
+              <a href="/app" className="docs__link" onClick={(e) => { if (onLaunch) { e.preventDefault(); onLaunch() } }}>/app</a>.
             </p>
           </div>
 
@@ -140,7 +124,7 @@ export function DocsPage({ onLaunch, onHome, navigate }: DocsPageProps) {
             <h2>Quick start</h2>
             <ol className="docs__steps">
               <li>
-                <strong>Configure.</strong> Open <a href="/app" className="docs__link" onClick={(e) => { e.preventDefault(); onLaunch() }}>the
+                <strong>Configure.</strong> Open <a href="/app" className="docs__link" onClick={(e) => { if (onLaunch) { e.preventDefault(); onLaunch() } }}>the
                 app</a>, pick a Style and Color theme, then tweak radius, density,
                 motion and type until the live preview feels right. Your whole
                 config lives in the URL hash — copy the link to save or share it.
@@ -523,15 +507,12 @@ npx uicockpit check        # catch any drift from the contract`}</code></pre>
               design and code read from one source.
             </p>
             <div className="docs__cta">
-              <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
+              <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={() => onLaunch?.()}>
                 Build my UI kit →
               </button>
             </div>
           </section>
         </main>
       </div>
-
-      <MktFooter navigate={navigate} />
-    </div>
   )
 }

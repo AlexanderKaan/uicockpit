@@ -8,6 +8,7 @@ import { useConfig } from './state/useConfig'
 import { randomKit } from './state/randomKit'
 import { DEFAULT_CONFIG } from './tokens/defaults'
 import { Toast } from './export/Toast'
+import { DocsBody } from './marketing/DocsBody'
 
 // Lazy-load — export generators + modal only ship when user opens it
 const ExportModal = lazy(() =>
@@ -17,6 +18,11 @@ const ExportModal = lazy(() =>
 interface CockpitAppProps {
   /** Called when user clicks the brand — sends them back to /. */
   onHome?: () => void
+  /** Which surface the route asks for. 'docs' replaces the stage with the in-app
+   *  guide (the /docs route); 'app' is the configurator. */
+  route?: 'app' | 'docs'
+  /** Push a new path (the app's SPA router) — drives the Docs link + deep-links. */
+  navigate?: (to: string) => void
 }
 
 // View Transitions API — Chrome/Edge/Safari 18+, falls back to instant switch elsewhere.
@@ -33,8 +39,9 @@ function startViewTransition(cb: () => void): void {
  *  Layout: a full-width top bar (brand · view switcher · actions) runs across
  *  the whole app; below it the stage fills the width and the control menu
  *  *floats* over the top-left (absolute), never reserving a column. */
-export function CockpitApp({ onHome }: CockpitAppProps = {}) {
+export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps = {}) {
   const { cfg, tokens, dispatch, undo, redo, canUndo, canRedo } = useConfig()
+  const docsActive = route === 'docs'
   // Default closed on phones — there the panel becomes an overlay drawer, so the
   // stage gets the full width; open inline as a column on desktop.
   const [menuOpen, setMenuOpen] = useState(() =>
@@ -44,7 +51,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   // runs concrete→abstract — real, instantly-themeable surfaces are the hook;
   // Foundations stays the inspect layer one tab away.
   const [view, setView] = useState<ViewKind>('components')
-  const [saved, setSaved] = useState(true)
   const [exportOpen, setExportOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -58,14 +64,10 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
     [cfg.mode],
   )
 
-  // Visual save indicator — flips to "Saving…" briefly after each cfg change
-  useEffect(() => {
-    setSaved(false)
-    const t = setTimeout(() => setSaved(true), 220)
-    return () => clearTimeout(t)
-  }, [cfg])
-
   const handleViewChange = (next: ViewKind) => {
+    // From the docs view, picking a catalog tab returns to the configurator on
+    // that view (the URL leaves /docs).
+    if (docsActive) navigate?.('/app')
     if (next === view) return
     startViewTransition(() => setView(next))
   }
@@ -115,7 +117,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
       <Topbar
         view={view}
         onViewChange={handleViewChange}
-        saved={saved}
         mode={cfg.mode}
         onToggleMode={() =>
           dispatch({ type: 'SET', patch: { mode: cfg.mode === 'light' ? 'dark' : 'light' } })
@@ -128,32 +129,43 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onHome={onHome}
+        onDocs={() => navigate?.(docsActive ? '/app' : '/docs')}
+        docsActive={docsActive}
         onUndo={undo}
         onRedo={redo}
         canUndo={canUndo}
         canRedo={canRedo}
       />
       <div className="app__body">
-        {/* Mobile-only backdrop behind the drawer (display:none on desktop). */}
-        {menuOpen && (
-          <div className="app__scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />
+        {docsActive ? (
+          /* The in-app guide — full-stage, the topbar persists above. */
+          <div className="app__docs">
+            <DocsBody onLaunch={() => navigate?.('/app')} />
+          </div>
+        ) : (
+          <>
+            {/* Mobile-only backdrop behind the drawer (display:none on desktop). */}
+            {menuOpen && (
+              <div className="app__scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />
+            )}
+            {menuOpen && (
+              <Panel
+                cfg={cfg}
+                tokens={tokens}
+                dispatch={dispatch}
+                onCollapse={() => setMenuOpen(false)}
+                onRandomize={onRandomize}
+                onReset={onReset}
+              />
+            )}
+            <Stage
+              cfg={cfg}
+              tokens={tokens}
+              view={view}
+              onViewChange={handleViewChange}
+            />
+          </>
         )}
-        {menuOpen && (
-          <Panel
-            cfg={cfg}
-            tokens={tokens}
-            dispatch={dispatch}
-            onCollapse={() => setMenuOpen(false)}
-            onRandomize={onRandomize}
-            onReset={onReset}
-          />
-        )}
-        <Stage
-          cfg={cfg}
-          tokens={tokens}
-          view={view}
-          onViewChange={handleViewChange}
-        />
       </div>
       {exportOpen && (
         <Suspense fallback={null}>
