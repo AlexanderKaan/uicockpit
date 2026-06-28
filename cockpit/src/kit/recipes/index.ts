@@ -4941,6 +4941,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-color: var(--k-primary);
   position: relative;
 }
+/* The not-yet / future state (the 3rd checklist step beside --done / --current),
+   so a status tracker reads done › current › upcoming without hand-rolled greys. */
+.timeline__item--upcoming .timeline__title { color: var(--k-fg-muted); }
+.timeline__item--upcoming .timeline__dot { color: var(--k-fg-faint); }
 .timeline__pulse {
   width: 8px;
   height: 8px;

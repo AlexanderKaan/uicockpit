@@ -4195,7 +4195,7 @@ function TimelineCard() {
             <div className="timeline__desc">348 / 412 passed</div>
           </div>
         </li>
-        <li className="timeline__item">
+        <li className="timeline__item timeline__item--upcoming">
           <span className="timeline__dot" />
           <div className="timeline__body">
             <div className="timeline__head"><span className="timeline__title">Build artifacts</span></div>
