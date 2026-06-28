@@ -110,4 +110,15 @@ describe('uicockpit check — the contract verifier (Fase D4)', () => {
       expect(v.filter((x) => x.check === 'no-raw-color')).toEqual([])
     })
   })
+
+  // Phase 3b — the `prefix` adoption field (class-collision namespacing).
+  describe('prefix (brownfield class namespacing)', () => {
+    it('still polices modifiers on a prefixed kit class', () => {
+      const cfg = { prefix: 'uic-' }
+      const bad = checkContract(contract, [{ path: 'a.tsx', content: `<a className="uic-btn--bogus" />` }], cfg) as Violation[]
+      expect(bad.find((x) => x.check === 'known-modifiers')).toBeTruthy()
+      const ok = checkContract(contract, [{ path: 'b.tsx', content: `<a className="uic-btn--primary" />` }], cfg) as Violation[]
+      expect(ok.filter((x) => x.check === 'known-modifiers')).toEqual([])
+    })
+  })
 })

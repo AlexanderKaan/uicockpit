@@ -31,6 +31,35 @@ export function aliasBlock(aliasMap) {
   return `\n/* uicockpit.json aliasMap — kit tokens adopt your existing values (brownfield).\n   The referenced custom properties must be defined in your own CSS. */\n:root {\n${lines.join('\n')}\n}\n`
 }
 
+/* The mode hooks are conventions, not recipe classes — never prefix them even if
+ * a recipe references them in a selector. */
+const PREFIX_SKIP = new Set(['dark', 'light'])
+
+/**
+ * Namespace every kit class in the CSS (Phase 3b `prefix`, the shadcn model) to
+ * dodge collisions with the host app's own class names. DRIVEN BY the contract's
+ * class vocabulary: only a class whose ROOT the kit actually defines is rewritten,
+ * so the host's classes, utility classes and the `.dark`/`.light` mode hooks are
+ * left untouched. A word boundary stops `.in` matching inside `.inset`.
+ * @param {string} css
+ * @param {string} prefix       e.g. 'uic-' ('' → no-op)
+ * @param {Set<string>} kitRoots  Object.keys(contract.components.classes)
+ * @returns {string}
+ */
+export function prefixCss(css, prefix, kitRoots) {
+  if (!prefix || !kitRoots || !kitRoots.size) return css
+  return css.replace(/\.(-?[A-Za-z_][\w-]*)/g, (m, cls) => {
+    const root = cls.split(/__|--/)[0]
+    if (PREFIX_SKIP.has(root) || !kitRoots.has(root)) return m
+    return `.${prefix}${cls}`
+  })
+}
+
+/** A short banner prepended to AGENTS.md so the agent writes prefixed classes. */
+function prefixNote(prefix) {
+  return `> **Class prefix:** this kit is installed with the prefix \`${prefix}\`. Write\n> every kit class with it — \`${prefix}btn\`, \`${prefix}card__head\`, \`${prefix}btn--primary\`.\n> The contract and \`uicockpit check\` know the prefix (from uicockpit.json).\n\n`
+}
+
 async function fetchText(url) {
   let res
   try {
@@ -61,18 +90,22 @@ export async function runInit(argv) {
     return 2
   }
 
-  // An existing uicockpit.json is the apply-point for the brownfield aliasMap: the
-  // FIRST init scaffolds it empty, you fill aliasMap, then `init --force` re-applies
-  // (appends the overrides to the fetched tokens.css). Malformed → ignore.
+  // An existing uicockpit.json is the apply-point for the brownfield transforms:
+  // the FIRST init scaffolds it empty, you fill aliasMap / prefix, then `init
+  // --force` re-applies. Malformed → ignore.
   let aliasMap = {}
+  let prefix = ''
   if (existsSync('uicockpit.json')) {
-    try { aliasMap = JSON.parse(readFileSync('uicockpit.json', 'utf8')).aliasMap || {} }
-    catch { /* keep {} */ }
+    try {
+      const cfg = JSON.parse(readFileSync('uicockpit.json', 'utf8'))
+      aliasMap = cfg.aliasMap || {}
+      prefix = typeof cfg.prefix === 'string' ? cfg.prefix : ''
+    } catch { /* keep defaults */ }
   }
   const aliases = aliasBlock(aliasMap)
 
   const targets = [
-    { file: 'uicockpit.tokens.css', url: `${base}/k/${hash}.css`, append: aliases },
+    { file: 'uicockpit.tokens.css', url: `${base}/k/${hash}.css` },
     { file: 'uicockpit.contract.json', url: `${base}/k/${hash}.contract.json` },
     { file: 'AGENTS.md', url: `${base}/k/${hash}.rules.md` },
     { file: 'design.md', url: `${base}/k/${hash}.design.md` },
@@ -85,18 +118,38 @@ export async function runInit(argv) {
     }
   }
 
+  // Fetch everything first — the prefix rewrite of the CSS needs the contract's
+  // class vocabulary, so we can't write file-by-file.
+  const fetched = {}
   for (const t of targets) {
-    let text
     try {
-      text = await fetchText(t.url)
+      fetched[t.file] = await fetchText(t.url)
     } catch (err) {
       console.error(`✗ ${err.message}`)
       console.error('  Check the kit hash, or your network connection.')
       return 2
     }
-    if (t.append) text += t.append
+  }
+
+  // Kit roots drive a SAFE prefix rewrite (only classes the kit defines).
+  let kitRoots = new Set()
+  try {
+    kitRoots = new Set(Object.keys(JSON.parse(fetched['uicockpit.contract.json']).components?.classes || {}))
+  } catch { /* no contract classes → prefix becomes a no-op */ }
+
+  for (const t of targets) {
+    let text = fetched[t.file]
+    let note = ''
+    if (t.file === 'uicockpit.tokens.css') {
+      text = prefixCss(text, prefix, kitRoots) + aliases
+      const tags = []
+      if (prefix) tags.push(`prefix '${prefix}'`)
+      if (Object.keys(aliasMap).length) tags.push(`${Object.keys(aliasMap).length} aliasMap override${Object.keys(aliasMap).length === 1 ? '' : 's'}`)
+      if (tags.length) note = ` (+ ${tags.join(', ')})`
+    }
+    if (t.file === 'AGENTS.md' && prefix) text = prefixNote(prefix) + text
     writeFileSync(t.file, text)
-    console.log(`  ✓ wrote ${t.file}${t.append ? ` (+ ${Object.keys(aliasMap).length} aliasMap override${Object.keys(aliasMap).length === 1 ? '' : 's'})` : ''}`)
+    console.log(`  ✓ wrote ${t.file}${note}`)
   }
 
   // Scaffold the adoption config (the shadcn components.json model). It is local +

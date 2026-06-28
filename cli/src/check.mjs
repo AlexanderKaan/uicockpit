@@ -31,6 +31,10 @@ export function checkContract(contract, files, config = {}) {
   // declared list compares against the literal the regex catches.
   const normColor = (c) => c.replace(/\s+/g, '').toLowerCase()
   const allowColors = new Set((config.allowColors || []).map(normColor))
+  // Class prefix (uicockpit.json) — kit classes are written `<prefix>btn` in this
+  // codebase. Strip it before vocabulary lookups so the kit-class checks still fire.
+  const prefix = typeof config.prefix === 'string' ? config.prefix : ''
+  const rxPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const ruleBy = {}
   for (const r of contract.rules || []) if (r.check) ruleBy[r.check] = r
   const sev = (check) => ruleBy[check]?.severity || 'warn'
@@ -58,17 +62,21 @@ export function checkContract(contract, files, config = {}) {
       // modifier the contract defines for that root. Consumer-owned classes
       // (unknown root) are ignored — this only polices the kit's own vocabulary.
       for (const m of text.matchAll(/class(?:Name)?\s*=\s*["'`]([^"'`]+)["'`]/g)) {
-        for (const cls of m[1].split(/\s+/)) {
-          const dd = cls.indexOf('--')
+        for (const raw of m[1].split(/\s+/)) {
+          const dd = raw.indexOf('--')
           if (dd === -1) continue
-          const base = cls.slice(0, dd)
-          const mod = cls.slice(dd + 2)
+          // Strip the configured prefix before reading the kit vocabulary.
+          const cls = prefix && raw.startsWith(prefix) ? raw.slice(prefix.length) : raw
+          const cdd = cls.indexOf('--')
+          if (cdd === -1) continue
+          const base = cls.slice(0, cdd)
+          const mod = cls.slice(cdd + 2)
           const uu = base.indexOf('__')
           const root = uu === -1 ? base : base.slice(0, uu)
           const def = classes[root]
           if (!def) continue // not a kit root → consumer's own class
           if (!def.modifiers.includes(mod)) {
-            add('known-modifiers', path, ln, `.${cls}: '${mod}' is not a defined modifier of .${root}`)
+            add('known-modifiers', path, ln, `.${raw}: '${mod}' is not a defined modifier of .${prefix}${root}`)
           }
         }
       }
@@ -124,7 +132,8 @@ export function checkContract(contract, files, config = {}) {
         for (const [cls, spec] of Object.entries(compositions)) {
           // A rule that targets the bundle's OWN class is a legit override, not a
           // re-roll — skip it (e.g. `.eyebrow { … }`, `.card .eyebrow { … }`).
-          if (new RegExp(`\\.${cls}(?![\\w-])`).test(selector)) continue
+          // The prefix is optional so a prefixed override (`.uic-eyebrow`) is caught too.
+          if (new RegExp(`\\.(?:${rxPrefix})?${cls}(?![\\w-])`).test(selector)) continue
           let hits = 0
           for (const s of spec.signature) if (decls.has(s)) hits++
           if (hits >= spec.minMatch) {
@@ -132,7 +141,7 @@ export function checkContract(contract, files, config = {}) {
             // match swallows any blanked leading comment/whitespace.
             const line = scan.slice(0, m.index + m[1].length).split('\n').length
             add('composition-reroll', path, line,
-              `'${selector}' re-implements the .${cls} composition utility (${hits}/${spec.signature.length} of its declarations) — use the .${cls} class instead of rebuilding the bundle`)
+              `'${selector}' re-implements the .${prefix}${cls} composition utility (${hits}/${spec.signature.length} of its declarations) — use the .${prefix}${cls} class instead of rebuilding the bundle`)
             break // one composition warning per rule is enough
           }
         }

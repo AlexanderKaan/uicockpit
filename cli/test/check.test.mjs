@@ -83,6 +83,23 @@ test('does not flag the consumer overriding the kit class itself', () => {
   assert.deepEqual(v.filter((x) => x.check === 'composition-reroll'), [])
 })
 
+test('prefix: a prefixed kit class is still policed for modifiers', () => {
+  const cfg = { prefix: 'uic-' }
+  // bogus modifier on the prefixed btn → still flagged
+  const bad = checkContract(contract, [{ path: 'a.tsx', content: '<a className="uic-btn--bogus" />' }], cfg)
+  assert.ok(bad.find((x) => x.check === 'known-modifiers'))
+  // a defined modifier → clean
+  const ok = checkContract(contract, [{ path: 'b.tsx', content: '<a className="uic-btn--primary" />' }], cfg)
+  assert.deepEqual(ok.filter((x) => x.check === 'known-modifiers'), [])
+})
+
+test('prefix: overriding the prefixed bundle class is not a re-roll', () => {
+  const cfg = { prefix: 'uic-' }
+  const v = checkContract(contract, [{ path: 'g.css', content:
+    '.uic-eyebrow { letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted); font-size: var(--k-type-eyebrow); }' }], cfg)
+  assert.deepEqual(v.filter((x) => x.check === 'composition-reroll'), [])
+})
+
 test('allowColors (uicockpit.json) exempts a sanctioned foreign brand colour', () => {
   const css = [{ path: 'h.css', content: '.brand { color: #1da1f2; } .oops { color: #ff0000; }' }]
   // No config → both flagged.
