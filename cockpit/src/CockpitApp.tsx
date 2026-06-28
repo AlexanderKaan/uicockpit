@@ -1,4 +1,5 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { buildTokens } from './tokens/buildTokens'
 import { Panel } from './panel/Panel'
 import { Stage, type ViewKind } from './stage/Stage'
 import { Topbar } from './stage/Topbar'
@@ -47,6 +48,15 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const [exportOpen, setExportOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+
+  // Dogfood: the configurator chrome runs on UIcockpit's OWN default kit. We emit
+  // the DEFAULT_CONFIG tokens (in the current light/dark mode) onto .app, and the
+  // chrome's --app-* vars alias these --k-* (see chrome.css). The live preview
+  // overrides --k-* on .cockpit-preview, so it still shows the user's kit.
+  const chromeTokens = useMemo(
+    () => buildTokens({ ...DEFAULT_CONFIG, mode: cfg.mode }).vars as CSSProperties,
+    [cfg.mode],
+  )
 
   // Visual save indicator — flips to "Saving…" briefly after each cfg change
   useEffect(() => {
@@ -101,7 +111,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   }, [])
 
   return (
-    <div className={`app ${menuOpen ? '' : 'app--menu-closed'} ${cfg.mode === 'dark' ? 'app--theme-dark' : ''}`}>
+    <div className={`app ${menuOpen ? '' : 'app--menu-closed'} ${cfg.mode === 'dark' ? 'app--theme-dark' : ''}`} style={chromeTokens}>
       <Topbar
         view={view}
         onViewChange={handleViewChange}
