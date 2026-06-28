@@ -26,6 +26,10 @@ interface ChartFrameProps {
   labels?: string[]
   height?: number
   showLegend?: boolean
+  /** No-data state — a centred placeholder instead of an empty plot. */
+  empty?: boolean
+  /** Async fetch in flight — skeleton bars instead of the chart. */
+  loading?: boolean
 }
 
 const chartVar = (i: number) => `var(--k-chart-${(i % 6) + 1})`
@@ -47,7 +51,7 @@ function niceMax(raw: number): number {
   return Math.ceil(raw / pow) * pow
 }
 
-export function ChartFrame({ type, series, labels, height = H, showLegend = true }: ChartFrameProps) {
+export function ChartFrame({ type, series, labels, height = H, showLegend = true, empty = false, loading = false }: ChartFrameProps) {
   // Hovered column index (cartesian) — drives the cursor + tooltip.
   const [hover, setHover] = useState<number | null>(null)
   // Unique-per-instance id for the area gradient defs (colons stripped so the
@@ -80,6 +84,31 @@ export function ChartFrame({ type, series, labels, height = H, showLegend = true
     const pointed = type === 'line' || type === 'area' || type === 'stackedArea'
     const i = pointed ? Math.round(fx * (cols - 1)) : Math.floor(fx * cols)
     setHover(Math.max(0, Math.min(cols - 1, i)))
+  }
+
+  // Designed async/empty states (law 6) — render in place of the plot.
+  if (loading) {
+    return (
+      <div className="chart" aria-busy="true">
+        <div className="chart__loading" style={{ height }}>
+          {[62, 88, 46, 96, 70, 52, 80].map((h, i) => (
+            <span key={i} className="sk chart__loading-bar" style={{ height: `${h}%` }} />
+          ))}
+        </div>
+      </div>
+    )
+  }
+  if (empty || cols === 0 || series.length === 0) {
+    return (
+      <div className="chart">
+        <div className="chart__empty" style={{ minHeight: height }}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 3v18h18" /><path d="M7 14l3-3 3 2 4-5" />
+          </svg>
+          <span>No data to display</span>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -1097,6 +1097,7 @@ function ChartCard() {
   // derived chart palette (--k-chart-1..6). The switcher proves the palette
   // reads across every shape a real dashboard ships.
   const [type, setType] = useState<ChartType>('area')
+  const [view, setView] = useState<'chart' | 'empty' | 'loading'>('chart')
   const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const series =
     type === 'donut'
@@ -1108,14 +1109,16 @@ function ChartCard() {
   const donutLabels = ['Direct', 'Search', 'Social', 'Referral']
   return (
     <Card wide title="Traffic by source" desc="One ChartFrame, six render modes — gridlines, axes, hover tooltips.">
-      <div className="segctrl" style={{ marginBottom: 10 }}>
+      <div className="segctrl" style={{ marginBottom: 10, flexWrap: 'wrap' }}>
         {([['line', 'Line'], ['area', 'Area'], ['bar', 'Bar'], ['stacked', 'Stacked'], ['stackedArea', 'Stacked area'], ['donut', 'Donut']] as const).map(([t, lbl]) => (
-          <button key={t} className={`segctrl__btn ${type === t ? 'segctrl__btn--on' : ''}`} onClick={() => setType(t)}>
+          <button key={t} className={`segctrl__btn ${view === 'chart' && type === t ? 'segctrl__btn--on' : ''}`} onClick={() => { setType(t); setView('chart') }}>
             {lbl}
           </button>
         ))}
+        <button className={`segctrl__btn ${view === 'loading' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('loading')}>Loading</button>
+        <button className={`segctrl__btn ${view === 'empty' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('empty')}>Empty</button>
       </div>
-      <ChartFrame type={type} height={140} labels={type === 'donut' ? donutLabels : labels} series={series} />
+      <ChartFrame type={type} height={140} labels={type === 'donut' ? donutLabels : labels} series={series} empty={view === 'empty'} loading={view === 'loading'} />
     </Card>
   )
 }
@@ -3157,9 +3160,16 @@ function ComboboxCard() {
   const FRAMEWORKS = ['Next.js', 'Remix', 'Astro', 'SvelteKit', 'Nuxt', 'Vite', 'Solid Start']
   const [q, setQ] = useState('')
   const [picked, setPicked] = useState<string | null>('Next.js')
+  const [loading, setLoading] = useState(false)
   // Custom Select dismiss — outside-click + Escape via the shared controller.
   const { open, setOpen, ref } = useDropdown()
   const matches = FRAMEWORKS.filter((f) => f.toLowerCase().includes(q.toLowerCase()))
+  // Simulate a debounced async fetch so the loading row is demonstrable.
+  const onQ = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQ(e.target.value)
+    setLoading(true)
+    window.setTimeout(() => setLoading(false), 450)
+  }
   return (
     <Card title="Framework" desc="Choose a starter for your app.">
       <div className="combobox" ref={ref}>
@@ -3171,9 +3181,11 @@ function ComboboxCard() {
           <div className="combobox__pop">
             <div className="cmdp__in" style={{ borderBottom: 'var(--k-divider)' }}>
               <Icon name="search" />
-              <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" />
+              <input autoFocus value={q} onChange={onQ} placeholder="Filter…" />
             </div>
-            {matches.length === 0 ? (
+            {loading ? (
+              <div className="combobox__loading"><span className="spinner spinner--sm" aria-hidden="true" />Searching…</div>
+            ) : matches.length === 0 ? (
               <div className="combobox__empty">No results.</div>
             ) : (
               <ul className="combobox__list" role="listbox" aria-label="Frameworks">
@@ -3786,7 +3798,9 @@ function NumberInputCard() {
 function PasswordInputCard() {
   const [show, setShow] = useState(false)
   const [pwd, setPwd] = useState('Sunset-42!')
+  const [caps, setCaps] = useState(false)
   const strength = Math.min(3, Math.floor(pwd.length / 4))
+  const onCaps = (e: React.KeyboardEvent<HTMLInputElement>) => setCaps(e.getModifierState('CapsLock'))
   return (
     <Card title="Set a password" desc="Use at least 8 characters.">
       <div className="pwinput">
@@ -3795,6 +3809,8 @@ function PasswordInputCard() {
           className="pwinput__field"
           value={pwd}
           onChange={(e) => setPwd(e.target.value)}
+          onKeyDown={onCaps}
+          onKeyUp={onCaps}
           placeholder="At least 8 characters"
         />
         <button className="pwinput__eye" onClick={() => setShow((v) => !v)} aria-label={show ? 'Hide' : 'Show'}>
@@ -3805,6 +3821,12 @@ function PasswordInputCard() {
           )}
         </button>
       </div>
+      {caps && (
+        <div className="pwinput__capslock" role="status">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 4 11h4v5h8v-5h4z" /><path d="M8 20h8" /></svg>
+          Caps Lock is on
+        </div>
+      )}
       <div className="pwinput__strength">
         {[0, 1, 2].map((i) => (
           <span key={i} className={'pwinput__bar' + (i <= strength ? ' pwinput__bar--on' : '')} data-level={strength} />
@@ -3855,6 +3877,12 @@ function SearchInputCard() {
           ))}
         </div>
       )}
+      {/* Loading state — a spinner replaces the magnifier while results fetch. */}
+      <span className="eyebrow" style={{ marginTop: 'var(--k-s-12)' }}>Loading</span>
+      <div className="searchinput" aria-busy="true">
+        <span className="spinner spinner--sm" aria-hidden="true" />
+        <input className="searchinput__field" defaultValue="invoices" placeholder="Search…" readOnly aria-label="Search (loading)" />
+      </div>
     </Card>
   )
 }

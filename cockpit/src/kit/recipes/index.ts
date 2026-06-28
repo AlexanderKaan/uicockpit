@@ -2740,6 +2740,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * The SVG fills its frame; series colours come straight from the palette. */
 .chart { display: flex; flex-direction: column; gap: var(--k-s-2); }
 .chart__canvas { width: 100%; position: relative; }
+/* No-data state — a centred placeholder filling the plot area, not a blank box. */
+.chart__empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--k-s-8); padding: var(--k-s-16);
+  color: var(--k-fg-faint); font-size: var(--k-type-small); text-align: center;
+}
+.chart__empty svg { width: 1.75rem; height: 1.75rem; opacity: 0.55; }
+/* Loading state — skeleton bars (reuse .sk shimmer) while data fetches. */
+.chart__loading { display: flex; align-items: flex-end; gap: var(--k-s-8); padding: var(--k-s-8) 0; }
+.chart__loading-bar { flex: 1; min-width: 0; border-radius: var(--k-radius-sm) var(--k-radius-sm) 0 0; }
 .chart__svg { width: 100%; height: 100%; display: block; }
 .chart__svg--donut { max-width: 220px; margin: 0 auto; }
 .chart__axis { stroke: var(--k-border); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -2947,7 +2957,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .combobox__item:hover, .combobox__item--on { background: var(--k-state-hover); }
 .combobox__item--selected .combobox__check { color: var(--k-primary); }
 .combobox__check { width: 14px; flex: none; color: transparent; }
-.combobox__empty { padding: var(--k-s-10); text-align: center; color: var(--k-fg-faint); font-size: var(--k-type-small); }`,
+.combobox__empty { padding: var(--k-s-10); text-align: center; color: var(--k-fg-faint); font-size: var(--k-type-small); }
+/* Loading: an async result fetch in flight — a spinner + label instead of a blank
+ * pop or a premature "no results". Swap to __empty once the (empty) results land. */
+.combobox__loading { display: flex; align-items: center; justify-content: center; gap: var(--k-s-8); padding: var(--k-s-10); color: var(--k-fg-muted); font-size: var(--k-type-small); }`,
   },
   {
     id: 'dropdown-menu',
@@ -4440,7 +4453,19 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-caption);
   color: var(--k-fg-muted);
   margin-left: var(--k-s-6);
-}`,
+}
+/* Caps-lock warning — show when the input detects Caps Lock (getModifierState).
+ * A quiet warning-toned hint below the field, not an error (the password may be
+ * intentional). Render/remove it from the consumer's keydown/keyup handler. */
+.pwinput__capslock {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-6);
+  margin-top: var(--k-s-6);
+  font-size: var(--k-type-caption);
+  color: var(--k-warning-soft-fg);
+}
+.pwinput__capslock svg { width: var(--k-icon-xs); height: var(--k-icon-xs); flex: none; }`,
   },
   {
     id: 'searchinput',
@@ -4464,6 +4489,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-muted);
   flex-shrink: 0;
 }
+/* Loading: render a <span class="spinner spinner--sm"> in the leading slot in
+ * place of the magnifier while results are fetched (async search). */
+.searchinput > .spinner { flex: none; }
 .searchinput__field { padding-left: 0; padding-right: 0; }
 .searchinput__clear {
   flex-shrink: 0;
