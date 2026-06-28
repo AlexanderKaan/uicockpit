@@ -199,6 +199,11 @@ export async function runCheck(argv) {
     console.log(`✗ ${res.errors.length + (strict ? res.warns.length : 0)} violation(s) of your design contract`)
     return 1
   }
-  console.log('✓ conforms to the design contract')
+  if (res.warns.length) {
+    // Honest: no hard violations, but don't claim full conformance over warnings.
+    console.log(`✓ no errors · ${res.warns.length} warning${res.warns.length === 1 ? '' : 's'} to review (--strict to enforce)`)
+  } else {
+    console.log('✓ conforms to the design contract')
+  }
   return 0
 }

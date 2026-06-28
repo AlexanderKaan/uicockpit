@@ -136,7 +136,9 @@ server.registerTool(
     const head = `uicockpit check — ${res.kit}: scanned ${res.fileCount} files\n${res.errors.length} error · ${res.warns.length} warn`
     const verdict = failed
       ? `\n\n✗ ${res.errors.length + (strict ? res.warns.length : 0)} violation(s) — fix these so the UI stays on-system.`
-      : '\n\n✓ conforms to the design contract.'
+      : res.warns.length
+        ? `\n\n✓ no errors · ${res.warns.length} warning${res.warns.length === 1 ? '' : 's'} to review (set strict to enforce).`
+        : '\n\n✓ conforms to the design contract.'
     return text((lines.length ? lines.join('\n') + '\n\n' : '') + head + verdict)
   },
 )
