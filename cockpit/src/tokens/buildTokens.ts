@@ -1210,6 +1210,16 @@ export function buildTokens(cfg: Config): Tokens {
       // ~15 sites with no token; unified to a single airy-caps value so caps
       // tracking reads consistently and is tunable in one place.
       '--k-track-eyebrow': '0.06em',
+      // Label-case treatment (the labelCase knob) — drives the EXISTING UI-label
+      // hooks `--k-ui-transform` / `--k-ui-tracking` that 7 chrome recipes already
+      // read (.btn · .lab · .badge · .tab · .navrow · .segctrl__btn · .dl). When
+      // 'caps', that whole label tier goes uppercase + lightly tracked (the
+      // industrial / terminal look, e.g. the "Sera" kit). Default 'sentence' resolves
+      // to none/0 — identical to the recipes' own fallbacks, so every other kit is
+      // byte-for-byte unchanged. Body text, page/card titles and numbers don't read
+      // these hooks, so they always stay as authored.
+      '--k-ui-transform': cfg.labelCase === 'caps' ? 'uppercase' : 'none',
+      '--k-ui-tracking': cfg.labelCase === 'caps' ? '0.05em' : '0',
       // Negative tracking for tight headings (--tight) + display figures (--display).
       // Was copied as raw -0.01em / -0.02em em-literals at every heading/stat/price.
       '--k-track-tight': '-0.01em',

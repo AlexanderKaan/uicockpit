@@ -57,6 +57,10 @@ export type Scale = 'compact' | 'default' | 'comfortable'
  * small/eyebrow) proportionally. md is the sensible default (body 14, nav 14,
  * h3 16 — aligned with shadcn/Material's 14px UI floor). */
 export type TypeScale = 'sm' | 'md' | 'lg' | 'xl'
+/** Label case — the UI-chrome label tier (eyebrows, table heads, tab/nav + button
+ *  labels): 'sentence' = as-authored; 'caps' = uppercase + tracking (the industrial
+ *  / terminal look). Body text, page headlines and numbers never transform. */
+export type LabelCase = 'sentence' | 'caps'
 export type IconSet = 'hairline' | 'line' | 'rounded' | 'bold' | 'solid'
 /* UI text weight is a fixed system constant (semibold) — no control, not driven
  * by Scale or Text size. UI_WEIGHTS (fonts.ts) is the lookup; this stays as the
@@ -169,6 +173,7 @@ export interface Config {
    * weight; replaces Style + Density + the separate UI-weight control). */
   scale: Scale
   typeScale: TypeScale
+  labelCase: LabelCase
   fontDisplay: string
   fontBody: string
   iconSet: IconSet

@@ -145,6 +145,12 @@ const TYPESCALE_OPTS = [
   { id: 'lg' as const, cap: 'L' },
   { id: 'xl' as const, cap: 'XL' },
 ]
+// Label case — the UI-chrome label tier (buttons, labels, badges, tabs, nav).
+// Default keeps them as authored; Caps = uppercase + tracking (the industrial look).
+const LABEL_CASE_OPTS = [
+  { id: 'sentence' as const, cap: 'Default' },
+  { id: 'caps' as const, cap: 'Caps' },
+]
 const PALETTE_OPTS = [
   { id: 'pastel' as const, cap: 'Pastel' },
   { id: 'bright' as const, cap: 'Bright' },
@@ -437,6 +443,15 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(TYPESCALE_OPTS),
       selected: cfg.typeScale,
       onPick: pick('typeScale'),
+    },
+    {
+      key: 'labelCase',
+      label: 'Label case',
+      value: cap(LABEL_CASE_OPTS, cfg.labelCase),
+      kind: 'seg',
+      opts: optsFrom(LABEL_CASE_OPTS),
+      selected: cfg.labelCase,
+      onPick: pick('labelCase'),
     },
     {
       sec: 'Shape',

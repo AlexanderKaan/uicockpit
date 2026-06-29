@@ -12,6 +12,7 @@ export const DEFAULT_CONFIG: Config = {
   buttonShape: 'match',        // follow the box radius by default (unified look)
   scale: 'default',            // size + presence macro (drives ui-weight too)
   typeScale: 'md',
+  labelCase: 'sentence',       // UI labels as-authored; 'caps' = the industrial/terminal look
   fontDisplay: 'Inter',
   fontBody: 'Inter',
   iconSet: 'line',

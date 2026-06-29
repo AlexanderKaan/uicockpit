@@ -12,6 +12,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "buttonShape": "match",
     "scale": "comfortable",
     "typeScale": "md",
+    "labelCase": "sentence",
     "fontDisplay": "Inter",
     "fontBody": "Inter",
     "iconSet": "line",
@@ -270,6 +271,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-type-h3": "1.0125rem",
     "--k-type-input-min": "16px",
     "--k-type-small": "0.75rem",
+    "--k-ui-tracking": "0",
+    "--k-ui-transform": "none",
     "--k-ui-weight": "600",
     "--k-warning": "oklch(89.6% 0.1934 109.7)",
     "--k-warning-fg": "#16160c",
@@ -3061,6 +3064,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
+  --k-ui-transform: none;
+  --k-ui-tracking: 0;
   --k-track-tight: -0.01em;
   --k-track-display: -0.02em;
   --k-leading-tight: 1.05;
@@ -3353,6 +3358,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
+  --k-ui-transform: none;
+  --k-ui-tracking: 0;
   --k-track-tight: -0.01em;
   --k-track-display: -0.02em;
   --k-leading-tight: 1.05;
@@ -9732,6 +9739,8 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
+  --k-ui-transform: none;
+  --k-ui-tracking: 0;
   --k-track-tight: -0.01em;
   --k-track-display: -0.02em;
   --k-leading-tight: 1.05;
@@ -10024,6 +10033,8 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
+  --k-ui-transform: none;
+  --k-ui-tracking: 0;
   --k-track-tight: -0.01em;
   --k-track-display: -0.02em;
   --k-leading-tight: 1.05;
@@ -16573,6 +16584,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "buttonShape": "match",
     "scale": "default",
     "typeScale": "md",
+    "labelCase": "sentence",
     "fontDisplay": "Inter",
     "fontBody": "Inter",
     "iconSet": "line",
