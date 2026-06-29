@@ -43,24 +43,32 @@ const GOOGLE_SANS = [
 // only legible as huge hero/logo type — not a usable interface face.
 const GOOGLE_SERIF = ['Fraunces', 'Newsreader']
 
+// Monospace faces — the technical/terminal signal (Vercel sets headings in Geist
+// Mono, Linear/Raycast use mono for IDs & numerics). All three are multi-weight on
+// Google Fonts so the generic weight spec works. Selectable as display OR body.
+const GOOGLE_MONO = ['Geist Mono', 'IBM Plex Mono', 'JetBrains Mono']
+export const MONO_FONTS: string[] = GOOGLE_MONO
+
 /** Body fonts — sans only (serifs are display-only by design choice).
  *  System sits in its own group at top; Google fonts in one combined group. */
 export const BODY_FONTS: FontGroup[] = [
   { group: 'System', fonts: [SYSTEM_FONT] },
   { group: 'Google fonts', fonts: GOOGLE_SANS },
+  { group: 'Mono', fonts: GOOGLE_MONO },
 ]
 
-/** Display fonts — includes serifs. Same shape: System + combined Google. */
+/** Display fonts — includes serifs + mono. Same shape: System + combined Google. */
 export const DISPLAY_GROUPS: FontGroup[] = [
   { group: 'System', fonts: [SYSTEM_FONT] },
   { group: 'Google fonts', fonts: [...GOOGLE_SANS, ...GOOGLE_SERIF].sort() },
+  { group: 'Mono', fonts: GOOGLE_MONO },
 ]
 
 /** Kept for backwards-compat with existing presets / snapshot tests that
  *  reference DISPLAY_ONLY explicitly. */
 export const DISPLAY_ONLY: FontGroup[] = [{ group: 'Serif', fonts: GOOGLE_SERIF }]
 
-export const ALL_FONTS: string[] = [SYSTEM_FONT, ...GOOGLE_SANS, ...GOOGLE_SERIF]
+export const ALL_FONTS: string[] = [SYSTEM_FONT, ...GOOGLE_SANS, ...GOOGLE_SERIF, ...GOOGLE_MONO]
 export const SERIF_FONTS: string[] = GOOGLE_SERIF
 
 export const UI_MONO = 'JetBrains Mono'
@@ -88,7 +96,9 @@ export function googleFontsImport(fontDisplay: string, fontBody: string): string
   // Every remaining family is multi-weight, so one spec fits all.
   const sansSpec = (name: string) => `${name.replace(/\s+/g, '+')}:wght@400;500;600;700`
   const families = [...seen].map(sansSpec)
-  families.push('JetBrains+Mono:wght@400;500')
+  // JetBrains Mono is always loaded for kbd/code — unless it's already a chosen
+  // face above (which loads it at full weights), in which case don't duplicate it.
+  if (!seen.has(UI_MONO)) families.push('JetBrains+Mono:wght@400;500')
   const url = `https://fonts.googleapis.com/css2?family=${families.join('&family=')}&display=swap`
   return `@import url('${url}');`
 }

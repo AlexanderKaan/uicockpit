@@ -17,7 +17,7 @@ import type {
 import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
 import { resolveHarmony } from './harmony'
 import { guardedBorders } from './coherence'
-import { customFontFamily, isCustomFont, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
+import { customFontFamily, isCustomFont, MONO_FONTS, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
 
 // Tailwind/shadcn convention: dimensional tokens emit in REM on a 16px root, so
 // typography + spacing + control sizing scale with the user's root font-size
@@ -669,16 +669,19 @@ export function buildTokens(cfg: Config): Tokens {
   // with the size macro and overlapping the typography controls.
   const uiW: number = UI_WEIGHTS.semibold
 
-  const displayIsSerif = SERIF_FONTS.includes(cfg.fontDisplay)
+  // Generic CSS fallback for a font: monospace > serif > sans-serif, derived from
+  // the family so a mono display (Vercel headings) keeps a mono fallback.
+  const genericFallback = (name: string): string =>
+    MONO_FONTS.includes(name) ? 'monospace' : SERIF_FONTS.includes(name) ? 'serif' : 'sans-serif'
 
   // Resolve font name to a CSS font-family string. Three branches:
   //   System    → OS-native stack (no webfont request)
-  //   Custom    → strip "Custom: " prefix, quote the family, fallback to sans
+  //   Custom    → strip "Custom: " prefix, quote the family, generic fallback
   //   Standard  → quoted Google Font name + appropriate generic fallback
-  const fontFamily = (name: string, isSerif: boolean): string => {
+  const fontFamily = (name: string): string => {
     if (name === SYSTEM_FONT) return SYSTEM_STACK
-    if (isCustomFont(name)) return `'${customFontFamily(name)}',${isSerif ? 'serif' : 'sans-serif'}`
-    return `'${name}',${isSerif ? 'serif' : 'sans-serif'}`
+    const fam = isCustomFont(name) ? customFontFamily(name) : name
+    return `'${fam}',${genericFallback(name)}`
   }
 
   // Page canvas (--k-bg). The neutral substrate the interface BLOCKS (cards,
@@ -1178,8 +1181,8 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-ease-in': motion.easeIn,
       '--k-state-hover': stateHover,
       '--k-state-press': statePress,
-      '--k-font-display': fontFamily(cfg.fontDisplay, displayIsSerif),
-      '--k-font-body': fontFamily(cfg.fontBody, false),
+      '--k-font-display': fontFamily(cfg.fontDisplay),
+      '--k-font-body': fontFamily(cfg.fontBody),
       '--k-font-mono': `'${UI_MONO}',ui-monospace,monospace`,
       // CP1 hero tier — the page-title / hero-KPI display size (~48px default).
       // Lives in the live token layer now (was export-only, derived in extras),
