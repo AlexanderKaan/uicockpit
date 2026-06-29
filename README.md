@@ -2,25 +2,24 @@
 
 # UIcockpit
 
-### Build a design system you actually like — and keep it in one place.
+### A design system your AI actually keeps to.
 
-**Tailwind is how you style. shadcn is what you assemble. UIcockpit is the design language that makes
-it yours — and keeps it that way.**
-
-Make a handful of taste decisions, watch them apply across 74 components, and take the whole thing
-with you: framework-neutral `--k-*` tokens **and** matching components, as one hosted `<link>`, a
-download, Tailwind v4 `@theme`, or shadcn/ui CSS.
+**Configure a design language once — then your coding agent builds on it, and
+`uicockpit check` makes sure it *stays* on it.** Framework-neutral `--k-*` tokens +
+100+ component recipes, delivered as a hosted `<link>`, a download, or natively inside
+your agent (CLI + MCP).
 
 **Free · no account · paste it anywhere.**
 
 [**Try it →** uicockpit.com](https://uicockpit.com) · [**Use a kit →** kit.uicockpit.com](https://kit.uicockpit.com) · [Docs](https://uicockpit.com/docs)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![npm: uicockpit](https://img.shields.io/badge/npm-uicockpit-cb3837?logo=npm&logoColor=white)](https://www.npmjs.com/package/uicockpit)
+[![npm: uicockpit-mcp](https://img.shields.io/badge/MCP-uicockpit--mcp-111?logo=npm&logoColor=white)](https://www.npmjs.com/package/uicockpit-mcp)
 [![Live kit CDN](https://img.shields.io/badge/CDN-kit.uicockpit.com-f38020?logo=cloudflare&logoColor=white)](https://kit.uicockpit.com)
-![Framework-neutral](https://img.shields.io/badge/framework-neutral-111)
 ![Price](https://img.shields.io/badge/price-%240%20forever-1ca85a)
 
-![UIcockpit — pick a vibe, get a coherent component system](docs/preview.png)
+![UIcockpit — pick a style, get a coherent component system](docs/preview.png)
 
 </div>
 
@@ -28,28 +27,26 @@ download, Tailwind v4 `@theme`, or shadcn/ui CSS.
 
 ## Why I made this 👋
 
-If you've ever vibe-coded an app, you know the feeling. You're moving fast, you reach for the same
-components for the twentieth time, and somewhere along the way you lose the thread. The radii start
-to drift. The greys don't quite agree. There's always *one* button that's just… a little off. It all
-works — but none of it feels like *yours*.
+If you've ever vibe-coded an app, you know the feeling. You're moving fast, the AI is
+reaching for the same components for the twentieth time, and somewhere along the way you
+lose the thread. The radii drift. The greys don't quite agree. There's always *one*
+button that's just… a little off. It all works — but none of it feels like *yours*.
 
-I kept hitting that wall, so I built UIcockpit to get out of it: a calm place to make the design
-decisions **once**, see them ripple across a whole component set, and walk away with the result. No
-spreadsheet of tokens, no hand-tuning forty little things — just a coherent system, in one artefact,
-that you can paste anywhere.
+I built UIcockpit to get out of that: a calm place to make the design decisions **once**,
+hand them to your agent as a real contract, and have a one-command **check** that catches
+the drift before it ships. No spreadsheet of tokens, no hand-tuning forty little things —
+a coherent system that survives contact with an AI that builds faster than you can review.
 
-It's framework-neutral (plain HTML, Vue, Svelte, React — whatever you're in), it's free, and there's
-no account and no lock-in. If it saves you the same headache it saved me, that's the whole point.
-
-Designers and developers, among friends. I hope it's useful. — **Alexander**
+Framework-neutral (plain HTML, Vue, Svelte, React — whatever you're in), free, no account,
+no lock-in. — **Alexander**
 
 ---
 
 ## Where it sits in the stack
 
-Tailwind is *how* you style. shadcn is *what* you assemble. **UIcockpit is the design language that
-makes it yours** — and the only layer that *keeps* it coherent as your app (and your AI) grow. It
-doesn't replace any of them; it sits above them, framework-neutral.
+Tailwind is *how* you style. shadcn is *what* you assemble. **UIcockpit is the design
+language that makes it yours** — and the only layer that *keeps* it coherent as your app
+(and your AI) grow. It sits above them, framework-neutral.
 
 | You already have… | which is… | so UIcockpit is… |
 |---|---|---|
@@ -57,49 +54,85 @@ doesn't replace any of them; it sits above them, framework-neutral.
 | **shadcn / Radix** | the **components** (+ behaviour) | the **design language** that makes any components look like one product |
 | **Figma / design tokens** | the design **source** (authoring) | the same language, but **executable**, framework-neutral, and **self-enforcing** |
 
-And because it's one artefact an agent can read, UIcockpit lives in your whole build loop:
-**Define** your language → your AI **applies** it → `npx uicockpit check` **verifies** it.
-*(Define → Apply → Verify — not a one-off asset, a layer in the loop.)*
+The loop it lives in: **Define** your language → your AI **applies** it →
+`uicockpit check` **verifies** it. Not a one-off asset — a layer in the build loop.
 
 → The thinking behind this: [`VISION.md`](./VISION.md) · [`POSITIONING.md`](./POSITIONING.md).
 
 ---
 
-## Three ways to use it
+## 1. Pick a starting point, make it yours
 
-### 1. One hosted `<link>` — the lazy way (recommended)
+Open [uicockpit.com](https://uicockpit.com), pick one of **7 named styles** grounded in
+the best modern apps, then tweak with 19 clear controls:
 
-Build a kit at [uicockpit.com](https://uicockpit.com), copy your link, drop it in your `<head>`:
+| Style | Grounded in | Feel |
+|---|---|---|
+| **Clean** | shadcn / Linear | the balanced default |
+| **Precision** | Linear / Figma | crisp, flat, cool |
+| **Minimal** | Vercel | mono headings, stark |
+| **Refined** | Stripe | ultralight headlines |
+| **Calm** | Notion | system font, seamless |
+| **Soft** | — | rounded and warm |
+| **Editorial** | — | serif headings |
 
-```html
-<link rel="stylesheet" href="https://kit.uicockpit.com/k/<your-kit-key>.css">
+Your brand colour rides through every style. And the engine **keeps it coherent**: pick
+any combination of the controls and it straightens the corners that would otherwise look
+wrong — a dense layout never gets giant headings, a card always stays visible against the
+page, the selected tab is always legible. *Make whatever you want; we straighten it.*
+
+---
+
+## 2. Ship it — two tracks
+
+### 🤖 Agent-native — the check loop (best for AI builds)
+
+Give your coding agent the system **and** the guardrail, no copy-paste:
+
+```bash
+npx uicockpit init <kit-hash>   # writes tokens.css + contract.json + AGENTS.md
+#  → your agent builds with the --k-* tokens and the house rules
+npx uicockpit check             # verifies nothing drifted from the contract — the moat
 ```
 
-That's the *whole* kit — every token **and** the component recipes (button, input, card, badge,
-table, dialog, …) with proper hover / focus / disabled states — served from the edge. Your buttons
-just work. Tweak the kit later and come back; the link is yours.
+Or run it as an **MCP server** (Claude Code, Cursor, Windsurf, Claude Desktop):
 
-### 2. Own the files
+```json
+{ "mcpServers": { "uicockpit": { "command": "npx", "args": ["-y", "uicockpit-mcp"] } } }
+```
 
-Prefer to commit it? Download `tokens.css`, `tokens.json`, a Tailwind v4 `@theme` block, shadcn/ui
-`globals.css`, a `BRIEF.md`, or an AI-prompt. No runtime, no dependency, nothing to eject from later.
+Three tools: **`install_kit`** (pull the kit) · **`get_design_context`** (the kit's
+*grammar* — tokens + component anatomy + composition rules + intent routing) ·
+**`check_conformance`** (verify the output). The agent learns your language, builds on it,
+and checks itself.
 
-### 3. Hand it to your AI
+→ [`uicockpit` CLI](./cli/README.md) · [`uicockpit-mcp`](./mcp/README.md)
 
-The AI-prompt export teaches your coding agent the token contract and a few house rules, so it builds
-**on-brand** UI for you instead of reaching for the same grey again.
+### 🎨 Web / paste
+
+- **One hosted `<link>`** — the whole kit (tokens + component recipes with real
+  hover/focus/disabled states) served from the edge:
+  ```html
+  <link rel="stylesheet" href="https://kit.uicockpit.com/k/<your-kit-key>.css">
+  ```
+- **Own the files** — download `tokens.css`, `tokens.json`, a Tailwind v4 `@theme`
+  block, or shadcn/ui `globals.css`. No runtime, no dependency.
+- **Quick-paste** into v0, Lovable, bolt, … via the in-app **"Use in [your tool]"** router.
 
 ---
 
 ## What's in the box
 
-- **120+ design tokens** — colour ramps (OKLCH, contrast-clamped), a type scale, spacing grid, radii,
-  shadows, a 3-tier motion system, a multi-hue chart/avatar palette.
-- **74 component recipes** — all token-driven, all with real state contracts, shipped in `tokens.css`
-  and over the CDN.
-- **7 export formats** + a live preview of your kit on a real app and a full component gallery — change one
-  control, watch the whole thing move.
-- **A WCAG contrast check** baked in, so the colours you pick stay readable.
+- **250+ design tokens** — OKLCH colour ramps (contrast-clamped to WCAG), a type scale
+  with weight + label-case control, spacing grid, radii, shadows, a 3-tier motion system,
+  a brand-harmonised multi-hue chart/avatar palette.
+- **100+ component recipes** — all token-driven, all with real state contracts, shipped in
+  `tokens.css` and over the CDN.
+- **Coherence guarantees** — the foundation self-corrects incoherent control combinations
+  (height harmony, surface separation, type-density contrast) and a WCAG contrast check is
+  baked in, so the kit you configure is always shippable.
+- **7 export formats** + a live preview on a real app and a full component gallery — change
+  one control, watch the whole thing move.
 
 ---
 
@@ -108,31 +141,33 @@ The AI-prompt export teaches your coding agent the token contract and a few hous
 One configuration → **one single source** → every surface:
 
 ```
-21 visual controls ──▶ --k-* tokens ──▶ ┌─ live preview (gallery + a real app, which dogfoods the export)
-   (Brand · Type ·                       ├─ tokens.css / json / Tailwind / shadcn / BRIEF / AI-prompt
-    Shape · Surface ·                     └─ hosted kit: kit.uicockpit.com/k/<key>.css
-    Motion & icons)
+19 visual controls ──▶ --k-* tokens ──▶ ┌─ live preview (gallery + a real app that dogfoods the export)
+   (Style · Brand · Type ·              ├─ tokens.css / json / Tailwind / shadcn / BRIEF / AI-prompt
+    Shape · Surface · Motion)           ├─ hosted kit: kit.uicockpit.com/k/<key>.css
+                                        └─ npx uicockpit init/check · the MCP server
 ```
 
-The CDN runs the exact same function the download uses, so the hosted link is byte-identical to the
-file you'd export. The demo app renders from the kit alone — so if the kit ever breaks, the app
-breaks too, and we catch it.
+The CDN runs the exact same function the download uses, so the hosted link is
+byte-identical to the file you'd export, and the contract `check` reads always agrees with
+the CSS. The demo app renders from the kit alone — if the kit ever breaks, the app breaks
+too, and we catch it.
 
 ---
 
-## Where this is heading
+## Not a component library — a coherence compiler
 
-Here's the thing I keep coming back to: a catalog of components is always finite, and the agent
-building your app isn't. Sooner or later it needs a component I never drew — and it guesses, and the
-guess drifts off your design language.
+A catalog of components is always finite; the agent building your app isn't. Sooner or
+later it needs a component you never drew — and it guesses, and the guess drifts off your
+language.
 
-So the real goal isn't 74 components, or 200. It's the *grammar* underneath them — the named bundles
-every component is quietly made of (a raised surface, a cozy inset, a section-title type set) — handed
-to the agent as building blocks, with `uicockpit check` making sure that whatever it assembles, even
-a component that never existed, is built only from *your* language.
+So the real product isn't 100 components, or 200. It's the **grammar** underneath them —
+the parts and composition rules every component is quietly made of — handed to the agent
+through `get_design_context`, with `uicockpit check` making sure that whatever it
+assembles, even a screen nobody drew, is built only from *your* language.
 
-A finite kit can, at best, be "complete." A grammar plus a verifier is *generative* — it covers the
-screens nobody drew. That's the north star: **not a component library, a coherence compiler.**
+A finite kit can, at best, be "complete." A grammar plus a verifier is *generative* — it
+covers the screens nobody drew. That's the north star, and the spine is already live:
+**configure → CDN → CLI/MCP → check.**
 
 → The full thinking lives in [`VISION.md`](./VISION.md).
 
@@ -149,18 +184,17 @@ npm run build        # the build gate (icon-verify → audits → tsc → vite b
 npx vitest run       # tests
 ```
 
-Vite + React 19 + TypeScript (strict). Architecture notes live in
-[`DECISIONS.md`](./DECISIONS.md) · [`ICONS.md`](./ICONS.md).
+Vite + React 19 + TypeScript (strict). The CLI (`cli/`) and MCP server (`mcp/`) are
+separate zero-dep packages. Architecture notes: [`DECISIONS.md`](./DECISIONS.md).
 
 ---
 
 ## Contributing
 
-This is meant to be a community thing, so come on in. A new colour theme, a missing component recipe,
-an export adapter (Style Dictionary, CSS-in-JS, Figma variables), a framework adapter, an
-accessibility fix — all very welcome. Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md) and the
-[`Code of Conduct`](./CODE_OF_CONDUCT.md), then open an issue or a discussion. Even just telling me
-what felt clunky helps.
+Come on in. A new named style, a missing component recipe, an export adapter (Style
+Dictionary, Figma variables), a framework adapter, an accessibility fix — all welcome.
+Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md) and the
+[`Code of Conduct`](./CODE_OF_CONDUCT.md), then open an issue or a discussion.
 
 ---
 

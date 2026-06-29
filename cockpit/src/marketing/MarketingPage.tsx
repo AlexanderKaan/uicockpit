@@ -103,8 +103,9 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
           <h1>Stop shipping the generic AI look.</h1>
           <p className="mkt__hero-sub">
             Tailwind is how you style. shadcn is what you assemble.{' '}
-            <strong>UIcockpit is the design language that makes it yours</strong> — colour,
-            type, shape and motion as framework-neutral tokens your AI applies in one shot,
+            <strong>UIcockpit is the design language that makes it yours</strong> — start
+            from a style modeled on the best apps (Linear, Stripe, Notion…), tune colour,
+            type, shape and motion into framework-neutral tokens your AI applies in one shot,
             plus a checker that keeps every screen coherent as the app grows. Build a kit in
             60 seconds.
           </p>
@@ -370,7 +371,7 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
 
           <div className="mkt__anatomy-note">
             <ShieldCheck size={16} strokeWidth={1.9} />
-            The same contract holds for all 74 components — so the kit feels like one system, end to end.
+            The same contract holds for all 100+ components — so the kit feels like one system, end to end.
           </div>
         </div>
       </section>

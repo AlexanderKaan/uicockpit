@@ -11,11 +11,11 @@ export function MktStats() {
         <div className="mkt__stat-label">Forever free</div>
       </div>
       <div className="mkt__stat">
-        <div className="mkt__stat-num">120+</div>
+        <div className="mkt__stat-num">250+</div>
         <div className="mkt__stat-label">Design tokens</div>
       </div>
       <div className="mkt__stat">
-        <div className="mkt__stat-num">74</div>
+        <div className="mkt__stat-num">100+</div>
         <div className="mkt__stat-label">UI components</div>
       </div>
       <div className="mkt__stat">

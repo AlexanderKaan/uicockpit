@@ -10,7 +10,7 @@ the agent's output conforms** — generate → apply → **check**, without copy
 | Tool | What it does |
 |---|---|
 | `install_kit` | Pulls a configured kit into the project — writes `uicockpit.tokens.css` (the full kit) and `uicockpit.contract.json`. Takes the kit `hash` from uicockpit.com. |
-| `get_design_context` | Returns a compact briefing — the kit's tokens (grouped), rules, and component classes — so the agent builds on-system without loading the full CSS. |
+| `get_design_context` | Returns the kit's *grammar* — tokens (grouped) + each component's anatomy (BEM parts) + composition rules + intent routing ("a status pill → a `.badge` tone"; "compose the card anatomy, don't inline layout") — so the agent builds on-system, even components the kit never drew, without loading the full CSS. |
 | `check_conformance` | Verifies the code against the contract: flags unknown tokens, undefined component modifiers, raw colours, off-grid spacing, non-token radii/font-sizes. The moat. |
 
 ## Setup
