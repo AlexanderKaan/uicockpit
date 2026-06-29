@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState, type Dispatch, type ReactNode } from 'react'
 import { Check, ChevronRight, Lock, PanelLeftClose, RotateCcw, Shuffle } from 'lucide-react'
 import { wouldZeroSeparation } from '../tokens/coherence'
+import { STYLE_KITS, activeKitId } from '../tokens/styleKits'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { BODY_FONTS, DISPLAY_GROUPS, customFontFamily, isCustomFont, type FontGroup } from '../tokens/fonts'
 import { nameColor } from '../tokens/color'
@@ -172,7 +173,7 @@ function fontLabel(f: string): string {
   return isCustomFont(f) ? customFontFamily(f) : f
 }
 
-type Opt = { id: string; label: string; viz?: ReactNode }
+type Opt = { id: string; label: string; viz?: ReactNode; sub?: ReactNode }
 /** Build a popover option-list from an option array, optionally attaching a
  *  per-option viz (kept only for radius/border-radius/motion/icons/themes —
  *  everything else is text-only; the canvas shows the effect). */
@@ -215,7 +216,7 @@ interface RowDef {
  * homes in the flat list, but read as PRIMARY (heavier label + a quiet neutral tick)
  * so a first-timer knows where to start — without re-introducing the removed
  * Essentials/Advanced tiering. */
-const ESSENTIAL_KEYS = new Set(['colorTheme', 'scale', 'fontDisplay', 'radius'])
+const ESSENTIAL_KEYS = new Set(['style', 'colorTheme', 'scale', 'fontDisplay', 'radius'])
 
 export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset }: PanelProps) {
   // Already on the curated default? → dim the Reset button (nothing to undo to).
@@ -271,7 +272,26 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
     borders: new Set(BORDER_OPTS.filter((o) => wouldZeroSeparation(cfg, { borders: o.id })).map((o) => o.id)),
   }
 
+  // Which named kit (if any) the current config matches — the front-door anchor.
+  const activeKit = activeKitId(cfg)
+
   const rows: RowDef[] = [
+    {
+      // Style — the FRONT-DOOR anchor (top of FOUNDATION, above Brand). Pick a curated
+      // named kit; it sets structure + type + colour-character but preserves the brand
+      // hue, then the knobs below perturb on top. 'Custom' once a knob diverges.
+      key: 'style',
+      label: 'Style',
+      value: STYLE_KITS.find((k) => k.id === activeKit)?.name ?? 'Custom',
+      kind: 'opts',
+      opts: STYLE_KITS.map((k) => ({ id: k.id, label: k.name, sub: k.blurb })),
+      selected: activeKit ?? undefined,
+      onPick: (id) => {
+        const kit = STYLE_KITS.find((k) => k.id === id)
+        if (kit) dispatch({ type: 'SET', patch: kit.config })
+        close()
+      },
+    },
     {
       // Brand — the HERO decision and the highest-leverage knob: one hex feeds
       // the whole OKLCH system (primary + derived secondary/accent + the auto
@@ -778,7 +798,14 @@ function OptionList({
           onClick={() => onPick(o.id)}
         >
           {o.viz && <span className="fmopt__viz">{o.viz}</span>}
-          <span className="fmopt__label">{o.label}</span>
+          {o.sub ? (
+            <span className="fmopt__text">
+              <span className="fmopt__label">{o.label}</span>
+              <span className="fmopt__sub">{o.sub}</span>
+            </span>
+          ) : (
+            <span className="fmopt__label">{o.label}</span>
+          )}
           {o.id === selected && <Check size={14} strokeWidth={2.5} className="fmopt__check" />}
         </button>
       ))}
