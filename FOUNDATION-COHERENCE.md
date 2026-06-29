@@ -30,7 +30,7 @@ knob-pairs become coherence guarantees.
 | # | Pair | How it goes incoherent | Verdict | State |
 |---|------|------------------------|---------|-------|
 | 1 | **Scale × Text size** | dense layout + huge display type (compact + XL) | **COUPLE** | ✅ **SHIPPED** (pilot) |
-| 2 | **Elevation × Surface × Border** (+ Background/Block-fill) = the *surface-separation* family | Flat + Plain + Faint + busy canvas ⇒ blocks don't separate from the page | **GUARD** | 🟡 partial — I2 guards *state* cues; general "≥1 separation channel must be live" not yet enforced. **Next pilot.** |
+| 2 | **Elevation × Surface × Border** = the *surface-separation* family | Flat + Plain + Faint ⇒ blocks don't separate from the page | **GUARD** | ✅ **SHIPPED** (pilot 2) — engine floors the edge if all three go off; panel LOCKS the dissolving option (visible padlock). |
 | 3 | **Palette × Harmony × Neutrals** = the *colour-temperature/saturation* family | cold accent + warm neutrals; over-saturated accent ramp | **GUARD** | ✅ mostly — CP-guardrails cap Expression (150%), harmony engine governs neutral tint. Verify, likely done. |
 | 4 | **Display font × Body font** | two clashing families (two display serifs, a script body) | LEAVE / soft-recommend | ⚪ taste/content — a curated *pairing* hint is the only honest guard; not a hard rule. |
 | 5 | Box radius × Button radius | square card + pill button | LEAVE | ⚪ two-valid-options — a real, deliberate style. |
@@ -68,7 +68,35 @@ Effect on the canonical clash:
 | compact + XL **after** | **34.7** | **25.4** | **18.6** | 16 |
 | comfortable + XL after | **39.8** | 27.9 | 19.2 | 16 |
 
-Compact flattens the hierarchy to suit its density; comfortable lets it tower. The
-mechanism generalizes: the next pair (surface-separation) becomes a **GUARD** — assert
-that at least one of {shadow, surface-fill delta, border} is perceptible, and nudge
-the weakest channel up if a combination zeroes all three.
+Compact flattens the hierarchy to suit its density; comfortable lets it tower.
+
+## Pilot #2 — surface-separation (SHIPPED, GUARD + visible lock)
+
+A block must separate from the page by ≥1 channel. The three, and when each CARRIES
+the separation (`coherence.ts`, the single source for both layers):
+
+- **shadow** — `surfaceDepth !== 'flat'`
+- **border** — `surface === 'outlined'` OR `borders !== 'faint'` (a faint hairline
+  alone is too weak to be the sole separator)
+- **fill** — `surface === 'filled'`
+
+The only fully-invisible combination is therefore exactly **flat + plain + faint**.
+
+Two layers, same rule:
+
+1. **Engine floor** (`buildTokens.ts`, the real guarantee — holds for export/CDN/agent):
+   `guardedBorders(cfg)` floors the block edge to `subtle` when all three channels are
+   off. A no-op for every other config (blast radius = exactly the broken corner).
+2. **Visible lock** (`Panel.tsx`, the honesty Alexander asked for): when two channels
+   are already off, the *third knob's dissolving option LOCKS* instead of silently
+   correcting —
+   - on the **Segmented** Surface knob, `plain` is **disabled + padlocked**;
+   - on the **Slider** Elevation/Border knobs, the lock raises the slider's **min**
+     (you physically can't drag past the floor) and shows a padlock.
+   Release by turning another channel back on. `wouldZeroSeparation(cfg, override)` is
+   the shared predicate, so the lock and the engine agree by construction.
+
+Verified live: at `flat + plain + subtle` the Border slider clamps to `subtle` (min
+raised, padlock); at `flat + outlined + faint` the Surface `plain` segment is disabled
+with a padlock while `filled` stays free. "Make whatever you want, we straighten it" —
+shown, not silently done.

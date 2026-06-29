@@ -471,6 +471,18 @@
 .fmseg__opt--viz { display: inline-flex; align-items: center; justify-content: center; padding: 3px; }
 .fmseg__viz { display: inline-flex; }
 
+/* Foundation-coherence lock (surface-separation guard) — the option that would
+   dissolve the block is disabled and wears a padlock, instead of being silently
+   floored. Honest: the user sees WHY they can't pick it. */
+.fmseg__opt--locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  gap: 4px;
+}
+.fmseg__opt--locked:hover { color: var(--app-fg-muted); }
+.fmseg__lock { flex: none; opacity: 0.85; }
+.fmsld--locked .fmsld__lock { flex: none; color: var(--app-fg-muted); opacity: 0.9; }
+
 /* Discrete slider — track + the current step's name read out at the right.
  * Same thumb/track language as the Harmony/Signature dials (.fmslider). */
 .fmsld { display: flex; align-items: center; gap: 9px; }

@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState, type Dispatch, type ReactNode } from 'react'
-import { Check, ChevronRight, PanelLeftClose, RotateCcw, Shuffle } from 'lucide-react'
+import { Check, ChevronRight, Lock, PanelLeftClose, RotateCcw, Shuffle } from 'lucide-react'
+import { wouldZeroSeparation } from '../tokens/coherence'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { BODY_FONTS, DISPLAY_GROUPS, customFontFamily, isCustomFont, type FontGroup } from '../tokens/fonts'
 import { nameColor } from '../tokens/color'
@@ -192,6 +193,10 @@ interface RowDef {
    *  above a full-width strip (Neutrals · Surface · Press). */
   stack?: boolean
   onPick?: (id: string) => void
+  /** Foundation-coherence lock (surface-separation guard): option-ids that would
+   *  dissolve the block, shown with a padlock instead of silently floored. */
+  locked?: Set<string>
+  lockTitle?: string
   fontGroups?: FontGroup[]
   fontValue?: string
   onFont?: (f: string) => void
@@ -245,6 +250,20 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
   // again and it snaps back.
   const themeHex = COLOR_THEMES[cfg.colorTheme]?.cPrimary
   const themeIsCustom = !!themeHex && cfg.cPrimary.toLowerCase() !== themeHex.toLowerCase()
+
+  // Surface-separation guard, made VISIBLE (FOUNDATION-COHERENCE.md, clash-pair #2).
+  // A block must stand out from the page by ≥1 channel — shadow (Elevation), fill
+  // (Surface), or a real border. The engine floors the edge if all three go off; HERE
+  // we surface that honestly: when two channels are already off, the option of the
+  // third knob that would dissolve the block LOCKS (padlock + disabled) instead of
+  // silently correcting. Same rule as the engine (coherence.ts) → they agree.
+  const sepLockTitle =
+    'Locked to keep blocks visible — a card needs at least one way to stand out from the page (a shadow, a fill, or a border). Turn one of the other two back on to free this up.'
+  const sepLocked = {
+    surfaceDepth: new Set(SURFACE_DEPTH_OPTS.filter((o) => wouldZeroSeparation(cfg, { surfaceDepth: o.id })).map((o) => o.id)),
+    surface: new Set(SURFACE_OPTS.filter((o) => wouldZeroSeparation(cfg, { surface: o.id })).map((o) => o.id)),
+    borders: new Set(BORDER_OPTS.filter((o) => wouldZeroSeparation(cfg, { borders: o.id })).map((o) => o.id)),
+  }
 
   const rows: RowDef[] = [
     {
@@ -447,6 +466,8 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(SURFACE_DEPTH_OPTS),
       selected: cfg.surfaceDepth,
       onPick: pick('surfaceDepth'),
+      locked: sepLocked.surfaceDepth,
+      lockTitle: sepLockTitle,
     },
     {
       // Surface — how contained surfaces separate from their background. ONE axis
@@ -461,6 +482,8 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(SURFACE_OPTS),
       selected: cfg.surface,
       onPick: pick('surface'),
+      locked: sepLocked.surface,
+      lockTitle: sepLockTitle,
     },
     {
       // Canvas — the page background (--k-bg). White · Neutral (default muted
@@ -496,6 +519,8 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(BORDER_OPTS),
       selected: cfg.borders,
       onPick: pick('borders'),
+      locked: sepLocked.borders,
+      lockTitle: sepLockTitle,
     },
     {
       // Interaction state wash (H2) is now a fixed house formula (whisper alpha
@@ -555,9 +580,9 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
                   <div className={`fmrow__inline ${r.stack ? 'fmrow__inline--stack' : ''}`}>
                     <span className="fmrow__label">{r.label}</span>
                     {r.kind === 'slider' ? (
-                      <Slider opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
+                      <Slider opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} locked={r.locked} lockTitle={r.lockTitle} />
                     ) : (
-                      <Segmented opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
+                      <Segmented opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} locked={r.locked} lockTitle={r.lockTitle} />
                     )}
                   </div>
                 ) : (
@@ -635,27 +660,36 @@ function Segmented({
   selected,
   onPick,
   ariaLabel,
+  locked,
+  lockTitle,
 }: {
   opts: Opt[]
   selected?: string
   onPick: (id: string) => void
   ariaLabel: string
+  locked?: Set<string>
+  lockTitle?: string
 }) {
   return (
     <div className="fmseg" role="radiogroup" aria-label={ariaLabel}>
-      {opts.map((o) => (
-        <button
-          key={o.id}
-          type="button"
-          role="radio"
-          aria-checked={o.id === selected}
-          className={`fmseg__opt ${o.id === selected ? 'fmseg__opt--on' : ''} ${o.viz ? 'fmseg__opt--viz' : ''}`}
-          onClick={() => onPick(o.id)}
-          title={o.label}
-        >
-          {o.viz ? <span className="fmseg__viz">{o.viz}</span> : o.label}
-        </button>
-      ))}
+      {opts.map((o) => {
+        const lk = locked?.has(o.id) ?? false
+        return (
+          <button
+            key={o.id}
+            type="button"
+            role="radio"
+            aria-checked={o.id === selected}
+            disabled={lk}
+            className={`fmseg__opt ${o.id === selected ? 'fmseg__opt--on' : ''} ${o.viz ? 'fmseg__opt--viz' : ''} ${lk ? 'fmseg__opt--locked' : ''}`}
+            onClick={() => { if (!lk) onPick(o.id) }}
+            title={lk ? lockTitle : o.label}
+          >
+            {lk && <Lock size={10} strokeWidth={2.25} className="fmseg__lock" aria-hidden />}
+            {o.viz ? <span className="fmseg__viz">{o.viz}</span> : o.label}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -669,19 +703,29 @@ function Slider({
   selected,
   onPick,
   ariaLabel,
+  locked,
+  lockTitle,
 }: {
   opts: Opt[]
   selected?: string
   onPick: (id: string) => void
   ariaLabel: string
+  locked?: Set<string>
+  lockTitle?: string
 }) {
-  const idx = Math.max(0, opts.findIndex((o) => o.id === selected))
+  // Locked options sit at the LOW end of these axes (flat / faint = the dissolving
+  // value), so the lock raises the slider's MIN — you can't drag past the floor.
+  const minIdx = locked && locked.size ? Math.max(0, opts.findIndex((o) => !locked.has(o.id))) : 0
+  const rawIdx = Math.max(0, opts.findIndex((o) => o.id === selected))
+  const idx = Math.max(minIdx, rawIdx)
   const cur = opts[idx]
+  const isLocked = minIdx > 0
   return (
-    <div className="fmsld">
+    <div className={`fmsld ${isLocked ? 'fmsld--locked' : ''}`} title={isLocked ? lockTitle : undefined}>
+      {isLocked && <Lock size={11} strokeWidth={2.25} className="fmsld__lock" aria-hidden />}
       <input
         type="range"
-        min={0}
+        min={minIdx}
         max={Math.max(0, opts.length - 1)}
         step={1}
         value={idx}

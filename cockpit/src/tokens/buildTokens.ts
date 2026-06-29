@@ -16,6 +16,7 @@ import type {
 } from './types'
 import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
 import { resolveHarmony } from './harmony'
+import { guardedBorders } from './coherence'
 import { customFontFamily, isCustomFont, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
 
 // Tailwind/shadcn convention: dimensional tokens emit in REM on a 16px root, so
@@ -501,7 +502,11 @@ export function buildTokens(cfg: Config): Tokens {
   // Border on the SAME neutral ladder — prominence set by the standalone Border
   // control (faint→strong) via BORDER_STEP, NOT by depth/crisp, so a Layered card
   // can still wear a quiet edge. (--k-input-border aliases this.)
-  const border = nStep(BORDER_STEP[cfg.borders][dark ? 1 : 0])
+  // Surface-separation GUARD (clash-pair #2): if Elevation, Surface AND Border are
+  // all off (flat + plain + faint), a block would be invisible — floor the edge to a
+  // perceptible hairline so it never dissolves into the page. No-op for every other
+  // config; holds for the export/CDN/agent path too (single source: coherence.ts).
+  const border = nStep(BORDER_STEP[guardedBorders(cfg)][dark ? 1 : 0])
 
   const r = RAD[cfg.radius]
   // Button radius. 'match' (the default) FOLLOWS the box radius so buttons and
