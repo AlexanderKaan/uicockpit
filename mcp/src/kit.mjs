@@ -39,6 +39,18 @@ const INTENTS = [
   { needs: 'card', line: 'Brand face (ticket, pass, membership card) → `class="card card--presentation"`' },
   { needs: 'toolbar', line: 'A row of mixed controls forced to one height → `class="toolbar"`' },
   { needs: 'btn', line: 'Primary action → `class="btn btn--primary"`; quiet → `btn btn--ghost`' },
+  // Composite archetypes — surfaced by the dumb-builder test (the pack named the
+  // root but the builder couldn't compose it). Route each to its root + parts.
+  { needs: 'card', line: 'Any panel / dashboard / data card → `.card`, composed from its parts (`__head`/`__title`/`__row`/`__row--spread`/`__col`/`__media`/`__foot`) — don’t inline the layout' },
+  { needs: 'stat-tile', line: 'A KPI tile (label · value · +/- delta) → `.stat-tile` (`--up`/`--down` colour the delta, `--hero` = focal); a row of them → `.stat-tile-grid`' },
+  { needs: 'pricing', line: 'Pricing / plan cards → `.pricing` (recommended plan adds `--featured`); compose `__name` · `__price`/`__amount`/`__period` · `__feats` · `__badge`' },
+  { needs: 'chart', line: 'A line / bar / donut chart → `.chart` (compose `__svg` · `__grid` · `__axis` · `__legend` · `__tip`; `__empty`/`__loading` for those states)' },
+  { needs: 'list', line: 'A ranked / settings / nav list → `.list` (`--settings` for label+control rows, `--cols` for value columns); each row is `.list__row` (`__lead` · `__title`/`__sub` · `__trail`)' },
+  { needs: 'msg', line: 'A chat / comment bubble → `.msg` (`--me` for sent); compose `__name` · `__body` · `__time`; stack messages in a `.thread`' },
+  { needs: 'field', line: 'A form field → `.field` (compose `__label` · the control `.in`/`.select` · `__hint`/`__error`)' },
+  { needs: 'toggle', line: 'An on/off setting → `.toggle` (`--on` = on state)' },
+  { needs: 'select', line: 'A single choice → `.select` (dropdown) or `.segctrl` (inline segmented)' },
+  { needs: 'buttons', line: 'A form / dialog action row → `.buttons`; commit = `.btn--primary`, cancel = `.btn--ghost`' },
   { needs: null, line: 'Muted / secondary text → `color: var(--k-fg-muted)`; faint → `var(--k-fg-faint)`' },
 ]
 
@@ -107,10 +119,36 @@ export function designContext(contract, hash = null) {
   const roots = Object.keys(classes)
   if (roots.length) {
     lines.push('')
-    lines.push(`## Component classes (${roots.length}) — use these, with only their defined modifiers`)
+    lines.push('## Composition — assemble from the anatomy, never hand-rolled layout')
+    lines.push('A component is a ROOT class + its `__parts` (the internal elements you nest) +')
+    lines.push('its `--modifiers` (variants). BUILD by composing the parts — do NOT invent your')
+    lines.push('own structure or inline padding/gap/radius. The parts already carry the spacing,')
+    lines.push('type and dividers; fighting them with inline styles is what makes UI drift.')
+    lines.push('- A container carries its OWN rhythm. `.card` sets the gap + padding + radius;')
+    lines.push('  compose `.card__head` (title+desc) · `.card__row` / `.card__row--spread`')
+    lines.push('  (horizontal / label↔value) · `.card__col` (vertical) · `.card__media` (a top')
+    lines.push('  image that bleeds to the edges + clips the radius) · `.card__foot` (a closed')
+    lines.push('  footer). Never set inline padding/gap that fights the container.')
+    lines.push('- Titles: a card/panel/dialog title is `.card__title`; a micro-label / kicker is')
+    lines.push('  `.eyebrow`. A KPI is `.stat-tile` (label→value→delta, `--up`/`--down` colour the')
+    lines.push('  +/- delta, `--hero` is the focal one) or the bare `.metric` (label→value→sub).')
+    lines.push('- Lay N items out with a layout primitive, never a hand-rolled grid: equal')
+    lines.push('  columns → `.l-grid`; responsive wrap → `.l-switcher`; a KPI strip →')
+    lines.push('  `.stat-tile-grid`; a row of mixed controls at one height → `.toolbar`.')
+    lines.push('- Semantic colour: positive/up → `--k-success`, negative/down → `--k-danger`,')
+    lines.push('  warning → `--k-warning`, info → `--k-info`, a rating/score → `--k-rating` (gold).')
+    lines.push('- Icons are YOURS: a component with a glyph (`.btn`, `.rating`, list rows) sizes +')
+    lines.push('  colours your own SVG via `--k-icon-xs/sm/md` + `currentColor`; wrap one in')
+    lines.push('  `.icon-tile` for a soft-tinted square mark.')
+    lines.push('')
+    lines.push(`## Component classes (${roots.length}) — the ROOT, its __parts (compose these), its --modifiers`)
     for (const root of roots) {
-      const mods = classes[root]?.modifiers || []
-      lines.push(`- .${root}${mods.length ? ` — modifiers: ${mods.map((m) => `${root}--${m}`).join(', ')}` : ''}`)
+      const def = classes[root] || {}
+      const parts = def.parts || []
+      const mods = def.modifiers || []
+      const partStr = parts.length ? ` · parts: ${parts.map((p) => `${root}__${p}`).join(' ')}` : ''
+      const modStr = mods.length ? ` · mods: ${mods.map((m) => `${root}--${m}`).join(' ')}` : ''
+      lines.push(`- .${root}${partStr}${modStr}`)
     }
   }
 
