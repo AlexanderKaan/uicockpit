@@ -1082,6 +1082,11 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-control-h-md': `var(--k-in-h-default)`,
       '--k-control-h-sm': `calc(var(--k-in-h-default) - 0.25rem)`,
       '--k-control-h-lg': `calc(var(--k-in-h-default) + 0.5rem)`,
+      // Min touch target (Invariant I4) — the WCAG-AA floor (24px). A small glyph
+      // control (a chip × / clear) keeps its visual size but centres a transparent
+      // ::before of this size to make the CLICK area reach the floor. Fixed (an
+      // accessibility constant), so it does NOT ride Scale/density.
+      '--k-hit-min': '1.5rem',
       // One min-width for floating menus/popovers/hover-cards so they read as one
       // overlay family (was 180/200px literals). rem → scales with the root size.
       '--k-overlay-min': '12rem',

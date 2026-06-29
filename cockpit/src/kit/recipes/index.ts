@@ -3493,6 +3493,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-weight: var(--k-weight-medium);
 }
 .taginput__remove {
+  position: relative;
   background: transparent;
   border: 0;
   padding: 0;
@@ -3505,6 +3506,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-radius: 50%;
   opacity: 0.7;
 }
+/* Hit-target (Invariant I4) — ::before centres a --k-hit-min (24px) click area. */
+.taginput__remove::before { content: ''; position: absolute; top: 50%; left: 50%; width: var(--k-hit-min); height: var(--k-hit-min); transform: translate(-50%, -50%); }
 .taginput__remove:hover { opacity: 1; background: var(--k-state-hover); }
 .taginput input {
   flex: 1;
@@ -4109,6 +4112,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   text-overflow: ellipsis;
 }
 .att-chip__x {
+  position: relative;
   flex-shrink: 0;
   width: 18px;
   height: 18px;
@@ -4121,6 +4125,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   line-height: 1;
   transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease);
 }
+/* Hit-target (Invariant I4) — visual stays small; ::before centres a --k-hit-min
+   (24px) click area (WCAG-AA floor). */
+.att-chip__x::before { content: ''; position: absolute; top: 50%; left: 50%; width: var(--k-hit-min); height: var(--k-hit-min); transform: translate(-50%, -50%); }
 .att-chip__x:hover { background: var(--k-state-hover); color: var(--k-fg); }`,
   },
   {
@@ -4643,6 +4650,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .searchinput > .spinner { flex: none; }
 .searchinput__field { padding-left: 0; padding-right: 0; }
 .searchinput__clear {
+  position: relative;
   flex-shrink: 0;
   width: 22px;
   height: 22px;
@@ -4657,6 +4665,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   place-items: center;
   transition: background var(--k-dur-fast, 110ms) var(--k-ease);
 }
+/* Hit-target (Invariant I4) — ::before centres a --k-hit-min (24px) click area. */
+.searchinput__clear::before { content: ''; position: absolute; top: 50%; left: 50%; width: var(--k-hit-min); height: var(--k-hit-min); transform: translate(-50%, -50%); }
 .searchinput__clear:hover { background: var(--k-state-hover); color: var(--k-fg); }
 .searchinput__clear:focus-visible {
   outline: 2px solid var(--k-ring-soft);
@@ -5578,6 +5588,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-color: transparent;
 }
 .chip__remove {
+  position: relative;
   display: grid;
   place-items: center;
   width: 16px;
@@ -5590,6 +5601,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-muted);
   cursor: pointer;
 }
+/* Hit-target (Invariant I4) — the visual × stays small, but a transparent ::before
+   centres a --k-hit-min (WCAG-AA, 24px) square so the CLICK area reaches the floor.
+   Glyph-independent: the same rule lifts any small control to a real touch target. */
+.chip__remove::before { content: ''; position: absolute; top: 50%; left: 50%; width: var(--k-hit-min); height: var(--k-hit-min); transform: translate(-50%, -50%); }
 .chip__remove:hover { background: var(--k-state-press); color: var(--k-fg); }
 .chip--suggestion { color: var(--k-fg-muted); border-color: var(--k-border); }
 .chip--suggestion:hover:not(:disabled) { color: var(--k-fg); }`,

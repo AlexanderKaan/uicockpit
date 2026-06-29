@@ -141,8 +141,8 @@ the 2026-06-29 invariant study; "enforced" tracks rail 4.
 |-----|-----|--------------------|----------|--------------|----------|
 | **I1 Height harmony** | L3 | the `.toolbar` CONTAINER forces `height: var(--tb-h)` on every control child | 100 % | — (recalibrated: see note) | ✅ `audit:control-h` |
 | **I2 Selected-edge** | L5 / L6 | `--k-selected-edge` = `inset 0 0 0 var(--k-bw) var(--k-border)` | **100 %** | — (recalibrated: see note) | ✅ `audit:state-edge` |
-| **I3 Focus-visible** | L6 | one focus primitive (stop relying on the *fragile global* only) | ~60 % | `.segctrl` · `.toggle` · `.tab` · `.combobox` · `.badge` · `.avatar` | ❌ |
-| **I4 Hit-target** | L4 | min interactive-size token + documented dense exceptions | ~50 % | `.navsub` · `.tree` · `.combobox` (28px) · `.calendar` · `.check` / `.radio` / `.toggle` | ❌ |
+| **I3 Focus-visible** | L6 | the CENTRAL global layer (universal `:focus-visible` + an inset variant) | 100 % (already) | — (study missed globalLayer) | ✅ `audit:focus` |
+| **I4 Hit-target** | L4 | `--k-hit-min` (24px AA floor) + a centred `::before` click area | 100 % | — (recalibrated: AA 24, not AAA 44) | ✅ `audit:hit-target` |
 
 **Phased plan:**
 
@@ -194,9 +194,22 @@ the 2026-06-29 invariant study; "enforced" tracks rail 4.
     explicit `--topbar-ctrl-h` on every control → **all 6 now 30px**, verified in the
     live DOM. (A bespoke row carries its own shared height; in app code the agent
     gets it free via `.toolbar`.)
-- **Phase 2** — **I3 focus-visible** · **I4 hit-target**.
-- **Phase 3** — **chrome dogfood**: `.fmseg` → the selected-edge token,
-  `.topbar__btn` → the control-height token. Kills our two bugs + proves the engine.
+- **Phase 2 — I3 focus + I4 hit-target — DONE.**
+  - **I3 (focus):** already solid — the study over-flagged a 3rd time (it read the
+    recipes and missed the CENTRAL focus layer in `globalLayer.ts`: a universal
+    `:focus-visible` ring + an inset variant for container children covers
+    everything; every `outline:none` suppression already moves the ring to a wrapper
+    `:focus-within` or a child). No retrofit; `audit:focus` guards against a future
+    bare suppression (no recipe may drop the ring without a replacement).
+  - **I4 (hit-target):** recalibrated — the floor is **WCAG-AA 24px**, not AAA 44px
+    (dense rows ~28px are legit; forcing 44 bloats data UI). The genuine failure is a
+    small standalone control below 24. Primitive `--k-hit-min` (24px) + a centred
+    transparent `::before` keeps the glyph small but lifts the CLICK area to the
+    floor. `audit:hit-target` *found 4* sub-24 buttons (chip×16 · att-chip×18 ·
+    taginput×16 · searchinput-clear×22 — two I'd missed by eye); all fixed.
+- **Phase 3** — **chrome dogfood** (broad): the rest of the chrome onto kit recipes.
+  The two specific chrome bugs are already fixed (`.fmseg` → the selected-edge in
+  I2, `.topbar__btn` → one shared height in I1).
 
 Each phase ships: primitive → uniform retrofit → a ratchet audit → a `check` rule
 where statically detectable.

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run verify:icons && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && npm run audit:layout && npm run audit:inline && npm run audit:craft && npm run audit:state-edge && npm run audit:control-h && tsc -b && vite build",
+    "build": "npm run verify:icons && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && npm run audit:layout && npm run audit:inline && npm run audit:craft && npm run audit:state-edge && npm run audit:control-h && npm run audit:focus && npm run audit:hit-target && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
@@ -27,6 +27,8 @@
     "audit:craft": "node scripts/audit-craft.mjs",
     "audit:state-edge": "node scripts/audit-state-edge.mjs",
     "audit:control-h": "node scripts/audit-control-h.mjs",
+    "audit:focus": "node scripts/audit-focus.mjs",
+    "audit:hit-target": "node scripts/audit-hit-target.mjs",
     "check": "node scripts/uicockpit-check.mjs"
   },
   "dependencies": {
