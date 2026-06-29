@@ -209,6 +209,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     // empty-state/file-grid + the stats band + calendar VIEWS. Widgets (date picker,
     // chart, timeline, danger-zone, auth card, stat tile…) are 'component'.
     [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [CanvasCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
+    [RatingCard, 'atom'], [MusicPlayerCard, 'component'], [WeatherCard, 'component'], [CheckoutCard, 'component'], [ProductCardCard, 'component'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
@@ -4416,6 +4417,136 @@ function CanvasCard() {
       >
         <span className="eyebrow">Premium</span>
         <div style={{ fontSize: 'var(--k-type-h3)', fontWeight: 600, lineHeight: 'var(--k-leading-tight)' }}>Brand atmosphere</div>
+      </div>
+    </Card>
+  )
+}
+
+/* ── a2ui-gallery test build: domain widgets composed from the kit grammar ──
+   Built as a UIcockpit *consumer* (kit classes + token-valued inline layout +
+   own SVGs), to prove the grammar styles real composed UIs. Gaps logged in the
+   session report. */
+const Star = ({ empty }: { empty?: boolean }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={empty ? 'rating__star--empty' : undefined} aria-hidden="true">
+    <path d="M12 2.6l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 16.5l-5.6 3.2 1.4-6.3L3 9.1l6.4-.6z" />
+  </svg>
+)
+function RatingCard() {
+  return (
+    <Card title="Rating" desc="A star scale for reviews / products — filled + empty stars + a count. New kit primitive.">
+      <div style={{ display: 'grid', gap: 'var(--k-s-10)', paddingTop: 'var(--k-s-4)' }}>
+        <span className="rating"><Star /><Star /><Star /><Star /><Star /><span className="rating__count">5.0</span></span>
+        <span className="rating"><Star /><Star /><Star /><Star /><Star empty /><span className="rating__count">4.2 (128)</span></span>
+        <span className="rating"><Star /><Star /><Star empty /><Star empty /><Star empty /><span className="rating__count">2.0</span></span>
+      </div>
+    </Card>
+  )
+}
+
+function MusicPlayerCard() {
+  const time: CSSProperties = { fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }
+  return (
+    <Card title="Music player" desc="Album art · track meta · transport + scrubber — .aspect, .scrubber, .btn--icon.">
+      <div className="card" style={{ padding: 'var(--k-s-16)', display: 'grid', gap: 'var(--k-s-14)' }}>
+        <div style={{ display: 'flex', gap: 'var(--k-s-12)', alignItems: 'center', minWidth: 0 }}>
+          <div className="aspect aspect--1x1" style={{ width: 56, flex: 'none', borderRadius: 'var(--k-radius-md)' }}>
+            <div className="aspect__fill" style={{ background: 'var(--k-canvas)' }} />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div className="card__title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Midnight City</div>
+            <div className="card__desc">M83 — Hurry Up, We're Dreaming</div>
+          </div>
+        </div>
+        <div className="scrubber"><div className="scrubber__fill" style={{ width: '38%' }} /><div className="scrubber__knob" style={{ left: '38%' }} /></div>
+        <div className="num" style={{ display: 'flex', justifyContent: 'space-between', ...time }}><span>1:32</span><span>4:03</span></div>
+        <div style={{ display: 'flex', gap: 'var(--k-s-8)', justifyContent: 'center', alignItems: 'center' }}>
+          <button className="btn btn--ghost btn--icon" aria-label="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm12 0v12l-9-6z" /></svg></button>
+          <button className="btn btn--primary btn--icon" aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg></button>
+          <button className="btn btn--ghost btn--icon" aria-label="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 6v12l9-6z" /></svg></button>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function WeatherCard() {
+  const Sun = ({ size = 20 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ color: 'var(--k-rating)' }}>
+      <circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M5 19l1.4-1.4M17.6 6.4L19 5" />
+    </svg>
+  )
+  const days = [['Mon', 19], ['Tue', 21], ['Wed', 18], ['Thu', 16]]
+  return (
+    <Card title="Weather" desc="Hero figure · forecast row — .eyebrow, .num (display), .metric, .divider.">
+      <div className="card" style={{ padding: 'var(--k-s-16)', display: 'grid', gap: 'var(--k-s-12)' }}>
+        <span className="eyebrow">Amsterdam</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--k-s-12)' }}>
+          <Sun size={36} />
+          <span className="num" style={{ fontSize: 'var(--k-type-display)', fontWeight: 600, lineHeight: 1 }}>18°</span>
+        </div>
+        <div className="card__desc">Partly cloudy · feels like 16°</div>
+        <div className="divider" />
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {days.map(([d, t]) => (
+            <div key={d as string} className="metric" style={{ alignItems: 'center', gap: 'var(--k-s-4)' }}>
+              <span className="metric__label">{d}</span>
+              <Sun />
+              <span className="num" style={{ fontSize: 'var(--k-type-small)' }}>{t}°</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function CheckoutCard() {
+  const Row = ({ name, price }: { name: string; price: string }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+      <span style={{ color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }}>{name}</span>
+      <span className="num" style={{ fontSize: 'var(--k-type-small)' }}>{price}</span>
+    </div>
+  )
+  return (
+    <Card title="Checkout" desc="Order summary · card-on-file · pay — .card--presentation, .num, .divider, .btn--primary.">
+      <div className="card" style={{ padding: 'var(--k-s-16)', display: 'grid', gap: 'var(--k-s-12)' }}>
+        <span className="eyebrow">Order summary</span>
+        <div style={{ display: 'grid', gap: 'var(--k-s-8)' }}>
+          <Row name="Pro plan · annual" price="$192.00" />
+          <Row name="Seats × 3" price="$108.00" />
+          <Row name="Tax" price="$30.00" />
+        </div>
+        <div className="divider" />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <span style={{ fontWeight: 'var(--k-weight-semibold)' } as CSSProperties}>Total</span>
+          <span className="num" style={{ fontSize: 'var(--k-type-h3)', fontWeight: 700 }}>$330.00</span>
+        </div>
+        <div className="card card--presentation" style={{ padding: 'var(--k-s-12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="num" style={{ letterSpacing: '0.08em' }}>•••• 4242</span>
+          <span className="card__desc" style={{ color: 'var(--k-primary-fg)' }}>Visa</span>
+        </div>
+        <button className="btn btn--primary" style={{ width: '100%' }}>Pay $330.00</button>
+      </div>
+    </Card>
+  )
+}
+
+function ProductCardCard() {
+  return (
+    <Card title="Product card" desc="Image · rating · price · CTA — .aspect, .rating, .badge, .num, .btn--primary.">
+      <div className="card" style={{ maxWidth: 280, overflow: 'hidden', padding: 0 }}>
+        <div className="aspect aspect--16x9"><div className="aspect__fill" style={{ background: 'var(--k-canvas)' }} /></div>
+        <div style={{ padding: 'var(--k-s-16)', display: 'grid', gap: 'var(--k-s-8)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--k-s-8)' }}>
+            <div className="card__title">Aeron Chair</div>
+            <span className="badge badge--success">In stock</span>
+          </div>
+          <span className="rating"><Star /><Star /><Star /><Star /><Star empty /><span className="rating__count">4.2</span></span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--k-s-4)' }}>
+            <span className="num" style={{ fontSize: 'var(--k-type-h3)', fontWeight: 700 }}>$1,395</span>
+            <button className="btn btn--primary">Add to cart</button>
+          </div>
+        </div>
       </div>
     </Card>
   )

@@ -927,6 +927,12 @@ export function buildTokens(cfg: Config): Tokens {
       // its chroma (brand ⟂ the neutral gauges), and it matches the brand-whisper
       // selected FILL. Compose: `box-shadow: var(--k-shadow-sm), var(--k-selected-edge)`.
       '--k-selected-edge': 'inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border))',
+      // Rating gold — a dedicated star/score colour. A rating reads gold by
+      // convention regardless of brand (like a warning reads amber), so it's a
+      // fixed amber, NOT brand-harmonised and NOT the warning tone (re-theming
+      // warning to red must not turn every rating red). Surfaced by the a2ui
+      // first-customer build test (the kit had no rating colour).
+      '--k-rating': hsl(43, 92, dark ? 60 : 50),
       '--k-radius-sm': radius.sm,
       '--k-radius-md': radius.md,
       '--k-radius-lg': radius.lg,

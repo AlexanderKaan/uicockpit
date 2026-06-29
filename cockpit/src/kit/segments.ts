@@ -140,8 +140,8 @@ export const STANDALONE_ATOMS: readonly string[] = [
   'prose',
   // loading & layout utilities
   'skeleton', 'spinner', 'separator', 'aspect-ratio', 'scroll-area',
-  // data-display primitive
-  'description-list',
+  // data-display primitives
+  'description-list', 'rating',
 ]
 
 const FOUNDATION_SET: ReadonlySet<string> = new Set(FOUNDATIONS)

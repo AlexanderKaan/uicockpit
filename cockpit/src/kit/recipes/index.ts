@@ -102,6 +102,20 @@ export const RECIPES: readonly Recipe[] = [
 .canvas { background: var(--k-canvas); }`,
   },
   {
+    id: 'rating',
+    section: "Rating",
+    css: `/* === Rating ============================================================
+   A star scale for reviews / products / recipes / restaurants. Read-only
+   display: render N filled stars + the rest as .rating__star--empty, with an
+   optional .rating__count ("4.8" or "(120)"). The kit has no dedicated rating
+   colour, so a filled star borrows the warning tone's amber — a contrast-safe
+   gold. Pass star SVGs as children; the scale rides --k-icon-sm. */
+.rating { display: inline-flex; align-items: center; gap: var(--k-s-2); color: var(--k-rating); line-height: 0; }
+.rating > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
+.rating__star--empty { color: var(--k-border); }
+.rating__count { margin-inline-start: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1; }`,
+  },
+  {
     id: 'toolbar',
     section: "Toolbar",
     css: `/* === Toolbar ===

@@ -181,6 +181,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-radius-md": "1rem",
     "--k-radius-pill": "999px",
     "--k-radius-sm": "0.6875rem",
+    "--k-rating": "oklch(80.5% 0.1649 81.0)",
     "--k-ring": "oklch(56.4% 0.1689 253.9)",
     "--k-ring-halo": "color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent)",
     "--k-ring-soft": "oklch(95.8% 0.0372 253.9)",
@@ -346,6 +347,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-primary-hover": "oklch(61.4% 0.1638 253.9)",
     "--k-primary-soft": "oklch(25.4% 0.0372 253.9)",
     "--k-primary-soft-fg": "oklch(84.6% 0.0669 248.6)",
+    "--k-rating": "oklch(84.0% 0.1545 86.0)",
     "--k-ring-soft": "oklch(25.4% 0.0372 253.9)",
     "--k-secondary": "oklch(57.4% 0.1318 268.5)",
     "--k-secondary-soft": "#263050",
@@ -389,6 +391,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "layout-primitives"
       ],
       "atom": [
+        "rating",
         "toolbar",
         "buttons",
         "card",
@@ -489,6 +492,11 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "composition": {
         "tier": "foundation",
         "section": "Composition utilities",
+        "uses": []
+      },
+      "rating": {
+        "tier": "atom",
+        "section": "Rating",
         "uses": []
       },
       "toolbar": {
@@ -2130,6 +2138,15 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "modifiers": [],
         "parts": []
       },
+      "rating": {
+        "modifiers": [
+          "empty"
+        ],
+        "parts": [
+          "count",
+          "star"
+        ]
+      },
       "resizable": {
         "modifiers": [
           "vertical"
@@ -2554,6 +2571,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "navigation-menu",
       "popover",
       "prose",
+      "rating",
       "scroll-area",
       "segmented-control-toggle-group",
       "separator",
@@ -2953,6 +2971,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
   --k-selected-edge: inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border));
+  --k-rating: oklch(80.5% 0.1649 81.0);
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -3244,6 +3263,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
   --k-selected-edge: inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border));
+  --k-rating: oklch(84.0% 0.1545 86.0);
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -3696,10 +3716,10 @@ body {
  *   the catalog:
  *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (51): the reusable elements with real
+ * ATOMS — the bare vocabulary (52): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose
+ *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose
  *
  * COMPONENTS — stand-alone pieces of app (25), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -3795,6 +3815,17 @@ body {
    for class="canvas" instead of hand-rolling a gradient off-grammar. Full-bleed:
    sit content on top; pair with .eyebrow + a headline for a hero. */
 .canvas { background: var(--k-canvas); }
+
+/* === Rating ============================================================
+   A star scale for reviews / products / recipes / restaurants. Read-only
+   display: render N filled stars + the rest as .rating__star--empty, with an
+   optional .rating__count ("4.8" or "(120)"). The kit has no dedicated rating
+   colour, so a filled star borrows the warning tone's amber — a contrast-safe
+   gold. Pass star SVGs as children; the scale rides --k-icon-sm. */
+.rating { display: inline-flex; align-items: center; gap: var(--k-s-2); color: var(--k-rating); line-height: 0; }
+.rating > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
+.rating__star--empty { color: var(--k-border); }
+.rating__count { margin-inline-start: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1; }
 
 /* === Toolbar ===
    A composition primitive: a horizontal row of controls (search, filters,
@@ -9588,6 +9619,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
   --k-selected-edge: inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border));
+  --k-rating: oklch(80.5% 0.1649 81.0);
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -9879,6 +9911,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
   --k-selected-edge: inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border));
+  --k-rating: oklch(84.0% 0.1545 86.0);
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -10331,10 +10364,10 @@ body {
  *   the catalog:
  *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (51): the reusable elements with real
+ * ATOMS — the bare vocabulary (52): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose
+ *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose
  *
  * COMPONENTS — stand-alone pieces of app (25), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -10430,6 +10463,17 @@ body {
    for class="canvas" instead of hand-rolling a gradient off-grammar. Full-bleed:
    sit content on top; pair with .eyebrow + a headline for a hero. */
 .canvas { background: var(--k-canvas); }
+
+/* === Rating ============================================================
+   A star scale for reviews / products / recipes / restaurants. Read-only
+   display: render N filled stars + the rest as .rating__star--empty, with an
+   optional .rating__count ("4.8" or "(120)"). The kit has no dedicated rating
+   colour, so a filled star borrows the warning tone's amber — a contrast-safe
+   gold. Pass star SVGs as children; the scale rides --k-icon-sm. */
+.rating { display: inline-flex; align-items: center; gap: var(--k-s-2); color: var(--k-rating); line-height: 0; }
+.rating > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
+.rating__star--empty { color: var(--k-border); }
+.rating__count { margin-inline-start: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1; }
 
 /* === Toolbar ===
    A composition primitive: a horizontal row of controls (search, filters,
@@ -16400,7 +16444,7 @@ layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
 \`max-width\`).
 
 **ATOMS** — the bare vocabulary; only meaningful inside something larger:
-Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose.
+Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Prose.
 
 **COMPONENTS** — stand-alone pieces of app. Each IS its surface; build it by COMPOSING
 the atoms listed, not by hand-rolling them inside a bare card:
@@ -16434,7 +16478,7 @@ the atoms listed, not by hand-rolling them inside a bare card:
 components per container width; they own arrangement, never look, and assemble into PAGES.
 
 **STANDALONE atoms** — attach to anything; use directly, no host component needed:
-Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list.
+Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list, Rating.
 
 **The rule of reach:** need a data surface? → the **Data table** component (it owns
 toolbar + selection + pagination + empty/loading/error). Need a form? → **Form
@@ -17170,6 +17214,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-ring-soft": "oklch(25.4% 0.0000 89.9)",
     "--k-ring-halo": "color-mix(in srgb, oklch(94.0% 0.0000 89.9) 28%, transparent)",
     "--k-state-border": "oklch(66.2% 0.0235 285.7)",
+    "--k-rating": "oklch(84.0% 0.1545 86.0)",
     "--k-shadow-xs": "0 1px 2px hsl(0 0 0/.05)",
     "--k-shadow-sm": "0 1px 2px hsl(0 0 0/.07)",
     "--k-shadow-md": "0 4px 6px -1px hsl(0 0 0/.10), 0 2px 4px -2px hsl(0 0 0/.10)",
