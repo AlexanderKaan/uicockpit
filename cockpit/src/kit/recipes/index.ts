@@ -559,7 +559,20 @@ export const RECIPES: readonly Recipe[] = [
 /* Inline cluster (adjacent controls) + stacked cluster — both on the canonical
  * --k-stack-gap so "the gap between two adjacent controls" is axis-independent. */
 .card__row { display: flex; gap: var(--k-stack-gap, 8px); align-items: center; flex-wrap: wrap; }
+/* Spread row — label ↔ value pushed to the two edges (invoice/order line items,
+   stat KV, "Total … $330"). Removes the most-guessed inline justify-content. */
+.card__row--spread { justify-content: space-between; flex-wrap: nowrap; }
 .card__col { display: flex; flex-direction: column; gap: var(--k-gap, var(--k-s-8)); }
+/* Media — a full-bleed top image/figure: bleeds past the card padding to the
+   card edges and clips to the card's TOP radius (product/recipe/article cards).
+   The mirror of .card__foot, for the head. Sit an .aspect inside it. Removes the
+   padding:0 + overflow-hidden + manual-radius guess. */
+.card__media {
+  margin: calc(-1 * var(--k-card-pad, var(--k-pad, 24px))) calc(-1 * var(--k-card-pad, var(--k-pad, 24px))) 0;
+  border-top-left-radius: var(--k-card-radius, var(--k-radius-lg));
+  border-top-right-radius: var(--k-card-radius, var(--k-radius-lg));
+  overflow: hidden;
+}
 /* Footer action zone (shadcn CardFooter). ONE footer frame for the whole kit:
  * FULL-BLEED — it cancels the card's own padding so the divider (and the --bar
  * fill) reach the card edges and CLOSE the box, instead of an inset hairline

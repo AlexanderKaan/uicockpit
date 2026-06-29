@@ -4502,50 +4502,52 @@ function WeatherCard() {
 
 function CheckoutCard() {
   const Row = ({ name, price }: { name: string; price: string }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+    <div className="card__row card__row--spread">
       <span style={{ color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }}>{name}</span>
       <span className="num" style={{ fontSize: 'var(--k-type-small)' }}>{price}</span>
     </div>
   )
+  // Rebuilt from the card ANATOMY (.card rhythm · __head · __row--spread · divider
+  // · __foot) — the structural inline layout (padding/grid/gap/justify) is gone;
+  // only TYPE choices + the full-width CTA remain.
   return (
-    <Card title="Checkout" desc="Order summary · card-on-file · pay — .card--presentation, .num, .divider, .btn--primary.">
-      <div className="card" style={{ padding: 'var(--k-s-16)', display: 'grid', gap: 'var(--k-s-12)' }}>
-        <span className="eyebrow">Order summary</span>
-        <div style={{ display: 'grid', gap: 'var(--k-s-8)' }}>
+    <Card title="Checkout" desc="Built from the card ANATOMY — .card rhythm · __head · __row--spread · __foot. No inline layout.">
+      <div className="card">
+        <div className="card__head"><div className="card__title">Order summary</div></div>
+        <div className="card__col">
           <Row name="Pro plan · annual" price="$192.00" />
           <Row name="Seats × 3" price="$108.00" />
           <Row name="Tax" price="$30.00" />
         </div>
         <div className="divider" />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <div className="card__row card__row--spread">
           <span style={{ fontWeight: 'var(--k-weight-semibold)' } as CSSProperties}>Total</span>
           <span className="num" style={{ fontSize: 'var(--k-type-h3)', fontWeight: 700 }}>$330.00</span>
         </div>
-        <div className="card card--presentation" style={{ padding: 'var(--k-s-12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span className="num" style={{ letterSpacing: '0.08em' }}>•••• 4242</span>
-          <span className="card__desc" style={{ color: 'var(--k-primary-fg)' }}>Visa</span>
+        <div className="card__foot">
+          <button className="btn btn--primary" style={{ width: '100%' }}>Pay $330.00</button>
         </div>
-        <button className="btn btn--primary" style={{ width: '100%' }}>Pay $330.00</button>
       </div>
     </Card>
   )
 }
 
 function ProductCardCard() {
+  // Rebuilt with .card__media — the image bleeds to the card edges + clips to the
+  // top radius with NO padding:0 / overflow / manual-radius guess. The card rhythm
+  // spaces the body; __row--spread handles the title↔badge and price↔CTA edges.
   return (
-    <Card title="Product card" desc="Image · rating · price · CTA — .aspect, .rating, .badge, .num, .btn--primary.">
-      <div className="card" style={{ maxWidth: 280, overflow: 'hidden', padding: 0 }}>
-        <div className="aspect aspect--16x9"><div className="aspect__fill" style={{ background: 'var(--k-canvas)' }} /></div>
-        <div style={{ padding: 'var(--k-s-16)', display: 'grid', gap: 'var(--k-s-8)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--k-s-8)' }}>
-            <div className="card__title">Aeron Chair</div>
-            <span className="badge badge--success">In stock</span>
-          </div>
-          <span className="rating"><Star /><Star /><Star /><Star /><Star empty /><span className="rating__count">4.2</span></span>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--k-s-4)' }}>
-            <span className="num" style={{ fontSize: 'var(--k-type-h3)', fontWeight: 700 }}>$1,395</span>
-            <button className="btn btn--primary">Add to cart</button>
-          </div>
+    <Card title="Product card" desc="Built from anatomy — .card__media (image bleed + radius) · __row--spread · .rating.">
+      <div className="card" style={{ maxWidth: 280 }}>
+        <div className="card__media"><div className="aspect aspect--16x9"><div className="aspect__fill" style={{ background: 'var(--k-canvas)' }} /></div></div>
+        <div className="card__row card__row--spread" style={{ alignItems: 'flex-start' }}>
+          <div className="card__title">Aeron Chair</div>
+          <span className="badge badge--success">In stock</span>
+        </div>
+        <span className="rating"><Star /><Star /><Star /><Star /><Star empty /><span className="rating__count">4.2</span></span>
+        <div className="card__row card__row--spread">
+          <span className="num" style={{ fontSize: 'var(--k-type-h3)', fontWeight: 700 }}>$1,395</span>
+          <button className="btn btn--primary">Add to cart</button>
         </div>
       </div>
     </Card>
