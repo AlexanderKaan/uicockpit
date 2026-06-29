@@ -212,7 +212,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-secondary-fg": "#ffffff",
     "--k-secondary-soft": "#dee3f2",
     "--k-secondary-soft-fg": "#16160c",
-    "--k-selected-edge": "inset 0 0 0 var(--k-bw) var(--k-state-border)",
+    "--k-selected-edge": "inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border))",
     "--k-selection": "oklch(59.9% 0.1813 254.1 / 0.18)",
     "--k-shadow-lg": "0 4px 8px hsl(210 16% 18%/.10),0 12px 24px hsl(210 16% 18%/.14),0 24px 48px hsl(210 16% 18%/.14)",
     "--k-shadow-md": "0 2px 4px hsl(210 16% 18%/.10),0 6px 14px hsl(210 16% 18%/.12)",
@@ -2952,7 +2952,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-state-selected-bg: color-mix(in srgb, var(--k-primary) 14%, transparent);
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
-  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-state-border);
+  --k-selected-edge: inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border));
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -3243,7 +3243,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-state-selected-bg: color-mix(in srgb, var(--k-primary) 14%, transparent);
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
-  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-state-border);
+  --k-selected-edge: inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border));
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -9587,7 +9587,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-state-selected-bg: color-mix(in srgb, var(--k-primary) 14%, transparent);
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
-  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-state-border);
+  --k-selected-edge: inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border));
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -9878,7 +9878,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-state-selected-bg: color-mix(in srgb, var(--k-primary) 14%, transparent);
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
-  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-state-border);
+  --k-selected-edge: inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border));
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;

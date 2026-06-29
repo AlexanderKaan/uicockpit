@@ -919,12 +919,14 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-state-selected-fg': 'var(--k-fg)',
       '--k-bw': bw,
       // Selected-edge (Invariant I2) — the gauge-independent ring that keeps an
-      // active/selected element legible even at the worst aesthetic combo (Flat
-      // elevation · Plain surface · Faint border). Rides --k-state-border (a FIXED
-      // mid-grey, NOT the Border-gauge-driven --k-border which fades to ~92% L at
-      // Faint), so no neutral gauge can defeat it. Compose into a selected-state's
-      // box-shadow: `box-shadow: var(--k-shadow-sm), var(--k-selected-edge)`.
-      '--k-selected-edge': 'inset 0 0 0 var(--k-bw) var(--k-state-border)',
+      // active/selected element legible even at the worst aesthetic combo (Flat ·
+      // Plain · Faint). It's BRAND-TINTED, not neutral grey: a fixed dark grey dark
+      // enough to survive Faint border is always DARKER than the resting border
+      // (which fades to ~92% L) — so it reads "heavier than the rest of the UI". A
+      // soft brand mix instead harmonises at normal settings AND survives Faint via
+      // its chroma (brand ⟂ the neutral gauges), and it matches the brand-whisper
+      // selected FILL. Compose: `box-shadow: var(--k-shadow-sm), var(--k-selected-edge)`.
+      '--k-selected-edge': 'inset 0 0 0 var(--k-bw) color-mix(in srgb, var(--k-primary) 30%, var(--k-border))',
       '--k-radius-sm': radius.sm,
       '--k-radius-md': radius.md,
       '--k-radius-lg': radius.lg,
