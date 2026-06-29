@@ -31,17 +31,18 @@ knob-pairs become coherence guarantees.
 |---|------|------------------------|---------|-------|
 | 1 | **Scale × Text size** | dense layout + huge display type (compact + XL) | **COUPLE** | ✅ **SHIPPED** (pilot) |
 | 2 | **Elevation × Surface × Border** = the *surface-separation* family | Flat + Plain + Faint ⇒ blocks don't separate from the page | **GUARD** | ✅ **SHIPPED** (pilot 2) — engine floors the edge if all three go off; panel LOCKS the dissolving option (visible padlock). |
-| 3 | **Palette × Harmony × Neutrals** = the *colour-temperature/saturation* family | cold accent + warm neutrals; over-saturated accent ramp | **GUARD** | ✅ mostly — CP-guardrails cap Expression (150%), harmony engine governs neutral tint. Verify, likely done. |
+| 3 | **Palette × Harmony × Neutrals** = the *colour-temperature/saturation* family | cold accent + warm neutrals; over-saturated accent ramp | **GUARD** | ✅ **VERIFIED** — 96 extreme Palette×Neutral×Harmony×mode combos, **0 WCAG-AA fails** (worst anchor 4.54). `clampToAA` anchors + CP-guardrails (Expression 150%) + harmony engine hold across the whole space. Temperature pairings (warm-grey + cool accent) are deliberate two-valid styles, not breaks. No engine work needed. |
 | 4 | **Display font × Body font** | two clashing families (two display serifs, a script body) | LEAVE / soft-recommend | ⚪ taste/content — a curated *pairing* hint is the only honest guard; not a hard rule. |
 | 5 | Box radius × Button radius | square card + pill button | LEAVE | ⚪ two-valid-options — a real, deliberate style. |
 | 6 | Scale × Radius | big fixed radius on tiny compact controls | LEAVE | ⚪ pills cap at half-height; fixed radii read fine on small controls. |
 | 7 | Motion × Motion-tempo | snappy base + generous tempo | — | ✅ composed multiplicatively by design (`MOT_BASE × TEMPO`); coherent by construction. |
 | 8 | Icons × Scale | icon glyphs not tracking text/density | — | ✅ `--k-icon-xs/sm/md` are rem-based (track text) — C2 sweep. |
 
-**The honest finding:** it is *not* "21 knobs all clash." Only **two families** need
-engine work — type×density (now fixed) and surface-separation (partially guarded).
-Everything else is already coherent-by-design, guarded, or a genuine two-valid choice.
-That respects "all the options are good": they are — the incoherence was narrow.
+**The honest finding:** it is *not* "21 knobs all clash." Only **two families** needed
+engine work — type×density and surface-separation — both now shipped + deployed. The
+colour family was verified clean (0/96 WCAG fails); everything else is coherent-by-design
+or a genuine two-valid choice. That respects "all the options are good": they are — the
+incoherence was narrow, and it's now closed.
 
 ## Pilot #1 — Scale × Text size (SHIPPED)
 
