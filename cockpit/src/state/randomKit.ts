@@ -30,30 +30,36 @@ const NEUTRALS = ['auto', 'cool', 'neutral', 'warm'] as const
 // is a curated (spread, expression) pair, so the family always reads deliberate.
 const HARMONIES = ['mono', 'tonal', 'complement', 'expressive'] as const satisfies readonly Exclude<Harmony, 'custom'>[]
 
-export function randomKit(current: Config, rnd: () => number = Math.random): Config {
+export function randomKit(current: Config, rnd: () => number = Math.random, locked: Set<string> = new Set()): Config {
+  // A knob the user pinned (per-row lock) keeps its current value through a roll.
+  const keep = (k: string) => locked.has(k)
+  const roll = <K extends keyof Config>(k: K, arr: readonly Config[K][]): Config[K] => (keep(k) ? current[k] : pick(arr, rnd))
   const bodyFonts = ALL_FONTS.filter((f) => f !== SYSTEM_FONT && !SERIF_FONTS.includes(f)) // body = sans only
   const displayFonts = ALL_FONTS.filter((f) => f !== SYSTEM_FONT) // display may be serif
-  const themed = applyColorTheme(current, pick(CHROMATIC_THEMES, rnd)) // sets cPrimary + colorTheme + color:'tone'
-  const harmony = pick(HARMONIES, rnd)
+  // Brand = colorTheme + cPrimary + color, moved together; pinned → keep all three.
+  const themed = keep('colorTheme') ? current : applyColorTheme(current, pick(CHROMATIC_THEMES, rnd))
+  // Harmony = harmony + spread + expression, moved together; pinned → keep all three.
+  const harmonyVals = keep('harmony')
+    ? { harmony: current.harmony, spread: current.spread, expression: current.expression }
+    : (() => { const h = pick(HARMONIES, rnd); return { harmony: h, ...HARMONY_PRESETS[h] } })()
   return {
     ...themed,
-    harmony,
-    ...HARMONY_PRESETS[harmony],
-    scale: pick(SCALES, rnd),
-    radius: pick(RADII, rnd),
-    buttonShape: pick(BTN_SHAPES, rnd),
-    typeScale: pick(TYPE_SCALES, rnd),
-    fontDisplay: pick(displayFonts, rnd),
-    fontBody: pick(bodyFonts, rnd),
-    iconSet: pick(ICON_SETS, rnd),
-    surfaceDepth: pick(SURFACE_DEPTHS, rnd),
-    surface: pick(SURFACES, rnd),
-    borders: pick(BORDERS, rnd),
-    motion: pick(MOTIONS, rnd),
-    motionTempo: pick(TEMPOS, rnd),
-    motionCurve: pick(CURVES, rnd),
-    palette: pick(PALETTES, rnd),
-    neutral: pick(NEUTRALS, rnd),
+    ...harmonyVals,
+    scale: roll('scale', SCALES),
+    radius: roll('radius', RADII),
+    buttonShape: roll('buttonShape', BTN_SHAPES),
+    typeScale: roll('typeScale', TYPE_SCALES),
+    fontDisplay: keep('fontDisplay') ? current.fontDisplay : pick(displayFonts, rnd),
+    fontBody: keep('fontBody') ? current.fontBody : pick(bodyFonts, rnd),
+    iconSet: roll('iconSet', ICON_SETS),
+    surfaceDepth: roll('surfaceDepth', SURFACE_DEPTHS),
+    surface: roll('surface', SURFACES),
+    borders: roll('borders', BORDERS),
+    motion: roll('motion', MOTIONS),
+    motionTempo: roll('motionTempo', TEMPOS),
+    motionCurve: roll('motionCurve', CURVES),
+    palette: roll('palette', PALETTES),
+    neutral: roll('neutral', NEUTRALS),
     mode: current.mode, // preserve light/dark — don't jar the user
   }
 }

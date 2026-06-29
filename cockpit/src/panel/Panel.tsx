@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useState, type Dispatch, type ReactNode } from 'react'
-import { Check, ChevronRight, Lock, PanelLeftClose, RotateCcw, Shuffle } from 'lucide-react'
-import { wouldZeroSeparation } from '../tokens/coherence'
+import { Check, ChevronRight, Lock, LockOpen, PanelLeftClose, RotateCcw, Shuffle } from 'lucide-react'
 import { STYLE_KITS, activeKitId } from '../tokens/styleKits'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { BODY_FONTS, DISPLAY_GROUPS, customFontFamily, isCustomFont, type FontGroup } from '../tokens/fonts'
@@ -46,6 +45,9 @@ interface PanelProps {
   onRandomize: () => void
   /** Restore every knob to the curated default kit (the "Reset" footer button). */
   onReset: () => void
+  /** Per-knob locks (by row key) — a pinned knob is skipped by Shuffle. */
+  lockedKeys: Set<string>
+  onToggleLock: (key: string) => void
 }
 
 /* Option arrays — the single source for each control's choices + captions. */
@@ -208,10 +210,6 @@ interface RowDef {
    *  above a full-width strip (Neutrals · Surface · Press). */
   stack?: boolean
   onPick?: (id: string) => void
-  /** Foundation-coherence lock (surface-separation guard): option-ids that would
-   *  dissolve the block, shown with a padlock instead of silently floored. */
-  locked?: Set<string>
-  lockTitle?: string
   fontGroups?: FontGroup[]
   fontValue?: string
   onFont?: (f: string) => void
@@ -220,13 +218,8 @@ interface RowDef {
   footer?: ReactNode
 }
 
-/* The four controls that decide ~80% of a kit's look (C9). They keep their domain
- * homes in the flat list, but read as PRIMARY (heavier label + a quiet neutral tick)
- * so a first-timer knows where to start — without re-introducing the removed
- * Essentials/Advanced tiering. */
-const ESSENTIAL_KEYS = new Set(['style', 'colorTheme', 'scale', 'fontDisplay', 'radius'])
 
-export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset }: PanelProps) {
+export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset, lockedKeys, onToggleLock }: PanelProps) {
   // Already on the curated default? → dim the Reset button (nothing to undo to).
   const atDefault = (Object.keys(DEFAULT_CONFIG) as (keyof Config)[]).every((k) => cfg[k] === DEFAULT_CONFIG[k])
   const set = <K extends keyof Config>(field: K, value: Config[K]) =>
@@ -266,19 +259,11 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
   const themeHex = COLOR_THEMES[cfg.colorTheme]?.cPrimary
   const themeIsCustom = !!themeHex && cfg.cPrimary.toLowerCase() !== themeHex.toLowerCase()
 
-  // Surface-separation guard, made VISIBLE (FOUNDATION-COHERENCE.md, clash-pair #2).
-  // A block must stand out from the page by ≥1 channel — shadow (Elevation), fill
-  // (Surface), or a real border. The engine floors the edge if all three go off; HERE
-  // we surface that honestly: when two channels are already off, the option of the
-  // third knob that would dissolve the block LOCKS (padlock + disabled) instead of
-  // silently correcting. Same rule as the engine (coherence.ts) → they agree.
-  const sepLockTitle =
-    'Locked to keep blocks visible — a card needs at least one way to stand out from the page (a shadow, a fill, or a border). Turn one of the other two back on to free this up.'
-  const sepLocked = {
-    surfaceDepth: new Set(SURFACE_DEPTH_OPTS.filter((o) => wouldZeroSeparation(cfg, { surfaceDepth: o.id })).map((o) => o.id)),
-    surface: new Set(SURFACE_OPTS.filter((o) => wouldZeroSeparation(cfg, { surface: o.id })).map((o) => o.id)),
-    borders: new Set(BORDER_OPTS.filter((o) => wouldZeroSeparation(cfg, { borders: o.id })).map((o) => o.id)),
-  }
+  // Surface-separation coherence is GUARANTEED by the engine floor (coherence.ts
+  // `guardedBorders` — a block can never go fully invisible in the OUTPUT). The old
+  // per-option panel lock (slider-min raise / disabled segment) read as an unclear
+  // "arrow" and was replaced by the per-row Shuffle lock above; the engine guarantee
+  // stands on its own.
 
   // Which named kit (if any) the current config matches — the front-door anchor.
   const activeKit = activeKitId(cfg)
@@ -475,8 +460,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(SURFACE_DEPTH_OPTS),
       selected: cfg.surfaceDepth,
       onPick: pick('surfaceDepth'),
-      locked: sepLocked.surfaceDepth,
-      lockTitle: sepLockTitle,
     },
     {
       // Surface — how contained surfaces separate from their background. ONE axis
@@ -491,8 +474,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(SURFACE_OPTS),
       selected: cfg.surface,
       onPick: pick('surface'),
-      locked: sepLocked.surface,
-      lockTitle: sepLockTitle,
     },
     {
       // Canvas — the page background (--k-bg). White · Neutral (default muted
@@ -515,8 +496,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(BORDER_OPTS),
       selected: cfg.borders,
       onPick: pick('borders'),
-      locked: sepLocked.borders,
-      lockTitle: sepLockTitle,
     },
     {
       // Interaction state wash (H2) is now a fixed house formula (whisper alpha
@@ -571,14 +550,25 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
                   ? <button type="button" className="fmsec fmsec--link" onClick={() => jumpToFoundation(r.sec!)} title={`Jump to ${r.sec} in Foundations`}>{r.sec}</button>
                   : <div className="fmsec">{r.sec}</div>
               )}
-              <div className={`fmrow ${inline ? 'fmrow--inline' : ''} ${openKey === r.key ? 'fmrow--open' : ''} ${ESSENTIAL_KEYS.has(r.key) ? 'fmrow--key' : ''}`}>
+              <div className={`fmrow ${inline ? 'fmrow--inline' : ''} ${openKey === r.key ? 'fmrow--open' : ''} ${lockedKeys.has(r.key) ? 'fmrow--locked' : ''}`}>
+                {r.key !== 'style' && (
+                  <button
+                    type="button"
+                    className="fmrow__lock"
+                    onClick={() => onToggleLock(r.key)}
+                    aria-pressed={lockedKeys.has(r.key)}
+                    title={lockedKeys.has(r.key) ? 'Pinned — Shuffle keeps this. Click to unlock.' : 'Lock against Shuffle'}
+                  >
+                    {lockedKeys.has(r.key) ? <Lock size={11} strokeWidth={2.25} /> : <LockOpen size={11} strokeWidth={2} />}
+                  </button>
+                )}
                 {inline ? (
                   <div className={`fmrow__inline ${r.stack ? 'fmrow__inline--stack' : ''}`}>
                     <span className="fmrow__label">{r.label}</span>
                     {r.kind === 'slider' ? (
-                      <Slider opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} locked={r.locked} lockTitle={r.lockTitle} />
+                      <Slider opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
                     ) : (
-                      <Segmented opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} locked={r.locked} lockTitle={r.lockTitle} />
+                      <Segmented opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
                     )}
                   </div>
                 ) : (
@@ -656,36 +646,27 @@ function Segmented({
   selected,
   onPick,
   ariaLabel,
-  locked,
-  lockTitle,
 }: {
   opts: Opt[]
   selected?: string
   onPick: (id: string) => void
   ariaLabel: string
-  locked?: Set<string>
-  lockTitle?: string
 }) {
   return (
     <div className="fmseg" role="radiogroup" aria-label={ariaLabel}>
-      {opts.map((o) => {
-        const lk = locked?.has(o.id) ?? false
-        return (
-          <button
-            key={o.id}
-            type="button"
-            role="radio"
-            aria-checked={o.id === selected}
-            disabled={lk}
-            className={`fmseg__opt ${o.id === selected ? 'fmseg__opt--on' : ''} ${o.viz ? 'fmseg__opt--viz' : ''} ${lk ? 'fmseg__opt--locked' : ''}`}
-            onClick={() => { if (!lk) onPick(o.id) }}
-            title={lk ? lockTitle : o.label}
-          >
-            {lk && <Lock size={10} strokeWidth={2.25} className="fmseg__lock" aria-hidden />}
-            {o.viz ? <span className="fmseg__viz">{o.viz}</span> : o.label}
-          </button>
-        )
-      })}
+      {opts.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          role="radio"
+          aria-checked={o.id === selected}
+          className={`fmseg__opt ${o.id === selected ? 'fmseg__opt--on' : ''} ${o.viz ? 'fmseg__opt--viz' : ''}`}
+          onClick={() => onPick(o.id)}
+          title={o.label}
+        >
+          {o.viz ? <span className="fmseg__viz">{o.viz}</span> : o.label}
+        </button>
+      ))}
     </div>
   )
 }
@@ -699,29 +680,19 @@ function Slider({
   selected,
   onPick,
   ariaLabel,
-  locked,
-  lockTitle,
 }: {
   opts: Opt[]
   selected?: string
   onPick: (id: string) => void
   ariaLabel: string
-  locked?: Set<string>
-  lockTitle?: string
 }) {
-  // Locked options sit at the LOW end of these axes (flat / faint = the dissolving
-  // value), so the lock raises the slider's MIN — you can't drag past the floor.
-  const minIdx = locked && locked.size ? Math.max(0, opts.findIndex((o) => !locked.has(o.id))) : 0
-  const rawIdx = Math.max(0, opts.findIndex((o) => o.id === selected))
-  const idx = Math.max(minIdx, rawIdx)
+  const idx = Math.max(0, opts.findIndex((o) => o.id === selected))
   const cur = opts[idx]
-  const isLocked = minIdx > 0
   return (
-    <div className={`fmsld ${isLocked ? 'fmsld--locked' : ''}`} title={isLocked ? lockTitle : undefined}>
-      {isLocked && <Lock size={11} strokeWidth={2.25} className="fmsld__lock" aria-hidden />}
+    <div className="fmsld">
       <input
         type="range"
-        min={minIdx}
+        min={0}
         max={Math.max(0, opts.length - 1)}
         step={1}
         value={idx}

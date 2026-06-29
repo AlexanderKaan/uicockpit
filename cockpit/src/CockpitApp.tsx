@@ -91,11 +91,24 @@ export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps 
     return () => window.removeEventListener('keydown', onKey)
   }, [undo, redo])
 
+  // Per-knob locks (session-only UI state, not part of the kit): a pinned knob
+  // keeps its value through a Shuffle. Keyed by the panel row key (= config field).
+  const [lockedKeys, setLockedKeys] = useState<Set<string>>(() => new Set())
+  const onToggleLock = useCallback((key: string) => {
+    setLockedKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }, [])
+
   const onRandomize = useCallback(() => {
     // REPLACE flows through the history reducer, so a roll is undoable (⌘Z).
-    dispatch({ type: 'REPLACE', cfg: randomKit(cfg) })
+    // Pinned knobs ride through unchanged.
+    dispatch({ type: 'REPLACE', cfg: randomKit(cfg, Math.random, lockedKeys) })
     setToast('🎲 Rolled a fresh kit — ⌘Z to undo')
-  }, [cfg, dispatch])
+  }, [cfg, dispatch, lockedKeys])
 
   const onReset = useCallback(() => {
     // Back to the curated default house style. REPLACE → undoable (⌘Z).
@@ -156,6 +169,8 @@ export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps 
                 onCollapse={() => setMenuOpen(false)}
                 onRandomize={onRandomize}
                 onReset={onReset}
+                lockedKeys={lockedKeys}
+                onToggleLock={onToggleLock}
               />
             )}
             <Stage
