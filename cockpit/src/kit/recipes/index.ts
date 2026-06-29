@@ -4361,7 +4361,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease), color var(--k-dur-fast, 140ms) var(--k-ease, ease);
 }
 .navmenu__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.navmenu__item--on { background: var(--k-state-hover); color: var(--k-fg); }
+/* Active reads CHROMATIC (brand whisper) so the current item is distinct from a
+   merely-hovered one (neutral) — not the same wash at the same intensity. */
+.navmenu__item--on { background: var(--k-state-selected-bg); color: var(--k-fg); font-weight: var(--k-weight-semibold); }
 .navmenu__group { position: relative; }
 .navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: var(--k-overlay-min, 12rem); z-index: var(--k-z-dropdown); animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }`,
   },

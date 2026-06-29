@@ -4,11 +4,12 @@ import { DEFAULT_CONFIG } from '../defaults'
 import type { Config } from '../types'
 
 /* H2 — the interaction-state algebra + motion schemes. Contract:
- *  1. ONE fixed formula (no dials): hover = 0.05, selected +.05, press +.10.
- *  2. The wash source is BAKED NEUTRAL — it follows the Neutrals ramp, so its
- *     temperature tracks the Neutral control (auto/cool/warm). Press is a fixed
- *     0.96 :active scale (baked in the recipe). The former States + State-tint
- *     dials were removed (every benchmark bakes one subtle neutral wash).
+ *  1. HOVER + PRESS are a fixed neutral wash: hover = 0.05, press = 0.15. SELECTED
+ *     is the exception (Invariant I2 · move B): a CHROMATIC brand whisper, not a
+ *     neutral notch — so persistent selection reads distinct from the neutral hover
+ *     by HUE and survives the worst aesthetic-gauge combo (gauge-independent).
+ *  2. The hover/press wash source is BAKED NEUTRAL — it follows the Neutrals ramp,
+ *     so its temperature tracks the Neutral control (auto/cool/warm).
  *  3. Motion schemes emit true spring linear() easings + settle durations;
  *     expressive ≠ standard. */
 
@@ -17,11 +18,15 @@ const alphaOf = (s: string): number => parseFloat(s.match(/\/ ([\d.]+)\)/)?.[1] 
 const chromaOf = (s: string): number => parseFloat(s.match(/oklch\([\d.]+% ([\d.]+)/)?.[1] ?? 'NaN')
 
 describe('H2 — state-layer algebra (fixed house formula)', () => {
-  it('the ladder steps from a baked 0.05 base: hover .05, selected .10, press .15', () => {
+  it('hover + press are the neutral wash (.05 / .15); selected is a chromatic brand whisper', () => {
     const v = buildTokens(DEFAULT_CONFIG).vars
     expect(alphaOf(String(v['--k-state-hover'])), 'hover').toBeCloseTo(0.05, 5)
-    expect(alphaOf(String(v['--k-state-selected-bg'])), 'selected').toBeCloseTo(0.1, 5)
     expect(alphaOf(String(v['--k-state-press'])), 'press').toBeCloseTo(0.15, 5)
+    // Selected = a brand-anchored whisper (move B): a color-mix of --k-primary, NOT
+    // a neutral alpha notch — distinct from hover by hue + gauge-independent.
+    const sel = String(v['--k-state-selected-bg'])
+    expect(sel).toMatch(/color-mix/)
+    expect(sel).toMatch(/--k-primary/)
   })
 
   it('the wash source is neutral and tracks the Neutrals ramp (cool ≠ warm hue)', () => {

@@ -31,8 +31,11 @@ const STATE_SEL = /(?:--on|--active|--selected)(?![\w-])|\[aria-selected="true"\
 const NEUTRAL_BG = /var\(--k-(?:surface(?:-2|-sunken|-container[\w-]*)?|bg)\b/
 // A chromatic fill — depth-independent (brand tint / solid / selected tint).
 const CHROMATIC = /var\(--k-(?:primary|secondary|accent|grad-\d|state-selected)/
-// A depth-independent EDGE — the token, an inset shadow, or a coloured border.
-const EDGE = /var\(--k-selected-edge\)|box-shadow\s*:[^;]*\binset\b|border(?:-color|-left|-right|-top|-bottom)?\s*:[^;]*var\(--k-(?:ring|primary|border|state-border)/
+// A worst-combo-proof EDGE — the token, or an inset/border in a GAUGE-INDEPENDENT
+// colour. NB bare `--k-border` does NOT count: it's driven by the Border gauge
+// (Faint → ~92% L), so it can be turned to near-invisible. Robust = --k-selected-edge
+// (now floored to --k-state-border), --k-state-border, --k-ring, or a brand edge.
+const EDGE = /var\(--k-selected-edge\)|(?:box-shadow|border(?:-color|-left|-right|-top|-bottom)?)\s*:[^;]*var\(--k-(?:state-border|ring|primary)/
 
 // Deliberate exceptions — a one-line reason each (an honest allowlist, not a hole).
 // Empty for now: every kit selected-state that paints a surface step carries the

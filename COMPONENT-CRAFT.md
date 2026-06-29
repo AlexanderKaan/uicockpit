@@ -159,6 +159,24 @@ the 2026-06-29 invariant study; "enforced" tracks rail 4.
     audit enforces only the real case (surface step without an edge → fail). A
     separate *active-vs-hover distinguishability* concern (e.g. `.navmenu__item--on`
     reads identical to its hover) is a different invariant, noted for later.
+  - **Robustness pass (gauge-combination, the user's follow-up):** the first cut
+    bound the edge to `--k-border` — but that's driven by the **Border gauge**
+    (Faint → ~92 % L, near-invisible), so it just swapped depth-dependence for
+    border-dependence. The deeper finding: state-distinction cues were derived
+    *purely from the neutral aesthetic gauges* (Elevation→shadow, Surface→border,
+    Border→border) with **no floor and no chromatic anchor**, so the worst combo
+    (Flat · Plain · Faint) can zero out a *functional* distinction. Fixes:
+    **A** — `--k-selected-edge` now rides `--k-state-border` (a FIXED mid-grey,
+    gauge-independent) not `--k-border`. **B** — `--k-state-selected-bg` is now a
+    **chromatic brand whisper** (`color-mix(--k-primary 14%)`), not a neutral +5 %
+    notch: persistent selection reads distinct from the neutral hover by *hue* and
+    survives every gauge combo (brand ⟂ the neutral gauges); hover/press stay
+    neutral. `.navmenu__item--on` (was identical to its hover) adopts it.
+    **C** — `audit:state-edge` tightened: an edge only counts as robust in a
+    gauge-independent colour (state-border / ring / primary), never bare `--k-border`.
+    *Principle for the engine: an aesthetic gauge must never be able to defeat a
+    functional state distinction to invisibility — floor it, and anchor persistent
+    states chromatically.*
   - **Next: I1 height harmony** (the button-height example).
 - **Phase 2** — **I3 focus-visible** · **I4 hit-target**.
 - **Phase 3** — **chrome dogfood**: `.fmseg` → the selected-edge token,

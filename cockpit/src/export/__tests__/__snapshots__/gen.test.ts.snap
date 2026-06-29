@@ -211,7 +211,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-secondary-fg": "#ffffff",
     "--k-secondary-soft": "#dee3f2",
     "--k-secondary-soft-fg": "#16160c",
-    "--k-selected-edge": "inset 0 0 0 var(--k-bw) var(--k-border)",
+    "--k-selected-edge": "inset 0 0 0 var(--k-bw) var(--k-state-border)",
     "--k-selection": "oklch(59.9% 0.1813 254.1 / 0.18)",
     "--k-shadow-lg": "0 4px 8px hsl(210 16% 18%/.10),0 12px 24px hsl(210 16% 18%/.14),0 24px 48px hsl(210 16% 18%/.14)",
     "--k-shadow-md": "0 2px 4px hsl(210 16% 18%/.10),0 6px 14px hsl(210 16% 18%/.12)",
@@ -231,7 +231,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-state-border": "oklch(58.9% 0.0341 249.9)",
     "--k-state-hover": "oklch(25.7% 0.0119 248.3 / 0.05)",
     "--k-state-press": "oklch(25.7% 0.0119 248.3 / 0.15000000000000002)",
-    "--k-state-selected-bg": "oklch(25.7% 0.0119 248.3 / 0.1)",
+    "--k-state-selected-bg": "color-mix(in srgb, var(--k-primary) 14%, transparent)",
     "--k-state-selected-fg": "var(--k-fg)",
     "--k-stroke-1": "1px",
     "--k-stroke-2": "2px",
@@ -359,7 +359,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-state-border": "oklch(67.6% 0.0262 248.2)",
     "--k-state-hover": "oklch(88.9% 0.0088 247.9 / 0.05)",
     "--k-state-press": "oklch(88.9% 0.0088 247.9 / 0.15000000000000002)",
-    "--k-state-selected-bg": "oklch(88.9% 0.0088 247.9 / 0.1)",
     "--k-success": "oklch(76.9% 0.1174 168.2)",
     "--k-success-soft": "oklch(34.7% 0.0359 170.3)",
     "--k-success-soft-fg": "#ffffff",
@@ -2949,10 +2948,10 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
   --k-ring-w: 3px;
   --k-state-border: oklch(58.9% 0.0341 249.9);
-  --k-state-selected-bg: oklch(25.7% 0.0119 248.3 / 0.1);
+  --k-state-selected-bg: color-mix(in srgb, var(--k-primary) 14%, transparent);
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
-  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-border);
+  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-state-border);
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -3239,10 +3238,10 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
   --k-ring-w: 3px;
   --k-state-border: oklch(67.6% 0.0262 248.2);
-  --k-state-selected-bg: oklch(88.9% 0.0088 247.9 / 0.1);
+  --k-state-selected-bg: color-mix(in srgb, var(--k-primary) 14%, transparent);
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
-  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-border);
+  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-state-border);
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -7844,7 +7843,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease), color var(--k-dur-fast, 140ms) var(--k-ease, ease);
 }
 .navmenu__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.navmenu__item--on { background: var(--k-state-hover); color: var(--k-fg); }
+/* Active reads CHROMATIC (brand whisper) so the current item is distinct from a
+   merely-hovered one (neutral) — not the same wash at the same intensity. */
+.navmenu__item--on { background: var(--k-state-selected-bg); color: var(--k-fg); font-weight: var(--k-weight-semibold); }
 .navmenu__group { position: relative; }
 .navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: var(--k-overlay-min, 12rem); z-index: var(--k-z-dropdown); animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }
 
@@ -9565,10 +9566,10 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
   --k-ring-w: 3px;
   --k-state-border: oklch(58.9% 0.0341 249.9);
-  --k-state-selected-bg: oklch(25.7% 0.0119 248.3 / 0.1);
+  --k-state-selected-bg: color-mix(in srgb, var(--k-primary) 14%, transparent);
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
-  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-border);
+  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-state-border);
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -9855,10 +9856,10 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
   --k-ring-w: 3px;
   --k-state-border: oklch(67.6% 0.0262 248.2);
-  --k-state-selected-bg: oklch(88.9% 0.0088 247.9 / 0.1);
+  --k-state-selected-bg: color-mix(in srgb, var(--k-primary) 14%, transparent);
   --k-state-selected-fg: var(--k-fg);
   --k-bw: 1px;
-  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-border);
+  --k-selected-edge: inset 0 0 0 var(--k-bw) var(--k-state-border);
   --k-radius-sm: 0.6875rem;
   --k-radius-md: 1rem;
   --k-radius-lg: 1rem;
@@ -14460,7 +14461,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease), color var(--k-dur-fast, 140ms) var(--k-ease, ease);
 }
 .navmenu__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.navmenu__item--on { background: var(--k-state-hover); color: var(--k-fg); }
+/* Active reads CHROMATIC (brand whisper) so the current item is distinct from a
+   merely-hovered one (neutral) — not the same wash at the same intensity. */
+.navmenu__item--on { background: var(--k-state-selected-bg); color: var(--k-fg); font-weight: var(--k-weight-semibold); }
 .navmenu__group { position: relative; }
 .navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: var(--k-overlay-min, 12rem); z-index: var(--k-z-dropdown); animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }
 
@@ -17132,7 +17135,6 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-ring-soft": "oklch(25.4% 0.0000 89.9)",
     "--k-ring-halo": "color-mix(in srgb, oklch(94.0% 0.0000 89.9) 28%, transparent)",
     "--k-state-border": "oklch(66.2% 0.0235 285.7)",
-    "--k-state-selected-bg": "oklch(88.4% 0.0082 286.2 / 0.1)",
     "--k-shadow-xs": "0 1px 2px hsl(0 0 0/.05)",
     "--k-shadow-sm": "0 1px 2px hsl(0 0 0/.07)",
     "--k-shadow-md": "0 4px 6px -1px hsl(0 0 0/.10), 0 2px 4px -2px hsl(0 0 0/.10)",

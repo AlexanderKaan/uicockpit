@@ -611,10 +611,14 @@ export function buildTokens(cfg: Config): Tokens {
   const [stH, stS] = [t.h, t.s]
   const stL = dark ? 86 : 14
   const stateHover = hslA(stH, stS, stL, sla)
-  // Selected fill — a notch stronger than hover so a selected item reads above
-  // a merely-hovered one. Always neutral: Emphasis is a pure intensity dial.
-  const selA = Math.min(sla + 0.05, 0.4)
-  const stateSelected = hslA(stH, stS, stL, selA)
+  // Selected fill (Invariant I2 · move B) — a WHISPER brand tint, not a neutral
+  // notch. Persistent selection gets a CHROMATIC anchor so it (a) reads distinct
+  // from the neutral hover wash by HUE, not just a fragile +5% intensity step, and
+  // (b) survives the worst aesthetic-gauge combo (Flat · Plain · Faint) — brand is
+  // orthogonal to the neutral gauges, so nothing can defeat it. Hover/press stay
+  // neutral (transient). (The prior neutral-only wash under-powered selection — the
+  // State-tint cull one notch too far for the *persistent* state.)
+  const stateSelected = 'color-mix(in srgb, var(--k-primary) 14%, transparent)'
   // Pressed / :active layer — a notch stronger again than selected, so a tap
   // gives a tactile "pressed" confirm (Material 3 ~10-12% state layer). Families
   // that had hover but no press (.menu__item, .navrow, nav items, close buttons)
@@ -914,13 +918,13 @@ export function buildTokens(cfg: Config): Tokens {
       // read via the neutral wash (above), not a brand color.
       '--k-state-selected-fg': 'var(--k-fg)',
       '--k-bw': bw,
-      // Selected-edge (Invariant I2) — the depth-independent ring that keeps an
-      // active/selected element legible even at Flat surface depth, where shadows
-      // and neutral tonal steps collapse. Compose it into a selected-state's
-      // box-shadow: `box-shadow: var(--k-shadow-sm), var(--k-selected-edge)`. The
-      // single source for the pattern segctrl proved; named so any control (and the
-      // app chrome) reaches for the token instead of re-spelling the inset ring.
-      '--k-selected-edge': 'inset 0 0 0 var(--k-bw) var(--k-border)',
+      // Selected-edge (Invariant I2) — the gauge-independent ring that keeps an
+      // active/selected element legible even at the worst aesthetic combo (Flat
+      // elevation · Plain surface · Faint border). Rides --k-state-border (a FIXED
+      // mid-grey, NOT the Border-gauge-driven --k-border which fades to ~92% L at
+      // Faint), so no neutral gauge can defeat it. Compose into a selected-state's
+      // box-shadow: `box-shadow: var(--k-shadow-sm), var(--k-selected-edge)`.
+      '--k-selected-edge': 'inset 0 0 0 var(--k-bw) var(--k-state-border)',
       '--k-radius-sm': radius.sm,
       '--k-radius-md': radius.md,
       '--k-radius-lg': radius.lg,
