@@ -38,7 +38,7 @@ const INTENTS = [
   { needs: 'scrubber', line: 'Media transport / player progress with a playhead → `class="scrubber"`' },
   { needs: 'card', line: 'Brand face (ticket, pass, membership card) → `class="card card--presentation"`' },
   { needs: 'toolbar', line: 'A row of mixed controls forced to one height → `class="toolbar"`' },
-  { needs: 'btn', line: 'Primary action → `class="btn btn--primary"`; quiet → `btn btn--ghost`' },
+  { needs: 'btn', line: 'Primary/commit action → `btn btn--primary`; a secondary (non-cancel) action → `btn btn--secondary` (or `btn--outline`); a quiet / cancel action → `btn btn--ghost`. A row-action / kebab / overflow trigger → `btn btn--ghost btn--icon` (it opens a `.menu`).' },
   // Composite archetypes — surfaced by the dumb-builder test (the pack named the
   // root but the builder couldn't compose it). Route each to its root + parts.
   { needs: 'card', line: 'Any panel / dashboard / data card → `.card`, composed from its parts (`__head`/`__title`/`__row`/`__row--spread`/`__col`/`__media`/`__foot`) — don’t inline the layout' },
@@ -51,10 +51,10 @@ const INTENTS = [
   { needs: 'toggle', line: 'An on/off setting → `.toggle` (`__knob` inside; `--on` = on state)' },
   { needs: 'select', line: 'A single choice → `.select` (a dropdown — for many or long options) or `.segctrl` (inline segmented — for 2–4 short options)' },
   { needs: 'buttons', line: 'A form / dialog action row → `.buttons`; commit = `.btn--primary`, cancel = `.btn--ghost`' },
-  { needs: 'datatable', line: 'A data-table panel → `.datatable` (chrome: `__bar` = the toolbar row · `__body` holds a real `.tbl` table · `__foot` with `__count`/`__perpage` · `__check` = the row-select cells). Pagination → `.pagination` with bare `<button>` children (auto-chipped); the current page is `<button aria-current="true">`; `.pagination__ellipsis` for the gap.' },
+  { needs: 'datatable', line: 'A data-table panel → `.datatable` (chrome: `__bar` = the toolbar row · `__body` holds a real `.tbl` table · `__foot` with `__count` + an OPTIONAL `__perpage` · `__check` = the row-select cell, holding a native `<input type=checkbox>` styled by `.check`). Pagination → `.pagination` with bare `<button>` children (auto-chipped); the current page is `<button aria-current="true">`; `.pagination__ellipsis` for the gap.' },
   { needs: 'calendar', line: 'A date / date-range picker → `.calendar` (compose `__head` with `__nav-title` + `__nav-btns`; the day grid is `.calendar__cell` items). State mods decorate the CELL: `.calendar__cell.calendar--today`/`--disabled`/`--out`/`--range`/`--range-start`/`--range-end`. A range view wraps months in `.calendar-range`.' },
   { needs: 'badge', line: 'A record / lifecycle status (Active · Pending · Archived · Failed) → a `.badge` tone (`--success` / `--warn` / `--neutral` / `--danger`). A LIVE presence dot (online / away / busy) is the different `.meta-status`.' },
-  { needs: 'select', line: 'A filter control → `.select` (a dropdown filter) · a removable active filter → `.chip--filter` · a whole filter bar → `.filterbar`.' },
+  { needs: 'select', line: 'A filter control → `.select` (the DEFAULT — a dropdown filter); use `.chip--filter` only for a removable active-filter pill, or `.filterbar` for a full multi-facet bar. Leaf form controls (`.select`, `.check`, `.in`) are styled by the class on the native element — no inner parts.' },
   { needs: null, line: 'Muted / secondary text → `color: var(--k-fg-muted)`; faint → `var(--k-fg-faint)`' },
 ]
 
@@ -141,9 +141,11 @@ export function designContext(contract, hash = null) {
     lines.push('  `.stat-tile-grid`; a row of mixed controls at one height → `.toolbar`.')
     lines.push('- Semantic colour: positive/up → `--k-success`, negative/down → `--k-danger`,')
     lines.push('  warning → `--k-warning`, info → `--k-info`, a rating/score → `--k-rating` (gold).')
-    lines.push('- Icons are YOURS: a component with a glyph (`.btn`, `.rating`, list rows) sizes +')
-    lines.push('  colours your own SVG via `--k-icon-xs/sm/md` + `currentColor`; wrap one in')
-    lines.push('  `.icon-tile` for a soft-tinted square mark.')
+    lines.push('- Icons are YOURS, with NO slot class: a glyph is a DIRECT `<svg>` (or `<i>`)')
+    lines.push('  child of the control — a `.btn`, a `.searchinput`, a `.pagination` button, a')
+    lines.push('  kebab trigger — sized via `--k-icon-xs/sm/md` + `currentColor`. The control')
+    lines.push('  styles its child glyph; don’t look for a `__icon` part. Wrap a standalone mark')
+    lines.push('  in `.icon-tile` for a soft-tinted square.')
     lines.push('- A `--modifier` that names a per-item STATE decorates the relevant PART or')
     lines.push('  INSTANCE, not the root: a selected day is `.calendar__cell.calendar--range`, a')
     lines.push('  selected table row is a `<tr class="is-selected">`, the current page is')
