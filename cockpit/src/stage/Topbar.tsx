@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, BookOpen, Boxes, Check, ChevronDown, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
+import { AppWindow, BookOpen, Boxes, Check, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -178,9 +178,8 @@ export function Topbar({ view, onViewChange, mode, onToggleMode, onShare, onExpo
           Share
         </button>
         <button type="button" className="topbar__btn topbar__btn--code" onClick={onExport} aria-label="Use this kit">
-          <span>Use kit</span>
           <Code size={14} strokeWidth={1.75} />
-          <ChevronDown size={13} strokeWidth={1.75} />
+          <span>Use kit</span>
         </button>
       </div>
     </header>

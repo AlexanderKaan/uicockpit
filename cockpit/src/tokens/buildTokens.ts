@@ -1210,16 +1210,17 @@ export function buildTokens(cfg: Config): Tokens {
       // ~15 sites with no token; unified to a single airy-caps value so caps
       // tracking reads consistently and is tunable in one place.
       '--k-track-eyebrow': '0.06em',
-      // Label-case treatment (the labelCase knob) — drives the EXISTING UI-label
-      // hooks `--k-ui-transform` / `--k-ui-tracking` that 7 chrome recipes already
-      // read (.btn · .lab · .badge · .tab · .navrow · .segctrl__btn · .dl). When
-      // 'caps', that whole label tier goes uppercase + lightly tracked (the
-      // industrial / terminal look, e.g. the "Sera" kit). Default 'sentence' resolves
-      // to none/0 — identical to the recipes' own fallbacks, so every other kit is
-      // byte-for-byte unchanged. Body text, page/card titles and numbers don't read
-      // these hooks, so they always stay as authored.
-      '--k-ui-transform': cfg.labelCase === 'caps' ? 'uppercase' : 'none',
-      '--k-ui-tracking': cfg.labelCase === 'caps' ? '0.05em' : '0',
+      // Label-case treatment (the labelCase knob). Best practice: uppercase belongs
+      // only to the SHORT, structural META-LABEL tier — NOT to interactive/action
+      // elements (buttons, tabs, segmented, nav, links), where caps hurts readability
+      // and reads dated (Material 3 reversed its uppercase buttons). So this drives a
+      // dedicated `--k-label-transform` read ONLY by the meta-label recipes (.badge ·
+      // .lab · .dl); the interactive chrome reads `--k-ui-transform` (left unset →
+      // sentence) and is never touched. The eyebrow / section-label / table-head /
+      // stat-label tier is already uppercase by default. Default 'sentence' = none/0,
+      // so every non-industrial kit is byte-for-byte unchanged.
+      '--k-label-transform': cfg.labelCase === 'caps' ? 'uppercase' : 'none',
+      '--k-label-tracking': cfg.labelCase === 'caps' ? '0.05em' : '0',
       // Negative tracking for tight headings (--tight) + display figures (--display).
       // Was copied as raw -0.01em / -0.02em em-literals at every heading/stat/price.
       '--k-track-tight': '-0.01em',

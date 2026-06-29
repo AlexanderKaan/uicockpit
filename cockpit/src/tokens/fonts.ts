@@ -38,7 +38,10 @@ const GOOGLE_SANS = [
   'Public Sans',
 ]
 
-const GOOGLE_SERIF = ['Fraunces', 'Instrument Serif', 'Newsreader']
+// Display serifs — only interface-usable ones (multi-weight, readable at heading
+// sizes). Instrument Serif was dropped: single-weight 400, hairline high-contrast,
+// only legible as huge hero/logo type — not a usable interface face.
+const GOOGLE_SERIF = ['Fraunces', 'Newsreader']
 
 /** Body fonts — sans only (serifs are display-only by design choice).
  *  System sits in its own group at top; Google fonts in one combined group. */
@@ -72,9 +75,6 @@ export const UI_WEIGHTS: Record<'medium' | 'semibold' | 'bold', number> = {
  * Build a Google Fonts CSS @import line for the chosen typefaces.
  * Used by every CSS export so dropped-in files render in the chosen
  * fonts without further setup. Includes JetBrains Mono (Kbd & code).
- *
- * Single-weight family quirk: Instrument Serif ships only as 400,
- * the URL spec doesn't take a wght parameter for it.
  */
 export function googleFontsImport(fontDisplay: string, fontBody: string): string {
   const seen = new Set<string>([fontDisplay, fontBody])
@@ -85,10 +85,8 @@ export function googleFontsImport(fontDisplay: string, fontBody: string): string
   for (const name of [...seen]) {
     if (isCustomFont(name)) seen.delete(name)
   }
-  const sansSpec = (name: string) => {
-    if (name === 'Instrument Serif') return name.replace(/\s+/g, '+')
-    return `${name.replace(/\s+/g, '+')}:wght@400;500;600;700`
-  }
+  // Every remaining family is multi-weight, so one spec fits all.
+  const sansSpec = (name: string) => `${name.replace(/\s+/g, '+')}:wght@400;500;600;700`
   const families = [...seen].map(sansSpec)
   families.push('JetBrains+Mono:wght@400;500')
   const url = `https://fonts.googleapis.com/css2?family=${families.join('&family=')}&display=swap`

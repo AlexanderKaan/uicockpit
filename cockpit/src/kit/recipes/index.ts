@@ -952,10 +952,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .lab > span:first-child {
   font-size: var(--k-type-eyebrow);
   color: var(--k-fg-muted);
-  /* Form labels inherit UI text — these are chrome elements, not body content */
+  /* Form labels inherit UI weight; case follows the meta-label tier (labelCase) */
   font-weight: var(--k-ui-weight, 500);
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 /* === FormField (.field) — the full form-row contract: label + required marker +
  * control + hint + error, wired for a11y (aria-describedby → hint/error ids,
@@ -1131,8 +1131,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   /* Same line-height: 1 trick as .btn — keeps tiny icons (the success
      check, info dot, etc.) optically centered with the label. */
   line-height: 1;
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 .badge > svg { flex-shrink: 0; display: block; }
 .badge--success { background: var(--k-success-soft); color: var(--k-success-soft-fg); }
@@ -3825,8 +3825,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   color: var(--k-fg-muted);
   font-weight: var(--k-ui-weight, 500);
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 .dl dd {
   font-size: var(--k-type-small);

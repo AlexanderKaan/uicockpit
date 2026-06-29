@@ -160,6 +160,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-inverse-fg-muted": "color-mix(in srgb, oklch(94.5% 0.0140 249.9) 62%, oklch(25.4% 0.0070 249.9))",
     "--k-inverse-primary": "oklch(56.4% 0.1689 253.9)",
     "--k-inverse-surface": "oklch(25.4% 0.0070 249.9)",
+    "--k-label-tracking": "0",
+    "--k-label-transform": "none",
     "--k-leading-normal": "1.5",
     "--k-leading-snug": "1.25",
     "--k-leading-tight": "1.05",
@@ -271,8 +273,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-type-h3": "1.0125rem",
     "--k-type-input-min": "16px",
     "--k-type-small": "0.75rem",
-    "--k-ui-tracking": "0",
-    "--k-ui-transform": "none",
     "--k-ui-weight": "600",
     "--k-warning": "oklch(89.6% 0.1934 109.7)",
     "--k-warning-fg": "#16160c",
@@ -3064,8 +3064,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
-  --k-ui-transform: none;
-  --k-ui-tracking: 0;
+  --k-label-transform: none;
+  --k-label-tracking: 0;
   --k-track-tight: -0.01em;
   --k-track-display: -0.02em;
   --k-leading-tight: 1.05;
@@ -3358,8 +3358,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
-  --k-ui-transform: none;
-  --k-ui-tracking: 0;
+  --k-label-transform: none;
+  --k-label-tracking: 0;
   --k-track-tight: -0.01em;
   --k-track-display: -0.02em;
   --k-leading-tight: 1.05;
@@ -4640,10 +4640,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .lab > span:first-child {
   font-size: var(--k-type-eyebrow);
   color: var(--k-fg-muted);
-  /* Form labels inherit UI text — these are chrome elements, not body content */
+  /* Form labels inherit UI weight; case follows the meta-label tier (labelCase) */
   font-weight: var(--k-ui-weight, 500);
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 /* === FormField (.field) — the full form-row contract: label + required marker +
  * control + hint + error, wired for a11y (aria-describedby → hint/error ids,
@@ -4816,8 +4816,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   /* Same line-height: 1 trick as .btn — keeps tiny icons (the success
      check, info dot, etc.) optically centered with the label. */
   line-height: 1;
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 .badge > svg { flex-shrink: 0; display: block; }
 .badge--success { background: var(--k-success-soft); color: var(--k-success-soft-fg); }
@@ -7363,8 +7363,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   color: var(--k-fg-muted);
   font-weight: var(--k-ui-weight, 500);
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 .dl dd {
   font-size: var(--k-type-small);
@@ -9739,8 +9739,8 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
-  --k-ui-transform: none;
-  --k-ui-tracking: 0;
+  --k-label-transform: none;
+  --k-label-tracking: 0;
   --k-track-tight: -0.01em;
   --k-track-display: -0.02em;
   --k-leading-tight: 1.05;
@@ -10033,8 +10033,8 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-type-caption: 0.625rem;
   --k-type-eyebrow: 0.6875rem;
   --k-track-eyebrow: 0.06em;
-  --k-ui-transform: none;
-  --k-ui-tracking: 0;
+  --k-label-transform: none;
+  --k-label-tracking: 0;
   --k-track-tight: -0.01em;
   --k-track-display: -0.02em;
   --k-leading-tight: 1.05;
@@ -11315,10 +11315,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .lab > span:first-child {
   font-size: var(--k-type-eyebrow);
   color: var(--k-fg-muted);
-  /* Form labels inherit UI text — these are chrome elements, not body content */
+  /* Form labels inherit UI weight; case follows the meta-label tier (labelCase) */
   font-weight: var(--k-ui-weight, 500);
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 /* === FormField (.field) — the full form-row contract: label + required marker +
  * control + hint + error, wired for a11y (aria-describedby → hint/error ids,
@@ -11491,8 +11491,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   /* Same line-height: 1 trick as .btn — keeps tiny icons (the success
      check, info dot, etc.) optically centered with the label. */
   line-height: 1;
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 .badge > svg { flex-shrink: 0; display: block; }
 .badge--success { background: var(--k-success-soft); color: var(--k-success-soft-fg); }
@@ -14038,8 +14038,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   color: var(--k-fg-muted);
   font-weight: var(--k-ui-weight, 500);
-  text-transform: var(--k-ui-transform, none);
-  letter-spacing: var(--k-ui-tracking, 0);
+  text-transform: var(--k-label-transform, none);
+  letter-spacing: var(--k-label-tracking, 0);
 }
 .dl dd {
   font-size: var(--k-type-small);
