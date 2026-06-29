@@ -51,6 +51,10 @@ const INTENTS = [
   { needs: 'toggle', line: 'An on/off setting → `.toggle` (`__knob` inside; `--on` = on state)' },
   { needs: 'select', line: 'A single choice → `.select` (a dropdown — for many or long options) or `.segctrl` (inline segmented — for 2–4 short options)' },
   { needs: 'buttons', line: 'A form / dialog action row → `.buttons`; commit = `.btn--primary`, cancel = `.btn--ghost`' },
+  { needs: 'datatable', line: 'A data-table panel → `.datatable` (chrome: `__bar` = the toolbar row · `__body` holds a real `.tbl` table · `__foot` with `__count`/`__perpage` · `__check` = the row-select cells). Pagination → `.pagination` with bare `<button>` children (auto-chipped); the current page is `<button aria-current="true">`; `.pagination__ellipsis` for the gap.' },
+  { needs: 'calendar', line: 'A date / date-range picker → `.calendar` (compose `__head` with `__nav-title` + `__nav-btns`; the day grid is `.calendar__cell` items). State mods decorate the CELL: `.calendar__cell.calendar--today`/`--disabled`/`--out`/`--range`/`--range-start`/`--range-end`. A range view wraps months in `.calendar-range`.' },
+  { needs: 'badge', line: 'A record / lifecycle status (Active · Pending · Archived · Failed) → a `.badge` tone (`--success` / `--warn` / `--neutral` / `--danger`). A LIVE presence dot (online / away / busy) is the different `.meta-status`.' },
+  { needs: 'select', line: 'A filter control → `.select` (a dropdown filter) · a removable active filter → `.chip--filter` · a whole filter bar → `.filterbar`.' },
   { needs: null, line: 'Muted / secondary text → `color: var(--k-fg-muted)`; faint → `var(--k-fg-faint)`' },
 ]
 
@@ -140,6 +144,11 @@ export function designContext(contract, hash = null) {
     lines.push('- Icons are YOURS: a component with a glyph (`.btn`, `.rating`, list rows) sizes +')
     lines.push('  colours your own SVG via `--k-icon-xs/sm/md` + `currentColor`; wrap one in')
     lines.push('  `.icon-tile` for a soft-tinted square mark.')
+    lines.push('- A `--modifier` that names a per-item STATE decorates the relevant PART or')
+    lines.push('  INSTANCE, not the root: a selected day is `.calendar__cell.calendar--range`, a')
+    lines.push('  selected table row is a `<tr class="is-selected">`, the current page is')
+    lines.push('  `<button aria-current="true">`, a danger menu item is a `.menu__item.menu--danger`.')
+    lines.push('  When a modifier reads as a per-item state, apply it to the item.')
     lines.push('')
     lines.push(`## Component classes (${roots.length}) — the ROOT, its __parts (compose these), its --modifiers`)
     for (const root of roots) {
