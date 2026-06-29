@@ -461,7 +461,11 @@
   background: var(--app-surface);
   color: var(--app-fg);
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+  /* Selected-edge (Invariant I2) — the depth-independent inset ring keeps the
+     active pill legible where the surface-on-bg tonal step + the faint shadow
+     collapse (the icon-picker "which one is selected?" bug). Mirrors the kit's
+     --k-selected-edge using the chrome's own border token. */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), inset 0 0 0 1px var(--app-border);
 }
 /* Icon-glyph segment (Icons row) — center the family glyph, no text. */
 .fmseg__opt--viz { display: inline-flex; align-items: center; justify-content: center; padding: 3px; }

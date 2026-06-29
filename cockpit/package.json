@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run verify:icons && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && npm run audit:layout && npm run audit:inline && npm run audit:craft && tsc -b && vite build",
+    "build": "npm run verify:icons && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && npm run audit:layout && npm run audit:inline && npm run audit:craft && npm run audit:state-edge && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
@@ -25,6 +25,7 @@
     "audit:layout": "node scripts/audit-layout.mjs",
     "audit:inline": "node scripts/audit-structural-inline.mjs",
     "audit:craft": "node scripts/audit-craft.mjs",
+    "audit:state-edge": "node scripts/audit-state-edge.mjs",
     "check": "node scripts/uicockpit-check.mjs"
   },
   "dependencies": {

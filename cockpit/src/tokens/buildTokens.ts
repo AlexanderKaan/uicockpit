@@ -914,6 +914,13 @@ export function buildTokens(cfg: Config): Tokens {
       // read via the neutral wash (above), not a brand color.
       '--k-state-selected-fg': 'var(--k-fg)',
       '--k-bw': bw,
+      // Selected-edge (Invariant I2) — the depth-independent ring that keeps an
+      // active/selected element legible even at Flat surface depth, where shadows
+      // and neutral tonal steps collapse. Compose it into a selected-state's
+      // box-shadow: `box-shadow: var(--k-shadow-sm), var(--k-selected-edge)`. The
+      // single source for the pattern segctrl proved; named so any control (and the
+      // app chrome) reaches for the token instead of re-spelling the inset ring.
+      '--k-selected-edge': 'inset 0 0 0 var(--k-bw) var(--k-border)',
       '--k-radius-sm': radius.sm,
       '--k-radius-md': radius.md,
       '--k-radius-lg': radius.lg,

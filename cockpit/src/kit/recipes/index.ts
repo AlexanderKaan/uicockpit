@@ -3729,13 +3729,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .segctrl__btn--on, .segctrl__btn[aria-checked="true"], .segctrl__btn[aria-selected="true"] {
   background: var(--k-surface);
   color: var(--k-fg);
-  /* Lift shadow + a layout-neutral inset hairline. The shadow gives elevation;
-     the inset ring is the depth-independent edge that keeps the active thumb
-     legible even at Flat surface depth (where --k-shadow-sm and the
-     surface/surface-2 tonal step both collapse). Mirrors the chrome
-     .viewtoggle's white-pill-on-grey-track clarity via a real edge instead of
-     relying on elevation alone. */
-  box-shadow: var(--k-shadow-sm), inset 0 0 0 var(--k-bw, 1px) var(--k-border);
+  /* Lift shadow + the selected-edge (Invariant I2): the inset ring is the
+     depth-independent edge that keeps the active thumb legible even at Flat
+     surface depth (where --k-shadow-sm and the surface/surface-2 tonal step both
+     collapse). --k-selected-edge is the single source for this pattern. */
+  box-shadow: var(--k-shadow-sm), var(--k-selected-edge);
 }`,
   },
   {

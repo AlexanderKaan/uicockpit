@@ -140,16 +140,26 @@ the 2026-06-29 invariant study; "enforced" tracks rail 4.
 | Inv | Law | Primitive (rail 2) | Coverage | Gap families | Enforced |
 |-----|-----|--------------------|----------|--------------|----------|
 | **I1 Height harmony** | L3 | per-control `min-height: var(--k-control-h-*)` + the `.toolbar` container force | ~70 % | `.segctrl` · `.check` · `.radio` · `.toggle` · `.slider` (unbound standalone) | ❌ info-only (`control-height-invariant`) |
-| **I2 Selected-edge** | L5 / L6 | `--k-selected-edge` = `inset 0 0 0 var(--k-bw) var(--k-border)` | **~15 %** | only `.segctrl` honors it; `.tbl` · `.tree` · `.navsub` · `.calendar` · `.cmdp` (+ chrome `.fmseg`) | ❌ not even named |
+| **I2 Selected-edge** | L5 / L6 | `--k-selected-edge` = `inset 0 0 0 var(--k-bw) var(--k-border)` | **100 %** | — (recalibrated: see note) | ✅ `audit:state-edge` |
 | **I3 Focus-visible** | L6 | one focus primitive (stop relying on the *fragile global* only) | ~60 % | `.segctrl` · `.toggle` · `.tab` · `.combobox` · `.badge` · `.avatar` | ❌ |
 | **I4 Hit-target** | L4 | min interactive-size token + documented dense exceptions | ~50 % | `.navsub` · `.tree` · `.combobox` (28px) · `.calendar` · `.check` / `.radio` / `.toggle` | ❌ |
 
 **Phased plan:**
 
 - **Phase 0** — this section: the engine + the status tracker. *(done)*
-- **Phase 1** — **I2 selected-edge** (highest leverage: 15 % coverage, one cheap
-  token) → **I1 height harmony**. *These are the user's two examples, shipped as
-  enforced invariants, not patches.*
+- **Phase 1 — I2 selected-edge — DONE.** Shipped the `--k-selected-edge` token;
+  `.segctrl` now composes it (single source); the chrome `.fmseg` (the user's
+  actual icon-picker bug) dogfoods it; `audit:state-edge` locks it in.
+  - **Recalibration (honest):** the invariant study over-flagged. The collapse is
+    specifically a **neutral *surface-elevation* step** (surface-on-bg) flattening at
+    Flat depth — `.segctrl` / the chrome `.fmseg`. The other "gaps" the study named
+    (`.tbl` `.tree` `.calendar` use a *chromatic* fill; `.navsub` uses chromatic
+    *text*; `.cmdp` / `.combobox` / `.searchinput` use a `--k-state-hover` *alpha
+    overlay*) are **not** I2 collapses — colour and overlays survive Flat depth. The
+    audit enforces only the real case (surface step without an edge → fail). A
+    separate *active-vs-hover distinguishability* concern (e.g. `.navmenu__item--on`
+    reads identical to its hover) is a different invariant, noted for later.
+  - **Next: I1 height harmony** (the button-height example).
 - **Phase 2** — **I3 focus-visible** · **I4 hit-target**.
 - **Phase 3** — **chrome dogfood**: `.fmseg` → the selected-edge token,
   `.topbar__btn` → the control-height token. Kills our two bugs + proves the engine.
