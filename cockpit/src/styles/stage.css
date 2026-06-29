@@ -15,6 +15,11 @@
   background: var(--app-surface);
   border-bottom: 1px solid var(--app-border);
   gap: 16px;
+  /* Height harmony (Invariant I1, chrome dogfood) — ONE explicit height for every
+     topbar control, so padding/line-height drift can't make Share (27) ≠ Use-kit
+     (28.4) ≠ the icon buttons (the bug). The kit guarantees this in a row via
+     .toolbar; the chrome is a bespoke row, so it carries its own shared height. */
+  --topbar-ctrl-h: 30px;
 }
 
 .topbar__left,
@@ -149,7 +154,13 @@
 }
 
 .topbar__btn {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--topbar-ctrl-h);
+  box-sizing: border-box;
+  line-height: 1;
+  padding: 0 12px;
   font-size: 12px;
   font-weight: 500;
   color: var(--app-fg);
@@ -168,8 +179,8 @@
   align-items: center;
   justify-content: center;
   width: 32px;
-  /* height auto + parent align-items:stretch → matches Share/Export height */
-  align-self: stretch;
+  height: var(--topbar-ctrl-h);
+  box-sizing: border-box;
   color: var(--app-fg-muted);
   border: 1px solid var(--app-border);
   border-radius: 7px;

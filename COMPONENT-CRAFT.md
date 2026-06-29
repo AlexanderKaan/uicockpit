@@ -139,7 +139,7 @@ the 2026-06-29 invariant study; "enforced" tracks rail 4.
 
 | Inv | Law | Primitive (rail 2) | Coverage | Gap families | Enforced |
 |-----|-----|--------------------|----------|--------------|----------|
-| **I1 Height harmony** | L3 | per-control `min-height: var(--k-control-h-*)` + the `.toolbar` container force | ~70 % | `.segctrl` · `.check` · `.radio` · `.toggle` · `.slider` (unbound standalone) | ❌ info-only (`control-height-invariant`) |
+| **I1 Height harmony** | L3 | the `.toolbar` CONTAINER forces `height: var(--tb-h)` on every control child | 100 % | — (recalibrated: see note) | ✅ `audit:control-h` |
 | **I2 Selected-edge** | L5 / L6 | `--k-selected-edge` = `inset 0 0 0 var(--k-bw) var(--k-border)` | **100 %** | — (recalibrated: see note) | ✅ `audit:state-edge` |
 | **I3 Focus-visible** | L6 | one focus primitive (stop relying on the *fragile global* only) | ~60 % | `.segctrl` · `.toggle` · `.tab` · `.combobox` · `.badge` · `.avatar` | ❌ |
 | **I4 Hit-target** | L4 | min interactive-size token + documented dense exceptions | ~50 % | `.navsub` · `.tree` · `.combobox` (28px) · `.calendar` · `.check` / `.radio` / `.toggle` | ❌ |
@@ -177,7 +177,23 @@ the 2026-06-29 invariant study; "enforced" tracks rail 4.
     *Principle for the engine: an aesthetic gauge must never be able to defeat a
     functional state distinction to invisibility — floor it, and anchor persistent
     states chromatically.*
-  - **Next: I1 height harmony** (the button-height example).
+- **Phase 1 — I1 height harmony — DONE.**
+  - **Recalibration (honest, again):** the study over-flagged. Height harmony is a
+    *container* guarantee, not per-control: `.toolbar` already forces
+    `height: var(--tb-h)` on all SIX row-height controls (`.btn` `.in` `.select`
+    `.select-trigger` `.searchinput` `.segctrl`). The "gaps" the study named —
+    `.toggle` `.slider` `.check` `.radio` — are **deliberately small** controls (a
+    switch is a 20px switch, not a 36px control); they align by *centering* in a row,
+    not by sharing the control height. Binding them to 36px would be wrong.
+  - **ENFORCE:** `audit:control-h` asserts every control-family class is in the
+    toolbar height-invariant selector, so a *future* control can't silently escape
+    the row height (the container can't forget one).
+  - **DOGFOOD (the user's actual button-height bug):** the chrome topbar was a
+    bespoke flex row with padding-derived buttons, so variants drifted (Share 27 ·
+    Use-kit 28.4 · icons 28.4 — different line-heights/content). Gave the topbar one
+    explicit `--topbar-ctrl-h` on every control → **all 6 now 30px**, verified in the
+    live DOM. (A bespoke row carries its own shared height; in app code the agent
+    gets it free via `.toolbar`.)
 - **Phase 2** — **I3 focus-visible** · **I4 hit-target**.
 - **Phase 3** — **chrome dogfood**: `.fmseg` → the selected-edge token,
   `.topbar__btn` → the control-height token. Kills our two bugs + proves the engine.
