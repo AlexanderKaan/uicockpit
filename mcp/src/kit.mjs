@@ -42,14 +42,14 @@ const INTENTS = [
   // Composite archetypes — surfaced by the dumb-builder test (the pack named the
   // root but the builder couldn't compose it). Route each to its root + parts.
   { needs: 'card', line: 'Any panel / dashboard / data card → `.card`, composed from its parts (`__head`/`__title`/`__row`/`__row--spread`/`__col`/`__media`/`__foot`) — don’t inline the layout' },
-  { needs: 'stat-tile', line: 'A KPI tile (label · value · +/- delta) → `.stat-tile` (`--up`/`--down` colour the delta, `--hero` = focal); a row of them → `.stat-tile-grid`' },
-  { needs: 'pricing', line: 'Pricing / plan cards → `.pricing` (recommended plan adds `--featured`); compose `__name` · `__price`/`__amount`/`__period` · `__feats` · `__badge`' },
+  { needs: 'stat-tile', line: 'A KPI tile (label · value · +/- delta) → `.stat-tile` (`__label` · `__value` · `__delta`; `--up`/`--down` colour the delta, `--hero` = the one focal tile); a row of them → `.stat-tile-grid`. A standalone BIG focal figure (a temperature, a balance) is `.stat-tile__value` / `.metric__value` — already a display-weight tier; the focal one adds `--hero`.' },
+  { needs: 'pricing', line: 'A pricing comparison → `.pricing` (a self-responsive grid WRAPPER); each plan is a `.pricing__tier` (the recommended one is `pricing__tier pricing__tier--featured`). Inside a tier compose: `__name` · `__price` (which wraps `__amount` + `__period`) · `__tagline` · `__feats` (each feature a plain `<li>`, it gets the ✓) · `__cta` (holds the `.btn`, pinned to the bottom so CTAs align) · optional `__badge`.' },
   { needs: 'chart', line: 'A line / bar / donut chart → `.chart` (compose `__svg` · `__grid` · `__axis` · `__legend` · `__tip`; `__empty`/`__loading` for those states)' },
-  { needs: 'list', line: 'A ranked / settings / nav list → `.list` (`--settings` for label+control rows, `--cols` for value columns); each row is `.list__row` (`__lead` · `__title`/`__sub` · `__trail`)' },
-  { needs: 'msg', line: 'A chat / comment bubble → `.msg` (`--me` for sent); compose `__name` · `__body` · `__time`; stack messages in a `.thread`' },
-  { needs: 'field', line: 'A form field → `.field` (compose `__label` · the control `.in`/`.select` · `__hint`/`__error`)' },
-  { needs: 'toggle', line: 'An on/off setting → `.toggle` (`--on` = on state)' },
-  { needs: 'select', line: 'A single choice → `.select` (dropdown) or `.segctrl` (inline segmented)' },
+  { needs: 'list', line: 'A ranked / settings / nav list → `.list` (`--settings` for label+control rows, `--cols` for value columns); each row is `.list__row` (`__lead` · `__title`/`__sub` · `__trail`). For a RANKED list the `__lead` holds the ordinal (1·2·3) or a lead icon; the value goes in `__trail`.' },
+  { needs: 'msg', line: 'A chat / comment bubble → `.msg` (`--me` = sent, right + brand fill); compose `__head` (an optional leading `.avatar` + `__name` + `__time`) then `__body` (the text); stack messages in a `.thread`. A composer = a `.toolbar` holding the `.in` + a `.btn--primary` send.' },
+  { needs: 'field', line: 'A form field → `.field` (compose `__label` · the control `.in`/`.select` · optional `__hint`/`__error`/`__req`)' },
+  { needs: 'toggle', line: 'An on/off setting → `.toggle` (`__knob` inside; `--on` = on state)' },
+  { needs: 'select', line: 'A single choice → `.select` (a dropdown — for many or long options) or `.segctrl` (inline segmented — for 2–4 short options)' },
   { needs: 'buttons', line: 'A form / dialog action row → `.buttons`; commit = `.btn--primary`, cancel = `.btn--ghost`' },
   { needs: null, line: 'Muted / secondary text → `color: var(--k-fg-muted)`; faint → `var(--k-fg-faint)`' },
 ]

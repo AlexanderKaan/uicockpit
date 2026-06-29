@@ -59,6 +59,10 @@ export const RECIPES: readonly Recipe[] = [
   color: var(--k-fg);
 }
 .metric__sub { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+/* Optional icon slot — for a labelled figure that carries a glyph (a forecast day:
+   label → icon → value). Sizes your SVG via the icon scale + currentColor. */
+.metric__icon { color: var(--k-fg-muted); line-height: 0; }
+.metric__icon svg { width: var(--k-icon-md); height: var(--k-icon-md); }
 
 /* Icon-tile — a soft-tinted square holding an icon (stat-tile marks, list leads,
    nav glyphs). The tint pair + radius + centering, named once instead of redefined
@@ -5197,6 +5201,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-success);
   font-weight: var(--k-weight-semibold);
 }
+/* Tagline + CTA — the parts the a2ui test wanted. The CTA pins to the bottom of
+   the (flex-column) tier so every plan's button aligns across the row, and goes
+   full-width. */
+.pricing__tagline { font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.pricing__cta { margin-top: auto; }
+.pricing__cta .btn { width: 100%; }
 
 /* StatGroup metric strip → unified into the .stat-tile family as
  * .stat-tile-strip / .stat-tile-strip__cell (defined with the stat-tile
