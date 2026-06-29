@@ -6,7 +6,7 @@ import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { BODY_FONTS, DISPLAY_GROUPS, customFontFamily, isCustomFont, type FontGroup } from '../tokens/fonts'
 import { nameColor } from '../tokens/color'
 import { COLOR_THEMES } from '../tokens/stylesAndThemes'
-import { HARMONY_PRESETS, applyHarmonyPreset } from '../tokens/harmony'
+import { applyHarmonyPreset } from '../tokens/harmony'
 import type { ColorTheme, Config, Harmony, Tokens } from '../tokens/types'
 import type { ConfigAction } from '../state/configReducer'
 import { FontPicker } from './FontPicker'
@@ -378,11 +378,12 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
     },
     {
       // Harmony (H1) — how the derived family (secondary/accent/decoratives/
-      // neutral tint) relates to the brand. 4 presets + the two live dials
-      // (Spread/Expression) in the flyout foot; a moved dial = Custom.
+      // neutral tint) relates to the brand. Four curated presets; the raw
+      // Spread°/Expression% dials were culled (power-user noise — the presets
+      // cover it, and a kit/preset is the right granularity, not a degree dial).
       key: 'harmony',
       label: 'Harmony',
-      value: cfg.harmony === 'custom' ? `Custom · ${cfg.spread}°` : cap(HARMONY_OPTS, cfg.harmony),
+      value: cap(HARMONY_OPTS, cfg.harmony),
       kind: 'opts',
       opts: optsFrom(HARMONY_OPTS),
       selected: cfg.harmony,
@@ -390,50 +391,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
         dispatch({ type: 'SET', patch: applyHarmonyPreset(id as Exclude<Harmony, 'custom'>) })
         close()
       },
-      footer: (
-        <div className="fmharmony">
-          <label className="fmslider">
-            <span className="fmslider__label">Spread</span>
-            <input
-              type="range"
-              min={0}
-              max={180}
-              step={5}
-              list="harmony-spread-detents"
-              value={cfg.spread}
-              onChange={(e) => {
-                const v = +e.target.value
-                dispatch({ type: 'SET', patch: cfg.harmony === 'custom' ? { spread: v } : { harmony: 'custom', spread: v } })
-              }}
-              aria-label="Hue spread of the derived color family (degrees)"
-            />
-            <span className="fmslider__val">{cfg.spread}°</span>
-          </label>
-          {/* Detents at the named anchor points: mono / tonal (+60) / complement */}
-          <datalist id="harmony-spread-detents">
-            <option value={HARMONY_PRESETS.mono.spread} />
-            <option value={HARMONY_PRESETS.tonal.spread} />
-            <option value={HARMONY_PRESETS.expressive.spread} />
-            <option value={HARMONY_PRESETS.complement.spread} />
-          </datalist>
-          <label className="fmslider">
-            <span className="fmslider__label">Expression</span>
-            <input
-              type="range"
-              min={0}
-              max={150}
-              step={5}
-              value={cfg.expression}
-              onChange={(e) => {
-                const v = +e.target.value
-                dispatch({ type: 'SET', patch: cfg.harmony === 'custom' ? { expression: v } : { harmony: 'custom', expression: v } })
-              }}
-              aria-label="Chroma expression of the derived color family (percent)"
-            />
-            <span className="fmslider__val">{cfg.expression}%</span>
-          </label>
-        </div>
-      ),
     },
     {
       key: 'palette',
@@ -549,19 +506,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(CANVAS_OPTS),
       selected: cfg.canvas,
       onPick: pick('canvas'),
-    },
-    {
-      // Fill — the tactical tint for the summary band (KPI strip / hero / amount).
-      // Same palette as Background; White = no wash. Applied to the focal block
-      // only (background: var(--k-fill)); working surfaces stay white.
-      key: 'fill',
-      label: 'Block fill',
-      value: cap(CANVAS_OPTS, cfg.fill),
-      kind: 'seg',
-      stack: true,
-      opts: optsFrom(CANVAS_OPTS),
-      selected: cfg.fill,
-      onPick: pick('fill'),
     },
     {
       key: 'borders',
