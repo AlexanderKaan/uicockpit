@@ -61,6 +61,10 @@ export type TypeScale = 'sm' | 'md' | 'lg' | 'xl'
  *  labels): 'sentence' = as-authored; 'caps' = uppercase + tracking (the industrial
  *  / terminal look). Body text, page headlines and numbers never transform. */
 export type LabelCase = 'sentence' | 'caps'
+/** Display weight — the heading/headline font-weight. 'semibold' is the house
+ *  default (headings 600, hero 700). 'light' is the Stripe-style ultralight headline;
+ *  'bold' the loud end. Only the display tier follows it; body + UI labels don't. */
+export type DisplayWeight = 'light' | 'regular' | 'medium' | 'semibold' | 'bold'
 export type IconSet = 'hairline' | 'line' | 'rounded' | 'bold' | 'solid'
 /* UI text weight is a fixed system constant (semibold) — no control, not driven
  * by Scale or Text size. UI_WEIGHTS (fonts.ts) is the lookup; this stays as the
@@ -174,6 +178,7 @@ export interface Config {
   scale: Scale
   typeScale: TypeScale
   labelCase: LabelCase
+  displayWeight: DisplayWeight
   fontDisplay: string
   fontBody: string
   iconSet: IconSet

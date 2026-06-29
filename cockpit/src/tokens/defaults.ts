@@ -13,6 +13,7 @@ export const DEFAULT_CONFIG: Config = {
   scale: 'default',            // size + presence macro (drives ui-weight too)
   typeScale: 'md',
   labelCase: 'sentence',       // UI labels as-authored; 'caps' = the industrial/terminal look
+  displayWeight: 'semibold',   // headings 600 / hero 700 (the house default); 'light' = ultralight
   fontDisplay: 'Inter',
   fontBody: 'Inter',
   iconSet: 'line',

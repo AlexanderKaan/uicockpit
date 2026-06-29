@@ -1,6 +1,7 @@
 import type {
   ButtonShape,
   Config,
+  DisplayWeight,
   Scale,
   Elevation,
   Borders,
@@ -668,6 +669,16 @@ export function buildTokens(cfg: Config): Tokens {
   // Scale drives size + density only; pinning weight here keeps it from drifting
   // with the size macro and overlapping the typography controls.
   const uiW: number = UI_WEIGHTS.semibold
+  // Display weight (the heading tier) — the knob picks [heading, hero] font-weights;
+  // the hero (.t-display, page titles) sits one notch heavier than ordinary headings.
+  // 'semibold' (default) = [600, 700] = the prior fixed values, so the default kit is
+  // unchanged. 'light' = the Stripe-style ultralight headline. Body + UI labels don't
+  // follow it (they keep --k-ui-weight / --k-weight-*). Only the display recipes read
+  // --k-weight-display / --k-weight-display-hero.
+  const DISPLAY_WEIGHT: Record<DisplayWeight, [number, number]> = {
+    light: [300, 400], regular: [400, 500], medium: [500, 600], semibold: [600, 700], bold: [700, 800],
+  }
+  const [wDisplay, wDisplayHero] = DISPLAY_WEIGHT[cfg.displayWeight] ?? DISPLAY_WEIGHT.semibold
 
   // Generic CSS fallback for a font: monospace > serif > sans-serif, derived from
   // the family so a mono display (Vercel headings) keeps a mono fallback.
@@ -1240,6 +1251,10 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-weight-medium': String(UI_WEIGHTS.medium),
       '--k-weight-semibold': String(UI_WEIGHTS.semibold),
       '--k-weight-bold': String(UI_WEIGHTS.bold),
+      // Heading-tier weight (the displayWeight knob). Display recipes read these
+      // instead of a fixed semibold/bold, so a kit can go ultralight (Stripe) → bold.
+      '--k-weight-display': String(wDisplay),
+      '--k-weight-display-hero': String(wDisplayHero),
       // === State tokens — closes the shadcn-gap for cautious devs.
       // Disabled buttons/inputs: muted bg + faint fg + opacity convention.
       // Focus ring: 2px solid offset by 2px (shadcn/Radix convention). */

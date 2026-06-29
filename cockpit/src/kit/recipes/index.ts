@@ -558,7 +558,7 @@ export const RECIPES: readonly Recipe[] = [
    (card-title had the display font, sheet-title didn't, dialog had no rule at
    all and fell back to an inline-styled <h3>). margin:0 so it's safe on a real
    <h3> element (which carries a UA margin) as well as a <div>/<span>. */
-.card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-semibold); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: var(--k-track-tight); line-height: var(--k-leading-snug); margin: 0; }
+.card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-display); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: var(--k-track-tight); line-height: var(--k-leading-snug); margin: 0; }
 .card__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.4; }
 /* Inline cluster (adjacent controls) + stacked cluster — both on the canonical
  * --k-stack-gap so "the gap between two adjacent controls" is axis-independent. */
@@ -631,7 +631,7 @@ export const RECIPES: readonly Recipe[] = [
 .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--k-s-16); flex-wrap: wrap; }
 .page-head__titles { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
 .page-head__eyebrow { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted); }
-.page-head__title { font-size: var(--k-type-h2); font-weight: var(--k-weight-bold); font-family: var(--k-font-display); letter-spacing: -0.02em; line-height: 1.15; color: var(--k-fg); margin: 0; }
+.page-head__title { font-size: var(--k-type-h2); font-weight: var(--k-weight-display-hero); font-family: var(--k-font-display); letter-spacing: -0.02em; line-height: 1.15; color: var(--k-fg); margin: 0; }
 .page-head__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); }
 .page-head__actions { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
 /* --bordered: a hairline under the whole header (the Tailwind page-heading with
@@ -666,7 +666,7 @@ export const RECIPES: readonly Recipe[] = [
 .section { display: flex; flex-direction: column; gap: var(--k-s-14); }
 .section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); padding-bottom: var(--k-s-10); border-bottom: var(--k-divider); }
 .section__titles { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
-.section__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
+.section__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-display); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
 .section__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); }
 .section__actions { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
 .section__body { display: flex; flex-direction: column; gap: var(--k-s-12); }
@@ -709,7 +709,7 @@ export const RECIPES: readonly Recipe[] = [
  * trails on the right and wraps below the body on a narrow container. */
 .action-panel { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--k-s-16); }
 .action-panel__body { display: flex; flex-direction: column; gap: var(--k-s-4); flex: 1 1 22rem; min-width: 0; }
-.action-panel__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
+.action-panel__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-display); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
 .action-panel__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.45; }
 .action-panel__action { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
 /* --danger: the destructive variant (the "Delete account" panel) — a danger
@@ -2262,7 +2262,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * link. Every app starts here, so it's a first-class screen pattern. */
 .auth { display: flex; flex-direction: column; gap: var(--k-space, 16px); }
 .auth__head { text-align: center; }
-.auth__title { font-size: var(--k-type-h2); font-weight: var(--k-weight-bold); font-family: var(--k-font-display); letter-spacing: -0.02em; }
+.auth__title { font-size: var(--k-type-h2); font-weight: var(--k-weight-display-hero); font-family: var(--k-font-display); letter-spacing: -0.02em; }
 .auth__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); margin-top: var(--k-s-4); }
 /* Google / GitHub pair — adjacent buttons in a horizontal layout: the SAME
    --k-stack-gap as any other adjacent-control pair (Welcome-back = Save/Cancel,
@@ -5948,7 +5948,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .prose h2 {
   font-family: var(--k-font-display);
   font-size: var(--k-type-h2);
-  font-weight: var(--k-weight-semibold);
+  font-weight: var(--k-weight-display);
   color: var(--k-fg);
   margin: 0 0 var(--k-s-12);
 }
@@ -5960,7 +5960,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .t-display {
   font-family: var(--k-font-display);
   font-size: var(--k-type-display);
-  font-weight: var(--k-weight-bold);
+  font-weight: var(--k-weight-display-hero);
   letter-spacing: -0.03em;
   line-height: 1.04;
   color: var(--k-fg);
@@ -5970,7 +5970,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .prose h3 {
   font-family: var(--k-font-display);
   font-size: var(--k-type-h3);
-  font-weight: var(--k-weight-semibold);
+  font-weight: var(--k-weight-display);
   color: var(--k-fg);
   margin: var(--k-s-20) 0 var(--k-s-8);
 }

@@ -152,6 +152,14 @@ const LABEL_CASE_OPTS = [
   { id: 'sentence' as const, cap: 'Default' },
   { id: 'caps' as const, cap: 'Caps' },
 ]
+// Heading weight — the display tier's font-weight, light → bold (ordered slider).
+const DISPLAY_WEIGHT_OPTS = [
+  { id: 'light' as const, cap: 'Light' },
+  { id: 'regular' as const, cap: 'Regular' },
+  { id: 'medium' as const, cap: 'Medium' },
+  { id: 'semibold' as const, cap: 'Semibold' },
+  { id: 'bold' as const, cap: 'Bold' },
+]
 const PALETTE_OPTS = [
   { id: 'pastel' as const, cap: 'Pastel' },
   { id: 'bright' as const, cap: 'Bright' },
@@ -463,6 +471,15 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset 
       opts: optsFrom(TYPESCALE_OPTS),
       selected: cfg.typeScale,
       onPick: pick('typeScale'),
+    },
+    {
+      key: 'displayWeight',
+      label: 'Heading weight',
+      value: cap(DISPLAY_WEIGHT_OPTS, cfg.displayWeight),
+      kind: 'slider',
+      opts: optsFrom(DISPLAY_WEIGHT_OPTS),
+      selected: cfg.displayWeight,
+      onPick: pick('displayWeight'),
     },
     {
       key: 'labelCase',
