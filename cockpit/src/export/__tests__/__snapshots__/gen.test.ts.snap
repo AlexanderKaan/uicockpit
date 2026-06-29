@@ -263,11 +263,11 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-track-tight": "-0.01em",
     "--k-type-body": "0.875rem",
     "--k-type-caption": "0.625rem",
-    "--k-type-display": "3rem",
+    "--k-type-display": "3.125rem",
     "--k-type-eyebrow": "0.6875rem",
-    "--k-type-h1": "1.875rem",
-    "--k-type-h2": "1.375rem",
-    "--k-type-h3": "1rem",
+    "--k-type-h1": "1.9563rem",
+    "--k-type-h2": "1.4125rem",
+    "--k-type-h3": "1.0125rem",
     "--k-type-input-min": "16px",
     "--k-type-small": "0.75rem",
     "--k-ui-weight": "600",
@@ -3051,10 +3051,10 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-font-display: 'Inter',sans-serif;
   --k-font-body: 'Inter',sans-serif;
   --k-font-mono: 'JetBrains Mono',ui-monospace,monospace;
-  --k-type-display: 3rem;
-  --k-type-h1: 1.875rem;
-  --k-type-h2: 1.375rem;
-  --k-type-h3: 1rem;
+  --k-type-display: 3.125rem;
+  --k-type-h1: 1.9563rem;
+  --k-type-h2: 1.4125rem;
+  --k-type-h3: 1.0125rem;
   --k-type-body: 0.875rem;
   --k-type-small: 0.75rem;
   --k-type-input-min: 16px;
@@ -3132,7 +3132,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-pane-margin: 24px;
 
   /* --- Extended type scale: h4/h5 in-between steps (the rest ship in :root above) --- */
-  --k-type-h4: 0.938rem;
+  --k-type-h4: 0.944rem;
   --k-type-h5: 0.919rem;
 }
 
@@ -3343,10 +3343,10 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-font-display: 'Inter',sans-serif;
   --k-font-body: 'Inter',sans-serif;
   --k-font-mono: 'JetBrains Mono',ui-monospace,monospace;
-  --k-type-display: 3rem;
-  --k-type-h1: 1.875rem;
-  --k-type-h2: 1.375rem;
-  --k-type-h3: 1rem;
+  --k-type-display: 3.125rem;
+  --k-type-h1: 1.9563rem;
+  --k-type-h2: 1.4125rem;
+  --k-type-h3: 1.0125rem;
   --k-type-body: 0.875rem;
   --k-type-small: 0.75rem;
   --k-type-input-min: 16px;
@@ -9722,10 +9722,10 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-font-display: 'Inter',sans-serif;
   --k-font-body: 'Inter',sans-serif;
   --k-font-mono: 'JetBrains Mono',ui-monospace,monospace;
-  --k-type-display: 3rem;
-  --k-type-h1: 1.875rem;
-  --k-type-h2: 1.375rem;
-  --k-type-h3: 1rem;
+  --k-type-display: 3.125rem;
+  --k-type-h1: 1.9563rem;
+  --k-type-h2: 1.4125rem;
+  --k-type-h3: 1.0125rem;
   --k-type-body: 0.875rem;
   --k-type-small: 0.75rem;
   --k-type-input-min: 16px;
@@ -9803,7 +9803,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-pane-margin: 24px;
 
   /* --- Extended type scale: h4/h5 in-between steps (the rest ship in :root above) --- */
-  --k-type-h4: 0.938rem;
+  --k-type-h4: 0.944rem;
   --k-type-h5: 0.919rem;
 }
 
@@ -10014,10 +10014,10 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-font-display: 'Inter',sans-serif;
   --k-font-body: 'Inter',sans-serif;
   --k-font-mono: 'JetBrains Mono',ui-monospace,monospace;
-  --k-type-display: 3rem;
-  --k-type-h1: 1.875rem;
-  --k-type-h2: 1.375rem;
-  --k-type-h3: 1rem;
+  --k-type-display: 3.125rem;
+  --k-type-h1: 1.9563rem;
+  --k-type-h2: 1.4125rem;
+  --k-type-h3: 1.0125rem;
   --k-type-body: 0.875rem;
   --k-type-small: 0.75rem;
   --k-type-input-min: 16px;
@@ -16409,7 +16409,7 @@ stacked-area / donut without any library at all.
 The configurator surfaces h1, h2, body, small directly; the rest derive
 via a modular ratio so the rhythm stays coherent.
 \`\`\`
---k-type-h4: 0.938rem;
+--k-type-h4: 0.944rem;
 --k-type-h5: 0.919rem;
 \`\`\`
 
@@ -17515,9 +17515,9 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --font-display: 'Inter',sans-serif;
   --font-sans: 'Inter',sans-serif;
   --font-mono: 'JetBrains Mono',ui-monospace,monospace;
-  --text-h1: 1.875rem;
-  --text-h2: 1.375rem;
-  --text-h3: 1rem;
+  --text-h1: 1.9563rem;
+  --text-h2: 1.4125rem;
+  --text-h3: 1.0125rem;
   --text-body: 0.875rem;
   --text-small: 0.75rem;
   --text-eyebrow: 0.6875rem;
@@ -17600,7 +17600,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-accent-6-soft-fg: oklch(45.0% 0.1223 149.2);
   --color-chart-6: oklch(80.6% 0.2079 150.0);
   /* Extended type scale — h3/h4/h5/caption/eyebrow + display */
-  --text-h4: 0.938rem;
+  --text-h4: 0.944rem;
   --text-h5: 0.919rem;
   /* Spacing scale — s-0 through s-12 (multiples of --k-space) */
   --spacing-0: 0;

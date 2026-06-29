@@ -628,7 +628,27 @@ export function buildTokens(cfg: Config): Tokens {
   // Fallback to md for any unknown value — old URL hashes may carry the
   // retired 'normal'/'tight'/'expressive' keys, and a crash there is worse
   // than silently re-centering on the default scale.
-  const [tsH1, tsH2, tsH3, tsBody, tsSmall] = TS[cfg.typeScale] ?? TS.md
+  const [tsRawH1, tsRawH2, tsRawH3, tsBody, tsSmall] = TS[cfg.typeScale] ?? TS.md
+  // ── Scale × Text-size coupling — the first foundation clash-pair ──────────────
+  // Scale (density) and Text-size were fully INDEPENDENT, so the cross-product
+  // could go incoherent: compact (btnH 32, pad 16, gaps 12) + XL (h1 38) =
+  // towering headings crammed into a tight layout. Rather than DELETE a knob
+  // position (every Text-size is a good option), we COUPLE the two: density
+  // modulates the DISPLAY CONTRAST — how far the heading tier out-sizes body.
+  //   compact     → flatter hierarchy (headings sit nearer body — a dense, even UI)
+  //   comfortable → more dramatic display type (the room to let headings tower)
+  // We compress the GAP above body (not a flat multiplier), so h3 never collapses
+  // INTO body, and body/small are untouched — they keep the 13–14px readability
+  // floor the TS table guards. Default scale is the identity (hc=1), so the default
+  // kit and every export snapshot are byte-for-byte unchanged. Every S/M/L/XL still
+  // resolves and stays distinct — just re-centered to stay proportional to the
+  // chosen density. "Make whatever you want, we straighten it", at the foundation.
+  const HIER_CONTRAST: Record<Scale, number> = { compact: 0.85, default: 1, comfortable: 1.08 }
+  const hc = HIER_CONTRAST[cfg.scale] ?? 1
+  const contractHeading = (px: number) => Math.round((tsBody + (px - tsBody) * hc) * 10) / 10
+  const tsH1 = contractHeading(tsRawH1)
+  const tsH2 = contractHeading(tsRawH2)
+  const tsH3 = contractHeading(tsRawH3)
   // CP1 — the HERO/display tier (the confident-pro foundation gap #1). The type
   // ceiling was h1 (38px at XL); a pro KPI / page title wants 48–60px so a screen
   // has ONE undeniable focal point. Derived 1.6× off h1 so it tracks Text-size:
