@@ -3,16 +3,16 @@ import { applyHarmonyPreset } from './harmony'
 
 /**
  * Named style kits — the FRONT-DOOR anchors (the "Style" picker, top of the panel).
- * Each kit is a curated, coherent STARTING POINT: it sets the structure + type +
- * colour-character, but NEVER the brand hue (colorTheme / cPrimary / color). You pick
- * a kit, your brand colour rides through unchanged ("Clean + your purple"), and the
- * individual knobs perturb on top — the coherence guards (Scale×Text, surface
- * separation) keep every perturbation whole.
+ * Each kit is a curated STARTING POINT; pick one, your brand colour rides through
+ * unchanged ("Clean + your purple"), then the knobs perturb on top.
  *
- * The strategic edge over shadcn's radius+colour themes: ours vary radius + button
- * shape + density + type character + label case + surface language + motion → genuinely
- * distinct signatures, not recolours. "Clean" mirrors DEFAULT_CONFIG exactly, so the
- * out-of-box kit reads as a named style, not "Custom".
+ * SUBTLE BY DESIGN (the shadcn lesson). Every kit shares ONE coherent base — same
+ * density (Scale default), same button shape (match), same surface language
+ * (outlined), same soft elevation, same accent treatment. A kit only nudges a few
+ * gentle levers: RADIUS, FONT, the odd flat/border shift, and the grey TINT. No kit
+ * changes density, goes pill, deepens shadows, or shouts in caps — those dramatic
+ * swings made every kit a different product instead of the same one, restyled.
+ * "Clean" mirrors DEFAULT_CONFIG exactly, so the out-of-box kit reads as a style.
  */
 export interface StyleKit {
   id: string
@@ -21,70 +21,40 @@ export interface StyleKit {
   config: Partial<Config>
 }
 
-// All kits share Tonal harmony (keeps the brand hue front-and-centre; never Mono,
-// which would grey out the user's colour).
+// The shared base every kit starts from — the constants that keep the family
+// coherent. A kit overrides only the few levers that give it character.
 const TONAL = applyHarmonyPreset('tonal')
+const BASE: Partial<Config> = {
+  scale: 'default', typeScale: 'md', buttonShape: 'match', labelCase: 'sentence',
+  surface: 'outlined', motion: 'smooth', motionTempo: 'normal', motionCurve: 'standard',
+  palette: 'vivid', canvas: 'neutral', fill: 'brand', iconSet: 'line',
+  surfaceDepth: 'soft', borders: 'subtle', ...TONAL,
+}
 
 export const STYLE_KITS: StyleKit[] = [
   {
     id: 'clean',
     name: 'Clean',
-    blurb: 'Trustworthy SaaS default — Linear / shadcn',
-    config: {
-      radius: 'soft', buttonShape: 'match', scale: 'default', typeScale: 'md', labelCase: 'sentence',
-      fontDisplay: 'Inter', fontBody: 'Inter', iconSet: 'line',
-      surfaceDepth: 'soft', surface: 'outlined', borders: 'subtle',
-      motion: 'smooth', motionTempo: 'normal', motionCurve: 'standard',
-      palette: 'vivid', neutral: 'auto', canvas: 'neutral', fill: 'brand', ...TONAL,
-    },
+    blurb: 'Balanced and neutral — the safe default',
+    config: { ...BASE, radius: 'soft', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'auto' },
   },
   {
     id: 'soft',
     name: 'Soft',
-    blurb: 'Friendly & rounded — Airbnb warmth',
-    config: {
-      radius: 'round', buttonShape: 'pill', scale: 'comfortable', typeScale: 'md', labelCase: 'sentence',
-      fontDisplay: 'Figtree', fontBody: 'Figtree', iconSet: 'rounded',
-      surfaceDepth: 'deep', surface: 'filled', borders: 'faint',
-      motion: 'playful', motionTempo: 'generous', motionCurve: 'spring',
-      palette: 'vivid', neutral: 'warm', canvas: 'neutral', fill: 'brand', ...TONAL,
-    },
+    blurb: 'Rounder corners, warmer greys',
+    config: { ...BASE, radius: 'round', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'warm' },
   },
   {
     id: 'sharp',
     name: 'Sharp',
-    blurb: 'Technical precision — Vercel / dev-tool',
-    config: {
-      radius: 'none', buttonShape: 'match', scale: 'compact', typeScale: 'sm', labelCase: 'sentence',
-      fontDisplay: 'Geist', fontBody: 'Geist', iconSet: 'line',
-      surfaceDepth: 'flat', surface: 'outlined', borders: 'medium',
-      motion: 'snappy', motionTempo: 'snappy', motionCurve: 'standard',
-      palette: 'bright', neutral: 'cool', canvas: 'white', fill: 'neutral', ...TONAL,
-    },
+    blurb: 'Crisp edges, technical grotesk',
+    config: { ...BASE, radius: 'none', fontDisplay: 'Geist', fontBody: 'Geist', neutral: 'cool', surfaceDepth: 'flat' },
   },
   {
     id: 'editorial',
     name: 'Editorial',
-    blurb: 'Serif headings, generous — Stripe-press',
-    config: {
-      radius: 'subtle', buttonShape: 'match', scale: 'comfortable', typeScale: 'lg', labelCase: 'sentence',
-      fontDisplay: 'Fraunces', fontBody: 'Inter', iconSet: 'line',
-      surfaceDepth: 'flat', surface: 'plain', borders: 'subtle',
-      motion: 'smooth', motionTempo: 'normal', motionCurve: 'standard',
-      palette: 'pastel', neutral: 'warm', canvas: 'neutral', fill: 'brand', ...TONAL,
-    },
-  },
-  {
-    id: 'industrial',
-    name: 'Industrial',
-    blurb: 'Uppercase labels, hard edges — terminal',
-    config: {
-      radius: 'none', buttonShape: 'match', scale: 'default', typeScale: 'md', labelCase: 'caps',
-      fontDisplay: 'IBM Plex Sans', fontBody: 'IBM Plex Sans', iconSet: 'bold',
-      surfaceDepth: 'flat', surface: 'outlined', borders: 'strong',
-      motion: 'snappy', motionTempo: 'snappy', motionCurve: 'standard',
-      palette: 'bright', neutral: 'neutral', canvas: 'white', fill: 'neutral', ...TONAL,
-    },
+    blurb: 'Serif headings, calm and warm',
+    config: { ...BASE, radius: 'soft', fontDisplay: 'Newsreader', fontBody: 'Inter', neutral: 'warm' },
   },
 ]
 
