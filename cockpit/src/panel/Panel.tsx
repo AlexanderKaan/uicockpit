@@ -757,16 +757,12 @@ function OptionList({
           className={`fmopt ${o.id === selected ? 'fmopt--on' : ''}`}
           aria-pressed={o.id === selected}
           onClick={() => onPick(o.id)}
+          // Sub-blurb (Style kits) is a hover tooltip, not a visible line — keeps the
+          // flyout a compact one-line-per-option list.
+          title={typeof o.sub === 'string' ? o.sub : undefined}
         >
           {o.viz && <span className="fmopt__viz">{o.viz}</span>}
-          {o.sub ? (
-            <span className="fmopt__text">
-              <span className="fmopt__label">{o.label}</span>
-              <span className="fmopt__sub">{o.sub}</span>
-            </span>
-          ) : (
-            <span className="fmopt__label">{o.label}</span>
-          )}
+          <span className="fmopt__label">{o.label}</span>
           {o.id === selected && <Check size={14} strokeWidth={2.5} className="fmopt__check" />}
         </button>
       ))}
