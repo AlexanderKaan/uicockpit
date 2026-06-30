@@ -1234,9 +1234,22 @@
   outline-offset: 3px;
   transition: outline-color var(--k-dur-fast, 140ms) var(--k-ease, ease), background var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease), opacity var(--k-dur-fast, 140ms) var(--k-ease, ease);
 }
-.shc__pick:hover { outline-color: var(--k-primary); background: var(--k-primary-soft); transform: translateY(-2px); }
-/* Dim the non-hovered components so the target pops — intuitive, no Inspect toggle. */
-.shc__pickpage:hover .shc__pick:not(:hover) { opacity: 0.45; }
+/* Section wrappers stay only for data-idx context now — visually inert; the
+   per-component hover (.shc__comp-hot) below is the real selection cue. */
+.shc__pick:hover { outline-color: transparent; background: transparent; transform: none; }
+.shc__pick::after { display: none; }
+/* The hovered component — a ring exactly around the table/chart/card/badge under
+   the cursor, with a soft halo + zoom-in cursor. No mode toggle, no whole-screen
+   block: you select the precise component you point at. */
+.shc__comp-hot {
+  outline: 2px solid var(--k-primary) !important;
+  outline-offset: 2px;
+  border-radius: var(--k-radius-sm);
+  box-shadow: 0 0 0 6px var(--k-primary-soft) !important;
+  cursor: zoom-in;
+  position: relative;
+  z-index: 1;
+}
 .shc__pick::after {
   content: attr(data-label);
   position: absolute;

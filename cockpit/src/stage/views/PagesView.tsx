@@ -6,7 +6,7 @@ import { renderSection } from '../../showcases/sections'
 import { buildTokens } from '../../tokens/buildTokens'
 import type { Config } from '../../tokens/types'
 import { setGalleryJump } from '../../state/galleryJump'
-import { COMPONENTS, componentAt } from '../../showcases/components'
+import { COMPONENTS, componentAt, elementAt } from '../../showcases/components'
 import { usesOf } from '../../kit/segments'
 import { FoundationsView } from './FoundationsView'
 import type { ViewKind } from '../Stage'
@@ -135,16 +135,28 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
     if (!doc.startViewTransition) { mutate(); return }
     doc.startViewTransition(() => flushSync(mutate))
   }
-  const pickSection = (e: ReactMouseEvent) => {
-    let el = e.target as HTMLElement | null
+  // Per-component picking: hovering outlines the EXACT component under the cursor
+  // (table / chart / card / badge…); clicking zooms straight into it. The
+  // containing manifest section is recorded so the breadcrumb keeps its context
+  // (and the Section crumb zooms out to the whole block).
+  const hotRef = useRef<HTMLElement | null>(null)
+  const setHot = (el: HTMLElement | null) => {
+    if (hotRef.current === el) return
+    if (hotRef.current) hotRef.current.classList.remove('shc__comp-hot')
+    hotRef.current = el
+    if (el) el.classList.add('shc__comp-hot')
+  }
+  const hoverComp = (e: ReactMouseEvent) => setHot(elementAt(e.target as Element))
+  const pickComp = (e: ReactMouseEvent) => {
+    const id = componentAt(e.target as Element)
+    if (!id || !COMPONENTS[id]) return
+    let el = e.target as HTMLElement | null, pane = 0, idx = 0
     while (el && el !== e.currentTarget) {
-      if (el.dataset && el.dataset.idx != null) {
-        const pane = +el.dataset.pane!, idx = +el.dataset.idx
-        vt(() => setFocus({ level: 'section', pane, idx }))
-        return
-      }
+      if (el.dataset && el.dataset.idx != null) { pane = +el.dataset.pane!; idx = +el.dataset.idx; break }
       el = el.parentElement
     }
+    setHot(null)
+    vt(() => setFocus({ level: 'atom', pane, idx, comp: id }))
   }
   // Section → Atom: the existing leaf-pick, now scoped to the isolated section.
   const pickAtom = (e: ReactMouseEvent) => {
@@ -215,7 +227,7 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
           ) : (
             <>
               {(!loupe || focus.level === 'page') && (
-                <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickSection : undefined}>
+                <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickComp : undefined} onMouseOver={loupe ? hoverComp : undefined} onMouseLeave={loupe ? () => setHot(null) : undefined}>
                   <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} appNav={appNav} />
                 </div>
               )}

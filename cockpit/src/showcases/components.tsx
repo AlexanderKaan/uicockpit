@@ -363,3 +363,16 @@ export function componentAt(start: Element | null): string | null {
   }
   return null
 }
+
+/** Like componentAt but returns the matching ELEMENT (the component's root), so a
+ *  hover can outline the exact component the cursor is over — per-component picking. */
+export function elementAt(start: Element | null): HTMLElement | null {
+  let el: Element | null = start
+  while (el && el !== document.body) {
+    for (const [cls] of CLASS_MAP) {
+      if (el.classList && el.classList.contains(cls)) return el as HTMLElement
+    }
+    el = el.parentElement
+  }
+  return null
+}
