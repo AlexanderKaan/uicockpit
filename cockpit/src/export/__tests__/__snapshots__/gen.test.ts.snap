@@ -3616,6 +3616,7 @@ body {
 .navsuite__item:focus-visible,
 .navmenu__item:focus-visible,
 .att-chip__x:focus-visible,
+.list__item:focus-visible,
 .barchart__bar:focus-visible {
   outline-offset: -2px;
 }
@@ -3630,6 +3631,22 @@ body {
 .pwinput__field::placeholder {
   color: var(--k-fg-muted);
   opacity: 1;
+}
+
+/* Browser autofill — repaint Chrome's native yellow fill back to the kit field
+   surface (a huge inset box-shadow over the native bg) so an autofilled email/
+   password keeps the one-family look and stays legible in dark mode, where the
+   native fill can drop ink to near-invisible. Covers every field shape so they
+   all inherit it. (See the focus-radius autofill trap.) */
+.in:-webkit-autofill, .in:-webkit-autofill:focus,
+.tx:-webkit-autofill,
+.numinput__field:-webkit-autofill,
+.pwinput__field:-webkit-autofill,
+.searchinput__field:-webkit-autofill,
+.phoneinput__field:-webkit-autofill {
+  -webkit-text-fill-color: var(--k-fg);
+  -webkit-box-shadow: 0 0 0 100vmax var(--k-field-bg, var(--k-input-bg)) inset;
+  caret-color: var(--k-fg);
 }
 
 /* Form validation — combine with the input border (use --k-bw for width):
@@ -6398,6 +6415,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: var(--k-s-6);
   margin: 0;
   font-size: var(--k-type-small);
+  /* Long result lists scroll inside the palette instead of growing off-screen. */
+  max-height: var(--k-overlay-max-lg, 24rem); overflow-y: auto;
 }
 /* Command palette items follow the MD row grammar — slightly taller than
  * dropdown menu items because cmdp is a "search & select" surface, not a
@@ -6857,7 +6876,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   animation: var(--k-anim-menu, k-menu-roll 200ms cubic-bezier(.05,.7,.1,1) both);
   transform-origin: top;
-  overflow: hidden;
+  /* Constrain height + scroll the overflow — a long option list must not run
+     off-screen (APG/Radix table-stakes). x stays clipped for the nested radius. */
+  max-height: var(--k-overlay-max, 22rem); overflow: hidden auto;
   /* Nested radius — items pick this up via their border-radius rule.
    * Math: outer (radius-md) − padding (4px) = inner radius needed for
    * concentric curves. Without this, hover state of first/last item
@@ -8506,6 +8527,19 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .list__item:first-of-type::before { content: none; }
 .list__item:hover { background: var(--k-state-hover); }
+/* Selected row (Invariant I2) — a row picked in a master/detail or multi-select
+   list. Was missing (only --unread existed), so the most-used flat row sat a tier
+   behind its own siblings (.list__row / .navrow both carry it). The chromatic fill
+   + the selected-edge match the table/menu selected language → reads at any depth. */
+.list__item[aria-selected="true"], .list__item.is-selected {
+  background: var(--k-state-selected-bg, var(--k-primary-soft));
+  box-shadow: var(--k-selected-edge);
+}
+.list__item[aria-selected="true"]:hover, .list__item.is-selected:hover { filter: brightness(0.98); }
+/* Hit-target floor (Invariant I4) — an interactive row clears the WCAG-2.2 24px
+   target even at Compact density; generalises the .tbl guard so list rows stop
+   being a per-component afterthought. */
+button.list__item, a.list__item, .list__item:has(input, button, a, [role="button"]) { min-block-size: var(--k-hit-min); }
 .list__lead {
   flex-shrink: 0;
   width: calc(var(--k-in-h-default) - 0.25rem);
@@ -10423,6 +10457,7 @@ body {
 .navsuite__item:focus-visible,
 .navmenu__item:focus-visible,
 .att-chip__x:focus-visible,
+.list__item:focus-visible,
 .barchart__bar:focus-visible {
   outline-offset: -2px;
 }
@@ -10437,6 +10472,22 @@ body {
 .pwinput__field::placeholder {
   color: var(--k-fg-muted);
   opacity: 1;
+}
+
+/* Browser autofill — repaint Chrome's native yellow fill back to the kit field
+   surface (a huge inset box-shadow over the native bg) so an autofilled email/
+   password keeps the one-family look and stays legible in dark mode, where the
+   native fill can drop ink to near-invisible. Covers every field shape so they
+   all inherit it. (See the focus-radius autofill trap.) */
+.in:-webkit-autofill, .in:-webkit-autofill:focus,
+.tx:-webkit-autofill,
+.numinput__field:-webkit-autofill,
+.pwinput__field:-webkit-autofill,
+.searchinput__field:-webkit-autofill,
+.phoneinput__field:-webkit-autofill {
+  -webkit-text-fill-color: var(--k-fg);
+  -webkit-box-shadow: 0 0 0 100vmax var(--k-field-bg, var(--k-input-bg)) inset;
+  caret-color: var(--k-fg);
 }
 
 /* Form validation — combine with the input border (use --k-bw for width):
@@ -13205,6 +13256,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: var(--k-s-6);
   margin: 0;
   font-size: var(--k-type-small);
+  /* Long result lists scroll inside the palette instead of growing off-screen. */
+  max-height: var(--k-overlay-max-lg, 24rem); overflow-y: auto;
 }
 /* Command palette items follow the MD row grammar — slightly taller than
  * dropdown menu items because cmdp is a "search & select" surface, not a
@@ -13664,7 +13717,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   animation: var(--k-anim-menu, k-menu-roll 200ms cubic-bezier(.05,.7,.1,1) both);
   transform-origin: top;
-  overflow: hidden;
+  /* Constrain height + scroll the overflow — a long option list must not run
+     off-screen (APG/Radix table-stakes). x stays clipped for the nested radius. */
+  max-height: var(--k-overlay-max, 22rem); overflow: hidden auto;
   /* Nested radius — items pick this up via their border-radius rule.
    * Math: outer (radius-md) − padding (4px) = inner radius needed for
    * concentric curves. Without this, hover state of first/last item
@@ -15313,6 +15368,19 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .list__item:first-of-type::before { content: none; }
 .list__item:hover { background: var(--k-state-hover); }
+/* Selected row (Invariant I2) — a row picked in a master/detail or multi-select
+   list. Was missing (only --unread existed), so the most-used flat row sat a tier
+   behind its own siblings (.list__row / .navrow both carry it). The chromatic fill
+   + the selected-edge match the table/menu selected language → reads at any depth. */
+.list__item[aria-selected="true"], .list__item.is-selected {
+  background: var(--k-state-selected-bg, var(--k-primary-soft));
+  box-shadow: var(--k-selected-edge);
+}
+.list__item[aria-selected="true"]:hover, .list__item.is-selected:hover { filter: brightness(0.98); }
+/* Hit-target floor (Invariant I4) — an interactive row clears the WCAG-2.2 24px
+   target even at Compact density; generalises the .tbl guard so list rows stop
+   being a per-component afterthought. */
+button.list__item, a.list__item, .list__item:has(input, button, a, [role="button"]) { min-block-size: var(--k-hit-min); }
 .list__lead {
   flex-shrink: 0;
   width: calc(var(--k-in-h-default) - 0.25rem);

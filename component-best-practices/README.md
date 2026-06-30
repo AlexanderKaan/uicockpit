@@ -26,13 +26,27 @@ only the recipe CSS. Patterns handled at the component level (skeleton rows, a R
 button, an indeterminate checkbox) are PRESENT even when the recipe only ships a
 primitive — a CSS-only scan flags them as false-positive gaps.
 
+## The cross-cutting synthesis
+
+**Read [SYSTEM-LEARNINGS.md](SYSTEM-LEARNINGS.md) first** — the meta-deliverable. It
+distils all 11 audits into the six *systemic* patterns (the invariant layer, overlay
+scroll, behaviour-carrying SUPPLY, contrast-derived ink, truncation, demonstrated-axis)
+that decide whether an *unknown* component is beautiful by default. Per-component docs
+are the evidence; SYSTEM-LEARNINGS is the conclusion.
+
 ## Done so far
+
+11 components audited (the full idiom breadth). Gaps cashed across three batches:
 
 | Component | Doc | Gaps cashed |
 |---|---|---|
 | Table (`.tbl`) | [table.md](table.md) | truncate→atom · `.tbl--card` · frozen-col · hit-target floor |
-| Data table (`.datatable`) | [data-table.md](data-table.md) | (skeleton + retry were already shipped; frozen-col via `.tbl__col--frozen`) |
+| Data table (`.datatable`) | [data-table.md](data-table.md) | frozen-col via `.tbl__col--frozen` (skeleton + retry were already shipped — false-positive gaps) |
 | Calendar (`.calendar*`) | [calendar.md](calendar.md) | now-line · overlap lanes · month event-layer · range hover-preview |
+| Select & menu | [select-menu.md](select-menu.md) | overlay max-height + scroll (`.menu`/`.cmdp`) |
+| List (`.list`) | [list.md](list.md) | selected-state (I2) · hit-target floor (I4) · inset focus-ring (I3) |
+| Form & input | [form-input.md](form-input.md) | browser-autofill restyle (globalLayer) |
+| Button · Card · Badge-chip · Dialog · Navigation | [button](button.md)·[card](card.md)·[badge-chip](badge-chip.md)·[dialog-overlay](dialog-overlay.md)·[navigation](navigation.md) | strong as-is; remaining = the L1/L4 systemic items in SYSTEM-LEARNINGS |
 
 Related: `TABLE-LIST-STICKY-PATTERNS.md` (sticky/scroll research) · `COMPONENT-CRAFT.md`
 (the 10 craft laws) · the Invariant Engine (ENFORCE rail) · `uikit-dumb-build` skill

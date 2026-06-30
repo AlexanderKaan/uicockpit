@@ -2780,6 +2780,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding: var(--k-s-6);
   margin: 0;
   font-size: var(--k-type-small);
+  /* Long result lists scroll inside the palette instead of growing off-screen. */
+  max-height: var(--k-overlay-max-lg, 24rem); overflow-y: auto;
 }
 /* Command palette items follow the MD row grammar — slightly taller than
  * dropdown menu items because cmdp is a "search & select" surface, not a
@@ -3260,7 +3262,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   animation: var(--k-anim-menu, k-menu-roll 200ms cubic-bezier(.05,.7,.1,1) both);
   transform-origin: top;
-  overflow: hidden;
+  /* Constrain height + scroll the overflow — a long option list must not run
+     off-screen (APG/Radix table-stakes). x stays clipped for the nested radius. */
+  max-height: var(--k-overlay-max, 22rem); overflow: hidden auto;
   /* Nested radius — items pick this up via their border-radius rule.
    * Math: outer (radius-md) − padding (4px) = inner radius needed for
    * concentric curves. Without this, hover state of first/last item
@@ -4996,6 +5000,19 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .list__item:first-of-type::before { content: none; }
 .list__item:hover { background: var(--k-state-hover); }
+/* Selected row (Invariant I2) — a row picked in a master/detail or multi-select
+   list. Was missing (only --unread existed), so the most-used flat row sat a tier
+   behind its own siblings (.list__row / .navrow both carry it). The chromatic fill
+   + the selected-edge match the table/menu selected language → reads at any depth. */
+.list__item[aria-selected="true"], .list__item.is-selected {
+  background: var(--k-state-selected-bg, var(--k-primary-soft));
+  box-shadow: var(--k-selected-edge);
+}
+.list__item[aria-selected="true"]:hover, .list__item.is-selected:hover { filter: brightness(0.98); }
+/* Hit-target floor (Invariant I4) — an interactive row clears the WCAG-2.2 24px
+   target even at Compact density; generalises the .tbl guard so list rows stop
+   being a per-component afterthought. */
+button.list__item, a.list__item, .list__item:has(input, button, a, [role="button"]) { min-block-size: var(--k-hit-min); }
 .list__lead {
   flex-shrink: 0;
   width: calc(var(--k-in-h-default) - 0.25rem);

@@ -194,6 +194,7 @@ ${s}.kanban__card:focus-visible,
 ${s}.navsuite__item:focus-visible,
 ${s}.navmenu__item:focus-visible,
 ${s}.att-chip__x:focus-visible,
+${s}.list__item:focus-visible,
 ${s}.barchart__bar:focus-visible {
   outline-offset: -2px;
 }
@@ -208,6 +209,22 @@ ${s}.numinput__field::placeholder,
 ${s}.pwinput__field::placeholder {
   color: var(--k-fg-muted);
   opacity: 1;
+}
+
+/* Browser autofill — repaint Chrome's native yellow fill back to the kit field
+   surface (a huge inset box-shadow over the native bg) so an autofilled email/
+   password keeps the one-family look and stays legible in dark mode, where the
+   native fill can drop ink to near-invisible. Covers every field shape so they
+   all inherit it. (See the focus-radius autofill trap.) */
+${s}.in:-webkit-autofill, ${s}.in:-webkit-autofill:focus,
+${s}.tx:-webkit-autofill,
+${s}.numinput__field:-webkit-autofill,
+${s}.pwinput__field:-webkit-autofill,
+${s}.searchinput__field:-webkit-autofill,
+${s}.phoneinput__field:-webkit-autofill {
+  -webkit-text-fill-color: var(--k-fg);
+  -webkit-box-shadow: 0 0 0 100vmax var(--k-field-bg, var(--k-input-bg)) inset;
+  caret-color: var(--k-fg);
 }
 
 /* Form validation — combine with the input border (use --k-bw for width):
