@@ -173,10 +173,12 @@
 }
 .fmrow:hover .fmrow__lock { opacity: 1; }
 .fmrow__lock:hover { opacity: 1; background: var(--app-hover); color: var(--app-fg); }
-.fmrow--locked .fmrow__lock { opacity: 1; color: var(--app-fg); }
-/* Stacked rows (Neutrals · Surface · Background) put the label ABOVE the strip, so
-   align the lock with that label (15px), not the centre of the whole label+strip block. */
-.fmrow:has(.fmrow__inline--stack) .fmrow__lock { top: 15px; }
+/* Pinned = FILLED, so it clearly reads as "on" (the outline alone was too subtle). */
+.fmrow--locked .fmrow__lock { opacity: 1; background: var(--app-fg); color: var(--app-surface); }
+.fmrow--locked .fmrow__lock:hover { background: var(--app-fg); color: var(--app-surface); }
+/* Stacked rows (Neutrals · Surface · Background) put the label above the options strip;
+   centre the lock on the OPTIONS box, not the title. */
+.fmrow:has(.fmrow__inline--stack) .fmrow__lock { top: 43px; }
 /* Row labels read as one consistent tier — every control title is the same
  * semibold (see .fmrow__label below). The old "essential rows" treatment (a
  * heavier 680 label + a left tick on Brand/Scale/Display font/Box radius) was
