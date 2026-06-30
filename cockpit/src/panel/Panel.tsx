@@ -17,24 +17,6 @@ import {
   VIZ_RADIUS,
 } from './vizFactories'
 
-/* Panel↔Foundations twin: a panel section header maps to its resolved-scale section
- * in the Foundations stage view. Clicking it scrolls that section into view + flashes
- * it — the "author the foundation, see it resolved" loop. A graceful no-op on any
- * other view (the target element only exists when Foundations is active). */
-const FND_LINK: Record<string, string> = {
-  Color: 'color', Typography: 'typography', Shape: 'shape',
-  Surface: 'surface', 'Motion & icons': 'motion-icons',
-}
-function jumpToFoundation(sec: string) {
-  const slug = FND_LINK[sec]
-  if (!slug) return
-  const el = document.getElementById(`fnd-${slug}`)
-  if (!el) return // not on the Foundations view
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  el.classList.add('fnd__card--flash')
-  window.setTimeout(() => el.classList.remove('fnd__card--flash'), 1000)
-}
-
 interface PanelProps {
   cfg: Config
   tokens: Tokens
@@ -545,11 +527,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
             const inline = r.kind === 'seg' || r.kind === 'slider'
             return (
             <Fragment key={r.key}>
-              {r.sec && (
-                FND_LINK[r.sec]
-                  ? <button type="button" className="fmsec fmsec--link" onClick={() => jumpToFoundation(r.sec!)} title={`Jump to ${r.sec} in Foundations`}>{r.sec}</button>
-                  : <div className="fmsec">{r.sec}</div>
-              )}
+              {r.sec && <div className="fmsec">{r.sec}</div>}
               <div className={`fmrow ${inline ? 'fmrow--inline' : ''} ${openKey === r.key ? 'fmrow--open' : ''} ${lockedKeys.has(r.key) ? 'fmrow--locked' : ''}`}>
                 {r.key !== 'style' && (
                   <button
