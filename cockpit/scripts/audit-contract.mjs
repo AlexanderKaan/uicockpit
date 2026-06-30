@@ -62,10 +62,10 @@ const PICKABLE = [...new Set([...cmBlock.matchAll(/\[\s*'[a-z][\w-]*'\s*,\s*'([a
 const ENFORCED_BY = {
   control: ['audit:control-h', 'audit:focus', 'audit:hit-target'],
   selectable: ['audit:state-edge'],
-  'tone-bearer': [], // aaInk-paired -soft-fg — not yet a dedicated gate
-  'text-slot': [], // truncation utility — not yet gated
-  surface: [], // elevation + separation — not yet gated
-  overlay: [], // max-height + scroll + trap — not yet gated
+  'tone-bearer': ['audit:role-treatments'], // every *-soft has a paired aaInk -soft-fg
+  'text-slot': ['audit:role-treatments'], // global .truncate clamp exists
+  overlay: ['audit:role-treatments'], // .menu/.cmdp__list cap height + scroll
+  surface: ['coherence-guard'], // foundation: surface ≠ bg + elevation (coherence.ts + tests)
 }
 
 // --- checks ----------------------------------------------------------------

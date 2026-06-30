@@ -1421,13 +1421,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tbl--condensed { font-size: var(--k-type-small); }
 .tbl--condensed th, .tbl--condensed td { padding: calc(var(--k-space, 10px) * 0.32) calc(var(--k-space, 10px) * 0.5); }
 
-/* --- Truncation utility (.truncate) ---------------------------------------
-   Opt-in single-line clamp for a long unbreakable value (name, path, title) so
-   ONE cell can't wrap and break the row rhythm — the pro-table move messy real
-   data needs. On the .tbl ATOM so every table earns it (was scoped to the
-   .datatable block). Pair with a title attr for the full value; --k-col-max
-   overrides the per-column cap. */
-.tbl .truncate { display: block; max-width: var(--k-col-max, 24ch); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* --- Truncation utility (.truncate) — the TEXT-SLOT role's guarantee --------
+   A GLOBAL single-line clamp for any long unbreakable value (name, path, title)
+   so one text slot can't wrap and break the layout. Universal (not table-scoped)
+   so every text-slot role earns it — see the Role Canvas (contracts.ts). Pair
+   with a title attr for the full value; --k-col-max overrides the per-slot cap. */
+.truncate { display: block; max-width: var(--k-col-max, 24ch); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* --- Card-framed table (.tbl--card) ---------------------------------------
    The bare .tbl uses border-collapse:collapse + per-row border-top — right for
