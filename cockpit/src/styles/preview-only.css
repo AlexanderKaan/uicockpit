@@ -812,57 +812,26 @@
  * becomes a quiet uppercase caption. Only the OUTER frame (> .card) flattens — a
  * nested demo card (the card atom itself) keeps its real surface. Scoped to
  * .cockpit-preview .gallery--workbench so blocks/pages and the bouquet keep cards. */
-.cockpit-preview .rail__card > .card {
+.cockpit-preview .gallery--workbench > .card {
   background: transparent;
   border: 0;
   box-shadow: none;
   padding: 0;
 }
-.cockpit-preview .rail__card > .card:hover { box-shadow: none; transform: none; }
-.cockpit-preview .rail__card > .card > .card__head {
+.cockpit-preview .gallery--workbench > .card:hover { box-shadow: none; transform: none; }
+.cockpit-preview .gallery--workbench > .card > .card__head {
   margin-bottom: var(--k-s-12);
   padding-bottom: var(--k-s-8);
   border-bottom: var(--k-divider);
 }
-.cockpit-preview .rail__card > .card > .card__head > .card__title {
+.cockpit-preview .gallery--workbench > .card > .card__head > .card__title {
   font-size: var(--k-type-eyebrow);
   text-transform: uppercase;
   letter-spacing: var(--k-track-eyebrow);
   font-weight: var(--k-weight-semibold);
   color: var(--k-fg-muted);
 }
-.cockpit-preview .rail__card > .card > .card__head > .card__desc { display: none; }
-
-/* === Component RAILS (prototype) — categories as horizontal scroll-snap rows ===
-   Swipe a row sideways (mobile-native), scroll down between categories. Chrome uses
-   the user's kit tokens so the whole browser re-skins with the kit. */
-.cockpit-preview .railwall { display: flex; flex-direction: column; gap: var(--k-s-28); padding: var(--k-s-2) 0 var(--k-s-20); width: 100%; }
-.cockpit-preview .railsec { min-width: 0; }
-.cockpit-preview .railsec__head { display: flex; align-items: baseline; gap: var(--k-s-8); margin: 0 0 var(--k-s-12); padding: 0 var(--k-s-2); }
-.cockpit-preview .railsec__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-display, var(--k-weight-semibold)); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
-.cockpit-preview .railsec__count { font-size: var(--k-type-small); color: var(--k-fg-muted); }
-.cockpit-preview .rail {
-  display: flex; gap: var(--k-s-14); overflow-x: auto; overflow-y: visible;
-  scroll-snap-type: x proximity;
-  padding: var(--k-s-2) var(--k-s-2) var(--k-s-14);
-  scrollbar-width: thin; scrollbar-color: var(--k-border) transparent;
-  -webkit-overflow-scrolling: touch;
-}
-.cockpit-preview .rail::-webkit-scrollbar { height: 8px; }
-.cockpit-preview .rail::-webkit-scrollbar-thumb { background: var(--k-border); border-radius: var(--k-radius-pill, 9px); }
-.cockpit-preview .rail::-webkit-scrollbar-thumb:hover { background: var(--k-fg-faint); }
-.cockpit-preview .rail__card {
-  flex: 0 0 250px; max-width: 250px; min-width: 0; scroll-snap-align: start; box-sizing: border-box;
-  border: var(--k-bw, 1px) solid var(--k-border); border-radius: var(--k-radius-lg);
-  background: var(--k-bg);
-  padding: var(--k-s-20) var(--k-s-16); min-height: 138px;
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-  transition: border-color var(--k-dur-fast, .15s) var(--k-ease, ease);
-}
-.cockpit-preview .rail__card:hover { border-color: var(--k-fg-faint); }
-/* Contain wide atoms (tables, calendars) so one can't blow the rail width open. */
-.cockpit-preview .rail__card > * { max-width: 100%; min-width: 0; }
+.cockpit-preview .gallery--workbench > .card > .card__head > .card__desc { display: none; }
 
 /* Foundations sections land below the topbar on a panel→Foundations jump, and flash
  * a brand ring so the eye catches the twin that just updated. */
