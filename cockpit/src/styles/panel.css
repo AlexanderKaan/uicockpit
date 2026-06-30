@@ -125,7 +125,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--app-fg-faint);
-  padding: 12px 10px 4px;
+  padding: 12px 10px 4px 28px;
 }
 /* A section header that twins a Foundations stage section — clicking jumps there.
  * Resets button chrome to match the .fmsec label; a → appears on hover as the cue. */
@@ -160,9 +160,8 @@
 .fmrow--open { z-index: 50; }
 /* Per-row Shuffle lock — a small padlock in a left gutter before every title; click
    to pin a knob so Shuffle keeps it through a roll. Always shown (faint), brighter on
-   hover, solid when pinned. */
-.fmrow__head, .fmrow__inline { padding-left: 28px; }
-.fmsec { padding-left: 28px; }
+   hover, solid when pinned. The gutter (28px left padding) lives in the row/section
+   padding rules below so the shorthand `padding` doesn't reset it. */
 .fmrow__lock {
   position: absolute; left: 4px; top: 50%; transform: translateY(-50%);
   display: inline-flex; align-items: center; justify-content: center;
@@ -186,7 +185,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 10px;
+  padding: 9px 10px 9px 28px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 8px;
@@ -438,7 +437,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 5px 10px;
+  padding: 5px 10px 5px 28px;
   min-height: 36px;
 }
 .fmrow__inline > .fmrow__label { flex: none; }
