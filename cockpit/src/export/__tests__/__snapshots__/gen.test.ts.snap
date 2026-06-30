@@ -1310,17 +1310,27 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       },
       "calendar": {
         "modifiers": [
+          "accent",
+          "allday",
+          "alt",
           "disabled",
+          "events",
           "on",
           "out",
           "range",
           "range-end",
+          "range-preview",
           "range-start",
           "today"
         ],
         "parts": [
           "cell",
+          "daynum",
+          "event",
+          "event-time",
+          "event-title",
           "head",
+          "more",
           "nav",
           "nav-btns",
           "nav-title"
@@ -1351,6 +1361,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "event-title",
           "head",
           "hour",
+          "now",
           "rail"
         ]
       },
@@ -2404,6 +2415,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       },
       "tbl": {
         "modifiers": [
+          "card",
           "condensed",
           "optional",
           "stack"
@@ -5104,6 +5116,30 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tbl--condensed { font-size: var(--k-type-small); }
 .tbl--condensed th, .tbl--condensed td { padding: calc(var(--k-space, 10px) * 0.32) calc(var(--k-space, 10px) * 0.5); }
 
+/* --- Truncation utility (.truncate) ---------------------------------------
+   Opt-in single-line clamp for a long unbreakable value (name, path, title) so
+   ONE cell can't wrap and break the row rhythm — the pro-table move messy real
+   data needs. On the .tbl ATOM so every table earns it (was scoped to the
+   .datatable block). Pair with a title attr for the full value; --k-col-max
+   overrides the per-column cap. */
+.tbl .truncate { display: block; max-width: var(--k-col-max, 24ch); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* --- Card-framed table (.tbl--card) ---------------------------------------
+   The bare .tbl uses border-collapse:collapse + per-row border-top — right for
+   a flush list, but collapsed borders belong to the GRID, not the cell box, so
+   they VANISH under sticky cells and bleed past a rounded clip (confirmed
+   FF/WebKit). .tbl--card is the primitive for a STANDALONE sticky/rounded
+   table: separate borders, dividers drawn as inset box-shadow (they paint on
+   the cell box → travel with a sticky cell + clip to the radius), a rounded
+   bordered frame, a sticky opaque header, and the last row dropping its divider
+   so the grid meets the curve clean. (The .datatable BLOCK builds on the same
+   idea; this is the atom-level version for a table used bare.) Wrap in a
+   max-height + overflow:auto container to engage the sticky header on scroll. */
+.tbl--card { border-collapse: separate; border-spacing: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius-lg); overflow: hidden; }
+.tbl--card thead th { position: sticky; top: 0; z-index: 1; background: var(--k-surface); box-shadow: inset 0 -1px 0 var(--k-border); }
+.tbl--card tbody tr { border-top: 0; }
+.tbl--card tbody tr + tr td, .tbl--card tbody tr + tr th { box-shadow: inset 0 1px 0 var(--k-border); }
+
 /* --- Responsive (Tailwind "hidden columns" + "stacked on mobile") --------
    Wrap a table in .tbl-responsive (a size container, so it adapts to its own
    width, not the viewport). Two levers:
@@ -5190,10 +5226,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Selection cell — checkbox column, fixed narrow width. */
 .datatable__check { width: 36px; }
 
-/* Content-stress helper (real data is messy): .truncate clamps a long title to a
-   single-line ellipsis so it never blows the grid. (Numeric columns — th.num /
-   td.num — are now handled on the .tbl atom above, so every table gets them.) */
-.datatable .truncate { display: block; max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Content-stress helper: .truncate (single-line ellipsis clamp) is now defined
+   on the .tbl ATOM above, so every table — bare or inside .datatable — gets it,
+   same as the th.num / td.num numeric treatment. */
 
 /* State slot — EMPTY / LOADING / ERROR share one centered well, so a row-less
  * table reads as a deliberate state, not a broken layout. Drop it in a full-span
@@ -6013,6 +6048,55 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    recipe owns the look. Booking-grade pickers need this state. */
 .calendar__cell--disabled { color: var(--k-fg-faint); opacity: 0.5; cursor: not-allowed; text-decoration: line-through; }
 .calendar__cell--disabled:hover { background: transparent; }
+/* --- Month as a SCHEDULER (.calendar--events) ----------------------------
+   The base .calendar is a centered date PICKER. An event-bearing month needs
+   taller, top-left cells that stack the day number above a run of event chips —
+   the Google/Notion month grid. Add .calendar--events to the grid; each cell
+   becomes a column (day number top-left, then .calendar__event chips, then a
+   .calendar__more overflow row). The picker states (--on/--today/--range) still
+   work, but events want their own quieter day-number treatment. */
+.calendar--events .calendar__cell {
+  aspect-ratio: auto; min-height: var(--k-cal-cell-events, 5.5rem);
+  display: flex; flex-direction: column; align-items: stretch;
+  place-items: stretch; gap: var(--k-s-2);
+  padding: var(--k-s-4); border-radius: var(--k-radius-sm);
+}
+.calendar--events .calendar__cell:hover { background: var(--k-state-hover); }
+.calendar--events .calendar__daynum { align-self: flex-start; font-variant-numeric: tabular-nums; color: var(--k-fg-muted); padding: 0 var(--k-s-2); }
+.calendar--events .calendar__cell--out .calendar__daynum { color: var(--k-fg-faint); }
+.calendar--events .calendar__cell--today .calendar__daynum {
+  display: grid; place-items: center; min-width: 1.5rem; height: 1.5rem;
+  border-radius: var(--k-radius-pill); background: var(--k-primary); color: var(--k-primary-fg);
+  font-weight: var(--k-weight-semibold); padding: 0;
+}
+/* event chip — a soft tonal pill with a leading colour edge + one-line title.
+   Timed events lead with a faint time; --allday is a flatter full-bleed bar.
+   Colour-code by calendar with --alt / --accent (mirrors the week-grid set). */
+.calendar__event {
+  display: flex; align-items: center; gap: var(--k-s-4);
+  padding: var(--k-s-2) var(--k-s-4); border-radius: var(--k-radius-sm);
+  background: var(--k-primary-soft); color: var(--k-primary-soft-fg);
+  border-left: 2px solid var(--k-primary);
+  font-size: var(--k-type-eyebrow); line-height: 1.4;
+  cursor: pointer; text-align: left; border-top: 0; border-right: 0; border-bottom: 0;
+}
+.calendar__event:hover { filter: brightness(0.97); }
+.calendar__event-time { opacity: 0.75; font-variant-numeric: tabular-nums; flex: none; }
+.calendar__event-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendar__event--allday { border-left-width: 0; padding-left: var(--k-s-6); font-weight: var(--k-weight-medium); }
+.calendar__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
+.calendar__event--accent { background: var(--k-accent-soft); color: var(--k-accent-soft-fg); border-left-color: var(--k-accent); }
+/* "+N more" overflow — month cells cap their chip count and spill the rest into
+   this quiet link (opens the day). Keeps every cell on the row grid. */
+.calendar__more {
+  align-self: flex-start; font-size: var(--k-type-eyebrow); color: var(--k-fg-muted);
+  cursor: pointer; padding: var(--k-s-2) var(--k-s-4); background: transparent; border: 0; text-align: left;
+}
+.calendar__more:hover { color: var(--k-fg); }
+/* range hover-preview — while picking a range (start set, end not yet), the cells
+   between start and the hovered day get a LOWER-emphasis band so the forming
+   range is visible before commit. Consumer paints --range-preview on mouseover. */
+.calendar__cell--range-preview { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-radius: 0; opacity: 0.6; }
 /* --- Date & time entry — the trichotomy (H4) ---
  * The kit ships THREE date/time entry forms; pick by context, never invent a
  * fourth:
@@ -6098,11 +6182,32 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-left: var(--k-divider);
   background: repeating-linear-gradient(to bottom, var(--k-border) 0, var(--k-border) 1px, transparent 1px, transparent var(--k-cal-hour, 3rem));
 }
+/* current-time "now" line — the single most-used time-grid cue. Render ONE inside
+   today's .calendar-week__col; --now = decimal hours after the grid's first hour
+   (e.g. 9:30 on an 8AM grid = 1.5). A leading dot marks the time on the column
+   edge. pointer-events:none so it never eats an event click; scrollIntoView it on
+   mount so the grid opens on "now". */
+.calendar-week__now {
+  position: absolute; left: 0; right: 0;
+  top: calc(var(--now, 0) * var(--k-cal-hour, 3rem));
+  height: 0; border-top: 2px solid var(--k-accent);
+  z-index: 2; pointer-events: none;
+}
+.calendar-week__now::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: var(--k-s-8); height: var(--k-s-8); transform: translate(-50%, -50%);
+  border-radius: var(--k-radius-pill); background: var(--k-accent);
+}
 /* an event - placed by --from (start hour) + --span (hours). Soft tonal fill +
    a leading accent edge = the standard scheduler event. Colour-code by calendar
-   with --alt / --accent. */
+   with --alt / --accent. OVERLAP: concurrent events split the column into lanes —
+   the consumer sets --lanes (how many overlap) + --lane (this event's 0-based
+   slot) and they sit side by side instead of hiding each other. Defaults
+   (--lanes:1, --lane:0) = a single full-width event, the common case. */
 .calendar-week__event {
-  position: absolute; left: var(--k-s-2); right: var(--k-s-2);
+  position: absolute;
+  left: calc(var(--lane, 0) / var(--lanes, 1) * 100% + var(--k-s-2));
+  width: calc(100% / var(--lanes, 1) - var(--k-s-4));
   top: calc(var(--from, 0) * var(--k-cal-hour, 3rem));
   height: calc(var(--span, 1) * var(--k-cal-hour, 3rem) - var(--k-s-4));
   margin-top: var(--k-s-2);
@@ -11796,6 +11901,30 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tbl--condensed { font-size: var(--k-type-small); }
 .tbl--condensed th, .tbl--condensed td { padding: calc(var(--k-space, 10px) * 0.32) calc(var(--k-space, 10px) * 0.5); }
 
+/* --- Truncation utility (.truncate) ---------------------------------------
+   Opt-in single-line clamp for a long unbreakable value (name, path, title) so
+   ONE cell can't wrap and break the row rhythm — the pro-table move messy real
+   data needs. On the .tbl ATOM so every table earns it (was scoped to the
+   .datatable block). Pair with a title attr for the full value; --k-col-max
+   overrides the per-column cap. */
+.tbl .truncate { display: block; max-width: var(--k-col-max, 24ch); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* --- Card-framed table (.tbl--card) ---------------------------------------
+   The bare .tbl uses border-collapse:collapse + per-row border-top — right for
+   a flush list, but collapsed borders belong to the GRID, not the cell box, so
+   they VANISH under sticky cells and bleed past a rounded clip (confirmed
+   FF/WebKit). .tbl--card is the primitive for a STANDALONE sticky/rounded
+   table: separate borders, dividers drawn as inset box-shadow (they paint on
+   the cell box → travel with a sticky cell + clip to the radius), a rounded
+   bordered frame, a sticky opaque header, and the last row dropping its divider
+   so the grid meets the curve clean. (The .datatable BLOCK builds on the same
+   idea; this is the atom-level version for a table used bare.) Wrap in a
+   max-height + overflow:auto container to engage the sticky header on scroll. */
+.tbl--card { border-collapse: separate; border-spacing: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius-lg); overflow: hidden; }
+.tbl--card thead th { position: sticky; top: 0; z-index: 1; background: var(--k-surface); box-shadow: inset 0 -1px 0 var(--k-border); }
+.tbl--card tbody tr { border-top: 0; }
+.tbl--card tbody tr + tr td, .tbl--card tbody tr + tr th { box-shadow: inset 0 1px 0 var(--k-border); }
+
 /* --- Responsive (Tailwind "hidden columns" + "stacked on mobile") --------
    Wrap a table in .tbl-responsive (a size container, so it adapts to its own
    width, not the viewport). Two levers:
@@ -11882,10 +12011,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Selection cell — checkbox column, fixed narrow width. */
 .datatable__check { width: 36px; }
 
-/* Content-stress helper (real data is messy): .truncate clamps a long title to a
-   single-line ellipsis so it never blows the grid. (Numeric columns — th.num /
-   td.num — are now handled on the .tbl atom above, so every table gets them.) */
-.datatable .truncate { display: block; max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Content-stress helper: .truncate (single-line ellipsis clamp) is now defined
+   on the .tbl ATOM above, so every table — bare or inside .datatable — gets it,
+   same as the th.num / td.num numeric treatment. */
 
 /* State slot — EMPTY / LOADING / ERROR share one centered well, so a row-less
  * table reads as a deliberate state, not a broken layout. Drop it in a full-span
@@ -12705,6 +12833,55 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    recipe owns the look. Booking-grade pickers need this state. */
 .calendar__cell--disabled { color: var(--k-fg-faint); opacity: 0.5; cursor: not-allowed; text-decoration: line-through; }
 .calendar__cell--disabled:hover { background: transparent; }
+/* --- Month as a SCHEDULER (.calendar--events) ----------------------------
+   The base .calendar is a centered date PICKER. An event-bearing month needs
+   taller, top-left cells that stack the day number above a run of event chips —
+   the Google/Notion month grid. Add .calendar--events to the grid; each cell
+   becomes a column (day number top-left, then .calendar__event chips, then a
+   .calendar__more overflow row). The picker states (--on/--today/--range) still
+   work, but events want their own quieter day-number treatment. */
+.calendar--events .calendar__cell {
+  aspect-ratio: auto; min-height: var(--k-cal-cell-events, 5.5rem);
+  display: flex; flex-direction: column; align-items: stretch;
+  place-items: stretch; gap: var(--k-s-2);
+  padding: var(--k-s-4); border-radius: var(--k-radius-sm);
+}
+.calendar--events .calendar__cell:hover { background: var(--k-state-hover); }
+.calendar--events .calendar__daynum { align-self: flex-start; font-variant-numeric: tabular-nums; color: var(--k-fg-muted); padding: 0 var(--k-s-2); }
+.calendar--events .calendar__cell--out .calendar__daynum { color: var(--k-fg-faint); }
+.calendar--events .calendar__cell--today .calendar__daynum {
+  display: grid; place-items: center; min-width: 1.5rem; height: 1.5rem;
+  border-radius: var(--k-radius-pill); background: var(--k-primary); color: var(--k-primary-fg);
+  font-weight: var(--k-weight-semibold); padding: 0;
+}
+/* event chip — a soft tonal pill with a leading colour edge + one-line title.
+   Timed events lead with a faint time; --allday is a flatter full-bleed bar.
+   Colour-code by calendar with --alt / --accent (mirrors the week-grid set). */
+.calendar__event {
+  display: flex; align-items: center; gap: var(--k-s-4);
+  padding: var(--k-s-2) var(--k-s-4); border-radius: var(--k-radius-sm);
+  background: var(--k-primary-soft); color: var(--k-primary-soft-fg);
+  border-left: 2px solid var(--k-primary);
+  font-size: var(--k-type-eyebrow); line-height: 1.4;
+  cursor: pointer; text-align: left; border-top: 0; border-right: 0; border-bottom: 0;
+}
+.calendar__event:hover { filter: brightness(0.97); }
+.calendar__event-time { opacity: 0.75; font-variant-numeric: tabular-nums; flex: none; }
+.calendar__event-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendar__event--allday { border-left-width: 0; padding-left: var(--k-s-6); font-weight: var(--k-weight-medium); }
+.calendar__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
+.calendar__event--accent { background: var(--k-accent-soft); color: var(--k-accent-soft-fg); border-left-color: var(--k-accent); }
+/* "+N more" overflow — month cells cap their chip count and spill the rest into
+   this quiet link (opens the day). Keeps every cell on the row grid. */
+.calendar__more {
+  align-self: flex-start; font-size: var(--k-type-eyebrow); color: var(--k-fg-muted);
+  cursor: pointer; padding: var(--k-s-2) var(--k-s-4); background: transparent; border: 0; text-align: left;
+}
+.calendar__more:hover { color: var(--k-fg); }
+/* range hover-preview — while picking a range (start set, end not yet), the cells
+   between start and the hovered day get a LOWER-emphasis band so the forming
+   range is visible before commit. Consumer paints --range-preview on mouseover. */
+.calendar__cell--range-preview { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-radius: 0; opacity: 0.6; }
 /* --- Date & time entry — the trichotomy (H4) ---
  * The kit ships THREE date/time entry forms; pick by context, never invent a
  * fourth:
@@ -12790,11 +12967,32 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-left: var(--k-divider);
   background: repeating-linear-gradient(to bottom, var(--k-border) 0, var(--k-border) 1px, transparent 1px, transparent var(--k-cal-hour, 3rem));
 }
+/* current-time "now" line — the single most-used time-grid cue. Render ONE inside
+   today's .calendar-week__col; --now = decimal hours after the grid's first hour
+   (e.g. 9:30 on an 8AM grid = 1.5). A leading dot marks the time on the column
+   edge. pointer-events:none so it never eats an event click; scrollIntoView it on
+   mount so the grid opens on "now". */
+.calendar-week__now {
+  position: absolute; left: 0; right: 0;
+  top: calc(var(--now, 0) * var(--k-cal-hour, 3rem));
+  height: 0; border-top: 2px solid var(--k-accent);
+  z-index: 2; pointer-events: none;
+}
+.calendar-week__now::before {
+  content: ""; position: absolute; left: 0; top: 0;
+  width: var(--k-s-8); height: var(--k-s-8); transform: translate(-50%, -50%);
+  border-radius: var(--k-radius-pill); background: var(--k-accent);
+}
 /* an event - placed by --from (start hour) + --span (hours). Soft tonal fill +
    a leading accent edge = the standard scheduler event. Colour-code by calendar
-   with --alt / --accent. */
+   with --alt / --accent. OVERLAP: concurrent events split the column into lanes —
+   the consumer sets --lanes (how many overlap) + --lane (this event's 0-based
+   slot) and they sit side by side instead of hiding each other. Defaults
+   (--lanes:1, --lane:0) = a single full-width event, the common case. */
 .calendar-week__event {
-  position: absolute; left: var(--k-s-2); right: var(--k-s-2);
+  position: absolute;
+  left: calc(var(--lane, 0) / var(--lanes, 1) * 100% + var(--k-s-2));
+  width: calc(100% / var(--lanes, 1) - var(--k-s-4));
   top: calc(var(--from, 0) * var(--k-cal-hour, 3rem));
   height: calc(var(--span, 1) * var(--k-cal-hour, 3rem) - var(--k-s-4));
   margin-top: var(--k-s-2);

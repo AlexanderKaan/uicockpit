@@ -50,7 +50,8 @@ const CARD_KEYWORDS: Record<string, string> = {
   TagInputCard: 'Topics tags chips tokens',
   ChipsCard: 'Chips assist filter input suggestion facet token chip',
   DateCard: 'Schedule date picker calendar range',
-  CalendarWeekCard: 'Calendar week day view schedule time grid agenda events',
+  CalendarWeekCard: 'Calendar week day view schedule time grid agenda events now line lanes overlap',
+  CalendarMonthCard: 'Calendar month scheduler event chips all day overflow more colour coded',
   CalendarYearCard: 'Calendar year view twelve months overview jump',
   CalendarRangeCard: 'Calendar range double two months date range booking',
   SlotPickerCard: 'Slot picker time booking availability',
@@ -98,6 +99,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   TableCard: 'System health table rows',
   GroupedTableCard: 'Grouped table rows summary total row condensed density section headers',
   ResponsiveTableCard: 'Responsive table stacked mobile hidden columns label value cards',
+  CardTableCard: 'Card framed table rounded frame sticky header scroll truncate files',
   HorizontalFormCard: 'Profile form labels on left horizontal layout settings dense',
   ColorPickerCard: 'Color colour picker radio swatches label accent choice',
   HeaderVariantsCard: 'Page header breadcrumb tabs banner image cover profile section heading',
@@ -212,8 +214,8 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [RatingCard, 'atom'], [MusicPlayerCard, 'component'], [WeatherCard, 'component'], [CheckoutCard, 'component'], [ProductCardCard, 'component'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
-    [CalendarWeekCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
-    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
+    [CalendarWeekCard, 'section'], [CalendarMonthCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
+    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -350,7 +352,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
-  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
+  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
   ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
 ]
 
@@ -2683,16 +2685,20 @@ function DateCard() {
   // the disabled-date state (.calendar__cell--disabled) next to range + today.
   const BLOCKED = new Set([8, 9])
   const isBlocked = (d: number) => BLOCKED.has(d)
+  // Previewing = start is set, end isn't, and the user is hovering a later day →
+  // the forming band wears the LOWER-emphasis --range-preview so it's clearly not
+  // committed yet; the anchor stays solid. The second click swaps to --range.
+  const previewing = end === null && start !== null && hover !== null && hover !== start
   const cellClass = (d: number): string => {
     const parts = ['calendar__cell']
     if (d < 1 || d > 31) parts.push('calendar__cell--out')
     else if (isBlocked(d)) parts.push('calendar__cell--disabled')
     if (d === today) parts.push('calendar__cell--today')
-    if (effStart !== null && effEnd !== null) {
-      if (d === effStart && d === effEnd) parts.push('calendar__cell--on')
-      else if (d === effStart) parts.push('calendar__cell--range-start')
-      else if (d === effEnd) parts.push('calendar__cell--range-end')
-      else if (d > effStart && d < effEnd) parts.push('calendar__cell--range')
+    if (effStart !== null && effEnd !== null && effStart !== effEnd) {
+      const lo = Math.min(effStart, effEnd), hi = Math.max(effStart, effEnd)
+      if (d === lo) parts.push('calendar__cell--range-start')
+      else if (d === hi) parts.push(previewing ? 'calendar__cell--range-preview' : 'calendar__cell--range-end')
+      else if (d > lo && d < hi) parts.push(previewing ? 'calendar__cell--range-preview' : 'calendar__cell--range')
     } else if (start !== null && d === start) {
       parts.push('calendar__cell--on')
     }
@@ -2780,16 +2786,22 @@ function CalendarWeekCard() {
     { name: 'Mon', num: 9 }, { name: 'Tue', num: 10 }, { name: 'Wed', num: 11, today: true },
     { name: 'Thu', num: 12 }, { name: 'Fri', num: 13 }, { name: 'Sat', num: 14 }, { name: 'Sun', num: 15 },
   ]
-  // events keyed by day index; from = hours after 8 AM, span = hours
-  const EVENTS: Record<number, Array<{ from: number; span: number; title: string; time: string; v?: string }>> = {
+  // events keyed by day index; from = hours after 8 AM, span = hours. lane/lanes
+  // split a column when events overlap (lane = 0-based slot, lanes = how many).
+  type Ev = { from: number; span: number; title: string; time: string; v?: string; lane?: number; lanes?: number }
+  const EVENTS: Record<number, Array<Ev>> = {
     0: [{ from: 1, span: 1.5, title: 'Standup', time: '9:00', v: '' }],
     2: [
       { from: 0.5, span: 1.5, title: 'Design sync', time: '8:30', v: ' calendar-week__event--alt' },
-      { from: 5, span: 2, title: 'Roadmap review', time: '1:00', v: '' },
+      // two concurrent 1 PM meetings → side-by-side lanes
+      { from: 5, span: 2, title: 'Roadmap review', time: '1:00', v: '', lane: 0, lanes: 2 },
+      { from: 5, span: 1.5, title: 'Vendor call', time: '1:00', v: ' calendar-week__event--accent', lane: 1, lanes: 2 },
     ],
     3: [{ from: 2, span: 1, title: '1:1 · Priya', time: '10:00', v: ' calendar-week__event--accent' }],
     4: [{ from: 3.5, span: 2, title: 'Ship review', time: '11:30', v: '' }],
   }
+  // "now" line at 10:18 AM → 2.3 hours after the 8 AM grid start, shown in today's column
+  const NOW = 2.3
   const cols = view === 'day' ? [DAYS[2]!] : DAYS
   const colIndex = (i: number) => (view === 'day' ? 2 : i)
   return (
@@ -2815,14 +2827,15 @@ function CalendarWeekCard() {
               <div key={h} className="calendar-week__hour"><span>{fmtHour(h)}</span></div>
             ))}
           </div>
-          {cols.map((_, i) => (
+          {cols.map((d, i) => (
             <div key={i} className="calendar-week__col">
+              {d.today && <div className="calendar-week__now" style={{ ['--now' as string]: NOW } as CSSProperties} />}
               {(EVENTS[colIndex(i)] ?? []).map((ev, j) => (
                 <button
                   key={j}
                   type="button"
                   className={`calendar-week__event${ev.v ?? ''}`}
-                  style={{ ['--from' as string]: ev.from, ['--span' as string]: ev.span } as CSSProperties}
+                  style={{ ['--from' as string]: ev.from, ['--span' as string]: ev.span, ...(ev.lanes ? { ['--lane' as string]: ev.lane, ['--lanes' as string]: ev.lanes } : {}) } as CSSProperties}
                 >
                   <span className="calendar-week__event-title">{ev.title}</span>
                   <span className="calendar-week__event-time">{ev.time}</span>
@@ -2831,6 +2844,54 @@ function CalendarWeekCard() {
             </div>
           ))}
         </div>
+      </div>
+    </Card>
+  )
+}
+
+function CalendarMonthCard() {
+  // Month as a SCHEDULER (.calendar--events): taller top-left cells stacking the
+  // day number over event chips, an all-day bar, the colour-coded --alt/--accent
+  // variants, and a "+N more" overflow. The base .calendar is a date PICKER; this
+  // is the same grid carrying events (Google/Notion month view).
+  const OFFSET = 3 // May 2026 starts on Thursday → 3 leading blanks (Mon-first)
+  const today = 13
+  type Ev = { title: string; time?: string; v?: string; allday?: boolean }
+  const EVENTS: Record<number, Ev[]> = {
+    11: [{ title: 'Design review', time: '10:00' }],
+    13: [
+      { title: 'Launch', allday: true, v: ' calendar__event--accent' },
+      { title: 'Standup', time: '9:00' },
+      { title: '1:1 · Priya', time: '11:00', v: ' calendar__event--alt' },
+      { title: 'Roadmap', time: '14:00' },
+    ],
+    14: [{ title: 'Offsite', allday: true, v: ' calendar__event--alt' }],
+    20: [{ title: 'Ship', time: '16:00' }],
+  }
+  const CAP = 3
+  return (
+    <Card wide title="May 2026" desc="Month scheduler — day cells carry event chips + overflow.">
+      <div className="calendar calendar--events">
+        {DOW.map((d, i) => (<div key={`h${i}`} className="calendar__head">{d}</div>))}
+        {Array.from({ length: 35 }, (_, idx) => {
+          const day = idx - OFFSET + 1
+          const out = day < 1 || day > 31
+          const evs = EVENTS[day] ?? []
+          const shown = evs.slice(0, CAP)
+          const extra = evs.length - shown.length
+          return (
+            <div key={idx} className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${day === today ? 'calendar__cell--today' : ''}`}>
+              <span className="calendar__daynum">{out ? '' : day}</span>
+              {shown.map((ev, j) => (
+                <span key={j} className={`calendar__event${ev.allday ? ' calendar__event--allday' : ''}${ev.v ?? ''}`}>
+                  {ev.time && <span className="calendar__event-time">{ev.time}</span>}
+                  <span className="calendar__event-title">{ev.title}</span>
+                </span>
+              ))}
+              {extra > 0 && <button type="button" className="calendar__more">+{extra} more</button>}
+            </div>
+          )
+        })}
       </div>
     </Card>
   )
@@ -2996,6 +3057,46 @@ function ResponsiveTableCard() {
                 <td data-label="Status">
                   <span className={`badge ${r.status === 'Paid' ? 'badge--success' : 'badge--warn'}`}>{r.status}</span>
                 </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  )
+}
+
+function CardTableCard() {
+  // Card-framed table: .tbl--card flips the atom to separate borders with
+  // inset-shadow dividers + a rounded bordered frame + a sticky opaque header,
+  // so a STANDALONE table can be sticky/rounded without the borders vanishing on
+  // scroll. Wrapped in a max-height scroll well to engage the sticky thead. The
+  // .truncate utility (now on the atom) clamps the long "File" cell.
+  const ROWS = [
+    { file: 'q4-financials-final-board-review.xlsx', size: '2.4 MB', by: 'Mara' },
+    { file: 'brand-guidelines-2026.pdf', size: '8.1 MB', by: 'Tom' },
+    { file: 'roadmap-export.csv', size: '142 KB', by: 'Priya' },
+    { file: 'customer-interviews-transcript.docx', size: '512 KB', by: 'Sven' },
+    { file: 'logo-pack-svg-and-png-assets.zip', size: '19 MB', by: 'Mara' },
+    { file: 'release-notes-draft.md', size: '6 KB', by: 'Tom' },
+  ]
+  return (
+    <Card title="Files" desc="Card-framed — rounded frame, sticky header, scrolls.">
+      <div style={{ maxHeight: '12rem', overflow: 'auto' }}>
+        <table className="tbl tbl--card">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Owner</th>
+              <th className="num">Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ROWS.map((r) => (
+              <tr key={r.file}>
+                <td><span className="truncate" style={{ maxWidth: '14ch' }} title={r.file}>{r.file}</span></td>
+                <td style={{ color: 'var(--k-fg-muted)' }}>{r.by}</td>
+                <td className="num">{r.size}</td>
               </tr>
             ))}
           </tbody>
