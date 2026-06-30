@@ -8,6 +8,7 @@ import type { Config } from '../../tokens/types'
 import { setGalleryJump } from '../../state/galleryJump'
 import { COMPONENTS, componentAt, elementAt } from '../../showcases/components'
 import { usesOf } from '../../kit/segments'
+import { CONTRACT, ROLE_GUARANTEE } from '../../kit/contracts'
 import { FoundationsView } from './FoundationsView'
 import type { ViewKind } from '../Stage'
 
@@ -298,16 +299,33 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
             )}
             {focus.level === 'atom' && (
               <>
-                <div className="shc__recipe-title">{comp ? `${atomLabel} — how it derives` : atomLabel}</div>
-                {comp ? (
+                <div className="shc__loupe-head">Contract · {atomLabel}</div>
+                {CONTRACT[focus.comp] ? (
                   <>
+                    <p className="shc__contract-intro">Each part wears a <strong>role</strong>; the role guarantees its treatment — so this composes coherently anywhere.</p>
+                    <ul className="shc__contract">
+                      {CONTRACT[focus.comp]!.map((p, i) => (
+                        <li className="shc__contract-row" key={i}>
+                          <span className="shc__contract-n">{i + 1}</span>
+                          <span className="shc__contract-body">
+                            <span className="shc__contract-head"><strong>{p.part}</strong> <span className={`shc__role shc__role--${p.role}`}>{p.role}</span></span>
+                            <span className="shc__contract-gtee">{ROLE_GUARANTEE[p.role]}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <p className="shc__loupe-blurb">A live component, captured from the screen — its roles aren’t contracted yet.</p>
+                )}
+                {comp && (
+                  <details className="shc__recipe-more">
+                    <summary className="shc__recipe-summary">Recipe — how it derives</summary>
                     {comp.recipe.map(([k, v]) => (
                       <div className="shc__recipe-row" key={k}><span className="shc__recipe-k">{k}</span><code className="shc__recipe-v">{v}</code></div>
                     ))}
                     <div className="shc__recipe-blurb">{comp.blurb}</div>
-                  </>
-                ) : (
-                  <p className="shc__loupe-blurb">A live component, captured from the screen. Open it in the gallery for its recipe + contract.</p>
+                  </details>
                 )}
                 <div className="shc__loupe-actions">
                   <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>

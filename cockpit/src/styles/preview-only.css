@@ -1364,3 +1364,33 @@
   color: var(--k-fg-muted);
   line-height: 1.5;
 }
+
+/* === The contract card — each part's role → guarantee (the Role Canvas) ===== */
+.shc__contract-intro { font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.5; margin: 0 0 var(--k-s-12); }
+.shc__contract { list-style: none; margin: 0 0 var(--k-s-12); padding: 0; display: flex; flex-direction: column; gap: var(--k-s-10); }
+.shc__contract-row { display: flex; gap: var(--k-s-8); align-items: flex-start; }
+.shc__contract-n {
+  flex: none; width: 20px; height: 20px; border-radius: 999px;
+  background: var(--k-surface-sunken); border: 1px solid var(--k-border);
+  color: var(--k-fg-muted); font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold);
+  display: grid; place-items: center;
+}
+.shc__contract-body { display: flex; flex-direction: column; gap: var(--k-s-2); min-width: 0; }
+.shc__contract-head { font-size: var(--k-type-small); color: var(--k-fg); }
+.shc__contract-gtee { font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.4; }
+/* Role chip — a closed set, colour-coded so the vocabulary reads at a glance. */
+.shc__role {
+  display: inline-block; font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: var(--k-s-2) var(--k-s-6); border-radius: 999px; margin-left: var(--k-s-4);
+  color: var(--k-primary); background: var(--k-primary-soft);
+}
+.shc__role--control { color: #2f6fed; background: rgb(47 111 237 / 0.12); }
+.shc__role--selectable { color: #1d8f80; background: rgb(42 157 143 / 0.14); }
+.shc__role--surface { color: #6b7280; background: rgb(122 127 135 / 0.16); }
+.shc__role--tone-bearer { color: #b9831f; background: rgb(200 130 31 / 0.16); }
+.shc__role--text-slot { color: #3f9367; background: rgb(74 157 106 / 0.14); }
+.shc__role--overlay { color: #7a63c9; background: rgb(138 111 208 / 0.16); }
+/* Recipe demoted to a collapsible beneath the contract. */
+.shc__recipe-more { margin-top: var(--k-s-12); border-top: var(--k-divider); padding-top: var(--k-s-8); }
+.shc__recipe-summary { font-size: var(--k-type-caption); color: var(--k-fg-muted); cursor: pointer; font-weight: var(--k-weight-medium); list-style-position: inside; }
