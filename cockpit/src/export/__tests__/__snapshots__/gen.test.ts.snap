@@ -6054,13 +6054,21 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   background: var(--k-surface);
   border: 1px solid var(--k-border);
   border-radius: var(--k-radius-lg);
-  overflow: hidden;
+  /* ONE scroll container (the whole grid), so head + body share one scrollbar and
+     their column dividers stay in register. overflow-y:auto also clips to the radius. */
+  overflow-x: hidden; overflow-y: auto; max-height: 24rem; overscroll-behavior: contain;
   font-size: var(--k-type-caption);
 }
 .calendar-week--day { --cal-cols: 1; }
-/* header - day name + date chip per column, aligned to the body via the shared
-   column template (the rail-width corner keeps both grids in register). */
-.calendar-week__head { display: grid; grid-template-columns: var(--cal-tpl); border-bottom: var(--k-divider); }
+/* header - day name + date chip per column. STICKY: pins to the top on scroll. The
+   bottom divider is an inset box-shadow (not border-bottom) so it travels with the
+   sticky head and doesn't bleed under the scrolling grid. */
+.calendar-week__head {
+  display: grid; grid-template-columns: var(--cal-tpl);
+  position: sticky; top: 0; z-index: 2;
+  background: var(--k-surface);
+  box-shadow: inset 0 -1px 0 var(--k-border);
+}
 .calendar-week__corner { border-right: var(--k-divider); }
 .calendar-week__col-head {
   display: flex; flex-direction: column; align-items: center; gap: var(--k-s-2);
@@ -6077,7 +6085,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* body - the scrollable time grid: an hour rail in column 1, then the day
    columns. Hour lines are drawn by a repeating gradient on the column itself, so
    no per-cell markup is needed; the rail labels sit at each gridline. */
-.calendar-week__body { display: grid; grid-template-columns: var(--cal-tpl); max-height: 22rem; overflow-y: auto; }
+.calendar-week__body { display: grid; grid-template-columns: var(--cal-tpl); }
 .calendar-week__rail { display: flex; flex-direction: column; border-right: var(--k-divider); }
 .calendar-week__hour {
   height: var(--k-cal-hour, 3rem);
@@ -12733,13 +12741,21 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   background: var(--k-surface);
   border: 1px solid var(--k-border);
   border-radius: var(--k-radius-lg);
-  overflow: hidden;
+  /* ONE scroll container (the whole grid), so head + body share one scrollbar and
+     their column dividers stay in register. overflow-y:auto also clips to the radius. */
+  overflow-x: hidden; overflow-y: auto; max-height: 24rem; overscroll-behavior: contain;
   font-size: var(--k-type-caption);
 }
 .calendar-week--day { --cal-cols: 1; }
-/* header - day name + date chip per column, aligned to the body via the shared
-   column template (the rail-width corner keeps both grids in register). */
-.calendar-week__head { display: grid; grid-template-columns: var(--cal-tpl); border-bottom: var(--k-divider); }
+/* header - day name + date chip per column. STICKY: pins to the top on scroll. The
+   bottom divider is an inset box-shadow (not border-bottom) so it travels with the
+   sticky head and doesn't bleed under the scrolling grid. */
+.calendar-week__head {
+  display: grid; grid-template-columns: var(--cal-tpl);
+  position: sticky; top: 0; z-index: 2;
+  background: var(--k-surface);
+  box-shadow: inset 0 -1px 0 var(--k-border);
+}
 .calendar-week__corner { border-right: var(--k-divider); }
 .calendar-week__col-head {
   display: flex; flex-direction: column; align-items: center; gap: var(--k-s-2);
@@ -12756,7 +12772,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* body - the scrollable time grid: an hour rail in column 1, then the day
    columns. Hour lines are drawn by a repeating gradient on the column itself, so
    no per-cell markup is needed; the rail labels sit at each gridline. */
-.calendar-week__body { display: grid; grid-template-columns: var(--cal-tpl); max-height: 22rem; overflow-y: auto; }
+.calendar-week__body { display: grid; grid-template-columns: var(--cal-tpl); }
 .calendar-week__rail { display: flex; flex-direction: column; border-right: var(--k-divider); }
 .calendar-week__hour {
   height: var(--k-cal-hour, 3rem);
