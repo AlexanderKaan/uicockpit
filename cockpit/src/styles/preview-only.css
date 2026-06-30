@@ -881,10 +881,14 @@
 .shc-wall__eyebrow { font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-faint); }
 .shc-wall__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); color: var(--k-fg); margin: var(--k-s-2) 0 0; }
 .shc-wall__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); max-width: 42ch; }
-.shc-wall__grid { display: grid; grid-template-columns: repeat(auto-fill, calc(var(--tw) * 1px)); gap: var(--k-s-24); justify-content: center; }
+/* 3-up, filling the stage width. --tw (the live column px) is measured in JS so
+   the fixed-1200 miniature scales to exactly the column width. */
+/* minmax(0,1fr): the scaled 1200px miniatures don't have their min-content blow
+   out the column — the frame's overflow:hidden clips them to the fluid width. */
+.shc-wall__grid { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--k-s-24); }
 .shc-wall__tile { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: var(--k-s-8); }
 .shc-wall__frame {
-  width: calc(var(--tw) * 1px); aspect-ratio: 16 / 10; overflow: hidden;
+  width: 100%; aspect-ratio: 4 / 3; overflow: hidden;
   border: 1px solid var(--k-border); border-radius: var(--k-radius-lg);
   background: var(--k-surface); box-shadow: 0 6px 22px -12px rgb(0 0 0 / 0.22);
   transition: transform var(--k-dur, 200ms) var(--k-ease, ease), box-shadow var(--k-dur, 200ms) var(--k-ease, ease);
@@ -894,6 +898,14 @@
 .shc-wall__mini { width: 1200px; transform: scale(calc(var(--tw) / 1200)); transform-origin: top left; pointer-events: none; }
 .shc-wall__cap { display: inline-flex; align-items: center; gap: var(--k-s-6); font-size: var(--k-type-small); font-weight: var(--k-weight-medium); color: var(--k-fg); }
 .shc-wall__cap svg { width: var(--k-icon-sm); height: var(--k-icon-sm); color: var(--k-fg-muted); }
+/* The empty 9th cell — a quiet placeholder for a future app archetype. */
+.shc-wall__tile--empty { cursor: default; }
+.shc-wall__frame--empty {
+  display: grid; place-items: center; background: transparent;
+  border: 1px dashed var(--k-border); box-shadow: none;
+}
+.shc-wall__frame--empty span { font-size: var(--k-type-small); color: var(--k-fg-faint); }
+.shc-wall__tile--empty:hover .shc-wall__frame--empty { transform: none; box-shadow: none; }
 /* Back-to-wall button, top-left of an entered screen. */
 .shc__back { margin-bottom: var(--k-s-8); }
 /* The zoom morph — keep it snappy + macOS-eased. */

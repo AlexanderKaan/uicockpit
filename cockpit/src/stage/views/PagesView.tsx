@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
+import { Fragment, useMemo, useState, useRef, useLayoutEffect, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
 import { flushSync } from 'react-dom'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
@@ -529,7 +529,21 @@ function LedgerSidebar({ appNav, pickable }: { appNav: AppNav; pickable: boolean
  * macOS-Mission-Control-zooms up to fill (View Transitions). The first of the
  * nested zoom levels: wall → screen → section/atom (the existing loupe drill). */
 function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => void }) {
-  const screens = LEDGER_SCREENS.filter((s) => s.group !== 'footer')
+  // 3-up grid that FILLS the stage width. The miniatures scale fixed-1200px
+  // design content into a fluid column, so the scale must track the live column
+  // width — measure it (ResizeObserver) and feed --tw (the column px). 8 screens
+  // + a "more soon" placeholder = a clean 3×3.
+  const gridRef = useRef<HTMLDivElement>(null)
+  const [tw, setTw] = useState(384)
+  useLayoutEffect(() => {
+    const el = gridRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const measure = () => { const w = el.clientWidth; if (w > 0) setTw(Math.floor((w - 24 * 2) / 3)) }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
   return (
     <div className="shc-wall">
       <div className="shc-wall__head">
@@ -537,10 +551,10 @@ function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => voi
           <div className="shc-wall__eyebrow">Showcase · live</div>
           <h2 className="shc-wall__title">Ledger</h2>
         </div>
-        <p className="shc-wall__sub">One product, {screens.length} screens — all themed by your kit. Click a screen to zoom in.</p>
+        <p className="shc-wall__sub">{LEDGER_SCREENS.length} screens, one product — all themed by your kit. Click a screen to zoom in.</p>
       </div>
-      <div className="shc-wall__grid">
-        {screens.map((s) => {
+      <div className="shc-wall__grid" ref={gridRef} style={{ ['--tw' as string]: tw } as CSSProperties}>
+        {LEDGER_SCREENS.map((s) => {
           const sm = SHOWCASES.find((x) => x.id === s.id)
           if (!sm) return null
           const tileNav: AppNav = { screens: LEDGER_SCREENS, current: s.id, highlight: s.id, onNavigate: () => {} }
@@ -555,6 +569,10 @@ function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => voi
             </button>
           )
         })}
+        {/* 9th cell — the empty slot, filled later (another app archetype). */}
+        <div className="shc-wall__tile shc-wall__tile--empty" aria-hidden="true">
+          <div className="shc-wall__frame shc-wall__frame--empty"><span>More soon</span></div>
+        </div>
       </div>
     </div>
   )
