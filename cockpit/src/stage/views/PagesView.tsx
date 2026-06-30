@@ -105,7 +105,10 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
   // clean live page; turning it on reveals the breadcrumb and makes sections
   // pickable. Click a section → it isolates and enlarges (atoms inside clickable);
   // click an atom → its specimen + recipe; All tokens → the foundation grid.
-  const [loupe, setLoupe] = useState(false)
+  // In a screen you are ALWAYS inspecting — no Inspect toggle. You reached this
+  // screen by zooming in from the wall; selecting a component is the primary act.
+  // (Hover reveals component bounds; click zooms in a level.)
+  const loupe = true
   const [focus, setFocus] = useState<Focus>({ level: 'page' })
   const [railOpen, setRailOpen] = useState(true)
   const [tokensOpen, setTokensOpen] = useState(false)
@@ -123,11 +126,21 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
 
   // Page → Section: walk up from the clicked node to the section wrapper (carries
   // its pane/idx as data-attrs), then isolate it.
+  // Each level change animates as a continuous zoom (View Transitions) instead of
+  // an instant swap — so wall→screen→component→atom all FEEL like zooming further
+  // in. .shc--app drops its `shc-zoom` name outside the wall morph (the `zooming`
+  // flag in PagesView), so these inner transitions are clean root crossfades.
+  const vt = (mutate: () => void) => {
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
+    if (!doc.startViewTransition) { mutate(); return }
+    doc.startViewTransition(() => flushSync(mutate))
+  }
   const pickSection = (e: ReactMouseEvent) => {
     let el = e.target as HTMLElement | null
     while (el && el !== e.currentTarget) {
       if (el.dataset && el.dataset.idx != null) {
-        setFocus({ level: 'section', pane: +el.dataset.pane!, idx: +el.dataset.idx })
+        const pane = +el.dataset.pane!, idx = +el.dataset.idx
+        vt(() => setFocus({ level: 'section', pane, idx }))
         return
       }
       el = el.parentElement
@@ -137,11 +150,8 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
   const pickAtom = (e: ReactMouseEvent) => {
     if (focus.level !== 'section') return
     const id = componentAt(e.target as Element)
-    if (id) setFocus({ level: 'atom', pane: focus.pane, idx: focus.idx, comp: id })
+    if (id) vt(() => setFocus({ level: 'atom', pane: focus.pane, idx: focus.idx, comp: id }))
   }
-
-  const enterLoupe = () => { setLoupe(true); setFocus({ level: 'page' }); setTokensOpen(false) }
-  const exitLoupe = () => { setLoupe(false); setFocus({ level: 'page' }); setTokensOpen(false) }
 
   // The breadcrumb spine — one crumb per visited altitude, each a button that
   // flies back out to its level. The All-tokens inspector (J3) appends as the
@@ -187,7 +197,7 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
             {crumbs.map((c, i) => (
               <span key={i} className="shc__crumb-wrap">
                 {i > 0 && <span className="shc__crumb-sep" aria-hidden>›</span>}
-                <button type="button" className={`shc__crumb ${c.on ? 'shc__crumb--on' : ''}`} onClick={c.go} aria-current={c.on ? 'true' : undefined}>{c.label}</button>
+                <button type="button" className={`shc__crumb ${c.on ? 'shc__crumb--on' : ''}`} onClick={() => vt(c.go)} aria-current={c.on ? 'true' : undefined}>{c.label}</button>
               </span>
             ))}
           </div>
@@ -310,9 +320,6 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
             <Icon name="grid" />All tokens
           </button>
         )}
-        <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={loupe} onClick={() => (loupe ? exitLoupe() : enterLoupe())}>
-          <Icon name="search" />{loupe ? 'Done' : 'Inspect'}
-        </button>
         <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={showJson} onClick={() => setShowJson((o) => !o)}>
           <Icon name="file" />JSON
         </button>
@@ -586,6 +593,9 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
   // toggles wall ↔ screen. The sidebar still drives screen switches once inside.
   const [screenId, setScreenId] = useState(LEDGER_SCREENS[0]!.id)
   const [entered, setEntered] = useState(false)
+  // `zooming` names .shc--app ONLY during the wall↔screen morph, so the inner
+  // section/atom zooms (which reuse the `shc-zoom` name) never collide with it.
+  const [zooming, setZooming] = useState(false)
   // Width lives here (the app level) so it survives screen switches — ShowcaseStage
   // still remounts per screen (key) to reset the loupe, but reads width from here.
   const [width, setWidth] = useState(1200)
@@ -605,19 +615,20 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
     const mutate = () => { setScreenId(id); setEntered(true) }
     const doc = document as VTDoc
     if (!doc.startViewTransition) { mutate(); return }
-    el.style.viewTransitionName = 'shc-zoom'
-    doc.startViewTransition(() => flushSync(mutate)).finished.finally(() => { el.style.viewTransitionName = '' })
+    el.style.viewTransitionName = 'shc-zoom'; setZooming(true)
+    doc.startViewTransition(() => flushSync(mutate)).finished.finally(() => { el.style.viewTransitionName = ''; setZooming(false) })
   }
   const exitToWall = () => {
     const doc = document as VTDoc
     if (!doc.startViewTransition) { setEntered(false); return }
-    doc.startViewTransition(() => flushSync(() => setEntered(false)))
+    setZooming(true)
+    doc.startViewTransition(() => flushSync(() => setEntered(false))).finished.finally(() => setZooming(false))
   }
 
   if (!entered) return <div className="lyt shc shc--wall"><ShowcaseWall onPick={enterScreen} /></div>
 
   return (
-    <div className="lyt shc shc--app" style={{ viewTransitionName: 'shc-zoom' } as CSSProperties}>
+    <div className="lyt shc shc--app" style={{ viewTransitionName: zooming ? 'shc-zoom' : undefined } as CSSProperties}>
       <button type="button" className="btn btn--ghost btn--sm shc__back" onClick={exitToWall}>
         <Icon name="chevL" /> All screens
       </button>

@@ -910,6 +910,13 @@
 .shc__back { margin-bottom: var(--k-s-8); }
 /* The zoom morph — keep it snappy + macOS-eased. */
 ::view-transition-group(shc-zoom) { animation-duration: 360ms; animation-timing-function: cubic-bezier(.2, .75, .2, 1); }
+/* Inner level zooms (screen → component → atom): the incoming view scales up
+   subtly so each click reads as zooming further IN, not an instant swap. */
+::view-transition-new(root) { animation: shc-zoom-in 300ms cubic-bezier(.2, .75, .2, 1) both; }
+@keyframes shc-zoom-in { from { opacity: 0; transform: scale(0.985); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(shc-zoom), ::view-transition-new(root), ::view-transition-old(root) { animation-duration: 1ms; }
+}
 
 /* === Layouts view (H3a) — the shell-tier wireframe workbench ============
  * Preview chrome only: the scaffold/navsuite/pane recipes under test are the
@@ -1223,11 +1230,13 @@
   position: relative;
   cursor: zoom-in;
   border-radius: var(--k-radius-md);
-  outline: var(--k-bw) solid transparent;
-  outline-offset: 2px;
-  transition: outline-color var(--k-dur-fast, 140ms) var(--k-ease, ease);
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  transition: outline-color var(--k-dur-fast, 140ms) var(--k-ease, ease), background var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease), opacity var(--k-dur-fast, 140ms) var(--k-ease, ease);
 }
-.shc__pick:hover { outline-color: var(--k-primary); }
+.shc__pick:hover { outline-color: var(--k-primary); background: var(--k-primary-soft); transform: translateY(-2px); }
+/* Dim the non-hovered components so the target pops — intuitive, no Inspect toggle. */
+.shc__pickpage:hover .shc__pick:not(:hover) { opacity: 0.45; }
 .shc__pick::after {
   content: attr(data-label);
   position: absolute;
