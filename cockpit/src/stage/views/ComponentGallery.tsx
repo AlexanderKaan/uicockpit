@@ -997,11 +997,16 @@ function DialogCard() {
         {open ? (
           <>
             <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} aria-label="Close dialog" />
-            <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+            <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" style={{ maxBlockSize: 188 }}>
               <h3 id="dialog-title" className="dialog__title">Delete project?</h3>
-              <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
-                This permanently removes all associated data.
-              </p>
+              <div className="dialog__body">
+                <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>
+                  This permanently removes:
+                </p>
+                <ul style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 'var(--k-s-8) 0 0', paddingLeft: 'var(--k-s-16)', display: 'grid', gap: 'var(--k-s-6)' }}>
+                  {['14 source files', '3 environments', 'all deploy history', '2 connected domains', 'the staging database', 'every API token', '8 team invitations'].map((x) => (<li key={x}>{x}</li>))}
+                </ul>
+              </div>
               <div className="dialog__foot">
                 <button className="btn btn--ghost btn--sm" onClick={() => setOpen(false)}>Cancel</button>
                 <button className="btn btn--danger btn--sm" onClick={() => setOpen(false)}>

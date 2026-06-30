@@ -2717,6 +2717,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   justify-content: flex-end;
   gap: var(--k-gap, var(--k-s-8));
 }
+/* Tall-dialog scroll — a content-heavy dialog must not push its footer off-screen.
+ * .dialog caps its height to the viewport; .dialog__body is the scroll region —
+ * min-height:0 lets it shrink in the flex column so the BODY scrolls while the
+ * title + .dialog__foot stay put (the .sheet already works this way). Negative
+ * inline margin lets the scrollbar reach the edge; content keeps the --k-pad gutter. */
+.dialog { max-block-size: calc(100dvh - 2rem); }
+.dialog__body {
+  min-height: 0; overflow: auto; overscroll-behavior: contain;
+  margin-inline: calc(-1 * var(--k-pad, 24px)); padding-inline: var(--k-pad, 24px);
+}
 /* Frame for modal demo — overlay backdrop, dialog centered inside */
 .dialog-frame {
   position: relative;
