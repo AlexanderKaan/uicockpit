@@ -350,6 +350,17 @@ const CLASS_MAP: Array<[string, string]> = [
   ['stepper', 'stepper'],
   ['aspect', 'aspect'],
   ['toolbar', 'toolbar'],
+  // Chrome / navigation tier — resolve the structural surfaces too, so the WHOLE
+  // screen is pickable (nav, topbar, banners), not just the leaf atoms. These sit
+  // after the leaf atoms so a .btn inside the sidebar still resolves to button.
+  ['banner', 'banner'],
+  ['alert', 'alert'],
+  ['select-trigger', 'select'],
+  ['calendar', 'calendar'],
+  ['segctrl', 'segmented'],
+  ['navsuite', 'navsuite'],
+  ['sidenav', 'sidenav'],
+  ['appbar', 'appbar'],
   ['card', 'card'],
 ]
 

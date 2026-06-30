@@ -66,7 +66,19 @@ const ARCH_LABEL: Record<string, string> = {
 type Focus =
   | { level: 'page' }
   | { level: 'section'; pane: number; idx: number }
-  | { level: 'atom'; pane: number; idx: number; comp: string }
+  // `node` = a CLONE of the LIVE element you clicked (mounted isolated, so anything
+  // is zoomable without a curated specimen — and a cloned node, not an HTML string,
+  // so there's no innerHTML/XSS surface). `comp` is its resolved type (for the
+  // recipe/contract); `label` its display name (may not be in COMPONENTS).
+  | { level: 'atom'; pane: number; idx: number; comp: string; node?: HTMLElement; label?: string }
+
+/** Display names for the chrome/structural types that have no curated COMPONENTS
+ *  spec — so the breadcrumb + rail still read nicely when you zoom into the nav. */
+const TYPE_LABELS: Record<string, string> = {
+  sidenav: 'Sidebar', navsuite: 'Navigation', appbar: 'Topbar', banner: 'Banner',
+  alert: 'Alert', select: 'Select', calendar: 'Calendar', segmented: 'Segmented control',
+  component: 'Component',
+}
 
 /**
  * Pages — the loupe (H3b manifest model · Fase J).
@@ -123,6 +135,8 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
   const section = focus.level !== 'page' ? m.panes[focus.pane]?.sections[focus.idx] : undefined
   const sInfo = section ? sectionInfo(section.kind) : undefined
   const comp = focus.level === 'atom' ? COMPONENTS[focus.comp] : undefined
+  const atomNode = focus.level === 'atom' ? focus.node : undefined
+  const atomLabel = focus.level === 'atom' ? (focus.label ?? comp?.label ?? focus.comp) : ''
 
   // Page → Section: walk up from the clicked node to the section wrapper (carries
   // its pane/idx as data-attrs), then isolate it.
@@ -147,22 +161,32 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
     if (el) el.classList.add('shc__comp-hot')
   }
   const hoverComp = (e: ReactMouseEvent) => setHot(elementAt(e.target as Element))
+  // Zoom into the LIVE element you clicked — captured + rendered isolated, so
+  // ANYTHING is zoomable (nav, topbar, banner…) without a curated specimen.
+  // componentAt resolves the TYPE (for the recipe/contract); the outerHTML is the
+  // specimen; TYPE_LABELS / COMPONENTS give the display name.
+  const zoomToComponent = (target: Element, pane: number, idx: number) => {
+    const el = elementAt(target)
+    if (!el) return
+    const id = componentAt(target) ?? 'component'
+    const node = el.cloneNode(true) as HTMLElement
+    node.classList.remove('shc__comp-hot')
+    const label = COMPONENTS[id]?.label ?? TYPE_LABELS[id] ?? id
+    setHot(null)
+    vt(() => setFocus({ level: 'atom', pane, idx, comp: id, node, label }))
+  }
   const pickComp = (e: ReactMouseEvent) => {
-    const id = componentAt(e.target as Element)
-    if (!id || !COMPONENTS[id]) return
     let el = e.target as HTMLElement | null, pane = 0, idx = 0
     while (el && el !== e.currentTarget) {
       if (el.dataset && el.dataset.idx != null) { pane = +el.dataset.pane!; idx = +el.dataset.idx; break }
       el = el.parentElement
     }
-    setHot(null)
-    vt(() => setFocus({ level: 'atom', pane, idx, comp: id }))
+    zoomToComponent(e.target as Element, pane, idx)
   }
   // Section → Atom: the existing leaf-pick, now scoped to the isolated section.
   const pickAtom = (e: ReactMouseEvent) => {
     if (focus.level !== 'section') return
-    const id = componentAt(e.target as Element)
-    if (id) vt(() => setFocus({ level: 'atom', pane: focus.pane, idx: focus.idx, comp: id }))
+    zoomToComponent(e.target as Element, focus.pane, focus.idx)
   }
 
   // The breadcrumb spine — one crumb per visited altitude, each a button that
@@ -175,7 +199,7 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
     const { pane, idx } = focus
     crumbs.push({ label: `Section · ${sInfo.label}`, go: () => { setTokensOpen(false); setFocus({ level: 'section', pane, idx }) }, on: !tokensOpen && focus.level === 'section' })
   }
-  if (comp) crumbs.push({ label: `Atom · ${comp.label}`, go: () => setTokensOpen(false), on: !tokensOpen && focus.level === 'atom' })
+  if (focus.level === 'atom') crumbs.push({ label: `Atom · ${focus.label ?? comp?.label ?? focus.comp}`, go: () => setTokensOpen(false), on: !tokensOpen && focus.level === 'atom' })
   if (tokensOpen) crumbs.push({ label: 'All tokens', go: () => {}, on: true })
 
   const hint =
@@ -236,8 +260,10 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
                   {renderSection(section, focus.idx)}
                 </div>
               )}
-              {loupe && focus.level === 'atom' && comp && (
-                <div className="shc__atomstage">{comp.specimen()}</div>
+              {loupe && focus.level === 'atom' && (
+                atomNode
+                  ? <div className="shc__atomstage" ref={(r) => { if (r && atomNode) r.replaceChildren(atomNode) }} />
+                  : comp ? <div className="shc__atomstage">{comp.specimen()}</div> : null
               )}
             </>
           )}
@@ -270,13 +296,19 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
                 </button>
               </>
             )}
-            {focus.level === 'atom' && comp && (
+            {focus.level === 'atom' && (
               <>
-                <div className="shc__recipe-title">Recipe — how it derives</div>
-                {comp.recipe.map(([k, v]) => (
-                  <div className="shc__recipe-row" key={k}><span className="shc__recipe-k">{k}</span><code className="shc__recipe-v">{v}</code></div>
-                ))}
-                <div className="shc__recipe-blurb">{comp.blurb}</div>
+                <div className="shc__recipe-title">{comp ? `${atomLabel} — how it derives` : atomLabel}</div>
+                {comp ? (
+                  <>
+                    {comp.recipe.map(([k, v]) => (
+                      <div className="shc__recipe-row" key={k}><span className="shc__recipe-k">{k}</span><code className="shc__recipe-v">{v}</code></div>
+                    ))}
+                    <div className="shc__recipe-blurb">{comp.blurb}</div>
+                  </>
+                ) : (
+                  <p className="shc__loupe-blurb">A live component, captured from the screen. Open it in the gallery for its recipe + contract.</p>
+                )}
                 <div className="shc__loupe-actions">
                   <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>
                     All tokens <Icon name="chevR" />
@@ -284,7 +316,7 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
                   <button
                     type="button"
                     className="btn btn--ghost btn--xs"
-                    onClick={() => { setGalleryJump(comp.label.toLowerCase(), COMP_TIER[focus.comp] ?? 'atom'); onViewChange('components') }}
+                    onClick={() => { setGalleryJump((comp?.label ?? atomLabel).toLowerCase(), COMP_TIER[focus.comp] ?? 'atom'); onViewChange('components') }}
                   >
                     Open in gallery
                   </button>
