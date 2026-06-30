@@ -158,20 +158,21 @@
 /* A control row: label (left) + current value (right) + chevron. */
 .fmrow { position: relative; }
 .fmrow--open { z-index: 50; }
-/* Per-row Shuffle lock — a faint padlock in a small left gutter; click to pin a knob
-   so Shuffle keeps it through a roll. Faint by default, visible on row-hover or pinned. */
+/* Per-row Shuffle lock — a small padlock in a left gutter before every title; click
+   to pin a knob so Shuffle keeps it through a roll. Always shown (faint), brighter on
+   hover, solid when pinned. */
 .fmrow__head, .fmrow__inline { padding-left: 28px; }
 .fmsec { padding-left: 28px; }
 .fmrow__lock {
   position: absolute; left: 5px; top: 50%; transform: translateY(-50%);
   display: inline-flex; align-items: center; justify-content: center;
   width: 18px; height: 18px; padding: 0; border: 0; border-radius: 5px;
-  background: transparent; color: var(--app-fg-muted); cursor: pointer;
-  opacity: 0;
+  background: transparent; color: var(--app-fg-faint); cursor: pointer;
+  opacity: 0.4;
   transition: opacity var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease),
               background var(--app-dur) var(--app-ease);
 }
-.fmrow:hover .fmrow__lock { opacity: 0.5; }
+.fmrow:hover .fmrow__lock { opacity: 0.7; color: var(--app-fg-muted); }
 .fmrow__lock:hover { opacity: 1; background: var(--app-hover); color: var(--app-fg); }
 .fmrow--locked .fmrow__lock { opacity: 1; color: var(--app-fg); }
 /* Row labels read as one consistent tier — every control title is the same
