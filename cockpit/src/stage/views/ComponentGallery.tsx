@@ -100,6 +100,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   GroupedTableCard: 'Grouped table rows summary total row condensed density section headers',
   ResponsiveTableCard: 'Responsive table stacked mobile hidden columns label value cards',
   CardTableCard: 'Card framed table rounded frame sticky header scroll truncate files',
+  FrozenColumnTableCard: 'Frozen first column sticky pinned spreadsheet wide table horizontal scroll metrics',
   HorizontalFormCard: 'Profile form labels on left horizontal layout settings dense',
   ColorPickerCard: 'Color colour picker radio swatches label accent choice',
   HeaderVariantsCard: 'Page header breadcrumb tabs banner image cover profile section heading',
@@ -215,7 +216,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarMonthCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
-    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
+    [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [FrozenColumnTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
@@ -352,7 +353,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
-  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
+  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
   ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
 ]
 
@@ -3097,6 +3098,43 @@ function CardTableCard() {
                 <td><span className="truncate" style={{ maxWidth: '14ch' }} title={r.file}>{r.file}</span></td>
                 <td style={{ color: 'var(--k-fg-muted)' }}>{r.by}</td>
                 <td className="num">{r.size}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  )
+}
+
+function FrozenColumnTableCard() {
+  // Frozen first column (.tbl__col--frozen) on a spreadsheet-shaped wide table:
+  // the Metric column pins while the month columns scroll horizontally, so row
+  // identity never gets lost. Built on .tbl--card (separate borders) so the
+  // sticky cell keeps its background + divider; the reveal shadow shows there's
+  // more to the right. Interactive rows clear the I4 hit-target floor.
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug']
+  const ROWS = [
+    { metric: 'Revenue', vals: ['$42k', '$48k', '$51k', '$55k', '$53k', '$61k', '$64k', '$68k'] },
+    { metric: 'New users', vals: ['1,204', '1,388', '1,510', '1,622', '1,580', '1,790', '1,844', '1,920'] },
+    { metric: 'Churn', vals: ['2.1%', '1.9%', '2.4%', '2.0%', '2.2%', '1.7%', '1.8%', '1.6%'] },
+    { metric: 'NPS', vals: ['41', '44', '43', '47', '46', '52', '54', '55'] },
+  ]
+  return (
+    <Card title="Metrics" desc="Frozen first column — the Metric pins while months scroll.">
+      <div style={{ overflowX: 'auto' }}>
+        <table className="tbl tbl--card" style={{ minWidth: '32rem' }}>
+          <thead>
+            <tr>
+              <th className="tbl__col--frozen">Metric</th>
+              {MONTHS.map((m) => (<th key={m} className="num">{m}</th>))}
+            </tr>
+          </thead>
+          <tbody>
+            {ROWS.map((r) => (
+              <tr key={r.metric}>
+                <th className="tbl__col--frozen tbl__name" style={{ textAlign: 'left' }}>{r.metric}</th>
+                {r.vals.map((v, i) => (<td key={i} className="num">{v}</td>))}
               </tr>
             ))}
           </tbody>

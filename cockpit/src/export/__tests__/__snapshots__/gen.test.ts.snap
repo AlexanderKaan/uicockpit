@@ -2417,6 +2417,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "modifiers": [
           "card",
           "condensed",
+          "frozen",
           "optional",
           "stack"
         ],
@@ -5139,6 +5140,28 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tbl--card thead th { position: sticky; top: 0; z-index: 1; background: var(--k-surface); box-shadow: inset 0 -1px 0 var(--k-border); }
 .tbl--card tbody tr { border-top: 0; }
 .tbl--card tbody tr + tr td, .tbl--card tbody tr + tr th { box-shadow: inset 0 1px 0 var(--k-border); }
+
+/* --- Hit-target floor (Invariant I4) --------------------------------------
+   An INTERACTIVE row (one holding a checkbox, button or link) must clear the
+   WCAG-2.2 24px target even at Compact density. :has() floors ONLY those rows,
+   so a dense read-only table stays tight — the guard never fights density where
+   it isn't needed. */
+.tbl tbody tr:has(input, button, a, [role="button"]) td { min-block-size: var(--k-hit-min); }
+
+/* --- Frozen first column (.tbl__col--frozen) ------------------------------
+   Spreadsheet-shaped wide tables: pin the first column so row identity (name /
+   id) survives horizontal scroll. Mark the first th AND every first td with
+   .tbl__col--frozen and wrap the table in an overflow-x:auto container. Needs
+   .tbl--card (separate borders) so the sticky cell keeps its opaque background
+   and dividers — collapsed borders vanish under a sticky cell. A one-sided
+   shadow reveals that there's more to the right. */
+.tbl__col--frozen { position: sticky; left: 0; z-index: 1; background: var(--k-surface); }
+.tbl thead .tbl__col--frozen { z-index: 2; }
+.tbl--card .tbl__col--frozen::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: var(--k-s-16);
+  transform: translateX(100%); pointer-events: none;
+  box-shadow: inset var(--k-s-12) 0 var(--k-s-8) calc(var(--k-s-10) * -1) rgb(0 0 0 / 0.12);
+}
 
 /* --- Responsive (Tailwind "hidden columns" + "stacked on mobile") --------
    Wrap a table in .tbl-responsive (a size container, so it adapts to its own
@@ -11924,6 +11947,28 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tbl--card thead th { position: sticky; top: 0; z-index: 1; background: var(--k-surface); box-shadow: inset 0 -1px 0 var(--k-border); }
 .tbl--card tbody tr { border-top: 0; }
 .tbl--card tbody tr + tr td, .tbl--card tbody tr + tr th { box-shadow: inset 0 1px 0 var(--k-border); }
+
+/* --- Hit-target floor (Invariant I4) --------------------------------------
+   An INTERACTIVE row (one holding a checkbox, button or link) must clear the
+   WCAG-2.2 24px target even at Compact density. :has() floors ONLY those rows,
+   so a dense read-only table stays tight — the guard never fights density where
+   it isn't needed. */
+.tbl tbody tr:has(input, button, a, [role="button"]) td { min-block-size: var(--k-hit-min); }
+
+/* --- Frozen first column (.tbl__col--frozen) ------------------------------
+   Spreadsheet-shaped wide tables: pin the first column so row identity (name /
+   id) survives horizontal scroll. Mark the first th AND every first td with
+   .tbl__col--frozen and wrap the table in an overflow-x:auto container. Needs
+   .tbl--card (separate borders) so the sticky cell keeps its opaque background
+   and dividers — collapsed borders vanish under a sticky cell. A one-sided
+   shadow reveals that there's more to the right. */
+.tbl__col--frozen { position: sticky; left: 0; z-index: 1; background: var(--k-surface); }
+.tbl thead .tbl__col--frozen { z-index: 2; }
+.tbl--card .tbl__col--frozen::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: var(--k-s-16);
+  transform: translateX(100%); pointer-events: none;
+  box-shadow: inset var(--k-s-12) 0 var(--k-s-8) calc(var(--k-s-10) * -1) rgb(0 0 0 / 0.12);
+}
 
 /* --- Responsive (Tailwind "hidden columns" + "stacked on mobile") --------
    Wrap a table in .tbl-responsive (a size container, so it adapts to its own
