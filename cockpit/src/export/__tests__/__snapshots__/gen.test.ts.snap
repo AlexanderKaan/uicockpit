@@ -8336,6 +8336,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   letter-spacing: var(--k-track-eyebrow);
   text-transform: uppercase;
   color: var(--k-fg-faint);
+  /* Sticky section header (the iOS grouped-list pattern): pins to the top when the
+     list lives in a scroll container, so the group label stays in view as its rows
+     scroll under it. A no-op in normal flow. Opaque bg so rows don't show through. */
+  position: sticky; top: 0; z-index: 1;
+  background: var(--k-surface);
 }
 .list__section:first-child { padding-top: var(--k-s-4); }
 .list__item {
@@ -15023,6 +15028,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   letter-spacing: var(--k-track-eyebrow);
   text-transform: uppercase;
   color: var(--k-fg-faint);
+  /* Sticky section header (the iOS grouped-list pattern): pins to the top when the
+     list lives in a scroll container, so the group label stays in view as its rows
+     scroll under it. A no-op in normal flow. Opaque bg so rows don't show through. */
+  position: sticky; top: 0; z-index: 1;
+  background: var(--k-surface);
 }
 .list__section:first-child { padding-top: var(--k-s-4); }
 .list__item {
