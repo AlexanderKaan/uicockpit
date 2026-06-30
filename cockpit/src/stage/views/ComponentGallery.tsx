@@ -292,16 +292,20 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
         {groups.length === 0 ? (
           <div className="gallery-empty">No atoms match “{q}”.</div>
         ) : (
-          <div className="gallery atomgroups" ref={galleryRef}>
+          /* RAILS prototype — each category is a horizontal scroll-snap rail. Swipe a
+             row sideways (mobile-native), scroll down between categories. The atom's
+             demo-frame card flattens via .rail__card so the bare atom sits in the tile. */
+          <div className="railwall">
             {groups.map(([name, comps]) => (
-              <section className="card atomgroup" key={name}>
-                <div className="atomgroup__head">
-                  <h3 className="atomgroup__title">{name}</h3>
-                  <span className="atomgroup__count">{comps.length}</span>
+              <section className="railsec" key={name}>
+                <div className="railsec__head">
+                  <h3 className="railsec__title">{name}</h3>
+                  <span className="railsec__count">{comps.length}</span>
                 </div>
-                {/* Bare atoms inside (flattened via .gallery--workbench), quiet labels. */}
-                <div className="atomgroup__items gallery--workbench">
-                  {comps.map((C, i) => <C key={i} />)}
+                <div className="rail">
+                  {comps.map((C, i) => (
+                    <div className="rail__card" key={i}><C /></div>
+                  ))}
                 </div>
               </section>
             ))}
