@@ -1,4 +1,5 @@
-import { Fragment, useMemo, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
+import { Fragment, useMemo, useState, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
+import { flushSync } from 'react-dom'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
 import { renderSection } from '../../showcases/sections'
@@ -523,13 +524,50 @@ function LedgerSidebar({ appNav, pickable }: { appNav: AppNav; pickable: boolean
   )
 }
 
+/* The WALL — the loupe entry: every Ledger screen as a live, scaled miniature,
+ * themed by the user's kit (re-theme-everywhere, visible). Click a tile and it
+ * macOS-Mission-Control-zooms up to fill (View Transitions). The first of the
+ * nested zoom levels: wall → screen → section/atom (the existing loupe drill). */
+function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => void }) {
+  const screens = LEDGER_SCREENS.filter((s) => s.group !== 'footer')
+  return (
+    <div className="shc-wall">
+      <div className="shc-wall__head">
+        <div>
+          <div className="shc-wall__eyebrow">Showcase · live</div>
+          <h2 className="shc-wall__title">Ledger</h2>
+        </div>
+        <p className="shc-wall__sub">One product, {screens.length} screens — all themed by your kit. Click a screen to zoom in.</p>
+      </div>
+      <div className="shc-wall__grid">
+        {screens.map((s) => {
+          const sm = SHOWCASES.find((x) => x.id === s.id)
+          if (!sm) return null
+          const tileNav: AppNav = { screens: LEDGER_SCREENS, current: s.id, highlight: s.id, onNavigate: () => {} }
+          return (
+            <button type="button" className="shc-wall__tile" key={s.id} onClick={(e) => onPick(s.id, e.currentTarget)} aria-label={`Open ${s.label}`}>
+              <div className="shc-wall__frame">
+                <div className="shc-wall__mini" aria-hidden="true">
+                  <ShowcaseShell m={sm} width={1200} appNav={tileNav} />
+                </div>
+              </div>
+              <span className="shc-wall__cap"><Icon name={s.icon} /> {s.label}</span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
-  // Showcases = ONE believable product (Ledger), not a grab-bag of half-apps. A
-  // single side menu (LEDGER_SCREENS) wraps every screen and DRIVES which one
-  // renders — Catalyst-style. `screenId` is the rendered manifest (may be a detail
-  // like the invoice, reached by clicking an invoice row); the sidebar highlights
-  // its parent. The old per-app chip picker is gone — the sidebar IS the picker.
+  // Showcases = ONE believable product (Ledger). The WALL is the entry (every
+  // screen as a live miniature); clicking a tile zooms IN to the single screen +
+  // its sidebar (Catalyst-style). `screenId` is the rendered manifest (may be a
+  // detail like the invoice, reached by clicking an invoice row); `entered`
+  // toggles wall ↔ screen. The sidebar still drives screen switches once inside.
   const [screenId, setScreenId] = useState(LEDGER_SCREENS[0]!.id)
+  const [entered, setEntered] = useState(false)
   // Width lives here (the app level) so it survives screen switches — ShowcaseStage
   // still remounts per screen (key) to reset the loupe, but reads width from here.
   const [width, setWidth] = useState(1200)
@@ -541,8 +579,30 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
     onNavigate: setScreenId,
   }
 
+  // View Transitions = the macOS-style shared-element zoom. The clicked tile and
+  // the entered stage share one `view-transition-name`, so the browser morphs the
+  // tile up to fill. Graceful no-op on browsers without the API.
+  type VTDoc = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<unknown> } }
+  const enterScreen = (id: string, el: HTMLElement) => {
+    const mutate = () => { setScreenId(id); setEntered(true) }
+    const doc = document as VTDoc
+    if (!doc.startViewTransition) { mutate(); return }
+    el.style.viewTransitionName = 'shc-zoom'
+    doc.startViewTransition(() => flushSync(mutate)).finished.finally(() => { el.style.viewTransitionName = '' })
+  }
+  const exitToWall = () => {
+    const doc = document as VTDoc
+    if (!doc.startViewTransition) { setEntered(false); return }
+    doc.startViewTransition(() => flushSync(() => setEntered(false)))
+  }
+
+  if (!entered) return <div className="lyt shc shc--wall"><ShowcaseWall onPick={enterScreen} /></div>
+
   return (
-    <div className="lyt shc shc--app">
+    <div className="lyt shc shc--app" style={{ viewTransitionName: 'shc-zoom' } as CSSProperties}>
+      <button type="button" className="btn btn--ghost btn--sm shc__back" onClick={exitToWall}>
+        <Icon name="chevL" /> All screens
+      </button>
       {/* key = remount per screen so the loupe + width reset to the screen default */}
       <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} appNav={appNav} width={width} onWidth={setWidth} />
     </div>

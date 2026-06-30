@@ -871,6 +871,34 @@
 .cockpit-preview .atomgroup__count { font-size: var(--k-type-caption); color: var(--k-fg-faint); font-variant-numeric: tabular-nums; }
 .cockpit-preview .atomgroup__items { display: flex; flex-direction: column; gap: var(--k-s-24); }
 
+/* === Showcase wall (the loupe entry) — every screen as a live miniature ====
+ * Preview chrome only. Each tile renders the REAL ShowcaseShell at 1200px then
+ * scales it down (--tw / 1200), clipped to a 16:10 frame — a true live preview,
+ * themed by the user's kit. Click zooms a tile up to fill via View Transitions
+ * (the `shc-zoom` name is set on the tile + the entered stage). */
+.shc-wall { --tw: 384; max-width: 1760px; margin: 0 auto; padding: var(--k-s-16) var(--k-s-16) var(--k-s-32); }
+.shc-wall__head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--k-s-16); flex-wrap: wrap; margin-bottom: var(--k-s-20); }
+.shc-wall__eyebrow { font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-faint); }
+.shc-wall__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); color: var(--k-fg); margin: var(--k-s-2) 0 0; }
+.shc-wall__sub { font-size: var(--k-type-small); color: var(--k-fg-muted); max-width: 42ch; }
+.shc-wall__grid { display: grid; grid-template-columns: repeat(auto-fill, calc(var(--tw) * 1px)); gap: var(--k-s-24); justify-content: center; }
+.shc-wall__tile { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: var(--k-s-8); }
+.shc-wall__frame {
+  width: calc(var(--tw) * 1px); aspect-ratio: 16 / 10; overflow: hidden;
+  border: 1px solid var(--k-border); border-radius: var(--k-radius-lg);
+  background: var(--k-surface); box-shadow: 0 6px 22px -12px rgb(0 0 0 / 0.22);
+  transition: transform var(--k-dur, 200ms) var(--k-ease, ease), box-shadow var(--k-dur, 200ms) var(--k-ease, ease);
+}
+.shc-wall__tile:hover .shc-wall__frame { transform: translateY(-4px); box-shadow: 0 16px 40px -16px rgb(0 0 0 / 0.30); }
+.shc-wall__tile:focus-visible .shc-wall__frame { outline: var(--k-focus-ring-width) solid var(--k-ring); outline-offset: 2px; }
+.shc-wall__mini { width: 1200px; transform: scale(calc(var(--tw) / 1200)); transform-origin: top left; pointer-events: none; }
+.shc-wall__cap { display: inline-flex; align-items: center; gap: var(--k-s-6); font-size: var(--k-type-small); font-weight: var(--k-weight-medium); color: var(--k-fg); }
+.shc-wall__cap svg { width: var(--k-icon-sm); height: var(--k-icon-sm); color: var(--k-fg-muted); }
+/* Back-to-wall button, top-left of an entered screen. */
+.shc__back { margin-bottom: var(--k-s-8); }
+/* The zoom morph — keep it snappy + macOS-eased. */
+::view-transition-group(shc-zoom) { animation-duration: 360ms; animation-timing-function: cubic-bezier(.2, .75, .2, 1); }
+
 /* === Layouts view (H3a) — the shell-tier wireframe workbench ============
  * Preview chrome only: the scaffold/navsuite/pane recipes under test are the
  * KIT; everything .lyt__* is the workbench around them (scrubber, ghost
