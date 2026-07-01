@@ -169,6 +169,14 @@ A finite kit can, at best, be "complete." A grammar plus a verifier is *generati
 covers the screens nobody drew. That's the north star, and the spine is already live:
 **configure → CDN → CLI/MCP → check.**
 
+The mechanism has a name: the **Role Canvas**. A small, closed set of roles — *control ·
+selectable · surface · tone-bearer · text-slot · overlay* — each guarantees one perceptual
+treatment (a height, a selected edge, a legible tint, a truncation…). Any element that tags
+a role — through a thin `data-role`, or simply the ARIA state that already names it
+(`aria-selected`, `role="menu"`) — **inherits that treatment for free**, so even a component
+we never built comes out coherent. It's a set of zero-specificity CSS floors, enforced in
+the build, and you can flip it on and off live in the app's loupe.
+
 → The full thinking lives in [`VISION.md`](./VISION.md).
 
 ---
@@ -195,6 +203,9 @@ Come on in. A new named style, a missing component recipe, an export adapter (St
 Dictionary, Figma variables), a framework adapter, an accessibility fix — all welcome.
 Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md) and the
 [`Code of Conduct`](./CODE_OF_CONDUCT.md), then open an issue or a discussion.
+
+See [`docs/roadmap.md`](./docs/roadmap.md) for what's shipped, in progress, and next — the
+gaps you hit while using it are the best input we get.
 
 ---
 

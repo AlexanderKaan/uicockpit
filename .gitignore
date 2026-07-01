@@ -22,8 +22,9 @@ BEAUTY-SPEC.md
 cockpit-reference.html
 .claude/
 
-# Internal build-log roadmap — a curated public ROADMAP replaces this
-ROADMAP.md
+# Internal build-log roadmap (root only) — the curated PUBLIC roadmap lives at
+# docs/roadmap.md and IS committed. Root-anchored so it doesn't ignore that one.
+/ROADMAP.md
 
 # Local env / secrets
 .env
