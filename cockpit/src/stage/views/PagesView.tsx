@@ -10,6 +10,7 @@ import { COMPONENTS, componentAt, elementAt } from '../../showcases/components'
 import { usesOf } from '../../kit/segments'
 import { CONTRACT, ROLE_GUARANTEE } from '../../kit/contracts'
 import { FoundationsView } from './FoundationsView'
+import { RoleCanvasDemo } from './RoleCanvasDemo'
 import type { ViewKind } from '../Stage'
 
 /* Component → gallery tier guess for the specimen's "Open in gallery" jump
@@ -274,8 +275,9 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
           <aside className="shc__loupe-rail" aria-label="Loupe inspector">
             {focus.level === 'page' && (
               <>
-                <div className="shc__loupe-head">The page</div>
-                <p className="shc__loupe-blurb">A showcase is data: {sectionCount} sections across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any section to zoom in.</p>
+                <RoleCanvasDemo />
+                <div className="rcx-divider" />
+                <p className="shc__loupe-blurb">Or drill the page itself: {sectionCount} sections across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any element to zoom into its contract.</p>
                 <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>
                   All tokens <Icon name="chevR" />
                 </button>

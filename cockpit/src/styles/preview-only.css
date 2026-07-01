@@ -1391,6 +1391,43 @@
 .shc__role--tone-bearer { color: #b9831f; background: rgb(200 130 31 / 0.16); }
 .shc__role--text-slot { color: #3f9367; background: rgb(74 157 106 / 0.14); }
 .shc__role--overlay { color: #7a63c9; background: rgb(138 111 208 / 0.16); }
+
+/* === Role Canvas playground (loupe page-level rail) — the generative binding, live ===
+   The `.rcx-*` classes are NEUTRAL scaffolding only (a frame so you can see each
+   specimen); the treatment that appears when tagged comes purely from the role
+   binding in globalLayer.ts. Lives inside .cockpit-preview so those floors apply. */
+.rcx-switch {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--k-s-2); padding: var(--k-s-2);
+  background: var(--k-surface-sunken, var(--k-surface-2)); border-radius: var(--k-radius-md);
+  margin-bottom: var(--k-s-14);
+}
+.rcx-switch__btn {
+  font: inherit; font-size: var(--k-type-caption); font-weight: var(--k-weight-semibold);
+  padding: var(--k-s-6) var(--k-s-8); border: 0; border-radius: calc(var(--k-radius-md) - 2px);
+  background: transparent; color: var(--k-fg-muted); cursor: pointer;
+}
+.rcx-switch__btn[aria-pressed="true"] { background: var(--k-surface); color: var(--k-fg); box-shadow: var(--k-shadow-sm); }
+.rcx-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--k-s-16); }
+.rcx-row { display: flex; flex-direction: column; gap: var(--k-s-6); }
+.rcx-row__head { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-8); }
+.rcx-row__head .shc__role { margin-left: 0; }
+.rcx-attr { font-family: var(--k-font-mono); font-size: var(--k-type-eyebrow); color: var(--k-fg-faint); transition: color var(--k-dur-fast, 110ms) var(--k-ease, ease); }
+.rcx-attr[data-on] { color: var(--k-primary); }
+.rcx-demo { min-height: 22px; }
+.rcx-gtee { font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.4; }
+.rcx-gtee em { color: var(--k-fg); font-style: normal; }
+
+/* Specimens — neutral frames; the role attribute supplies the actual treatment. */
+.rcx-box { display: inline-block; padding: var(--k-s-8) var(--k-s-12); font-size: var(--k-type-small); color: var(--k-fg); }
+.rcx-ctrl { background: var(--k-surface-2, var(--k-surface-sunken)); border-radius: var(--k-radius-sm); padding-inline: var(--k-s-12); font-size: var(--k-type-small); color: var(--k-fg); }
+.rcx-opt { padding: var(--k-s-8) var(--k-s-12); border-radius: var(--k-radius-md); font-size: var(--k-type-small); color: var(--k-fg); }
+.rcx-pill { display: inline-block; padding: var(--k-s-2) var(--k-s-10); border-radius: 999px; font-size: var(--k-type-caption); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); }
+.rcx-textrow { display: flex; max-width: 100%; overflow: hidden; font-size: var(--k-type-small); color: var(--k-fg); }
+.rcx-menu { height: 92px; border: var(--k-bw) solid var(--k-border); border-radius: var(--k-radius-md); padding: var(--k-s-4); font-size: var(--k-type-small); }
+.rcx-menu--clip { overflow: hidden; }
+.rcx-mi { padding: var(--k-s-4) var(--k-s-8); color: var(--k-fg); }
+.rcx-divider { height: var(--k-bw); background: var(--k-border); margin: var(--k-s-16) 0 var(--k-s-12); }
+
 /* Recipe demoted to a collapsible beneath the contract. */
 .shc__recipe-more { margin-top: var(--k-s-12); border-top: var(--k-divider); padding-top: var(--k-s-8); }
 .shc__recipe-summary { font-size: var(--k-type-caption); color: var(--k-fg-muted); cursor: pointer; font-weight: var(--k-weight-medium); list-style-position: inside; }
