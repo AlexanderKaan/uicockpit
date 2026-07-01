@@ -81,7 +81,7 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             <span className="mkt__eyebrow-dot" />
             Free &amp; open source
           </div>
-          <h1>Make everything your AI builds look designed.</h1>
+          <h1>Ship AI apps that look designed, not generated.</h1>
           <p className="mkt__hero-sub">
             AI ships a working app in minutes — then you lose days tweaking, and it still
             looks like every other AI app. UIcockpit gives your AI{' '}
