@@ -1645,9 +1645,9 @@
 .og-card__foot { margin-top: 44px; display: flex; align-items: baseline; gap: 10px; font-size: 21px; }
 .og-card__url { color: var(--mkt-accent, #007aff); font-weight: 600; }
 .og-card__meta { color: #9a9aa1; }
-.og-card__right { position: absolute; inset: 0 0 0 470px; overflow: hidden; }
+.og-card__right { position: absolute; inset: 0 0 0 620px; overflow: hidden; }
 .og-card__collage {
   position: absolute; top: 50%; left: 0; transform: translateY(-50%);
-  width: 840px; height: auto; display: block;
+  width: 820px; height: auto; display: block;
 }
 .og-card__accent { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--mkt-accent, #007aff); z-index: 2; }
