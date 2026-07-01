@@ -1,7 +1,8 @@
 /**
- * Shared trust/stats strip — the $0 lead tile + 4 hard numbers. Used on the
+ * Shared trust/stats strip — the $0 lead tile + 3 hard numbers. Used on the
  * landing page and every SEO landing page so "free" + the proof points read
  * the same everywhere (one source, no drift). Render inside a `.mkt__container`.
+ * Four tiles, each a proposition pillar: free · scope · guarantee · portability.
  */
 export function MktStats() {
   return (
@@ -9,10 +10,6 @@ export function MktStats() {
       <div className="mkt__stat mkt__stat--free">
         <div className="mkt__stat-num">$0</div>
         <div className="mkt__stat-label">Forever free</div>
-      </div>
-      <div className="mkt__stat">
-        <div className="mkt__stat-num">250+</div>
-        <div className="mkt__stat-label">Design tokens</div>
       </div>
       <div className="mkt__stat">
         <div className="mkt__stat-num">100+</div>

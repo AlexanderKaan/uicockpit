@@ -1,4 +1,4 @@
-import { Sparkles, Palette, Type, FileCode2, Zap, ShieldCheck, BarChart3, Layers3, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
+import { Sparkles, Palette, FileCode2, BarChart3, ShieldCheck, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
 import { MktNav } from './MktNav'
@@ -227,15 +227,6 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               </p>
             </div>
             <div className="mkt__feature">
-              <span className="mkt__feature-icon"><Layers3 size={20} strokeWidth={1.75} /></span>
-              <h3>Layout primitives, sorted</h3>
-              <p>
-                Z-index stack (dropdown, modal, toast, tooltip), Tailwind-aligned breakpoints,
-                container widths — exported alongside your colors so layout questions have
-                token answers, not gut feelings.
-              </p>
-            </div>
-            <div className="mkt__feature">
               <span className="mkt__feature-icon"><BarChart3 size={20} strokeWidth={1.75} /></span>
               <h3>Charts that match the brand</h3>
               <p>
@@ -245,30 +236,12 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               </p>
             </div>
             <div className="mkt__feature">
-              <span className="mkt__feature-icon"><Zap size={20} strokeWidth={1.75} /></span>
-              <h3>Motion that feels premium</h3>
-              <p>
-                Spec-grade three-tier durations + direction-aware easings.
-                Named animation shorthands. Respects <code>prefers-reduced-motion</code>.
-                Choose Snappy, Smooth, or Playful — the whole system shifts together.
-              </p>
-            </div>
-            <div className="mkt__feature">
-              <span className="mkt__feature-icon"><Type size={20} strokeWidth={1.75} /></span>
-              <h3>Type scale, properly</h3>
-              <p>
-                Display, h1–h5, body, small, caption, eyebrow — full hierarchy derived from
-                one modular ratio. System fonts, 16 Google fonts, or drag-and-drop your own
-                <code>.woff2</code>. Stays in your session.
-              </p>
-            </div>
-            <div className="mkt__feature">
               <span className="mkt__feature-icon"><Smartphone size={20} strokeWidth={1.75} /></span>
               <h3>AI prompt, behavior-shaping</h3>
               <p>
                 Paste one prompt into your AI tool's rules file (<code>.cursorrules</code>,
-                <code>CLAUDE.md</code>, a system prompt) — and every generation respects the
-                tokens, breakpoints, z-index stack, and chart palette automatically.
+                <code>CLAUDE.md</code>, a system prompt) — and every generation respects your
+                tokens, type, components, and motion automatically.
               </p>
             </div>
             <div className="mkt__feature">
