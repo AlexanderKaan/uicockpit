@@ -28,7 +28,10 @@
  *                 its generative binding: a :where([data-role="text-slot"]) floor
  *                 delivers the same clamp, so unknown text inherits the role
  *   overlay     → the floating list surfaces cap their height + scroll (can't run
- *                 off-screen)
+ *                 off-screen) AND its generative binding: a :where(role=menu /
+ *                 role=listbox / [data-role="overlay"]) floor delivers the same
+ *                 cap, so an unknown dropdown inherits it (focus-trap is a
+ *                 behaviour concern, left to the framework / behavior.js shim)
  *   surface     → enforced by the FOUNDATION coherence guard (surface ≠ bg +
  *                 elevation); see coherence.ts + its tests — not re-checked here.
  *
@@ -137,6 +140,14 @@ for (const sel of ['.menu', '.cmdp__list']) {
     fails.push(`overlay · ${sel} lacks max-height + overflow — a long list would run off-screen`)
   }
 }
+// ...and the generative binding: an unknown floating list (role=menu/listbox or
+// [data-role="overlay"]) inherits the same height cap + scroll.
+const overlay = floorFor('[data-role="overlay"]')
+if (!overlay || !/max-height/.test(overlay.body) || !/overflow/.test(overlay.body)) {
+  fails.push(
+    'overlay · no generative binding in globalLayer.ts — expected a zero-specificity :where([data-role="overlay"], [role="menu"], [role="listbox"]) floor delivering max-height + overflow, so an unknown floating list caps its height + scrolls',
+  )
+}
 
 if (fails.length) {
   console.error('=== audit:role-treatments — role guarantees (Role Canvas ENFORCE) ===')
@@ -144,4 +155,4 @@ if (fails.length) {
   console.error(`\n${fails.length} role guarantee(s) not delivered. Every role in contracts.ts must carry its ROLE_GUARANTEE treatment.`)
   process.exit(1)
 }
-console.log('audit:role-treatments — clean · selectable + surface + control + text-slot (generative bindings) · tone-bearer (AA-ink paired) · overlay (scroll-capped) all enforced')
+console.log('audit:role-treatments — clean · selectable + surface + control + text-slot + overlay (generative bindings) · tone-bearer (AA-ink paired) all enforced')

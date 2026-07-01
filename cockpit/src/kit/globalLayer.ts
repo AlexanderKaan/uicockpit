@@ -232,6 +232,21 @@ ${s}:where([data-role="text-slot"]) {
   white-space: nowrap;
 }
 
+/* === Role Canvas · \`overlay\` — the generative binding =======================
+   A floating list surface must cap its height and scroll the overflow so a long
+   list can't run off-screen. Bound to the ARIA roles that name a floating list
+   (role=menu / role=listbox) + a thin [data-role="overlay"] — an UNKNOWN dropdown
+   inherits the height cap + scroll. Zero-specificity :where() floor; any component
+   (.menu / .cmdp__list) overrides it. Only the CSS half of the guarantee lives
+   here: focus-trap / ESC / focus-return are a BEHAVIOUR concern, deliberately
+   left to the framework or the optional behavior.js shim (the Radix-complement
+   boundary). NB [role=dialog] is excluded — a modal sizes itself, not from a
+   dropdown height cap. */
+${s}:where([data-role="overlay"], [role="menu"], [role="listbox"]) {
+  max-height: var(--k-overlay-max, 22rem);
+  overflow: hidden auto;
+}
+
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring
    off the element for clear visibility on standalone buttons/inputs.
