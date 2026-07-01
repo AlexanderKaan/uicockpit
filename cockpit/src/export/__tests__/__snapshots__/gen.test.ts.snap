@@ -4548,8 +4548,8 @@ body {
 .entity-card__row { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-8); }
 .entity-card__label { color: var(--k-fg-muted); font-size: var(--k-type-small); }
 .entity-card__value { font-weight: var(--k-weight-medium); color: var(--k-fg); }
-/* --fill: the compact tinted header Alexander sketched (less tall, slightly
- * coloured, full-bleed divider) — the head wears --k-surface-fill. */
+/* --fill: a compact tinted header (less tall, slightly coloured, full-bleed
+ * divider) — the head wears --k-surface-fill. */
 .entity-card--fill .entity-card__head { background: var(--k-surface-fill); }
 
 /* === Action panel (SECTION tier) =========================================
@@ -11508,8 +11508,8 @@ body {
 .entity-card__row { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-8); }
 .entity-card__label { color: var(--k-fg-muted); font-size: var(--k-type-small); }
 .entity-card__value { font-weight: var(--k-weight-medium); color: var(--k-fg); }
-/* --fill: the compact tinted header Alexander sketched (less tall, slightly
- * coloured, full-bleed divider) — the head wears --k-surface-fill. */
+/* --fill: a compact tinted header (less tall, slightly coloured, full-bleed
+ * divider) — the head wears --k-surface-fill. */
 .entity-card--fill .entity-card__head { background: var(--k-surface-fill); }
 
 /* === Action panel (SECTION tier) =========================================
