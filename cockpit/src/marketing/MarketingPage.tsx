@@ -1,6 +1,7 @@
 import { Sparkles, Palette, Type, FileCode2, Zap, ShieldCheck, BarChart3, Layers3, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
+import { MktNav } from './MktNav'
 import { ToolLogo } from '../brand/toolLogos'
 import { MktFooter } from './MktFooter'
 import { MktStats } from './MktStats'
@@ -9,7 +10,6 @@ import { MktStats } from './MktStats'
 
 interface MarketingPageProps {
   onLaunch: () => void
-  onDocs: () => void
   navigate: (to: string) => void
 }
 
@@ -67,30 +67,10 @@ function HeroDotGrid() {
  * The "Build my UI kit" CTA hands off to the configurator at /app via
  * the onLaunch prop (parent-managed client-side routing — no React Router).
  */
-export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps) {
+export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
   return (
     <div className="mkt">
-      <header className="mkt__nav">
-        <div className="mkt__container mkt__nav-inner">
-          <a href="/" className="mkt__brand" onClick={(e) => e.preventDefault()}>
-            <img src="/logo.svg" alt="" width={28} height={28} className="mkt__brand-logo" />
-            UIcockpit
-          </a>
-          <nav className="mkt__nav-links">
-            <a href="#features" className="mkt__nav-link">Features</a>
-            <a href="#anatomy" className="mkt__nav-link">Components</a>
-            <a href="#livekit" className="mkt__nav-link">Live kit</a>
-            <a href="#usein" className="mkt__nav-link">Use it</a>
-            <a href="#how" className="mkt__nav-link">How it works</a>
-            <a href="/docs" className="mkt__nav-link" onClick={(e) => { e.preventDefault(); onDocs() }}>Docs</a>
-            {/* GitHub link returns when the OSS launch pack ships — see task #86.
-                Leaving a placeholder href would be a false promise to visitors. */}
-          </nav>
-          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
-            Build my UI kit
-          </button>
-        </div>
-      </header>
+      <MktNav navigate={navigate} />
 
       {/* Hero */}
       <section className="mkt__hero">
@@ -98,16 +78,15 @@ export function MarketingPage({ onLaunch, onDocs, navigate }: MarketingPageProps
         <div className="mkt__container">
           <div className="mkt__eyebrow">
             <span className="mkt__eyebrow-dot" />
-            100% Free · Framework-neutral · No Lock-In
+            Free &amp; open source
           </div>
-          <h1>Stop shipping the generic AI look.</h1>
+          <h1>Make everything your AI builds look designed.</h1>
           <p className="mkt__hero-sub">
-            Tailwind is how you style. shadcn is what you assemble.{' '}
-            <strong>UIcockpit is the design language that makes it yours</strong> — start
-            from a style modeled on the best apps (Linear, Stripe, Notion…), tune colour,
-            type, shape and motion into framework-neutral tokens your AI applies in one shot,
-            plus a checker that keeps every screen coherent as the app grows. Build a kit in
-            60 seconds.
+            AI ships a working app in minutes — then you lose days tweaking, and it still
+            looks like every other AI app. UIcockpit gives your AI{' '}
+            <strong>one design language to apply to every screen</strong>: colour, type,
+            shape and motion as framework-neutral tokens, with a checker that keeps it all
+            coherent as you grow.
           </p>
           <div className="mkt__hero-ctas">
             <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
@@ -563,7 +542,7 @@ npx uicockpit check`}</code></pre>
       {/* Final CTA */}
       <section className="mkt__final">
         <div className="mkt__container">
-          <h2>Stop picking hex codes.<br />Start shipping kits.</h2>
+          <h2>Stop shipping the generic AI look.<br />Start shipping yours.</h2>
           <p className="mkt__final-sub">
             Build a coherent, opinion-rich design system in under a minute — 100% free,
             no account.

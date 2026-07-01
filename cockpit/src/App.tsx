@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CockpitApp } from './CockpitApp'
 import { MarketingPage } from './marketing/MarketingPage'
+import { MarketingManifesto } from './marketing/MarketingManifesto'
 import { SeoPage } from './marketing/SeoPage'
 import { findEntry } from './marketing/seo/seoData'
 import './styles/marketing.css'
@@ -51,6 +52,16 @@ export function App() {
       />
     )
 
+  // The manifesto — human, first-person "why" page (marketing-voice, .mkt chrome).
+  if (path === '/manifesto')
+    return (
+      <MarketingManifesto
+        onLaunch={() => navigate('/app')}
+        onDocs={() => navigate('/docs')}
+        navigate={navigate}
+      />
+    )
+
   // Data-driven SEO routes (comparison / alternative / use-case).
   if (
     path.startsWith('/compare/') ||
@@ -65,7 +76,6 @@ export function App() {
   return (
     <MarketingPage
       onLaunch={() => navigate('/app')}
-      onDocs={() => navigate('/docs')}
       navigate={navigate}
     />
   )

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Check } from 'lucide-react'
+import { MktNav } from './MktNav'
 import { MktFooter } from './MktFooter'
 import { MktStats } from './MktStats'
 import { findEntry, type SeoEntry } from './seo/seoData'
@@ -71,22 +72,8 @@ export function SeoPage({ entry, navigate }: SeoPageProps) {
 
   return (
     <div className="mkt">
-      {/* Nav — same shell as the landing page. */}
-      <header className="mkt__nav">
-        <div className="mkt__container mkt__nav-inner">
-          <a href="/" className="mkt__brand" onClick={(e) => go(e, '/')}>
-            <img src="/logo.svg" alt="" width={28} height={28} className="mkt__brand-logo" />
-            UIcockpit
-          </a>
-          <nav className="mkt__nav-links">
-            <a href="/" className="mkt__nav-link" onClick={(e) => go(e, '/')}>Home</a>
-            <a href="/docs" className="mkt__nav-link" onClick={(e) => go(e, '/docs')}>Docs</a>
-          </nav>
-          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={() => navigate('/app')}>
-            Build my UI kit
-          </button>
-        </div>
-      </header>
+      {/* Nav — shared shell with the landing / manifesto pages. */}
+      <MktNav navigate={navigate} />
 
       {/* Hero */}
       <section className="mkt__section seo__hero">

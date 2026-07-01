@@ -76,12 +76,24 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  border-bottom: 1px solid var(--mkt-border);
+}
+/* The glassy backdrop lives on a pseudo-element BEHIND the nav content, not on
+   the nav itself. A backdrop-filter turns its element into a compositing layer,
+   and text painted on that layer renders with grainy grayscale AA (worst on bold
+   weights). Keeping the filter on ::before lets the links paint on the normal
+   layer — crisp again — while the glass effect is unchanged. */
+.mkt__nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
-  border-bottom: 1px solid var(--mkt-border);
 }
 .mkt__nav-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -111,7 +123,95 @@
 }
 .mkt__nav-link { transition: color 160ms ease; }
 .mkt__nav-link:hover { color: var(--mkt-fg); }
-@media (max-width: 700px) { .mkt__nav-links { display: none; } }
+.mkt__nav-link[aria-current="page"] { color: var(--mkt-fg); font-weight: 600; }
+/* Only two destination links now (Manifesto · Docs), so the row stays roomy;
+   collapse it only on phones, where the dev-stack tools (GitHub + CTA) carry
+   the nav and the brand mark is the way home. */
+@media (max-width: 560px) { .mkt__nav-links { display: none; } }
+
+/* === Nav tools — the "part of your dev stack" cluster (version + GitHub) === */
+.mkt__nav-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Version dropdown — native <details>, zero-JS. */
+.mkt__ver { position: relative; }
+.mkt__ver-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 9px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 8px;
+  background: var(--mkt-surface);
+  color: var(--mkt-fg-muted);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+.mkt__ver-trigger::-webkit-details-marker { display: none; }
+.mkt__ver-trigger:hover { border-color: #d8d8dd; color: var(--mkt-fg); }
+.mkt__ver[open] .mkt__ver-trigger { border-color: var(--mkt-accent); color: var(--mkt-fg); }
+.mkt__ver-num {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.mkt__ver-caret { transition: transform 180ms ease; opacity: 0.7; }
+.mkt__ver[open] .mkt__ver-caret { transform: rotate(180deg); }
+
+.mkt__ver-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 208px;
+  padding: 6px;
+  background: var(--mkt-surface);
+  border: 1px solid var(--mkt-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(10, 10, 11, 0.12), 0 2px 6px rgba(10, 10, 11, 0.06);
+  z-index: 20;
+}
+.mkt__ver-head {
+  padding: 6px 10px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--mkt-fg-faint);
+  letter-spacing: 0.01em;
+}
+.mkt__ver-item {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--mkt-fg-muted);
+  transition: background 140ms ease, color 140ms ease;
+}
+.mkt__ver-item:hover { background: var(--mkt-sunken); color: var(--mkt-fg); }
+.mkt__ver-sep { height: 1px; background: var(--mkt-border); margin: 5px 6px; }
+
+/* GitHub icon link */
+.mkt__gh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: var(--mkt-fg-muted);
+  transition: background 160ms ease, color 160ms ease;
+}
+.mkt__gh:hover { background: var(--mkt-sunken); color: var(--mkt-fg); }
+
+@media (max-width: 700px) {
+  .mkt__nav-tools { gap: 8px; }
+  .mkt__ver { display: none; } /* keep GitHub + CTA on phones */
+}
 
 /* === Buttons === */
 .mkt-btn {
@@ -136,27 +236,19 @@
     filter 180ms cubic-bezier(.05,.7,.1,1),
     transform 180ms cubic-bezier(.05,.7,.1,1);
 }
-/* Primary CTA — green → blue → purple horizontal gradient.
- * Used on every "Build my UI kit" trigger in the marketing site (nav,
- * hero, final). The gradient gives the brand a spectrum feel rather than
- * a single voltage of blue — fits a tool that's all about color systems.
+/* Primary CTA — solid near-black. Used on every "Build my UI kit" trigger in
+ * the marketing site (nav, hero, final). A single confident dark voltage
+ * (Linear / Vercel style) reads more "tool" than the old spectrum gradient,
+ * and lets the blue accent stay reserved for links + highlights.
  *
- * Hover/active: instead of swapping to a darker variant (which would
- * mean re-defining the whole gradient), we shift `filter: brightness`.
- * Cheaper to maintain and reads as the same gradient "lit up" or
- * "pressed". Transitions on filter are GPU-friendly. */
+ * Hover/active swap the background (on near-black a brightness filter barely
+ * registers): hover lifts to a lighter charcoal, active presses darker. */
 .mkt-btn--primary {
-  /* Blue → deep-purple gradient. 101deg gives a slight diagonal tilt
-   * (warmer top-left, cooler bottom-right). Stops extend beyond 100%
-   * (the 118.53% endpoint) so the visible band is mostly the blue with
-   * just a hint of purple bleeding in from the right.
-   * Border-radius inherits 999px from .mkt-btn (the difference between
-   * 99px and 999px on a 38px-tall pill is zero — both fully round). */
-  background: linear-gradient(101deg, #007BFF 50.96%, #570BA9 118.53%);
+  background: #18181b;
   color: #fff;
 }
-.mkt-btn--primary:hover { filter: brightness(0.94); }
-.mkt-btn--primary:active { transform: scale(0.98); filter: brightness(0.9); }
+.mkt-btn--primary:hover { background: #2b2b30; }
+.mkt-btn--primary:active { transform: scale(0.98); background: #101012; }
 .mkt-btn--ghost {
   /* Solid white background — the hero's dot grid would otherwise show
    * through and undermine the "secondary button" affordance. */
@@ -1400,4 +1492,127 @@
   .docs { grid-template-columns: 1fr; gap: 0; }
   .docs__toc { display: none; }
   .docs__cols { grid-template-columns: 1fr; }
+}
+
+/* ===========================================================================
+   Manifesto (/manifesto) — a single centered reading column. First-person,
+   long-form; deliberately calmer than the landing (no dot grid, no cards).
+   =========================================================================== */
+.mkt__manifesto {
+  max-width: 40rem; /* 640px — same measure as the hero copy */
+  margin: 0 auto;
+  padding: 72px 24px 96px;
+}
+
+.mkt__manifesto .mkt__eyebrow { margin-bottom: 20px; }
+
+.mkt__manifesto h1 {
+  font-size: clamp(32px, 5vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 640;
+  margin: 0 0 12px;
+}
+
+.mkt__manifesto-byline {
+  font-size: 15px;
+  color: var(--mkt-fg-muted);
+  margin: 0 0 40px;
+}
+
+.mkt__manifesto-lead {
+  font-size: 22px;
+  line-height: 1.4;
+  letter-spacing: -0.017em;
+  font-weight: 560;
+  color: var(--mkt-fg);
+  margin: 0 0 28px;
+}
+
+/* Opening pull-quote (a friend's line) — italic, accent left-rule. */
+.mkt__manifesto-quote {
+  margin: 0 0 24px;
+  padding: 4px 0 4px 22px;
+  border-left: 3px solid var(--mkt-accent);
+  font-size: 21px;
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+  font-style: italic;
+  color: var(--mkt-fg);
+}
+
+.mkt__manifesto h2 {
+  font-size: 25px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 620;
+  margin: 52px 0 18px;
+}
+
+.mkt__manifesto p {
+  font-size: 17.5px;
+  line-height: 1.68;
+  color: #26262b;
+  margin: 0 0 22px;
+}
+
+.mkt__manifesto em { font-style: italic; }
+.mkt__manifesto strong { font-weight: 620; color: var(--mkt-fg); }
+
+.mkt__manifesto code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.88em;
+  background: var(--mkt-sunken);
+  border: 1px solid var(--mkt-border);
+  border-radius: 5px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
+.mkt__manifesto-list {
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.mkt__manifesto-list li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 17.5px;
+  line-height: 1.6;
+  color: #26262b;
+}
+.mkt__manifesto-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mkt-accent);
+}
+
+.mkt__manifesto-sign {
+  font-size: 17.5px;
+  font-weight: 560;
+  color: var(--mkt-fg);
+  margin-top: 36px;
+}
+
+.mkt__manifesto-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 48px;
+  padding-top: 40px;
+  border-top: 1px solid var(--mkt-border);
+}
+
+@media (max-width: 700px) {
+  .mkt__manifesto { padding: 48px 20px 72px; }
+  .mkt__manifesto-lead { font-size: 20px; }
+  .mkt__manifesto p, .mkt__manifesto-list li { font-size: 16.5px; }
 }

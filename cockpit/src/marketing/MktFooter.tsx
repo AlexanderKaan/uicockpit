@@ -27,6 +27,7 @@ export function MktFooter({ navigate }: MktFooterProps) {
             <a href="/" className="mkt__footlink" onClick={(e) => go(e, '/')}>Home</a>
             <a href="/app" className="mkt__footlink" onClick={(e) => go(e, '/app')}>Configurator</a>
             <a href="/docs" className="mkt__footlink" onClick={(e) => go(e, '/docs')}>Docs</a>
+            <a href="/manifesto" className="mkt__footlink" onClick={(e) => go(e, '/manifesto')}>Manifesto</a>
             <a href="/#livekit" className="mkt__footlink" onClick={(e) => go(e, '/#livekit')}>Live kit</a>
           </nav>
 
