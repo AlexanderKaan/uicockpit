@@ -3674,6 +3674,27 @@ body {
   overflow: hidden auto;
 }
 
+/* === Role Canvas · \`tone-bearer\` — the generative binding (perceptual role) =
+   Unlike the other roles, tone-bearer isn't one treatment but a FAMILY keyed to a
+   tone VALUE — so it binds to [data-role="tone-bearer"] + [data-tone="…"]. Each
+   tone maps to the paired --k-<tone>-soft tint + its --k-<tone>-soft-fg, the
+   AA-derived ink the tone-bearer token gate already guarantees legible — so an
+   UNKNOWN badge/pill/banner tagged with a tone inherits a tint that its text is
+   provably readable on. Base (no tone) = a neutral chip. Zero-specificity
+   :where() floor; any component (.badge/.alert/.banner) overrides it. Enforced by
+   audit:role-treatments (the binding + the paired-ink guarantee). */
+:where([data-role="tone-bearer"]) {
+  background: var(--k-surface-sunken, var(--k-surface-2));
+  color: var(--k-fg-muted);
+}
+:where([data-role="tone-bearer"][data-tone="primary"])   { background: var(--k-primary-soft);   color: var(--k-primary-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="secondary"]) { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="accent"])    { background: var(--k-accent-soft);    color: var(--k-accent-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="success"])   { background: var(--k-success-soft);   color: var(--k-success-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="warning"])   { background: var(--k-warning-soft);   color: var(--k-warning-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="danger"])    { background: var(--k-danger-soft);    color: var(--k-danger-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="info"])      { background: var(--k-info-soft);      color: var(--k-info-soft-fg); }
+
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring
    off the element for clear visibility on standalone buttons/inputs.
@@ -10612,6 +10633,27 @@ body {
   max-height: var(--k-overlay-max, 22rem);
   overflow: hidden auto;
 }
+
+/* === Role Canvas · \`tone-bearer\` — the generative binding (perceptual role) =
+   Unlike the other roles, tone-bearer isn't one treatment but a FAMILY keyed to a
+   tone VALUE — so it binds to [data-role="tone-bearer"] + [data-tone="…"]. Each
+   tone maps to the paired --k-<tone>-soft tint + its --k-<tone>-soft-fg, the
+   AA-derived ink the tone-bearer token gate already guarantees legible — so an
+   UNKNOWN badge/pill/banner tagged with a tone inherits a tint that its text is
+   provably readable on. Base (no tone) = a neutral chip. Zero-specificity
+   :where() floor; any component (.badge/.alert/.banner) overrides it. Enforced by
+   audit:role-treatments (the binding + the paired-ink guarantee). */
+:where([data-role="tone-bearer"]) {
+  background: var(--k-surface-sunken, var(--k-surface-2));
+  color: var(--k-fg-muted);
+}
+:where([data-role="tone-bearer"][data-tone="primary"])   { background: var(--k-primary-soft);   color: var(--k-primary-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="secondary"]) { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="accent"])    { background: var(--k-accent-soft);    color: var(--k-accent-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="success"])   { background: var(--k-success-soft);   color: var(--k-success-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="warning"])   { background: var(--k-warning-soft);   color: var(--k-warning-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="danger"])    { background: var(--k-danger-soft);    color: var(--k-danger-soft-fg); }
+:where([data-role="tone-bearer"][data-tone="info"])      { background: var(--k-info-soft);      color: var(--k-info-soft-fg); }
 
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring

@@ -24,6 +24,9 @@
  *                 (focus is already universal via :focus-visible).
  *   tone-bearer → every tinted *-soft token carries a paired AA-derived *-soft-fg
  *                 (so text on any tint is guaranteed legible — the badge/aaInk law)
+ *                 AND its generative binding: a :where([data-role="tone-bearer"]
+ *                 [data-tone]) family maps each tone to its --k-<tone>-soft tint +
+ *                 -soft-fg ink, one binding per legible tone (can't drift)
  *   text-slot   → the global .truncate utility exists (single-line clamp) AND
  *                 its generative binding: a :where([data-role="text-slot"]) floor
  *                 delivers the same clamp, so unknown text inherits the role
@@ -112,6 +115,28 @@ for (const x of softs) {
     fails.push(`tone-bearer · --k-${x}-soft has no AA-derived --k-${x}-soft-fg — text on the tint isn't guaranteed legible`)
   }
 }
+// ...and its GENERATIVE binding: a [data-role="tone-bearer"][data-tone] family,
+// each pairing a --k-<tone>-soft tint with its AA-derived --k-<tone>-soft-fg ink,
+// AND every tone that owns a legible pair (a -soft-fg) must have a binding — so
+// an unknown badge inherits a tint its text is provably readable on, and the
+// tone set can't silently drift from the tokens.
+const toneBearer = floorFor('[data-role="tone-bearer"]')
+if (!toneBearer) {
+  fails.push('tone-bearer · no generative binding in globalLayer.ts — expected a :where([data-role="tone-bearer"]) family keyed to [data-tone] pairing --k-<tone>-soft with --k-<tone>-soft-fg')
+} else {
+  // The chart-series palette (--k-accent-1..N) carries -soft/-soft-fg pairs too,
+  // but it's a data-viz SERIES scale, not a semantic badge tone — so it's exempt
+  // from the tone-bearer binding family (only the AA-ink pairing above applies).
+  const SERIES_TONE = /^accent-\d+$/
+  const bound = new Set([...globalLayerSrc.matchAll(/\[data-tone="([a-z0-9-]+)"\]/g)].map((m) => m[1]))
+  for (const tone of softs) {
+    if (SOFT_FG_EXEMPT.has(tone) || SERIES_TONE.test(tone)) continue
+    if (!snap.includes(`--k-${tone}-soft-fg:`)) continue // already flagged above
+    if (!bound.has(tone)) {
+      fails.push(`tone-bearer · tone "${tone}" has a legible --k-${tone}-soft/-soft-fg pair but no [data-tone="${tone}"] binding — unknown ${tone}-toned markup wouldn't inherit the role`)
+    }
+  }
+}
 
 // --- text-slot: the .truncate utility AND its generative role binding --------
 if (!/\.truncate\s*\{[^}]*overflow:\s*hidden[^}]*text-overflow:\s*ellipsis[^}]*white-space:\s*nowrap/.test(recipes)) {
@@ -155,4 +180,4 @@ if (fails.length) {
   console.error(`\n${fails.length} role guarantee(s) not delivered. Every role in contracts.ts must carry its ROLE_GUARANTEE treatment.`)
   process.exit(1)
 }
-console.log('audit:role-treatments — clean · selectable + surface + control + text-slot + overlay (generative bindings) · tone-bearer (AA-ink paired) all enforced')
+console.log('audit:role-treatments — clean · all 6 roles generatively bound (selectable · surface · control · text-slot · overlay · tone-bearer) + tone-bearer AA-ink paired · enforced')
