@@ -583,6 +583,19 @@
   color: var(--mkt-fg);
   line-height: 1.4;
   min-width: 210px;
+  /* Pin the label column so the row stays readable while the rest of the
+     table scrolls horizontally (mobile). No-op on desktop where it fits.
+     Needs an opaque bg to occlude the scrolling cells, and a right hairline
+     as the seam. box-shadow (not border) so it survives border-collapse. */
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--mkt-bg);
+  box-shadow: 1px 0 0 var(--mkt-border);
+}
+.mkt__cmp thead th.mkt__cmp-rowhead {
+  background: var(--mkt-sunken); /* the top-left corner cell */
+  z-index: 2;
 }
 .mkt__cmp--matrix td { white-space: nowrap; }
 .mkt__cmp--matrix .mkt__cmp-rowhead { font-size: 13.5px; }
