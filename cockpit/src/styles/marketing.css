@@ -1645,16 +1645,9 @@
 .og-card__foot { margin-top: 44px; display: flex; align-items: baseline; gap: 10px; font-size: 21px; }
 .og-card__url { color: var(--mkt-accent, #007aff); font-weight: 600; }
 .og-card__meta { color: #9a9aa1; }
-.og-card__right { position: absolute; inset: 0 0 0 480px; overflow: hidden; }
-.og-card__gallery {
-  position: absolute; top: -70px; left: 0; width: 800px;
-  -webkit-mask-image:
-    linear-gradient(to right, transparent 0, #000 9%, #000 90%, transparent 100%),
-    linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    linear-gradient(to right, transparent 0, #000 9%, #000 90%, transparent 100%),
-    linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%);
-  mask-composite: intersect;
+.og-card__right { position: absolute; inset: 0 0 0 470px; overflow: hidden; }
+.og-card__collage {
+  position: absolute; top: 50%; left: 0; transform: translateY(-50%);
+  width: 840px; height: auto; display: block;
 }
 .og-card__accent { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--mkt-accent, #007aff); z-index: 2; }

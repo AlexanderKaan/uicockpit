@@ -1,22 +1,12 @@
-import { IconProvider } from '../icons/Icon'
-import { ComponentGallery } from '../stage/views/ComponentGallery'
-import { buildTokens } from '../tokens/buildTokens'
-import { DEFAULT_CONFIG } from '../tokens/defaults'
-import { applyColorTheme } from '../tokens/stylesAndThemes'
-import type { CSSProperties } from 'react'
-
 /**
  * OgCard — the 1280×640 social-preview / open-graph card, rendered at `/og`.
  *
- * Left: the proposition (brand · eyebrow · headline · sub · url). Right: the REAL
- * <ComponentGallery/> (the exact wall the configurator shows), brand-tinted and
- * edge-masked so it dissolves like the homepage hero — so the OG image shows
- * actual kit components, never a mock, and can't drift from the product.
- *
- * Not linked anywhere; it exists so the OG PNG can be screenshotted at 1280×640.
+ * Left: the proposition (brand · eyebrow · headline · sub · url). Right: a curated,
+ * edge-feathered collage of real kit components (`public/og-collage.png`) that
+ * dissolves into the copy — so the OG image shows actual components, hand-cropped
+ * for the best arrangement. Not linked; it exists so the OG PNG can be
+ * screenshotted at 1280×640.
  */
-const OG_VARS = buildTokens(applyColorTheme(DEFAULT_CONFIG, 'cobalt')).vars as CSSProperties
-
 export function OgCard() {
   return (
     <div className="mkt og-card">
@@ -45,11 +35,7 @@ export function OgCard() {
       </div>
 
       <div className="og-card__right">
-        <div className="cockpit-preview og-card__gallery" style={OG_VARS}>
-          <IconProvider set={DEFAULT_CONFIG.iconSet}>
-            <ComponentGallery limit={48} />
-          </IconProvider>
-        </div>
+        <img src="/og-collage.png" alt="" className="og-card__collage" />
       </div>
 
       <div className="og-card__accent" />
