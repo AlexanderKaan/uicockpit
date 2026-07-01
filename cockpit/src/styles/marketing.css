@@ -1621,3 +1621,40 @@
   .mkt__manifesto-lead { font-size: 20px; }
   .mkt__manifesto p, .mkt__manifesto-list li { font-size: 16.5px; }
 }
+
+/* === OG / social-preview card (/og) — fixed 1280×640, screenshotted to a PNG ===
+   Left = proposition; right = the REAL ComponentGallery, brand-tinted + edge-masked
+   so it dissolves like the homepage hero. Not linked; a render target only. */
+.og-card {
+  width: 1280px; height: 640px; display: flex; align-items: stretch;
+  background: #ffffff; overflow: hidden; position: relative;
+}
+.og-card__left {
+  width: 548px; flex: none; padding: 72px 0 72px 76px;
+  display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1;
+  background: linear-gradient(to right, #fff 78%, transparent);
+}
+.og-card__brand { font-size: 30px; gap: 12px; margin-bottom: 34px; cursor: default; }
+.og-card__brand .mkt__brand-logo { width: 44px; height: 44px; border-radius: 11px; }
+.og-card__eyebrow { margin-bottom: 22px; font-size: 18px; }
+.og-card__h1 {
+  font-size: 60px; line-height: 1.06; letter-spacing: -0.03em; font-weight: 640;
+  color: #0a0a0b; margin: 0 0 28px; max-width: 13ch;
+}
+.og-card__sub { font-size: 23px; line-height: 1.45; color: #5c5c64; margin: 0; max-width: 26ch; }
+.og-card__foot { margin-top: 44px; display: flex; align-items: baseline; gap: 10px; font-size: 21px; }
+.og-card__url { color: var(--mkt-accent, #007aff); font-weight: 600; }
+.og-card__meta { color: #9a9aa1; }
+.og-card__right { position: absolute; inset: 0 0 0 480px; overflow: hidden; }
+.og-card__gallery {
+  position: absolute; top: -70px; left: 0; width: 800px;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 9%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 9%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%);
+  mask-composite: intersect;
+}
+.og-card__accent { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--mkt-accent, #007aff); z-index: 2; }

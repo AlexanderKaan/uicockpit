@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { CockpitApp } from './CockpitApp'
 import { MarketingPage } from './marketing/MarketingPage'
 import { MarketingManifesto } from './marketing/MarketingManifesto'
+import { OgCard } from './marketing/OgCard'
 import { SeoPage } from './marketing/SeoPage'
 import { findEntry } from './marketing/seo/seoData'
 import './styles/marketing.css'
@@ -51,6 +52,9 @@ export function App() {
         navigate={navigate}
       />
     )
+
+  // The social-preview / OG card (1280×640) — not linked; screenshotted to a PNG.
+  if (path === '/og') return <OgCard />
 
   // The manifesto — human, first-person "why" page (marketing-voice, .mkt chrome).
   if (path === '/manifesto')
