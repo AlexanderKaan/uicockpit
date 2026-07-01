@@ -640,10 +640,10 @@ export function renderSection(spec: SectionSpec, key: number) {
           <FilterTable
             filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
             ariaLabel="Filter invoices" searchLabel="Search invoices"
-            head={<tr><th>Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
+            head={<tr><th className="tbl__col--frozen">Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
             row={(r) => (
               <tr key={r.number}>
-                <td><div style={{ fontWeight: med }}>#{r.number}</div><div style={muted}>{r.project}</div></td>
+                <td className="tbl__col--frozen"><div style={{ fontWeight: med }}>#{r.number}</div><div style={muted}>{r.project}</div></td>
                 <td>
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
                     <BrandLogo id={r.clientLogo} size={28} />
@@ -687,10 +687,10 @@ export function renderSection(spec: SectionSpec, key: number) {
           <FilterTable
             filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
             ariaLabel="Filter clients" searchLabel="Search clients"
-            head={<tr><th>Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th><th aria-label="Actions" /></tr>}
+            head={<tr><th className="tbl__col--frozen">Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th><th aria-label="Actions" /></tr>}
             row={(r) => (
               <tr key={r.company}>
-                <td>
+                <td className="tbl__col--frozen">
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
                     <BrandLogo id={r.logo} size={28} />
                     <span style={{ fontWeight: med }}>{r.company}</span>
@@ -753,10 +753,10 @@ export function renderSection(spec: SectionSpec, key: number) {
           <FilterTable
             filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
             ariaLabel="Filter expenses" searchLabel="Search expenses"
-            head={<tr><th>Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
+            head={<tr><th className="tbl__col--frozen">Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
             row={(r) => (
               <tr key={r.vendor + r.date}>
-                <td>
+                <td className="tbl__col--frozen">
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
                     <BrandLogo id={r.logo} size={28} />
                     <span style={{ fontWeight: med }}>{r.vendor}</span>

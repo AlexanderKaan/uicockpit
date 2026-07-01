@@ -1543,6 +1543,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 @container datatable (max-width: 40rem) {
   .datatable--page .datatable__body { overflow-x: auto; }
   .datatable--page .tbl { min-width: 34rem; }
+  /* When the body scrolls, a frozen first column keeps row identity in view.
+     The seam is scoped HERE (not on the base) so a full-width desktop table
+     doesn't grow a lone vertical divider on column one. */
+  .datatable--page .tbl__col--frozen { box-shadow: 1px 0 0 var(--k-border); }
+  /* The header cell also pins; stack its bottom divider WITH the seam (the
+     sticky-thead rule below would otherwise replace the seam with just the divider). */
+  .datatable--page .tbl thead .tbl__col--frozen { box-shadow: inset 0 -1px 0 var(--k-border), 1px 0 0 var(--k-border); }
 }
 .datatable .tbl thead th {
   position: sticky; top: 0; z-index: 1;
