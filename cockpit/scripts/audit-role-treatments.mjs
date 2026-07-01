@@ -24,7 +24,9 @@
  *                 (focus is already universal via :focus-visible).
  *   tone-bearer → every tinted *-soft token carries a paired AA-derived *-soft-fg
  *                 (so text on any tint is guaranteed legible — the badge/aaInk law)
- *   text-slot   → a global .truncate utility exists (single-line clamp)
+ *   text-slot   → the global .truncate utility exists (single-line clamp) AND
+ *                 its generative binding: a :where([data-role="text-slot"]) floor
+ *                 delivers the same clamp, so unknown text inherits the role
  *   overlay     → the floating list surfaces cap their height + scroll (can't run
  *                 off-screen)
  *   surface     → enforced by the FOUNDATION coherence guard (surface ≠ bg +
@@ -108,9 +110,20 @@ for (const x of softs) {
   }
 }
 
-// --- text-slot: a global .truncate clamp utility exists ---------------------
+// --- text-slot: the .truncate utility AND its generative role binding --------
 if (!/\.truncate\s*\{[^}]*overflow:\s*hidden[^}]*text-overflow:\s*ellipsis[^}]*white-space:\s*nowrap/.test(recipes)) {
   fails.push('text-slot · no global .truncate utility (overflow:hidden + text-overflow:ellipsis + white-space:nowrap)')
+}
+const textSlot = floorFor('[data-role="text-slot"]')
+if (
+  !textSlot ||
+  !/overflow:\s*hidden/.test(textSlot.body) ||
+  !/text-overflow:\s*ellipsis/.test(textSlot.body) ||
+  !/white-space:\s*nowrap/.test(textSlot.body)
+) {
+  fails.push(
+    'text-slot · no generative binding in globalLayer.ts — expected a zero-specificity :where([data-role="text-slot"]) floor delivering the single-line clamp (overflow:hidden + text-overflow:ellipsis + white-space:nowrap), so unknown text inherits the role',
+  )
 }
 
 // --- overlay: floating list surfaces cap height + scroll -------------------
@@ -131,4 +144,4 @@ if (fails.length) {
   console.error(`\n${fails.length} role guarantee(s) not delivered. Every role in contracts.ts must carry its ROLE_GUARANTEE treatment.`)
   process.exit(1)
 }
-console.log('audit:role-treatments — clean · selectable + surface + control (generative bindings) · tone-bearer (AA-ink paired) · text-slot (.truncate) · overlay (scroll-capped) all enforced')
+console.log('audit:role-treatments — clean · selectable + surface + control + text-slot (generative bindings) · tone-bearer (AA-ink paired) · overlay (scroll-capped) all enforced')

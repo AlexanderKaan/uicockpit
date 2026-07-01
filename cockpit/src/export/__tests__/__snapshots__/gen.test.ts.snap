@@ -3646,6 +3646,19 @@ body {
 :where([data-role="control"][data-size="sm"]) { min-height: var(--k-control-h-sm); }
 :where([data-role="control"][data-size="lg"]) { min-height: var(--k-control-h-lg); }
 
+/* === Role Canvas · \`text-slot\` — the generative binding (perceptual role) ===
+   The guarantee: text that must not break the layout. The kit already ships the
+   explicit \`.truncate\` utility (24ch cap); this is its ROLE form — an unknown
+   element tagged [data-role="text-slot"] inherits the single-line clamp and, via
+   min-width:0, actually shrinks inside a flex parent (the classic truncation
+   gotcha). Zero-specificity :where() floor; any component overrides it. */
+:where([data-role="text-slot"]) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring
    off the element for clear visibility on standalone buttons/inputs.
@@ -10556,6 +10569,19 @@ body {
 }
 :where([data-role="control"][data-size="sm"]) { min-height: var(--k-control-h-sm); }
 :where([data-role="control"][data-size="lg"]) { min-height: var(--k-control-h-lg); }
+
+/* === Role Canvas · \`text-slot\` — the generative binding (perceptual role) ===
+   The guarantee: text that must not break the layout. The kit already ships the
+   explicit \`.truncate\` utility (24ch cap); this is its ROLE form — an unknown
+   element tagged [data-role="text-slot"] inherits the single-line clamp and, via
+   min-width:0, actually shrinks inside a flex parent (the classic truncation
+   gotcha). Zero-specificity :where() floor; any component overrides it. */
+:where([data-role="text-slot"]) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring
