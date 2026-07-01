@@ -201,6 +201,24 @@ ${s}:where([data-role="surface"]) {
   box-shadow: var(--k-shadow-sm);
 }
 
+/* === Role Canvas · \`control\` — the generative binding (perceptual role) =====
+   The most common role; its guarantee is height · focus-ring · hit-target. The
+   FOCUS ring is already universal (the :focus-visible rule below) and the
+   hit-target floor picks [data-role="control"] up in the coarse-pointer block,
+   so the piece the generative binding adds is the HEIGHT invariant — the
+   proof-of-one-role (--k-control-h-* centralised → zero drift). Bound to the thin
+   [data-role="control"] (+ an optional [data-size] for the sm/lg tiers), in a
+   zero-specificity :where() floor so any component (.btn / .in / .select-trigger…)
+   overrides it while an UNKNOWN control inherits the exact kit height + vertical
+   centering. */
+${s}:where([data-role="control"]) {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--k-control-h-md);
+}
+${s}:where([data-role="control"][data-size="sm"]) { min-height: var(--k-control-h-sm); }
+${s}:where([data-role="control"][data-size="lg"]) { min-height: var(--k-control-h-lg); }
+
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring
    off the element for clear visibility on standalone buttons/inputs.
@@ -357,7 +375,8 @@ ${s}.taginput[aria-disabled="true"] {
   ${s}.btn, ${s}.in, ${s}.select-trigger,
   ${s}.menu__item, ${s}.navsub__item, ${s}.navmenu__item, ${s}.list__row,
   ${s}.tab, ${s}.segctrl__btn, ${s}.calendar__cell, ${s}.sidenav__toggle,
-  ${s}.phoneinput__country { min-height: var(--k-touch-target); }
+  ${s}.phoneinput__country,
+  ${s}[data-role="control"] { min-height: var(--k-touch-target); }
   ${s}.btn--icon, ${s}.btn--circle,
   ${s}.lightbox__btn, ${s}.alert__close, ${s}.banner__close, ${s}.toast__close {
     min-width: var(--k-touch-target); min-height: var(--k-touch-target);

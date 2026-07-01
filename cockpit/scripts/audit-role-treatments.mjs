@@ -16,6 +16,12 @@
  *                 elevation, so an unknown container reads as "off the ground".
  *                 (The surface-vs-bg CONTRAST is separately guarded by the
  *                 foundation coherence rail — see coherence.ts.)
+ *   control     → the generative binding exists: a zero-specificity
+ *                 :where([data-role="control"]) floor delivers the height
+ *                 invariant (min-height: var(--k-control-h-*)), and
+ *                 [data-role="control"] is in the coarse-pointer hit-target
+ *                 floor — so an unknown control inherits height + touch target
+ *                 (focus is already universal via :focus-visible).
  *   tone-bearer → every tinted *-soft token carries a paired AA-derived *-soft-fg
  *                 (so text on any tint is guaranteed legible — the badge/aaInk law)
  *   text-slot   → a global .truncate utility exists (single-line clamp)
@@ -76,6 +82,22 @@ if (
   )
 }
 
+// control — a perceptual role ARIA can't name, bound to [data-role="control"]
+// → the HEIGHT invariant (--k-control-h-*) inherited by unknown controls. (Focus
+// is universal via :focus-visible; the hit-target floor picks it up in the
+// coarse-pointer block — both checked below.)
+const control = floorFor('[data-role="control"]')
+if (!control || !/min-height:\s*var\(--k-control-h/.test(control.body)) {
+  fails.push(
+    'control · no generative binding in globalLayer.ts — expected a zero-specificity :where([data-role="control"]) floor delivering min-height: var(--k-control-h-*), so an unknown control inherits the kit height invariant',
+  )
+}
+if (!/\[data-role="control"\][^{]*\{\s*min-height:\s*var\(--k-touch-target/.test(globalLayerSrc)) {
+  fails.push(
+    'control · [data-role="control"] is not in the coarse-pointer hit-target floor (min-height: var(--k-touch-target)) — an unknown control wouldn\'t clear the 44px touch minimum',
+  )
+}
+
 // --- tone-bearer: every emitted *-soft tint has a paired AA-derived *-soft-fg ---
 const SOFT_FG_EXEMPT = new Set(['ring']) // focus halo — never holds text
 const softs = [...new Set([...snap.matchAll(/--k-([a-z0-9-]+)-soft:/g)].map((m) => m[1]))]
@@ -109,4 +131,4 @@ if (fails.length) {
   console.error(`\n${fails.length} role guarantee(s) not delivered. Every role in contracts.ts must carry its ROLE_GUARANTEE treatment.`)
   process.exit(1)
 }
-console.log('audit:role-treatments — clean · selectable + surface (generative bindings) · tone-bearer (AA-ink paired) · text-slot (.truncate) · overlay (scroll-capped) all enforced')
+console.log('audit:role-treatments — clean · selectable + surface + control (generative bindings) · tone-bearer (AA-ink paired) · text-slot (.truncate) · overlay (scroll-capped) all enforced')
