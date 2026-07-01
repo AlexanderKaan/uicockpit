@@ -11,6 +11,11 @@
  *                 floor in globalLayer.ts binds --k-selected-edge to the ARIA
  *                 selected state + [data-role="selectable"], so UNKNOWN markup
  *                 inherits the role (the first Role-Canvas generative binding)
+ *   surface     → the generative binding exists: a zero-specificity
+ *                 :where([data-role="surface"]) floor delivers surface bg +
+ *                 elevation, so an unknown container reads as "off the ground".
+ *                 (The surface-vs-bg CONTRAST is separately guarded by the
+ *                 foundation coherence rail — see coherence.ts.)
  *   tone-bearer → every tinted *-soft token carries a paired AA-derived *-soft-fg
  *                 (so text on any tint is guaranteed legible — the badge/aaInk law)
  *   text-slot   → a global .truncate utility exists (single-line clamp)
@@ -33,25 +38,41 @@ const snap = readFileSync(resolve(ROOT, 'src/export/__tests__/__snapshots__/gen.
 
 const fails = []
 
-// --- selectable: the GENERATIVE binding exists (Role Canvas floor) ----------
-// The selected treatment must be bound ONCE, globally, to the ARIA state that
-// names selection + a thin [data-role="selectable"], in a zero-specificity
-// :where() floor — so UNKNOWN selectable markup inherits --k-selected-edge and
-// no component has to re-roll it. (Per-recipe legibility is a separate gate:
-// audit:state-edge / Invariant I2.)
-const selectableBinding = globalLayerSrc.match(
-  /:where\(([\s\S]*?)\)\s*\{([\s\S]*?)\}/,
+// --- the GENERATIVE bindings exist (Role Canvas zero-specificity floors) -----
+// Each role's treatment must be bound ONCE, globally, in a zero-specificity
+// :where() floor — so UNKNOWN markup that tags the role (via ARIA state and/or a
+// thin [data-role]) inherits the treatment and no component has to re-roll it.
+// (Per-recipe legibility is a separate gate: audit:state-edge / Invariant I2.)
+const whereFloors = [...globalLayerSrc.matchAll(/:where\(([\s\S]*?)\)\s*\{([\s\S]*?)\}/g)].map(
+  (m) => ({ sel: m[1], body: m[2] }),
 )
-const bindingSel = selectableBinding?.[1] ?? ''
-const bindingBody = selectableBinding?.[2] ?? ''
+const floorFor = (needleInSel) => whereFloors.find((f) => f.sel.includes(needleInSel))
+
+// selectable — ARIA-named state (aria-selected/aria-checked) + [data-role] →
+// the selected-edge treatment inherited by unknown selectable markup.
+const selectable = floorFor('[data-role="selectable"]')
 if (
-  !/\[data-role="selectable"\]/.test(bindingSel) ||
-  !/aria-selected="true"/.test(bindingSel) ||
-  !/aria-checked="true"/.test(bindingSel) ||
-  !/--k-selected-edge/.test(bindingBody)
+  !selectable ||
+  !/aria-selected="true"/.test(selectable.sel) ||
+  !/aria-checked="true"/.test(selectable.sel) ||
+  !/--k-selected-edge/.test(selectable.body)
 ) {
   fails.push(
     'selectable · no generative binding in globalLayer.ts — expected a zero-specificity :where(…) floor keyed to [data-role="selectable"] + aria-selected/aria-checked that delivers var(--k-selected-edge), so unknown selectable markup inherits the role',
+  )
+}
+
+// surface — a perceptual role ARIA can't name, so bound to [data-role="surface"]
+// → the separation treatment (surface bg + elevation) inherited by unknown
+// containers.
+const surface = floorFor('[data-role="surface"]')
+if (
+  !surface ||
+  !/--k-surface\b/.test(surface.body) ||
+  !/box-shadow[^;]*--k-shadow/.test(surface.body)
+) {
+  fails.push(
+    'surface · no generative binding in globalLayer.ts — expected a zero-specificity :where([data-role="surface"]) floor delivering var(--k-surface) + a box-shadow elevation, so an unknown container reads as "off the ground"',
   )
 }
 
@@ -88,4 +109,4 @@ if (fails.length) {
   console.error(`\n${fails.length} role guarantee(s) not delivered. Every role in contracts.ts must carry its ROLE_GUARANTEE treatment.`)
   process.exit(1)
 }
-console.log('audit:role-treatments — clean · selectable (generative binding) · tone-bearer (AA-ink paired) · text-slot (.truncate) · overlay (scroll-capped) all enforced')
+console.log('audit:role-treatments — clean · selectable + surface (generative bindings) · tone-bearer (AA-ink paired) · text-slot (.truncate) · overlay (scroll-capped) all enforced')

@@ -183,6 +183,24 @@ ${s}:where(
   box-shadow: var(--k-selected-edge);
 }
 
+/* === Role Canvas · \`surface\` — the generative binding (perceptual role) ====
+   ARIA has no attribute for "this is a raised surface", so this role — one of the
+   perceptual roles ARIA can't name — binds to the thin [data-role="surface"].
+   Same zero-specificity :where() FLOOR: an UNKNOWN container tagged
+   data-role="surface" inherits the kit's separation treatment (surface bg +
+   hairline border + radius + the sm elevation) so it reads as "off the ground",
+   while any component (.card, .stat, .pane, .well…) fully overrides it. The
+   perceptual companion to the ARIA-named \`selectable\` binding. Enforced by
+   audit:role-treatments; the surface-vs-bg contrast itself is guarded by the
+   foundation coherence rail. */
+${s}:where([data-role="surface"]) {
+  background: var(--k-surface);
+  color: var(--k-fg);
+  border: 1px solid var(--k-border);
+  border-radius: var(--k-radius-lg);
+  box-shadow: var(--k-shadow-sm);
+}
+
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring
    off the element for clear visibility on standalone buttons/inputs.
