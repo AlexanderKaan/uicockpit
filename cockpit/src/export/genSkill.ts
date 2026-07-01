@@ -75,14 +75,21 @@ Radix / Headless UI / cmdk):
 - Type: ${cfg.fontDisplay} display / ${cfg.fontBody} body · Icons ${lib.label}
 - Full values + rationale live in **design.md**; the live \`tokens.css\` link is the source of truth.
 
-## Verify (the loop that actually binds)
-After you apply the kit, run the verifier against this pack's \`contract.json\` and
-fix what it flags — don't trust the rules alone, agents drift:
+## Verify — run this after EVERY change, not once (the loop that actually binds)
+The rules above are a nudge; a fresh session — or a later you — drifts anyway (a wrong
+blue, an off-scale radius, a magic \`20px\`). Nothing catches that by eye. So after **every**
+UI edit, run the verifier against this pack's \`contract.json\` and treat a violation like a
+failing test — fix it before you move on:
 
 \`\`\`bash
-npx uicockpit check
+npx uicockpit check          # or, over MCP: call the check_conformance tool
 \`\`\`
 
-It catches hardcoded hex, off-grid spacing, magic px and wrong tokens. Re-run until clean.
+It flags hardcoded hex, off-grid spacing, magic px and wrong tokens. Re-run until clean.
+
+**Make it automatic** so coherence survives a fresh context window: add \`npx uicockpit check\`
+as a **pre-commit hook and/or a CI step**. That turns "please use the token" into a check that
+**fails the build** on drift — the only thing that reliably holds across many screens, sessions
+and hands.
 `
 }

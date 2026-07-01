@@ -174,7 +174,11 @@ export async function runInit(argv) {
   console.log('  1. Import uicockpit.tokens.css once at your app root (or use the hosted <link>).')
   console.log('  2. AGENTS.md holds the rules; design.md is the full spec + recipe catalog —')
   console.log('     your coding agent picks them up automatically.')
-  console.log('  3. Run  npx uicockpit check  to catch any drift from the contract.')
+  console.log('  3. Run  npx uicockpit check  after every UI change to catch drift from the contract.')
+  console.log('\n  Make it automatic — the check only holds if it runs without you remembering:')
+  console.log('  • Git pre-commit hook:')
+  console.log("      echo 'npx uicockpit check' > .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit")
+  console.log('  • Or a CI step (fails the build on drift):  - run: npx uicockpit check')
   console.log('  • uicockpit.json holds adoption settings (allowColors for sanctioned brand')
   console.log('    colours; prefix / aliasMap / framework for brownfield) — check reads it.')
   return 0
