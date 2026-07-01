@@ -1,6 +1,7 @@
 import { Sparkles, Palette, FileCode2, BarChart3, ShieldCheck, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
+import { LoopAnimation } from './LoopAnimation'
 import { MktNav } from './MktNav'
 import { ToolLogo } from '../brand/toolLogos'
 import { MktFooter } from './MktFooter'
@@ -157,6 +158,9 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               language once, let your AI apply it on every screen, and check that nothing drifts
               as the app grows.
             </p>
+          </div>
+          <div className="mkt__loop-viz">
+            <LoopAnimation />
           </div>
           <div className="mkt__loop">
             <div className="mkt__loop-card">

@@ -455,6 +455,11 @@
 .mkt__triad-is strong { font-weight: 600; }
 
 /* === Define → Apply → Verify — the build-loop section === */
+/* The animated explainer (LoopAnimation) sits above the three cards. */
+.mkt__loop-viz {
+  max-width: 620px;
+  margin: 4px auto 44px;
+}
 .mkt__loop {
   display: grid;
   grid-template-columns: 1fr auto 1fr auto 1fr;
