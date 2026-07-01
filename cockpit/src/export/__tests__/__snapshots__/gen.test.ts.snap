@@ -3586,6 +3586,30 @@ body {
   pointer-events: none;
 }
 
+/* === Role Canvas · \`selectable\` — the generative binding ===================
+   The kit's ONE selected treatment (chromatic fill + the inset --k-selected-edge)
+   bound once to the ARIA state that NAMES selection (aria-selected on option /
+   row / gridcell / tab, aria-checked on radio) + a thin [data-role="selectable"]
+   for markup not yet wired to ARIA. Wrapped in :where() so it carries ZERO
+   specificity — a true FLOOR: any component rule (even a single class) overrides
+   it completely, while UNKNOWN markup (a selectable we never built) inherits the
+   uniform look for free. This is what stops chip / list / tab / table / segmented
+   from each re-rolling the selected state. See contracts.ts + ROLE-CANVAS.md
+   (role → guaranteed treatment). Enforced by audit:role-treatments. */
+:where(
+  [data-role="selectable"][aria-selected="true"],
+  [data-role="selectable"][aria-checked="true"],
+  [data-role="selectable"].is-selected,
+  [role="option"][aria-selected="true"],
+  [role="row"][aria-selected="true"],
+  [role="gridcell"][aria-selected="true"],
+  [role="tab"][aria-selected="true"],
+  [role="radio"][aria-checked="true"]
+) {
+  background: var(--k-state-selected-bg, var(--k-primary-soft));
+  box-shadow: var(--k-selected-edge);
+}
+
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).
    --k-focus-ring-offset is +2px (outset) by default — lifts the ring
    off the element for clear visibility on standalone buttons/inputs.
@@ -10434,6 +10458,30 @@ body {
   opacity: var(--k-disabled-opacity);
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* === Role Canvas · \`selectable\` — the generative binding ===================
+   The kit's ONE selected treatment (chromatic fill + the inset --k-selected-edge)
+   bound once to the ARIA state that NAMES selection (aria-selected on option /
+   row / gridcell / tab, aria-checked on radio) + a thin [data-role="selectable"]
+   for markup not yet wired to ARIA. Wrapped in :where() so it carries ZERO
+   specificity — a true FLOOR: any component rule (even a single class) overrides
+   it completely, while UNKNOWN markup (a selectable we never built) inherits the
+   uniform look for free. This is what stops chip / list / tab / table / segmented
+   from each re-rolling the selected state. See contracts.ts + ROLE-CANVAS.md
+   (role → guaranteed treatment). Enforced by audit:role-treatments. */
+:where(
+  [data-role="selectable"][aria-selected="true"],
+  [data-role="selectable"][aria-checked="true"],
+  [data-role="selectable"].is-selected,
+  [role="option"][aria-selected="true"],
+  [role="row"][aria-selected="true"],
+  [role="gridcell"][aria-selected="true"],
+  [role="tab"][aria-selected="true"],
+  [role="radio"][aria-checked="true"]
+) {
+  background: var(--k-state-selected-bg, var(--k-primary-soft));
+  box-shadow: var(--k-selected-edge);
 }
 
 /* Focus ring — keyboard focus only (avoids mouse-click flashes).

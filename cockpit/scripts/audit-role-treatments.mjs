@@ -7,6 +7,10 @@
  * guarantees its treatment" is true, not aspirational. It closes the worklist
  * audit:contract prints (the declared-not-yet-enforced roles):
  *
+ *   selectable  → the generative binding exists: one zero-specificity :where()
+ *                 floor in globalLayer.ts binds --k-selected-edge to the ARIA
+ *                 selected state + [data-role="selectable"], so UNKNOWN markup
+ *                 inherits the role (the first Role-Canvas generative binding)
  *   tone-bearer → every tinted *-soft token carries a paired AA-derived *-soft-fg
  *                 (so text on any tint is guaranteed legible — the badge/aaInk law)
  *   text-slot   → a global .truncate utility exists (single-line clamp)
@@ -24,9 +28,32 @@ import { fileURLToPath } from 'node:url'
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(HERE, '..')
 const recipes = readFileSync(resolve(ROOT, 'src/kit/recipes/index.ts'), 'utf8')
+const globalLayerSrc = readFileSync(resolve(ROOT, 'src/kit/globalLayer.ts'), 'utf8')
 const snap = readFileSync(resolve(ROOT, 'src/export/__tests__/__snapshots__/gen.test.ts.snap'), 'utf8')
 
 const fails = []
+
+// --- selectable: the GENERATIVE binding exists (Role Canvas floor) ----------
+// The selected treatment must be bound ONCE, globally, to the ARIA state that
+// names selection + a thin [data-role="selectable"], in a zero-specificity
+// :where() floor — so UNKNOWN selectable markup inherits --k-selected-edge and
+// no component has to re-roll it. (Per-recipe legibility is a separate gate:
+// audit:state-edge / Invariant I2.)
+const selectableBinding = globalLayerSrc.match(
+  /:where\(([\s\S]*?)\)\s*\{([\s\S]*?)\}/,
+)
+const bindingSel = selectableBinding?.[1] ?? ''
+const bindingBody = selectableBinding?.[2] ?? ''
+if (
+  !/\[data-role="selectable"\]/.test(bindingSel) ||
+  !/aria-selected="true"/.test(bindingSel) ||
+  !/aria-checked="true"/.test(bindingSel) ||
+  !/--k-selected-edge/.test(bindingBody)
+) {
+  fails.push(
+    'selectable · no generative binding in globalLayer.ts — expected a zero-specificity :where(…) floor keyed to [data-role="selectable"] + aria-selected/aria-checked that delivers var(--k-selected-edge), so unknown selectable markup inherits the role',
+  )
+}
 
 // --- tone-bearer: every emitted *-soft tint has a paired AA-derived *-soft-fg ---
 const SOFT_FG_EXEMPT = new Set(['ring']) // focus halo — never holds text
@@ -61,4 +88,4 @@ if (fails.length) {
   console.error(`\n${fails.length} role guarantee(s) not delivered. Every role in contracts.ts must carry its ROLE_GUARANTEE treatment.`)
   process.exit(1)
 }
-console.log('audit:role-treatments — clean · tone-bearer (AA-ink paired) · text-slot (.truncate) · overlay (scroll-capped) all enforced')
+console.log('audit:role-treatments — clean · selectable (generative binding) · tone-bearer (AA-ink paired) · text-slot (.truncate) · overlay (scroll-capped) all enforced')
