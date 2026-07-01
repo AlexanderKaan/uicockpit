@@ -16,6 +16,7 @@
  * Local dev:  npx wrangler dev   →  curl 'http://localhost:8787/k/<hash>.css'
  */
 import { decode } from '../src/state/hash'
+import { briefToHash } from '../src/state/brief'
 import { genCss } from '../src/export/genCss'
 import { genContract } from '../src/export/genContract'
 import { genSkill } from '../src/export/genSkill'
@@ -51,7 +52,36 @@ export default {
   fetch(request: Request): Response {
     if (request.method === 'OPTIONS') return new Response(null, { headers: CORS })
 
-    const { pathname } = new URL(request.url)
+    const url = new URL(request.url)
+    const { pathname } = url
+
+    // POST-less "make me a kit" — a readable brief → the config hash + every kit
+    // URL. The agent-native on-ramp (and a plain shareable link): an LLM describes
+    // a kit in params instead of driving the GUI. GET /new?brand=cobalt&radius=soft
+    // &density=comfortable&buttonShape=pill&icons=line
+    if (pathname === '/new') {
+      const q = url.searchParams
+      const hash = briefToHash({
+        brand: q.get('brand') ?? undefined,
+        radius: q.get('radius') ?? undefined,
+        density: q.get('density') ?? undefined,
+        buttonShape: q.get('buttonShape') ?? undefined,
+        icons: q.get('icons') ?? undefined,
+      })
+      const k = (ext: string) => `${url.origin}/k/${encodeURIComponent(hash)}.${ext}`
+      const body = {
+        hash,
+        css: k('css'),
+        contract: k('contract.json'),
+        rules: k('rules.md'),
+        design: k('design.md'),
+        editor: `https://uicockpit.com/app#${hash}`,
+      }
+      return new Response(JSON.stringify(body, null, 2), {
+        headers: { 'content-type': 'application/json; charset=utf-8', ...CORS, 'cache-control': CACHE },
+      })
+    }
+
     for (const r of ROUTES) {
       const m = pathname.match(r.re)
       if (!m) continue

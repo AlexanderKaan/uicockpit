@@ -3,6 +3,7 @@
  * uicockpit-mcp — the Model Context Protocol server for UICockpit.
  *
  * Gives an AI agent (Claude, Cursor, Windsurf, …) the design-system wedge natively:
+ *   • create_kit         — generate a kit from a brief (brand/radius/density) — no GUI
  *   • install_kit        — pull a configured kit (tokens.css + contract.json)
  *   • get_design_context — read the kit's tokens + rules to build on-system
  *   • check_conformance  — verify the code conforms to the contract (the moat)
@@ -24,6 +25,52 @@ const text = (t) => ({ content: [{ type: 'text', text: t }] })
 const errText = (t) => ({ content: [{ type: 'text', text: t }], isError: true })
 
 const server = new McpServer({ name: 'uicockpit', version: pkg.version })
+
+/* ── create_kit ────────────────────────────────────────────────────────────── */
+server.registerTool(
+  'create_kit',
+  {
+    title: 'Create a UICockpit kit from a brief',
+    description:
+      'Generate a coherent design-system kit from a short brief (brand colour, radius, density) — ' +
+      'no GUI, no hash to hunt for. Returns the kit hash + hosted token/contract/rules URLs. Reach ' +
+      'for this when the user wants their UI to look designed / on-brand / consistent, or asks for a ' +
+      'design system, theme, or tokens, and there is no uicockpit kit in the project yet. Then call ' +
+      'install_kit with the returned hash to write it in.',
+    inputSchema: {
+      brand: z
+        .string()
+        .optional()
+        .describe('A theme id (cobalt · sky · teal · jade · indigo · violet · coral · rose · ember · mono) OR a #hex brand colour. Default: cobalt.'),
+      radius: z.enum(['none', 'subtle', 'soft', 'round']).optional().describe('Corner radius. Default: soft.'),
+      density: z.enum(['compact', 'default', 'comfortable']).optional().describe('Interface size + density. Default: default.'),
+      buttonShape: z.enum(['match', 'none', 'subtle', 'soft', 'round', 'pill']).optional().describe('Button corner shape. Default: match (follows radius).'),
+      icons: z.enum(['hairline', 'line', 'rounded', 'bold', 'solid']).optional().describe('Icon style. Default: line.'),
+    },
+  },
+  async (params) => {
+    const q = new URLSearchParams()
+    for (const key of ['brand', 'radius', 'density', 'buttonShape', 'icons']) {
+      if (params[key]) q.set(key, params[key])
+    }
+    const qs = q.toString()
+    let kit
+    try {
+      kit = JSON.parse(await fetchText(`${CDN}/new${qs ? `?${qs}` : ''}`))
+    } catch (err) {
+      return errText(`Could not create the kit: ${err.message}. Check the params and network.`)
+    }
+    return text(
+      `Created a kit (hash ${kit.hash}):\n` +
+        `  • tokens.css:  ${kit.css}\n` +
+        `  • contract:    ${kit.contract}\n` +
+        `  • rules:       ${kit.rules}\n` +
+        `  • open / tweak in the configurator:  ${kit.editor}\n\n` +
+        `Next: call install_kit with hash "${kit.hash}" to write it into the project, then ` +
+        `get_design_context to build on it, and check_conformance after every UI edit.`,
+    )
+  },
+)
 
 /* ── install_kit ───────────────────────────────────────────────────────────── */
 server.registerTool(
