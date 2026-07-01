@@ -377,9 +377,8 @@
   display: grid;
   place-items: start center;
   min-width: 0;
-  /* Flat canvas — the framed preview floats on the plain chrome bg (the brand
-   * gradient mesh was removed per Alexander; the kit's own surfaces carry the
-   * colour now). */
+  /* Flat canvas — the framed preview floats on the plain chrome bg; the kit's
+   * own surfaces carry the colour, not a background gradient. */
   background: var(--app-bg);
 }
 /* The framed preview lifts off the canvas with a soft shadow (premium float). */

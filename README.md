@@ -57,7 +57,7 @@ language that makes it yours** — and the only layer that *keeps* it coherent a
 The loop it lives in: **Define** your language → your AI **applies** it →
 `uicockpit check` **verifies** it. Not a one-off asset — a layer in the build loop.
 
-→ The thinking behind this: [`VISION.md`](./VISION.md) · [`POSITIONING.md`](./POSITIONING.md).
+→ The thinking behind this: [`VISION.md`](./VISION.md).
 
 ---
 
@@ -193,7 +193,7 @@ npx vitest run       # tests
 ```
 
 Vite + React 19 + TypeScript (strict). The CLI (`cli/`) and MCP server (`mcp/`) are
-separate zero-dep packages. Architecture notes: [`DECISIONS.md`](./DECISIONS.md).
+separate zero-dependency packages.
 
 ---
 

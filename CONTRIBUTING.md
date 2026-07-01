@@ -39,8 +39,9 @@ the CDN (`src/export/genCss.ts`). There is no second copy to keep in sync.
 - **Non-exportable preview scaffolding** (gallery masonry, demo-app chrome) → `src/styles/preview-only.css`.
 - **Tokens** → `src/tokens/buildTokens.ts`.
 
-Read [`cockpit/CLAUDE.md`](./cockpit/CLAUDE.md) (the navigation map) and [`DECISIONS.md`](./DECISIONS.md)
-before editing.
+The kit is single-sourced: component CSS lives once in `src/kit/recipes/index.ts` and
+feeds both the export and the live preview — edit there, and `npm run build` runs the
+full audit suite that keeps everything coherent. Keep it green before opening a PR.
 
 ## Common contributions
 

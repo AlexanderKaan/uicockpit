@@ -35,6 +35,23 @@ cockpit-reference.html
 # .dev.vars (local) / `wrangler secret put` (prod), both still ignored above.
 !.env.production
 
+# === Internal working docs — background, benchmarks, deliberation (not public) ===
+# The public story lives in README.md · VISION.md · MANIFESTO.md · docs/roadmap.md.
+# Everything below is our own working material — best-practice comparisons, coverage
+# audits, craft rubrics, decision logs, concept drafts — kept local, never shipped.
+/BEST-IN-CLASS-ANALYSIS.md
+/COMPONENT-CRAFT.md
+/DECISIONS.md
+/FOUNDATION-COHERENCE.md
+/ICONS.md
+/KIT-COVERAGE-AUDIT.md
+/POSITIONING.md
+/ROLE-CANVAS.md
+/SEGMENT-REGISTRY.md
+/TABLE-LIST-STICKY-PATTERNS.md
+/TAILWIND-APPUI-VARIANT-AUDIT.md
+/component-best-practices/
+
 # OS / editor
 .DS_Store
 Thumbs.db

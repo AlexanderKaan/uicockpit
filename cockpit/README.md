@@ -1,11 +1,12 @@
 # cockpit/ — the app
 
-This is the Vite + React 19 + TS app for UIcockpit. There is no separate package
-documentation: the single source of truth lives one level up.
+The Vite + React 19 + TypeScript app for UIcockpit — the configurator, the live
+preview, and the token engine.
 
-- **Build / run / architecture / current state →** [`../ROADMAP.md`](../ROADMAP.md)
-  (Part 1 = build source of truth).
-- Dev: `npm run dev` · Build + all gates: `npm run build` · Tests: `npx vitest run`.
+- **What it is + how it fits →** the [root README](../README.md) · [roadmap](../docs/roadmap.md).
+- **Dev:** `npm run dev`
+- **Build (runs the full audit + type gate):** `npm run build`
+- **Tests:** `npx vitest run`
 
-(This file previously held the default Vite scaffold README; it was boilerplate and
-has been replaced by this pointer.)
+The kit is single-sourced: component CSS lives once in `src/kit/recipes/index.ts` and
+feeds both the export and the live preview.
