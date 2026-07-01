@@ -516,6 +516,140 @@
   .mkt__loop-arrow { transform: rotate(90deg); justify-self: center; }
 }
 
+/* === Compare — "Two ways to use it": the two positioning tables === */
+.mkt__cmp-block { margin-top: 3.5rem; }
+.mkt__cmp-block:first-of-type { margin-top: 0; }
+.mkt__cmp-lead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.mkt__cmp-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #ebf4ff;
+  color: var(--mkt-accent);
+}
+.mkt__cmp-lead h3 {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--mkt-fg);
+}
+.mkt__cmp-lead p {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--mkt-fg-muted);
+  margin-top: 2px;
+}
+/* Horizontal scroll only when the matrix can't fit (mobile) */
+.mkt__cmp-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--mkt-border);
+  border-radius: 14px;
+  background: var(--mkt-bg);
+}
+.mkt__cmp {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.mkt__cmp th,
+.mkt__cmp td {
+  padding: 13px 16px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--mkt-border);
+}
+.mkt__cmp tbody tr:last-child th,
+.mkt__cmp tbody tr:last-child td { border-bottom: 0; }
+.mkt__cmp thead th {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--mkt-fg-muted);
+  letter-spacing: -0.005em;
+  background: var(--mkt-sunken);
+  white-space: nowrap;
+}
+.mkt__cmp-rowhead {
+  text-align: left !important;
+  font-weight: 500;
+  color: var(--mkt-fg);
+  line-height: 1.4;
+  min-width: 210px;
+}
+.mkt__cmp--matrix td { white-space: nowrap; }
+.mkt__cmp--matrix .mkt__cmp-rowhead { font-size: 13.5px; }
+/* The UIcockpit column — tinted rail so the differentiators read at a glance */
+.mkt__cmp-col--us { background: rgba(0, 122, 255, 0.05); }
+.mkt__cmp thead th.mkt__cmp-col--us {
+  background: #ebf4ff;
+  color: var(--mkt-accent);
+}
+/* Matrix marks — full / partial / none dots */
+.mkt__cmp-dot {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  vertical-align: -1px;
+}
+.mkt__cmp-dot--full { background: var(--mkt-accent); }
+.mkt__cmp-dot--part {
+  background:
+    linear-gradient(90deg, var(--mkt-accent) 0 50%, transparent 50% 100%),
+    var(--mkt-bg);
+  box-shadow: inset 0 0 0 1.5px var(--mkt-accent);
+}
+.mkt__cmp-dot--none {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px #d3d3d9;
+}
+/* Drift table — prose cells, not dots */
+.mkt__cmp--drift td {
+  text-align: left;
+  line-height: 1.45;
+  font-size: 13.5px;
+}
+.mkt__cmp--drift .mkt__cmp-rowhead { min-width: 190px; }
+.mkt__cmp-alone { color: var(--mkt-fg-muted); }
+.mkt__cmp-with { color: var(--mkt-fg); font-weight: 500; }
+.mkt__cmp code {
+  font-family: var(--mkt-mono, ui-monospace, monospace);
+  font-size: 0.85em;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(0, 122, 255, 0.08);
+  color: var(--mkt-accent);
+}
+.mkt__cmp-legend {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-end;
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--mkt-fg-muted);
+}
+.mkt__cmp-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.mkt__cmp-foot {
+  margin-top: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--mkt-fg-muted);
+  max-width: 640px;
+}
+.mkt__cmp-foot em { color: var(--mkt-fg); font-style: normal; font-weight: 600; }
+@media (max-width: 640px) {
+  .mkt__cmp-rowhead { min-width: 150px; }
+  .mkt__cmp-legend { justify-content: flex-start; }
+}
+
 /* === Hero showcase — the component bouquet ===
    Full-bleed wrapper for ComponentBouquet (the real <ComponentGallery/>).
    Breaks out of the page flow to span the whole viewport; the bouquet itself

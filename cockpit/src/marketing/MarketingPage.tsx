@@ -2,6 +2,7 @@ import { Sparkles, Palette, FileCode2, BarChart3, ShieldCheck, Smartphone, Link2
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
 import { LoopAnimation } from './LoopAnimation'
+import { MktCompare } from './MktCompare'
 import { MktNav } from './MktNav'
 import { ToolLogo } from '../brand/toolLogos'
 import { MktFooter } from './MktFooter'
@@ -260,6 +261,9 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
           </div>
         </div>
       </section>
+
+      {/* Two ways to use it — the two comparison tables (the two positionings) */}
+      <MktCompare />
 
       {/* Anatomy — what every component is guaranteed to be built from */}
       <section className="mkt__section" id="anatomy">
