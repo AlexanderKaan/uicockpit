@@ -66,15 +66,22 @@ export function MarketingManifesto({ onLaunch, onDocs, navigate }: MarketingMani
 
         <h2>So here's the idea</h2>
         <p className="mkt__manifesto-lead">
-          You set your design language once, and your AI applies it to everything it builds —
-          even the screens you never thought to make.
+          You design your UI once — turn every knob until it's yours — and then keep it that way.
         </p>
         <p>
-          Concretely: you tune colour, type, shape, spacing and motion into a small set of
-          framework-neutral tokens — about a minute, no account. Your agent builds from those
-          instead of guessing. And <code>npx uicockpit check</code> flags anything that drifts
-          off them — a hardcoded colour, an off-grid size, a one-off component — so the whole
-          app stays coherent as it grows. Configure once; stay coherent everywhere.
+          Concretely: you tune colour, type, shape, spacing and motion in a small visual
+          configurator — a full component gallery updates as you go — until it looks right,
+          about a minute, no account. Then you export it as a framework-neutral kit (tokens +
+          component recipes) and drop it into any stack. And it isn't a one-time download: host
+          it behind a link, come back to re-tune it later, and every app on that link restyles —
+          so your system stays up to date instead of going stale in a folder.
+        </p>
+        <p>
+          Because it's a real, machine-readable contract, it also <em>holds</em>. Your agent
+          builds new screens from it instead of guessing, and <code>npx uicockpit check</code>{' '}
+          flags anything that drifts off it — a hardcoded colour, an off-grid size, a one-off
+          component. Whether the drift is an AI next session or you six months later, the whole
+          thing stays coherent as it grows. Configure once; stay coherent everywhere.
         </p>
 
         <h2>Why it matters more now</h2>

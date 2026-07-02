@@ -4,10 +4,11 @@
 
 ### A design system your AI actually keeps to.
 
-**Configure a design language once — then your coding agent builds on it, and
-`uicockpit check` makes sure it *stays* on it.** Framework-neutral `--k-*` tokens +
-100+ components (real recipes with state contracts), delivered as a hosted `<link>`, a
-download, or natively inside your agent (CLI + MCP).
+**Dial in your design language visually, export it framework-neutral, and keep it up
+to date behind one link — then hand it to your coding agent and `uicockpit check`
+makes sure it *stays* on it.** Framework-neutral `--k-*` tokens + 100+ components (real
+recipes with state contracts), delivered as a hosted `<link>`, a download, or natively
+inside your agent (CLI + MCP).
 
 **Free · no account · paste it anywhere.**
 

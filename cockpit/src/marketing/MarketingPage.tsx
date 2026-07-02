@@ -84,11 +84,10 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
           </div>
           <h1>Ship AI apps that look designed, not generated.</h1>
           <p className="mkt__hero-sub">
-            AI ships a working app in minutes — then you lose days tweaking, and it still
-            looks like every other AI app. UIcockpit gives your AI{' '}
-            <strong>one design language to apply to every screen</strong>: colour, type,
-            shape and motion as framework-neutral tokens, with a checker that keeps it all
-            coherent as you grow.
+            Dial in your design language — colour, type, shape and motion — preview it live,
+            and export it as <strong>framework-neutral tokens + components</strong> you drop
+            into any app and keep tweaking behind one link. Then hand it to your AI, and a
+            checker keeps every new screen on it instead of drifting back to generic.
           </p>
           <div className="mkt__hero-ctas">
             <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
