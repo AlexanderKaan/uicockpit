@@ -57,7 +57,7 @@ export const pathFor = (e: SeoEntry): string => `/${KIND_SEGMENT[e.kind]}/${e.sl
 /* ── Reusable closing differentiators (kept consistent across pages) ───────── */
 const TRANSPORT_POINT = {
   h: 'One source, many transports',
-  p: 'Tokens, a Tailwind @theme block, a shadcn globals.css, a components.html, an AI prompt — all derive from one config, so they can never disagree. Plus a hosted live <link> you return to and keep tweaking.',
+  p: 'Tokens (CSS + JSON), a Tailwind @theme block, a shadcn globals.css, an AI prompt and a machine-readable contract — all derive from one config, so they can never disagree. Plus a hosted live <link> you return to, and a CLI + MCP so your agent reads the system and checks its own work against it.',
 }
 const NEUTRAL_POINT = {
   h: 'Framework-neutral by design',
@@ -66,6 +66,10 @@ const NEUTRAL_POINT = {
 const NOLOCKIN_POINT = {
   h: 'No accounts, no lock-in',
   p: 'No login to configure or export. Your whole setup lives in the link; the static download is always one click away, byte-identical to the hosted kit. Eject any time.',
+}
+const CHECK_POINT = {
+  h: 'A check that fails the build',
+  p: 'Every kit ships a machine-readable contract and a verifier — uicockpit check, over a CLI and an MCP server. Wire it as a pre-commit or CI gate (--strict) and any drift — a raw hex, an off-scale radius, the wrong token — fails the build, so what your AI generates stays on-system across every screen and session.',
 }
 
 export const SEO_ENTRIES: SeoEntry[] = [
@@ -90,9 +94,9 @@ export const SEO_ENTRIES: SeoEntry[] = [
       rows: [
         { feature: 'Stack', us: 'Framework-neutral (HTML, Vue, Svelte, React…)', them: 'React + Tailwind + Radix', winner: 'us' },
         { feature: 'What you get', us: 'A complete design language as tokens + recipes', them: 'Component source code you own', winner: 'tie' },
-        { feature: 'Ready-made components', us: 'Token + recipe CSS (component emit on the roadmap)', them: 'Yes — accessible React components', winner: 'them' },
-        { feature: 'Visual editor', us: '20+ controls, live gallery + app preview', them: 'Hand-edit CSS variables', winner: 'us' },
-        { feature: 'Export formats', us: '8 (tokens.css / JSON / Tailwind / shadcn / AI prompt / components.html …)', them: 'Component files', winner: 'us' },
+        { feature: 'Ready-made components', us: '100+ recipe CSS (full state contracts), not copy-paste source', them: 'Yes — accessible React components', winner: 'them' },
+        { feature: 'Visual editor', us: '19 controls, live gallery + app preview', them: 'Hand-edit CSS variables', winner: 'us' },
+        { feature: 'Export formats', us: '7 (tokens.css / JSON / Tailwind / shadcn / AI prompt / contract …)', them: 'Component files', winner: 'us' },
         { feature: 'Works with shadcn', us: 'Yes — exports a shadcn-compatible globals.css', them: 'It is shadcn', winner: 'tie' },
         { feature: 'AI handoff', us: 'Behaviour-shaping AI prompt + rules pack', them: 'Human-readable docs', winner: 'us' },
         { feature: 'Hosted live kit', us: 'Yes — one <link>, returnable, auto-updating', them: 'No', winner: 'us' },
@@ -107,7 +111,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
     faq: [
       { q: 'Is UIcockpit a shadcn alternative?', a: 'Not exactly — it solves a different problem. shadcn gives you components; UIcockpit gives you the design language to make them look like yours. Most people use both.' },
       { q: 'Can I use UIcockpit with my existing shadcn project?', a: 'Yes. Export the shadcn globals.css and drop it in — your components inherit the new brand, density and dark mode with no component edits.' },
-      { q: 'Does UIcockpit give me components too?', a: 'Today it ships token + recipe CSS (full hover/focus/disabled contracts). A copy-the-code component emit is on the roadmap.' },
+      { q: 'Does UIcockpit give me components too?', a: 'It ships 100+ component recipes — CSS with full hover/focus/disabled contracts — plus the grammar an agent composes new components from, verified by uicockpit check. Not copy-paste React source like shadcn, so most people pair the two.' },
     ],
     related: ['/alternatives/shadcn', '/uses/shadcn-theme-generator', '/compare/tweakcn'],
   },
@@ -131,8 +135,9 @@ export const SEO_ENTRIES: SeoEntry[] = [
         { feature: 'Type', us: 'Design-system configurator (deterministic)', them: 'AI UI generator (prompt → code)', winner: 'tie' },
         { feature: 'Output', us: 'Reusable tokens + recipes for your whole app', them: 'One-off generated components', winner: 'us' },
         { feature: 'Consistency', us: 'One coherent system across every screen', them: 'Varies per prompt / per generation', winner: 'us' },
+        { feature: 'Catches drift before ship', us: 'uicockpit check --strict fails the build on off-token values', them: 'No check — you eyeball each screen', winner: 'us' },
         { feature: 'Stack', us: 'Framework-neutral', them: 'React + Tailwind / shadcn', winner: 'us' },
-        { feature: 'Brand control', us: '20+ explicit controls (colour/type/shape/motion)', them: 'Described in prose, hard to pin down', winner: 'us' },
+        { feature: 'Brand control', us: '19 explicit controls (colour/type/shape/motion)', them: 'Described in prose, hard to pin down', winner: 'us' },
         { feature: 'Speed to a first screen', us: 'Configure, then build', them: 'Instant scaffold from a prompt', winner: 'them' },
         { feature: 'Accounts', us: 'None', them: 'Account, credit-based', winner: 'us' },
         { feature: 'Use together', us: 'Feed our AI prompt into v0 → on-brand output', them: '—', winner: 'tie' },
@@ -141,6 +146,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
     points: [
       { h: 'Coherence v0 can’t guarantee', p: 'A generator optimises one screen at a time. UIcockpit fixes the system once, so the tenth screen matches the first.' },
       { h: 'Better together', p: 'Keep using v0 to scaffold. Paste UIcockpit’s AI prompt so every generation inherits your tokens, palette and composition rules.' },
+      CHECK_POINT,
       NEUTRAL_POINT,
     ],
     faq: [
@@ -169,7 +175,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
         { feature: 'Scope', us: 'Colour, type, shape, density, motion + component recipes', them: 'shadcn theme variables (colour, radius)', winner: 'us' },
         { feature: 'Stack', us: 'Framework-neutral', them: 'shadcn (React + Tailwind)', winner: 'us' },
         { feature: 'Preview', us: 'Full component gallery + real app screens', them: 'shadcn component preview', winner: 'us' },
-        { feature: 'Export formats', us: '7 (tokens.css / JSON / Tailwind / shadcn / AI prompt / components.html …)', them: 'shadcn CSS variables', winner: 'us' },
+        { feature: 'Export formats', us: '7 (tokens.css / JSON / Tailwind / shadcn / AI prompt / contract …)', them: 'shadcn CSS variables', winner: 'us' },
         { feature: 'Best if you ship only shadcn', us: 'Works great, plus everything else', them: 'Focused, lightweight choice', winner: 'them' },
         { feature: 'AI handoff', us: 'Behaviour-shaping AI prompt + rules', them: '—', winner: 'us' },
         { feature: 'Hosted live kit', us: 'Yes — returnable, auto-updating', them: 'No', winner: 'us' },
@@ -207,8 +213,8 @@ export const SEO_ENTRIES: SeoEntry[] = [
         { feature: 'Aesthetic', us: 'Your own design language (any look)', them: 'Material Design by default', winner: 'us' },
         { feature: 'Stack', us: 'Framework-neutral', them: 'React', winner: 'us' },
         { feature: 'Runtime', us: 'Zero runtime — just CSS variables', them: 'Component-library runtime', winner: 'us' },
-        { feature: 'Component breadth', us: 'Token + recipe CSS (emit on roadmap)', them: 'Large, mature component set', winner: 'them' },
-        { feature: 'Theming', us: '20+ visual controls → tokens', them: 'JS theme object (in code)', winner: 'us' },
+        { feature: 'Component breadth', us: '100+ recipe CSS (state contracts), not a runtime library', them: 'Large, mature component set', winner: 'them' },
+        { feature: 'Theming', us: '19 visual controls → tokens', them: 'JS theme object (in code)', winner: 'us' },
         { feature: 'Output', us: 'Framework-neutral tokens (7 formats)', them: 'React components + theme', winner: 'tie' },
         { feature: 'Lock-in', us: 'None — eject to files', them: 'React + MUI runtime', winner: 'us' },
       ],
@@ -305,6 +311,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
     points: [
       { h: 'Deterministic, not per-prompt', p: 'Set the system once; every screen and every generation matches.' },
       { h: 'Make v0 consistent', p: 'Not a replacement you must pick — feed our AI prompt into v0 and keep generating, on-brand.' },
+      CHECK_POINT,
       NEUTRAL_POINT,
     ],
     faq: [
@@ -431,12 +438,14 @@ export const SEO_ENTRIES: SeoEntry[] = [
     ],
     points: [
       { h: 'Tokens + the prompt to apply them', p: 'Not just variables — a rules file that teaches the model how to use them consistently.' },
-      { h: 'Works with any AI tool', p: 'Framework-neutral output and a portable prompt fit any AI coding workflow.' },
+      CHECK_POINT,
+      { h: 'Works with any AI tool', p: 'Framework-neutral output and a portable prompt fit any AI coding workflow — plus an MCP server so agents install the kit, read its design context and check conformance natively.' },
       TRANSPORT_POINT,
     ],
     faq: [
       { q: 'How does the AI prompt help?', a: 'It encodes the token contract and composition rules, so generated UI uses the right values instead of inventing new ones.' },
-      { q: 'Which AI tools does it support?', a: 'Any that read a rules file or system prompt — the export is plain, portable text.' },
+      { q: 'What actually stops the AI from drifting?', a: 'uicockpit check. It reads the same machine-readable contract and fails the build (--strict) on any off-token value — a raw hex, an off-scale radius, the wrong token. It runs as a CLI and an MCP server, so the agent verifies its own work.' },
+      { q: 'Which AI tools does it support?', a: 'Any that read a rules file or system prompt — the export is plain, portable text. Claude Code, Cursor and Windsurf also get the native MCP server (install_kit · get_design_context · check_conformance).' },
     ],
     related: ['/compare/v0', '/alternatives/v0', '/uses/framework-neutral-design-tokens'],
   },
@@ -452,7 +461,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
     sub: 'One set of tokens that works everywhere — React, Vue, Svelte, plain HTML. Plain CSS custom properties, light and dark, zero runtime, no lock-in.',
     intro: [
       'Most theming tools assume a stack. UIcockpit does not: its output is plain --k-* CSS custom properties plus a W3C Design Tokens JSON, so the same system drops into any framework.',
-      'From that single source it also emits a Tailwind v4 @theme block, a shadcn globals.css, a components.html and an AI prompt — pick the transport your project needs.',
+      'From that single source it also emits a Tailwind v4 @theme block, a shadcn globals.css, an AI prompt and a machine-readable contract — pick the transport your project needs.',
     ],
     points: [
       NEUTRAL_POINT,
