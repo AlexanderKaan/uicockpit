@@ -624,6 +624,18 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
+/* Touch — floor the panel's own tap targets to the 44px WCAG 2.5.5 / Apple-HIG
+   target on a coarse pointer (mirrors the kit's globalLayer floor, for app chrome).
+   The 19px per-row Shuffle padlock is a deliberate exception — a tiny absolute
+   glyph that needs a hit-expanding pseudo, deferred to that careful pass. */
+@media (pointer: coarse) {
+  .fmrow__head,
+  .seg__opt,
+  .panel__shuffle,
+  .panel__reset { min-height: 44px; }
+  .seg__opt { display: flex; align-items: center; justify-content: center; }
+}
+
 /* === FontPicker — custom dropdown where each option is rendered in its
    own typeface (Google Fonts eager-loaded in index.html). Replaces the
    native <select> which could only show font names in the chrome font. */

@@ -195,6 +195,17 @@
 .topbar__icon-btn:hover:not(:disabled) { background: var(--app-hover); border-color: var(--app-fg-muted); color: var(--app-fg); }
 /* Disabled (undo/redo at the ends of history) — dimmed + inert, no hover. */
 .topbar__icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Touch — floor the top-bar controls to the 44px WCAG 2.5.5 / Apple-HIG target
+   on a coarse pointer. Desktop (fine pointer) keeps the dense chrome. The visual
+   height stays modest; min-height grows the tap area. */
+@media (pointer: coarse) {
+  .topbar__icon-btn,
+  .topbar__doc-link,
+  .topbar__btn,
+  .view-toggle__btn { min-height: 44px; }
+  .topbar__icon-btn { min-width: 44px; }
+}
 /* Saved-kits heart — turns favorite-red and shows a count once you've saved
    at least one kit, so the saved count is glanceable. */
 .kit-heart { position: relative; }
