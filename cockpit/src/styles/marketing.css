@@ -99,6 +99,19 @@
   justify-content: space-between;
   height: 60px;
 }
+/* Above the mobile breakpoint (where the links show), switch to a 3-column grid
+   so the middle links are centred on the page regardless of how wide the brand
+   vs the tools cluster are (space-between would float them left). Equal 1fr side
+   columns → the auto middle is dead-centre. On mobile the links are hidden and
+   the tools cluster is wider than a 1fr column, so stay on flex to avoid overlap. */
+@media (min-width: 561px) {
+  .mkt__nav-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+  }
+  .mkt__nav-inner > .mkt__brand { justify-self: start; }
+  .mkt__nav-inner > .mkt__nav-tools { justify-self: end; }
+}
 .mkt__brand {
   display: inline-flex;
   align-items: center;
