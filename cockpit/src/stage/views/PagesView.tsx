@@ -102,9 +102,10 @@ function ShowcaseStage({ m, appNav, width, onWidth }: { m: ShowcaseManifest; app
         </div>
       </div>
 
-      {/* The dock — a slim bottom toolbar with the width scrubber. Sized + centred
-       * to match the app preview above it, so the two read as one aligned block. */}
-      <div className="shc__dock" style={{ width, maxWidth: '100%' }}>
+      {/* The dock — a slim bottom toolbar with the width scrubber. Sized (same width
+       * clamp as the app shell) + left-aligned to match the app preview above it, so
+       * the two read as one aligned block at every width. */}
+      <div className="shc__dock" style={{ width, maxWidth: '100%', minWidth: appNav ? 680 : undefined }}>
         <label className="lyt__scrub shc__dock-scrub">
           <span className="lyt__scrub-label">Width</span>
           <input
