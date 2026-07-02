@@ -1046,11 +1046,11 @@
 }
 .shc__previewwrap {
   display: flex;
-  /* `safe center` centers when it fits but falls back to start when the showcase
-   * (min-width 680 on the Ledger shell) is wider than the frame — so on a small
-   * laptop / phone you get a correct, horizontally-scrollable desktop preview
-   * instead of the shell squeezing into a broken half-view. */
-  justify-content: safe center;
+  /* LEFT-align (not centre): the width dock below shares this exact left edge and
+   * grows to the right with the slider. Centring would re-centre the dock — and the
+   * slider lives IN it — under the cursor mid-drag, so the slider only jumped to the
+   * extremes. A stable left edge keeps the slider draggable AND the two aligned. */
+  justify-content: flex-start;
   overflow-x: auto;
   min-width: 0;
 }
@@ -1062,10 +1062,11 @@
   align-items: center;
   gap: var(--k-s-8);
   flex-wrap: wrap;
-  /* Match + centre under the app preview above (width set inline to the shell
-   * width, capped to the frame) so the bar and the app line up edge to edge. */
+  /* Match the app preview above (width set inline to the shell width, capped to the
+   * frame) and share its LEFT edge — so the bar and the app line up, and the slider
+   * inside doesn't shift under the cursor while you drag it. */
   box-sizing: border-box;
-  margin: var(--k-s-12) auto 0;
+  margin: var(--k-s-12) 0 0;
   padding: var(--k-s-8) var(--k-s-12);
   border: var(--k-bw) solid var(--k-border);
   border-radius: var(--k-radius-lg);
