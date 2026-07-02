@@ -180,6 +180,10 @@
   justify-content: center;
   width: 32px;
   height: var(--topbar-ctrl-h);
+  /* Never let a cramped topbar squash an icon button to nothing — on a phone the
+     "Show controls" toggle is the ONLY way into the configurator, and it was
+     collapsing to ~2px. Text buttons floor at their label; icon buttons must too. */
+  flex-shrink: 0;
   box-sizing: border-box;
   color: var(--app-fg-muted);
   border: 1px solid var(--app-border);

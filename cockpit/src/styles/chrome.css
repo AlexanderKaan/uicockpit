@@ -185,3 +185,12 @@
   /* View switcher → icon-only pills (labels off) to save the center column. */
   .topbar .view-toggle__lbl { display: none; }
 }
+
+/* Phones: the topbar is tight enough that non-collapsing icon buttons would
+ * overflow, so reclaim the Docs label (icon-only; Docs is also in the footer).
+ * This keeps the "Show controls" trigger — the only way into the configurator —
+ * at a real, tappable size instead of being squeezed to a sliver. */
+@media (max-width: 560px) {
+  .topbar .topbar__doc-link span { display: none; }
+  .topbar .topbar__doc-link { width: 32px; padding: 0; justify-content: center; }
+}
