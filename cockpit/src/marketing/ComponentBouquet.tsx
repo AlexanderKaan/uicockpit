@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { IconProvider } from '../icons/Icon'
 import { ComponentGallery } from '../stage/views/ComponentGallery'
 import { buildTokens } from '../tokens/buildTokens'
@@ -35,18 +35,33 @@ export function ComponentBouquet() {
   const [theme, setTheme] = useState<ColorTheme>('cobalt')
   const [userPicked, setUserPicked] = useState(false) // a manual pick takes over for good
   const [hovering, setHovering] = useState(false)      // pause while the visitor inspects
+  const [inView, setInView] = useState(false)          // only morph while the block is on screen
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  // Only cycle while the hero is actually in view. Otherwise it keeps advancing
+  // off-screen and a visitor who scrolls back up lands on a colour that changed
+  // behind their back (the "unexpected jump"). Pausing off-screen means they
+  // return to the exact colour they left, and it resumes morphing as they watch.
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') { setInView(true); return }
+    const io = new IntersectionObserver(([e]) => setInView(!!e?.isIntersecting), { threshold: 0.15 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   // Auto-morph (C6) — practice-what-you-preach: the hero cycles the kit through its
   // brand colours on its own, so a visitor SEES "your kit, any colour" without
-  // touching anything. Stops the moment they take control (pick) or hover to read,
-  // and never runs under prefers-reduced-motion. The dots advance with it.
-  const autoMorph = !userPicked && !hovering
+  // touching anything. Runs only while in view; stops the moment they take control
+  // (pick) or hover to read, and never under prefers-reduced-motion. Dots advance
+  // with it; the wall crossfades between colours (see .mkt__bouquet--morphing).
+  const autoMorph = !userPicked && !hovering && inView
   useEffect(() => {
     if (!autoMorph) return
     if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     const id = setInterval(() => {
       setTheme((cur) => SWITCH_THEMES[(SWITCH_THEMES.indexOf(cur) + 1) % SWITCH_THEMES.length]!)
-    }, 3200)
+    }, 2800)
     return () => clearInterval(id)
   }, [autoMorph])
 
@@ -63,12 +78,13 @@ export function ComponentBouquet() {
 
   return (
     <div
+      ref={wrapRef}
       className="mkt__bouquet-wrap"
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
       <div
-        className="cockpit-preview mkt__bouquet"
+        className={`cockpit-preview mkt__bouquet${autoMorph ? ' mkt__bouquet--morphing' : ''}`}
         style={THEME_VARS[theme]}
         role="region"
         aria-label="Interactive component preview — try the controls, then re-tint with the brand colours below"

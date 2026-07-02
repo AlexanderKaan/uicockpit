@@ -716,6 +716,24 @@
   width: calc(100% + 440px);
   margin-inline: -220px;
 }
+/* Crossfade the auto-morph: while the wall is cycling colours on its own, ease
+   every colour property so each swap glides instead of popping. Scoped to the
+   --morphing class (added only during auto-morph) so it's OFF the moment the
+   visitor hovers/interacts — sliders and switches keep their own snappy timing.
+   Skipped under reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .mkt__bouquet--morphing *,
+  .mkt__bouquet--morphing *::before,
+  .mkt__bouquet--morphing *::after {
+    transition:
+      background-color 450ms ease,
+      border-color 450ms ease,
+      color 450ms ease,
+      fill 450ms ease,
+      stroke 450ms ease,
+      box-shadow 450ms ease !important;
+  }
+}
 
 /* === Hero theme switcher — re-tint the whole wall live (CSS-var swap) ===
    Sits BELOW the wall (cleaner than crowding the CTA zone), 1.2× scale. */
