@@ -1062,7 +1062,10 @@
   align-items: center;
   gap: var(--k-s-8);
   flex-wrap: wrap;
-  margin-top: var(--k-s-12);
+  /* Match + centre under the app preview above (width set inline to the shell
+   * width, capped to the frame) so the bar and the app line up edge to edge. */
+  box-sizing: border-box;
+  margin: var(--k-s-12) auto 0;
   padding: var(--k-s-8) var(--k-s-12);
   border: var(--k-bw) solid var(--k-border);
   border-radius: var(--k-radius-lg);
