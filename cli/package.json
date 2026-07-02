@@ -1,6 +1,6 @@
 {
   "name": "uicockpit",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Apply and ENFORCE a UICockpit design system in any codebase — generate → apply → check. The wedge nobody else ships.",
   "type": "module",
   "bin": {
