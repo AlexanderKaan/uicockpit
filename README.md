@@ -19,7 +19,7 @@ your agent (CLI + MCP).
 [![Live kit CDN](https://img.shields.io/badge/CDN-kit.uicockpit.com-f38020?logo=cloudflare&logoColor=white)](https://kit.uicockpit.com)
 ![Price](https://img.shields.io/badge/price-%240%20forever-1ca85a)
 
-![UIcockpit — pick a style, get a coherent component system](docs/preview.png)
+![UIcockpit — ship AI apps that look designed, not generated: one design language, real components](docs/preview.png)
 
 </div>
 
