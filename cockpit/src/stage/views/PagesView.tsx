@@ -1,15 +1,13 @@
-import { Fragment, useMemo, useState, useRef, useLayoutEffect, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
+import { Fragment, useState, useRef, useLayoutEffect, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
 import { flushSync } from 'react-dom'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
 import { renderSection } from '../../showcases/sections'
-import { buildTokens } from '../../tokens/buildTokens'
 import type { Config } from '../../tokens/types'
 import { setGalleryJump } from '../../state/galleryJump'
 import { COMPONENTS, componentAt, elementAt } from '../../showcases/components'
 import { usesOf } from '../../kit/segments'
 import { CONTRACT, ROLE_GUARANTEE } from '../../kit/contracts'
-import { FoundationsView } from './FoundationsView'
 import { RoleCanvasDemo } from './RoleCanvasDemo'
 import type { ViewKind } from '../Stage'
 
@@ -89,7 +87,7 @@ const TYPE_LABELS: Record<string, string> = {
  * manifests.ts), rendered through the same kit recipes the export ships. The view
  * is deliberately content-first (Fase J-7): chips → preview, with every control
  * pushed into a slim bottom dock or one click away. Inspect turns the preview into
- * a continuous zoom — Page › Section › Atom › All tokens — with a breadcrumb spine.
+ * a continuous zoom — Page › Section › Atom — with a breadcrumb spine.
  */
 
 const PANE_CLASS = {
@@ -110,7 +108,7 @@ export interface AppNav {
   onNavigate: (id: string) => void
 }
 
-function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void; appNav?: AppNav; width: number; onWidth: (w: number) => void }) {
+function ShowcaseStage({ m, onViewChange, appNav, width, onWidth }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void; appNav?: AppNav; width: number; onWidth: (w: number) => void }) {
   // Width is OWNED by the parent (the one app) so it PERSISTS across screen
   // switches — the manifests share width 1200, but the slider value shouldn't snap
   // back on every nav click. Loupe/focus stay local (they SHOULD reset per screen).
@@ -118,16 +116,13 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
   // The loupe (Fase J-2): a continuous zoom Page › Section › Atom. `loupe` off is a
   // clean live page; turning it on reveals the breadcrumb and makes sections
   // pickable. Click a section → it isolates and enlarges (atoms inside clickable);
-  // click an atom → its specimen + recipe; All tokens → the foundation grid.
+  // click an atom → its specimen + recipe.
   // In a screen you are ALWAYS inspecting — no Inspect toggle. You reached this
   // screen by zooming in from the wall; selecting a component is the primary act.
   // (Hover reveals component bounds; click zooms in a level.)
   const loupe = true
   const [focus, setFocus] = useState<Focus>({ level: 'page' })
   const [railOpen, setRailOpen] = useState(true)
-  const [tokensOpen, setTokensOpen] = useState(false)
-  const [showJson, setShowJson] = useState(false)
-  const tokens = useMemo(() => buildTokens(cfg), [cfg])
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
   // Fase J-5 — Shells folded into the slider: a `suite`-nav showcase morphs its
   // navigation bar → rail → sidebar at the scaffold container's 600/1200px
@@ -192,39 +187,25 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
   }
 
   // The breadcrumb spine — one crumb per visited altitude, each a button that
-  // flies back out to its level. The All-tokens inspector (J3) appends as the
-  // deepest rung whenever it's open.
+  // flies back out to its level.
   const crumbs: Array<{ label: string; go: () => void; on: boolean }> = [
-    { label: `Page · ${m.title}`, go: () => { setTokensOpen(false); setFocus({ level: 'page' }) }, on: !tokensOpen && focus.level === 'page' },
+    { label: `Page · ${m.title}`, go: () => setFocus({ level: 'page' }), on: focus.level === 'page' },
   ]
   if (sInfo && focus.level !== 'page') {
     const { pane, idx } = focus
-    crumbs.push({ label: `Section · ${sInfo.label}`, go: () => { setTokensOpen(false); setFocus({ level: 'section', pane, idx }) }, on: !tokensOpen && focus.level === 'section' })
+    crumbs.push({ label: `Section · ${sInfo.label}`, go: () => setFocus({ level: 'section', pane, idx }), on: focus.level === 'section' })
   }
-  if (focus.level === 'atom') crumbs.push({ label: `Atom · ${focus.label ?? comp?.label ?? focus.comp}`, go: () => setTokensOpen(false), on: !tokensOpen && focus.level === 'atom' })
-  if (tokensOpen) crumbs.push({ label: 'All tokens', go: () => {}, on: true })
+  if (focus.level === 'atom') crumbs.push({ label: `Atom · ${focus.label ?? comp?.label ?? focus.comp}`, go: () => {}, on: focus.level === 'atom' })
 
   const hint =
-    tokensOpen ? 'Every resolved token — the foundation behind the kit'
-      : focus.level === 'page' ? 'Click any section to zoom in'
-        : focus.level === 'section' ? 'Click any element to drill to its atom'
-          : 'Deepest atom level'
+    focus.level === 'page' ? 'Click any section to zoom in'
+      : focus.level === 'section' ? 'Click any element to drill to its atom'
+        : 'Deepest atom level'
 
-  const stageKey = `${tokensOpen ? 'tokens' : focus.level}-${focus.level !== 'page' ? `${focus.pane}.${focus.idx}` : ''}-${focus.level === 'atom' ? focus.comp : ''}`
+  const stageKey = `${focus.level}-${focus.level !== 'page' ? `${focus.pane}.${focus.idx}` : ''}-${focus.level === 'atom' ? focus.comp : ''}`
   const sectionCount = m.panes.reduce((n, p) => n + p.sections.length, 0)
   const caption = `${ARCH_LABEL[m.archetype] ?? m.archetype} · ${m.nav === 'suite' ? 'adaptive nav' : 'top nav'}`
-  const showWidth = !loupe || (focus.level === 'page' && !tokensOpen)
-
-  // Export-as-starter: the manifest IS the starter — download it as JSON.
-  const downloadManifest = () => {
-    const blob = new Blob([JSON.stringify(m, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${m.id}.manifest.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  const showWidth = !loupe || focus.level === 'page'
 
   return (
     <>
@@ -246,41 +227,32 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
       )}
 
       {/* The stage — the preview floats, centred on the canvas; rail beside it when inspecting. */}
-      <div className={`lyt__stage shc__loupebody ${loupe && railOpen && !tokensOpen ? 'shc__loupebody--rail' : ''}`}>
+      <div className={`lyt__stage shc__loupebody ${loupe && railOpen ? 'shc__loupebody--rail' : ''}`}>
         <div className="shc__loupestage" key={stageKey}>
-          {tokensOpen ? (
-            <FoundationsView cfg={cfg} tokens={tokens} />
-          ) : (
-            <>
-              {(!loupe || focus.level === 'page') && (
-                <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickComp : undefined} onMouseOver={loupe ? hoverComp : undefined} onMouseLeave={loupe ? () => setHot(null) : undefined}>
-                  <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} appNav={appNav} />
-                </div>
-              )}
-              {loupe && focus.level === 'section' && section && (
-                <div className="shc__focusblock" onClick={pickAtom}>
-                  {renderSection(section, focus.idx)}
-                </div>
-              )}
-              {loupe && focus.level === 'atom' && (
-                atomNode
-                  ? <div className="shc__atomstage" ref={(r) => { if (r && atomNode) r.replaceChildren(atomNode) }} />
-                  : comp ? <div className="shc__atomstage">{comp.specimen()}</div> : null
-              )}
-            </>
+          {(!loupe || focus.level === 'page') && (
+            <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickComp : undefined} onMouseOver={loupe ? hoverComp : undefined} onMouseLeave={loupe ? () => setHot(null) : undefined}>
+              <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} appNav={appNav} />
+            </div>
+          )}
+          {loupe && focus.level === 'section' && section && (
+            <div className="shc__focusblock" onClick={pickAtom}>
+              {renderSection(section, focus.idx)}
+            </div>
+          )}
+          {loupe && focus.level === 'atom' && (
+            atomNode
+              ? <div className="shc__atomstage" ref={(r) => { if (r && atomNode) r.replaceChildren(atomNode) }} />
+              : comp ? <div className="shc__atomstage">{comp.specimen()}</div> : null
           )}
         </div>
 
-        {loupe && railOpen && !tokensOpen && (
+        {loupe && railOpen && (
           <aside className="shc__loupe-rail" aria-label="Loupe inspector">
             {focus.level === 'page' && (
               <>
                 <RoleCanvasDemo />
                 <div className="rcx-divider" />
                 <p className="shc__loupe-blurb">Or drill the page itself: {sectionCount} sections across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any element to zoom into its contract.</p>
-                <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>
-                  All tokens <Icon name="chevR" />
-                </button>
               </>
             )}
             {focus.level === 'section' && sInfo && (
@@ -330,9 +302,6 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
                   </details>
                 )}
                 <div className="shc__loupe-actions">
-                  <button type="button" className="btn btn--outline btn--xs" onClick={() => setTokensOpen(true)}>
-                    All tokens <Icon name="chevR" />
-                  </button>
                   <button
                     type="button"
                     className="btn btn--ghost btn--xs"
@@ -374,27 +343,12 @@ function ShowcaseStage({ m, cfg, onViewChange, appNav, width, onWidth }: { m: Sh
           </label>
         )}
         <span className="shc__dock-spacer" />
-        {loupe && !tokensOpen && (
+        {loupe && (
           <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={railOpen} onClick={() => setRailOpen((o) => !o)}>
             {railOpen ? 'Hide recipe' : 'Show recipe'}
           </button>
         )}
-        {loupe && (
-          <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={tokensOpen} onClick={() => setTokensOpen((o) => !o)}>
-            <Icon name="grid" />All tokens
-          </button>
-        )}
-        <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={showJson} onClick={() => setShowJson((o) => !o)}>
-          <Icon name="file" />JSON
-        </button>
-        <button type="button" className="btn btn--ghost btn--icon btn--sm" onClick={downloadManifest} aria-label="Download manifest" title="Download manifest">
-          <Icon name="upload" />
-        </button>
       </div>
-
-      {showJson && (
-        <pre className="code shc__manifest" aria-label={`Manifest for ${m.title}`}>{JSON.stringify(m, null, 2)}</pre>
-      )}
     </>
   )
 }

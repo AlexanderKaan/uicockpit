@@ -38,9 +38,6 @@ const GALLERY_FILES = [
   'src/stage/views/ComponentGallery.tsx',
   'src/stage/views/ChartFrame.tsx',
   'src/stage/views/apps/AppHelpers.tsx',
-  // The Foundations stage view demonstrates foundation-tier recipes (the layout
-  // primitives + their .l-center--narrow/--wide modifiers) — a real demo surface.
-  'src/stage/views/FoundationsView.tsx',
 ]
 // App = the manifest-driven showcase renderer (H3c — SupaDash retired); sections.tsx
 // composes EXPORTED kit recipes only. (PagesView is workbench chrome, not "app".)
