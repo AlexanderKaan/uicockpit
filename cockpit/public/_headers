@@ -1,0 +1,18 @@
+# Cloudflare Pages cache policy.
+#
+# The service worker and the HTML shell must NEVER be pinned by the CDN/browser,
+# so a fresh deploy is picked up on the next visit: the SW update check always
+# revalidates sw.js, sees the new build, and `registerType: 'autoUpdate'` swaps
+# the app. (Default Pages policy cached sw.js for 4h, which delayed that.)
+#
+# Content-hashed assets (…-<hash>.js/.css) carry the build hash in their name, so
+# they can be cached forever — a new build ships new filenames.
+
+/sw.js
+  Cache-Control: no-cache
+
+/index.html
+  Cache-Control: no-cache
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
