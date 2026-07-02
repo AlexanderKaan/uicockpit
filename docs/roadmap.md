@@ -16,7 +16,7 @@ Legend: ✅ shipped & live · 🚧 in progress · ⏭ next · 🔭 exploring
   (Clean, Precision, Minimal, Refined…) and make it yours.
 - **Framework-neutral tokens** — everything exports as plain `--k-*` CSS variables that
   drop into plain HTML, React, Vue, Svelte, Tailwind, shadcn — anything.
-- **100+ component recipes** — real per-component CSS (buttons, inputs, dialogs, tables,
+- **100+ components** — real per-component recipes (buttons, inputs, dialogs, tables,
   charts, nav…) with full hover / focus / disabled state contracts, not just tokens.
 - **The hosted live kit** — `kit.uicockpit.com/k/<key>.css`, byte-identical to the file
   you'd download, so the `<link>` and the export never disagree.

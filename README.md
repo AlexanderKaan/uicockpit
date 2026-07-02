@@ -6,8 +6,8 @@
 
 **Configure a design language once — then your coding agent builds on it, and
 `uicockpit check` makes sure it *stays* on it.** Framework-neutral `--k-*` tokens +
-100+ component recipes, delivered as a hosted `<link>`, a download, or natively inside
-your agent (CLI + MCP).
+100+ components (real recipes with state contracts), delivered as a hosted `<link>`, a
+download, or natively inside your agent (CLI + MCP).
 
 **Free · no account · paste it anywhere.**
 
@@ -92,7 +92,7 @@ Give your coding agent the system **and** the guardrail, no copy-paste:
 ```bash
 npx uicockpit init <kit-hash>   # writes tokens.css + contract.json + AGENTS.md
 #  → your agent builds with the --k-* tokens and the house rules
-npx uicockpit check             # verifies nothing drifted from the contract — the moat
+npx uicockpit check --strict    # fails on any drift from the contract — the moat
 ```
 
 Or run it as an **MCP server** (Claude Code, Cursor, Windsurf, Claude Desktop):
@@ -127,8 +127,8 @@ it, and check itself.
 - **250+ design tokens** — OKLCH colour ramps (contrast-clamped to WCAG), a type scale
   with weight + label-case control, spacing grid, radii, shadows, a 3-tier motion system,
   a brand-harmonised multi-hue chart/avatar palette.
-- **100+ component recipes** — all token-driven, all with real state contracts, shipped in
-  `tokens.css` and over the CDN.
+- **100+ components** — real per-component recipes, all token-driven, all with full
+  hover/focus/disabled state contracts, shipped in `tokens.css` and over the CDN.
 - **Coherence guarantees** — the foundation self-corrects incoherent control combinations
   (height harmony, surface separation, type-density contrast) and a WCAG contrast check is
   baked in, so the kit you configure is always shippable.

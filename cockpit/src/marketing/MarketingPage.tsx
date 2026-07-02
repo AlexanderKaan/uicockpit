@@ -184,8 +184,8 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             <div className="mkt__loop-card">
               <span className="mkt__loop-step"><ShieldCheck size={18} strokeWidth={1.9} /> Verify</span>
               <p>
-                Run <code>npx uicockpit check</code>. It catches a hardcoded hex, off-grid spacing,
-                or the wrong token — so what the agent ships stays coherent, screen after screen.
+                Run <code>npx uicockpit check --strict</code>. It fails on a hardcoded hex, off-grid
+                spacing, or the wrong token — so what the agent ships stays coherent, screen after screen.
               </p>
             </div>
           </div>
@@ -493,7 +493,7 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
                 <h3>CLI — generate → apply → check</h3>
               </div>
               <pre className="mkt__kit-code"><code>{`npx uicockpit init <hash>
-npx uicockpit check`}</code></pre>
+npx uicockpit check --strict`}</code></pre>
               <p>
                 Pulls your kit (tokens + a machine-readable contract), then verifies the
                 code conforms — the loop nobody else ships.

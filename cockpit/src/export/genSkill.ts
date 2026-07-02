@@ -82,12 +82,14 @@ UI edit, run the verifier against this pack's \`contract.json\` and treat a viol
 failing test — fix it before you move on:
 
 \`\`\`bash
-npx uicockpit check          # or, over MCP: call the check_conformance tool
+npx uicockpit check --strict   # or, over MCP: call check_conformance with strict: true
 \`\`\`
 
 It flags hardcoded hex, off-grid spacing, magic px and wrong tokens. Re-run until clean.
+Use \`--strict\` (above) so that style drift — a raw hex, off-grid spacing, an off-scale radius —
+also fails, not only broken references; without it those are warnings you can miss.
 
-**Make it automatic** so coherence survives a fresh context window: add \`npx uicockpit check\`
+**Make it automatic** so coherence survives a fresh context window: add \`npx uicockpit check --strict\`
 as a **pre-commit hook and/or a CI step**. That turns "please use the token" into a check that
 **fails the build** on drift — the only thing that reliably holds across many screens, sessions
 and hands.
