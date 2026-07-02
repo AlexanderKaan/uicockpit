@@ -101,10 +101,11 @@ Or run it as an **MCP server** (Claude Code, Cursor, Windsurf, Claude Desktop):
 { "mcpServers": { "uicockpit": { "command": "npx", "args": ["-y", "uicockpit-mcp"] } } }
 ```
 
-Three tools: **`install_kit`** (pull the kit) · **`get_design_context`** (the kit's
+Four tools: **`create_kit`** (generate a kit from a brief — brand, radius, density) ·
+**`install_kit`** (pull it into the project) · **`get_design_context`** (the kit's
 *grammar* — tokens + component anatomy + composition rules + intent routing) ·
-**`check_conformance`** (verify the output). The agent learns your language, builds on it,
-and checks itself.
+**`check_conformance`** (verify the output). The agent can spin up your language, build on
+it, and check itself.
 
 → [`uicockpit` CLI](./cli/README.md) · [`uicockpit-mcp`](./mcp/README.md)
 
@@ -131,8 +132,10 @@ and checks itself.
 - **Coherence guarantees** — the foundation self-corrects incoherent control combinations
   (height harmony, surface separation, type-density contrast) and a WCAG contrast check is
   baked in, so the kit you configure is always shippable.
-- **7 export formats** + a live preview on a real app and a full component gallery — change
-  one control, watch the whole thing move.
+- **Many outputs from one config** — `tokens.css`, `tokens.json`, a Tailwind v4 `@theme`
+  block, shadcn/ui `globals.css`, plus the machine-readable `contract.json`, agent rules,
+  and a full `design.md` — with a live preview on a real app and a full component gallery:
+  change one control, watch the whole thing move.
 
 ---
 
