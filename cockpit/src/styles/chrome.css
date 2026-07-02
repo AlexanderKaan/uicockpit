@@ -141,11 +141,25 @@
 .app__docs .docs { padding-top: 28px; }
 .app__docs .docs__toc { top: 20px; max-height: calc(100vh - 120px); }
 
+/* === Tablet + mobile (≤1024px) — declutter the top bar ========================
+ * The full desktop topbar (undo/redo, saved kits, share, the a11y badge, the
+ * brand wordmark) overcrowds a tablet long BEFORE the phone drawer kicks in.
+ * Shed the secondary controls early so brand · nav · the primary CTA stay clear.
+ * The side panel stays put here — only phones (below) collapse it to a drawer.
+ * Prefixed with .topbar to outrank the base single-class display rules. */
+@media (max-width: 1024px) {
+  .topbar { padding: 8px 12px; gap: 8px; }
+  .topbar .topbar__brand-name,
+  .topbar .a11y-badge-wrap,
+  .topbar .kits-pop-wrap,
+  .topbar .topbar__icon-btn--hist,
+  .topbar .topbar__btn--with-icon { display: none; }
+}
+
 /* === Mobile (≤768px) — phone layout ===========================================
  * The desktop shell is a two-column row (panel | stage). On a phone that shoves
  * the stage off-screen, so the panel becomes a slide-in DRAWER overlaying the
- * stage (shadcn-style: hamburger → sheet), and the top bar sheds its secondary
- * controls so nothing overlaps. */
+ * stage (shadcn-style: hamburger → sheet). */
 @media (max-width: 768px) {
   /* Panel → drawer, absolutely placed within the (position:relative) body so it
    * sits exactly under the top bar and over the full-width stage. */
@@ -174,14 +188,6 @@
   }
   @keyframes app-scrim-in { from { opacity: 0; } to { opacity: 1; } }
 
-  /* Top bar — drop the secondary controls so brand · nav · primary CTA fit.
-   * Prefixed with .topbar to outrank the base single-class display rules. */
-  .topbar { padding: 8px 12px; gap: 8px; }
-  .topbar .topbar__brand-name,
-  .topbar .a11y-badge-wrap,
-  .topbar .kits-pop-wrap,
-  .topbar .topbar__icon-btn--hist,
-  .topbar .topbar__btn--with-icon { display: none; }
   /* View switcher → icon-only pills (labels off) to save the center column. */
   .topbar .view-toggle__lbl { display: none; }
 }
