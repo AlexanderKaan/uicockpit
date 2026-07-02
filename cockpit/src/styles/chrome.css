@@ -200,3 +200,51 @@
   .topbar .topbar__doc-link span { display: none; }
   .topbar .topbar__doc-link { width: 32px; padding: 0; justify-content: center; }
 }
+
+/* === Mobile bottom control bar (phones) — thumb-zone entry to the configurator ==
+ * A fixed bar (Customize · Shuffle · Use kit) in easy thumb reach, mirroring the
+ * bottom-sheet pattern. Hidden on desktop and while the drawer is open — the open
+ * drawer carries its own controls, so the bar would be redundant there. */
+.app__mobilebar { display: none; }
+.app__mobilebar-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-bg);
+  color: var(--app-fg);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.app__mobilebar-btn svg { color: var(--app-fg-muted); }
+.app__mobilebar-btn--primary {
+  background: var(--app-fg);
+  border-color: var(--app-fg);
+  color: var(--app-surface);
+}
+.app__mobilebar-btn--primary svg { color: var(--app-surface); }
+
+@media (max-width: 768px) {
+  .app--menu-closed .app__mobilebar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    gap: 8px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+    background: var(--app-surface);
+    border-top: 1px solid var(--app-border);
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.06);
+  }
+  /* Keep the last of the stage clear of the fixed bar. */
+  .app--menu-closed .app__body { padding-bottom: 68px; }
+}

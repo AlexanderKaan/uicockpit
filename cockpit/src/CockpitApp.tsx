@@ -3,6 +3,7 @@ import { buildTokens } from './tokens/buildTokens'
 import { Panel } from './panel/Panel'
 import { Stage, type ViewKind } from './stage/Stage'
 import { Topbar } from './stage/Topbar'
+import { MobileControlBar } from './stage/MobileControlBar'
 import { CommandPalette } from './stage/CommandPalette'
 import { useConfig } from './state/useConfig'
 import { randomKit } from './state/randomKit'
@@ -182,6 +183,13 @@ export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps 
           </>
         )}
       </div>
+      {!docsActive && (
+        <MobileControlBar
+          onCustomize={() => setMenuOpen(true)}
+          onShuffle={onRandomize}
+          onExport={() => setExportOpen(true)}
+        />
+      )}
       {exportOpen && (
         <Suspense fallback={null}>
           <ExportModal
