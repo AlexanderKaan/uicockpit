@@ -3,21 +3,6 @@ import { flushSync } from 'react-dom'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
 import { renderSection } from '../../showcases/sections'
-import type { Config } from '../../tokens/types'
-import { setGalleryJump } from '../../state/galleryJump'
-import { COMPONENTS, componentAt, elementAt } from '../../showcases/components'
-import { usesOf } from '../../kit/segments'
-import { CONTRACT, ROLE_GUARANTEE } from '../../kit/contracts'
-import { RoleCanvasDemo } from './RoleCanvasDemo'
-import type { ViewKind } from '../Stage'
-
-/* Component → gallery tier guess for the specimen's "Open in gallery" jump
- * (Fase J-1). componentAt returns a kit-class id; the component-tier patterns jump
- * to the Components wall, the rest default to Atoms. */
-const COMP_TIER: Record<string, 'atom' | 'component'> = {
-  stat: 'component', table: 'component', card: 'component', chart: 'component', kanban: 'component',
-  pricing: 'component', tree: 'component', timeline: 'component', dropzone: 'component',
-}
 
 /* Manifest section kind → graph wiring (Fase J-2). The manifest uses short names
  * ('stats', 'table'); the segment graph (segments.ts) + the gallery use canonical
@@ -61,25 +46,6 @@ const ARCH_LABEL: Record<string, string> = {
   workspace: 'Workspace',
 }
 
-/* The loupe's altitude. page → section → atom is a continuous zoom; each level is
- * a breadcrumb crumb you can click to fly back out (Fase J-2). */
-type Focus =
-  | { level: 'page' }
-  | { level: 'section'; pane: number; idx: number }
-  // `node` = a CLONE of the LIVE element you clicked (mounted isolated, so anything
-  // is zoomable without a curated specimen — and a cloned node, not an HTML string,
-  // so there's no innerHTML/XSS surface). `comp` is its resolved type (for the
-  // recipe/contract); `label` its display name (may not be in COMPONENTS).
-  | { level: 'atom'; pane: number; idx: number; comp: string; node?: HTMLElement; label?: string }
-
-/** Display names for the chrome/structural types that have no curated COMPONENTS
- *  spec — so the breadcrumb + rail still read nicely when you zoom into the nav. */
-const TYPE_LABELS: Record<string, string> = {
-  sidenav: 'Sidebar', navsuite: 'Navigation', appbar: 'Topbar', banner: 'Banner',
-  alert: 'Alert', select: 'Select', calendar: 'Calendar', segmented: 'Segmented control',
-  component: 'Component',
-}
-
 /**
  * Pages — the loupe (H3b manifest model · Fase J).
  *
@@ -108,246 +74,58 @@ export interface AppNav {
   onNavigate: (id: string) => void
 }
 
-function ShowcaseStage({ m, onViewChange, appNav, width, onWidth }: { m: ShowcaseManifest; cfg: Config; onViewChange: (v: ViewKind) => void; appNav?: AppNav; width: number; onWidth: (w: number) => void }) {
-  // Width is OWNED by the parent (the one app) so it PERSISTS across screen
-  // switches — the manifests share width 1200, but the slider value shouldn't snap
-  // back on every nav click. Loupe/focus stay local (they SHOULD reset per screen).
+function ShowcaseStage({ m, appNav, width, onWidth }: { m: ShowcaseManifest; appNav?: AppNav; width: number; onWidth: (w: number) => void }) {
+  // Width is OWNED by the parent (the one app) so it PERSISTS across screen switches.
   const setWidth = onWidth
-  // The loupe (Fase J-2): a continuous zoom Page › Section › Atom. `loupe` off is a
-  // clean live page; turning it on reveals the breadcrumb and makes sections
-  // pickable. Click a section → it isolates and enlarges (atoms inside clickable);
-  // click an atom → its specimen + recipe.
-  // In a screen you are ALWAYS inspecting — no Inspect toggle. You reached this
-  // screen by zooming in from the wall; selecting a component is the primary act.
-  // (Hover reveals component bounds; click zooms in a level.)
-  const loupe = true
-  const [focus, setFocus] = useState<Focus>({ level: 'page' })
-  const [railOpen, setRailOpen] = useState(true)
+  // Fase J-9 — the showcase is a REAL, interactive app: the sidebar switches screens,
+  // invoice rows open the detail, menus open. Inspecting a component's contract lives
+  // in the Components tab now, so the two concerns never fight — no in-app drill or
+  // selection overlay here, nothing masquerades as a component's selected state.
   const wc = width < 600 ? 'Compact' : width < 840 ? 'Medium' : width < 1200 ? 'Expanded' : width < 1600 ? 'Large' : 'Extra-large'
-  // Fase J-5 — Shells folded into the slider: a `suite`-nav showcase morphs its
-  // navigation bar → rail → sidebar at the scaffold container's 600/1200px
-  // breakpoints (see the `@container scaffold` queries in recipes).
+  // A `suite`-nav showcase morphs its navigation bar → rail → sidebar at the scaffold
+  // container's 600/1200px breakpoints (the `@container scaffold` queries in recipes).
   const navState = m.nav === 'suite' ? (width < 600 ? 'Bottom bar' : width < 1200 ? 'Rail' : 'Sidebar') : null
-
-  const section = focus.level !== 'page' ? m.panes[focus.pane]?.sections[focus.idx] : undefined
-  const sInfo = section ? sectionInfo(section.kind) : undefined
-  const comp = focus.level === 'atom' ? COMPONENTS[focus.comp] : undefined
-  const atomNode = focus.level === 'atom' ? focus.node : undefined
-  const atomLabel = focus.level === 'atom' ? (focus.label ?? comp?.label ?? focus.comp) : ''
-
-  // Page → Section: walk up from the clicked node to the section wrapper (carries
-  // its pane/idx as data-attrs), then isolate it.
-  // Each level change animates as a continuous zoom (View Transitions) instead of
-  // an instant swap — so wall→screen→component→atom all FEEL like zooming further
-  // in. .shc--app drops its `shc-zoom` name outside the wall morph (the `zooming`
-  // flag in PagesView), so these inner transitions are clean root crossfades.
-  const vt = (mutate: () => void) => {
-    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
-    if (!doc.startViewTransition) { mutate(); return }
-    doc.startViewTransition(() => flushSync(mutate))
-  }
-  // Per-component picking: hovering outlines the EXACT component under the cursor
-  // (table / chart / card / badge…); clicking zooms straight into it. The
-  // containing manifest section is recorded so the breadcrumb keeps its context
-  // (and the Section crumb zooms out to the whole block).
-  const hotRef = useRef<HTMLElement | null>(null)
-  const setHot = (el: HTMLElement | null) => {
-    if (hotRef.current === el) return
-    if (hotRef.current) hotRef.current.classList.remove('shc__comp-hot')
-    hotRef.current = el
-    if (el) el.classList.add('shc__comp-hot')
-  }
-  const hoverComp = (e: ReactMouseEvent) => setHot(elementAt(e.target as Element))
-  // Zoom into the LIVE element you clicked — captured + rendered isolated, so
-  // ANYTHING is zoomable (nav, topbar, banner…) without a curated specimen.
-  // componentAt resolves the TYPE (for the recipe/contract); the outerHTML is the
-  // specimen; TYPE_LABELS / COMPONENTS give the display name.
-  const zoomToComponent = (target: Element, pane: number, idx: number) => {
-    const el = elementAt(target)
-    if (!el) return
-    const id = componentAt(target) ?? 'component'
-    const node = el.cloneNode(true) as HTMLElement
-    node.classList.remove('shc__comp-hot')
-    const label = COMPONENTS[id]?.label ?? TYPE_LABELS[id] ?? id
-    setHot(null)
-    vt(() => setFocus({ level: 'atom', pane, idx, comp: id, node, label }))
-  }
-  const pickComp = (e: ReactMouseEvent) => {
-    let el = e.target as HTMLElement | null, pane = 0, idx = 0
-    while (el && el !== e.currentTarget) {
-      if (el.dataset && el.dataset.idx != null) { pane = +el.dataset.pane!; idx = +el.dataset.idx; break }
-      el = el.parentElement
-    }
-    zoomToComponent(e.target as Element, pane, idx)
-  }
-  // Section → Atom: the existing leaf-pick, now scoped to the isolated section.
-  const pickAtom = (e: ReactMouseEvent) => {
-    if (focus.level !== 'section') return
-    zoomToComponent(e.target as Element, focus.pane, focus.idx)
-  }
-
-  // The breadcrumb spine — one crumb per visited altitude, each a button that
-  // flies back out to its level.
-  const crumbs: Array<{ label: string; go: () => void; on: boolean }> = [
-    { label: `Page · ${m.title}`, go: () => setFocus({ level: 'page' }), on: focus.level === 'page' },
-  ]
-  if (sInfo && focus.level !== 'page') {
-    const { pane, idx } = focus
-    crumbs.push({ label: `Section · ${sInfo.label}`, go: () => setFocus({ level: 'section', pane, idx }), on: focus.level === 'section' })
-  }
-  if (focus.level === 'atom') crumbs.push({ label: `Atom · ${focus.label ?? comp?.label ?? focus.comp}`, go: () => {}, on: focus.level === 'atom' })
-
-  const hint =
-    focus.level === 'page' ? 'Click any section to zoom in'
-      : focus.level === 'section' ? 'Click any element to drill to its atom'
-        : 'Deepest atom level'
-
-  const stageKey = `${focus.level}-${focus.level !== 'page' ? `${focus.pane}.${focus.idx}` : ''}-${focus.level === 'atom' ? focus.comp : ''}`
-  const sectionCount = m.panes.reduce((n, p) => n + p.sections.length, 0)
   const caption = `${ARCH_LABEL[m.archetype] ?? m.archetype} · ${m.nav === 'suite' ? 'adaptive nav' : 'top nav'}`
-  const showWidth = !loupe || focus.level === 'page'
 
   return (
     <>
-      {/* Context line — the breadcrumb spine when inspecting, else a quiet caption. */}
-      {loupe ? (
-        <nav className="shc__loupebar" aria-label="Zoom level">
-          <div className="shc__crumbs">
-            {crumbs.map((c, i) => (
-              <span key={i} className="shc__crumb-wrap">
-                {i > 0 && <span className="shc__crumb-sep" aria-hidden>›</span>}
-                <button type="button" className={`shc__crumb ${c.on ? 'shc__crumb--on' : ''}`} onClick={() => vt(c.go)} aria-current={c.on ? 'true' : undefined}>{c.label}</button>
-              </span>
-            ))}
+      {/* A quiet caption — the showcase is a real, interactive app; inspect a
+          component's contract over in the Components tab. */}
+      <p className="shc__caption">{caption}</p>
+
+      {/* The stage — the live, interactive app, centred on the canvas. */}
+      <div className="lyt__stage shc__loupebody">
+        <div className="shc__loupestage">
+          <div className="shc__previewwrap">
+            <ShowcaseShell m={m} width={width} appNav={appNav} />
           </div>
-          <span className="shc__loupehint">{hint}</span>
-        </nav>
-      ) : (
-        <p className="shc__caption">{caption}</p>
-      )}
-
-      {/* The stage — the preview floats, centred on the canvas; rail beside it when inspecting. */}
-      <div className={`lyt__stage shc__loupebody ${loupe && railOpen ? 'shc__loupebody--rail' : ''}`}>
-        <div className="shc__loupestage" key={stageKey}>
-          {(!loupe || focus.level === 'page') && (
-            <div className={`shc__previewwrap ${loupe ? 'shc__pickpage' : ''}`} onClick={loupe ? pickComp : undefined} onMouseOver={loupe ? hoverComp : undefined} onMouseLeave={loupe ? () => setHot(null) : undefined}>
-              <ShowcaseShell m={m} width={loupe ? Math.min(width, 1100) : width} pickable={loupe} appNav={appNav} />
-            </div>
-          )}
-          {loupe && focus.level === 'section' && section && (
-            <div className="shc__focusblock" onClick={pickAtom}>
-              {renderSection(section, focus.idx)}
-            </div>
-          )}
-          {loupe && focus.level === 'atom' && (
-            atomNode
-              ? <div className="shc__atomstage" ref={(r) => { if (r && atomNode) r.replaceChildren(atomNode) }} />
-              : comp ? <div className="shc__atomstage">{comp.specimen()}</div> : null
-          )}
         </div>
-
-        {loupe && railOpen && (
-          <aside className="shc__loupe-rail" aria-label="Loupe inspector">
-            {focus.level === 'page' && (
-              <>
-                <RoleCanvasDemo />
-                <div className="rcx-divider" />
-                <p className="shc__loupe-blurb">Or drill the page itself: {sectionCount} sections across {m.panes.length} {m.panes.length === 1 ? 'pane' : 'panes'}. Click any element to zoom into its contract.</p>
-              </>
-            )}
-            {focus.level === 'section' && sInfo && (
-              <>
-                <div className="shc__loupe-head">Section · {sInfo.label}</div>
-                <p className="shc__loupe-blurb">Composes these atoms — click any element to drill into it:</p>
-                <ul className="shc__uses">
-                  {(usesOf(sInfo.seg).length ? usesOf(sInfo.seg) : ['(self-contained)']).map((u) => <li key={u}>{u}</li>)}
-                </ul>
-                <button
-                  type="button"
-                  className="btn btn--outline btn--xs"
-                  onClick={() => { setGalleryJump(sInfo.jump.q, sInfo.jump.tier); onViewChange('components') }}
-                >
-                  Open in gallery <Icon name="chevR" />
-                </button>
-              </>
-            )}
-            {focus.level === 'atom' && (
-              <>
-                <div className="shc__loupe-head">Contract · {atomLabel}</div>
-                {CONTRACT[focus.comp] ? (
-                  <>
-                    <p className="shc__contract-intro">Each part wears a <strong>role</strong>; the role guarantees its treatment — so this composes coherently anywhere.</p>
-                    <ul className="shc__contract">
-                      {CONTRACT[focus.comp]!.map((p, i) => (
-                        <li className="shc__contract-row" key={i}>
-                          <span className="shc__contract-n">{i + 1}</span>
-                          <span className="shc__contract-body">
-                            <span className="shc__contract-head"><strong>{p.part}</strong> <span className={`shc__role shc__role--${p.role}`}>{p.role}</span></span>
-                            <span className="shc__contract-gtee">{ROLE_GUARANTEE[p.role]}</span>
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                ) : (
-                  <p className="shc__loupe-blurb">A live component, captured from the screen — its roles aren’t contracted yet.</p>
-                )}
-                {comp && (
-                  <details className="shc__recipe-more">
-                    <summary className="shc__recipe-summary">Recipe — how it derives</summary>
-                    {comp.recipe.map(([k, v]) => (
-                      <div className="shc__recipe-row" key={k}><span className="shc__recipe-k">{k}</span><code className="shc__recipe-v">{v}</code></div>
-                    ))}
-                    <div className="shc__recipe-blurb">{comp.blurb}</div>
-                  </details>
-                )}
-                <div className="shc__loupe-actions">
-                  <button
-                    type="button"
-                    className="btn btn--ghost btn--xs"
-                    onClick={() => { setGalleryJump((comp?.label ?? atomLabel).toLowerCase(), COMP_TIER[focus.comp] ?? 'atom'); onViewChange('components') }}
-                  >
-                    Open in gallery
-                  </button>
-                </div>
-              </>
-            )}
-          </aside>
-        )}
       </div>
 
       {/* The dock — a slim bottom toolbar. Width on the left (the old header
        * scrubber, demoted); the actions on the right. Everything that used to
        * stack above the preview now lives here, out of the content's way. */}
       <div className="shc__dock">
-        {showWidth && (
-          <label className="lyt__scrub shc__dock-scrub">
-            <span className="lyt__scrub-label">Width</span>
-            <input
-              type="range"
-              min={360}
-              max={1680}
-              step={10}
-              value={width}
-              list="shc-win-detents"
-              onChange={(e) => setWidth(+e.target.value)}
-              aria-label="Shell width in pixels"
-            />
-            <datalist id="shc-win-detents">
-              <option value={600} />
-              <option value={840} />
-              <option value={1200} />
-              <option value={1600} />
-            </datalist>
-            <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong>{navState && <> · {navState}</>}</span>
-          </label>
-        )}
-        <span className="shc__dock-spacer" />
-        {loupe && (
-          <button type="button" className="btn btn--ghost btn--sm btn--toggle" aria-pressed={railOpen} onClick={() => setRailOpen((o) => !o)}>
-            {railOpen ? 'Hide recipe' : 'Show recipe'}
-          </button>
-        )}
+        <label className="lyt__scrub shc__dock-scrub">
+          <span className="lyt__scrub-label">Width</span>
+          <input
+            type="range"
+            min={360}
+            max={1680}
+            step={10}
+            value={width}
+            list="shc-win-detents"
+            onChange={(e) => setWidth(+e.target.value)}
+            aria-label="Shell width in pixels"
+          />
+          <datalist id="shc-win-detents">
+            <option value={600} />
+            <option value={840} />
+            <option value={1200} />
+            <option value={1600} />
+          </datalist>
+          <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong>{navState && <> · {navState}</>}</span>
+        </label>
       </div>
     </>
   )
@@ -603,7 +381,7 @@ function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => voi
   )
 }
 
-export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v: ViewKind) => void }) {
+export function PagesView() {
   // Showcases = ONE believable product (Ledger). The WALL is the entry (every
   // screen as a live miniature); clicking a tile zooms IN to the single screen +
   // its sidebar (Catalyst-style). `screenId` is the rendered manifest (may be a
@@ -650,8 +428,8 @@ export function PagesView({ cfg, onViewChange }: { cfg: Config; onViewChange: (v
       <button type="button" className="btn btn--ghost btn--sm shc__back" onClick={exitToWall}>
         <Icon name="chevL" /> All screens
       </button>
-      {/* key = remount per screen so the loupe + width reset to the screen default */}
-      <ShowcaseStage m={m} cfg={cfg} key={m.id} onViewChange={onViewChange} appNav={appNav} width={width} onWidth={setWidth} />
+      {/* key = remount per screen so per-screen state resets to the screen default */}
+      <ShowcaseStage m={m} key={m.id} appNav={appNav} width={width} onWidth={setWidth} />
     </div>
   )
 }

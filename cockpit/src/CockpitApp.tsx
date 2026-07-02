@@ -178,7 +178,6 @@ export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps 
               cfg={cfg}
               tokens={tokens}
               view={view}
-              onViewChange={handleViewChange}
             />
           </>
         )}
