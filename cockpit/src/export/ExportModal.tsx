@@ -88,7 +88,7 @@ const FORMATS: Fmt[] = [
   { id: 'tailwind', label: 'Tailwind v4', hint: '@theme block, full system', filename: 'tailwind-theme.css', icon: Palette, generator: genTailwind },
   { id: 'shadcn', label: 'shadcn/ui', hint: '--background, --primary, …', filename: 'shadcn-globals.css', icon: Layers, generator: genShadcn },
 ]
-type View = ToolId | FmtId | 'cli'
+type View = 'overview' | ToolId | FmtId | 'cli'
 const isFmt = (v: View): v is FmtId => FORMATS.some((f) => f.id === v)
 
 /* ── Agent rules — the skill body is agent-agnostic (genSkill); only the delivery
@@ -219,7 +219,7 @@ interface ExportModalProps {
 }
 
 export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
-  const [view, setView] = useState<View>('v0')
+  const [view, setView] = useState<View>('overview')
   const [framework, setFramework] = useState<Framework>('next')
   const [pm, setPm] = useState<Pm>('pnpm')
 
@@ -242,6 +242,7 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
         </div>
         <div className="modal__split">
           <nav className="modal__nav" role="tablist" aria-label="Pick your tool">
+            <NavBtn id="overview" label="In this kit" hint="Settings · a11y · outputs" icon={<Package size={15} strokeWidth={1.75} />} view={view} onView={setView} />
             <div className="modal__navgroup">Web builders</div>
             {TOOLS.filter((t) => t.track === 'web').map((t) => (
               <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} icon={<ToolLogo id={t.id} size={15} />} view={view} onView={setView} />
@@ -257,7 +258,9 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
             ))}
           </nav>
           <div className="modal__pane">
-            {view === 'cli' ? (
+            {view === 'overview' ? (
+              <OverviewPane cfg={cfg} />
+            ) : view === 'cli' ? (
               <CliPane cfg={cfg} onToast={onToast} />
             ) : isFmt(view) ? (
               <FormatsPane
@@ -488,7 +491,6 @@ function ToolPane({ tool, cfg, onToast }: { tool: ToolDef; cfg: Config; onToast:
           <StepCard key={s.n} step={s} onToast={onToast} />
         ))}
       </div>
-      <KitProof cfg={cfg} tk={tk} />
     </div>
   )
 }
@@ -498,7 +500,6 @@ function ToolPane({ tool, cfg, onToast }: { tool: ToolDef; cfg: Config; onToast:
  *  Surfaces the check-loop (the moat) as a first-class destination, not buried in a
  *  per-tool step. */
 function CliPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void }) {
-  const tk = useMemo(() => buildTokens(cfg), [cfg])
   const hash = encode(cfg)
   const mcpConfig = `{
   "mcpServers": {
@@ -547,7 +548,6 @@ function CliPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void }
           <StepCard key={s.n} step={s} onToast={onToast} />
         ))}
       </div>
-      <KitProof cfg={cfg} tk={tk} />
     </div>
   )
 }
@@ -713,16 +713,32 @@ function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ 
   ]
 }
 
-/** "What's in your kit" — proof (choices + WCAG), demoted behind a disclosure so
- *  the per-tool steps stay above the fold. Shared by every tool pane. */
-function KitProof({ cfg, tk }: { cfg: Config; tk: ReturnType<typeof buildTokens> }) {
+/** "In this kit" — the modal's landing pane and single source of truth for what
+ *  the kit contains: the settings you chose, the WCAG proof, and the outputs every
+ *  destination derives from. Kit-level context lives here ONCE, not repeated on
+ *  every tool pane; pick a destination on the left to actually use it. */
+function OverviewPane({ cfg }: { cfg: Config }) {
+  const tk = useMemo(() => buildTokens(cfg), [cfg])
   const a11y = useMemo(() => auditContrast(tk), [tk])
   const a11yPass = a11y.filter((p) => p.passes).length
   const a11yTotal = a11y.length
   const choices = buildChoices(cfg, tk)
   return (
-    <details className="export-ov__reveal tool__proof">
-      <summary className="export-ov__reveal-sum">What's in your kit — {choices.length} settings · {a11yPass}/{a11yTotal} WCAG pairs pass</summary>
+    <div className="tool tool--overview">
+      <div className="tool__head">
+        <span className="tool__logo" aria-hidden="true"><Package size={22} strokeWidth={1.75} /></span>
+        <div className="tool__heading">
+          <span className="tool__name">In this kit</span>
+          <span className="tool__tagline">{choices.length} settings · {a11yPass}/{a11yTotal} WCAG pairs pass</span>
+        </div>
+      </div>
+      <p className="tool__overview-lead">
+        Everything this kit contains, in one place. Every output — tokens, a Tailwind or
+        shadcn theme, an AI prompt, the machine-readable contract — derives from these
+        exact settings, so they can never disagree. Pick a destination on the left to use it.
+      </p>
+
+      <div className="tool__overview-sec">Settings</div>
       <div className="export-ov__choices">
         {choices.map((c) => (
           <div key={c.label} className="export-ov__choice">
@@ -734,6 +750,7 @@ function KitProof({ cfg, tk }: { cfg: Config; tk: ReturnType<typeof buildTokens>
           </div>
         ))}
       </div>
+
       <div className="export-ov__a11y">
         <div className="export-ov__a11y-head">
           <div className="export-ov__a11y-title">Accessibility</div>
@@ -754,6 +771,6 @@ function KitProof({ cfg, tk }: { cfg: Config; tk: ReturnType<typeof buildTokens>
           ))}
         </div>
       </div>
-    </details>
+    </div>
   )
 }
