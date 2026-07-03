@@ -135,7 +135,6 @@ export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps 
         onToggleMode={() =>
           dispatch({ type: 'SET', patch: { mode: cfg.mode === 'light' ? 'dark' : 'light' } })
         }
-        onShare={onShare}
         onExport={() => setExportOpen(true)}
         tokens={tokens}
         cfg={cfg}

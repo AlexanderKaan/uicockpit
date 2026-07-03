@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, BookOpen, Boxes, Check, Code, Heart, Link2, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
+import { AppWindow, BookOpen, Boxes, Check, Code, Heart, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
@@ -11,7 +11,6 @@ interface TopbarProps {
   onViewChange: (v: ViewKind) => void
   mode: 'light' | 'dark'
   onToggleMode: () => void
-  onShare: () => void
   onExport: () => void
   tokens: Tokens
   cfg: Config
@@ -32,7 +31,7 @@ interface TopbarProps {
   canRedo: boolean
 }
 
-export function Topbar({ view, onViewChange, mode, onToggleMode, onShare, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onDocs, docsActive, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
+export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onDocs, docsActive, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -172,10 +171,6 @@ export function Topbar({ view, onViewChange, mode, onToggleMode, onShare, onExpo
           title={mode === 'dark' ? 'Light mode' : 'Dark mode'}
         >
           {mode === 'dark' ? <Sun size={15} strokeWidth={1.75} /> : <Moon size={15} strokeWidth={1.75} />}
-        </button>
-        <button type="button" className="topbar__btn topbar__btn--with-icon" onClick={onShare}>
-          <Link2 size={13} strokeWidth={1.75} />
-          Share
         </button>
         <button type="button" className="topbar__btn topbar__btn--code" onClick={onExport} aria-label="Use this kit">
           <Code size={14} strokeWidth={1.75} />

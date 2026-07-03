@@ -259,7 +259,7 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
           </nav>
           <div className="modal__pane">
             {view === 'overview' ? (
-              <OverviewPane cfg={cfg} />
+              <OverviewPane cfg={cfg} onToast={onToast} />
             ) : view === 'cli' ? (
               <CliPane cfg={cfg} onToast={onToast} />
             ) : isFmt(view) ? (
@@ -717,12 +717,23 @@ function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ 
  *  the kit contains: the settings you chose, the WCAG proof, and the outputs every
  *  destination derives from. Kit-level context lives here ONCE, not repeated on
  *  every tool pane; pick a destination on the left to actually use it. */
-function OverviewPane({ cfg }: { cfg: Config }) {
+function OverviewPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void }) {
   const tk = useMemo(() => buildTokens(cfg), [cfg])
   const a11y = useMemo(() => auditContrast(tk), [tk])
   const a11yPass = a11y.filter((p) => p.passes).length
   const a11yTotal = a11y.length
   const choices = buildChoices(cfg, tk)
+  // Copy a link to THIS kit — opens it in the configurator (the whole config lives
+  // in the URL hash). This is the old top-bar "Share", folded into its natural home.
+  const copyLink = async () => {
+    const url = `${window.location.origin}/app#${encode(cfg)}`
+    try {
+      await navigator.clipboard.writeText(url)
+      onToast('Kit link copied')
+    } catch {
+      onToast('Copy failed — select & copy manually')
+    }
+  }
   return (
     <div className="tool tool--overview">
       <div className="tool__head">
@@ -731,6 +742,9 @@ function OverviewPane({ cfg }: { cfg: Config }) {
           <span className="tool__name">In this kit</span>
           <span className="tool__tagline">{choices.length} settings · {a11yPass}/{a11yTotal} WCAG pairs pass</span>
         </div>
+        <button type="button" className="modal__btn tool__dl" style={{ marginLeft: 'auto' }} onClick={copyLink}>
+          <Copy size={13} strokeWidth={1.75} /> Copy link
+        </button>
       </div>
       <p className="tool__overview-lead">
         Everything this kit contains, in one place. Every output — tokens, a Tailwind or
