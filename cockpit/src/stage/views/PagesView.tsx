@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
 import { renderSection } from '../../showcases/sections'
+import { InteractiveSlider } from './apps/AppHelpers'
 
 /* Manifest section kind → graph wiring (Fase J-2). The manifest uses short names
  * ('stats', 'table'); the segment graph (segments.ts) + the gallery use canonical
@@ -106,26 +107,23 @@ function ShowcaseStage({ m, appNav, width, onWidth }: { m: ShowcaseManifest; app
        * clamp as the app shell) + left-aligned to match the app preview above it, so
        * the two read as one aligned block at every width. */}
       <div className="shc__dock" style={{ width, maxWidth: '100%', minWidth: appNav ? 680 : undefined }}>
-        <label className="lyt__scrub shc__dock-scrub">
+        <div className="lyt__scrub shc__dock-scrub">
           <span className="lyt__scrub-label">Width</span>
-          <input
-            type="range"
+          {/* Dogfood: the kit's OWN slider (InteractiveSlider → the exported `.slider`
+           * recipe), not a bespoke native range. Fixed track width + a fixed-width
+           * value column: the label text changes length across breakpoints
+           * (Compact→Medium, 3→4 digits), and a flex track would resize under the
+           * thumb on every change — that was the jitter. Fixed width = stable. */}
+          <InteractiveSlider
+            value={width}
             min={360}
             max={1680}
-            step={10}
-            value={width}
-            list="shc-win-detents"
-            onChange={(e) => setWidth(+e.target.value)}
-            aria-label="Shell width in pixels"
+            width={220}
+            onChange={(v) => setWidth(Math.round(v / 10) * 10)}
+            ariaLabel="Shell width in pixels"
           />
-          <datalist id="shc-win-detents">
-            <option value={600} />
-            <option value={840} />
-            <option value={1200} />
-            <option value={1600} />
-          </datalist>
           <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong>{navState && <> · {navState}</>}</span>
-        </label>
+        </div>
       </div>
     </>
   )

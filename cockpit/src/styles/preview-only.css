@@ -807,7 +807,6 @@
   max-width: 560px;
 }
 .lyt__scrub-label { font-size: var(--k-type-small); color: var(--k-fg-muted); white-space: nowrap; }
-.lyt__scrub input[type='range'] { flex: 1; accent-color: var(--k-primary); min-width: 0; }
 .lyt__scrub-val {
   font-size: var(--k-type-small);
   font-variant-numeric: tabular-nums;
@@ -1077,7 +1076,9 @@
   background: var(--k-surface);
 }
 .shc__dock-spacer { flex: 1; }
-.shc__dock-scrub { flex: 0 1 360px; min-width: 200px; margin: 0; }
+/* Natural width, no shrink: the slider inside is a FIXED-width kit `.slider`, so
+ * the scrub takes its content width and the track never resizes (was the jitter). */
+.shc__dock-scrub { flex: 0 0 auto; min-width: 0; margin: 0; }
 /* Phone: the showcase top-search can't hold a fixed 232px in a ~360 frame, and the
  * width scrubber wants its own row. */
 @media (max-width: 768px) {
