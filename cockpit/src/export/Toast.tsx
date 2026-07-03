@@ -23,5 +23,5 @@ export function Toast({ message, onDone, ms = 1600 }: ToastProps) {
   }, [message, ms, onDone])
 
   if (!visible) return null
-  return <div className="toast" role="status" aria-live="polite">{message}</div>
+  return <div className="app-toast" role="status" aria-live="polite">{message}</div>
 }

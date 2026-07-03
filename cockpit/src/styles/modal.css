@@ -233,8 +233,12 @@
   white-space: nowrap;
 }
 
-/* === Toast === */
-.toast {
+/* === Toast (chrome feedback pill) ===
+ * NB: distinct class from the kit's `.toast` COMPONENT recipe — injectKit()
+ * injects that recipe UNSCOPED into <head> after this file, so a shared `.toast`
+ * selector lost the cascade (kit's white overlay bg + this file's white text =
+ * invisible pill). Keep this app-scoped. */
+.app-toast {
   position: fixed;
   bottom: 24px;
   left: 50%;
