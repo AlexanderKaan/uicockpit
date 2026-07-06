@@ -21,9 +21,8 @@ interface TopbarProps {
   onToggleMenu: () => void
   /** Brand click → back to the marketing home. */
   onHome?: () => void
-  /** Docs link (left zone) — opens the in-app docs view; `docsActive` toggles back. */
+  /** Docs link (left zone) — navigates OUT to the site-shell /docs page (IA-1). */
   onDocs: () => void
-  docsActive: boolean
   /** Undo/redo (C2) — config history. Buttons mirror ⌘Z / ⇧⌘Z. */
   onUndo: () => void
   onRedo: () => void
@@ -31,7 +30,7 @@ interface TopbarProps {
   canRedo: boolean
 }
 
-export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onDocs, docsActive, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
+export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onDocs, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -80,9 +79,8 @@ export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, token
         </button>
         <button
           type="button"
-          className={`topbar__doc-link ${docsActive ? 'topbar__doc-link--on' : ''}`}
+          className="topbar__doc-link"
           onClick={onDocs}
-          aria-pressed={docsActive}
           title="How to use UIcockpit"
         >
           <BookOpen size={14} strokeWidth={1.75} />

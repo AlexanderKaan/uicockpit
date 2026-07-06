@@ -13,6 +13,12 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+  <!-- The showcase wall — real screens on the kit (IA-1 public destination). -->
+  <url>
+    <loc>https://uicockpit.com/showcases</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
   <!-- Documentation — how to use the system. -->
   <url>
     <loc>https://uicockpit.com/docs</loc>

@@ -1,7 +1,7 @@
 import { ChevronDown } from 'lucide-react'
 
 /** The published npm package version (`uicockpit` CLI) — the public number. */
-export const UICOCKPIT_VERSION = 'v0.3.2'
+export const UICOCKPIT_VERSION = 'v0.4.0'
 export const REPO_URL = 'https://github.com/AlexanderKaan/uicockpit'
 
 /** GitHub brand mark (lucide dropped brand icons — inline the official glyph). */
@@ -17,7 +17,7 @@ interface MktNavProps {
   /** Client-side navigate (App's pushState router). */
   navigate: (to: string) => void
   /** Which page we're on — drives aria-current on the matching destination. */
-  current?: 'manifesto' | 'docs'
+  current?: 'manifesto' | 'docs' | 'showcases'
 }
 
 /**
@@ -50,8 +50,9 @@ export function MktNav({ navigate, current }: MktNavProps) {
         </a>
 
         <nav className="mkt__nav-links">
-          <a href="/manifesto" className="mkt__nav-link" {...ariaCurrent('manifesto')} onClick={(e) => go(e, '/manifesto')}>Manifesto</a>
+          <a href="/showcases" className="mkt__nav-link" {...ariaCurrent('showcases')} onClick={(e) => go(e, '/showcases')}>Showcases</a>
           <a href="/docs" className="mkt__nav-link" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
+          <a href="/manifesto" className="mkt__nav-link" {...ariaCurrent('manifesto')} onClick={(e) => go(e, '/manifesto')}>Manifesto</a>
         </nav>
 
         <div className="mkt__nav-tools">

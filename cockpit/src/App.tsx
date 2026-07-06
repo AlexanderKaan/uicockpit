@@ -4,16 +4,19 @@ import { MarketingPage } from './marketing/MarketingPage'
 import { MarketingManifesto } from './marketing/MarketingManifesto'
 import { OgCard } from './marketing/OgCard'
 import { SeoPage } from './marketing/SeoPage'
+import { DocsPage } from './marketing/DocsPage'
+import { ShowcasesPage } from './marketing/ShowcasesPage'
 import { findEntry } from './marketing/seo/seoData'
 import './styles/marketing.css'
 
 /**
  * Lightweight pathname-based SPA router — no React Router dependency.
+ * IA-1 "hub + tool": ONE site shell (MktNav) over every content destination;
+ * /app stays the fullscreen instrument.
  *   /                    → Marketing landing
  *   /app                 → The configurator (also any /app/* future deep links)
- *   /docs                → Documentation, now rendered INSIDE the app shell
- *                          (CockpitApp route="docs") — public + indexable, but
- *                          no longer a marketing-styled page.
+ *   /docs                → The guide, in the SITE shell (was: inside the app shell)
+ *   /showcases           → The Ledger showcase wall as a public destination
  *   /compare/<slug>      → SEO comparison page  ("UIcockpit vs X")
  *   /alternatives/<slug> → SEO alternative page ("X alternative")
  *   /uses/<slug>         → SEO use-case / keyword landing
@@ -42,16 +45,13 @@ function useRoute() {
 export function App() {
   const { path, navigate } = useRoute()
 
-  // The configurator owns both /app and /docs (docs renders full-stage inside the
-  // app shell). Same component at the tree root → state survives the toggle.
-  if (path.startsWith('/app') || path.startsWith('/docs'))
-    return (
-      <CockpitApp
-        onHome={() => navigate('/')}
-        route={path.startsWith('/docs') ? 'docs' : 'app'}
-        navigate={navigate}
-      />
-    )
+  // The configurator — the fullscreen instrument layer.
+  if (path.startsWith('/app'))
+    return <CockpitApp onHome={() => navigate('/')} navigate={navigate} />
+
+  // The guide + the showcase wall — content destinations in the site shell (IA-1).
+  if (path.startsWith('/docs')) return <DocsPage navigate={navigate} />
+  if (path.startsWith('/showcases')) return <ShowcasesPage navigate={navigate} />
 
   // The social-preview / OG card (1280×640) — not linked; screenshotted to a PNG.
   if (path === '/og') return <OgCard />

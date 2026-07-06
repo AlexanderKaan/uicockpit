@@ -1503,6 +1503,25 @@
 .seo__rel-title { font-size: 15px; font-weight: 600; color: var(--mkt-fg); }
 
 /* ============================================================
+   Showcases page (/showcases, IA-1) — the Ledger wall as a public
+   destination. The stage is a full-bleed band holding the REAL
+   PagesView inside a .cockpit-preview token scope (default kit).
+   ============================================================ */
+.mkt__section--showcases { padding-bottom: 0; }
+.mkt__showcase-stage {
+  margin-top: 40px;
+  border-top: 1px solid var(--mkt-border);
+  border-bottom: 1px solid var(--mkt-border);
+  background: var(--mkt-bg-soft, #f7f8fa);
+}
+.mkt__showcase-stage .cockpit-preview {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+.mkt__showcase-cta { display: flex; justify-content: center; padding: 40px 24px 72px; }
+
+/* ============================================================
    Docs page (/docs) — sticky-TOC documentation. Reuses the .mkt
    shell (nav + footer) and the --mkt-* palette for continuity.
    ============================================================ */

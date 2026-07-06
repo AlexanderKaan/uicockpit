@@ -9,7 +9,6 @@ import { useConfig } from './state/useConfig'
 import { randomKit } from './state/randomKit'
 import { DEFAULT_CONFIG } from './tokens/defaults'
 import { Toast } from './export/Toast'
-import { DocsBody } from './marketing/DocsBody'
 
 // Lazy-load — export generators + modal only ship when user opens it
 const ExportModal = lazy(() =>
@@ -19,10 +18,8 @@ const ExportModal = lazy(() =>
 interface CockpitAppProps {
   /** Called when user clicks the brand — sends them back to /. */
   onHome?: () => void
-  /** Which surface the route asks for. 'docs' replaces the stage with the in-app
-   *  guide (the /docs route); 'app' is the configurator. */
-  route?: 'app' | 'docs'
-  /** Push a new path (the app's SPA router) — drives the Docs link + deep-links. */
+  /** Push a new path (the app's SPA router) — drives the Docs link + deep-links.
+   *  (Docs was re-housed to the SITE shell in IA-1 — the app only links OUT.) */
   navigate?: (to: string) => void
 }
 
@@ -40,9 +37,8 @@ function startViewTransition(cb: () => void): void {
  *  Layout: a full-width top bar (brand · view switcher · actions) runs across
  *  the whole app; below it the stage fills the width and the control menu
  *  *floats* over the top-left (absolute), never reserving a column. */
-export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps = {}) {
+export function CockpitApp({ onHome, navigate }: CockpitAppProps = {}) {
   const { cfg, tokens, dispatch, undo, redo, canUndo, canRedo } = useConfig()
-  const docsActive = route === 'docs'
   // Default closed on phones — there the panel becomes an overlay drawer, so the
   // stage gets the full width; open inline as a column on desktop.
   const [menuOpen, setMenuOpen] = useState(() =>
@@ -66,9 +62,6 @@ export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps 
   )
 
   const handleViewChange = (next: ViewKind) => {
-    // From the docs view, picking a catalog tab returns to the configurator on
-    // that view (the URL leaves /docs).
-    if (docsActive) navigate?.('/app')
     if (next === view) return
     startViewTransition(() => setView(next))
   }
@@ -142,52 +135,40 @@ export function CockpitApp({ onHome, route = 'app', navigate }: CockpitAppProps 
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onHome={onHome}
-        onDocs={() => navigate?.(docsActive ? '/app' : '/docs')}
-        docsActive={docsActive}
+        onDocs={() => navigate?.('/docs')}
         onUndo={undo}
         onRedo={redo}
         canUndo={canUndo}
         canRedo={canRedo}
       />
       <div className="app__body">
-        {docsActive ? (
-          /* The in-app guide — full-stage, the topbar persists above. */
-          <div className="app__docs">
-            <DocsBody onLaunch={() => navigate?.('/app')} />
-          </div>
-        ) : (
-          <>
-            {/* Mobile-only backdrop behind the drawer (display:none on desktop). */}
-            {menuOpen && (
-              <div className="app__scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />
-            )}
-            {menuOpen && (
-              <Panel
-                cfg={cfg}
-                tokens={tokens}
-                dispatch={dispatch}
-                onCollapse={() => setMenuOpen(false)}
-                onRandomize={onRandomize}
-                onReset={onReset}
-                lockedKeys={lockedKeys}
-                onToggleLock={onToggleLock}
-              />
-            )}
-            <Stage
-              cfg={cfg}
-              tokens={tokens}
-              view={view}
-            />
-          </>
+        {/* Mobile-only backdrop behind the drawer (display:none on desktop). */}
+        {menuOpen && (
+          <div className="app__scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />
         )}
-      </div>
-      {!docsActive && (
-        <MobileControlBar
-          onCustomize={() => setMenuOpen(true)}
-          onShuffle={onRandomize}
-          onExport={() => setExportOpen(true)}
+        {menuOpen && (
+          <Panel
+            cfg={cfg}
+            tokens={tokens}
+            dispatch={dispatch}
+            onCollapse={() => setMenuOpen(false)}
+            onRandomize={onRandomize}
+            onReset={onReset}
+            lockedKeys={lockedKeys}
+            onToggleLock={onToggleLock}
+          />
+        )}
+        <Stage
+          cfg={cfg}
+          tokens={tokens}
+          view={view}
         />
-      )}
+      </div>
+      <MobileControlBar
+        onCustomize={() => setMenuOpen(true)}
+        onShuffle={onRandomize}
+        onExport={() => setExportOpen(true)}
+      />
       {exportOpen && (
         <Suspense fallback={null}>
           <ExportModal
