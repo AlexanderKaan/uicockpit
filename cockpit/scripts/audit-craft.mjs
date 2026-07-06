@@ -38,7 +38,7 @@ const REPORT_ONLY = process.argv.slice(2).includes('--report')
 
 // The pinned count of magic-px literals in the kit. Lower this (never raise it)
 // as the C2/C6 sweep tokenizes dimensions. See RATCHET CONTRACT above.
-const BASELINE = 171
+const BASELINE = 170
 
 const SRC = 'src/kit/recipes/index.ts'
 const HAIRLINE = new Set(['0.5', '1', '1.5', '2']) // borders + focus rings: device-tuned

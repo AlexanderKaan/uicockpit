@@ -48,7 +48,7 @@ export type SectionSpec =
   | { kind: 'media'; seed: { title?: string; items: Array<{ name: string; kind: 'image' | 'video' | 'file'; badge?: string; tone?: 'info' | 'success' | 'warning'; hero?: boolean; img?: string; meta?: string }> } }
   // The real `.filegrid` recipe — a grid of file tiles; clicking one opens the
   // real `.lightbox` preview (Documents vault).
-  | { kind: 'filegrid'; seed: { title: string; files: Array<{ name: string; ext: string; size: string; tone: 'success' | 'danger' | 'warn' | 'info'; image?: boolean }> } }
+  | { kind: 'filegrid'; seed: { title: string; files: Array<{ name: string; ext: string; size: string; date?: string; tone: 'success' | 'danger' | 'warn' | 'info'; image?: boolean }> } }
   | { kind: 'empty'; seed: { icon: IconName; title: string; sub: string; cta?: string } }
   // CP6 Phase 3 — the month grid as a section (wraps the kit's .calendar recipe +
   // its cell modifiers). firstDow = weekday index (0=Mon … 6=Sun) of day 1.
@@ -407,12 +407,12 @@ export const SHOWCASES: ShowcaseManifest[] = [
         role: 'flex',
         sections: [
           { kind: 'filegrid', seed: { title: 'Receipts & contracts · 6 files', files: [
-            { name: 'MSA-tuple-2026.pdf', ext: 'PDF', size: '480 KB', tone: 'danger' },
-            { name: 'receipt-northwind.png', ext: 'PNG', size: '1.2 MB', tone: 'success', image: true },
-            { name: 'invoice-00011.pdf', ext: 'PDF', size: '96 KB', tone: 'danger' },
-            { name: 'receipt-prism.jpg', ext: 'JPG', size: '840 KB', tone: 'success', image: true },
-            { name: 'W-9-loomis.pdf', ext: 'PDF', size: '210 KB', tone: 'warn' },
-            { name: 'statement-mar-2026.pdf', ext: 'PDF', size: '2.1 MB', tone: 'danger' },
+            { name: 'MSA-tuple-2026.pdf', ext: 'PDF', size: '480 KB', date: 'Mar 3', tone: 'danger' },
+            { name: 'receipt-northwind.png', ext: 'PNG', size: '1.2 MB', date: 'Mar 2', tone: 'success', image: true },
+            { name: 'invoice-00011.pdf', ext: 'PDF', size: '96 KB', date: 'Feb 28', tone: 'danger' },
+            { name: 'receipt-prism.jpg', ext: 'JPG', size: '840 KB', date: 'Feb 24', tone: 'success', image: true },
+            { name: 'ledger-q1.xlsx', ext: 'XLSX', size: '540 KB', date: 'Feb 20', tone: 'info' },
+            { name: 'statement-mar-2026.pdf', ext: 'PDF', size: '2.1 MB', date: 'Feb 18', tone: 'danger' },
           ] } },
           { kind: 'dropzone', seed: { title: 'Drop receipts or click to browse', hint: 'PDF, PNG, JPG — up to 25 MB per file' } },
         ],

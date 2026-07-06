@@ -3950,11 +3950,14 @@ function AttachmentChipCard() {
 }
 
 function FileGridCard() {
+  // Each tile demonstrates a cover TYPE variant (--doc / --img / --sheet)
+  // plus one plain cover — the faux previews that keep a populated vault
+  // from reading as an empty grey state.
   const files = [
-    { name: 'hero-banner.png', size: '2.4 MB', badge: 'PNG', tone: 'success' as const },
-    { name: 'brand-deck-q2.pdf', size: '8.1 MB', badge: 'PDF', tone: 'danger' as const },
-    { name: 'onboarding.mp4', size: '24.7 MB', badge: 'MP4', tone: 'warn' as const },
-    { name: 'design-system.fig', size: '12.3 MB', badge: 'FIG', tone: 'info' as const },
+    { name: 'brand-deck-q2.pdf', size: '8.1 MB', date: 'Mar 4', badge: 'PDF', tone: 'danger' as const, cover: 'doc' as const },
+    { name: 'hero-banner.png', size: '2.4 MB', date: 'Mar 2', badge: 'PNG', tone: 'success' as const, cover: 'img' as const },
+    { name: 'q1-forecast.xlsx', size: '540 KB', date: 'Feb 27', badge: 'XLSX', tone: 'info' as const, cover: 'sheet' as const },
+    { name: 'design-system.fig', size: '12.3 MB', date: 'Feb 21', badge: 'FIG', tone: 'warn' as const, cover: null },
   ]
   return (
     <Card wide title="Files" desc="Recently uploaded assets.">
@@ -3968,12 +3971,14 @@ function FileGridCard() {
       <div className="filegrid filegrid--2">
         {files.map((f) => (
           <button key={f.name} className="filegrid__tile">
-            <div className="filegrid__cover"><Icon name="file" /></div>
-            <div className="filegrid__row">
-              <span className="filegrid__name">{f.name}</span>
-              <span className={`badge badge--${f.tone}`}>{f.badge}</span>
+            <div className={`filegrid__cover${f.cover ? ` filegrid__cover--${f.cover}` : ''}`}>
+              <span className={`filegrid__tag badge badge--${f.tone}`}>{f.badge}</span>
+              {!f.cover && <Icon name="file" />}
             </div>
-            <span className="filegrid__meta">{f.size}</span>
+            <div className="filegrid__body">
+              <span className="filegrid__name">{f.name}</span>
+              <span className="filegrid__meta">{f.size} · {f.date}</span>
+            </div>
           </button>
         ))}
       </div>

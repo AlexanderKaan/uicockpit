@@ -5,28 +5,44 @@ import { useModal, useDropdown, Toggle, MenuButton } from '../stage/views/apps/A
 import type { SectionSpec } from './manifests'
 import { BrandLogo } from './logos'
 
+/** Map a file's ext/image flag to a `.filegrid__cover` type variant so the
+ *  cover paints the right faux preview (document page / image / spreadsheet). */
+function coverKind(ext: string, image?: boolean): 'doc' | 'img' | 'sheet' | null {
+  if (image) return 'img'
+  const e = ext.toUpperCase()
+  if (e === 'XLS' || e === 'XLSX' || e === 'CSV') return 'sheet'
+  if (e === 'PDF' || e === 'DOC' || e === 'DOCX' || e === 'TXT') return 'doc'
+  return null
+}
+
 /** The Documents vault — the real `.filegrid` tiles; clicking a tile opens the real
  *  `.lightbox` preview (modal contract via useModal; arrow keys cycle files). */
-function FileGridSection({ title, files }: { title: string; files: Array<{ name: string; ext: string; size: string; tone: 'success' | 'danger' | 'warn' | 'info'; image?: boolean }> }) {
+function FileGridSection({ title, files }: { title: string; files: Array<{ name: string; ext: string; size: string; date?: string; tone: 'success' | 'danger' | 'warn' | 'info'; image?: boolean }> }) {
   const [open, setOpen] = useState<number | null>(null)
   const lbRef = useModal<HTMLDivElement>(open !== null, () => setOpen(null))
   const n = files.length
   const f = open !== null ? files[open]! : null
+  const fKind = f ? coverKind(f.ext, f.image) : null
   return (
     <div className="section">
       <div className="section__head"><div className="section__titles"><span className="section__title">{title}</span></div></div>
       <div className="section__body">
         <div className="filegrid filegrid--3">
-          {files.map((file, i) => (
-            <button key={file.name} type="button" className="filegrid__tile" onClick={() => setOpen(i)}>
-              <div className="filegrid__cover"><Icon name={file.image ? 'grid' : 'file'} /></div>
-              <div className="filegrid__row">
-                <span className="filegrid__name">{file.name}</span>
-                <span className={`badge badge--${file.tone}`}>{file.ext}</span>
-              </div>
-              <span className="filegrid__meta">{file.size}</span>
-            </button>
-          ))}
+          {files.map((file, i) => {
+            const kind = coverKind(file.ext, file.image)
+            return (
+              <button key={file.name} type="button" className="filegrid__tile" onClick={() => setOpen(i)}>
+                <div className={`filegrid__cover${kind ? ` filegrid__cover--${kind}` : ''}`}>
+                  <span className={`filegrid__tag badge badge--${file.tone}`}>{file.ext}</span>
+                  {!kind && <Icon name="file" />}
+                </div>
+                <div className="filegrid__body">
+                  <span className="filegrid__name">{file.name}</span>
+                  <span className="filegrid__meta">{file.size}{file.date ? ` · ${file.date}` : ''}</span>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
       {f && open !== null && (
@@ -43,10 +59,14 @@ function FileGridSection({ title, files }: { title: string; files: Array<{ name:
             else if (e.key === 'ArrowRight') { e.preventDefault(); setOpen((open + 1) % n) }
           }}
         >
-          <div className="lightbox__stage card" onClick={(e) => e.stopPropagation()} style={{ width: '46%', maxWidth: 520, display: 'grid', placeItems: 'center', gap: 'var(--k-s-10)', aspectRatio: '4 / 3' }}>
-            <Icon name={f.image ? 'grid' : 'file'} />
-            <span style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{f.name}</span>
-            <span className={`badge badge--${f.tone}`}>{f.ext} · {f.size}</span>
+          <div className="lightbox__stage card" onClick={(e) => e.stopPropagation()} style={{ width: '46%', maxWidth: 520, display: 'grid', gap: 'var(--k-s-12)' }}>
+            <div className={`filegrid__cover${fKind ? ` filegrid__cover--${fKind}` : ''}`} style={{ width: '100%' }}>
+              {!fKind && <Icon name="file" />}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--k-s-10)' }}>
+              <span style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'], overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+              <span className={`badge badge--${f.tone}`}>{f.ext} · {f.size}</span>
+            </div>
           </div>
           <button type="button" className="lightbox__btn lightbox__btn--close" onClick={() => setOpen(null)} aria-label="Close"><Icon name="x" /></button>
           <button type="button" className="lightbox__btn lightbox__btn--prev" onClick={(e) => { e.stopPropagation(); setOpen((open + n - 1) % n) }} aria-label="Previous"><Icon name="chevL" /></button>

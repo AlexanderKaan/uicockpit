@@ -5519,11 +5519,26 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   {
     id: 'file-grid',
     section: "File grid",
+    doc: {
+      dos: [
+        "Give every cover a type variant (--doc / --img / --sheet) so a populated vault reads as real files, not an empty grey grid.",
+        "Keep the ext tag on the cover corner and “size · date” in the meta line — scannable at a glance.",
+        "Match the col modifier (--2 / --3 / --5) to the container width; names ellipsis so tracks can shrink.",
+      ],
+      donts: [
+        "Don't leave a cover blank — an empty cover reads as a loading or empty state, the exact thing this recipe fixes.",
+        "Don't drop the name ellipsis; a long unbroken filename overflows its column.",
+      ],
+    },
     css: `/* === File grid (.filegrid) ============================================
- * Generic 4-column thumbnail grid voor media libraries, album collections,
- * cloud storage, AI artifacts. Tiles: cover (aspect 4/3) + name + type
- * badge + meta. Hover lift met spring curve (signature). Modifier voor
- * 2/3/5 cols beschikbaar voor verschillende contexten. */
+ * Generic thumbnail grid for media libraries, cloud storage, AI artifacts
+ * and — the flagship use — a document/receipts vault. Each tile is a faux
+ * file PREVIEW (pure CSS, no assets): the cover paints a believable
+ * thumbnail per type — a document PAGE with ruled text lines (--doc), an
+ * IMAGE gradient (--img), or a SPREADSHEET grid (--sheet) — so a populated
+ * vault never reads as an empty grey state. A small ext tag pins to the
+ * cover corner; name + "size · date" sit below. Hover lift with the spring
+ * curve (signature). 2/3/5-col modifiers for different contexts. */
 .filegrid {
   display: grid;
   /* minmax(0,1fr) — NOT plain 1fr. Plain 1fr defaults to minmax(auto,1fr),
@@ -5540,7 +5555,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .filegrid__tile {
   display: flex;
   flex-direction: column;
-  gap: var(--k-s-8);
+  gap: var(--k-s-10);
   padding: var(--k-space, 16px);
   border: var(--k-hairline, 1px solid var(--k-border));
   border-radius: var(--k-radius-md);
@@ -5555,7 +5570,10 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   transform: translateY(-2px);
   box-shadow: var(--k-shadow-md);
 }
+/* Cover — the faux preview surface. position:relative anchors the type
+ * variants' ::before page/grid and the corner tag. */
 .filegrid__cover {
+  position: relative;
   aspect-ratio: 4 / 3;
   background: var(--k-surface-sunken);
   border-radius: calc(var(--k-radius-md) * 0.6);
@@ -5564,12 +5582,76 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   color: var(--k-fg-muted);
   overflow: hidden;
 }
-.filegrid__cover svg { width: 22px; height: 22px; }
-.filegrid__row {
+/* Plain cover (no type variant): a centred glyph, slightly quieted. Sized
+ * off the icon token so it tracks the Scale/density lever. */
+.filegrid__cover svg { width: calc(var(--k-icon-md) * 1.6); height: calc(var(--k-icon-md) * 1.6); opacity: .65; }
+
+/* Ext tag — small chip pinned to the cover's top-left. Compose with a
+ * .badge for the type colour: class="filegrid__tag badge badge--danger". */
+.filegrid__tag {
+  position: absolute;
+  top: var(--k-s-6);
+  left: var(--k-s-6);
+  z-index: 1;
+}
+
+/* — Document page (--doc): a white sheet with ruled faux text lines. Two
+ *   pseudos share one rect: ::before is the paper, ::after the ruled lines
+ *   (clipped to the paper's content-box so they inset cleanly). The page
+ *   runs off the bottom edge so it reads as a full sheet, thumbnailed. */
+.filegrid__cover--doc { background: var(--k-surface-sunken); }
+.filegrid__cover--doc::before,
+.filegrid__cover--doc::after {
+  content: "";
+  position: absolute;
+  left: 24%; right: 24%; top: 15%; bottom: -6%;
+  box-sizing: border-box;
+}
+.filegrid__cover--doc::before {
+  background: var(--k-surface);
+  border: 1px solid var(--k-border);
+  border-bottom: 0;
+  border-radius: var(--k-radius-sm, 4px) var(--k-radius-sm, 4px) 0 0;
+  box-shadow: var(--k-shadow-sm);
+}
+.filegrid__cover--doc::after {
+  padding: 26% 22% 0;
+  background: repeating-linear-gradient(to bottom, var(--k-border) 0 2px, transparent 2px 9px);
+  background-origin: content-box;
+  background-clip: content-box;
+}
+
+/* — Image (--img): a soft photographic gradient. nth-child hue shifts give
+ *   a populated album some variety without extra markup. — */
+.filegrid__cover--img {
+  background:
+    radial-gradient(120% 90% at 22% 14%, color-mix(in oklch, var(--k-surface) 55%, transparent), transparent 62%),
+    linear-gradient(135deg, var(--k-accent) 0%, color-mix(in oklch, var(--k-accent) 34%, var(--k-surface-sunken)) 100%);
+}
+.filegrid__tile:nth-child(3n) .filegrid__cover--img { filter: hue-rotate(38deg); }
+.filegrid__tile:nth-child(3n+1) .filegrid__cover--img { filter: hue-rotate(-32deg); }
+
+/* — Spreadsheet (--sheet): a small grid on a white sheet, tinted header row. — */
+.filegrid__cover--sheet::before {
+  content: "";
+  position: absolute;
+  inset: 17% 20%;
+  background:
+    linear-gradient(color-mix(in oklch, var(--k-accent) 22%, var(--k-surface)), color-mix(in oklch, var(--k-accent) 22%, var(--k-surface))) top / 100% 26% no-repeat,
+    repeating-linear-gradient(to right, var(--k-border) 0 1px, transparent 1px 25%),
+    repeating-linear-gradient(to bottom, var(--k-border) 0 1px, transparent 1px 26%),
+    var(--k-surface);
+  border: 1px solid var(--k-border);
+  border-radius: var(--k-radius-sm, 4px);
+  box-shadow: var(--k-shadow-sm);
+}
+
+/* Body — name over meta. */
+.filegrid__body {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--k-s-4);
+  flex-direction: column;
+  gap: var(--k-s-2);
+  min-width: 0;
 }
 .filegrid__name {
   font-size: var(--k-type-small);
@@ -5577,12 +5659,21 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
   min-width: 0;
 }
 .filegrid__meta {
   font-size: var(--k-type-eyebrow);
   color: var(--k-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+/* Legacy inline row (name + trailing chip on one line) — kept for tiles
+ * that don't use the stacked body. */
+.filegrid__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--k-s-6);
+  min-width: 0;
 }`,
   },
   {
