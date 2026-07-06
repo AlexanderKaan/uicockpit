@@ -1,0 +1,157 @@
+{
+  "generatedFrom": "uicockpit check --strict",
+  "totals": {
+    "withKit": 5,
+    "withoutKit": 127
+  },
+  "byRuleWithout": {
+    "no-raw-color": 35,
+    "spacing-grid": 45,
+    "font-size-scale": 26,
+    "known-modifiers": 6,
+    "tokens-imported": 6,
+    "radius-scale": 9
+  },
+  "rows": [
+    {
+      "id": "settings-form",
+      "category": "feature-with-constraint",
+      "withKit": {
+        "violations": 0,
+        "errors": 0,
+        "warns": 0,
+        "rules": {}
+      },
+      "withoutKit": {
+        "violations": 30,
+        "errors": 1,
+        "warns": 29,
+        "rules": {
+          "no-raw-color": 10,
+          "spacing-grid": 12,
+          "font-size-scale": 6,
+          "known-modifiers": 1,
+          "tokens-imported": 1
+        }
+      }
+    },
+    {
+      "id": "invoice-table",
+      "category": "data-display",
+      "withKit": {
+        "violations": 1,
+        "errors": 1,
+        "warns": 0,
+        "rules": {
+          "tokens-exist": 1
+        }
+      },
+      "withoutKit": {
+        "violations": 21,
+        "errors": 5,
+        "warns": 16,
+        "rules": {
+          "spacing-grid": 3,
+          "font-size-scale": 6,
+          "no-raw-color": 5,
+          "radius-scale": 1,
+          "known-modifiers": 5,
+          "tokens-imported": 1
+        }
+      }
+    },
+    {
+      "id": "pricing",
+      "category": "clone-with-modification",
+      "withKit": {
+        "violations": 2,
+        "errors": 2,
+        "warns": 0,
+        "rules": {
+          "tokens-exist": 2
+        }
+      },
+      "withoutKit": {
+        "violations": 14,
+        "errors": 0,
+        "warns": 14,
+        "rules": {
+          "spacing-grid": 7,
+          "radius-scale": 2,
+          "no-raw-color": 4,
+          "tokens-imported": 1
+        }
+      }
+    },
+    {
+      "id": "stat-header",
+      "category": "data-display",
+      "withKit": {
+        "violations": 1,
+        "errors": 1,
+        "warns": 0,
+        "rules": {
+          "tokens-exist": 1
+        }
+      },
+      "withoutKit": {
+        "violations": 25,
+        "errors": 0,
+        "warns": 25,
+        "rules": {
+          "no-raw-color": 3,
+          "font-size-scale": 6,
+          "spacing-grid": 12,
+          "radius-scale": 3,
+          "tokens-imported": 1
+        }
+      }
+    },
+    {
+      "id": "alerts",
+      "category": "state-display",
+      "withKit": {
+        "violations": 0,
+        "errors": 0,
+        "warns": 0,
+        "rules": {}
+      },
+      "withoutKit": {
+        "violations": 12,
+        "errors": 0,
+        "warns": 12,
+        "rules": {
+          "no-raw-color": 3,
+          "spacing-grid": 6,
+          "font-size-scale": 1,
+          "radius-scale": 1,
+          "tokens-imported": 1
+        }
+      }
+    },
+    {
+      "id": "login",
+      "category": "page-setup",
+      "withKit": {
+        "violations": 1,
+        "errors": 1,
+        "warns": 0,
+        "rules": {
+          "tokens-exist": 1
+        }
+      },
+      "withoutKit": {
+        "violations": 25,
+        "errors": 0,
+        "warns": 25,
+        "rules": {
+          "no-raw-color": 10,
+          "spacing-grid": 5,
+          "font-size-scale": 7,
+          "radius-scale": 2,
+          "tokens-imported": 1
+        }
+      }
+    }
+  ]
+}

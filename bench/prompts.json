@@ -1,0 +1,12 @@
+{
+  "battery": "uicockpit drift-bench v1",
+  "note": "Same build tasks, built once WITH the kit pack (tokens + recipes + contract) and once WITHOUT. `uicockpit check --strict` scores drift from the contract. The delta is the evidence.",
+  "prompts": [
+    { "id": "settings-form", "category": "feature-with-constraint", "prompt": "Build a settings form: a card with a title 'Profile', three labeled fields (Full name text input, Email text input, a Plan select with Free/Pro/Scale), inline validation showing an error under Email, and a footer action row with a secondary Cancel button and a primary Save button." },
+    { "id": "invoice-table", "category": "data-display", "prompt": "Build an invoices table with columns Invoice #, Client, Amount (right-aligned, currency), Status (a coloured badge: Paid/Overdue/Draft), and Due date. Five rows of realistic data. Above the table, a toolbar with a search field on the left and a primary 'New invoice' button on the right." },
+    { "id": "pricing", "category": "clone-with-modification", "prompt": "Build a three-tier pricing section: Free, Pro, Scale. Each is a card with the plan name, a price, four feature bullet points, and a call-to-action button. Highlight the Pro tier as the recommended plan with a primary button; the others use a secondary/ghost button." },
+    { "id": "stat-header", "category": "data-display", "prompt": "Build a dashboard header: a page title 'Overview', a segmented control to switch date range (7 days / 30 days / All-time), and a row of four KPI stat tiles (Revenue, Active users, Churn, MRR) each showing a small label, a big number, and a +/- delta versus last period (green for up, red for down)." },
+    { "id": "alerts", "category": "state-display", "prompt": "Build four inline alert messages stacked vertically: one informational, one success, one warning, one danger/error. Each has a leading status icon, a short message, and a dismiss (x) button. Use the conventional status colours." },
+    { "id": "login", "category": "page-setup", "prompt": "Build a centered login card: a heading 'Sign in', an email field, a password field, a 'Remember me' checkbox, a primary 'Sign in' button that spans the card width, and a muted 'Forgot password?' link below." }
+  ]
+}
