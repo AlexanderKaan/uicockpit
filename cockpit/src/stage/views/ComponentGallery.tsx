@@ -118,6 +118,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   StatGroupCard: 'Overview metrics KPIs summary numbers',
   TrendCard: 'Revenue trend chart sparkline delta',
   ChartCard: 'Traffic by source chart graph analytics',
+  BreakdownCard: 'Breakdown share bar category list expenses by category analytics',
   UsageMeterCard: 'Monthly quota usage meter limit',
   FileGridCard: 'Files file grid thumbnails',
   TreeViewCard: 'Explorer tree view folders files',
@@ -218,7 +219,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [CanvasCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
     [RatingCard, 'atom'], [MusicPlayerCard, 'component'], [WeatherCard, 'component'], [CheckoutCard, 'component'], [ProductCardCard, 'component'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
-    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
+    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [BreakdownCard, 'component'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarMonthCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
     [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [FrozenColumnTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
@@ -1167,6 +1168,36 @@ function ChartCard() {
         <button className={`segctrl__btn ${view === 'empty' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('empty')}>Empty</button>
       </div>
       <ChartFrame type={type} height={140} labels={type === 'donut' ? donutLabels : labels} series={series} empty={view === 'empty'} loading={view === 'loading'} />
+    </Card>
+  )
+}
+
+// Breakdown — a share-bar category list, the analytical companion beside a
+// chart ("made of what?"). Each row's marker + bar colour comes from the
+// derived --k-chart-1..6 palette via --bd-color, so it shares the chart legend.
+function BreakdownCard() {
+  const rows = [
+    { name: 'Payroll', value: 13980 },
+    { name: 'Software & tools', value: 6240 },
+    { name: 'Contractors', value: 4820 },
+    { name: 'Office & travel', value: 2960 },
+    { name: 'Other', value: 2156 },
+  ]
+  const total = rows.reduce((s, r) => s + r.value, 0)
+  return (
+    <Card docId="breakdown" title="Expenses by category" desc="A share-bar breakdown — the analytical companion beside a trend chart.">
+      <div className="breakdown">
+        {rows.map((r, i) => {
+          const pct = Math.round((r.value / total) * 100)
+          return (
+            <div key={r.name} className="breakdown__row" style={{ '--bd-color': `var(--k-chart-${(i % 6) + 1})`, '--bd-pct': `${pct}%` } as CSSProperties}>
+              <span className="breakdown__name"><span className="breakdown__label">{r.name}</span></span>
+              <span className="breakdown__val">${r.value.toLocaleString('en-US')}<span className="breakdown__pct">{pct}%</span></span>
+              <div className="breakdown__track"><div className="breakdown__bar" /></div>
+            </div>
+          )
+        })}
+      </div>
     </Card>
   )
 }
@@ -5065,6 +5096,7 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'table', name: 'Table', group: 'Data display', recipeId: 'table', blurb: 'The base data table — header, rows, numeric alignment, hover and zebra.', Preview: TableCard },
   { slug: 'data-table', name: 'Data Table', group: 'Data display', recipeId: 'data-table', blurb: 'The flagship data surface — toolbar, selection, sticky header, pagination and every state.', Preview: DataTableProCard },
   { slug: 'chart', name: 'Chart', group: 'Data display', recipeId: 'chart', blurb: 'Line / area / bar / stacked / donut on the kit’s derived 6-series palette.', Preview: ChartCard },
+  { slug: 'breakdown', name: 'Breakdown', group: 'Data display', recipeId: 'breakdown', blurb: 'A share-bar category list — the analytical companion beside a chart.', Preview: BreakdownCard },
   { slug: 'stat-tile', name: 'Stat Tile', group: 'Data display', recipeId: 'stat-tile', blurb: 'A KPI tile — big number, label, delta and an optional sparkline.', Preview: StatCard },
   { slug: 'list', name: 'List', group: 'Data display', recipeId: 'list', blurb: 'Rows of items with lead media, meta and trailing actions or badges.', Preview: ListCard },
   { slug: 'description-list', name: 'Description List', group: 'Data display', recipeId: 'description-list', blurb: 'Key–value pairs — account info, plan details, a spec sheet.', Preview: DescriptionListCard },

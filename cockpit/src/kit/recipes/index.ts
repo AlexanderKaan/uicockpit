@@ -3213,6 +3213,80 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .kanban__prio i { height: 1.5px; border-radius: 1px; background: currentColor; }`,
   },
   {
+    id: 'breakdown',
+    section: "Breakdown",
+    doc: {
+      dos: [
+        "Pair a breakdown with a chart or KPI — it answers “made of what?” where the chart shows “over time.”",
+        "Colour each bar from the --k-chart-1..6 palette (set --bd-color) so a breakdown beside a chart shares its legend.",
+        "Sort rows biggest-first and show the percent so the long tail is obvious at a glance.",
+      ],
+      donts: [
+        "Don't exceed ~6 rows — fold the remainder into an “Other” row so the bars stay readable.",
+        "Don't hardcode a bar colour — drive it from --bd-color so it re-themes with the palette.",
+      ],
+    },
+    css: `/* === Breakdown (.breakdown) — a share-bar list ===========================
+ * The analytical companion to a chart: a labelled category list where each
+ * row shows a marker + name, its value + percent, and a proportional share
+ * bar coloured from the chart palette. Answers "made of what?" — expense
+ * categories, revenue by client, traffic sources, aging buckets. Bars draw
+ * in on mount. Per row set --bd-color (a --k-chart-n, drives marker + bar)
+ * and --bd-pct (the fill width). LAYOUT-only inline vars, never structural. */
+.breakdown { display: flex; flex-direction: column; gap: var(--k-s-14); }
+.breakdown__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--k-s-12);
+  row-gap: var(--k-s-6);
+  align-items: baseline;
+}
+.breakdown__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-8);
+  min-width: 0;
+  font-size: var(--k-type-small);
+  color: var(--k-fg);
+}
+/* Category marker — a round dot in the row's palette colour (pseudo, no extra
+ * node). Round (not the chart legend's square) reads as a list bullet. */
+.breakdown__name::before {
+  content: "";
+  width: var(--k-marker);
+  height: var(--k-marker);
+  border-radius: 50%;
+  background: var(--bd-color, var(--k-primary));
+  flex: none;
+}
+.breakdown__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.breakdown__val {
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--k-fg);
+  white-space: nowrap;
+}
+.breakdown__pct { margin-left: var(--k-s-6); color: var(--k-fg-muted); font-weight: var(--k-weight-medium); }
+.breakdown__track {
+  grid-column: 1 / -1;
+  height: var(--k-s-6);
+  border-radius: var(--k-radius-pill);
+  background: var(--k-surface-sunken);
+  overflow: hidden;
+}
+.breakdown__bar {
+  height: 100%;
+  width: var(--bd-pct, 0%);
+  border-radius: inherit;
+  background: var(--bd-color, var(--k-primary));
+  transform-origin: left;
+  animation: breakdown-grow 640ms var(--k-ease-out, cubic-bezier(.2, .8, .2, 1)) both;
+}
+@keyframes breakdown-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .breakdown__bar { animation: none; } }`,
+  },
+  {
     id: 'sparkline',
     section: "Sparkline",
     css: `/* === Sparkline ===

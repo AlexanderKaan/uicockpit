@@ -113,6 +113,7 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   'calendar-range': ['calendar', 'buttons'], // the double-month range picker
   'stat-tile': ['card', 'sparkline', 'badges-pills'], // a single metric tile
   chart: ['card'], // a chart widget (lives in a card)
+  breakdown: [], // a share-bar category list — the analytical companion beside a chart
   timeline: ['avatar', 'badges-pills'], // an event list
   'activity-feed': ['avatar', 'badges-pills', 'list'], // a feed list
 }

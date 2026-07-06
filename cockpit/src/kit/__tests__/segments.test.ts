@@ -55,7 +55,7 @@ describe('segment graph integrity', () => {
     expect(idsByTier('component')).toHaveLength(Object.keys(COMPONENT_USES).length)
     expect(idsByTier('section')).toHaveLength(Object.keys(SECTION_USES).length)
     expect(idsByTier('foundation')).toHaveLength(5)
-    expect(idsByTier('component')).toHaveLength(25)
+    expect(idsByTier('component')).toHaveLength(26)
     // The 2026-06-15 "slab vs widget" re-audit: a SECTION is a full-width page slab
     // (its own job + heading; stacked to build a page); a COMPONENT is a widget you
     // drop INSIDE one. 14 sections = 4 shell regions (scaffold/navsuite/pane + the

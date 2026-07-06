@@ -531,6 +531,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "dialog",
         "command-palette",
         "chart",
+        "breakdown",
         "usage-meter",
         "menubar",
         "resizable",
@@ -860,6 +861,11 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": [
           "card"
         ]
+      },
+      "breakdown": {
+        "tier": "component",
+        "section": "Breakdown",
+        "uses": []
       },
       "sparkline": {
         "tier": "atom",
@@ -1356,6 +1362,18 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "breadcrumb": {
         "modifiers": [],
         "parts": []
+      },
+      "breakdown": {
+        "modifiers": [],
+        "parts": [
+          "bar",
+          "label",
+          "name",
+          "pct",
+          "row",
+          "track",
+          "val"
+        ]
       },
       "btn": {
         "modifiers": [
@@ -4011,9 +4029,9 @@ body {
  *   are what guarantee a consumer's UI looks like the preview.
  *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
  *
- * COMPONENTS — stand-alone pieces of app (25), composed FROM the atoms — the
+ * COMPONENTS — stand-alone pieces of app (26), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
- *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
+ *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Dialog, Command palette, Chart, Breakdown, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
  *
  * SECTIONS — the page-region tier (14): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
@@ -7012,6 +7030,66 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .kanban__icons { display: inline-flex; align-items: center; gap: var(--k-s-6); color: var(--k-fg-faint); }
 .kanban__prio { display: inline-flex; flex-direction: column; gap: 1.5px; width: 11px; color: var(--k-fg-faint); }
 .kanban__prio i { height: 1.5px; border-radius: 1px; background: currentColor; }
+
+/* === Breakdown (.breakdown) — a share-bar list ===========================
+ * The analytical companion to a chart: a labelled category list where each
+ * row shows a marker + name, its value + percent, and a proportional share
+ * bar coloured from the chart palette. Answers "made of what?" — expense
+ * categories, revenue by client, traffic sources, aging buckets. Bars draw
+ * in on mount. Per row set --bd-color (a --k-chart-n, drives marker + bar)
+ * and --bd-pct (the fill width). LAYOUT-only inline vars, never structural. */
+.breakdown { display: flex; flex-direction: column; gap: var(--k-s-14); }
+.breakdown__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--k-s-12);
+  row-gap: var(--k-s-6);
+  align-items: baseline;
+}
+.breakdown__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-8);
+  min-width: 0;
+  font-size: var(--k-type-small);
+  color: var(--k-fg);
+}
+/* Category marker — a round dot in the row's palette colour (pseudo, no extra
+ * node). Round (not the chart legend's square) reads as a list bullet. */
+.breakdown__name::before {
+  content: "";
+  width: var(--k-marker);
+  height: var(--k-marker);
+  border-radius: 50%;
+  background: var(--bd-color, var(--k-primary));
+  flex: none;
+}
+.breakdown__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.breakdown__val {
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--k-fg);
+  white-space: nowrap;
+}
+.breakdown__pct { margin-left: var(--k-s-6); color: var(--k-fg-muted); font-weight: var(--k-weight-medium); }
+.breakdown__track {
+  grid-column: 1 / -1;
+  height: var(--k-s-6);
+  border-radius: var(--k-radius-pill);
+  background: var(--k-surface-sunken);
+  overflow: hidden;
+}
+.breakdown__bar {
+  height: 100%;
+  width: var(--bd-pct, 0%);
+  border-radius: inherit;
+  background: var(--bd-color, var(--k-primary));
+  transform-origin: left;
+  animation: breakdown-grow 640ms var(--k-ease-out, cubic-bezier(.2, .8, .2, 1)) both;
+}
+@keyframes breakdown-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .breakdown__bar { animation: none; } }
 
 /* === Sparkline ===
    Inline micro-chart inside a stat-tile. Fixed dimensions so it reads as a
@@ -11209,9 +11287,9 @@ body {
  *   are what guarantee a consumer's UI looks like the preview.
  *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
  *
- * COMPONENTS — stand-alone pieces of app (25), composed FROM the atoms — the
+ * COMPONENTS — stand-alone pieces of app (26), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
- *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Dialog, Command palette, Chart, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
+ *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Dialog, Command palette, Chart, Breakdown, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
  *
  * SECTIONS — the page-region tier (14): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
@@ -14210,6 +14288,66 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .kanban__icons { display: inline-flex; align-items: center; gap: var(--k-s-6); color: var(--k-fg-faint); }
 .kanban__prio { display: inline-flex; flex-direction: column; gap: 1.5px; width: 11px; color: var(--k-fg-faint); }
 .kanban__prio i { height: 1.5px; border-radius: 1px; background: currentColor; }
+
+/* === Breakdown (.breakdown) — a share-bar list ===========================
+ * The analytical companion to a chart: a labelled category list where each
+ * row shows a marker + name, its value + percent, and a proportional share
+ * bar coloured from the chart palette. Answers "made of what?" — expense
+ * categories, revenue by client, traffic sources, aging buckets. Bars draw
+ * in on mount. Per row set --bd-color (a --k-chart-n, drives marker + bar)
+ * and --bd-pct (the fill width). LAYOUT-only inline vars, never structural. */
+.breakdown { display: flex; flex-direction: column; gap: var(--k-s-14); }
+.breakdown__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--k-s-12);
+  row-gap: var(--k-s-6);
+  align-items: baseline;
+}
+.breakdown__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-8);
+  min-width: 0;
+  font-size: var(--k-type-small);
+  color: var(--k-fg);
+}
+/* Category marker — a round dot in the row's palette colour (pseudo, no extra
+ * node). Round (not the chart legend's square) reads as a list bullet. */
+.breakdown__name::before {
+  content: "";
+  width: var(--k-marker);
+  height: var(--k-marker);
+  border-radius: 50%;
+  background: var(--bd-color, var(--k-primary));
+  flex: none;
+}
+.breakdown__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.breakdown__val {
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--k-fg);
+  white-space: nowrap;
+}
+.breakdown__pct { margin-left: var(--k-s-6); color: var(--k-fg-muted); font-weight: var(--k-weight-medium); }
+.breakdown__track {
+  grid-column: 1 / -1;
+  height: var(--k-s-6);
+  border-radius: var(--k-radius-pill);
+  background: var(--k-surface-sunken);
+  overflow: hidden;
+}
+.breakdown__bar {
+  height: 100%;
+  width: var(--bd-pct, 0%);
+  border-radius: inherit;
+  background: var(--bd-color, var(--k-primary));
+  transform-origin: left;
+  animation: breakdown-grow 640ms var(--k-ease-out, cubic-bezier(.2, .8, .2, 1)) both;
+}
+@keyframes breakdown-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .breakdown__bar { animation: none; } }
 
 /* === Sparkline ===
    Inline micro-chart inside a stat-tile. Fixed dimensions so it reads as a
@@ -17726,6 +17864,7 @@ the atoms listed, not by hand-rolling them inside a bare card:
 - **Calendar range** — composes: Calendar · Buttons
 - **Stat tile** — composes: Card · Sparkline · Badges & pills
 - **Chart** — composes: Card
+- **Breakdown** — composes: (self-contained)
 - **Timeline** — composes: Avatar · Badges & pills
 - **Activity feed** — composes: Avatar · Badges & pills · List
 
@@ -17812,6 +17951,16 @@ kit already guarantees.
 **Don't**
 - Don't introduce colours outside the chart palette — they break theming and dark mode.
 - Don't plot more than six series in one frame; split the story instead.
+
+### Breakdown
+**Do**
+- Pair a breakdown with a chart or KPI — it answers “made of what?” where the chart shows “over time.”
+- Colour each bar from the --k-chart-1..6 palette (set --bd-color) so a breakdown beside a chart shares its legend.
+- Sort rows biggest-first and show the percent so the long tail is obvious at a glance.
+
+**Don't**
+- Don't exceed ~6 rows — fold the remainder into an “Other” row so the bars stay readable.
+- Don't hardcode a bar colour — drive it from --bd-color so it re-themes with the palette.
 
 ### Toast stack
 **Do**

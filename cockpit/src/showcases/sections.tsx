@@ -208,6 +208,31 @@ function ChartTabs({ tabs }: { tabs: Array<{ label: string; type: 'bar' | 'area'
   )
 }
 
+/** Breakdown — the real `.breakdown` share-bar list. Rows are sorted biggest-
+ *  first and each bar's colour comes from the derived --k-chart-1..6 palette,
+ *  so a breakdown beside a chart shares its legend ("made of what?"). */
+function BreakdownSection({ title, unit, rows }: { title: string; unit?: string; rows: Array<{ name: string; value: number }> }) {
+  const sorted = [...rows].sort((a, b) => b.value - a.value)
+  const total = sorted.reduce((s, r) => s + r.value, 0) || 1
+  return (
+    <div className="card">
+      <div className="card__head"><span className="card__title">{title}</span></div>
+      <div className="breakdown">
+        {sorted.map((r, i) => {
+          const pct = Math.round((r.value / total) * 100)
+          return (
+            <div key={r.name} className="breakdown__row" style={{ '--bd-color': `var(--k-chart-${(i % 6) + 1})`, '--bd-pct': `${pct}%` } as CSSProperties}>
+              <span className="breakdown__name"><span className="breakdown__label">{r.name}</span></span>
+              <span className="breakdown__val">{unit ?? ''}{r.value.toLocaleString('en-US')}<span className="breakdown__pct">{pct}%</span></span>
+              <div className="breakdown__track"><div className="breakdown__bar" /></div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 /** Photo avatar with a graceful initial fallback — the flagship's "real app"
  *  tell. Real portrait via .avatar__img; on load error, swap to the initial. */
 function PhotoAvatar({ url, name, sm }: { url: string; name: string; sm?: boolean }) {
@@ -304,6 +329,8 @@ export function renderSection(spec: SectionSpec, key: number) {
       )
     case 'chartTabs':
       return <ChartTabs key={key} tabs={spec.seed.tabs} />
+    case 'breakdown':
+      return <BreakdownSection key={key} title={spec.seed.title} unit={spec.seed.unit} rows={spec.seed.rows} />
     case 'filegrid':
       return <FileGridSection key={key} title={spec.seed.title} files={spec.seed.files} />
     case 'list':
