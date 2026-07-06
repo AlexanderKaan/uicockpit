@@ -204,6 +204,17 @@ export const RECIPES: readonly Recipe[] = [
   {
     id: 'buttons',
     section: "Buttons",
+    doc: {
+      dos: [
+        "One .btn--primary per view region \u2014 everything else stays quiet (default or .btn--ghost).",
+        "A destructive action wears .btn--danger, not primary.",
+        "Use the size modifiers (.btn--sm / .btn--xs) \u2014 heights are locked to the control scale.",
+      ],
+      donts: [
+        "Don't stretch or restyle a button's height with padding overrides \u2014 the height invariant keeps every control row aligned.",
+        "Don't put two primaries side by side; demote one to ghost.",
+      ],
+    },
     css: `/* === Buttons ===
    Horizontal padding uses max() against --k-radius-md so it scales when
    the user picks a larger radius. At pill (md=26px) the curve dominates
@@ -505,6 +516,17 @@ export const RECIPES: readonly Recipe[] = [
   {
     id: 'card',
     section: "Card",
+    doc: {
+      dos: [
+        "Follow the anatomy: .card__head (title + meta), content rows, and .card__foot for actions behind the hairline divider.",
+        "One primary action per card, in the foot; secondaries are .btn--ghost.",
+        "Reserve .card__foot for true form/settings/commit cards \u2014 a display card ends at its content.",
+      ],
+      donts: [
+        "Don't nest cards inside cards \u2014 use rows or a plain group.",
+        "Don't use cards as page layout; that is the scaffold / pane tier.",
+      ],
+    },
     css: `/* === Card ================================================================
  * The fundamental surface container: a bordered, rounded, padded box on the
  * --k-surface plane that holds any component. Anatomy — .card__head (title +
@@ -1492,6 +1514,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   {
     id: 'data-table',
     section: "Data table",
+    doc: {
+      dos: [
+        "Reach for .data-table for ANY data surface \u2014 it owns the toolbar, selection, sticky header, pagination and the empty/loading/error states.",
+        "Put numeric columns in .num cells (th + td) \u2014 right-aligned, tabular numerals, so totals line up.",
+        "On a narrow container let the container query reflow it; freeze the identity column with .tbl__col--frozen when it scrolls horizontally.",
+      ],
+      donts: [
+        "Don't hand-roll a table out of .card + flex rows \u2014 density, hover, selection and the states are already guaranteed here.",
+        "Don't bolt a separate search input above it \u2014 the toolbar slot is part of the recipe.",
+      ],
+    },
     css: `/* === Data table ===
    The flagship BLOCK: a bordered frame that wraps the .tbl atom into a complete,
    believable data surface — matrix-complete across every state real data hits.
@@ -2351,6 +2384,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   {
     id: 'calendar',
     section: "Calendar",
+    doc: {
+      dos: [
+        "Pick the variant for the job: the month grid for picking, .calendar-week for scheduling, the range states for periods.",
+        "Keep today marked even while another day is selected \u2014 the two states are independent.",
+        "Fix the grid at six rows so a picker popover never changes height between months.",
+      ],
+      donts: [
+        "Don't rebuild a date picker from a table \u2014 the calendar owns the cell states and keyboard flow.",
+        "Don't use the bare month grid for read-only event display; that is the week/agenda pattern.",
+      ],
+    },
     css: `/* === Calendar ===
    Single-cell selection + range pattern (shadcn / react-day-picker style).
    Range cells fill with primary-soft and lose corner radius on connection
@@ -2692,6 +2736,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   {
     id: 'dialog',
     section: "Dialog",
+    doc: {
+      dos: [
+        "One primary action per dialog; the action row is .dialog__foot \u2014 secondaries as .btn--ghost, the primary trailing.",
+        "A destructive confirmation wears .btn--danger and names the object ('Delete 3 invoices'), never a bare 'Are you sure?'.",
+        "Keep it to one screen of content \u2014 a longer flow belongs in a .sheet or its own page.",
+      ],
+      donts: [
+        "Don't stack dialogs \u2014 replace the content or step within the one you have.",
+        "Don't use a dialog for passive status; that is a .toast or .banner.",
+      ],
+    },
     css: `/* === Dialog === */
 .dialog {
   border-radius: var(--k-radius-lg);
@@ -2945,6 +3000,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   {
     id: 'chart',
     section: "Chart",
+    doc: {
+      dos: [
+        "Series colours come from the derived --k-chart-1..6 palette \u2014 every kit ships a harmonised set that survives re-theming.",
+        "Give every chart an insight header (title + the delta that matters), not just axes.",
+        "Use the recipe's legend and keep axis labels in caption type.",
+      ],
+      donts: [
+        "Don't introduce colours outside the chart palette \u2014 they break theming and dark mode.",
+        "Don't plot more than six series in one frame; split the story instead.",
+      ],
+    },
     css: `/* === Chart ===
    Data-viz elements (bars, sparklines) deliberately do NOT scale with the
    theme's radius — a pill-shaped bar reads as a pill, not as data. A small
@@ -3535,6 +3601,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   {
     id: 'toast-stack',
     section: "Toast stack",
+    doc: {
+      dos: [
+        "A passive confirmation uses the toned variants (.toast--success/info/warn/error) and auto-dismisses.",
+        "An actionable toast ('Saved \u2014 Undo') is the snackbar: .toast--snackbar on the inverse surface, ONE .toast__action, one at a time.",
+        "Anchor the stack in one corner via .toast-stack and cap it at about three visible.",
+      ],
+      donts: [
+        "Don't use a toast for anything that needs a decision \u2014 that is a .dialog.",
+        "Don't auto-dismiss a toast that carries an action.",
+      ],
+    },
     css: `/* === Toast stack ===
    In production this stack pins bottom-right of the viewport (use position:
    fixed + bottom/right). In the gallery demo it lives inside a bordered
@@ -5567,6 +5644,17 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   {
     id: 'form-panel',
     section: "Form panel",
+    doc: {
+      dos: [
+        "One column by default \u2014 label above control; every field is a .field carrying its label, control and .field__hint.",
+        "Show validation inline: aria-invalid on the control + the message in .field__error, next to the field it belongs to.",
+        "Commit actions live in the sunken foot \u2014 one .btn--primary, secondaries as .btn--ghost.",
+      ],
+      donts: [
+        "Don't use placeholders as labels \u2014 they vanish the moment the user types.",
+        "Don't disable the submit button while the user is still typing; validate on blur and on submit.",
+      ],
+    },
     css: `/* === Form panel ===
    The editing-surface BLOCK — what you reach for when a screen needs a real form,
    not a loose stack of inputs. A bordered panel with a titled header, a body of
@@ -5647,6 +5735,17 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   {
     id: 'filter-bar',
     section: "Filter bar",
+    doc: {
+      dos: [
+        "Active filters render as removable chips in the bar \u2014 the query state stays visible, not buried in dropdowns.",
+        "Offer a clear-all once two or more filters are active.",
+        "Keep the bar to one row; overflow goes into a 'More filters' popover.",
+      ],
+      donts: [
+        "Don't duplicate the query state in a table toolbar next to it \u2014 one owner per surface.",
+        "Don't make the search input full-width inside the bar; it shares the row with the facets.",
+      ],
+    },
     css: `/* === Filter bar ===
    The query BLOCK that sits above a list or table: a search field, faceted selects,
    an autocomplete, a range, plus an active-filter chip row that summarises and
@@ -5895,6 +5994,17 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   {
     id: 'navsuite',
     section: "Nav suite",
+    doc: {
+      dos: [
+        "Let the suite morph by container width \u2014 bottom bar \u2192 rail \u2192 sidebar come free; never fork a separate mobile nav.",
+        "Mark the active item with aria-current \u2014 the kit's selected treatment binds to it.",
+        "Group items under section labels once you pass about six items.",
+      ],
+      donts: [
+        "Don't hide primary navigation behind a hamburger on a wide container.",
+        "Don't rebuild a sidebar from .card + links \u2014 the suite owns nav spacing, states and the morph.",
+      ],
+    },
     css: `/* === Nav suite — ONE nav that reshapes per container width (H3a) ===
    The adaptive navigation primitive (Compose's NavigationSuiteScaffold as a
    recipe): bottom bar (<600) -> collapsed icon rail (600-1199) -> expanded

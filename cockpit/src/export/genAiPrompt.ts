@@ -10,6 +10,29 @@ import { Z_INDEX, BREAKPOINTS } from '../tokens/extras'
 import { RECIPES } from '../kit'
 import { FOUNDATIONS, COMPONENT_USES, STANDALONE_ATOMS, idsByTier } from '../kit/segments'
 
+/** Per-component Do/Don't craft rules (LP1 doc-cards) — rendered from the recipes'
+ * own `doc` blocks, so the export can never drift from the kit source. Encodes
+ * WHEN to reach for a component and how to compose it — the judgment layer the
+ * class vocabulary alone can't carry. */
+export function bestPractices(): string {
+  const withDoc = RECIPES.filter((r) => r.doc)
+  if (!withDoc.length) return ''
+  const blocks = withDoc
+    .map((r) => {
+      const d = r.doc!
+      return `### ${r.section}\n**Do**\n${d.dos.map((x) => `- ${x}`).join('\n')}\n\n**Don't**\n${d.donts.map((x) => `- ${x}`).join('\n')}`
+    })
+    .join('\n\n')
+  return `## Component best practices — Do / Don't
+
+Craft rules per flagship component, part of the contract: they encode WHEN to
+reach for a component and how to compose it. Treat a "Don't" here with the same
+weight as a token rule — most of them describe a second version of something the
+kit already guarantees.
+
+${blocks}`
+}
+
 /** The composition contract, derived from the segment graph — the structural part
  * an agent must enforce: the tier ladder, which components exist and what each
  * composes, and which atoms stand alone. Built from `src/kit/segments.ts`, so it
@@ -382,6 +405,8 @@ Components ship in three sizes (\`--sm\` / default / \`--lg\`). Pick by context:
 When in doubt, **pick default**. \`--sm\` and \`--lg\` are explicit opt-ins.
 
 ${componentModel()}
+
+${bestPractices()}
 
 ## Components I expect you to build
 

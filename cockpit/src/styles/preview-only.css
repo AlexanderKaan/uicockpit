@@ -730,6 +730,47 @@
 }
 .cockpit-preview .gallery--workbench > .card > .card__head > .card__desc { display: none; }
 
+/* === Best-practices disclosure (LP1 doc-cards) =========================
+ * Flagship gallery cards surface their recipe's Do/Don't rules behind a quiet
+ * <details> in the card head — the SAME content the design.md export and the
+ * MCP serve (single source: the recipe's `doc` block). Gallery chrome only. */
+.gdoc { margin-top: var(--k-s-6); font-size: var(--k-type-caption); }
+.gdoc > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-4);
+  color: var(--k-fg-faint);
+  font-weight: var(--k-weight-medium);
+  cursor: pointer;
+}
+.gdoc > summary::-webkit-details-marker { display: none; }
+.gdoc > summary:hover { color: var(--k-fg-muted); }
+.gdoc__chev { display: inline-flex; transition: transform var(--k-dur, 200ms) var(--k-ease, ease); }
+.gdoc[open] .gdoc__chev { transform: rotate(180deg); }
+.gdoc__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--k-s-12);
+  margin-top: var(--k-s-8);
+  padding: var(--k-s-10);
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+  background: var(--k-surface-2);
+}
+@container (max-width: 32rem) { .gdoc__cols { grid-template-columns: 1fr; } }
+.gdoc__h {
+  font-size: var(--k-type-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: var(--k-track-eyebrow);
+  font-weight: var(--k-weight-semibold);
+  margin-bottom: var(--k-s-4);
+}
+.gdoc__h--do { color: var(--k-success); }
+.gdoc__h--dont { color: var(--k-danger); }
+.gdoc__cols ul { margin: 0; padding-left: var(--k-s-16); display: grid; gap: var(--k-s-4); }
+.gdoc__cols li { color: var(--k-fg-muted); line-height: 1.5; }
+
 
 /* === Atoms — grouped category cards ==================================
  * The Atoms view buckets the bare atoms into bordered CATEGORY cards (like the

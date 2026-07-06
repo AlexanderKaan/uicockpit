@@ -1,6 +1,6 @@
 import type { Config } from '../tokens/types'
 import { genBrief } from './genBrief'
-import { componentModel } from './genAiPrompt'
+import { componentModel, bestPractices } from './genAiPrompt'
 
 /* design.md — ONE doc, two voices. The headline artifact of the "Use this kit"
  * pack: the human handoff (what the system is + every token + the rules, from
@@ -31,6 +31,8 @@ Touch only look / layout / composition — never rewrite the app's logic to fit 
 kit.
 
 ${componentModel()}
+
+${bestPractices()}
 
 ## Verify your work
 

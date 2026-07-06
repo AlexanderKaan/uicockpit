@@ -7,6 +7,7 @@ import { ChartFrame } from './ChartFrame'
 import type { ChartType } from './ChartFrame'
 import { popGalleryJump } from '../../state/galleryJump'
 import { renderSection } from '../../showcases/sections'
+import { RECIPES } from '../../kit'
 
 // PAGE tier — the full-bleed page TEMPLATES (the former "Page recipes" showcase,
 // rehoused here as the catalog's 4th wall). Each is a whole screen composed from
@@ -404,13 +405,31 @@ function DangerZoneCard() {
  * component-type label. `desc` is an optional muted subtitle, like shadcn's
  * CardDescription. Both are optional: a card may open straight into its UI
  * when a heading would feel bolted-on. (#202 volledig-shadcn sweep.) */
-function Card({ title, desc, children, wide, xwide }: { title?: string; desc?: string; children: React.ReactNode; wide?: boolean; xwide?: boolean }) {
+function Card({ title, desc, children, wide, xwide, docId }: { title?: string; desc?: string; children: React.ReactNode; wide?: boolean; xwide?: boolean; docId?: string }) {
+  // LP1 doc-cards — flagship cards surface their recipe's Do/Don't craft rules
+  // (the same single source design.md + the MCP serve) behind a quiet disclosure.
+  const doc = docId ? RECIPES.find((r) => r.id === docId)?.doc : undefined
   return (
     <div className={`card${wide ? ' card--wide' : ''}${xwide ? ' card--xwide' : ''}`}>
       {(title || desc) && (
         <div className="card__head">
           {title && <div className="card__title">{title}</div>}
           {desc && <div className="card__desc">{desc}</div>}
+          {doc && (
+            <details className="gdoc">
+              <summary>Best practices<span className="gdoc__chev"><ChevronSvg size={11} /></span></summary>
+              <div className="gdoc__cols">
+                <div>
+                  <div className="gdoc__h gdoc__h--do">Do</div>
+                  <ul>{doc.dos.map((x) => <li key={x}>{x}</li>)}</ul>
+                </div>
+                <div>
+                  <div className="gdoc__h gdoc__h--dont">Don&apos;t</div>
+                  <ul>{doc.donts.map((x) => <li key={x}>{x}</li>)}</ul>
+                </div>
+              </div>
+            </details>
+          )}
         </div>
       )}
       {children}
@@ -992,7 +1011,7 @@ function SkeletonCard() {
 function DialogCard() {
   const [open, setOpen] = useState(true)
   return (
-    <Card title="Delete project" desc="Open the confirmation dialog.">
+    <Card docId="dialog" title="Delete project" desc="Open the confirmation dialog.">
       <div className="card__row">
         <button className="btn btn--ghost btn--sm" onClick={() => setOpen((v) => !v)}>
           {open ? 'Close dialog' : 'Open dialog'}
@@ -1137,7 +1156,7 @@ function ChartCard() {
         ]
   const donutLabels = ['Direct', 'Search', 'Social', 'Referral']
   return (
-    <Card wide title="Traffic by source" desc="One ChartFrame, six render modes — gridlines, axes, hover tooltips.">
+    <Card wide docId="chart" title="Traffic by source" desc="One ChartFrame, six render modes — gridlines, axes, hover tooltips.">
       <div className="segctrl" style={{ marginBottom: 10, flexWrap: 'wrap' }}>
         {([['line', 'Line'], ['area', 'Area'], ['bar', 'Bar'], ['stacked', 'Stacked'], ['stackedArea', 'Stacked area'], ['donut', 'Donut']] as const).map(([t, lbl]) => (
           <button key={t} className={`segctrl__btn ${view === 'chart' && type === t ? 'segctrl__btn--on' : ''}`} onClick={() => { setType(t); setView('chart') }}>
@@ -1312,7 +1331,7 @@ function DataTableProCard() {
   const toggleAll = () => setSel(allOn ? new Set() : new Set(DT_ROWS.map((r) => r.id)))
   const setMode = (k: DTState) => { setState(k); setSel(new Set()) }
   return (
-    <Card wide title="Data table" desc="Toolbar, selection, every state & pagination — the flagship block.">
+    <Card wide docId="data-table" title="Data table" desc="Toolbar, selection, every state & pagination — the flagship block.">
       <div className="segctrl" role="tablist" aria-label="Table state" style={{ marginBottom: 12 }}>
         {DT_STATES.map((s) => (
           <button key={s.k} role="tab" aria-selected={state === s.k} className={`segctrl__btn ${state === s.k ? 'segctrl__btn--on' : ''}`} onClick={() => setMode(s.k)}>{s.label}</button>
@@ -1423,7 +1442,7 @@ function FormPanelCard() {
   const [plan, setPlan] = useState('team')
   const [qty, setQty] = useState(3)
   return (
-    <Card wide title="Form panel" desc="Sectioned fields, validation & an action bar — the form block.">
+    <Card wide docId="form-panel" title="Form panel" desc="Sectioned fields, validation & an action bar — the form block.">
       <div className="formpanel">
         <div className="formpanel__head">
           <div className="formpanel__title">New workspace</div>
@@ -1499,7 +1518,7 @@ function FilterBarCard() {
   const [score, setScore] = useState(60)
   const [chips, setChips] = useState(['status: open', 'env: prod'])
   return (
-    <Card wide title="Filter bar" desc="Search, facets, range & active-filter chips — the query block.">
+    <Card wide docId="filter-bar" title="Filter bar" desc="Search, facets, range & active-filter chips — the query block.">
       <div className="filterbar">
         <div className="toolbar">
           <div className="searchinput" style={{ maxWidth: 200 }}>
@@ -2358,7 +2377,7 @@ function ButtonsCard() {
   // round⇄square corner morph (visible on pill themes, springs via --k-spring).
   const [starred, setStarred] = useState(false)
   return (
-    <Card title="Buttons" desc="One loud primary, quiet siblings. Variant · size · state — all at intrinsic width.">
+    <Card docId="buttons" title="Buttons" desc="One loud primary, quiet siblings. Variant · size · state — all at intrinsic width.">
       <div className="card__row">
         <button type="button" className="btn btn--primary">Get started</button>
         <button type="button" className="btn btn--secondary">Secondary</button>
@@ -2881,7 +2900,7 @@ function CalendarMonthCard() {
   }
   const CAP = 3
   return (
-    <Card wide title="May 2026" desc="Month scheduler — day cells carry event chips + overflow.">
+    <Card wide docId="calendar" title="May 2026" desc="Month scheduler — day cells carry event chips + overflow.">
       <div className="calendar calendar--events">
         {DOW.map((d, i) => (<div key={`h${i}`} className="calendar__head">{d}</div>))}
         {Array.from({ length: 35 }, (_, idx) => {
@@ -3563,7 +3582,7 @@ function ToastStackCard() {
     window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000)
   }
   return (
-    <Card title="Toast" desc="Trigger a sample notification.">
+    <Card docId="toast-stack" title="Toast" desc="Trigger a sample notification.">
       <div className="card__row" style={{ flexWrap: 'wrap', gap: 6 }}>
         <button className="btn btn--ghost btn--sm" onClick={() => fire('success')}>
           <Icon name="check" /> Success

@@ -17515,6 +17515,113 @@ own width, so they reflow correctly wherever you drop them — full-bleed, in a
 narrow sidebar, or on mobile — with no per-page media queries. Drop the component and
 trust it; don't wrap it in your own breakpoints.
 
+## Component best practices — Do / Don't
+
+Craft rules per flagship component, part of the contract: they encode WHEN to
+reach for a component and how to compose it. Treat a "Don't" here with the same
+weight as a token rule — most of them describe a second version of something the
+kit already guarantees.
+
+### Buttons
+**Do**
+- One .btn--primary per view region — everything else stays quiet (default or .btn--ghost).
+- A destructive action wears .btn--danger, not primary.
+- Use the size modifiers (.btn--sm / .btn--xs) — heights are locked to the control scale.
+
+**Don't**
+- Don't stretch or restyle a button's height with padding overrides — the height invariant keeps every control row aligned.
+- Don't put two primaries side by side; demote one to ghost.
+
+### Card
+**Do**
+- Follow the anatomy: .card__head (title + meta), content rows, and .card__foot for actions behind the hairline divider.
+- One primary action per card, in the foot; secondaries are .btn--ghost.
+- Reserve .card__foot for true form/settings/commit cards — a display card ends at its content.
+
+**Don't**
+- Don't nest cards inside cards — use rows or a plain group.
+- Don't use cards as page layout; that is the scaffold / pane tier.
+
+### Data table
+**Do**
+- Reach for .data-table for ANY data surface — it owns the toolbar, selection, sticky header, pagination and the empty/loading/error states.
+- Put numeric columns in .num cells (th + td) — right-aligned, tabular numerals, so totals line up.
+- On a narrow container let the container query reflow it; freeze the identity column with .tbl__col--frozen when it scrolls horizontally.
+
+**Don't**
+- Don't hand-roll a table out of .card + flex rows — density, hover, selection and the states are already guaranteed here.
+- Don't bolt a separate search input above it — the toolbar slot is part of the recipe.
+
+### Calendar
+**Do**
+- Pick the variant for the job: the month grid for picking, .calendar-week for scheduling, the range states for periods.
+- Keep today marked even while another day is selected — the two states are independent.
+- Fix the grid at six rows so a picker popover never changes height between months.
+
+**Don't**
+- Don't rebuild a date picker from a table — the calendar owns the cell states and keyboard flow.
+- Don't use the bare month grid for read-only event display; that is the week/agenda pattern.
+
+### Dialog
+**Do**
+- One primary action per dialog; the action row is .dialog__foot — secondaries as .btn--ghost, the primary trailing.
+- A destructive confirmation wears .btn--danger and names the object ('Delete 3 invoices'), never a bare 'Are you sure?'.
+- Keep it to one screen of content — a longer flow belongs in a .sheet or its own page.
+
+**Don't**
+- Don't stack dialogs — replace the content or step within the one you have.
+- Don't use a dialog for passive status; that is a .toast or .banner.
+
+### Chart
+**Do**
+- Series colours come from the derived --k-chart-1..6 palette — every kit ships a harmonised set that survives re-theming.
+- Give every chart an insight header (title + the delta that matters), not just axes.
+- Use the recipe's legend and keep axis labels in caption type.
+
+**Don't**
+- Don't introduce colours outside the chart palette — they break theming and dark mode.
+- Don't plot more than six series in one frame; split the story instead.
+
+### Toast stack
+**Do**
+- A passive confirmation uses the toned variants (.toast--success/info/warn/error) and auto-dismisses.
+- An actionable toast ('Saved — Undo') is the snackbar: .toast--snackbar on the inverse surface, ONE .toast__action, one at a time.
+- Anchor the stack in one corner via .toast-stack and cap it at about three visible.
+
+**Don't**
+- Don't use a toast for anything that needs a decision — that is a .dialog.
+- Don't auto-dismiss a toast that carries an action.
+
+### Form panel
+**Do**
+- One column by default — label above control; every field is a .field carrying its label, control and .field__hint.
+- Show validation inline: aria-invalid on the control + the message in .field__error, next to the field it belongs to.
+- Commit actions live in the sunken foot — one .btn--primary, secondaries as .btn--ghost.
+
+**Don't**
+- Don't use placeholders as labels — they vanish the moment the user types.
+- Don't disable the submit button while the user is still typing; validate on blur and on submit.
+
+### Filter bar
+**Do**
+- Active filters render as removable chips in the bar — the query state stays visible, not buried in dropdowns.
+- Offer a clear-all once two or more filters are active.
+- Keep the bar to one row; overflow goes into a 'More filters' popover.
+
+**Don't**
+- Don't duplicate the query state in a table toolbar next to it — one owner per surface.
+- Don't make the search input full-width inside the bar; it shares the row with the facets.
+
+### Nav suite
+**Do**
+- Let the suite morph by container width — bottom bar → rail → sidebar come free; never fork a separate mobile nav.
+- Mark the active item with aria-current — the kit's selected treatment binds to it.
+- Group items under section labels once you pass about six items.
+
+**Don't**
+- Don't hide primary navigation behind a hamburger on a wide container.
+- Don't rebuild a sidebar from .card + links — the suite owns nav spacing, states and the morph.
+
 ## Verify your work
 
 This pack ships a machine-readable \`contract.json\`. After applying the kit, run

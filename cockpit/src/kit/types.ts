@@ -13,6 +13,22 @@
  * leaves component selectors unscoped too (the configurator chrome uses a
  * disjoint class namespace) and only scopes the global layer.
  */
+/**
+ * Per-component craft rules (LP1 doc-cards) — the Do/Don't knowledge that the
+ * class vocabulary alone can't carry: WHEN to reach for the component and how
+ * to compose it. One source, three consumers: the design.md export (→ CDN → the
+ * MCP's get_design_context), the gallery's best-practices disclosure, and any
+ * future per-component docs page.
+ */
+export interface RecipeDoc {
+  /** Imperative craft rules — what a correct usage does. */
+  dos: string[]
+  /** The anti-patterns this component exists to prevent. */
+  donts: string[]
+  /** Recipe ids this component typically composes with (reserved; not yet rendered). */
+  pairsWith?: string[]
+}
+
 export interface Recipe {
   /** Stable id, used by the gates (`audit:provenance`, modifiers). e.g. 'button'. */
   id: string
@@ -20,4 +36,6 @@ export interface Recipe {
   section: string
   /** The component's CSS block — `var(--k-*)`-driven, no per-config branching. */
   css: string
+  /** Do/Don't craft rules (LP1) — flagship components first; optional elsewhere. */
+  doc?: RecipeDoc
 }
