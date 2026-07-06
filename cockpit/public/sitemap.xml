@@ -13,6 +13,12 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+  <!-- The component catalog — the reference layer (IA-2 public destination). -->
+  <url>
+    <loc>https://uicockpit.com/components</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
   <!-- The showcase wall — real screens on the kit (IA-1 public destination). -->
   <url>
     <loc>https://uicockpit.com/showcases</loc>

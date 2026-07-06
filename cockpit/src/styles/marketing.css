@@ -1503,23 +1503,54 @@
 .seo__rel-title { font-size: 15px; font-weight: 600; color: var(--mkt-fg); }
 
 /* ============================================================
-   Showcases page (/showcases, IA-1) — the Ledger wall as a public
-   destination. The stage is a full-bleed band holding the REAL
-   PagesView inside a .cockpit-preview token scope (default kit).
+   Reference surfaces (/showcases IA-1, /components IA-2) — the Ledger
+   wall + the component catalog as public destinations. Each is a
+   full-bleed band holding a REAL view (PagesView / ComponentsView)
+   inside a .cockpit-preview token scope. IA-3: the scope carries the
+   default kit OR the visitor's own (see .mkt__kittoggle).
    ============================================================ */
-.mkt__section--showcases { padding-bottom: 0; }
-.mkt__showcase-stage {
+.mkt__section--showcases,
+.mkt__section--catalog { padding-bottom: 0; }
+.mkt__showcase-stage,
+.mkt__catalog-stage {
   margin-top: 40px;
   border-top: 1px solid var(--mkt-border);
   border-bottom: 1px solid var(--mkt-border);
   background: var(--mkt-bg-soft, #f7f8fa);
 }
-.mkt__showcase-stage .cockpit-preview {
+.mkt__showcase-stage .cockpit-preview,
+.mkt__catalog-stage .cockpit-preview {
   max-width: 1440px;
   margin: 0 auto;
   padding: 32px 24px 48px;
 }
-.mkt__showcase-cta { display: flex; justify-content: center; padding: 40px 24px 72px; }
+.mkt__showcase-cta,
+.mkt__catalog-cta { display: flex; justify-content: center; padding: 40px 24px 72px; }
+
+/* Kit bridge toggle (IA-3) — Default kit ↔ Your kit, above the stage. */
+.mkt__catalog-tools { margin-top: 20px; display: flex; justify-content: center; }
+.mkt__kittoggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 999px;
+  background: var(--mkt-bg-soft, #f7f8fa);
+}
+.mkt__kittoggle-btn {
+  border: 0;
+  background: transparent;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mkt-fg-muted);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.mkt__kittoggle-btn--on { background: var(--mkt-surface, #fff); color: var(--mkt-fg); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06); }
+.mkt__kit-hint { font-size: 13px; }
 
 /* ============================================================
    Docs page (/docs) — sticky-TOC documentation. Reuses the .mkt

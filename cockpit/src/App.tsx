@@ -6,6 +6,7 @@ import { OgCard } from './marketing/OgCard'
 import { SeoPage } from './marketing/SeoPage'
 import { DocsPage } from './marketing/DocsPage'
 import { ShowcasesPage } from './marketing/ShowcasesPage'
+import { ComponentsPage } from './marketing/ComponentsPage'
 import { findEntry } from './marketing/seo/seoData'
 import './styles/marketing.css'
 
@@ -49,8 +50,10 @@ export function App() {
   if (path.startsWith('/app'))
     return <CockpitApp onHome={() => navigate('/')} navigate={navigate} />
 
-  // The guide + the showcase wall — content destinations in the site shell (IA-1).
+  // The guide + the catalog + the showcase wall — content destinations in the
+  // site shell (IA-1/IA-2).
   if (path.startsWith('/docs')) return <DocsPage navigate={navigate} />
+  if (path.startsWith('/components')) return <ComponentsPage navigate={navigate} />
   if (path.startsWith('/showcases')) return <ShowcasesPage navigate={navigate} />
 
   // The social-preview / OG card (1280×640) — not linked; screenshotted to a PNG.
