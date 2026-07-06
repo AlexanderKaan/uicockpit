@@ -130,7 +130,11 @@ function ShowcaseStage({ m, appNav, width, onWidth }: { m: ShowcaseManifest; app
 }
 
 /** The pure shell render — one manifest → one live scaffold. Nav selection is local. */
-function ShowcaseShell({
+/* Exported for scripts/gen-templates.tsx (LP4): rendered WITHOUT appNav it emits
+ * pure exported-kit classes (scaffold · appbar · navsuite + the sections), which
+ * is exactly what a static template may contain — the appNav variant adds
+ * preview-only chrome (LedgerSidebar, shc__* topbar) that never ships. */
+export function ShowcaseShell({
   m,
   width,
   renderSectionFn = renderSection,

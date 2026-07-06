@@ -1,0 +1,53 @@
+{
+  "generator": "uicockpit",
+  "templates": [
+    {
+      "name": "home",
+      "title": "Ledger · Home",
+      "blurb": "Billing flagship — the cashflow home: a KPI strip, a grouped transaction feed, and recent clients. Same app, same cast as the invoice screen.",
+      "file": "home.html"
+    },
+    {
+      "name": "reports",
+      "title": "Ledger · Reports",
+      "blurb": "Billing flagship — Reports: a KPI strip, the invoiced-vs-collected revenue chart, and a live activity feed. Same cast, same restraint.",
+      "file": "reports.html"
+    },
+    {
+      "name": "invoices",
+      "title": "Ledger · Invoices",
+      "blurb": "Billing flagship — the invoices list: a Fill summary band over a filterable .datatable of invoices (client logo · amount · status · due). The third of three perfect screens.",
+      "file": "invoices.html"
+    },
+    {
+      "name": "clients",
+      "title": "Ledger · Clients",
+      "blurb": "Billing flagship — the clients directory (the CRM archetype, rebuilt into the one Ledger app): a Fill summary band over a filterable .datatable of accounts with contact photos.",
+      "file": "clients.html"
+    },
+    {
+      "name": "expenses",
+      "title": "Ledger · Expenses",
+      "blurb": "Billing flagship — the expenses ledger: a Fill summary band over a filterable .datatable of spend (vendor mark · category · amount · status). Completes the Ledger menu.",
+      "file": "expenses.html"
+    },
+    {
+      "name": "documents",
+      "title": "Ledger · Documents",
+      "blurb": "Billing flagship — Documents: the receipts & contracts vault as a media grid with an upload dropzone. Folds the old Studio surface into the one app.",
+      "file": "documents.html"
+    },
+    {
+      "name": "assistant",
+      "title": "Ledger · Assistant",
+      "blurb": "Billing flagship — the finance copilot: ask about overdue invoices, draft reminders, forecast cashflow. Folds the AI-assistant surface into the one app.",
+      "file": "assistant.html"
+    },
+    {
+      "name": "plans",
+      "title": "Ledger · Plans & billing",
+      "blurb": "Billing flagship — Plans & billing: the org details, the current plan + upgrade, and notification preferences. Folds the Portal + Site pricing surfaces into the one app.",
+      "file": "plans.html"
+    }
+  ]
+}

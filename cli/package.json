@@ -1,6 +1,6 @@
 {
   "name": "uicockpit",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "The CLI of the UICockpit design system generator - apply and ENFORCE your generated design system in any codebase: generate -> apply -> check. The verifier nobody else ships.",
   "type": "module",
   "bin": {

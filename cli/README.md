@@ -79,6 +79,17 @@ the list doubles as a record of where the system doesn't fit yet. The hatch neve
 covers the error-level reference checks (`tokens-exist`, `known-modifiers`): a
 broken reference is a bug, not a taste decision.
 
+### `uicockpit template [name] [--kit=<hash>] [--force]`
+
+Ship-ready page templates — dashboard, invoices list, clients, expenses, reports,
+documents, AI assistant, plans & billing — as **plain HTML wearing your kit**. No
+name lists what's available; with a name it writes `<name>.html`, pointing the
+stylesheet at your kit (the hash from `uicockpit.json`, or `--kit=`).
+
+The markup is pure kit vocabulary (every class is a recipe), so a template is both
+a working page AND the starting markup for your own screen — and `uicockpit check`
+keeps your edits on-system.
+
 ## How it fits
 
 `init` and `check` are stateless over the kit **hash** — the same payload behind
