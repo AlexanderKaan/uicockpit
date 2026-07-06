@@ -70,11 +70,18 @@ function renderPage(r: Route): string {
   return html
 }
 
+/* Write FLAT .html files (dist/manifesto.html, dist/uses/x.html), not the
+ * directory form (dist/manifesto/index.html). CF Pages' default html_handling
+ * serves `/foo.html` at the clean URL `/foo` with NO redirect and NO trailing
+ * slash — so the served URL matches our canonical exactly. The directory form
+ * instead 308-redirects `/foo` → `/foo/`, splitting the URL from the canonical. */
 function write(path: string, html: string): void {
-  const dir = path === '/' ? DIST : `${DIST}${path.replace(/^\//, '')}/`
-  mkdirSync(dir, { recursive: true })
-  writeFileSync(`${dir}index.html`, html)
-  console.log(`  ✓ prerendered ${path}`)
+  if (path === '/') { writeFileSync(`${DIST}index.html`, html); console.log('  ✓ prerendered /'); return }
+  const rel = path.replace(/^\//, '')
+  const slash = rel.lastIndexOf('/')
+  if (slash !== -1) mkdirSync(`${DIST}${rel.slice(0, slash)}`, { recursive: true })
+  writeFileSync(`${DIST}${rel}.html`, html)
+  console.log(`  ✓ prerendered ${path}  →  ${rel}.html`)
 }
 
 // ── The content routes ──────────────────────────────────────────────────────
