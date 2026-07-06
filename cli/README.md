@@ -27,14 +27,21 @@ npx uicockpit check
 
 ### `uicockpit init <hash> [--force] [--cdn=<url>]`
 
-Fetches the configured kit from the CDN and writes three files to the current
+Fetches the configured kit from the CDN and writes the kit files to the current
 directory:
 
 - `uicockpit.tokens.css` — the full kit (CSS variables + component recipes)
 - `uicockpit.contract.json` — the machine-checkable contract `check` reads
-- `AGENTS.md` — the always-on agent rules (auto-discovered by Cursor, Claude Code, …)
+- `AGENTS.md` — the always-on agent rules (auto-discovered by Cursor, Codex, …)
+- `design.md` — the full spec + recipe catalog
 
-`--force` overwrites existing files. The hash is the share-key from the
+It also maintains a compact, marker-fenced UICockpit block inside your agent-doc
+files — `CLAUDE.md`, `.claude/CLAUDE.md`, `.cursorrules` (whichever exist; it
+creates `CLAUDE.md` when none do). Re-running `init` refreshes **only** the block
+between `<!-- UICOCKPIT:START -->` and `<!-- UICOCKPIT:END -->`; everything you
+wrote around it is untouched.
+
+`--force` overwrites existing kit files. The hash is the share-key from the
 **"Use this kit"** panel at uicockpit.com.
 
 ### `uicockpit check [contract.json] [dir] [--strict]`
@@ -58,6 +65,19 @@ setup error. `--strict` makes warnings fail too (good for CI).
 # CI example
 - run: npx uicockpit check --strict
 ```
+
+**Sanctioned exceptions.** A deliberate off-system line (a partner's brand banner,
+a pixel-perfect embed) can be annotated:
+
+```css
+.partner-banner { background: #ff5500; } /* uicockpit-allow: partner brand, per marketing */
+```
+
+The line's *style* findings are accepted — they never fail the build, even under
+`--strict` — but they stay visible in the report under **allowed exceptions**, so
+the list doubles as a record of where the system doesn't fit yet. The hatch never
+covers the error-level reference checks (`tokens-exist`, `known-modifiers`): a
+broken reference is a bug, not a taste decision.
 
 ## How it fits
 

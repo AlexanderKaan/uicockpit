@@ -38,9 +38,25 @@ export function checkContract(contract, files, config = {}) {
   const ruleBy = {}
   for (const r of contract.rules || []) if (r.check) ruleBy[r.check] = r
   const sev = (check) => ruleBy[check]?.severity || 'warn'
-  const add = (check, file, line, message) => {
+  const add = (check, file, line, message, allow = null) => {
     if (!ruleBy[check]) return // rule not in this contract → skip
-    violations.push({ check, severity: sev(check), file, line, message })
+    const v = { check, severity: sev(check), file, line, message }
+    // Sanctioned escape hatch (LP7): the finding is ACCEPTED but stays visible —
+    // reported under "allowed exceptions", never silently dropped.
+    if (allow) { v.allowed = true; v.reason = allow.reason }
+    violations.push(v)
+  }
+
+  // `/* uicockpit-allow: <reason> */` on a line sanctions that line's STYLE-drift
+  // findings (the warn-level taste checks: raw colour, off-grid spacing, radius/
+  // font-size scale). It deliberately does NOT cover the error-level reference
+  // checks (tokens-exist, known-modifiers) — a broken reference is a bug, not a
+  // taste decision. The legacy `uicockpit-allow-color` tag keeps its old
+  // colour-only, silent behaviour. Negative lookahead keeps the two apart.
+  const ALLOW_RX = /uicockpit-allow(?!-color)\b(?:\s*:\s*([^*\r\n]*?))?\s*(?:\*\/|$)/
+  const allowTag = (text) => {
+    const m = text.match(ALLOW_RX)
+    return m ? { reason: (m[1] || '').trim() || '(no reason given)' } : null
   }
 
   // Cold-start guard — track whether the kit stylesheet is imported anywhere and
@@ -89,28 +105,32 @@ export function checkContract(contract, files, config = {}) {
 
       if (!isCss || isDef) continue
 
+      // The line-level escape hatches, resolved once per line.
+      const allow = allowTag(text)
+      const allowColorLine = text.includes('uicockpit-allow-color')
+
       // no-raw-color (warn) — prefer --k-* colour tokens over raw literals.
-      // Escape hatch: a sanctioned colour (uicockpit.json `allowColors`) or a line
-      // tagged `uicockpit-allow-color` is a deliberate foreign brand value.
-      const allowLine = text.includes('uicockpit-allow-color')
+      // Escape hatches: a sanctioned colour (uicockpit.json `allowColors`) or the
+      // legacy `uicockpit-allow-color` tag skip silently (deliberate foreign brand
+      // value); the generic `uicockpit-allow: <reason>` records an allowed exception.
       for (const m of text.matchAll(/#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)|\bhsla?\([^)]*\)/g)) {
-        if (allowLine || allowColors.has(normColor(m[0]))) continue
-        add('no-raw-color', path, ln, `raw colour ${m[0]} — use a --k-* colour token`)
+        if (allowColorLine || allowColors.has(normColor(m[0]))) continue
+        add('no-raw-color', path, ln, `raw colour ${m[0]} — use a --k-* colour token`, allow)
       }
       // spacing-grid (warn) — margin/padding/gap px literals on the 4px grid.
       for (const m of text.matchAll(/\b(margin|padding|gap|row-gap|column-gap)\b[^;:]*:\s*([^;]+);/gi)) {
         for (const px of m[2].matchAll(/(-?\d+(?:\.\d+)?)px/g)) {
           const n = Math.abs(parseFloat(px[1]))
-          if (n > 0 && n % GRID !== 0) add('spacing-grid', path, ln, `${m[1]}: ${px[0]} is off the ${GRID}px grid — use a --k-s-* token`)
+          if (n > 0 && n % GRID !== 0) add('spacing-grid', path, ln, `${m[1]}: ${px[0]} is off the ${GRID}px grid — use a --k-s-* token`, allow)
         }
       }
       // radius-scale (warn) — border-radius should use --k-radius-* tokens.
       for (const m of text.matchAll(/border-radius\s*:\s*([^;]+);/gi)) {
-        if (/\d+px/.test(m[1]) && !/var\(/.test(m[1])) add('radius-scale', path, ln, `border-radius: ${m[1].trim()} — use a --k-radius-* token`)
+        if (/\d+px/.test(m[1]) && !/var\(/.test(m[1])) add('radius-scale', path, ln, `border-radius: ${m[1].trim()} — use a --k-radius-* token`, allow)
       }
       // font-size-scale (warn) — font-size should use the --k-type-* scale.
       for (const m of text.matchAll(/font-size\s*:\s*([^;]+);/gi)) {
-        if (/\d+px/.test(m[1]) && !/var\(/.test(m[1])) add('font-size-scale', path, ln, `font-size: ${m[1].trim()} — use a --k-type-* token`)
+        if (/\d+px/.test(m[1]) && !/var\(/.test(m[1])) add('font-size-scale', path, ln, `font-size: ${m[1].trim()} — use a --k-type-* token`, allow)
       }
     }
 
@@ -238,14 +258,18 @@ export async function scanAndCheck({ dir = '.', contractPath = null } = {}) {
 
   const config = loadConfig(dir, fs, pathMod)
   const violations = checkContract(contract, files, config)
+  // Allowed exceptions (LP7, `uicockpit-allow: <reason>`) are accepted — they never
+  // gate — but stay visible as their own bucket so the exceptions list reads as a
+  // living feature-gap radar, not a silent hole in the contract.
   return {
     ok: true,
     contractPath: resolved,
     kit: contract.name || 'kit',
     fileCount: files.length,
     violations,
-    errors: violations.filter((v) => v.severity === 'error'),
-    warns: violations.filter((v) => v.severity === 'warn'),
+    errors: violations.filter((v) => v.severity === 'error' && !v.allowed),
+    warns: violations.filter((v) => v.severity === 'warn' && !v.allowed),
+    allowed: violations.filter((v) => v.allowed),
   }
 }
 
@@ -275,11 +299,18 @@ export async function runCheck(argv) {
   }
 
   for (const v of res.violations) {
+    if (v.allowed) continue // reported in their own section below
     const tag = v.severity === 'error' ? 'ERROR' : 'warn '
     console.log(`  ${tag}  ${v.file}:${v.line}  [${v.check}]  ${v.message}`)
   }
+  if (res.allowed.length) {
+    console.log(`\n  Allowed exceptions (uicockpit-allow) — accepted, kept visible:`)
+    for (const v of res.allowed) {
+      console.log(`  allow  ${v.file}:${v.line}  [${v.check}]  ${v.message} — ${v.reason}`)
+    }
+  }
   console.log(`\nuicockpit check — ${res.kit}: scanned ${res.fileCount} files`)
-  console.log(`${res.errors.length} error · ${res.warns.length} warn`)
+  console.log(`${res.errors.length} error · ${res.warns.length} warn${res.allowed.length ? ` · ${res.allowed.length} allowed` : ''}`)
 
   if (res.errors.length || (strict && res.warns.length)) {
     console.log(`✗ ${res.errors.length + (strict ? res.warns.length : 0)} violation(s) of your design contract`)

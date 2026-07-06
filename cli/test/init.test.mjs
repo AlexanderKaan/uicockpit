@@ -57,3 +57,41 @@ test('non-token keys are ignored (only --* custom properties)', () => {
   assert.ok(!css.includes('primary:'))
   assert.match(css, /--k-accent:\s*var\(--brand\);/)
 })
+
+/* agentDocsBlock + upsertMarkerBlock (LP3) — the marker-fenced pointer block
+ * init maintains inside CLAUDE.md / .claude/CLAUDE.md / .cursorrules. */
+
+import { agentDocsBlock, upsertMarkerBlock, AGENT_DOCS_START, AGENT_DOCS_END } from '../src/init.mjs'
+
+test('agentDocsBlock carries the hash, the check gate and the pointers', () => {
+  const b = agentDocsBlock('abc123')
+  assert.ok(b.startsWith(AGENT_DOCS_START) && b.endsWith(AGENT_DOCS_END))
+  assert.match(b, /kit `abc123`/)
+  assert.match(b, /uicockpit check --strict/)
+  assert.match(b, /AGENTS\.md/)
+  assert.match(b, /design\.md/)
+})
+
+test('upsert into an empty file → just the block', () => {
+  const out = upsertMarkerBlock('', agentDocsBlock('h1'))
+  assert.ok(out.startsWith(AGENT_DOCS_START))
+  assert.ok(out.endsWith(AGENT_DOCS_END + '\n'))
+})
+
+test('upsert appends to existing content without touching it', () => {
+  const out = upsertMarkerBlock('# My project\n\nMy own rules.\n', agentDocsBlock('h1'))
+  assert.ok(out.startsWith('# My project'))
+  assert.ok(out.includes('My own rules.'))
+  assert.ok(out.includes(AGENT_DOCS_START))
+})
+
+test('re-run replaces ONLY the fenced block (user content above/below survives)', () => {
+  const v1 = upsertMarkerBlock('above\n', agentDocsBlock('old-hash')) + '\nbelow\n'
+  const v2 = upsertMarkerBlock(v1, agentDocsBlock('new-hash'))
+  assert.ok(v2.includes('above'))
+  assert.ok(v2.includes('below'))
+  assert.ok(v2.includes('kit `new-hash`'))
+  assert.ok(!v2.includes('old-hash'))
+  // exactly one block
+  assert.equal(v2.split(AGENT_DOCS_START).length, 2)
+})

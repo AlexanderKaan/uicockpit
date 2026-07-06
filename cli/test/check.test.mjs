@@ -141,3 +141,49 @@ test('an inline uicockpit-allow-color tag exempts that line', () => {
     '.brand { color: #1da1f2; } /* uicockpit-allow-color */' }])
   assert.deepEqual(v.filter((x) => x.check === 'no-raw-color'), [])
 })
+
+/* uicockpit-allow (LP7) — the sanctioned escape hatch: style-drift findings on an
+ * annotated line are ACCEPTED (never gate) but stay visible as allowed exceptions. */
+
+test('uicockpit-allow: marks the line\'s style findings allowed, with the reason', () => {
+  const v = run([
+    { path: 'a.css', content: '.x { color: #ff5500; padding: 13px; } /* uicockpit-allow: partner brand banner */' },
+  ])
+  const allowed = v.filter((x) => x.allowed)
+  assert.equal(allowed.length, 2) // raw colour + off-grid padding, both sanctioned
+  assert.ok(allowed.every((x) => x.reason === 'partner brand banner'))
+})
+
+test('uicockpit-allow without a reason still records the exception', () => {
+  const v = run([
+    { path: 'a.css', content: '.x { color: #ff5500; } /* uicockpit-allow */' },
+  ])
+  const allowed = v.filter((x) => x.allowed)
+  assert.equal(allowed.length, 1)
+  assert.equal(allowed[0].reason, '(no reason given)')
+})
+
+test('the hatch does NOT cover error-level reference checks', () => {
+  const v = run([
+    { path: 'a.css', content: '.x { color: var(--k-nope); } /* uicockpit-allow: nope */' },
+  ])
+  const err = v.find((x) => x.check === 'tokens-exist')
+  assert.ok(err && !err.allowed) // broken reference is a bug, not taste
+})
+
+test('unannotated drift on other lines is still a plain warn', () => {
+  const v = run([
+    { path: 'a.css', content: '.x { color: #ff5500; } /* uicockpit-allow: ok */\n.y { color: #00ff55; }' },
+  ])
+  assert.equal(v.filter((x) => x.allowed).length, 1)
+  assert.equal(v.filter((x) => x.check === 'no-raw-color' && !x.allowed).length, 1)
+})
+
+test('legacy uicockpit-allow-color keeps its silent colour-only behaviour', () => {
+  const v = run([
+    { path: 'a.css', content: '.x { color: #ff5500; padding: 13px; } /* uicockpit-allow-color */' },
+  ])
+  assert.equal(v.filter((x) => x.check === 'no-raw-color').length, 0) // silent skip
+  const pad = v.find((x) => x.check === 'spacing-grid')
+  assert.ok(pad && !pad.allowed) // -color tag does not sanction spacing
+})

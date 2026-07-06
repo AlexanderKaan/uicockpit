@@ -55,6 +55,53 @@ export function prefixCss(css, prefix, kitRoots) {
   })
 }
 
+/* ── Agent-docs injection (LP3) ──────────────────────────────────────────────
+ * AGENTS.md carries the FULL rules (the file Codex/Cursor read natively). But
+ * Claude Code reads CLAUDE.md, and users often already have one — so init also
+ * maintains a compact, marker-fenced pointer block inside the agent-doc files
+ * that exist (CLAUDE.md · .claude/CLAUDE.md · .cursorrules), creating CLAUDE.md
+ * when none exist. Re-running init refreshes ONLY the fenced block; everything
+ * the user wrote around it is untouched. */
+
+export const AGENT_DOCS_START = '<!-- UICOCKPIT:START — managed by `npx uicockpit init`; edits inside this block are overwritten -->'
+export const AGENT_DOCS_END = '<!-- UICOCKPIT:END -->'
+
+/**
+ * The compact agent-context block — a pointer card, not the rules themselves
+ * (those live in AGENTS.md / design.md, which stay the single source).
+ * @param {string} hash  the kit share-key
+ * @returns {string}
+ */
+export function agentDocsBlock(hash) {
+  return `${AGENT_DOCS_START}
+## UICockpit design system (kit \`${hash}\`)
+
+This project wears a generated UICockpit design system. Non-negotiables:
+
+- Style ONLY with the kit: \`--k-*\` tokens + the component recipes in \`uicockpit.tokens.css\`.
+- Never hardcode a colour, radius, shadow, font-size or spacing — there is a token for it.
+- Compose existing recipes before inventing new UI — the catalog lives in \`design.md\`.
+- Full rules: \`AGENTS.md\` · machine contract: \`uicockpit.contract.json\` · settings: \`uicockpit.json\`.
+- After EVERY UI change run \`npx uicockpit check --strict\` and fix what it flags before you finish.
+${AGENT_DOCS_END}`
+}
+
+/**
+ * Insert or refresh the fenced block in an agent-doc file's text. Pure.
+ * @param {string} existing  current file text ('' for a new file)
+ * @param {string} block     agentDocsBlock(hash)
+ * @returns {string}
+ */
+export function upsertMarkerBlock(existing, block) {
+  const start = existing.indexOf(AGENT_DOCS_START)
+  const end = existing.indexOf(AGENT_DOCS_END)
+  if (start !== -1 && end !== -1 && end >= start) {
+    return existing.slice(0, start) + block + existing.slice(end + AGENT_DOCS_END.length)
+  }
+  if (!existing.trim()) return block + '\n'
+  return existing.replace(/\n*$/, '\n\n') + block + '\n'
+}
+
 /** A short banner prepended to AGENTS.md so the agent writes prefixed classes. */
 function prefixNote(prefix) {
   return `> **Class prefix:** this kit is installed with the prefix \`${prefix}\`. Write\n> every kit class with it — \`${prefix}btn\`, \`${prefix}card__head\`, \`${prefix}btn--primary\`.\n> The contract and \`uicockpit check\` know the prefix (from uicockpit.json).\n\n`
@@ -152,6 +199,24 @@ export async function runInit(argv) {
     console.log(`  ✓ wrote ${t.file}${note}`)
   }
 
+  // Agent-docs injection (LP3): maintain the fenced pointer block in every
+  // agent-doc file that exists; create CLAUDE.md when none do. Marker-fenced, so
+  // a re-run refreshes the block and never touches the user's own content.
+  {
+    const { mkdirSync } = await import('node:fs')
+    const block = agentDocsBlock(hash)
+    const candidates = ['CLAUDE.md', '.claude/CLAUDE.md', '.cursorrules']
+    let injected = candidates.filter((f) => existsSync(f))
+    if (!injected.length) injected = ['CLAUDE.md']
+    for (const f of injected) {
+      if (f.includes('/')) mkdirSync(f.slice(0, f.lastIndexOf('/')), { recursive: true })
+      const existing = existsSync(f) ? readFileSync(f, 'utf8') : ''
+      const isUpdate = existing.includes(AGENT_DOCS_START)
+      writeFileSync(f, upsertMarkerBlock(existing, block))
+      console.log(`  ✓ ${isUpdate ? 'refreshed' : 'wrote'} UICockpit block in ${f}`)
+    }
+  }
+
   // Scaffold the adoption config (the shadcn components.json model). It is local +
   // hand-editable — `check` reads it — so we don't clobber an existing one even on
   // --force (the fetched artifacts above are the kit; this is the user's settings).
@@ -182,5 +247,7 @@ export async function runInit(argv) {
   console.log('  • Or a CI step (fails the build on drift):  - run: npx uicockpit check --strict')
   console.log('  • uicockpit.json holds adoption settings (allowColors for sanctioned brand')
   console.log('    colours; prefix / aliasMap / framework for brownfield) — check reads it.')
+  console.log("  • A deliberate off-system line? Annotate it `/* uicockpit-allow: <reason> */` —")
+  console.log('    accepted (never fails, even --strict) but reported as an allowed exception.')
   return 0
 }
