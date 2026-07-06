@@ -22,6 +22,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { MarketingPage } from '../src/marketing/MarketingPage'
 import { MarketingManifesto } from '../src/marketing/MarketingManifesto'
 import { SeoPage } from '../src/marketing/SeoPage'
+import { StylesPage } from '../src/marketing/StylesPage'
+import { TemplatesPage } from '../src/marketing/TemplatesPage'
 import { SEO_ENTRIES, pathFor, type SeoEntry } from '../src/marketing/seo/seoData'
 
 const SITE = 'https://uicockpit.com'
@@ -99,6 +101,20 @@ write('/manifesto', renderPage({
   description: "Why I'm building UIcockpit: a design system generator that makes taste decisions once and keeps AI-built UI coherent — a grammar plus a guarantee, built in the open.",
 }))
 
+write('/styles', renderPage({
+  path: '/styles',
+  markup: renderToStaticMarkup(<StylesPage navigate={noop} />),
+  title: 'Styles — named starting points you tune into your own — UIcockpit',
+  description: 'Seven named style kits — Linear-crisp, Vercel-mono, Stripe-refined and more. Each opens the configurator as a starting point you tune, not a fixed theme you settle for.',
+}))
+
+write('/templates', renderPage({
+  path: '/templates',
+  markup: renderToStaticMarkup(<TemplatesPage navigate={noop} />),
+  title: 'Templates — ship-ready pages that wear your kit — UIcockpit',
+  description: 'Whole screens — dashboard, tables, settings, an AI chat — as plain HTML built from the kit. One command (npx uicockpit template <name>) drops any of them into your project wearing your kit.',
+}))
+
 const entries: SeoEntry[] = SEO_ENTRIES
 for (const entry of entries) {
   write(pathFor(entry), renderPage({
@@ -114,6 +130,8 @@ for (const entry of entries) {
 const staticRoutes: Array<{ loc: string; freq: string; pri: string }> = [
   { loc: '/', freq: 'weekly', pri: '1.0' },
   { loc: '/components', freq: 'weekly', pri: '0.9' },
+  { loc: '/styles', freq: 'monthly', pri: '0.8' },
+  { loc: '/templates', freq: 'monthly', pri: '0.8' },
   { loc: '/showcases', freq: 'monthly', pri: '0.8' },
   { loc: '/docs', freq: 'monthly', pri: '0.8' },
   { loc: '/manifesto', freq: 'monthly', pri: '0.6' },

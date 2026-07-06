@@ -7,6 +7,8 @@ import { SeoPage } from './marketing/SeoPage'
 import { DocsPage } from './marketing/DocsPage'
 import { ShowcasesPage } from './marketing/ShowcasesPage'
 import { ComponentsPage } from './marketing/ComponentsPage'
+import { StylesPage } from './marketing/StylesPage'
+import { TemplatesPage } from './marketing/TemplatesPage'
 import { findEntry } from './marketing/seo/seoData'
 import './styles/marketing.css'
 
@@ -55,6 +57,8 @@ export function App() {
   if (path.startsWith('/docs')) return <DocsPage navigate={navigate} />
   if (path.startsWith('/components')) return <ComponentsPage navigate={navigate} />
   if (path.startsWith('/showcases')) return <ShowcasesPage navigate={navigate} />
+  if (path.startsWith('/styles')) return <StylesPage navigate={navigate} />
+  if (path.startsWith('/templates')) return <TemplatesPage navigate={navigate} />
 
   // The social-preview / OG card (1280×640) — not linked; screenshotted to a PNG.
   if (path === '/og') return <OgCard />

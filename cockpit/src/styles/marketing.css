@@ -1527,6 +1527,83 @@
 .mkt__showcase-cta,
 .mkt__catalog-cta { display: flex; justify-content: center; padding: 40px 24px 72px; }
 
+/* ============================================================
+   Styles page (/styles, IA-5) — named kits as live specimens.
+   ============================================================ */
+.mkt__style-grid {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  /* Cards size to their own content — no stretching a short specimen into a
+     tall grey void to match the tallest card in the row. */
+  align-items: start;
+}
+.mkt__style-card {
+  border: 1px solid var(--mkt-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--mkt-surface, #fff);
+  display: flex;
+  flex-direction: column;
+}
+/* The specimen sits on the kit's own canvas; its .cockpit-preview scope carries
+   that kit's tokens so the card, button, input and badge show its character. */
+.mkt__style-specimen {
+  padding: 24px;
+  background: var(--k-bg);
+  border-bottom: 1px solid var(--mkt-border);
+}
+.mkt__style-specimen .card { display: flex; flex-direction: column; gap: var(--k-s-10); }
+.mkt__style-meta { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 4px; }
+.mkt__style-name { font-size: 15px; font-weight: 650; color: var(--mkt-fg); }
+.mkt__style-blurb { font-size: 13px; color: var(--mkt-fg-muted); }
+.mkt__style-use { align-self: flex-start; margin-top: 10px; font-size: 13px; text-decoration: none; }
+
+/* ============================================================
+   Templates page (/templates, IA-5) — ship-ready pages + CLI.
+   ============================================================ */
+.mkt__tpl-install {
+  margin: 40px 0 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 12px;
+  background: var(--mkt-bg-soft, #f7f8fa);
+}
+.mkt__tpl-install-label { font-size: 13px; font-weight: 600; color: var(--mkt-fg); }
+.mkt__tpl-install code { font-family: var(--mkt-mono, ui-monospace, monospace); font-size: 13px; color: var(--mkt-fg); }
+.mkt__tpl-list { display: flex; flex-direction: column; border: 1px solid var(--mkt-border); border-radius: 12px; overflow: hidden; }
+.mkt__tpl-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--mkt-border);
+}
+.mkt__tpl-row:last-child { border-bottom: 0; }
+.mkt__tpl-info { flex: 1; min-width: 0; }
+.mkt__tpl-name { font-size: 15px; font-weight: 600; color: var(--mkt-fg); }
+.mkt__tpl-blurb { font-size: 13px; color: var(--mkt-fg-muted); margin-top: 2px; }
+.mkt__tpl-cmd {
+  font-family: var(--mkt-mono, ui-monospace, monospace);
+  font-size: 12.5px;
+  color: var(--mkt-fg-muted);
+  background: var(--mkt-bg-soft, #f7f8fa);
+  padding: 5px 10px;
+  border-radius: 7px;
+  white-space: nowrap;
+}
+.mkt__tpl-view { font-size: 13px; text-decoration: none; white-space: nowrap; }
+.mkt__tpl-cta { display: flex; justify-content: center; margin-top: 40px; }
+@media (max-width: 640px) {
+  .mkt__tpl-row { flex-wrap: wrap; gap: 8px; }
+  .mkt__tpl-cmd { order: 3; width: 100%; overflow-x: auto; }
+}
+
 /* Kit bridge toggle (IA-3) — Default kit ↔ Your kit, above the stage. */
 .mkt__catalog-tools { margin-top: 20px; display: flex; justify-content: center; }
 .mkt__kittoggle {
