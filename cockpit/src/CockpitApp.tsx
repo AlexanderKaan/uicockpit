@@ -18,9 +18,6 @@ const ExportModal = lazy(() =>
 interface CockpitAppProps {
   /** Called when user clicks the brand — sends them back to /. */
   onHome?: () => void
-  /** Push a new path (the app's SPA router) — drives the Docs link + deep-links.
-   *  (Docs was re-housed to the SITE shell in IA-1 — the app only links OUT.) */
-  navigate?: (to: string) => void
 }
 
 // View Transitions API — Chrome/Edge/Safari 18+, falls back to instant switch elsewhere.
@@ -37,7 +34,7 @@ function startViewTransition(cb: () => void): void {
  *  Layout: a full-width top bar (brand · view switcher · actions) runs across
  *  the whole app; below it the stage fills the width and the control menu
  *  *floats* over the top-left (absolute), never reserving a column. */
-export function CockpitApp({ onHome, navigate }: CockpitAppProps = {}) {
+export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const { cfg, tokens, dispatch, undo, redo, canUndo, canRedo } = useConfig()
   // Default closed on phones — there the panel becomes an overlay drawer, so the
   // stage gets the full width; open inline as a column on desktop.
@@ -135,7 +132,6 @@ export function CockpitApp({ onHome, navigate }: CockpitAppProps = {}) {
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onHome={onHome}
-        onDocs={() => navigate?.('/docs')}
         onUndo={undo}
         onRedo={redo}
         canUndo={canUndo}

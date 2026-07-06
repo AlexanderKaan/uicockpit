@@ -119,7 +119,11 @@
   font-weight: 600;
   font-size: 15px;
   letter-spacing: -0.01em;
+  color: var(--mkt-fg);
+  text-decoration: none;
 }
+/* Full wordmark SVG (mark + "UIcockpit"); text = currentColor (= --mkt-fg). */
+.mkt__brand-mark { display: block; }
 .mkt__brand-logo {
   /* 28px ≈ 22px × 1.3 — logo +30% so it carries the nav with confidence. */
   width: 28px;

@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, BookOpen, Boxes, Check, Code, Heart, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
+import { AppWindow, Boxes, Check, Code, Heart, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { ViewKind } from './Stage'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
 import { SavedKits } from '../panel/SavedKits'
 import { useSavedKits } from '../state/savedKits'
+import { Wordmark } from '../Wordmark'
 
 interface TopbarProps {
   view: ViewKind
@@ -21,8 +22,6 @@ interface TopbarProps {
   onToggleMenu: () => void
   /** Brand click → back to the marketing home. */
   onHome?: () => void
-  /** Docs link (left zone) — navigates OUT to the site-shell /docs page (IA-1). */
-  onDocs: () => void
   /** Undo/redo (C2) — config history. Buttons mirror ⌘Z / ⇧⌘Z. */
   onUndo: () => void
   onRedo: () => void
@@ -30,7 +29,7 @@ interface TopbarProps {
   canRedo: boolean
 }
 
-export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onDocs, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
+export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -57,13 +56,11 @@ export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, token
             aria-label="Back to UIcockpit home"
             title="Back to home"
           >
-            <img src="/logo.svg" alt="" width={26} height={26} className="topbar__logo" />
-            <span className="topbar__brand-name">UIcockpit</span>
+            <Wordmark height={22} className="topbar__wordmark" />
           </button>
         ) : (
           <span className="topbar__brand">
-            <img src="/logo.svg" alt="" width={26} height={26} className="topbar__logo" />
-            <span className="topbar__brand-name">UIcockpit</span>
+            <Wordmark height={22} className="topbar__wordmark" />
           </span>
         )}
         {/* Toggle the floating control menu. */}
@@ -76,15 +73,6 @@ export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, token
           title={menuOpen ? 'Hide controls' : 'Show controls'}
         >
           <PanelLeft size={15} strokeWidth={1.75} />
-        </button>
-        <button
-          type="button"
-          className="topbar__doc-link"
-          onClick={onDocs}
-          title="How to use UIcockpit"
-        >
-          <BookOpen size={14} strokeWidth={1.75} />
-          <span>Docs</span>
         </button>
         <A11yBadge audit={audit} pass={pass} total={total} allPass={allPass} />
       </div>

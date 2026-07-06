@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { Wordmark } from '../Wordmark'
 
 /** The published npm package version (`uicockpit` CLI) — the public number. */
 // Derived from cli/package.json at build time (see vite.config.ts) — auto-syncs
@@ -46,9 +47,8 @@ export function MktNav({ navigate, current }: MktNavProps) {
   return (
     <header className="mkt__nav">
       <div className="mkt__container mkt__nav-inner">
-        <a href="/" className="mkt__brand" onClick={(e) => go(e, '/')}>
-          <img src="/logo.svg" alt="" width={28} height={28} className="mkt__brand-logo" />
-          UIcockpit
+        <a href="/" className="mkt__brand" onClick={(e) => go(e, '/')} aria-label="UIcockpit home">
+          <Wordmark height={24} className="mkt__brand-mark" />
         </a>
 
         <nav className="mkt__nav-links">
