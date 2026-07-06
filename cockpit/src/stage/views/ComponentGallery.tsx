@@ -126,6 +126,9 @@ const CARD_KEYWORDS: Record<string, string> = {
   // — Blocks / composed —
   FormPanelCard: 'Form panel labeled fields validation action bar',
   ThreadCard: 'Conversation chat message thread bubble comments',
+  ToolCallCard: 'Tool call AI agent function receipt status running done error mcp',
+  ReasoningCard: 'Reasoning thinking chain of thought AI disclosure thought for',
+  CitationCard: 'Citation source chip footnote reference grounded AI answer',
   ProseCard: 'Article prose rich text body copy changelog docs',
   FilterBarCard: 'Filter bar toolbar facets',
   InboxFilterCard: 'Inbox filter mail messages',
@@ -222,7 +225,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'component'], [SheetCard, 'component'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'component'],
-    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ThreadCard, 'component'], [ProseCard, 'component'],
+    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ThreadCard, 'component'], [ToolCallCard, 'atom'], [ReasoningCard, 'atom'], [CitationCard, 'atom'], [ProseCard, 'component'],
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
@@ -353,6 +356,8 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
+  // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
+  ['AI thread', [ToolCallCard, ReasoningCard, CitationCard]],
   ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
   ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
 ]
@@ -4290,6 +4295,89 @@ function ThreadCard() {
           <div className="msg__head"><span className="msg__name">You</span><span className="msg__time">09:26</span></div>
           <p className="msg__body">Looks good. Sending the redline now.</p>
         </div>
+      </div>
+    </Card>
+  )
+}
+
+/* === Tool call (LP6) =================================================
+ * The "assistant used a tool" receipt in an AI thread — a native <details>
+ * with mono tool name, args summary and a status dot; open for the raw
+ * result. Status = one axis: --running · --done · --error. */
+function ToolCallCard() {
+  return (
+    <Card title="Tool call" desc="An AI agent's tool receipt — status dot, mono name, expandable result.">
+      <div style={{ display: 'grid', gap: 'var(--k-s-4)' }}>
+        <details className="tool-call tool-call--done" open>
+          <summary>
+            <span className="tool-call__name">search_invoices</span>
+            <span className="tool-call__meta">status: overdue · limit: 10</span>
+            <span className="tool-call__status">Done</span>
+            <span className="tool-call__chevron"><ChevronSvg size={11} /></span>
+          </summary>
+          <pre className="tool-call__body">{'2 results\n#00009  Tuple, Inc       $2,000.00   14 days overdue\n#00008  Vantage Retail  $21,400.00   8 days overdue'}</pre>
+        </details>
+        <details className="tool-call tool-call--running">
+          <summary>
+            <span className="tool-call__name">draft_reminder</span>
+            <span className="tool-call__meta">invoice: #00009 · tone: friendly</span>
+            <span className="tool-call__status">Running</span>
+            <span className="tool-call__chevron"><ChevronSvg size={11} /></span>
+          </summary>
+        </details>
+        <details className="tool-call tool-call--error">
+          <summary>
+            <span className="tool-call__name">send_email</span>
+            <span className="tool-call__meta">to: billing@tuple.com</span>
+            <span className="tool-call__status">Failed</span>
+            <span className="tool-call__chevron"><ChevronSvg size={11} /></span>
+          </summary>
+          <pre className="tool-call__body">SMTP 550 — recipient rejected. Check the address and retry.</pre>
+        </details>
+      </div>
+    </Card>
+  )
+}
+
+/* === Reasoning (LP6) =================================================
+ * The model's thinking disclosure — "Thought for 12s", collapsed by default;
+ * opens a quiet rail-marked transcript. --live tints the label while the
+ * model is still thinking. */
+function ReasoningCard() {
+  return (
+    <Card title="Reasoning" desc="The AI's thinking line — collapsed by default, the transcript one click away.">
+      <div style={{ display: 'grid', gap: 'var(--k-s-8)' }}>
+        <details className="reasoning" open>
+          <summary>
+            Thought <span className="reasoning__time">for 12s</span>
+            <span className="reasoning__chevron"><ChevronSvg size={11} /></span>
+          </summary>
+          <p className="reasoning__body">Two invoices match "overdue". The total the user asked for should count all open invoices, not just the overdue ones — compute both and answer with the distinction.</p>
+        </details>
+        <details className="reasoning reasoning--live">
+          <summary>
+            Thinking <span className="reasoning__time">· 4s</span>
+            <span className="reasoning__chevron"><ChevronSvg size={11} /></span>
+          </summary>
+        </details>
+      </div>
+    </Card>
+  )
+}
+
+/* === Citation (LP6) ==================================================
+ * The inline [n] source chip a grounded answer hangs its claims on — in
+ * running text at baseline, or grouped in a .cite-row under the message. */
+function CitationCard() {
+  return (
+    <Card title="Citation" desc="Numbered source chips — inline at baseline, or a source row under the answer.">
+      <p style={{ margin: 0, fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', lineHeight: 1.6 }}>
+        Q2 revenue grew 18% quarter-over-quarter <a className="cite" href="#src-1"><span className="cite__n">1</span></a>,
+        driven mostly by the Scale plan <a className="cite" href="#src-2"><span className="cite__n">2</span></a>.
+      </p>
+      <div className="cite-row">
+        <a className="cite" href="#src-1"><span className="cite__n">1</span> Q2 board deck</a>
+        <a className="cite" href="#src-2"><span className="cite__n">2</span> plans.csv</a>
       </div>
     </Card>
   )

@@ -317,7 +317,43 @@ export function renderSection(spec: SectionSpec, key: number) {
                 <span className="msg__name">{m.name}</span>
                 <span className="msg__time">{m.time}</span>
               </div>
+              {/* LP6 — the AI-furniture tier: the thinking line above the reply… */}
+              {m.reasoning && (
+                <details className="reasoning" style={{ marginBottom: 'var(--k-s-6)' }}>
+                  <summary>
+                    {m.reasoning.label} {m.reasoning.time && <span className="reasoning__time">{m.reasoning.time}</span>}
+                    <span className="reasoning__chevron"><Icon name="chevD" /></span>
+                  </summary>
+                  {m.reasoning.body && <p className="reasoning__body">{m.reasoning.body}</p>}
+                </details>
+              )}
+              {/* …the tool receipts between question and answer… */}
+              {m.tools && m.tools.length > 0 && (
+                <div style={{ display: 'grid', gap: 'var(--k-s-4)', marginBottom: 'var(--k-s-6)' }}>
+                  {m.tools.map((t) => (
+                    <details className={`tool-call tool-call--${t.status}`} key={t.name}>
+                      <summary>
+                        <span className="tool-call__name">{t.name}</span>
+                        <span className="tool-call__meta">{t.meta}</span>
+                        <span className="tool-call__status">{t.status === 'running' ? 'Running' : t.status === 'done' ? 'Done' : 'Failed'}</span>
+                        <span className="tool-call__chevron"><Icon name="chevD" /></span>
+                      </summary>
+                      {t.result && <pre className="tool-call__body">{t.result}</pre>}
+                    </details>
+                  ))}
+                </div>
+              )}
               <p className="msg__body">{m.body}</p>
+              {/* …and the source chips the answer is grounded on. */}
+              {m.sources && m.sources.length > 0 && (
+                <div className="cite-row">
+                  {m.sources.map((s) => (
+                    <a className="cite" href="#sources" key={s.n} onClick={(e) => e.preventDefault()}>
+                      <span className="cite__n">{s.n}</span> {s.label}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

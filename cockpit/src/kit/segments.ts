@@ -136,6 +136,9 @@ export const STANDALONE_ATOMS: readonly string[] = [
   'alert', 'banner', 'inline-status-meta-micro-components', 'attachment-chip-family',
   // a chat/comment bubble — self-contained, stacks into a .thread (Fase J-8)
   'message',
+  // AI-thread furniture (LP6) — self-contained receipts/disclosures that drop
+  // into any .msg or feed: the tool receipt, the thinking line, the source chip
+  'tool-call', 'reasoning', 'citation',
   // a rich-text container — styles raw semantic tags; no single host (Fase J-8)
   'prose',
   // loading & layout utilities

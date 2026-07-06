@@ -6089,6 +6089,166 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .msg--me .msg__body { color: inherit; }`,
   },
   {
+    id: 'tool-call',
+    section: 'Tool call',
+    css: `/* === Tool call ===
+   The "assistant used a tool" card in an AI thread — the receipt of an action,
+   not a message. A native <details> (zero-JS disclosure): a mono tool name, a
+   one-line args summary and a status dot in the summary row; open it for the
+   raw result. Status is ONE axis on the root:
+     .tool-call--running   in flight (info dot)
+     .tool-call--done      finished (success dot)
+     .tool-call--error     failed (danger dot + danger name)
+   Stack several between a question and the answer; sits inside .msg after the
+   body, or standalone in a feed. Quiet by design — a surface-2 well in caption
+   type, so the conversation stays the foreground. */
+.tool-call {
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+  background: var(--k-surface-2);
+  font-size: var(--k-type-caption);
+}
+.tool-call + .tool-call { margin-top: var(--k-s-4); }
+.tool-call summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-6);
+  min-width: 0;
+  padding: var(--k-s-6) var(--k-s-10);
+  cursor: pointer;
+}
+.tool-call summary::-webkit-details-marker { display: none; }
+.tool-call__name {
+  font-family: var(--k-font-mono);
+  font-weight: var(--k-weight-medium);
+  color: var(--k-fg);
+  flex: none;
+}
+.tool-call__meta {
+  color: var(--k-fg-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+.tool-call__status {
+  margin-left: auto;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-6);
+  color: var(--k-fg-muted);
+}
+/* The status dot — the same --k-marker series dot the chart legend wears. */
+.tool-call__status::before {
+  content: '';
+  width: var(--k-marker);
+  height: var(--k-marker);
+  border-radius: 50%;
+  background: var(--k-fg-faint);
+}
+.tool-call--running .tool-call__status::before { background: var(--k-info); }
+.tool-call--done .tool-call__status::before { background: var(--k-success); }
+.tool-call--error .tool-call__status::before { background: var(--k-danger); }
+.tool-call--error .tool-call__name { color: var(--k-danger); }
+.tool-call__chevron {
+  width: var(--k-icon-xs);
+  height: var(--k-icon-xs);
+  color: var(--k-fg-faint);
+  flex: none;
+  transition: transform var(--k-dur, 200ms) var(--k-ease, ease);
+}
+.tool-call[open] .tool-call__chevron { transform: rotate(180deg); }
+.tool-call__body {
+  margin: 0;
+  border-top: var(--k-divider);
+  padding: var(--k-s-8) var(--k-s-10);
+  font-family: var(--k-font-mono);
+  color: var(--k-fg-muted);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}`,
+  },
+  {
+    id: 'reasoning',
+    section: 'Reasoning',
+    css: `/* === Reasoning ===
+   The model's thinking disclosure — the "Thought for 12s" line above an AI
+   reply. Collapsed by default (the thinking is context, not content); a native
+   <details> opens a quiet, rail-marked transcript in faint caption type. One
+   optional axis:
+     .reasoning--live   still thinking (info-tinted label)
+   Compose INSIDE .msg before the body, or above a .prose answer. */
+.reasoning { font-size: var(--k-type-caption); }
+.reasoning summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-6);
+  color: var(--k-fg-muted);
+  font-weight: var(--k-weight-medium);
+  cursor: pointer;
+}
+.reasoning summary::-webkit-details-marker { display: none; }
+.reasoning__time { color: var(--k-fg-faint); font-weight: normal; }
+.reasoning--live summary { color: var(--k-info); }
+.reasoning__chevron {
+  width: var(--k-icon-xs);
+  height: var(--k-icon-xs);
+  color: var(--k-fg-faint);
+  flex: none;
+  transition: transform var(--k-dur, 200ms) var(--k-ease, ease);
+}
+.reasoning[open] .reasoning__chevron { transform: rotate(180deg); }
+.reasoning__body {
+  margin: var(--k-s-6) 0 0;
+  padding: var(--k-s-2) 0 var(--k-s-2) var(--k-s-10);
+  border-left: var(--k-stroke-3, 3px) solid var(--k-border);
+  color: var(--k-fg-faint);
+  line-height: 1.6;
+}`,
+  },
+  {
+    id: 'citation',
+    section: 'Citation',
+    css: `/* === Citation ===
+   The inline source chip a grounded AI answer hangs its claims on — a numbered
+   pill at text baseline. Anchor or span; the number carries the accent, the
+   label stays quiet. Group under a message with .cite-row.
+     .cite       → the [n] chip: number + optional source label
+     .cite-row   → a wrapping row of sources under the answer */
+.cite {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--k-s-4);
+  padding: 0 var(--k-s-6);
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: 999px;
+  background: var(--k-surface);
+  font-size: var(--k-type-caption);
+  line-height: 1.5;
+  color: var(--k-fg-muted);
+  text-decoration: none;
+  vertical-align: baseline;
+  transition: border-color var(--k-dur-fast, 120ms) var(--k-ease, ease),
+              color var(--k-dur-fast, 120ms) var(--k-ease, ease);
+}
+.cite:hover { border-color: var(--k-primary); color: var(--k-fg); }
+.cite__n {
+  font-variant-numeric: tabular-nums;
+  color: var(--k-primary);
+  font-weight: var(--k-weight-semibold);
+}
+.cite-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--k-s-4);
+  margin-top: var(--k-s-6);
+}`,
+  },
+  {
     id: 'prose',
     section: 'Prose',
     css: `/* === Prose ===

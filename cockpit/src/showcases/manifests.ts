@@ -26,7 +26,11 @@ export type SectionSpec =
   // ChartFrame with its own data). The Reports screen's metric switcher.
   | { kind: 'chartTabs'; seed: { tabs: Array<{ label: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> }> } }
   | { kind: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
-  | { kind: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean; avatar?: string }> } }
+  | { kind: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean; avatar?: string
+      /** LP6 AI-furniture — a reply can carry the model's thinking line, tool receipts and source chips. */
+      reasoning?: { label: string; time?: string; body?: string }
+      tools?: Array<{ name: string; meta: string; status: 'running' | 'done' | 'error'; result?: string }>
+      sources?: Array<{ n: number; label: string }> }> } }
   | { kind: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[]; greeting?: string } }
   | { kind: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[]; badgeToneByValue?: Record<string, 'success' | 'warning' | 'danger' | 'info'>; avatarCols?: number[] } }
   | { kind: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string } }
@@ -431,8 +435,18 @@ export const SHOWCASES: ShowcaseManifest[] = [
         sections: [
           { kind: 'thread', seed: { messages: [
             { name: 'You', time: '09:14', avatar: 'AK', body: 'Which invoices are overdue, and how much is outstanding?', me: true },
-            { name: 'Ledger AI', time: '09:14', avatar: 'L', body: 'Two invoices are overdue: #00009 (Tuple, Inc — $2,000.00, 14 days) and #00008 (Vantage Retail — $21,400.00, 8 days). Total outstanding across all open invoices is $245,988.00. Want me to draft reminders for the two overdue ones?' },
+            { name: 'Ledger AI', time: '09:14', avatar: 'L',
+              reasoning: { label: 'Thought', time: 'for 6s', body: 'Two invoices match "overdue". The outstanding total should count ALL open invoices, not just the overdue ones — compute both and answer with the distinction.' },
+              tools: [
+                { name: 'search_invoices', meta: 'status: overdue · limit: 10', status: 'done', result: '2 results\n#00009  Tuple, Inc       $2,000.00   14 days overdue\n#00008  Vantage Retail  $21,400.00   8 days overdue' },
+                { name: 'sum_outstanding', meta: 'scope: all open invoices', status: 'done', result: '$245,988.00 across 12 open invoices' },
+              ],
+              body: 'Two invoices are overdue: #00009 (Tuple, Inc — $2,000.00, 14 days) and #00008 (Vantage Retail — $21,400.00, 8 days). Total outstanding across all open invoices is $245,988.00. Want me to draft reminders for the two overdue ones?',
+              sources: [ { n: 1, label: 'Invoices · Outstanding' }, { n: 2, label: 'Aging report · March' } ] },
             { name: 'You', time: '09:15', avatar: 'AK', body: 'Yes — draft a friendly reminder for Tuple.', me: true },
+            { name: 'Ledger AI', time: '09:15', avatar: 'L',
+              tools: [ { name: 'draft_reminder', meta: 'invoice: #00009 · tone: friendly', status: 'running' } ],
+              body: 'On it — drafting a friendly reminder for Tuple, Inc referencing invoice #00009 ($2,000.00, 14 days past due). I\'ll show it here for your sign-off before anything is sent.' },
           ] } },
           { kind: 'composer', seed: { greeting: 'Good morning, Alex', placeholder: 'Ask Ledger AI — ⏎ to send, ⇧⏎ for a new line', hero: true, suggestions: ['Draft a payment reminder', 'Which invoices are overdue?', 'Forecast next month', 'Summarize March expenses'] } },
         ],
