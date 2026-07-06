@@ -124,6 +124,14 @@
 }
 /* Full wordmark SVG (mark + "UIcockpit"); text = currentColor (= --mkt-fg). */
 .mkt__brand-mark { display: block; }
+
+/* Wordmark parts (global — the component ships in the marketing nav + the app
+ * topbar). The disc rides currentColor; the glyph is the local background, so
+ * the mark inverts in dark mode (white disc + dark glyph) rather than a dark
+ * disc disappearing. --wm-glyph defaults to white (light contexts); the app
+ * topbar overrides it to its surface so dark mode flips cleanly. */
+.wm-disc { fill: currentColor; }
+.wm-glyph { fill: var(--wm-glyph, #fff); }
 .mkt__brand-logo {
   /* 28px ≈ 22px × 1.3 — logo +30% so it carries the nav with confidence. */
   width: 28px;

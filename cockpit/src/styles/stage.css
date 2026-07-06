@@ -45,9 +45,10 @@
   flex: none;
 }
 .topbar__logo { display: block; flex: none; border-radius: 6px; }
-/* Full wordmark (mark + "UIcockpit") — the text inherits color:var(--app-fg) from
-   .topbar__brand, so it adapts to light/dark; the mark keeps its own disc+glyph. */
-.topbar__wordmark { display: block; flex: none; }
+/* Full wordmark (mark + "UIcockpit") — the text + disc inherit color:var(--app-fg)
+   from .topbar__brand, so they adapt to light/dark. --wm-glyph = the topbar
+   surface, so the mark INVERTS in dark mode (white disc + dark glyph). */
+.topbar__wordmark { display: block; flex: none; --wm-glyph: var(--app-surface); }
 .topbar__brand--link {
   background: transparent;
   border: 0;
