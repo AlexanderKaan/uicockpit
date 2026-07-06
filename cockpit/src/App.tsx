@@ -6,7 +6,8 @@ import { OgCard } from './marketing/OgCard'
 import { SeoPage } from './marketing/SeoPage'
 import { DocsPage } from './marketing/DocsPage'
 import { ShowcasesPage } from './marketing/ShowcasesPage'
-import { ComponentsPage } from './marketing/ComponentsPage'
+import { ComponentsIndexPage, ComponentDetailPage } from './marketing/ComponentDocs'
+import { componentPageBySlug } from './stage/views/ComponentGallery'
 import { StylesPage } from './marketing/StylesPage'
 import { TemplatesPage } from './marketing/TemplatesPage'
 import { findEntry } from './marketing/seo/seoData'
@@ -55,7 +56,12 @@ export function App() {
   // The guide + the catalog + the showcase wall — content destinations in the
   // site shell (IA-1/IA-2).
   if (path.startsWith('/docs')) return <DocsPage navigate={navigate} />
-  if (path.startsWith('/components')) return <ComponentsPage navigate={navigate} />
+  if (path === '/components' || path === '/components/') return <ComponentsIndexPage navigate={navigate} />
+  if (path.startsWith('/components/')) {
+    const slug = path.slice('/components/'.length).replace(/\/$/, '')
+    if (componentPageBySlug(slug)) return <ComponentDetailPage slug={slug} navigate={navigate} />
+    return <ComponentsIndexPage navigate={navigate} /> // unknown slug → the index
+  }
   if (path.startsWith('/showcases')) return <ShowcasesPage navigate={navigate} />
   if (path.startsWith('/styles')) return <StylesPage navigate={navigate} />
   if (path.startsWith('/templates')) return <TemplatesPage navigate={navigate} />

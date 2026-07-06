@@ -1528,6 +1528,74 @@
 .mkt__catalog-cta { display: flex; justify-content: center; padding: 40px 24px 72px; }
 
 /* ============================================================
+   Component docs (/components + /components/<slug>, IA-2b) — a
+   persistent sidebar index + per-slug detail pages, the "normal"
+   components reference. .cmpdoc = [sidebar · main].
+   ============================================================ */
+.cmpdoc {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  gap: 48px;
+  padding-top: 40px;
+  padding-bottom: 72px;
+  align-items: start;
+}
+.cmpdoc__side { position: sticky; top: 88px; max-height: calc(100vh - 108px); overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding-right: 8px; }
+.cmpdoc__side-group { margin-top: 18px; }
+.cmpdoc__side-head { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mkt-fg-faint); margin-bottom: 6px; }
+.cmpdoc__side-link { display: block; padding: 5px 10px; border-radius: 7px; font-size: 13.5px; color: var(--mkt-fg-muted); text-decoration: none; }
+.cmpdoc__side-link:hover { background: var(--mkt-bg-soft, #f7f8fa); color: var(--mkt-fg); }
+.cmpdoc__side-link--on { background: var(--mkt-accent-soft, #eef2ff); color: var(--mkt-fg); font-weight: 600; }
+.cmpdoc__side-over { margin-bottom: 4px; }
+
+.cmpdoc__main { min-width: 0; }
+.cmpdoc__crumbs { font-size: 13px; color: var(--mkt-fg-muted); margin-bottom: 12px; }
+.cmpdoc__crumbs a { color: var(--mkt-fg-muted); text-decoration: none; }
+.cmpdoc__crumbs a:hover { color: var(--mkt-fg); text-decoration: underline; }
+.cmpdoc__head { margin-bottom: 28px; }
+.cmpdoc__title-row { display: flex; align-items: center; gap: 12px; }
+.cmpdoc__head h1 { font-size: 30px; margin: 0; }
+.cmpdoc__tier { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 8px; border-radius: 999px; background: var(--mkt-bg-soft, #f2f3f5); color: var(--mkt-fg-muted); }
+.cmpdoc__lead { font-size: 15px; color: var(--mkt-fg-muted); margin: 8px 0 0; max-width: 60ch; line-height: 1.55; }
+.cmpdoc__tools { display: flex; align-items: center; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+.cmpdoc__use { text-decoration: none; font-size: 13px; }
+
+/* Index: grouped preview tiles that link to the detail pages. */
+.cmpdoc__previews { background: transparent; }
+.cmpdoc__section { margin-bottom: 40px; }
+.cmpdoc__section-head { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--k-fg-muted); margin: 0 0 16px; }
+.cmpdoc__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.cmpdoc__tile { display: flex; flex-direction: column; border: var(--k-bw) solid var(--k-border); border-radius: var(--k-radius-lg); overflow: hidden; text-decoration: none; background: var(--k-surface); transition: border-color 120ms ease, transform 120ms ease; }
+.cmpdoc__tile:hover { border-color: var(--k-primary); transform: translateY(-2px); }
+.cmpdoc__tile-preview { padding: 20px; min-height: 128px; display: flex; align-items: center; justify-content: center; background: var(--k-bg); border-bottom: var(--k-bw) solid var(--k-border); overflow: hidden; }
+.cmpdoc__tile-preview > * { max-width: 100%; transform: scale(0.82); transform-origin: center; }
+.cmpdoc__tile-name { padding: 10px 14px; font-size: 13.5px; font-weight: 600; color: var(--k-fg); }
+
+/* Detail: the large live preview + composition + best practices + recipe CSS. */
+.cmpdoc__stage { border: var(--k-bw) solid var(--k-border); border-radius: var(--k-radius-lg); background: var(--k-bg); padding: 32px; margin-bottom: 20px; }
+.cmpdoc__composes { font-size: 13.5px; color: var(--mkt-fg-muted); margin: 0 0 28px; }
+.cmpdoc__composes strong { color: var(--mkt-fg); font-weight: 600; }
+.cmpdoc__block { margin-bottom: 36px; }
+.cmpdoc__block h2 { font-size: 18px; margin: 0 0 14px; }
+.cmpdoc__note { font-size: 13.5px; color: var(--mkt-fg-muted); margin: 0 0 12px; line-height: 1.55; }
+.cmpdoc__note code { font-family: var(--mkt-mono, ui-monospace, monospace); font-size: 12.5px; }
+.cmpdoc__dodont { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; border: 1px solid var(--mkt-border); border-radius: 12px; background: var(--mkt-bg-soft, #f7f8fa); }
+.cmpdoc__dh { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.cmpdoc__dh--do { color: #16a34a; }
+.cmpdoc__dh--dont { color: #dc2626; }
+.cmpdoc__dodont ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.cmpdoc__dodont li { font-size: 13.5px; color: var(--mkt-fg-muted); line-height: 1.5; }
+.cmpdoc__css { margin: 0; padding: 18px; border-radius: 12px; background: #0d1117; color: #c9d1d9; font-family: var(--mkt-mono, ui-monospace, monospace); font-size: 12.5px; line-height: 1.6; overflow-x: auto; max-height: 520px; overflow-y: auto; }
+
+@media (max-width: 860px) {
+  .cmpdoc { grid-template-columns: 1fr; gap: 0; }
+  .cmpdoc__side { position: static; max-height: none; flex-direction: row; flex-wrap: wrap; gap: 4px; margin-bottom: 24px; }
+  .cmpdoc__side-group { margin-top: 0; display: contents; }
+  .cmpdoc__side-head { display: none; }
+  .cmpdoc__dodont { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
    Styles page (/styles, IA-5) — named kits as live specimens.
    ============================================================ */
 .mkt__style-grid {

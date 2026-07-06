@@ -24,6 +24,8 @@ import { MarketingManifesto } from '../src/marketing/MarketingManifesto'
 import { SeoPage } from '../src/marketing/SeoPage'
 import { StylesPage } from '../src/marketing/StylesPage'
 import { TemplatesPage } from '../src/marketing/TemplatesPage'
+import { ComponentsIndexPage, ComponentDetailPage } from '../src/marketing/ComponentDocs'
+import { COMPONENT_PAGES } from '../src/stage/views/ComponentGallery'
 import { SEO_ENTRIES, pathFor, type SeoEntry } from '../src/marketing/seo/seoData'
 
 const SITE = 'https://uicockpit.com'
@@ -101,6 +103,22 @@ write('/manifesto', renderPage({
   description: "Why I'm building UIcockpit: a design system generator that makes taste decisions once and keeps AI-built UI coherent — a grammar plus a guarantee, built in the open.",
 }))
 
+// The component reference: the index + a detail page per slug (IA-2b).
+write('/components', renderPage({
+  path: '/components',
+  markup: renderToStaticMarkup(<ComponentsIndexPage navigate={noop} />),
+  title: 'Components — 60+ accessible components, themed by your kit — UIcockpit',
+  description: 'Browse 60+ accessible, framework-neutral components — buttons, tables, dialogs, charts, an AI chat. Each with its markup, recipe CSS and best-practice rules, wearing your kit.',
+}))
+for (const c of COMPONENT_PAGES) {
+  write(`/components/${c.slug}`, renderPage({
+    path: `/components/${c.slug}`,
+    markup: renderToStaticMarkup(<ComponentDetailPage slug={c.slug} navigate={noop} />),
+    title: `${c.name} — a themeable ${c.name} component — UIcockpit`,
+    description: c.blurb,
+  }))
+}
+
 write('/styles', renderPage({
   path: '/styles',
   markup: renderToStaticMarkup(<StylesPage navigate={noop} />),
@@ -137,7 +155,8 @@ const staticRoutes: Array<{ loc: string; freq: string; pri: string }> = [
   { loc: '/manifesto', freq: 'monthly', pri: '0.6' },
 ]
 const seoRoutes = entries.map((e) => ({ loc: pathFor(e), freq: 'monthly', pri: e.kind === 'use' ? '0.7' : '0.6' }))
-const urls = [...staticRoutes, ...seoRoutes]
+const componentRoutes = COMPONENT_PAGES.map((c) => ({ loc: `/components/${c.slug}`, freq: 'monthly', pri: '0.7' }))
+const urls = [...staticRoutes, ...componentRoutes, ...seoRoutes]
   .map(({ loc, freq, pri }) => `  <url><loc>${SITE}${loc}</loc><changefreq>${freq}</changefreq><priority>${pri}</priority></url>`)
   .join('\n')
 writeFileSync(`${DIST}sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`)

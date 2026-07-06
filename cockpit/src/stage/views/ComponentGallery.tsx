@@ -5009,3 +5009,108 @@ function WizardStepperCard() {
     </Card>
   )
 }
+
+/* ── Component pages registry (IA-2b) ────────────────────────────────────────
+ * The single source for the public /components index + the per-slug detail
+ * pages: slug → { display name, group, the recipe id (for CSS · doc · segments),
+ * a one-line blurb, and the live Preview (a real gallery card) }. Curated to the
+ * components people reach for; the detail page derives tier/composition/CSS/Do-
+ * Don'ts from the recipe + segment graph so nothing is duplicated. */
+export interface ComponentPage {
+  slug: string
+  name: string
+  group: string
+  recipeId: string
+  blurb: string
+  Preview: () => ReactElement
+}
+
+export const COMPONENT_PAGES: ComponentPage[] = [
+  // Actions
+  { slug: 'button', name: 'Button', group: 'Actions', recipeId: 'buttons', blurb: 'The primary action control — one loud primary per region, quiet siblings, a locked height scale.', Preview: ButtonsCard },
+  { slug: 'button-group', name: 'Button Group', group: 'Actions', recipeId: 'button-group', blurb: 'Segmented actions that share one seam — a split button or a related-action cluster.', Preview: ButtonGroupCard },
+  { slug: 'dropdown-menu', name: 'Dropdown Menu', group: 'Actions', recipeId: 'dropdown-menu', blurb: 'A trigger that opens a themed menu of actions, with sections, shortcuts and destructive items.', Preview: DropdownMenuCard },
+  { slug: 'context-menu', name: 'Context Menu', group: 'Actions', recipeId: 'context-menu', blurb: 'Right-click actions on a surface — the same menu vocabulary, summoned in place.', Preview: ContextMenuCard },
+  { slug: 'toolbar', name: 'Toolbar', group: 'Actions', recipeId: 'toolbar', blurb: 'A row of grouped controls at one locked height — the editor/table action bar.', Preview: ToolbarCard },
+  { slug: 'command-palette', name: 'Command Palette', group: 'Actions', recipeId: 'command-palette', blurb: 'The ⌘K launcher — searchable actions with sections, shortcuts and keyboard flow.', Preview: CmdPaletteCard },
+  { slug: 'menubar', name: 'Menubar', group: 'Actions', recipeId: 'menubar', blurb: 'A desktop-style top menu bar with nested menus — File / Edit / View.', Preview: MenubarCard },
+
+  // Inputs
+  { slug: 'input', name: 'Input', group: 'Inputs', recipeId: 'form', blurb: 'The text field and its label/hint/error anatomy — the base of every form.', Preview: FormCard },
+  { slug: 'select', name: 'Select', group: 'Inputs', recipeId: 'select-trigger', blurb: 'A themed select trigger + option menu — the native picker, restyled to the kit.', Preview: SelectCard },
+  { slug: 'combobox', name: 'Combobox', group: 'Inputs', recipeId: 'combobox', blurb: 'Type-ahead select: filter a list as you type, keyboard-navigable.', Preview: ComboboxCard },
+  { slug: 'checkbox-radio', name: 'Checkbox & Radio', group: 'Inputs', recipeId: 'radio-card', blurb: 'Multi- and single-select controls, including the richer selectable card variant.', Preview: SelectionCard },
+  { slug: 'switch', name: 'Switch', group: 'Inputs', recipeId: 'switch-toggle', blurb: 'A binary toggle with a shape-locked round knob and the kit’s motion.', Preview: SwitchCard },
+  { slug: 'slider', name: 'Slider', group: 'Inputs', recipeId: 'slider', blurb: 'A drag-to-set value control on a stroke-3 track with a precise handle.', Preview: SliderCard },
+  { slug: 'search-input', name: 'Search Input', group: 'Inputs', recipeId: 'searchinput', blurb: 'A search field with a lead icon, ghost clear button and optional kbd hint.', Preview: SearchInputCard },
+  { slug: 'number-input', name: 'Number Input', group: 'Inputs', recipeId: 'numberinput', blurb: 'A numeric field with stepper affordances and tabular alignment.', Preview: NumberInputCard },
+  { slug: 'password-input', name: 'Password Input', group: 'Inputs', recipeId: 'passwordinput', blurb: 'A password field with a reveal toggle and caps-lock warning.', Preview: PasswordInputCard },
+  { slug: 'phone-input', name: 'Phone Input', group: 'Inputs', recipeId: 'phoneinput', blurb: 'A phone field with a country-code select add-on.', Preview: PhoneInputCard },
+  { slug: 'input-otp', name: 'Input OTP', group: 'Inputs', recipeId: 'input-otp', blurb: 'A one-time-code field — separated single-character cells.', Preview: InputOtpCard },
+  { slug: 'tag-input', name: 'Tag Input', group: 'Inputs', recipeId: 'tag-input', blurb: 'Enter and remove tokens inline — labels, recipients, filters.', Preview: TagInputCard },
+  { slug: 'date-picker', name: 'Date Picker', group: 'Inputs', recipeId: 'calendar', blurb: 'A date field whose popover calendar is pure kit — themed, not OS chrome.', Preview: DateFieldCard },
+
+  // Forms
+  { slug: 'form-panel', name: 'Form Panel', group: 'Forms', recipeId: 'form-panel', blurb: 'The full form block — sectioned fields, inline validation and a sunken action bar.', Preview: FormPanelCard },
+  { slug: 'filter-bar', name: 'Filter Bar', group: 'Forms', recipeId: 'filter-bar', blurb: 'Search, facets and removable active-filter chips — the query surface for any list.', Preview: FilterBarCard },
+  { slug: 'file-upload', name: 'File Upload', group: 'Forms', recipeId: 'file-upload-dropzone', blurb: 'A drag-and-drop dropzone with browse fallback and file-type hints.', Preview: DropzoneCard },
+  { slug: 'rating', name: 'Rating', group: 'Forms', recipeId: 'rating', blurb: 'A star scale for reviews and feedback, filled + empty + a count.', Preview: RatingCard },
+
+  // Data & display
+  { slug: 'table', name: 'Table', group: 'Data display', recipeId: 'table', blurb: 'The base data table — header, rows, numeric alignment, hover and zebra.', Preview: TableCard },
+  { slug: 'data-table', name: 'Data Table', group: 'Data display', recipeId: 'data-table', blurb: 'The flagship data surface — toolbar, selection, sticky header, pagination and every state.', Preview: DataTableProCard },
+  { slug: 'chart', name: 'Chart', group: 'Data display', recipeId: 'chart', blurb: 'Line / area / bar / stacked / donut on the kit’s derived 6-series palette.', Preview: ChartCard },
+  { slug: 'stat-tile', name: 'Stat Tile', group: 'Data display', recipeId: 'stat-tile', blurb: 'A KPI tile — big number, label, delta and an optional sparkline.', Preview: StatCard },
+  { slug: 'list', name: 'List', group: 'Data display', recipeId: 'list', blurb: 'Rows of items with lead media, meta and trailing actions or badges.', Preview: ListCard },
+  { slug: 'description-list', name: 'Description List', group: 'Data display', recipeId: 'description-list', blurb: 'Key–value pairs — account info, plan details, a spec sheet.', Preview: DescriptionListCard },
+  { slug: 'timeline', name: 'Timeline', group: 'Data display', recipeId: 'timeline', blurb: 'Vertical events with state dots — activity feeds, build history, version logs.', Preview: TimelineCard },
+  { slug: 'avatar', name: 'Avatar', group: 'Data display', recipeId: 'avatar', blurb: 'A user image or initials, with sizes and a status dot.', Preview: AvatarCard },
+  { slug: 'badge', name: 'Badge & Chip', group: 'Data display', recipeId: 'chip', blurb: 'Compact status pills and removable chips in the toned status colours.', Preview: ChipsCard },
+  { slug: 'entity-card', name: 'Entity Card', group: 'Data display', recipeId: 'entity-card', blurb: 'An identity + a few key facts — mark, name, a kebab menu and meta rows.', Preview: EntityCardCard },
+  { slug: 'usage-meter', name: 'Usage Meter', group: 'Data display', recipeId: 'usage-meter', blurb: 'A quota bar whose fill shifts to a warning tone past a threshold.', Preview: UsageMeterCard },
+  { slug: 'code-block', name: 'Code Block', group: 'Data display', recipeId: 'codeblock', blurb: 'A mono code surface with a header, copy button and language tag.', Preview: CodeBlockCard },
+  { slug: 'pricing', name: 'Pricing', group: 'Data display', recipeId: 'pricing', blurb: 'A pricing tier card — plan, price, feature list and one primary action.', Preview: PricingCardCard },
+
+  // Feedback & status
+  { slug: 'alert', name: 'Alert', group: 'Feedback', recipeId: 'alert', blurb: 'An inline message in the toned status colours — info, success, warning, danger.', Preview: AlertsCard },
+  { slug: 'banner', name: 'Banner', group: 'Feedback', recipeId: 'banner', blurb: 'A full-width page-level notice with an action and a dismiss.', Preview: BannerCard },
+  { slug: 'toast', name: 'Toast', group: 'Feedback', recipeId: 'toast-stack', blurb: 'Transient confirmations — the toned variants and the actionable snackbar.', Preview: ToastStackCard },
+  { slug: 'progress', name: 'Progress', group: 'Feedback', recipeId: 'progress', blurb: 'A determinate progress bar, heavier than the slider to read as ongoing work.', Preview: ProgressCard },
+  { slug: 'skeleton', name: 'Skeleton', group: 'Feedback', recipeId: 'skeleton', blurb: 'Loading placeholders that match the shape of what’s coming.', Preview: SkeletonCard },
+  { slug: 'spinner', name: 'Spinner', group: 'Feedback', recipeId: 'spinner', blurb: 'An indeterminate loading indicator at the control-height scale.', Preview: SpinnerCard },
+  { slug: 'empty-state', name: 'Empty State', group: 'Feedback', recipeId: 'empty-state', blurb: 'The zero-data screen — an icon, a line of guidance and one action.', Preview: EmptyStateCard },
+
+  // Navigation
+  { slug: 'tabs', name: 'Tabs', group: 'Navigation', recipeId: 'tabs', blurb: 'A tab strip that switches panels, with an active underline and keyboard flow.', Preview: TabsCard },
+  { slug: 'breadcrumb', name: 'Breadcrumb', group: 'Navigation', recipeId: 'pagination-breadcrumb', blurb: 'A path trail back up the hierarchy, with a truncating overflow.', Preview: BreadcrumbCard },
+  { slug: 'pagination', name: 'Pagination', group: 'Navigation', recipeId: 'pagination-breadcrumb', blurb: 'Page controls with prev/next and a windowed page range.', Preview: PaginationCard },
+  { slug: 'navigation-menu', name: 'Navigation Menu', group: 'Navigation', recipeId: 'navigation-menu', blurb: 'A top nav with dropdown mega-panels for sections.', Preview: NavMenuCard },
+  { slug: 'stepper', name: 'Stepper', group: 'Navigation', recipeId: 'stepper', blurb: 'A multi-step progress indicator — done, current and future states.', Preview: StepperCard },
+
+  // Overlays & disclosure
+  { slug: 'dialog', name: 'Dialog', group: 'Overlays', recipeId: 'dialog', blurb: 'A focused modal — one screen of content, one primary action in a sunken foot.', Preview: DialogCard },
+  { slug: 'alert-dialog', name: 'Alert Dialog', group: 'Overlays', recipeId: 'alert-dialog', blurb: 'A confirmation modal that names the object and its destructive action.', Preview: AlertDialogCard },
+  { slug: 'sheet', name: 'Sheet', group: 'Overlays', recipeId: 'sheet-drawer', blurb: 'A slide-in panel from an edge — a longer flow than a dialog holds.', Preview: SheetCard },
+  { slug: 'popover', name: 'Popover', group: 'Overlays', recipeId: 'popover', blurb: 'A small floating panel anchored to a trigger, for quick forms and pickers.', Preview: PopoverCard },
+  { slug: 'tooltip', name: 'Tooltip', group: 'Overlays', recipeId: 'tooltip', blurb: 'A hover hint — one line of context, never interactive content.', Preview: TooltipCard },
+  { slug: 'hover-card', name: 'Hover Card', group: 'Overlays', recipeId: 'hover-card', blurb: 'A richer hover preview — a profile or link card summoned on dwell.', Preview: HoverCardCard },
+  { slug: 'accordion', name: 'Accordion', group: 'Overlays', recipeId: 'accordion', blurb: 'Stacked disclosure panels — one section open at a time or many.', Preview: AccordionCard },
+  { slug: 'lightbox', name: 'Lightbox', group: 'Overlays', recipeId: 'lightbox', blurb: 'A full-screen media viewer with prev/next and a caption.', Preview: LightboxCard },
+
+  // Layout
+  { slug: 'carousel', name: 'Carousel', group: 'Layout', recipeId: 'carousel', blurb: 'Sliding panels with prev/next and dot pagination.', Preview: CarouselCard },
+  { slug: 'aspect-ratio', name: 'Aspect Ratio', group: 'Layout', recipeId: 'aspect-ratio', blurb: 'A box that holds a fixed ratio as it scales — media, embeds, thumbnails.', Preview: AspectRatioCard },
+  { slug: 'scroll-area', name: 'Scroll Area', group: 'Layout', recipeId: 'scroll-area', blurb: 'A scoped scroll container with a themed, overlay scrollbar.', Preview: ScrollAreaCard },
+  { slug: 'resizable', name: 'Resizable', group: 'Layout', recipeId: 'resizable', blurb: 'Drag-to-resize split panes with a grabbable handle.', Preview: ResizableCard },
+
+  // AI thread
+  { slug: 'chat', name: 'Chat', group: 'AI', recipeId: 'message', blurb: 'A conversation thread — incoming vs your own message bubbles.', Preview: ThreadCard },
+  { slug: 'tool-call', name: 'Tool Call', group: 'AI', recipeId: 'tool-call', blurb: 'An AI agent’s tool receipt — mono name, args, a status dot and an expandable result.', Preview: ToolCallCard },
+  { slug: 'reasoning', name: 'Reasoning', group: 'AI', recipeId: 'reasoning', blurb: 'The model’s thinking disclosure — “Thought for 12s”, collapsed by default.', Preview: ReasoningCard },
+  { slug: 'citation', name: 'Citation', group: 'AI', recipeId: 'citation', blurb: 'The inline source chip a grounded answer hangs its claims on.', Preview: CitationCard },
+  { slug: 'prose', name: 'Prose', group: 'Content', recipeId: 'prose', blurb: 'A rich-text container that styles raw semantic tags to the kit’s type and rhythm.', Preview: ProseCard },
+  { slug: 'attachment', name: 'Attachment', group: 'Content', recipeId: 'attachment-chip-family', blurb: 'A file chip with type icon, name and size — for messages and forms.', Preview: AttachmentChipCard },
+]
+
+export const componentPageBySlug = (slug: string): ComponentPage | undefined =>
+  COMPONENT_PAGES.find((c) => c.slug === slug)
