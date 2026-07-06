@@ -366,6 +366,18 @@ export function renderSection(spec: SectionSpec, key: number) {
       return <BreakdownSection key={key} title={spec.seed.title} unit={spec.seed.unit} rows={spec.seed.rows} />
     case 'planCompare':
       return <PlanCompareSection key={key} eyebrow={spec.seed.eyebrow} tiers={spec.seed.tiers} features={spec.seed.features} />
+    case 'pageHead': {
+      const a = spec.seed.actions
+      return (
+        <PageHead key={key} title={spec.seed.title} sub={spec.seed.sub} actions={a && a.length > 0 ? (
+          <>{a.map((act) => (
+            <button type="button" key={act.label} className={`btn btn--sm ${act.primary ? 'btn--primary' : 'btn--ghost'}`}>
+              {act.icon && <Icon name={act.icon} />} {act.label}
+            </button>
+          ))}</>
+        ) : undefined} />
+      )
+    }
     case 'filegrid':
       return <FileGridSection key={key} title={spec.seed.title} files={spec.seed.files} />
     case 'list':

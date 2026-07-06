@@ -364,14 +364,26 @@ function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => voi
           if (!sm) return null
           const tileNav: AppNav = { screens: LEDGER_SCREENS, current: s.id, highlight: s.id, onNavigate: () => {} }
           return (
-            <button type="button" className="shc-wall__tile" key={s.id} onClick={(e) => onPick(s.id, e.currentTarget)} aria-label={`Open ${s.label}`}>
+            // role="button" (not a <button>) because each tile embeds a full,
+            // interactive showcase scaffold — real <button>s inside a <button>
+            // is invalid HTML (hydration warnings). A div + keyboard handler
+            // keeps it activat­able without nesting buttons.
+            <div
+              role="button"
+              tabIndex={0}
+              className="shc-wall__tile"
+              key={s.id}
+              onClick={(e) => onPick(s.id, e.currentTarget)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(s.id, e.currentTarget) } }}
+              aria-label={`Open ${s.label}`}
+            >
               <div className="shc-wall__frame">
                 <div className="shc-wall__mini" aria-hidden="true">
                   <ShowcaseShell m={sm} width={1200} appNav={tileNav} />
                 </div>
               </div>
               <span className="shc-wall__cap"><Icon name={s.icon} /> {s.label}</span>
-            </button>
+            </div>
           )
         })}
         {/* 9th cell — the empty slot, filled later (another app archetype). */}

@@ -20,6 +20,9 @@ export type ShowcaseArchetype = 'feed' | 'list-detail' | 'supporting' | 'workspa
 export type ShowcaseNav = 'suite' | 'topbar'
 
 export type SectionSpec =
+  // The screen-level header — the kit's `.page-head` recipe (title · sub · a
+  // trailing actions cluster). Prepend one so every screen opens the same way.
+  | { kind: 'pageHead'; seed: { title: string; sub?: string; actions?: Array<{ label: string; icon?: IconName; primary?: boolean }> } }
   | { kind: 'stats'; seed: { items: Array<{ label: string; value: string; delta?: string; up?: boolean; hero?: boolean; spark?: number[] }> } }
   | { kind: 'chart'; seed: { title: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> } }
   // Tabbed chart — a real .tabs strip switching between named chart views (each a
@@ -372,6 +375,10 @@ export const SHOWCASES: ShowcaseManifest[] = [
       {
         role: 'flex',
         sections: [
+          { kind: 'pageHead', seed: { title: 'Reports', sub: 'Cashflow, collections and aging — March 2026.', actions: [
+            { label: 'Export', icon: 'upload' },
+            { label: 'New invoice', icon: 'plus', primary: true },
+          ] } },
           { kind: 'stats', seed: { items: [
             { label: 'Net revenue', value: '$405,091.00', delta: '+4.75%', up: true, hero: true, spark: [186, 204, 198, 241, 273, 312] },
             { label: 'Collected (Mar)', value: '$148,316.00', delta: '+8.10%', up: true, spark: [120, 132, 128, 140, 137, 148] },
@@ -421,6 +428,9 @@ export const SHOWCASES: ShowcaseManifest[] = [
       {
         role: 'flex',
         sections: [
+          { kind: 'pageHead', seed: { title: 'Documents', sub: 'Receipts, contracts and statements — 6 files.', actions: [
+            { label: 'Upload', icon: 'upload', primary: true },
+          ] } },
           { kind: 'filegrid', seed: { title: 'Receipts & contracts · 6 files', files: [
             { name: 'MSA-tuple-2026.pdf', ext: 'PDF', size: '480 KB', date: 'Mar 3', tone: 'danger' },
             { name: 'receipt-northwind.png', ext: 'PNG', size: '1.2 MB', date: 'Mar 2', tone: 'success', image: true },
@@ -482,6 +492,9 @@ export const SHOWCASES: ShowcaseManifest[] = [
       {
         role: 'flex',
         sections: [
+          { kind: 'pageHead', seed: { title: 'Plans & billing', sub: 'Your subscription, billing details and notifications.', actions: [
+            { label: 'Manage billing', icon: 'card' },
+          ] } },
           { kind: 'stats', seed: { items: [
             { label: 'Current plan', value: 'Scale · annual', hero: true },
             { label: 'Seats', value: '4 of 5 used' },
