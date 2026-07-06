@@ -2,8 +2,19 @@ import { defineConfig } from 'vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
 import { VitePWA } from 'vite-plugin-pwa'
+import { readFileSync } from 'node:fs'
+
+// The nav version chip tracks the PUBLISHED CLI — the concrete artifact users
+// install (`npx uicockpit`). Derive it from cli/package.json at build time so it
+// auto-syncs on every deploy after a version bump; no hand-edited string to drift.
+const cliVersion = JSON.parse(
+  readFileSync(new URL('../cli/package.json', import.meta.url), 'utf8'),
+).version as string
 
 export default defineConfig({
+  define: {
+    __UICOCKPIT_VERSION__: JSON.stringify(`v${cliVersion}`),
+  },
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),

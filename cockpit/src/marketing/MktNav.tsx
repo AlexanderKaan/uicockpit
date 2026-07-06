@@ -1,7 +1,9 @@
 import { ChevronDown } from 'lucide-react'
 
 /** The published npm package version (`uicockpit` CLI) — the public number. */
-export const UICOCKPIT_VERSION = 'v0.4.0'
+// Derived from cli/package.json at build time (see vite.config.ts) — auto-syncs
+// with every deploy after a `npm version` bump, so it can never drift again.
+export const UICOCKPIT_VERSION = __UICOCKPIT_VERSION__
 export const REPO_URL = 'https://github.com/AlexanderKaan/uicockpit'
 
 /** GitHub brand mark (lucide dropped brand icons — inline the official glyph). */
