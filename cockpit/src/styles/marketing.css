@@ -1528,6 +1528,61 @@
 .mkt__catalog-cta { display: flex; justify-content: center; padding: 40px 24px 72px; }
 
 /* ============================================================
+   Drift-bench proof (homepage #proof, Golf 4) — the measured
+   with-kit vs without-kit comparison.
+   ============================================================ */
+.mkt__bench { max-width: 760px; margin: 40px auto 0; }
+.mkt__bench-totals {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 28px;
+  border: 1px solid var(--mkt-border);
+  border-radius: 16px;
+  background: var(--mkt-bg-soft, #f7f8fa);
+}
+.mkt__bench-total { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.mkt__bench-num { font-size: 52px; font-weight: 750; line-height: 1; letter-spacing: -0.02em; }
+.mkt__bench-total--good .mkt__bench-num { color: #16a34a; }
+.mkt__bench-total--bad .mkt__bench-num { color: #dc2626; }
+.mkt__bench-lbl { font-size: 12.5px; color: var(--mkt-fg-muted); text-align: center; line-height: 1.35; }
+.mkt__bench-vs { font-size: 15px; color: var(--mkt-fg-faint); font-weight: 500; }
+.mkt__bench-delta {
+  margin-left: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--mkt-fg);
+  color: var(--mkt-bg, #fff);
+  font-size: 13px;
+  font-weight: 650;
+}
+.mkt__bench-rows { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; }
+.mkt__bench-row { display: grid; grid-template-columns: 120px 1fr 1fr; align-items: center; gap: 12px; }
+.mkt__bench-name { font-size: 13px; color: var(--mkt-fg-muted); }
+.mkt__bench-track { position: relative; height: 22px; display: flex; align-items: center; }
+.mkt__bench-bar { height: 22px; border-radius: 5px; min-width: 2px; }
+.mkt__bench-bar--good { background: #16a34a; }
+.mkt__bench-bar--bad { background: #dc2626; opacity: 0.85; }
+.mkt__bench-count { position: absolute; left: 100%; margin-left: 7px; font-size: 12px; font-variant-numeric: tabular-nums; font-weight: 600; }
+.mkt__bench-count--good { color: #16a34a; }
+.mkt__bench-count--bad { color: #dc2626; }
+.mkt__bench-legend { display: flex; gap: 20px; justify-content: flex-end; margin-top: 6px; font-size: 12px; color: var(--mkt-fg-muted); }
+.mkt__bench-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.mkt__bench-dot { width: 9px; height: 9px; border-radius: 50%; }
+.mkt__bench-dot--good { background: #16a34a; }
+.mkt__bench-dot--bad { background: #dc2626; }
+.mkt__bench-foot { margin: 28px 0 0; font-size: 14px; color: var(--mkt-fg-muted); line-height: 1.6; }
+.mkt__bench-foot strong { color: var(--mkt-fg); font-variant-numeric: tabular-nums; }
+.mkt__bench-cite { margin: 10px 0 0; font-size: 12.5px; color: var(--mkt-fg-faint); }
+.mkt__bench code, .mkt__bench-foot code, .mkt__bench-cite code { font-family: var(--mkt-mono, ui-monospace, monospace); font-size: 0.92em; }
+@media (max-width: 560px) {
+  .mkt__bench-row { grid-template-columns: 84px 1fr 1fr; gap: 8px; }
+  .mkt__bench-name { font-size: 12px; }
+}
+
+/* ============================================================
    Component docs (/components + /components/<slug>, IA-2b) — a
    persistent sidebar index + per-slug detail pages, the "normal"
    components reference. .cmpdoc = [sidebar · main].

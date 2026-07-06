@@ -2,6 +2,7 @@ import { Sparkles, Palette, FileCode2, BarChart3, ShieldCheck, Smartphone, Link2
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
 import { LoopAnimation } from './LoopAnimation'
+import { MktDriftBench } from './MktDriftBench'
 import { MktCompare } from './MktCompare'
 import { MktNav } from './MktNav'
 import { ToolLogo } from '../brand/toolLogos'
@@ -194,6 +195,9 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
           <p className="mkt__loop-foot">Define → Apply → Verify — every time the UI changes.</p>
         </div>
       </section>
+
+      {/* Drift-bench — the measured proof of the Verify claim (Golf 4). */}
+      <MktDriftBench />
 
       {/* Features */}
       <section className="mkt__section" id="features">
