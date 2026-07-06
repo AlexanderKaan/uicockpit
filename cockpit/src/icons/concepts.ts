@@ -1,6 +1,6 @@
 /**
- * The 24 icon concepts Cockpit's preview & dashboard use.
- * Every adapter must provide all 24. Build-time check (verify:icons).
+ * The 28 icon concepts Cockpit's preview & dashboard use.
+ * Every adapter must provide all 28. Build-time check (verify:icons).
  */
 export const ICON_CONCEPTS = [
   'check',
@@ -27,6 +27,10 @@ export const ICON_CONCEPTS = [
   'chat',
   'feed',
   'card',
+  'copy',
+  'refresh',
+  'thumbUp',
+  'thumbDown',
 ] as const
 
 export type IconName = (typeof ICON_CONCEPTS)[number]

@@ -358,7 +358,7 @@ export function renderSection(spec: SectionSpec, key: number) {
       return (
         <div className="thread" key={key}>
           {spec.seed.messages.map((m, i) => (
-            <div className={`msg ${m.me ? 'msg--me' : ''}`} key={i}>
+            <div className={`msg ${m.me ? 'msg--me' : m.ai ? 'msg--ai' : ''}`} key={i}>
               <div className="msg__head">
                 {m.avatar && <span className={`avatar avatar--sm avatar--a${(i % 6) + 1}`} aria-hidden="true">{m.avatar}</span>}
                 <span className="msg__name">{m.name}</span>
@@ -399,6 +399,15 @@ export function renderSection(spec: SectionSpec, key: number) {
                       <span className="cite__n">{s.n}</span> {s.label}
                     </a>
                   ))}
+                </div>
+              )}
+              {/* Assistant reply gets the hover action row — copy · regenerate · rate. */}
+              {m.ai && (
+                <div className="msg__actions">
+                  <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Copy"><Icon name="copy" /></button>
+                  <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Regenerate"><Icon name="refresh" /></button>
+                  <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Good response"><Icon name="thumbUp" /></button>
+                  <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Bad response"><Icon name="thumbDown" /></button>
                 </div>
               )}
             </div>

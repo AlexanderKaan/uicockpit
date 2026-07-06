@@ -30,6 +30,8 @@ export type SectionSpec =
   | { kind: 'breakdown'; seed: { title: string; unit?: string; rows: Array<{ name: string; value: number }> } }
   | { kind: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
   | { kind: 'thread'; seed: { messages: Array<{ name: string; time: string; body: string; me?: boolean; avatar?: string
+      /** The assistant's turn — renders as .msg--ai (wider raised answer-card) with a .msg__actions row. */
+      ai?: boolean
       /** LP6 AI-furniture — a reply can carry the model's thinking line, tool receipts and source chips. */
       reasoning?: { label: string; time?: string; body?: string }
       tools?: Array<{ name: string; meta: string; status: 'running' | 'done' | 'error'; result?: string }>
@@ -445,7 +447,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
         sections: [
           { kind: 'thread', seed: { messages: [
             { name: 'You', time: '09:14', avatar: 'AK', body: 'Which invoices are overdue, and how much is outstanding?', me: true },
-            { name: 'Ledger AI', time: '09:14', avatar: 'L',
+            { name: 'Ledger AI', time: '09:14', avatar: 'L', ai: true,
               reasoning: { label: 'Thought', time: 'for 6s', body: 'Two invoices match "overdue". The outstanding total should count ALL open invoices, not just the overdue ones — compute both and answer with the distinction.' },
               tools: [
                 { name: 'search_invoices', meta: 'status: overdue · limit: 10', status: 'done', result: '2 results\n#00009  Tuple, Inc       $2,000.00   14 days overdue\n#00008  Vantage Retail  $21,400.00   8 days overdue' },
@@ -454,7 +456,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
               body: 'Two invoices are overdue: #00009 (Tuple, Inc — $2,000.00, 14 days) and #00008 (Vantage Retail — $21,400.00, 8 days). Total outstanding across all open invoices is $245,988.00. Want me to draft reminders for the two overdue ones?',
               sources: [ { n: 1, label: 'Invoices · Outstanding' }, { n: 2, label: 'Aging report · March' } ] },
             { name: 'You', time: '09:15', avatar: 'AK', body: 'Yes — draft a friendly reminder for Tuple.', me: true },
-            { name: 'Ledger AI', time: '09:15', avatar: 'L',
+            { name: 'Ledger AI', time: '09:15', avatar: 'L', ai: true,
               tools: [ { name: 'draft_reminder', meta: 'invoice: #00009 · tone: friendly', status: 'running' } ],
               body: 'On it — drafting a friendly reminder for Tuple, Inc referencing invoice #00009 ($2,000.00, 14 days past due). I\'ll show it here for your sign-off before anything is sent.' },
           ] } },

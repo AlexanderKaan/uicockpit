@@ -4340,15 +4340,21 @@ function ListCard() {
  * support chats, AI assistants. */
 function ThreadCard() {
   return (
-    <Card title="Conversation" desc="A chat thread — incoming vs your own message.">
+    <Card docId="message" title="Conversation" desc="A chat thread — the three voices: incoming, you, and the assistant.">
       <div className="thread">
-        <div className="msg">
-          <div className="msg__head"><span className="msg__name">Mira</span><span className="msg__time">09:24</span></div>
-          <p className="msg__body">Draft contract is ready for review — can we sign off today?</p>
-        </div>
         <div className="msg msg--me">
-          <div className="msg__head"><span className="msg__name">You</span><span className="msg__time">09:26</span></div>
-          <p className="msg__body">Looks good. Sending the redline now.</p>
+          <div className="msg__head"><span className="msg__name">You</span><span className="msg__time">09:24</span></div>
+          <p className="msg__body">Is the draft contract ready to sign off today?</p>
+        </div>
+        <div className="msg msg--ai">
+          <div className="msg__head"><span className="avatar avatar--sm avatar--a2" aria-hidden="true">L</span><span className="msg__name">Ledger AI</span><span className="msg__time">09:24</span></div>
+          <p className="msg__body">Yes — the redline is clean and both parties initialled every change. You’re clear to sign.</p>
+          <div className="msg__actions">
+            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Copy"><Icon name="copy" /></button>
+            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Regenerate"><Icon name="refresh" /></button>
+            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Good response"><Icon name="thumbUp" /></button>
+            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Bad response"><Icon name="thumbDown" /></button>
+          </div>
         </div>
       </div>
     </Card>

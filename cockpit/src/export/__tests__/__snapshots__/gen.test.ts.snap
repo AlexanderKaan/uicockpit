@@ -2051,9 +2051,11 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       },
       "msg": {
         "modifiers": [
+          "ai",
           "me"
         ],
         "parts": [
+          "actions",
           "body",
           "head",
           "name",
@@ -9933,6 +9935,8 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    comment feed. The modifier flips ONE axis: who is speaking.
      .msg          → an incoming message (left, neutral surface)
      .msg--me      → the sender's own message (right, brand-soft fill)
+     .msg--ai      → the assistant's turn (a wider, raised answer-card that
+                     groups its reasoning, tool receipts, reply + actions)
    The bubble caps its width so a thread reads as a conversation, not full-bleed
    paragraphs. Everything derives — fill, border and text all from tokens. */
 .thread {
@@ -9968,6 +9972,31 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .msg--me .msg__time { color: inherit; opacity: 0.7; }
 .msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
 .msg--me .msg__body { color: inherit; }
+/* The assistant's turn — a distinct THIRD voice. It's not a narrow bubble: an
+   AI answer earns room, so it stretches and sits on a faintly raised surface
+   that groups its reasoning, tool receipts, reply and actions as one card
+   (the Claude/ChatGPT layout: compact user bubbles, full-width AI answers). */
+.msg--ai {
+  align-self: stretch;
+  max-width: 100%;
+  background: var(--k-surface-raised, var(--k-surface));
+  /* An accent left-edge marks the assistant's turn so the answer-card reads as
+     distinct even where surface-raised collapses to the surface (flat Style). */
+  border-inline-start: 2px solid var(--k-primary);
+}
+/* Action row — copy / regenerate / rate an AI reply. Real ghost icon buttons
+   inside; quiet by default (muted), brightening on hover / keyboard focus. */
+.msg__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-2);
+  margin-top: var(--k-s-6);
+  opacity: 0.65;
+  transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease);
+}
+.msg:hover .msg__actions,
+.msg:focus-within .msg__actions { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .msg__actions { transition: none; } }
 
 /* === Tool call ===
    The "assistant used a tool" card in an AI thread — the receipt of an action,
@@ -17191,6 +17220,8 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    comment feed. The modifier flips ONE axis: who is speaking.
      .msg          → an incoming message (left, neutral surface)
      .msg--me      → the sender's own message (right, brand-soft fill)
+     .msg--ai      → the assistant's turn (a wider, raised answer-card that
+                     groups its reasoning, tool receipts, reply + actions)
    The bubble caps its width so a thread reads as a conversation, not full-bleed
    paragraphs. Everything derives — fill, border and text all from tokens. */
 .thread {
@@ -17226,6 +17257,31 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .msg--me .msg__time { color: inherit; opacity: 0.7; }
 .msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
 .msg--me .msg__body { color: inherit; }
+/* The assistant's turn — a distinct THIRD voice. It's not a narrow bubble: an
+   AI answer earns room, so it stretches and sits on a faintly raised surface
+   that groups its reasoning, tool receipts, reply and actions as one card
+   (the Claude/ChatGPT layout: compact user bubbles, full-width AI answers). */
+.msg--ai {
+  align-self: stretch;
+  max-width: 100%;
+  background: var(--k-surface-raised, var(--k-surface));
+  /* An accent left-edge marks the assistant's turn so the answer-card reads as
+     distinct even where surface-raised collapses to the surface (flat Style). */
+  border-inline-start: 2px solid var(--k-primary);
+}
+/* Action row — copy / regenerate / rate an AI reply. Real ghost icon buttons
+   inside; quiet by default (muted), brightening on hover / keyboard focus. */
+.msg__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-2);
+  margin-top: var(--k-s-6);
+  opacity: 0.65;
+  transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease);
+}
+.msg:hover .msg__actions,
+.msg:focus-within .msg__actions { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .msg__actions { transition: none; } }
 
 /* === Tool call ===
    The "assistant used a tool" card in an AI thread — the receipt of an action,
@@ -18011,6 +18067,16 @@ kit already guarantees.
 **Don't**
 - Don't hide primary navigation behind a hamburger on a wide container.
 - Don't rebuild a sidebar from .card + links — the suite owns nav spacing, states and the morph.
+
+### Chat message
+**Do**
+- Pick the voice with the modifier: plain .msg for an incoming person, .msg--me for you, .msg--ai for the assistant’s turn.
+- Let the AI turn (.msg--ai) hold its reasoning, tool receipts, answer and .msg__actions as one grouped answer-card.
+- Keep .msg__actions as ghost icon buttons (copy · regenerate · rate) — they reveal on hover and stay visible on touch.
+
+**Don't**
+- Don't give an incoming person’s message the brand fill — that reads as “you.”
+- Don't stack more than one primary action in the bubble; message actions are all quiet ghosts.
 
 ## Verify your work
 

@@ -11,8 +11,12 @@ import {
   ChevronRightIcon,
   Cog6ToothIcon,
   CreditCardIcon,
+  DocumentDuplicateIcon,
   DocumentIcon,
   EllipsisHorizontalIcon,
+  ArrowPathIcon,
+  HandThumbDownIcon,
+  HandThumbUpIcon,
   HomeIcon,
   InformationCircleIcon,
   MagnifyingGlassIcon,
@@ -64,6 +68,10 @@ const adapter: IconAdapter = {
     chat: wrap(ChatBubbleLeftIcon),
     feed: wrap(RssIcon),
     card: wrap(CreditCardIcon),
+    copy: wrap(DocumentDuplicateIcon),
+    refresh: wrap(ArrowPathIcon),
+    thumbUp: wrap(HandThumbUpIcon),
+    thumbDown: wrap(HandThumbDownIcon),
   },
 }
 

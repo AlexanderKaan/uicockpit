@@ -6,8 +6,12 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Copy,
   CreditCard,
   File,
+  RefreshCw,
+  ThumbsDown,
+  ThumbsUp,
   Home,
   Info,
   LayoutGrid,
@@ -57,6 +61,10 @@ const adapter: IconAdapter = {
     chat: wrap(MessageSquare),
     feed: wrap(Rss),
     card: wrap(CreditCard),
+    copy: wrap(Copy),
+    refresh: wrap(RefreshCw),
+    thumbUp: wrap(ThumbsUp),
+    thumbDown: wrap(ThumbsDown),
   },
 }
 

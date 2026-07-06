@@ -1,4 +1,5 @@
 import {
+  ArrowClockwise,
   Bell,
   Calendar,
   CaretDown,
@@ -7,6 +8,7 @@ import {
   ChartBar,
   Chat,
   Check,
+  Copy,
   CreditCard,
   DotsThree,
   File,
@@ -20,6 +22,8 @@ import {
   Rss,
   Sparkle,
   Storefront,
+  ThumbsDown,
+  ThumbsUp,
   Trash,
   UploadSimple,
   X,
@@ -57,6 +61,10 @@ const adapter: IconAdapter = {
     chat: wrap(Chat),
     feed: wrap(Rss),
     card: wrap(CreditCard),
+    copy: wrap(Copy),
+    refresh: wrap(ArrowClockwise),
+    thumbUp: wrap(ThumbsUp),
+    thumbDown: wrap(ThumbsDown),
   },
 }
 
