@@ -5525,6 +5525,97 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
  * block above; cells reuse .stat-tile__value / .stat-tile__label). */`,
   },
   {
+    id: 'plan-compare',
+    section: "Plan comparison",
+    doc: {
+      dos: [
+        "Reach for a comparison when the choice is “which tier?” — plans across the top, features down the side, one value per cell.",
+        "Highlight exactly one column (the current or recommended plan) — the band draws behind that tier so the eye lands on it.",
+        "Keep cells to a check, a dash, or a short value (“Unlimited”, “5”); a comparison is scanned, not read.",
+      ],
+      donts: [
+        "Don't use .pricing (standalone tier cards) when the job is comparing feature-by-feature — that’s this recipe.",
+        "Don't highlight two columns; the whole point is to aim the decision at one.",
+      ],
+    },
+    css: `/* === Plan comparison (.plan-compare) — a tier × feature matrix ==========
+ * The upgrade-decision surface: plans across the top, features down the
+ * side, a check / dash / value in each cell, and ONE highlighted column
+ * (the current or recommended plan) drawn as a continuous band behind its
+ * cells. A CSS grid (not a table) so the highlight can span every row while
+ * the columns stay perfectly aligned. On the root set --pc-cols (tier count)
+ * and --pc-hl (the 1-based grid column of the highlighted tier = its
+ * index + 2, since column 1 is the feature-label rail). */
+.plan-compare {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(var(--pc-cols, 3), minmax(0, 1fr));
+  /* Rows are made EXPLICIT (header + --pc-rows feature rows) so the highlight
+     band's grid-row: 1 / -1 resolves to the full height — an absolutely-placed
+     item only sees explicit line numbers, and implicit auto-rows wouldn't count. */
+  grid-template-rows: auto repeat(var(--pc-rows, 6), auto);
+  position: relative;
+  align-items: stretch;
+}
+/* The highlight band — sits behind the featured column's cells, top to bottom.
+ * position:absolute so it's placed INTO its grid area (the featured column,
+ * all rows) without occupying a track for auto-placement — otherwise it would
+ * block the featured tier's own header + cells from landing in that column. */
+.plan-compare__hl {
+  position: absolute;
+  inset: 0;
+  grid-row: 1 / -1;
+  grid-column: var(--pc-hl, 2) / span 1;
+  background: var(--k-surface-raised, var(--k-surface));
+  border: 2px solid var(--k-primary);
+  border-radius: var(--k-radius-md);
+  z-index: 0;
+}
+.plan-compare__corner,
+.plan-compare__head,
+.plan-compare__feat,
+.plan-compare__cell { position: relative; z-index: 1; }
+/* Header row — one cell per tier: name, price, CTA. */
+.plan-compare__corner { padding: var(--k-s-12) var(--k-s-10); display: flex; align-items: flex-end; }
+.plan-compare__eyebrow {
+  font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold);
+  letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted);
+}
+.plan-compare__head {
+  display: flex; flex-direction: column; align-items: center; gap: var(--k-s-6);
+  padding: var(--k-s-12) var(--k-s-10); text-align: center;
+}
+.plan-compare__name {
+  font-size: var(--k-type-small); font-weight: var(--k-weight-semibold);
+  letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted);
+}
+.plan-compare__price { display: flex; align-items: baseline; gap: var(--k-s-2); }
+.plan-compare__amount {
+  font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold);
+  font-family: var(--k-font-display); font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em; color: var(--k-fg);
+}
+.plan-compare__per { font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
+.plan-compare__head .btn { width: 100%; margin-top: var(--k-s-2); }
+/* Feature rows — label in the rail, a value under each tier; hairline between. */
+.plan-compare__feat {
+  display: flex; align-items: center;
+  padding: var(--k-s-10);
+  font-size: var(--k-type-small); color: var(--k-fg);
+  border-top: var(--k-hairline, 1px solid var(--k-border));
+}
+.plan-compare__cell {
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--k-s-10);
+  font-size: var(--k-type-small); font-variant-numeric: tabular-nums; color: var(--k-fg);
+  border-top: var(--k-hairline, 1px solid var(--k-border));
+  text-align: center;
+}
+/* Cell marks — a success check for "included", a quiet dash for "not". */
+.plan-compare__yes { color: var(--k-success); display: inline-flex; }
+.plan-compare__yes svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
+.plan-compare__no { color: var(--k-fg-faint); }`,
+  },
+  {
     id: 'twocolumnlayout',
     section: "TwoColumnLayout",
     css: `/* === TwoColumnLayout (#11) — composed demo === */

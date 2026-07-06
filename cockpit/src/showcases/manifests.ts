@@ -40,6 +40,9 @@ export type SectionSpec =
   | { kind: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[]; badgeToneByValue?: Record<string, 'success' | 'warning' | 'danger' | 'info'>; avatarCols?: number[] } }
   | { kind: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string } }
   | { kind: 'pricing'; seed: { tiers: Array<{ name: string; price: string; period: string; feats: string[]; featured?: boolean; cta: string }> } }
+  // The `.plan-compare` recipe — a tier × feature matrix with one highlighted
+  // column (the current/recommended plan). Cells: true (✓) · false (—) · a value.
+  | { kind: 'planCompare'; seed: { eyebrow?: string; tiers: Array<{ name: string; price: string; per?: string; cta: string; featured?: boolean }>; features: Array<{ label: string; cells: Array<boolean | string> }> } }
   | { kind: 'prose'; seed: { title: string; kicker?: string; paragraphs: string[]; hero?: boolean; ctas?: string[] } }
   | { kind: 'dl'; seed: { title?: string; pairs: Array<[string, string]> } }
   | { kind: 'chips'; seed: { label: string; options: string[]; active: number } }
@@ -489,8 +492,17 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { label: 'VAT number', placeholder: 'EU123456789' },
             { label: 'Billing email', value: 'finance@acme.inc' },
           ], submit: 'Save changes' } },
-          { kind: 'pricing', seed: { tiers: [
-            { name: 'Scale', price: '$96', period: '/mo', feats: ['Unlimited invoices', 'Audit log & SSO', 'Dedicated CSM'], featured: true, cta: 'Current plan' },
+          { kind: 'planCompare', seed: { eyebrow: 'Your plan', tiers: [
+            { name: 'Starter', price: '$0', per: '/mo', cta: 'Downgrade' },
+            { name: 'Growth', price: '$39', per: '/mo', cta: 'Switch' },
+            { name: 'Scale', price: '$96', per: '/mo', cta: 'Current plan', featured: true },
+          ], features: [
+            { label: 'Invoices / month', cells: ['25', '500', 'Unlimited'] },
+            { label: 'Team seats', cells: ['1', '5', 'Unlimited'] },
+            { label: 'Automated reminders', cells: [false, true, true] },
+            { label: 'Audit log & SSO', cells: [false, false, true] },
+            { label: 'Custom branding', cells: [false, true, true] },
+            { label: 'Dedicated CSM', cells: [false, false, true] },
           ] } },
           { kind: 'settings', seed: { title: 'Notifications', rows: [
             { title: 'Payment received', sub: 'Email me when a client pays an invoice.', on: true },

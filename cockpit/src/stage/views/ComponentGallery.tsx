@@ -135,6 +135,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   FilterBarCard: 'Filter bar toolbar facets',
   InboxFilterCard: 'Inbox filter mail messages',
   PricingCardCard: 'Plans pricing tiers subscription',
+  PlanCompareCard: 'Plan comparison compare tiers feature matrix upgrade table',
   CodeBlockCard: 'Quick start code block snippet syntax',
   LoginCard: 'Log in sign in auth credentials',
   SignupCard: 'Sign up register create account auth',
@@ -224,7 +225,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [FrozenColumnTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
-    [PricingCardCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
+    [PricingCardCard, 'section'], [PlanCompareCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'component'], [SheetCard, 'component'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'component'],
     [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ThreadCard, 'component'], [ToolCallCard, 'atom'], [ReasoningCard, 'atom'], [CitationCard, 'atom'], [ProseCard, 'component'],
@@ -4570,6 +4571,53 @@ function CodeBlockCard() {
 /* === Pricing (Tier 4 #12) — composed demo, no new CSS ===
  * 3 tiers met featured middle highlighted. Bouwt op .card + .btn + .badge.
  * Layout via flex column; no inline plan-specific CSS. */
+// Plan comparison — a tier × feature matrix (distinct from .pricing's
+// standalone cards): plans across the top, features down the side, one
+// highlighted column drawn behind the recommended tier.
+function PlanCompareCard() {
+  const tiers = [
+    { name: 'Starter', price: '$0', per: '/mo', cta: 'Get started' },
+    { name: 'Pro', price: '$19', per: '/mo', cta: 'Start trial', featured: true },
+    { name: 'Scale', price: '$96', per: '/mo', cta: 'Contact sales' },
+  ]
+  const features: Array<{ label: string; cells: Array<boolean | string> }> = [
+    { label: 'Projects', cells: ['3', 'Unlimited', 'Unlimited'] },
+    { label: 'Monthly tokens', cells: ['10K', '500K', 'Unlimited'] },
+    { label: 'Advanced exports', cells: [false, true, true] },
+    { label: 'Audit log & SSO', cells: [false, false, true] },
+    { label: 'Priority support', cells: [false, true, true] },
+    { label: 'Dedicated CSM', cells: [false, false, true] },
+  ]
+  const hl = tiers.findIndex((t) => t.featured)
+  return (
+    <Card xwide docId="plan-compare" title="Compare plans" desc="A tier × feature matrix with the recommended plan highlighted.">
+      <div className="plan-compare" style={{ '--pc-cols': tiers.length, '--pc-rows': features.length, '--pc-hl': hl + 2 } as CSSProperties}>
+        {hl >= 0 && <div className="plan-compare__hl" />}
+        <div className="plan-compare__corner"><span className="plan-compare__eyebrow">Compare</span></div>
+        {tiers.map((t) => (
+          <div className="plan-compare__head" key={t.name}>
+            <span className="plan-compare__name">{t.name}</span>
+            <span className="plan-compare__price"><span className="plan-compare__amount">{t.price}</span><span className="plan-compare__per">{t.per}</span></span>
+            <button className={`btn btn--sm ${t.featured ? 'btn--primary' : 'btn--ghost'}`}>{t.cta}</button>
+          </div>
+        ))}
+        {features.map((f) => (
+          <Fragment key={f.label}>
+            <div className="plan-compare__feat">{f.label}</div>
+            {f.cells.map((c, i) => (
+              <div className="plan-compare__cell" key={i}>
+                {c === true ? <span className="plan-compare__yes"><Icon name="check" /></span>
+                  : c === false ? <span className="plan-compare__no">—</span>
+                  : c}
+              </div>
+            ))}
+          </Fragment>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
 function PricingCardCard() {
   const [cycle, setCycle] = useState<'monthly' | 'yearly'>('monthly')
   const yearly = cycle === 'yearly'
@@ -5113,6 +5161,7 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'usage-meter', name: 'Usage Meter', group: 'Data display', recipeId: 'usage-meter', blurb: 'A quota bar whose fill shifts to a warning tone past a threshold.', Preview: UsageMeterCard },
   { slug: 'code-block', name: 'Code Block', group: 'Data display', recipeId: 'codeblock', blurb: 'A mono code surface with a header, copy button and language tag.', Preview: CodeBlockCard },
   { slug: 'pricing', name: 'Pricing', group: 'Data display', recipeId: 'pricing', blurb: 'A pricing tier card — plan, price, feature list and one primary action.', Preview: PricingCardCard },
+  { slug: 'plan-compare', name: 'Plan Comparison', group: 'Data display', recipeId: 'plan-compare', blurb: 'A tier × feature matrix with one highlighted column — the upgrade-decision surface.', Preview: PlanCompareCard },
 
   // Feedback & status
   { slug: 'alert', name: 'Alert', group: 'Feedback', recipeId: 'alert', blurb: 'An inline message in the toned status colours — info, success, warning, danger.', Preview: AlertsCard },

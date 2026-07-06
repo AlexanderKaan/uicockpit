@@ -56,6 +56,7 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   // Pricing table, file gallery, the empty-content region, the nav rail — each a
   // full-width slab you stack into a page.
   pricing: ['card', 'buttons', 'badges-pills'],
+  'plan-compare': ['buttons'],
   sidebar: ['navigation-row', 'avatar', 'badges-pills'],
   'empty-state': ['buttons'],
   'file-grid': ['card', 'badges-pills'],

@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
 import { useModal, useDropdown, Toggle, MenuButton } from '../stage/views/apps/AppHelpers'
@@ -208,6 +208,39 @@ function ChartTabs({ tabs }: { tabs: Array<{ label: string; type: 'bar' | 'area'
   )
 }
 
+/** Plan comparison — the real `.plan-compare` tier × feature matrix. One column
+ *  (the featured/current plan) is highlighted by a band behind its cells. */
+function PlanCompareSection({ eyebrow, tiers, features }: { eyebrow?: string; tiers: Array<{ name: string; price: string; per?: string; cta: string; featured?: boolean }>; features: Array<{ label: string; cells: Array<boolean | string> }> }) {
+  const hl = tiers.findIndex((t) => t.featured)
+  return (
+    <div className="card">
+      <div className="plan-compare" style={{ '--pc-cols': tiers.length, '--pc-rows': features.length, '--pc-hl': hl + 2 } as CSSProperties}>
+        {hl >= 0 && <div className="plan-compare__hl" />}
+        <div className="plan-compare__corner">{eyebrow && <span className="plan-compare__eyebrow">{eyebrow}</span>}</div>
+        {tiers.map((t) => (
+          <div className="plan-compare__head" key={t.name}>
+            <span className="plan-compare__name">{t.name}</span>
+            <span className="plan-compare__price"><span className="plan-compare__amount">{t.price}</span>{t.per && <span className="plan-compare__per">{t.per}</span>}</span>
+            <button type="button" className={`btn btn--sm ${t.featured ? 'btn--primary' : 'btn--ghost'}`}>{t.cta}</button>
+          </div>
+        ))}
+        {features.map((f) => (
+          <Fragment key={f.label}>
+            <div className="plan-compare__feat">{f.label}</div>
+            {f.cells.map((c, i) => (
+              <div className="plan-compare__cell" key={i}>
+                {c === true ? <span className="plan-compare__yes"><Icon name="check" /></span>
+                  : c === false ? <span className="plan-compare__no">—</span>
+                  : c}
+              </div>
+            ))}
+          </Fragment>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /** Breakdown — the real `.breakdown` share-bar list. Rows are sorted biggest-
  *  first and each bar's colour comes from the derived --k-chart-1..6 palette,
  *  so a breakdown beside a chart shares its legend ("made of what?"). */
@@ -331,6 +364,8 @@ export function renderSection(spec: SectionSpec, key: number) {
       return <ChartTabs key={key} tabs={spec.seed.tabs} />
     case 'breakdown':
       return <BreakdownSection key={key} title={spec.seed.title} unit={spec.seed.unit} rows={spec.seed.rows} />
+    case 'planCompare':
+      return <PlanCompareSection key={key} eyebrow={spec.seed.eyebrow} tiers={spec.seed.tiers} features={spec.seed.features} />
     case 'filegrid':
       return <FileGridSection key={key} title={spec.seed.title} files={spec.seed.files} />
     case 'list':

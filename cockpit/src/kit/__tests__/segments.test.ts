@@ -64,7 +64,7 @@ describe('segment graph integrity', () => {
     // calendar-week/calendar-year VIEWS). The ~11 widgets we'd over-promoted (calendar
     // picker/range, chart, timeline, activity-feed, stat-tile, action-panel,
     // danger-zone, entity-card, filter-bar, auth) moved back to COMPONENT_USES.
-    expect(idsByTier('section')).toHaveLength(14)
+    expect(idsByTier('section')).toHaveLength(15)
   })
 
   it('every standalone-blessed id is a real ATOM (not a component/foundation)', () => {
