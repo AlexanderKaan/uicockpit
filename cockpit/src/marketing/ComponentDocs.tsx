@@ -1,12 +1,19 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useMemo, type CSSProperties, type ReactNode } from 'react'
 import { MktNav } from './MktNav'
 import { MktFooter } from './MktFooter'
-import { KitToggle } from './KitToggle'
 import { IconProvider } from '../icons/Icon'
-import { useVisitorKit } from '../state/useVisitorKit'
+import { buildTokens } from '../tokens/buildTokens'
+import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { COMPONENT_PAGES, componentPageBySlug, type ComponentPage } from '../stage/views/ComponentGallery'
 import { RECIPES } from '../kit'
 import { tierOf, usesOf } from '../kit/segments'
+
+/** The component reference always shows the DEFAULT kit — one canonical look for
+ *  the docs, no per-visitor toggle (the /app configurator is where you re-theme). */
+function useDefaultKit() {
+  const tokens = useMemo(() => buildTokens(DEFAULT_CONFIG).vars as CSSProperties, [])
+  return { tokens, iconSet: DEFAULT_CONFIG.iconSet }
+}
 
 /* IA-2b — the public component reference: a persistent sidebar index + per-slug
  * detail pages, the "normal" components docs shadcn/Astryx have. Everything is
@@ -59,7 +66,7 @@ function DocsShell({ current, navigate, children }: { current?: string; navigate
 
 /* ── The index — every component as a grouped, linkable preview tile ────────── */
 export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => void }) {
-  const { tokens, iconSet, hasKit, showKit, setShowKit } = useVisitorKit()
+  const { tokens, iconSet } = useDefaultKit()
   useEffect(() => {
     const prev = document.title
     document.title = 'Components — 60+ accessible components, themed by your kit — UIcockpit'
@@ -70,12 +77,9 @@ export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => vo
       <div className="cmpdoc__head">
         <h1>Components</h1>
         <p className="cmpdoc__lead">
-          Every component in the kit — accessible, framework-neutral, and wearing <em>your</em> kit,
-          not ours. Pick one for its markup, recipe CSS and best-practice rules.
+          Every component in the kit — accessible, framework-neutral, and endlessly themeable.
+          Pick one for its markup, recipe CSS and best-practice rules.
         </p>
-        <div className="cmpdoc__tools">
-          <KitToggle hasKit={hasKit} showKit={showKit} onChange={setShowKit} onConfigure={() => navigate('/app')} />
-        </div>
       </div>
       <div className="cockpit-preview cmpdoc__previews" style={tokens}>
         <IconProvider set={iconSet}>
@@ -101,7 +105,7 @@ export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => vo
 /* ── The detail — one component: preview · composition · recipe CSS · Do/Don't ── */
 export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate: (to: string) => void }) {
   const page = componentPageBySlug(slug) as ComponentPage
-  const { tokens, iconSet, hasKit, showKit, setShowKit } = useVisitorKit()
+  const { tokens, iconSet } = useDefaultKit()
   const recipe = recipeOf(page.recipeId)
   const tier = tierOf(page.recipeId)
   const composes = usesOf(page.recipeId)
@@ -127,7 +131,6 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
         </div>
         <p className="cmpdoc__lead">{page.blurb}</p>
         <div className="cmpdoc__tools">
-          <KitToggle hasKit={hasKit} showKit={showKit} onChange={setShowKit} onConfigure={() => navigate('/app')} />
           <a className="mkt-btn mkt-btn--primary cmpdoc__use" href="/app">Open in configurator →</a>
         </div>
       </div>
