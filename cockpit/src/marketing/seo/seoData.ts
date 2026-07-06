@@ -424,6 +424,33 @@ export const SEO_ENTRIES: SeoEntry[] = [
   },
   {
     kind: 'use',
+    slug: 'design-system-generator',
+    navLabel: 'Design system generator',
+    title: 'Design system generator — generate your own, don’t theme someone else’s — UIcockpit',
+    metaDescription:
+      'A design system generator, not another design system: turn 19 live controls into your own system — 100+ components, WCAG-audited, framework-neutral exports, and a verifier (uicockpit check) that keeps AI-generated code on it.',
+    eyebrow: 'Use case',
+    h1: 'A design system generator, not another design system',
+    sub: 'A design system ships someone else’s taste, themed. A generator ships yours — dialed in live, exported anywhere, and enforced as you and your AI build.',
+    intro: [
+      'Design systems — shadcn, Material, Meta’s Astryx — hand you their components with theming on top: pick a preset, or hand-write a theme file. UIcockpit sits one level above: it GENERATES the system itself. Nineteen live controls (colour, type, shape, density, motion, elevation) re-render 100+ real components as you decide, so what you export is a system of your own, not a preset from a shelf.',
+      'And because a generated system is machine-made, it stays machine-checkable: every kit ships a contract and a verifier, so the system you generated is the system your app keeps wearing — even when an AI writes the screens.',
+    ],
+    points: [
+      { h: 'Generated, not picked', p: 'No fixed theme list. Every control combination is a valid, coherent system — guardrails keep the combinations from going ugly, a live WCAG audit (16 pairs) keeps them accessible.' },
+      CHECK_POINT,
+      NEUTRAL_POINT,
+      TRANSPORT_POINT,
+    ],
+    faq: [
+      { q: 'How is a generator different from a design system?', a: 'A design system is a fixed set of styled components you adopt (and theme). A generator produces the system itself from your decisions — the tokens, the component recipes, the docs and the contract all derive from your configuration.' },
+      { q: 'Is this a competitor to shadcn or Astryx?', a: 'No — it feeds them. The output is framework-neutral tokens plus per-tool transports (Tailwind @theme, shadcn globals.css, plain CSS), so you can wear your generated system on top of the primitives you already use.' },
+      { q: 'What keeps the generated system from drifting?', a: 'uicockpit check — a verifier that reads the kit’s machine-readable contract and fails the build (--strict) on raw hex, off-grid spacing or wrong tokens. It runs as a CLI and inside agents via MCP.' },
+    ],
+    related: ['/uses/ai-design-system', '/compare/shadcn', '/uses/framework-neutral-design-tokens'],
+  },
+  {
+    kind: 'use',
     slug: 'ai-design-system',
     navLabel: 'AI design system',
     title: 'AI design system generator — tokens + an AI prompt that applies them — UIcockpit',

@@ -1,6 +1,6 @@
 # UIcockpit
 
-> Open-source, browser-based design system configurator for developers and designers building modern web apps. Pick a Style and a color theme or customize from scratch — UIcockpit produces framework-neutral design tokens, component CSS recipes, and an agent pack (spec + skill rules + a checkable contract) that tells AI coding tools how to use them. It is the design-language layer that sits above component primitives like shadcn/ui, so AI-built apps don't all look generic.
+> Open-source, browser-based design system generator for developers and designers building modern web apps — AI fluent and drift-proof. Pick a Style and a color theme or customize from scratch in the visual configurator — UIcockpit produces framework-neutral design tokens, component CSS recipes, and an agent pack (spec + skill rules + a checkable contract) that tells AI coding tools how to use them, plus a verifier (`uicockpit check`) that keeps generated code on-system. Not a design system (someone else's taste, themed) but the generator that ships your own; it sits a layer above component primitives like shadcn/ui, so AI-built apps don't all look generic.
 
 URL: https://uicockpit.com/
 License: MIT
@@ -10,7 +10,7 @@ Telemetry: None
 
 ## What it is
 
-UIcockpit is a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About two dozen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery and live showcases as the user tweaks. You can start from scratch — or **start from your existing app**: paste its CSS / Tailwind / HTML, or drop a screenshot, and UIcockpit reads back its foundation (colors, type, radius, density, dark-mode) into editable controls. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
+UIcockpit is a design system generator: a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About two dozen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery and live showcases as the user tweaks. Start from a curated Style or shuffle and refine — every kit is your own, not a preset picked from a shelf. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
 
 ## Who it's for
 

@@ -2,13 +2,14 @@
 
 # UIcockpit
 
-### A design system your AI actually keeps to.
+### The open-source design system generator — AI fluent, drift-proof.
 
-**Dial in your design language visually, export it framework-neutral, and keep it up
-to date behind one link — then hand it to your coding agent and `uicockpit check`
-makes sure it *stays* on it.** Framework-neutral `--k-*` tokens + 100+ components (real
-recipes with state contracts), delivered as a hosted `<link>`, a download, or natively
-inside your agent (CLI + MCP).
+**Not another design system — the machine that makes yours.** Dial in your design
+language visually, export it framework-neutral, and keep it up to date behind one
+link — then hand it to your coding agent and `uicockpit check` makes sure it *stays*
+on it. `--k-*` tokens + 100+ accessible components (real recipes with state contracts)
+with a built-in WCAG audit of *your* kit, delivered as a hosted `<link>`, a download,
+or natively inside your agent (CLI + MCP).
 
 **Free · no account · paste it anywhere.**
 
@@ -45,6 +46,7 @@ no lock-in. — **Alexander**
 
 ## Where it sits in the stack
 
+A design system hands you someone else's taste, themed — a **generator** ships your own.
 Tailwind is *how* you style. shadcn is *what* you assemble. **UIcockpit is the design
 language that makes it yours** — and the only layer that *keeps* it coherent as your app
 (and your AI) grow. It sits above them, framework-neutral.

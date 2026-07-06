@@ -83,6 +83,9 @@ something else.
 And to be clear about the neighbours: this isn't a competitor to shadcn or the
 component libraries I love and use. They give you the components; we give you the
 design language those components wear. We sit a layer above, and we're happy there.
+In a word: those are design systems — UICockpit is a design system *generator*. A
+design system ships someone else's taste, beautifully themed; a generator is the
+machine that makes yours, and then keeps it honest.
 
 ## This is ours, not mine
 

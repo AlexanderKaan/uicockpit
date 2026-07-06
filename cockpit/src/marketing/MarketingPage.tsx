@@ -84,10 +84,11 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
           </div>
           <h1>Ship AI apps that look designed, not generated.</h1>
           <p className="mkt__hero-sub">
-            Dial in your design language — colour, type, shape and motion — preview it live,
-            and export it as <strong>framework-neutral tokens + components</strong> you drop
-            into any app and keep tweaking behind one link. Then hand it to your AI, and a
-            checker keeps every new screen on it instead of drifting back to generic.
+            UIcockpit is a <strong>design system generator</strong>: dial in your design
+            language — colour, type, shape and motion — preview it live, and export it as{' '}
+            <strong>framework-neutral tokens + components</strong> you drop into any app and
+            keep tweaking behind one link. Then hand it to your AI, and a checker keeps every
+            new screen on it instead of drifting back to generic.
           </p>
           <div className="mkt__hero-ctas">
             <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
@@ -122,9 +123,11 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             </div>
             <h2>Not another component library.</h2>
             <p className="mkt__section-sub">
-              Tailwind is <em>how</em> you style. shadcn is <em>what</em> you assemble.
-              UIcockpit is the <strong>design language that makes it yours</strong> — the layer
-              that owns how your app looks, and keeps it coherent as it (and your AI) grows.
+              A design system hands you someone else&apos;s taste, themed — a{' '}
+              <strong>generator</strong> ships your own. Tailwind is <em>how</em> you style.
+              shadcn is <em>what</em> you assemble. UIcockpit is the{' '}
+              <strong>design language that makes it yours</strong> — the layer that owns how
+              your app looks, and keeps it coherent as it (and your AI) grows.
             </p>
           </div>
           <div className="mkt__triad">

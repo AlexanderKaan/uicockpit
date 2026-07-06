@@ -24,8 +24,8 @@ export function OgCard() {
         <h1 className="og-card__h1">Ship AI apps that look designed, not generated.</h1>
 
         <p className="og-card__sub">
-          Dial in your design system, export it anywhere, and keep it coherent as
-          you — and your AI — build on it.
+          The design system generator — dial yours in, export it anywhere, and keep
+          it coherent as you and your AI build on it.
         </p>
 
         <div className="og-card__foot">

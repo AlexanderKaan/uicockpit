@@ -1,7 +1,7 @@
 {
   "name": "uicockpit-mcp",
   "version": "0.5.0",
-  "description": "MCP server for UICockpit — give an AI agent a real design system and a check loop: install a kit, read its design context, and verify conformance natively.",
+  "description": "MCP server for UICockpit, the design system generator - give an AI agent your generated design system and a check loop: install a kit, read its design context, and verify conformance natively.",
   "type": "module",
   "bin": {
     "uicockpit-mcp": "bin/server.mjs"
