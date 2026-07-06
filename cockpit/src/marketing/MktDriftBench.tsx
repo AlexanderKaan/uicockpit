@@ -57,11 +57,11 @@ export function MktDriftBench() {
               <div className="mkt__bench-row" key={r.id}>
                 <span className="mkt__bench-name">{r.id}</span>
                 <span className="mkt__bench-track">
-                  <span className="mkt__bench-bar mkt__bench-bar--good" style={{ width: `${(r.withKit / MAX) * 100}%` }} />
+                  <span className="mkt__bench-bar mkt__bench-bar--good" style={{ width: `${(r.withKit / MAX) * 88}%` }} />
                   <span className="mkt__bench-count mkt__bench-count--good">{r.withKit}</span>
                 </span>
                 <span className="mkt__bench-track">
-                  <span className="mkt__bench-bar mkt__bench-bar--bad" style={{ width: `${(r.withoutKit / MAX) * 100}%` }} />
+                  <span className="mkt__bench-bar mkt__bench-bar--bad" style={{ width: `${(r.withoutKit / MAX) * 88}%` }} />
                   <span className="mkt__bench-count mkt__bench-count--bad">{r.withoutKit}</span>
                 </span>
               </div>

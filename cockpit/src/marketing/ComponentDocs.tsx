@@ -129,9 +129,6 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
           <span className={`cmpdoc__tier cmpdoc__tier--${tier}`}>{tier}</span>
         </div>
         <p className="cmpdoc__lead">{page.blurb}</p>
-        <div className="cmpdoc__tools">
-          <a className="mkt-btn mkt-btn--primary cmpdoc__use" href="/app">Open in configurator →</a>
-        </div>
       </div>
 
       <div className="cockpit-preview cmpdoc__stage" style={tokens}>
