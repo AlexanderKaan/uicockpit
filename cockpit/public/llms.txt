@@ -37,7 +37,13 @@ Export is framed as an install experience, not a format dump — a hosted link p
 
 5. **shadcn/ui globals.css** — the standard shadcn CSS variable contract (`--background`, `--primary`, `--ring`, etc.) so shadcn components inherit the kit without modification.
 
-The kit's decisions, the full WCAG audit, and the agent rules all live in **design.md** (the old BRIEF.md + AI-prompt, merged). A W3C `tokens.json` (Tokens Studio / Figma) is available on request but no longer a default tab.
+6. **Astryx defineTheme file** — a ready theme for Meta's Astryx design system (astryx.atmeta.com): ~30 core semantic tokens as [light, dark] tuples + typography + motion, compiled with `npx astryx theme build`. Also served at `https://kit.uicockpit.com/k/<hash>.astryx.ts`. See https://uicockpit.com/uses/astryx-theme-generator
+
+7. **uicockpit.kit.json** — kit-as-code: the design DECISIONS as a readable, versionable JSON (config + an editor deep-link), written by `npx uicockpit init` and served at `/k/<hash>.kit.json` — git-diff your design changes.
+
+The kit's decisions, the full WCAG audit, the per-component **Do/Don't best practices** and the agent rules all live in **design.md** (the old BRIEF.md + AI-prompt, merged). A W3C `tokens.json` (Tokens Studio / Figma) is available on request but no longer a default tab.
+
+Live proof: https://uicockpit.com/showcases — Ledger, a complete billing product built purely from the kit's components (8 interactive screens, one design system).
 
 ## Distinctive features vs. competitors
 
@@ -58,7 +64,7 @@ UIcockpit is not a component library — it is the design-language / token layer
 - **vs Material UI (MUI)** — MUI is a mature React component library with the Material Design look; UIcockpit emits framework-neutral, zero-runtime tokens for your own aesthetic on any stack. https://uicockpit.com/compare/material-ui
 - **vs Tailwind UI** — Tailwind UI sells ready-made blocks; UIcockpit is the free design system that themes them. https://uicockpit.com/compare/tailwind-ui
 
-Use-case landing pages: design tokens for Tailwind v4 (https://uicockpit.com/uses/design-tokens-for-tailwind), shadcn theme generator (https://uicockpit.com/uses/shadcn-theme-generator), AI design system (https://uicockpit.com/uses/ai-design-system), framework-neutral design tokens (https://uicockpit.com/uses/framework-neutral-design-tokens).
+Use-case landing pages: design system generator (https://uicockpit.com/uses/design-system-generator), Astryx theme generator (https://uicockpit.com/uses/astryx-theme-generator), design tokens for Tailwind v4 (https://uicockpit.com/uses/design-tokens-for-tailwind), shadcn theme generator (https://uicockpit.com/uses/shadcn-theme-generator), AI design system (https://uicockpit.com/uses/ai-design-system), framework-neutral design tokens (https://uicockpit.com/uses/framework-neutral-design-tokens).
 
 ## Tech stack
 
