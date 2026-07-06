@@ -64,12 +64,13 @@ function DocsShell({ current, navigate, children }: { current?: string; navigate
   )
 }
 
-/* ── The index — every component as a grouped, linkable preview tile ────────── */
+/* ── The index — a clean, grouped text list of the components (shadcn-style).
+ *    The live preview lives on each detail page, not here (a reference index,
+ *    not a showcase). ──────────────────────────────────────────────────────── */
 export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => void }) {
-  const { tokens, iconSet } = useDefaultKit()
   useEffect(() => {
     const prev = document.title
-    document.title = 'Components — 60+ accessible components, themed by your kit — UIcockpit'
+    document.title = 'Components — 60+ accessible, framework-neutral components — UIcockpit'
     return () => { document.title = prev }
   }, [])
   return (
@@ -78,26 +79,24 @@ export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => vo
         <h1>Components</h1>
         <p className="cmpdoc__lead">
           Every component in the kit — accessible, framework-neutral, and endlessly themeable.
-          Pick one for its markup, recipe CSS and best-practice rules.
+          Pick one for its live example, recipe CSS and best-practice rules.
         </p>
       </div>
-      <div className="cockpit-preview cmpdoc__previews" style={tokens}>
-        <IconProvider set={iconSet}>
-          {GROUPS.map((g) => (
-            <section className="cmpdoc__section" key={g}>
-              <h2 className="cmpdoc__section-head">{g}</h2>
-              <div className="cmpdoc__grid">
-                {byGroup(g).map((c) => (
-                  <a key={c.slug} className="cmpdoc__tile" href={`/components/${c.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/components/${c.slug}`) }}>
-                    <div className="cmpdoc__tile-preview"><c.Preview /></div>
-                    <div className="cmpdoc__tile-name">{c.name}</div>
-                  </a>
-                ))}
-              </div>
-            </section>
-          ))}
-        </IconProvider>
-      </div>
+      {GROUPS.map((g) => (
+        <section className="cmpdoc__idx-section" key={g}>
+          <h2 className="cmpdoc__idx-head">{g}</h2>
+          <div className="cmpdoc__idx-grid">
+            {byGroup(g).map((c) => (
+              <a
+                key={c.slug}
+                className="cmpdoc__idx-link"
+                href={`/components/${c.slug}`}
+                onClick={(e) => { e.preventDefault(); navigate(`/components/${c.slug}`) }}
+              >{c.name}</a>
+            ))}
+          </div>
+        </section>
+      ))}
     </DocsShell>
   )
 }

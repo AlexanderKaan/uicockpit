@@ -1615,16 +1615,13 @@
 .cmpdoc__tools { display: flex; align-items: center; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
 .cmpdoc__use { text-decoration: none; font-size: 13px; }
 
-/* Index: grouped preview tiles that link to the detail pages. */
-.cmpdoc__previews { background: transparent; }
-.cmpdoc__section { margin-bottom: 40px; }
-.cmpdoc__section-head { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--k-fg-muted); margin: 0 0 16px; }
-.cmpdoc__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-.cmpdoc__tile { display: flex; flex-direction: column; border: var(--k-bw) solid var(--k-border); border-radius: var(--k-radius-lg); overflow: hidden; text-decoration: none; background: var(--k-surface); transition: border-color 120ms ease, transform 120ms ease; }
-.cmpdoc__tile:hover { border-color: var(--k-primary); transform: translateY(-2px); }
-.cmpdoc__tile-preview { padding: 20px; min-height: 128px; display: flex; align-items: center; justify-content: center; background: var(--k-bg); border-bottom: var(--k-bw) solid var(--k-border); overflow: hidden; }
-.cmpdoc__tile-preview > * { max-width: 100%; transform: scale(0.82); transform-origin: center; }
-.cmpdoc__tile-name { padding: 10px 14px; font-size: 13.5px; font-weight: 600; color: var(--k-fg); }
+/* Index: a clean, grouped TEXT list (shadcn-style) — a reference index, not a
+   showcase. The live example lives on each detail page. */
+.cmpdoc__idx-section { margin-bottom: 32px; }
+.cmpdoc__idx-head { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mkt-fg-faint); margin: 0 0 12px; }
+.cmpdoc__idx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 2px 20px; }
+.cmpdoc__idx-link { display: block; padding: 7px 10px; margin-left: -10px; border-radius: 7px; font-size: 14px; color: var(--mkt-fg-muted); text-decoration: none; }
+.cmpdoc__idx-link:hover { background: var(--mkt-bg-soft, #f7f8fa); color: var(--mkt-fg); }
 
 /* Detail: the large live preview + composition + best practices + recipe CSS. */
 .cmpdoc__stage { border: var(--k-bw) solid var(--k-border); border-radius: var(--k-radius-lg); background: var(--k-bg); padding: 32px; margin-bottom: 20px; }
