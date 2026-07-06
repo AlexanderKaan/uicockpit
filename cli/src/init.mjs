@@ -156,6 +156,9 @@ export async function runInit(argv) {
     { file: 'uicockpit.contract.json', url: `${base}/k/${hash}.contract.json` },
     { file: 'AGENTS.md', url: `${base}/k/${hash}.rules.md` },
     { file: 'design.md', url: `${base}/k/${hash}.design.md` },
+    // Kit-as-code (LP5a): the design DECISIONS as a readable, versionable file —
+    // git-diff your design changes; the editor deep-link inside reopens the kit.
+    { file: 'uicockpit.kit.json', url: `${base}/k/${hash}.kit.json`, optional: true },
   ]
 
   for (const t of targets) {
@@ -166,12 +169,17 @@ export async function runInit(argv) {
   }
 
   // Fetch everything first — the prefix rewrite of the CSS needs the contract's
-  // class vocabulary, so we can't write file-by-file.
+  // class vocabulary, so we can't write file-by-file. `optional` artifacts (newer
+  // CDN routes) degrade gracefully against an older worker instead of failing init.
   const fetched = {}
   for (const t of targets) {
     try {
       fetched[t.file] = await fetchText(t.url)
     } catch (err) {
+      if (t.optional) {
+        console.error(`  · skipped ${t.file} (${err.message})`)
+        continue
+      }
       console.error(`✗ ${err.message}`)
       console.error('  Check the kit hash, or your network connection.')
       return 2
@@ -185,6 +193,7 @@ export async function runInit(argv) {
   } catch { /* no contract classes → prefix becomes a no-op */ }
 
   for (const t of targets) {
+    if (fetched[t.file] === undefined) continue // optional artifact the CDN doesn't serve yet
     let text = fetched[t.file]
     let note = ''
     if (t.file === 'uicockpit.tokens.css') {

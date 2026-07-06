@@ -7,6 +7,7 @@ import { genRegistry } from '../genRegistry'
 import { genContract } from '../genContract'
 import { genDesignMd } from '../genDesignMd'
 import { genSkill } from '../genSkill'
+import { genAstryx } from '../genAstryx'
 import { DEFAULT_CONFIG } from '../../tokens/defaults'
 import { applyColorTheme } from '../../tokens/stylesAndThemes'
 import type { Config } from '../../tokens/types'
@@ -98,6 +99,24 @@ describe('genTailwind', () => {
 
   it('matches snapshot for soft + cobalt sample', () => {
     expect(genTailwind(sampleCfg)).toMatchSnapshot()
+  })
+})
+
+describe('genAstryx (LP5b — Meta Astryx defineTheme export)', () => {
+  it('emits a standalone defineTheme file with light/dark tuples', () => {
+    const out = genAstryx(sampleCfg)
+    expect(out).toContain("import {defineTheme} from '@astryxdesign/core/theme'")
+    expect(out).toContain("'--color-background-body': [")
+    // the brand never mode-flips, so accent may be a single literal
+    expect(out).toContain("'--color-accent':")
+    expect(out).toContain('typography')
+    expect(out).toContain('motion: {fast:')
+    // resolved literals only — a theme file must stand alone in an Astryx project
+    expect(out).not.toContain('var(--k-')
+  })
+
+  it('matches snapshot for soft + cobalt sample', () => {
+    expect(genAstryx(sampleCfg)).toMatchSnapshot()
   })
 })
 

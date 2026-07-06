@@ -34,6 +34,7 @@ import { Seg } from '../panel/primitives/Seg'
 import { genCss } from './genCss'
 import { genTailwind } from './genTailwind'
 import { genShadcn } from './genShadcn'
+import { genAstryx } from './genAstryx'
 import { genContract } from './genContract'
 import { genDesignMd } from './genDesignMd'
 import { genSkill } from './genSkill'
@@ -74,7 +75,7 @@ const TOOLS: ToolDef[] = [
 /* ── The "Plain files" drawer — the 3 formats that map to a real stack ─────────
  * tokens.css · Tailwind v4 · shadcn/ui. The per-tool panes are the headline path;
  * this is the framework-aware eject-to-files lane for "any project". */
-type FmtId = 'css' | 'tailwind' | 'shadcn'
+type FmtId = 'css' | 'tailwind' | 'shadcn' | 'astryx'
 interface Fmt {
   id: FmtId
   label: string
@@ -87,6 +88,7 @@ const FORMATS: Fmt[] = [
   { id: 'css', label: 'tokens.css', hint: ':root + .dark, 60+ vars + recipes', filename: 'tokens.css', icon: FileCode, generator: genCss },
   { id: 'tailwind', label: 'Tailwind v4', hint: '@theme block, full system', filename: 'tailwind-theme.css', icon: Palette, generator: genTailwind },
   { id: 'shadcn', label: 'shadcn/ui', hint: '--background, --primary, …', filename: 'shadcn-globals.css', icon: Layers, generator: genShadcn },
+  { id: 'astryx', label: 'Astryx', hint: 'defineTheme file, Meta\'s DS', filename: 'uicockpit.astryx.ts', icon: Layers, generator: genAstryx },
 ]
 type View = 'overview' | ToolId | FmtId | 'cli'
 const isFmt = (v: View): v is FmtId => FORMATS.some((f) => f.id === v)
@@ -194,6 +196,19 @@ function getInstall(fmt: FmtId, fw: Framework, pm: Pm): Install {
             : 'Replace your global stylesheet (the one with @import "tailwindcss") with the file below.',
           `Add components: ${DLX[pm]} shadcn@latest add button card input …`,
           'Every shadcn component now inherits this theme automatically.',
+        ],
+      }
+    case 'astryx':
+      // Meta's design system (astryx.atmeta.com) — their customization story is
+      // "pick 1 of 7 curated themes or hand-write a defineTheme file". We write it.
+      return {
+        showFramework: false,
+        command: `${ADD[pm]} @astryxdesign/core @astryxdesign/theme-neutral`,
+        steps: [
+          'Install Astryx (command above) if your project isn\'t set up yet.',
+          'Save the file below under themes/ in your Astryx project.',
+          `Compile it: ${DLX[pm]} astryx theme build ./themes/uicockpit.astryx.ts`,
+          'Pass the built theme to your <Theme> provider — every Astryx component now wears your kit.',
         ],
       }
   }

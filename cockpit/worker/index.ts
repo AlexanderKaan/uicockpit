@@ -21,6 +21,7 @@ import { genCss } from '../src/export/genCss'
 import { genContract } from '../src/export/genContract'
 import { genSkill } from '../src/export/genSkill'
 import { genDesignMd } from '../src/export/genDesignMd'
+import { genAstryx } from '../src/export/genAstryx'
 import type { Config } from '../src/tokens/types'
 
 const CORS = {
@@ -45,6 +46,8 @@ const ROUTES: Route[] = [
   { re: /^\/k\/(.+)\.contract\.json$/, type: 'application/json; charset=utf-8', gen: genContract, bad: '{"error":"invalid or empty kit key"}' },
   { re: /^\/k\/(.+)\.rules\.md$/, type: 'text/markdown; charset=utf-8', gen: genSkill, bad: 'UICockpit: invalid or empty kit key' },
   { re: /^\/k\/(.+)\.design\.md$/, type: 'text/markdown; charset=utf-8', gen: genDesignMd, bad: 'UICockpit: invalid or empty kit key' },
+  // LP5b — a Meta Astryx defineTheme file from the same hash (their DS as an export target).
+  { re: /^\/k\/(.+)\.astryx\.ts$/, type: 'text/plain; charset=utf-8', gen: genAstryx, bad: '// UICockpit: invalid or empty kit key' },
   { re: /^\/k\/(.+)\.css$/, type: 'text/css; charset=utf-8', gen: genCss, bad: '/* UICockpit: invalid or empty kit key */' },
 ]
 
@@ -75,11 +78,33 @@ export default {
         contract: k('contract.json'),
         rules: k('rules.md'),
         design: k('design.md'),
+        kit: k('kit.json'),
+        astryx: k('astryx.ts'),
         editor: `https://uicockpit.com/app#${hash}`,
       }
       return new Response(JSON.stringify(body, null, 2), {
         headers: { 'content-type': 'application/json; charset=utf-8', ...CORS, 'cache-control': CACHE },
       })
+    }
+
+    // LP5a — kit-as-code: the config itself as a readable, versionable JSON file
+    // (uicockpit.kit.json). Needs the raw hash alongside the decoded config (the
+    // editor deep-link), so it lives outside the plain gen(cfg) ROUTES table.
+    const kitM = pathname.match(/^\/k\/(.+)\.kit\.json$/)
+    if (kitM) {
+      const hash = safeDecodeURIComponent(kitM[1]!)
+      const cfg = decode(hash)
+      const headers: Record<string, string> = { 'content-type': 'application/json; charset=utf-8', ...CORS }
+      if (!cfg) return new Response('{"error":"invalid or empty kit key"}', { status: 400, headers })
+      const body = {
+        $schema: 'https://uicockpit.com/uicockpit.kit.schema.json',
+        generator: 'uicockpit',
+        hash,
+        editor: `https://uicockpit.com/app#${hash}`,
+        config: cfg,
+      }
+      headers['cache-control'] = CACHE
+      return new Response(JSON.stringify(body, null, 2) + '\n', { headers })
     }
 
     for (const r of ROUTES) {
