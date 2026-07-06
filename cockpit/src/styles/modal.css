@@ -59,11 +59,15 @@
 .modal__nav {
   border-right: 1px solid var(--app-border);
   background: var(--app-bg);
-  padding: 10px;
+  /* Extra bottom padding so that when the rail overflows on a short screen and
+   * scrolls, the last group ('Plain files') + its items get breathing room at
+   * the scroll-end instead of jamming against the modal's bottom edge. */
+  padding: 10px 10px 16px;
   display: flex;
   flex-direction: column;
   gap: 2px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .modal__navitem {
   display: flex;
