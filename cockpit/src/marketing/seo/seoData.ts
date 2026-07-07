@@ -424,33 +424,6 @@ export const SEO_ENTRIES: SeoEntry[] = [
   },
   {
     kind: 'use',
-    slug: 'astryx-theme-generator',
-    navLabel: 'Astryx theme generator',
-    title: 'Astryx theme generator — a visual defineTheme editor for Meta’s design system — UIcockpit',
-    metaDescription:
-      'Generate a Meta Astryx theme visually: dial in colour, type, radius and motion in a live preview, then export a ready defineTheme file (light + dark tuples) for astryx theme build. Free, no account.',
-    eyebrow: 'Use case',
-    h1: 'A visual theme generator for Meta’s Astryx',
-    sub: 'Astryx ships 7 curated themes — or you hand-write a defineTheme file. UIcockpit is the third option: dial your own in a live preview and export the file.',
-    intro: [
-      'Astryx (astryx.atmeta.com) themes are TypeScript files: token overrides as [light, dark] tuples plus typography and motion config, compiled by the Astryx CLI. Writing one by hand means picking dozens of colour values that must stay coherent across two modes.',
-      'UIcockpit generates that file from a kit you tuned visually: ~30 core semantic tokens (backgrounds, text, icons, borders, status, radius, shadows) mapped from your kit — light and dark both — plus your fonts and motion. Only the tokens that differ from Astryx’s defaults are overridden, exactly as their docs recommend.',
-    ],
-    points: [
-      { h: 'A real defineTheme file', p: 'Ready for npx astryx theme build — resolved OKLCH literals, light/dark tuples, typography and motion included. No hand-picking 60 colour stops.' },
-      { h: 'WCAG-audited before you export', p: 'The kit behind the theme passes a live 16-pair contrast audit, so the generated Astryx theme inherits accessible pairings.' },
-      NOLOCKIN_POINT,
-      TRANSPORT_POINT,
-    ],
-    faq: [
-      { q: 'Does this replace Astryx?', a: 'No — it feeds it. Astryx provides the React components; UIcockpit generates the theme those components wear. The same kit also exports to Tailwind, shadcn and plain CSS.' },
-      { q: 'How do I use the exported file?', a: 'Save it under themes/ in your Astryx project and compile it with npx astryx theme build ./themes/<name>.ts, then pass the built theme to your <Theme> provider.' },
-      { q: 'What if I re-tune the kit later?', a: 'Regenerate the file from the same link — the kit lives behind a hash, so the theme file, tokens.css and every other export stay in sync.' },
-    ],
-    related: ['/uses/design-system-generator', '/uses/shadcn-theme-generator', '/compare/shadcn'],
-  },
-  {
-    kind: 'use',
     slug: 'design-system-generator',
     navLabel: 'Design system generator',
     title: 'Design system generator — generate your own, don’t theme someone else’s — UIcockpit',

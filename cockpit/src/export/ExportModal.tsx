@@ -10,6 +10,7 @@ import {
   FileCode,
   Gauge,
   Layers,
+  Link2,
   Moon,
   MousePointerClick,
   Package,
@@ -34,7 +35,6 @@ import { Seg } from '../panel/primitives/Seg'
 import { genCss } from './genCss'
 import { genTailwind } from './genTailwind'
 import { genShadcn } from './genShadcn'
-import { genAstryx } from './genAstryx'
 import { genContract } from './genContract'
 import { genDesignMd } from './genDesignMd'
 import { genSkill } from './genSkill'
@@ -75,7 +75,7 @@ const TOOLS: ToolDef[] = [
 /* ── The "Plain files" drawer — the 3 formats that map to a real stack ─────────
  * tokens.css · Tailwind v4 · shadcn/ui. The per-tool panes are the headline path;
  * this is the framework-aware eject-to-files lane for "any project". */
-type FmtId = 'css' | 'tailwind' | 'shadcn' | 'astryx'
+type FmtId = 'css' | 'tailwind' | 'shadcn'
 interface Fmt {
   id: FmtId
   label: string
@@ -88,9 +88,8 @@ const FORMATS: Fmt[] = [
   { id: 'css', label: 'tokens.css', hint: ':root + .dark, 60+ vars + recipes', filename: 'tokens.css', icon: FileCode, generator: genCss },
   { id: 'tailwind', label: 'Tailwind v4', hint: '@theme block, full system', filename: 'tailwind-theme.css', icon: Palette, generator: genTailwind },
   { id: 'shadcn', label: 'shadcn/ui', hint: '--background, --primary, …', filename: 'shadcn-globals.css', icon: Layers, generator: genShadcn },
-  { id: 'astryx', label: 'Astryx', hint: 'defineTheme file, Meta\'s DS', filename: 'uicockpit.astryx.ts', icon: Layers, generator: genAstryx },
 ]
-type View = 'overview' | ToolId | FmtId | 'cli'
+type View = 'overview' | 'link' | ToolId | FmtId | 'cli'
 const isFmt = (v: View): v is FmtId => FORMATS.some((f) => f.id === v)
 
 /* ── Agent rules — the skill body is agent-agnostic (genSkill); only the delivery
@@ -198,19 +197,6 @@ function getInstall(fmt: FmtId, fw: Framework, pm: Pm): Install {
           'Every shadcn component now inherits this theme automatically.',
         ],
       }
-    case 'astryx':
-      // Meta's design system (astryx.atmeta.com) — their customization story is
-      // "pick 1 of 7 curated themes or hand-write a defineTheme file". We write it.
-      return {
-        showFramework: false,
-        command: `${ADD[pm]} @astryxdesign/core @astryxdesign/theme-neutral`,
-        steps: [
-          'Install Astryx (command above) if your project isn\'t set up yet.',
-          'Save the file below under themes/ in your Astryx project.',
-          `Compile it: ${DLX[pm]} astryx theme build ./themes/uicockpit.astryx.ts`,
-          'Pass the built theme to your <Theme> provider — every Astryx component now wears your kit.',
-        ],
-      }
   }
 }
 
@@ -258,6 +244,7 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
         <div className="modal__split">
           <nav className="modal__nav" role="tablist" aria-label="Pick your tool">
             <NavBtn id="overview" label="In this kit" hint="Settings · a11y · outputs" icon={<Package size={15} strokeWidth={1.75} />} view={view} onView={setView} />
+            <NavBtn id="link" label="Kit URL" hint="One link — live, no install" icon={<Link2 size={15} strokeWidth={1.75} />} view={view} onView={setView} />
             <div className="modal__navgroup">Web builders</div>
             {TOOLS.filter((t) => t.track === 'web').map((t) => (
               <NavBtn key={t.id} id={t.id} label={t.name} hint={t.tagline} icon={<ToolLogo id={t.id} size={15} />} view={view} onView={setView} />
@@ -275,6 +262,8 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
           <div className="modal__pane">
             {view === 'overview' ? (
               <OverviewPane cfg={cfg} onToast={onToast} />
+            ) : view === 'link' ? (
+              <LinkPane cfg={cfg} onToast={onToast} />
             ) : view === 'cli' ? (
               <CliPane cfg={cfg} onToast={onToast} />
             ) : isFmt(view) ? (
@@ -563,6 +552,90 @@ function CliPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void }
           <StepCard key={s.n} step={s} onToast={onToast} />
         ))}
       </div>
+    </div>
+  )
+}
+
+/** Kit URL — the headline expression of the whole proposition: your design system
+ *  IS a link. One hosted stylesheet (kit.uicockpit.com/k/<hash>.css) — paste the
+ *  <link>, done. Sits first under the kit because it's the shortest path from
+ *  "made it" to "using it everywhere". The hash is the version. */
+function LinkPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void }) {
+  const hash = encode(cfg)
+  const cssUrl = `${KIT_CDN_BASE}/k/${hash}.css`
+  const linkTag = `<link rel="stylesheet" href="${cssUrl}">`
+  const importRule = `@import url("${cssUrl}");`
+  const copy = (text: string, label: string) => async () => {
+    try { await navigator.clipboard.writeText(text); onToast(`${label} copied`) }
+    catch { onToast('Copy failed — select & copy manually') }
+  }
+  return (
+    <div className="tool tool--overview">
+      <div className="tool__head">
+        <span className="tool__logo" aria-hidden="true"><Link2 size={22} strokeWidth={1.75} /></span>
+        <div className="tool__heading">
+          <span className="tool__name">Kit URL</span>
+          <span className="tool__tagline">Your whole design system — one hosted stylesheet.</span>
+        </div>
+      </div>
+      <p className="tool__overview-lead">
+        This URL <strong>is</strong> your kit. Paste the one <code>&lt;link&gt;</code> into your{' '}
+        <code>&lt;head&gt;</code> and every <code>--k-*</code> token and component recipe is live —
+        no install, no build step. The hash is the version: this exact link always serves this exact
+        kit, byte-identical anywhere it loads.
+      </p>
+
+      <div className="toolstep">
+        <span className="toolstep__num" aria-hidden="true">1</span>
+        <div className="toolstep__body">
+          <div className="toolstep__title">Drop it in your &lt;head&gt;</div>
+          <p className="toolstep__desc">Live and versioned by the URL — retune the kit and you get a new one.</p>
+          <div className="toolstep__codecard">
+            <div className="toolstep__codehead">
+              <span className="toolstep__codelabel">index.html · &lt;head&gt;</span>
+              <div className="toolstep__codeacts">
+                <button type="button" className="modal__btn" onClick={copy(linkTag, 'Link tag')}>
+                  <Copy size={13} strokeWidth={1.75} /> Copy
+                </button>
+                <button
+                  type="button"
+                  className="modal__btn"
+                  onClick={() => { downloadText(genCss(cfg), 'tokens.css'); onToast('tokens.css downloaded') }}
+                  aria-label="Download tokens.css"
+                  title="Download tokens.css for an offline copy"
+                >
+                  <Download size={13} strokeWidth={1.75} />
+                </button>
+              </div>
+            </div>
+            <code className="toolstep__inline">{linkTag}</code>
+          </div>
+        </div>
+      </div>
+
+      <div className="toolstep">
+        <span className="toolstep__num" aria-hidden="true">2</span>
+        <div className="toolstep__body">
+          <div className="toolstep__title">Or import it in CSS</div>
+          <p className="toolstep__desc">Same file, for a stylesheet or a CSS <code>@import</code>.</p>
+          <div className="toolstep__codecard">
+            <div className="toolstep__codehead">
+              <span className="toolstep__codelabel">styles.css</span>
+              <div className="toolstep__codeacts">
+                <button type="button" className="modal__btn" onClick={copy(importRule, 'CSS @import')}>
+                  <Copy size={13} strokeWidth={1.75} /> Copy
+                </button>
+              </div>
+            </div>
+            <code className="toolstep__inline">{importRule}</code>
+          </div>
+        </div>
+      </div>
+
+      <p className="tool__overview-lead">
+        Prefer a file committed to your repo? The <strong>Plain files</strong> tab downloads the same
+        CSS (plus Tailwind / shadcn variants). Want an agent to apply and verify it? See <strong>CLI + MCP</strong>.
+      </p>
     </div>
   )
 }
