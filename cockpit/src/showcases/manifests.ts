@@ -156,6 +156,7 @@ export const LEDGER_SCREENS: LedgerScreen[] = [
   { id: 'ledger-expenses', icon: 'card', label: 'Expenses', group: 'Billing' },
   { id: 'ledger-documents', icon: 'grid', label: 'Documents', group: 'Workspace' },
   { id: 'ledger-assistant', icon: 'spark', label: 'Assistant', group: 'Workspace' },
+  { id: 'ledger-schedule', icon: 'cal', label: 'Schedule', group: 'Workspace' },
   { id: 'ledger-plans', icon: 'cog', label: 'Plans & billing', group: 'footer' },
 ]
 /** Detail screens that aren't sidebar peers — they're reached FROM a list screen
@@ -521,6 +522,44 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { title: 'Payment received', sub: 'Email me when a client pays an invoice.', on: true },
             { title: 'Overdue reminders', sub: 'Auto-remind clients 3 days after the due date.', on: true },
             { title: 'Weekly summary', sub: 'A Monday digest of cashflow and outstanding.', on: false },
+          ] } },
+        ],
+      },
+    ],
+  },
+  // ── Schedule — the billing calendar: upcoming invoice due dates, scheduled
+  //    payments and reminders. The 9th screen; composes existing recipes only
+  //    (pageHead · stats · chips · calendar · list) — showcases the calendar.
+  {
+    id: 'ledger-schedule',
+    title: 'Ledger · Schedule',
+    blurb: 'Billing flagship — Schedule: the month calendar of upcoming invoice due dates, scheduled payments and reminders, with an upcoming-items list. Showcases the kit calendar.',
+    width: 1200,
+    archetype: 'feed',
+    nav: 'suite',
+    navItems: LEDGER_NAV,
+    barTitle: 'Ledger',
+    panes: [
+      {
+        role: 'flex',
+        sections: [
+          { kind: 'pageHead', seed: { title: 'Schedule', sub: 'Upcoming invoices, payments and reminders — March 2026.', actions: [
+            { label: 'Export', icon: 'upload' },
+            { label: 'New invoice', icon: 'plus', primary: true },
+          ] } },
+          { kind: 'stats', seed: { items: [
+            { label: 'Due this week', value: '$34,560.00', delta: '4 invoices', up: false },
+            { label: 'Scheduled', value: '12 items' },
+            { label: 'Overdue', value: '$12,787.00', delta: '3 invoices', up: false },
+          ] } },
+          { kind: 'chips', seed: { label: 'Filter', options: ['All', 'Invoices', 'Payments', 'Reminders'], active: 0 } },
+          { kind: 'calendar', seed: { title: 'March 2026', firstDow: 6, days: 31, today: 9, selected: 16, events: [3, 6, 12, 16, 20, 24, 27] } },
+          { kind: 'list', seed: { title: 'Upcoming', items: [
+            { icon: 'file', title: 'Invoice #00013 due — Vantage', sub: '$21,400.00', trail: 'Mar 12', badge: 'warning' },
+            { icon: 'card', title: 'Rent — Loomis Studio', sub: '$4,200.00 · auto-pay', trail: 'Mar 16' },
+            { icon: 'bell', title: 'Reminder — Tuple, Inc', sub: 'Invoice #00009 · 14 days overdue', trail: 'Mar 18', badge: 'danger' },
+            { icon: 'file', title: 'Invoice #00014 due — SavvyCal', sub: '$14,000.00', trail: 'Mar 20', badge: 'success' },
+            { icon: 'check', title: 'Payroll run', sub: '$13,980.00', trail: 'Mar 27' },
           ] } },
         ],
       },

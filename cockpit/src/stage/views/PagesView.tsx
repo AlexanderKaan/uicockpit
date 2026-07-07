@@ -386,10 +386,6 @@ function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => voi
             </div>
           )
         })}
-        {/* 9th cell — the empty slot, filled later (another app archetype). */}
-        <div className="shc-wall__tile shc-wall__tile--empty" aria-hidden="true">
-          <div className="shc-wall__frame shc-wall__frame--empty"><span>More soon</span></div>
-        </div>
       </div>
     </div>
   )
