@@ -33,33 +33,44 @@ const BASE: Partial<Config> = {
 }
 
 export const STYLE_KITS: StyleKit[] = [
+  // Each kit now owns a SIGNATURE lever no other kit touches, so the seven read
+  // as genuinely different systems (not grey variants) at one glance — while the
+  // brand colour rides through unchanged. Coupled pairs (dense↔small type,
+  // airy↔large type) follow the foundation-coherence rules, so no combo clashes.
   {
     id: 'clean', name: 'Clean', blurb: 'Balanced and neutral — the safe default',
+    // The anchor = DEFAULT_CONFIG. Everything else is a deliberate departure from this.
     config: { ...BASE, radius: 'soft', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'auto' },
   },
   {
-    id: 'precision', name: 'Precision', blurb: 'Crisp, flat, cool — Linear / Figma',
-    config: { ...BASE, radius: 'subtle', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'cool', surfaceDepth: 'flat' },
+    id: 'precision', name: 'Precision', blurb: 'Dense, sharp, cool — Linear',
+    // Signature = DENSITY. Compact + small type + defined borders + snappy motion.
+    config: { ...BASE, radius: 'subtle', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'cool', surfaceDepth: 'flat', scale: 'compact', typeScale: 'sm', borders: 'medium', motion: 'snappy', motionTempo: 'snappy' },
   },
   {
-    id: 'minimal', name: 'Minimal', blurb: 'Mono headings, stark — Vercel',
-    config: { ...BASE, radius: 'subtle', fontDisplay: 'Geist Mono', fontBody: 'Geist', neutral: 'neutral', surfaceDepth: 'flat' },
+    id: 'minimal', name: 'Minimal', blurb: 'Square, mono, stark — Vercel',
+    // Signature = SQUARE + CAPS. radius:none + mono display + uppercase labels.
+    config: { ...BASE, radius: 'none', fontDisplay: 'Geist Mono', fontBody: 'Geist', neutral: 'neutral', surfaceDepth: 'flat', labelCase: 'caps' },
   },
   {
-    id: 'refined', name: 'Refined', blurb: 'Ultralight headlines — Stripe',
-    config: { ...BASE, radius: 'soft', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'cool', displayWeight: 'light', palette: 'pastel' },
+    id: 'refined', name: 'Refined', blurb: 'Airy, ultralight, pill buttons — Stripe',
+    // Signature = PILL BUTTONS + AIR. Ultralight headings, comfortable density, pastel.
+    config: { ...BASE, radius: 'soft', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'cool', displayWeight: 'light', palette: 'pastel', buttonShape: 'pill', scale: 'comfortable', typeScale: 'lg' },
   },
   {
-    id: 'calm', name: 'Calm', blurb: 'System font, seamless — Notion',
-    config: { ...BASE, radius: 'subtle', fontDisplay: 'System', fontBody: 'System', neutral: 'warm', surface: 'plain', palette: 'pastel' },
+    id: 'calm', name: 'Calm', blurb: 'Borderless, system font — Notion',
+    // Signature = QUIET. Plain (seamless) surface, faint borders, hairline icons, system font.
+    config: { ...BASE, radius: 'subtle', fontDisplay: 'System', fontBody: 'System', neutral: 'warm', surface: 'plain', palette: 'pastel', borders: 'faint', iconSet: 'hairline' },
   },
   {
-    id: 'soft', name: 'Soft', blurb: 'Rounded and warm — friendly',
-    config: { ...BASE, radius: 'round', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'warm', surface: 'filled', borders: 'faint' },
+    id: 'soft', name: 'Soft', blurb: 'Rounded, bold, playful — friendly',
+    // Signature = CHUNKY. Round radius, filled surface, bold headings, rounded icons, playful motion.
+    config: { ...BASE, radius: 'round', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'warm', surface: 'filled', displayWeight: 'bold', iconSet: 'rounded', motion: 'playful', motionCurve: 'spring' },
   },
   {
-    id: 'editorial', name: 'Editorial', blurb: 'Serif headings, calm and warm',
-    config: { ...BASE, radius: 'soft', fontDisplay: 'Newsreader', fontBody: 'Inter', neutral: 'warm', surface: 'plain', palette: 'pastel' },
+    id: 'editorial', name: 'Editorial', blurb: 'Serif, spacious, literary',
+    // Signature = SERIF + SPACE. Serif at regular weight, large type, comfortable density.
+    config: { ...BASE, radius: 'soft', fontDisplay: 'Newsreader', fontBody: 'Inter', neutral: 'warm', surface: 'plain', palette: 'pastel', displayWeight: 'regular', typeScale: 'lg', scale: 'comfortable' },
   },
 ]
 

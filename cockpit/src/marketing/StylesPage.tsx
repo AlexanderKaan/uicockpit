@@ -32,48 +32,47 @@ function Specimen({ config }: { config: Partial<Config> }) {
   // font, weight and surface all show at once — the OG-collage idea, compact.
   const row: CSSProperties = { display: 'flex', alignItems: 'center', gap: 'var(--k-s-8)' }
   const between: CSSProperties = { ...row, justifyContent: 'space-between' }
+  // A small BOUQUET of real, self-contained components floating on the kit's
+  // canvas — a metric card, a control strip, a segmented control, a rating row —
+  // so a style's radius, borders, surface, font, weight and accent all read at
+  // once, without pretending to be one made-up screen.
   return (
     <div className="mkt__style-specimen" style={tokens}>
       <IconProvider set={cfg.iconSet}>
-        <div className="card">
-          {/* Type — the large display line carries the display font + weight
-              (serif / mono / ultralight), the loudest thing a style changes. */}
-          <div>
-            <div className="mkt__style-spec-display">Invoice</div>
-            <div className="card__desc">#00042 · due in 14 days</div>
-          </div>
-
-          {/* A metric + delta + rating — accent, tabular numbers and star fill. */}
-          <div style={between}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--k-s-6)' }}>
-              <span className="stat-tile__value" style={{ fontSize: 'var(--k-type-h3)' }}>$2,400</span>
+        <div className="mkt__style-bouquet">
+          {/* Anchor: a real metric card — surface, radius, border, the display
+              font on the title word + the big number, and the accent delta. */}
+          <div className="card mkt__style-metric">
+            <div style={between}>
+              <span className="card__title">Revenue</span>
+              <span className="badge badge--solid-primary">Live</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--k-s-8)' }}>
+              <span className="mkt__style-spec-display">$24,300</span>
               <span className="stat-tile__delta stat-tile__delta--up">+12%</span>
             </div>
-            <span className="rating"><SpecStar /><SpecStar /><SpecStar /><SpecStar /><SpecStar empty /></span>
           </div>
 
-          {/* Segmented control — accent + radius on a distinct component type. */}
+          {/* Control strip — button shape/radius + the aimed accent + a switch. */}
+          <div style={{ ...row, flexWrap: 'wrap' }}>
+            <button type="button" className="btn btn--primary btn--sm">Send</button>
+            <button type="button" className="btn btn--ghost btn--sm">Details</button>
+            <span className="toggle toggle--on" role="switch" aria-checked="true" style={{ marginLeft: 'auto' }}><span className="toggle__knob" /></span>
+          </div>
+
+          {/* Segmented control — radius + accent + label case (caps vs sentence). */}
           <div className="segctrl">
             <button type="button" className="segctrl__btn segctrl__btn--on">Overview</button>
             <button type="button" className="segctrl__btn">Activity</button>
           </div>
 
-          <input className="in" placeholder="client@acme.inc" aria-label="Email" />
-
-          {/* Badges + a switch — accent + radius, on/off. */}
+          {/* Rating + chips — accent + radius on small pills. */}
           <div style={between}>
+            <span className="rating"><SpecStar /><SpecStar /><SpecStar /><SpecStar /><SpecStar empty /></span>
             <div style={row}>
-              <span className="badge badge--solid-primary">Paid</span>
+              <span className="badge">New</span>
               <span className="badge">Draft</span>
             </div>
-            <span className="toggle toggle--on" role="switch" aria-checked="true"><span className="toggle__knob" /></span>
-          </div>
-
-          {/* Three button weights — radius + the aimed accent. */}
-          <div style={{ ...row, flexWrap: 'wrap' }}>
-            <button type="button" className="btn btn--primary btn--sm">Send</button>
-            <button type="button" className="btn btn--secondary btn--sm">Save</button>
-            <button type="button" className="btn btn--ghost btn--sm">Preview</button>
           </div>
         </div>
       </IconProvider>

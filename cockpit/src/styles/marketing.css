@@ -1691,7 +1691,10 @@
   background: var(--k-bg);
   border-bottom: 1px solid var(--mkt-border);
 }
-.mkt__style-specimen .card { display: flex; flex-direction: column; gap: var(--k-s-10); }
+/* The bouquet — a few real components floating on the kit canvas with air. */
+.mkt__style-bouquet { display: flex; flex-direction: column; gap: var(--k-s-12); }
+.mkt__style-specimen .card { display: flex; flex-direction: column; gap: var(--k-s-8); }
+.mkt__style-metric { padding: var(--k-space, 16px); }
 .mkt__style-meta { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 4px; }
 .mkt__style-name { font-size: 15px; font-weight: 650; color: var(--mkt-fg); }
 .mkt__style-blurb { font-size: 13px; color: var(--mkt-fg-muted); }
