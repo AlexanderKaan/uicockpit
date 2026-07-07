@@ -203,7 +203,7 @@ export function SeoPage({ entry, navigate }: SeoPageProps) {
       {/* Final CTA */}
       <section className="mkt__final">
         <div className="mkt__container">
-          <h2>Design a UI kit in 60 seconds.</h2>
+          <h2>Generate a design system your AI agent follows.</h2>
           <p className="mkt__final-sub">
             100% free, framework-neutral tokens — no account, no lock-in, your design language,
             your file.

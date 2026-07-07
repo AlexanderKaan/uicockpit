@@ -92,8 +92,8 @@ function write(path: string, html: string): void {
 write('/', renderPage({
   path: '/',
   markup: renderToStaticMarkup(<MarketingPage onLaunch={noop} navigate={noop} />),
-  title: 'UIcockpit — The design system generator: your kit in 60 seconds',
-  description: "The open-source design system generator — AI fluent, drift-proof. UIcockpit turns colour, type, shape and motion into framework-neutral design tokens + components, so your AI-built app doesn't look generic. Export for Tailwind v4, shadcn/ui, or any framework. 100% free, no accounts, no telemetry, no lock-in.",
+  title: 'UIcockpit — The design system generator for AI-built apps',
+  description: 'Generate a design system — tokens + components — export it to Tailwind v4, shadcn/ui or any framework, and keep it consistent when AI builds. Free & open source.',
 }))
 
 write('/manifesto', renderPage({
