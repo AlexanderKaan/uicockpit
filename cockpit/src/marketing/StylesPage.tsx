@@ -27,8 +27,11 @@ function Specimen({ config }: { config: Partial<Config> }) {
       <IconProvider set={cfg.iconSet}>
         <div className="card">
           <div className="card__head">
-            <div className="card__title">Invoice #00042</div>
-            <div className="card__desc">Due in 14 days · $2,400.00</div>
+            {/* Lead with a LARGE display line — the display font + weight is the
+                loudest thing a style changes (serif / mono / ultralight), but it's
+                invisible at title size. At h1 the difference is unmistakable. */}
+            <div className="mkt__style-spec-display">Invoice</div>
+            <div className="card__desc">#00042 · due in 14 days · $2,400.00</div>
           </div>
           <div className="card__row" style={{ gap: 'var(--k-s-8)', flexWrap: 'wrap' }}>
             <span className="badge badge--solid-primary">Paid</span>

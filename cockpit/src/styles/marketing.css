@@ -2120,3 +2120,14 @@
 .tplview__frame { flex: 1; width: 100%; border: 0; display: block; background: var(--mkt-bg, #fff); }
 /* Narrow: the command line is the first thing to drop. */
 @media (max-width: 640px) { .tplview__cmd { display: none; } }
+
+/* /styles specimen — lead with a large display line so each kit's display font +
+   weight (serif / mono / ultralight) is unmistakable, not a subtle title. */
+.mkt__style-spec-display {
+  font-family: var(--k-font-display);
+  font-weight: var(--k-weight-display-hero, var(--k-weight-semibold));
+  font-size: var(--k-type-h1);
+  letter-spacing: var(--k-track-display, -0.02em);
+  line-height: 1.1;
+  color: var(--k-fg);
+}
