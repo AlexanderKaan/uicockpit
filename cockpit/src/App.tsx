@@ -9,7 +9,7 @@ import { ShowcasesPage } from './marketing/ShowcasesPage'
 import { ComponentsIndexPage, ComponentDetailPage } from './marketing/ComponentDocs'
 import { componentPageBySlug } from './stage/views/ComponentGallery'
 import { StylesPage } from './marketing/StylesPage'
-import { TemplatesPage } from './marketing/TemplatesPage'
+import { TemplatesPage, TemplatePreview } from './marketing/TemplatesPage'
 import { findEntry } from './marketing/seo/seoData'
 import './styles/marketing.css'
 
@@ -64,6 +64,10 @@ export function App() {
   }
   if (path.startsWith('/showcases')) return <ShowcasesPage navigate={navigate} />
   if (path.startsWith('/styles')) return <StylesPage navigate={navigate} />
+  if (path.startsWith('/templates/preview/')) {
+    const name = path.slice('/templates/preview/'.length).replace(/\/$/, '')
+    return <TemplatePreview name={name} navigate={navigate} />
+  }
   if (path.startsWith('/templates')) return <TemplatesPage navigate={navigate} />
 
   // The social-preview / OG card (1280×640) — not linked; screenshotted to a PNG.

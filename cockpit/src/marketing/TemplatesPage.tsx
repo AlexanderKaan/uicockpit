@@ -18,6 +18,7 @@ const TEMPLATES = LEDGER_SCREENS.map((screen) => {
   const blurb = (m.blurb.split('—')[1] ?? m.blurb).trim()
   return { name, title: m.title.replace(/^Ledger · /, ''), blurb }
 })
+const TEMPLATE_BY_NAME = new Map(TEMPLATES.map((t) => [t.name, t]))
 
 export function TemplatesPage({ navigate }: { navigate: (to: string) => void }) {
   useEffect(() => {
@@ -56,7 +57,11 @@ export function TemplatesPage({ navigate }: { navigate: (to: string) => void }) 
                   <div className="mkt__tpl-blurb">{t.blurb}</div>
                 </div>
                 <code className="mkt__tpl-cmd">uicockpit template {t.name}</code>
-                <a className="mkt-btn mkt-btn--ghost mkt__tpl-view" href={`/templates/${t.name}.html`} target="_blank" rel="noopener noreferrer">
+                <a
+                  className="mkt-btn mkt-btn--ghost mkt__tpl-view"
+                  href={`/templates/preview/${t.name}`}
+                  onClick={(e) => { e.preventDefault(); navigate(`/templates/preview/${t.name}`) }}
+                >
                   Preview →
                 </a>
               </div>
@@ -71,6 +76,45 @@ export function TemplatesPage({ navigate }: { navigate: (to: string) => void }) 
         </div>
       </section>
       <MktFooter navigate={navigate} />
+    </div>
+  )
+}
+
+/**
+ * /templates/preview/<name> — a thin preview SHELL: a back bar (← Templates) +
+ * the install command, over the raw template loaded in an <iframe>. The iframe
+ * keeps the template HTML CHROME-FREE (it's the exact file the CLI fetches +
+ * ships), while still giving the visitor a way back — the dead-end a bare
+ * new-tab .html link left them in. Unknown name → bounce to the list.
+ */
+export function TemplatePreview({ name, navigate }: { name: string; navigate: (to: string) => void }) {
+  const t = TEMPLATE_BY_NAME.get(name)
+  useEffect(() => {
+    if (!t) { navigate('/templates'); return }
+    const prev = document.title
+    document.title = `${t.title} template — preview — UIcockpit`
+    return () => { document.title = prev }
+  }, [t, navigate])
+  if (!t) return null
+  return (
+    <div className="tplview">
+      <header className="tplview__bar">
+        <a
+          className="tplview__back"
+          href="/templates"
+          onClick={(e) => { e.preventDefault(); navigate('/templates') }}
+        >
+          ← Templates
+        </a>
+        <span className="tplview__name">Ledger · {t.title}</span>
+        <div className="tplview__actions">
+          <code className="tplview__cmd">npx uicockpit template {t.name}</code>
+          <a className="tplview__raw" href={`/templates/${t.name}.html`} target="_blank" rel="noopener noreferrer">
+            Open raw ↗
+          </a>
+        </div>
+      </header>
+      <iframe className="tplview__frame" src={`/templates/${t.name}.html`} title={`${t.title} template preview`} />
     </div>
   )
 }
