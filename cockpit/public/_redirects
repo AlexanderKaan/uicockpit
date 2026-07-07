@@ -3,4 +3,10 @@
 # to the app shell so client-side routes (/docs, /compare/*, /alternatives/*,
 # /uses/*, /app) resolve on a direct hit or refresh. Status 200 = rewrite, so
 # the URL the visitor sees is preserved (important for SEO).
+
+# Retired page — the Astryx theme-generator use case (the Astryx export was
+# dropped to keep the export on the core). 301 to the closest live equivalent.
+# Specific rule sits ABOVE the catch-all so it wins (first match).
+/uses/astryx-theme-generator   /uses/design-system-generator   301
+
 /*    /index.html   200
