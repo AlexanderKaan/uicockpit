@@ -106,7 +106,7 @@ function ShowcaseStage({ m, appNav, width, onWidth }: { m: ShowcaseManifest; app
       {/* The dock — a slim bottom toolbar with the width scrubber. Sized (same width
        * clamp as the app shell) + left-aligned to match the app preview above it, so
        * the two read as one aligned block at every width. */}
-      <div className="shc__dock" style={{ width, maxWidth: '100%', minWidth: appNav ? 680 : undefined }}>
+      <div className="shc__dock" style={{ width, maxWidth: '100%' }}>
         <div className="lyt__scrub shc__dock-scrub">
           <span className="lyt__scrub-label">Width</span>
           {/* Dogfood: the kit's OWN slider (InteractiveSlider → the exported `.slider`
@@ -165,7 +165,7 @@ export function ShowcaseShell({
     if ((e.target as HTMLElement).closest('tbody tr')) appNav.onNavigate('ledger')
   }
   return (
-    <div className={`scaffold scaffold--${m.archetype} ${appNav ? 'shc__app' : ''}`} data-screen={appNav?.current} style={{ width, maxWidth: '100%', minWidth: appNav ? 680 : undefined }}>
+    <div className={`scaffold scaffold--${m.archetype} ${appNav ? 'shc__app' : ''}`} data-screen={appNav?.current} style={{ width, maxWidth: '100%' }}>
       <div className="scaffold__frame shc__frame">
         <div className="scaffold__bar appbar">
           {onDetail && (

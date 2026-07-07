@@ -6157,6 +6157,33 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   .sidenav--rail .navrow[data-tip]::after,
   .sidenav--rail .sidenav__toggle[data-tip]::after { transition: none; }
 }
+/* ---- Responsive (compact) ---- the .scaffold drops the nav to a BOTTOM area
+ * below its 600px container width (M3 compact). There a vertical sidebar reads
+ * wrong, so the sidebar REFLOWS to a horizontal, scrollable icon strip — a
+ * mobile tab bar. Driven by the SCAFFOLD container (not the viewport), so it
+ * also engages in the fixed-width loupe and in a consumer's real app. Brand,
+ * group labels and the pinned footer collapse; each row keeps just its icon. */
+@container scaffold (max-width: 600px) {
+  .sidenav {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    gap: var(--k-s-2);
+    padding: var(--k-s-6) var(--k-s-8);
+    border-right: 0;
+    border-top: var(--k-divider);
+    overflow-x: auto;
+  }
+  .sidenav__brand,
+  .sidenav__foot,
+  .nav-group { display: none; }
+  .sidenav__name,
+  .navrow__label,
+  .navrow__chev,
+  .navsub { display: none; }
+  .navrow { flex: 0 0 auto; justify-content: center; gap: 0; padding: var(--k-s-8) var(--k-s-10); position: relative; }
+  .navrow .badge--count { position: absolute; top: var(--k-s-2); right: var(--k-s-4); min-width: var(--k-s-8); width: var(--k-s-8); height: var(--k-s-8); padding: 0; font-size: 0; border: var(--k-bw) solid var(--k-chrome-bg, var(--k-surface-sunken)); }
+}
 
 /* === App bar — the top app-shell header ==================================
  * The sibling of .sidenav: a horizontal bar on the Chrome plane carrying the
@@ -13524,6 +13551,33 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 @media (prefers-reduced-motion: reduce) {
   .sidenav--rail .navrow[data-tip]::after,
   .sidenav--rail .sidenav__toggle[data-tip]::after { transition: none; }
+}
+/* ---- Responsive (compact) ---- the .scaffold drops the nav to a BOTTOM area
+ * below its 600px container width (M3 compact). There a vertical sidebar reads
+ * wrong, so the sidebar REFLOWS to a horizontal, scrollable icon strip — a
+ * mobile tab bar. Driven by the SCAFFOLD container (not the viewport), so it
+ * also engages in the fixed-width loupe and in a consumer's real app. Brand,
+ * group labels and the pinned footer collapse; each row keeps just its icon. */
+@container scaffold (max-width: 600px) {
+  .sidenav {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    gap: var(--k-s-2);
+    padding: var(--k-s-6) var(--k-s-8);
+    border-right: 0;
+    border-top: var(--k-divider);
+    overflow-x: auto;
+  }
+  .sidenav__brand,
+  .sidenav__foot,
+  .nav-group { display: none; }
+  .sidenav__name,
+  .navrow__label,
+  .navrow__chev,
+  .navsub { display: none; }
+  .navrow { flex: 0 0 auto; justify-content: center; gap: 0; padding: var(--k-s-8) var(--k-s-10); position: relative; }
+  .navrow .badge--count { position: absolute; top: var(--k-s-2); right: var(--k-s-4); min-width: var(--k-s-8); width: var(--k-s-8); height: var(--k-s-8); padding: 0; font-size: 0; border: var(--k-bw) solid var(--k-chrome-bg, var(--k-surface-sunken)); }
 }
 
 /* === App bar — the top app-shell header ==================================
