@@ -4384,11 +4384,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Bare metric strip — joined cells in one box with internal hairlines (was
  * .statgrp). Reuses .stat-tile__value / .stat-tile__label; no per-cell card. */
 .stat-tile-strip {
-  /* Responsive: FLEX-wrap (not an auto-fit grid). Cells grow to fill their row,
-   * so a count that doesn't divide the column span (e.g. 4 metrics wrapping to
-   * 3 + 1) has its last row STRETCH to full width instead of leaving orphan grid
-   * cells that show the container fill as a grey ghost block. The gap shows the
+  /* Responsive: FLEX-wrap on a CONTAINER-QUERY ladder keyed to the strip's OWN
+   * width (so it adapts at any embedded size — the loupe, a narrow pane — not
+   * the viewport). Cells grow to fill their row, so a count that doesn't divide
+   * the row (4 → 2+2, or 3 → 2+1) never leaves an orphan grid cell showing the
+   * fill as a grey ghost block. The ladder: 1-up (narrow) → 2-up (medium, so a
+   * 4-metric band lands on a clean 2×2) → the full row (wide). The gap shows the
    * container line as the internal hairline — dividers need no nth-child math. */
+  container-type: inline-size;
+  container-name: statstrip;
   display: flex;
   flex-wrap: wrap;
   gap: var(--k-bw, 1px);
@@ -4397,7 +4401,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-radius: var(--k-radius-md);
   overflow: hidden;
 }
-.stat-tile-strip__cell { flex: 1 1 9rem; min-width: 0; padding: var(--k-space, 16px); background: var(--k-surface); display: flex; flex-direction: column; gap: var(--k-s-2); }
+/* 1-up by default (narrow); the ladder widens the basis as the strip grows. */
+.stat-tile-strip__cell { flex: 1 1 100%; min-width: 0; padding: var(--k-space, 16px); background: var(--k-surface); display: flex; flex-direction: column; gap: var(--k-s-2); }
+/* Medium — two balanced columns (a 4-up KPI band becomes a 2×2; an odd trailing
+   cell keeps flex-grow so it fills its row instead of orphaning). */
+@container statstrip (min-width: 28rem) { .stat-tile-strip__cell { flex-basis: 40%; } }
+/* Wide — the full metric row: as many equal cells as fit, last row fills. */
+@container statstrip (min-width: 40rem) { .stat-tile-strip__cell { flex-basis: 9rem; } }
 /* Summary-band Fill — the ONE focal "state at a glance" strip per screen wears
  * the tactical wash (flagship doctrine): cells take --k-surface-fill, the grid
  * gap stays the hairline. White (default) Background ⇒ fill resolves to plain
