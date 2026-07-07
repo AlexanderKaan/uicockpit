@@ -585,49 +585,51 @@ function LinkPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void 
         kit, byte-identical anywhere it loads.
       </p>
 
-      <div className="toolstep">
-        <span className="toolstep__num" aria-hidden="true">1</span>
-        <div className="toolstep__body">
-          <div className="toolstep__title">Drop it in your &lt;head&gt;</div>
-          <p className="toolstep__desc">Live and versioned by the URL — retune the kit and you get a new one.</p>
-          <div className="toolstep__codecard">
-            <div className="toolstep__codehead">
-              <span className="toolstep__codelabel">index.html · &lt;head&gt;</span>
-              <div className="toolstep__codeacts">
-                <button type="button" className="modal__btn" onClick={copy(linkTag, 'Link tag')}>
-                  <Copy size={13} strokeWidth={1.75} /> Copy
-                </button>
-                <button
-                  type="button"
-                  className="modal__btn"
-                  onClick={() => { downloadText(genCss(cfg), 'tokens.css'); onToast('tokens.css downloaded') }}
-                  aria-label="Download tokens.css"
-                  title="Download tokens.css for an offline copy"
-                >
-                  <Download size={13} strokeWidth={1.75} />
-                </button>
+      <div className="tool__steps" style={{ marginTop: 16 }}>
+        <div className="toolstep">
+          <span className="toolstep__num" aria-hidden="true">1</span>
+          <div className="toolstep__body">
+            <div className="toolstep__title">Drop it in your &lt;head&gt;</div>
+            <p className="toolstep__desc">Live and versioned by the URL — retune the kit and you get a new one.</p>
+            <div className="toolstep__codecard">
+              <div className="toolstep__codehead">
+                <span className="toolstep__codelabel">index.html · &lt;head&gt;</span>
+                <div className="toolstep__codeacts">
+                  <button type="button" className="modal__btn" onClick={copy(linkTag, 'Link tag')}>
+                    <Copy size={13} strokeWidth={1.75} /> Copy
+                  </button>
+                  <button
+                    type="button"
+                    className="modal__btn"
+                    onClick={() => { downloadText(genCss(cfg), 'tokens.css'); onToast('tokens.css downloaded') }}
+                    aria-label="Download tokens.css"
+                    title="Download tokens.css for an offline copy"
+                  >
+                    <Download size={13} strokeWidth={1.75} />
+                  </button>
+                </div>
               </div>
+              <code className="toolstep__inline">{linkTag}</code>
             </div>
-            <code className="toolstep__inline">{linkTag}</code>
           </div>
         </div>
-      </div>
 
-      <div className="toolstep">
-        <span className="toolstep__num" aria-hidden="true">2</span>
-        <div className="toolstep__body">
-          <div className="toolstep__title">Or import it in CSS</div>
-          <p className="toolstep__desc">Same file, for a stylesheet or a CSS <code>@import</code>.</p>
-          <div className="toolstep__codecard">
-            <div className="toolstep__codehead">
-              <span className="toolstep__codelabel">styles.css</span>
-              <div className="toolstep__codeacts">
-                <button type="button" className="modal__btn" onClick={copy(importRule, 'CSS @import')}>
-                  <Copy size={13} strokeWidth={1.75} /> Copy
-                </button>
+        <div className="toolstep">
+          <span className="toolstep__num" aria-hidden="true">2</span>
+          <div className="toolstep__body">
+            <div className="toolstep__title">Or import it in CSS</div>
+            <p className="toolstep__desc">Same file, for a stylesheet or a CSS <code>@import</code>.</p>
+            <div className="toolstep__codecard">
+              <div className="toolstep__codehead">
+                <span className="toolstep__codelabel">styles.css</span>
+                <div className="toolstep__codeacts">
+                  <button type="button" className="modal__btn" onClick={copy(importRule, 'CSS @import')}>
+                    <Copy size={13} strokeWidth={1.75} /> Copy
+                  </button>
+                </div>
               </div>
+              <code className="toolstep__inline">{importRule}</code>
             </div>
-            <code className="toolstep__inline">{importRule}</code>
           </div>
         </div>
       </div>
