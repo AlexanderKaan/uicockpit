@@ -109,9 +109,6 @@ export function TemplatePreview({ name, navigate }: { name: string; navigate: (t
         <span className="tplview__name">Ledger · {t.title}</span>
         <div className="tplview__actions">
           <code className="tplview__cmd">npx uicockpit template {t.name}</code>
-          <a className="tplview__raw" href={`/templates/${t.name}.html`} target="_blank" rel="noopener noreferrer">
-            Open raw ↗
-          </a>
         </div>
       </header>
       <iframe className="tplview__frame" src={`/templates/${t.name}.html`} title={`${t.title} template preview`} />
