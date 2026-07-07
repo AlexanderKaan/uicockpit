@@ -4591,6 +4591,7 @@ function PlanCompareCard() {
   const hl = tiers.findIndex((t) => t.featured)
   return (
     <Card xwide docId="plan-compare" title="Compare plans" desc="A tier × feature matrix with the recommended plan highlighted.">
+      <div className="plan-compare-scroll">
       <div className="plan-compare" style={{ '--pc-cols': tiers.length, '--pc-rows': features.length, '--pc-hl': hl + 2 } as CSSProperties}>
         {hl >= 0 && <div className="plan-compare__hl" />}
         <div className="plan-compare__corner"><span className="plan-compare__eyebrow">Compare</span></div>
@@ -4613,6 +4614,7 @@ function PlanCompareCard() {
             ))}
           </Fragment>
         ))}
+      </div>
       </div>
     </Card>
   )

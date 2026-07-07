@@ -214,6 +214,7 @@ function PlanCompareSection({ eyebrow, tiers, features }: { eyebrow?: string; ti
   const hl = tiers.findIndex((t) => t.featured)
   return (
     <div className="card">
+      <div className="plan-compare-scroll">
       <div className="plan-compare" style={{ '--pc-cols': tiers.length, '--pc-rows': features.length, '--pc-hl': hl + 2 } as CSSProperties}>
         {hl >= 0 && <div className="plan-compare__hl" />}
         <div className="plan-compare__corner">{eyebrow && <span className="plan-compare__eyebrow">{eyebrow}</span>}</div>
@@ -236,6 +237,7 @@ function PlanCompareSection({ eyebrow, tiers, features }: { eyebrow?: string; ti
             ))}
           </Fragment>
         ))}
+      </div>
       </div>
     </div>
   )

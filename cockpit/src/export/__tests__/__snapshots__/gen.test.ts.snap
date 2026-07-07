@@ -2222,6 +2222,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "yes"
         ]
       },
+      "plan-compare-scroll": {
+        "modifiers": [],
+        "parts": []
+      },
       "popover": {
         "modifiers": [
           "end",
@@ -9245,8 +9249,14 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
  * the columns stay perfectly aligned. On the root set --pc-cols (tier count)
  * and --pc-hl (the 1-based grid column of the highlighted tier = its
  * index + 2, since column 1 is the feature-label rail). */
+/* Scroll wrapper — on a narrow container the matrix scrolls horizontally
+   instead of squishing its columns below readability (the same convention as
+   the data table). Wrap the grid in this on any width-constrained surface. */
+.plan-compare-scroll { overflow-x: auto; }
 .plan-compare {
   display: grid;
+  /* Keeps the columns readable; below this the wrapper scrolls. */
+  min-width: 30rem;
   grid-template-columns: 1.3fr repeat(var(--pc-cols, 3), minmax(0, 1fr));
   /* Rows are made EXPLICIT (header + --pc-rows feature rows) so the highlight
      band's grid-row: 1 / -1 resolves to the full height — an absolutely-placed
@@ -16607,8 +16617,14 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
  * the columns stay perfectly aligned. On the root set --pc-cols (tier count)
  * and --pc-hl (the 1-based grid column of the highlighted tier = its
  * index + 2, since column 1 is the feature-label rail). */
+/* Scroll wrapper — on a narrow container the matrix scrolls horizontally
+   instead of squishing its columns below readability (the same convention as
+   the data table). Wrap the grid in this on any width-constrained surface. */
+.plan-compare-scroll { overflow-x: auto; }
 .plan-compare {
   display: grid;
+  /* Keeps the columns readable; below this the wrapper scrolls. */
+  min-width: 30rem;
   grid-template-columns: 1.3fr repeat(var(--pc-cols, 3), minmax(0, 1fr));
   /* Rows are made EXPLICIT (header + --pc-rows feature rows) so the highlight
      band's grid-row: 1 / -1 resolves to the full height — an absolutely-placed
