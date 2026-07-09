@@ -25,11 +25,6 @@ Usage:
       flags unknown tokens, undefined modifiers, raw colours, off-grid spacing.
       Exit 0 = conforms · 1 = violations · 2 = setup error. --strict fails on warnings.
 
-  npx uicockpit template [name] [--kit=<hash>] [--force]
-      Seed a starting screen (dashboard, invoices, settings, AI chat, …) as plain
-      HTML already wearing YOUR kit — a starting point your agent extends under
-      check, not a finished page. No name = list the starting screens.
-
   npx uicockpit help | --version
 
 Docs: https://uicockpit.com`)
@@ -46,10 +41,6 @@ async function main() {
     case 'init': {
       const { runInit } = await import(new URL('../src/init.mjs', import.meta.url))
       return runInit(rest)
-    }
-    case 'template': {
-      const { runTemplate } = await import(new URL('../src/template.mjs', import.meta.url))
-      return runTemplate(rest)
     }
     case 'version':
     case '-v':

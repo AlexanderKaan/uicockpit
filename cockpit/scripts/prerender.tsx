@@ -1,8 +1,8 @@
 /**
  * prerender (IA-4) — bake the pure-content routes into static HTML snapshots so
  * bots and link-preview crawlers (which don't run JS) see the real content, not
- * just the SPA shell's default meta. Same approach as gen-templates: render each
- * page to static markup with react-dom/server, no headless browser.
+ * just the SPA shell's default meta. Each page is rendered to static markup with
+ * react-dom/server — no headless browser.
  *
  * We prerender the CONTENT routes only (landing · manifesto · the data-driven
  * SEO pages). The tool (/app) and the app-like reference surfaces (/components,

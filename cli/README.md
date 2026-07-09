@@ -79,17 +79,6 @@ the list doubles as a record of where the system doesn't fit yet. The hatch neve
 covers the error-level reference checks (`tokens-exist`, `known-modifiers`): a
 broken reference is a bug, not a taste decision.
 
-### `uicockpit template [name] [--kit=<hash>] [--force]`
-
-Seed a **starting screen** — dashboard, invoices list, clients, expenses, reports,
-documents, AI assistant, plans & billing — as **plain HTML already wearing your
-kit**. No name lists the starting screens; with a name it writes `<name>.html`,
-pointing the stylesheet at your kit (the hash from `uicockpit.json`, or `--kit=`).
-
-It's a starting point, not a finished page: the markup is pure kit vocabulary
-(every class is a recipe), so it's the seed your agent extends — and `uicockpit
-check` keeps those edits on-system.
-
 ## How it fits
 
 `init` and `check` are stateless over the kit **hash** — the same payload behind

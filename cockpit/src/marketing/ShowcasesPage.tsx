@@ -5,12 +5,6 @@ import { KitToggle } from './KitToggle'
 import { PagesView } from '../stage/views/PagesView'
 import { IconProvider } from '../icons/Icon'
 import { useVisitorKit } from '../state/useVisitorKit'
-import { LEDGER_SCREENS } from '../showcases/manifests'
-
-/* The CLI names for `npx uicockpit template <name>` — the SAME screens shown in the
- * wall above, derived from the SAME manifest gen-templates.tsx builds, so the chips
- * can't drift from what actually ships. */
-const TEMPLATE_NAMES = LEDGER_SCREENS.map((s) => s.id.replace(/^ledger-?/, '') || 'home')
 
 /**
  * /showcases — the Ledger showcase wall as a PUBLIC destination (IA-1). The wall
@@ -59,27 +53,6 @@ export function ShowcasesPage({ navigate }: { navigate: (to: string) => void }) 
           <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={() => navigate('/app')}>
             {hasKit ? 'Keep tuning these screens →' : 'Re-theme these screens — build my kit →'}
           </button>
-        </div>
-
-        {/* Seed a starting screen — the CLI templates, reframed. Not "ship a
-            finished page" (turnkey, off-thesis) but "seed a starting point your
-            agent extends under check". The screens above ARE the previews; here's
-            how to drop one in as a file. Chips = the CLI names (same manifest). */}
-        <div className="mkt__container mkt__seed">
-          <h2 className="mkt__seed-title">Seed a starting screen</h2>
-          <p className="mkt__seed-sub">
-            Want one as a file to build on? One command drops a screen into your project — already
-            wearing your kit. It&apos;s a <em>starting point your agent extends under <code>check</code></em>,
-            not a finished page to copy.
-          </p>
-          <div className="mkt__seed-install">
-            <code>npx uicockpit template &lt;name&gt;</code>
-          </div>
-          <div className="mkt__seed-chips" aria-label="Available starting screens">
-            {TEMPLATE_NAMES.map((name) => (
-              <code className="mkt__seed-chip" key={name}>{name}</code>
-            ))}
-          </div>
         </div>
       </section>
       <MktFooter navigate={navigate} />
