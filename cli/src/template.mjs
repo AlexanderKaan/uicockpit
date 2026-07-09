@@ -1,13 +1,15 @@
 /**
- * `uicockpit template [name]` — pull a ship-ready page template into the project.
+ * `uicockpit template [name]` — seed a starting screen into the project: a whole
+ * screen already wearing your kit, for your agent to extend under `check`. Not a
+ * finished page to ship as-is — a starting point you build on.
  *
- * Templates are PREBUILT static HTML on uicockpit.com (/templates/<name>.html):
+ * Screens are PREBUILT static HTML on uicockpit.com (/templates/<name>.html):
  * the markup is identical for every kit — the whole design lives in the kit CSS
- * the template's <link> pulls in. So this command is a fetch + one rewrite: it
+ * the file's <link> pulls in. So this command is a fetch + one rewrite: it
  * swaps the default-kit href for YOUR kit (the hash in uicockpit.json, or
  * --kit=<hash>), keyed on the `data-uicockpit-kit` attribute.
  *
- *   npx uicockpit template                  list available templates
+ *   npx uicockpit template                  list the starting screens
  *   npx uicockpit template invoices         write invoices.html wearing your kit
  *   npx uicockpit template home --kit=<h>   explicit kit hash
  */
@@ -64,7 +66,7 @@ export async function runTemplate(argv) {
       console.error(`✗ ${err.message}`)
       return 2
     }
-    console.log('Available templates (ship-ready pages, built purely from your kit):\n')
+    console.log('Starting screens (built purely from your kit — a seed your agent extends under check):\n')
     for (const t of idx.templates) console.log(`  ${t.name.padEnd(12)} ${t.title} — ${t.blurb.split('—')[1]?.trim() ?? t.blurb}`)
     console.log('\nUsage:  npx uicockpit template <name>   (add --force to overwrite)')
     return 0

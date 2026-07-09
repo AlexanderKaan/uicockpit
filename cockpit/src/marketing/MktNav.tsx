@@ -20,7 +20,7 @@ interface MktNavProps {
   /** Client-side navigate (App's pushState router). */
   navigate: (to: string) => void
   /** Which page we're on — drives aria-current on the matching destination. */
-  current?: 'manifesto' | 'docs' | 'showcases' | 'components' | 'styles' | 'templates'
+  current?: 'manifesto' | 'docs' | 'showcases' | 'components' | 'styles'
 }
 
 /**
@@ -54,7 +54,6 @@ export function MktNav({ navigate, current }: MktNavProps) {
         <nav className="mkt__nav-links">
           <a href="/components" className="mkt__nav-link" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
           <a href="/styles" className="mkt__nav-link" {...ariaCurrent('styles')} onClick={(e) => go(e, '/styles')}>Styles</a>
-          <a href="/templates" className="mkt__nav-link" {...ariaCurrent('templates')} onClick={(e) => go(e, '/templates')}>Templates</a>
           <a href="/showcases" className="mkt__nav-link" {...ariaCurrent('showcases')} onClick={(e) => go(e, '/showcases')}>Showcases</a>
           <a href="/docs" className="mkt__nav-link" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
         </nav>

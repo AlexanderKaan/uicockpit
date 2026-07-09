@@ -23,7 +23,6 @@ import { MarketingPage } from '../src/marketing/MarketingPage'
 import { MarketingManifesto } from '../src/marketing/MarketingManifesto'
 import { SeoPage } from '../src/marketing/SeoPage'
 import { StylesPage } from '../src/marketing/StylesPage'
-import { TemplatesPage } from '../src/marketing/TemplatesPage'
 import { ComponentsIndexPage, ComponentDetailPage } from '../src/marketing/ComponentDocs'
 import { COMPONENT_PAGES } from '../src/stage/views/ComponentGallery'
 import { SEO_ENTRIES, pathFor, type SeoEntry } from '../src/marketing/seo/seoData'
@@ -126,13 +125,6 @@ write('/styles', renderPage({
   description: 'Seven named style kits — Linear-crisp, Vercel-mono, Stripe-refined and more. Each opens the configurator as a starting point you tune, not a fixed theme you settle for.',
 }))
 
-write('/templates', renderPage({
-  path: '/templates',
-  markup: renderToStaticMarkup(<TemplatesPage navigate={noop} />),
-  title: 'Templates — ship-ready pages that wear your kit — UIcockpit',
-  description: 'Whole screens — dashboard, tables, settings, an AI chat — as plain HTML built from the kit. One command (npx uicockpit template <name>) drops any of them into your project wearing your kit.',
-}))
-
 const entries: SeoEntry[] = SEO_ENTRIES
 for (const entry of entries) {
   write(pathFor(entry), renderPage({
@@ -149,7 +141,6 @@ const staticRoutes: Array<{ loc: string; freq: string; pri: string }> = [
   { loc: '/', freq: 'weekly', pri: '1.0' },
   { loc: '/components', freq: 'weekly', pri: '0.9' },
   { loc: '/styles', freq: 'monthly', pri: '0.8' },
-  { loc: '/templates', freq: 'monthly', pri: '0.8' },
   { loc: '/showcases', freq: 'monthly', pri: '0.8' },
   { loc: '/docs', freq: 'monthly', pri: '0.8' },
   { loc: '/manifesto', freq: 'monthly', pri: '0.6' },

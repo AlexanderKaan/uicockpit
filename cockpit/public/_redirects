@@ -9,4 +9,10 @@
 # Specific rule sits ABOVE the catch-all so it wins (first match).
 /uses/astryx-theme-generator   /uses/design-system-generator   301
 
+# Retired /templates marketing page — folded into /showcases ("seed a starting
+# screen"). EXACT match only, so the CLI's static /templates/<name>.html files +
+# /templates/index.json still serve directly (a /templates/* wildcard would eat them).
+/templates            /showcases   301
+/templates/preview/*  /showcases   301
+
 /*    /index.html   200

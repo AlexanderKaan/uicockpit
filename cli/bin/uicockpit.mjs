@@ -26,8 +26,9 @@ Usage:
       Exit 0 = conforms · 1 = violations · 2 = setup error. --strict fails on warnings.
 
   npx uicockpit template [name] [--kit=<hash>] [--force]
-      Ship-ready page templates (dashboard, invoices, settings, AI chat, …)
-      as plain HTML wearing YOUR kit. No name = list what's available.
+      Seed a starting screen (dashboard, invoices, settings, AI chat, …) as plain
+      HTML already wearing YOUR kit — a starting point your agent extends under
+      check, not a finished page. No name = list the starting screens.
 
   npx uicockpit help | --version
 
