@@ -153,7 +153,13 @@ const CARD_KEYWORDS: Record<string, string> = {
 const searchText = (C: () => ReactElement) =>
   (labelOf(C) + ' ' + (CARD_KEYWORDS[C.name] ?? '')).toLowerCase()
 
-export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'component' | 'section' | 'page' } = {}) {
+// `tier`:
+//   'all'     → the flat, searchable overview (atoms + components + sections in one
+//               wall) — the configurator's single Components view (the shadcn model).
+//   'atom' | 'component' | 'section' | 'page' → a single-tier wall (still used by the
+//               public /components slugs + kept available; the in-app 4-way toggle is
+//               retired). undefined → the marketing bouquet (all cards, no search, limit-sliced).
+export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom' | 'component' | 'section' | 'page' | 'all' } = {}) {
   // Order strategy: highest brand-impact first, token-neutral utilities last.
   // Users should SEE the result of every token change without scrolling.
   const galleryRef = useRef<HTMLDivElement>(null)
@@ -238,7 +244,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
     [AttachmentChipCard, 'atom'], [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], [AspectRatioCard, 'atom'], [ScrollAreaCard, 'atom'],
   ]
-  const filtered = tier ? CARDS.filter(([, t]) => t === tier) : CARDS
+  const filtered = tier && tier !== 'all' ? CARDS.filter(([, t]) => t === tier) : CARDS
   const shown = limit ? filtered.slice(0, limit) : filtered
 
   // The Atoms view groups the bare atoms into bordered CATEGORY cards (like the
@@ -320,9 +326,11 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     )
   }
 
-  // COMPONENTS view (tier='component') — filterable. The no-tier marketing bouquet
-  // path never reaches the search wrap (it renders the bare interleaved wall below).
-  if (tier === 'component' || tier === 'section') {
+  // COMPONENTS view — filterable. `'all'` is the flat overview (atoms + components +
+  // sections in one searchable wall, the shadcn model); 'component'/'section' are the
+  // single-tier walls. The no-tier marketing bouquet path never reaches the search
+  // wrap (it renders the bare interleaved wall below).
+  if (tier === 'component' || tier === 'section' || tier === 'all') {
     const components = shown.filter(([C]) => matchesQ(C))
     return (
       <div className="gallerywrap">
