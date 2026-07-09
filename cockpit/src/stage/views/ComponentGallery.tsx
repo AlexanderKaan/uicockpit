@@ -174,22 +174,32 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
       // its height + VGAP trailing rows, so every vertical gap is EXACTLY VGAP
       // with no quantisation drift. VGAP = the column gutter, so H and V match.
       const VGAP = parseFloat(gs.columnGap) || 40
-      for (const el of cards) {
-        el.style.gridRowEnd = 'auto'
-        const h = el.getBoundingClientRect().height
-        el.style.gridRowEnd = `span ${Math.max(1, Math.ceil((h + VGAP) / ROW))}`
-      }
+      // BATCH the reads and writes: reset all spans, then read all heights, then
+      // write all spans. The old code interleaved write→read PER card, forcing one
+      // synchronous reflow for every one of ~116 cards — so a knob change that
+      // resized the cards (e.g. Text size) froze the phone for seconds. This does
+      // ~2 reflows total instead of ~116.
+      for (const el of cards) el.style.gridRowEnd = 'auto'
+      const spans = cards.map((el) => Math.max(1, Math.ceil((el.getBoundingClientRect().height + VGAP) / ROW)))
+      cards.forEach((el, i) => { el.style.gridRowEnd = `span ${spans[i]}` })
       const positions = cards.map((el) => ({ el, top: el.offsetTop, left: el.offsetLeft }))
       positions.sort((a, b) => (Math.abs(a.top - b.top) > 8 ? a.top - b.top : a.left - b.left))
       positions.forEach((p, i) => p.el.style.setProperty('--card-i', String(i)))
     }
+    // Coalesce bursts into ONE pass per frame. All ~116 per-card observers fire
+    // together when a token change resizes the cards; without this each firing ran
+    // the full O(n) layout — the multi-second freeze on configure. rAF-debounced,
+    // the whole burst becomes a single layout() on the next frame.
+    let raf = 0
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; layout() }) }
     layout()
-    const ro = new ResizeObserver(layout)
+    const ro = new ResizeObserver(schedule)
     cards.forEach((c) => ro.observe(c))
-    window.addEventListener('resize', layout)
+    window.addEventListener('resize', schedule)
     return () => {
+      if (raf) cancelAnimationFrame(raf)
       ro.disconnect()
-      window.removeEventListener('resize', layout)
+      window.removeEventListener('resize', schedule)
     }
   }, [q, tier]) // re-measure when the search filter changes the visible card set
 
