@@ -10,7 +10,7 @@
  *  HARD (fail the build):
  *   1. Every role used in CONTRACT exists in ROLE_GUARANTEE (no orphan/typo roles).
  *   2. Every role in ROLE_GUARANTEE is in the Role union type (and vice-versa).
- *   3. Every CONTRACT component-type resolves via componentAt() (∈ CLASS_MAP ids) —
+ *   3. Every CONTRACT component-type is a CLASS_MAP id (a pickable type) —
  *      a contract for a type the loupe can't reach is dead.
  *   4. Every PICKABLE type (CLASS_MAP id) has a CONTRACT entry — coverage: if the
  *      loupe can zoom into it, it must declare its roles.
@@ -55,7 +55,7 @@ const ROLES_USED = [...new Set([...contractBlock.matchAll(/role:\s*'([a-z-]+)'/g
 
 // --- parse CLASS_MAP ids (the pickable types) ------------------------------
 const cmStart = components.indexOf('const CLASS_MAP')
-const cmBlock = components.slice(cmStart, components.indexOf('export function componentAt', cmStart))
+const cmBlock = components.slice(cmStart, components.indexOf('// end CLASS_MAP', cmStart))
 const PICKABLE = [...new Set([...cmBlock.matchAll(/\[\s*'[a-z][\w-]*'\s*,\s*'([a-z][a-z-]*)'\s*\]/g)].map((m) => m[1]))]
 
 // --- which role guarantees are actually enforced by an existing audit -------

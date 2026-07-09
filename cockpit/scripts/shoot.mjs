@@ -70,11 +70,11 @@ if (scrollText) {
   } catch (e) { console.error('scroll failed:', e.message) }
 }
 
-// Optional 7th arg: click a SupaDash sidebar nav item by text (Pages view).
+// Optional 7th arg: click a sidebar nav item by text (Pages view).
 const appNav = process.argv[8]
 if (appNav) {
   try {
-    await page.locator('.dash__nav, .sidenav, nav').getByText(new RegExp(`^${appNav}$`, 'i')).first().click()
+    await page.locator('.sidenav, nav').getByText(new RegExp(`^${appNav}$`, 'i')).first().click()
     await page.waitForTimeout(600)
   } catch (e) { console.error('appNav failed:', e.message) }
 }

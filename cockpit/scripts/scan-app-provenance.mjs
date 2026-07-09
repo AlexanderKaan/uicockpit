@@ -8,11 +8,11 @@
  * allow-list of preview-HARNESS classes (the demo super-app shell, the viewport
  * frame, the configurator's own demo-card chrome) that no real consumer needs.
  *
- * Why the allow-list is EXPLICIT (and `dash__*` is class-level, not a prefix):
- * being merely defined in `preview-only.css` is NOT enough. That file is the
- * preview's escape hatch; a kit-worthy component authored there (e.g. a richer
- * sidebar under `.dash__nav`) would ship NOTHING to a CDN consumer while quietly
- * diverging from its gallery twin. Freezing the harness surface here means any
+ * Why the allow-list is EXPLICIT (class-level, not a broad prefix): being merely
+ * defined in `preview-only.css` is NOT enough. That file is the preview's escape
+ * hatch; a kit-worthy component authored there (e.g. a richer sidebar) would ship
+ * NOTHING to a CDN consumer while quietly diverging from its gallery twin.
+ * Freezing the harness surface here means any
  * NEW preview-only class the app reaches for fails the build until someone makes
  * the call: promote it to the kit (it ships), or bless it as harness (it doesn't).
  *
@@ -42,16 +42,11 @@ const APP_FILES = ['src/showcases/sections.tsx']
 /* PREVIEW-HARNESS allow-list — classes the app may use that are NOT shipped.
  * Keep tight + documented. Two forms:
  *   EXACT      — the exact class is allowed, nothing else under that root. Used
- *                for the `dash*` app-shell so a kit-worthy `.dash__nav`-style
- *                addition is NOT silently waved through.
+ *                for the `form-measure` utility so a kit-worthy sibling authored
+ *                under the same root is NOT silently waved through.
  *   PREFIXES   — any sub-part is allowed. Only for unambiguous demo-viewport
  *                shells (mobile frame, view-transition) that aren't components. */
 const HARNESS_EXACT = new Set([
-  // SupaDash super-app shell — page layout, not a shippable component.
-  'dash', 'dash--rail', 'dash__main', 'dash__head', 'dash__page', 'dash__stats',
-  'dash__navquick', 'dash__navquick-kbd',
-  // B★7 — the Home bento grid (page layout, not a shippable component).
-  'dash__bento', 'dash__hero',
   // Form width constraint utility (caps a form to a readable measure).
   'form-measure', 'form-measure--center',
 ])
@@ -60,8 +55,9 @@ const HARNESS_PREFIXES = ['app-frame', 'view-transition']
 const UTILITY_OK = new Set(['cockpit-preview', 'sr-only', 'visually-hidden'])
 /* Single-word ROOTS the app may render whose base rule legitimately lives in
  * preview-only.css (the demo shell), not the kit. Keep this tiny — every entry
- * is a component that a CDN consumer does NOT receive. */
-const SINGLE_HARNESS = new Set(['dash'])
+ * is a component that a CDN consumer does NOT receive. Currently empty (the
+ * SupaDash `dash` shell was retired). */
+const SINGLE_HARNESS = new Set()
 
 // Full BEM class token (root[-…][__part][--mod]) at a className boundary.
 const DEF_RE = /\.((?:[a-z][a-z0-9]*)(?:-[a-z0-9]+)*(?:__[a-z0-9-]+)?(?:--[a-z0-9-]+)?)/g
