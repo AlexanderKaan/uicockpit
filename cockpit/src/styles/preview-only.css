@@ -2,9 +2,9 @@
  *
  * Everything here is live-preview scaffolding that must NOT ship to a CDN
  * consumer: the global-layer top (kept here until Phase 2b folds it into
- * src/kit/globalLayer.ts), the component-gallery masonry, the SupaDash app
- * (dashboard) chrome, configurator panel chrome, and dead-vertical CSS left
- * after the app-cull. The exportable component recipes live in
+ * src/kit/globalLayer.ts), the component-gallery masonry, configurator panel
+ * chrome, and dead-vertical CSS left after the app-cull. The exportable
+ * component recipes live in
  * src/kit/recipes/index.ts and are injected into the preview by src/main.tsx.
  *
  * Generated once by scripts/extract-kit.mjs from preview.css; hand-maintained
@@ -210,129 +210,6 @@
   box-shadow: var(--k-shadow-md);
 }
 
-/* === Dashboard === */
-.dash {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  height: 100%;
-  min-height: 540px;
-  gap: 0;
-}
-/* Phone: the fixed 200px/64px sidebar makes the 6 screens unusable, so collapse
- * to a single content column and drop the nav (the demo's value on a phone is the
- * screen content, not deep nav). Preview-only — never ships to a CDN consumer. */
-@media (max-width: 640px) {
-  .dash, .dash--rail { grid-template-columns: 1fr; }
-  .dash__nav { display: none; }
-}
-/* The app-shell SIDEBAR itself is the exportable `.sidenav` kit recipe (brand
- * header, chrome-mode background, pinned footer, and the collapsed icon-rail —
- * see "Sidebar" in src/kit/recipes). The app dogfoods it: `.dash__nav` was
- * retired in favour of `.sidenav`. What stays HERE is purely app-LAYOUT glue:
- * the two-column grid and the bespoke ⌘K launcher in the footer. */
-/* Footer command launcher — a SupaDash-specific quick-action button (not a nav
- * destination, so not a .navrow). */
-.dash__navquick {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-8);
-  padding: var(--k-s-8) var(--k-s-10);
-  border: 0;
-  border-radius: var(--k-radius-md);
-  background: transparent;
-  color: var(--k-fg-faint);
-  font-size: var(--k-type-body);
-  font-family: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-.dash__navquick:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.dash__navquick-kbd { font-size: var(--k-type-caption); }
-
-/* ---- Rail (collapsed) mode -------------------------------------------------
- * The icon-only sidebar behaviour (labels/groups/sub-lists collapse, tooltips,
- * badge→dot) is owned by `.sidenav--rail` in the kit. Here we only narrow the
- * app GRID column and collapse the bespoke ⌘K launcher to a centered glyph. */
-.dash--rail { grid-template-columns: 64px 1fr; }
-.dash--rail .dash__navquick-kbd { display: none; }
-.dash--rail .dash__navquick {
-  justify-content: center;
-  gap: 0;
-  padding: var(--k-s-8) 0;
-  position: relative;
-}
-/* Quick-actions shows a ⌘ glyph in place of its ⌘K chip when collapsed. */
-.dash--rail .dash__navquick::before {
-  content: '⌘';
-  font-size: var(--k-type-body);
-  line-height: 1;
-}
-/* Hover tooltip — flies out to the right of the rail. */
-.dash--rail .dash__navquick[data-tip]::after {
-  content: attr(data-tip);
-  position: absolute;
-  left: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%) translateX(-4px);
-  background: var(--k-fg);
-  color: var(--k-bg);
-  padding: var(--k-s-4) var(--k-s-8);
-  border-radius: var(--k-radius-sm, 6px);
-  font-size: var(--k-type-small);
-  font-weight: 500;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  box-shadow: var(--k-shadow-md);
-  transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease),
-              transform var(--k-dur-fast, 140ms) var(--k-ease, ease);
-  z-index: var(--k-z-tooltip);
-}
-.dash--rail .dash__navquick[data-tip]:hover::after {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
-}
-@media (prefers-reduced-motion: reduce) {
-  .dash--rail .dash__navquick[data-tip]::after { transition: none; }
-}
-.dash__main {
-  padding: calc(var(--k-space, 20px) * 1.1) calc(var(--k-space, 20px) * 1.3);
-  overflow: auto;
-  min-width: 0;
-}
-.dash__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--k-s-16); }
-.dash__stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--k-s-12);
-  margin-bottom: var(--k-s-20);
-}
-@media (max-width: 900px) { .dash__stats { grid-template-columns: repeat(2, 1fr); } }
-/* App KPI tiles use the unified .stat-tile recipe (single source of truth —
- * see the "stat-tile" block below). .dash__stats is just the 4-col grid
- * wrapper that holds them. */
-
-/* === Home bento (B★7) — a weighted dashboard grid with ONE focal point.
- * 4 cols: the revenue hero spans 2×2 (the focal card with a live area chart),
- * the four KPI tiles fill the right 2×2, then usage/storage and activity/alert
- * pair off below. Replaces the old vertical stack of full-width strips —
- * hierarchy now comes from SIZE, not from stacking. Container-query collapses to
- * 2 cols (hero full-width) on a narrow stage. Gaps tokenized (--k-space). */
-.dash__bento {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--k-space);
-  margin-bottom: var(--k-s-24);
-  align-items: stretch;
-  container-type: inline-size;
-}
-.dash__bento > * { min-width: 0; margin: 0; }
-.dash__hero { justify-content: space-between; gap: var(--k-s-12); }
-@container (max-width: 680px) {
-  .dash__bento { grid-template-columns: repeat(2, 1fr); }
-  .dash__hero { grid-column: span 2 !important; grid-row: auto !important; }
-}
-
 /* The .activity feed itself is the exportable "Activity feed" kit recipe (see
  * src/kit/recipes). Only its card-enter intro stagger (--card-i below) stays
  * preview-only — that's demo animation, not part of the shipped component. */
@@ -439,32 +316,6 @@
    index row-major (left→right, top→bottom). Without JS the fallback 0
    makes all cards animate at once, which still looks fine — just no curtain. */
 
-/* Universal page-open roll-down. Every dashboard / app-vertical page cascades
-   its TOP-LEVEL blocks into place (breadcrumb → header → each content block) —
-   the same premium "afrol" the Overview had, now consistent on every screen
-   regardless of whether the page is built from cards, a table, a list or a
-   two-pane layout. It re-plays on each page switch (the .dash__main content
-   re-mounts), landing right after the skeleton.
-
-   Direct children only. This rule sits LATER in source than the generic
-   `.card` entrance, so for a card that's a direct page child it wins (one
-   motion, no double-animate); nested cards simply ride their rolling
-   container. Reuses card-fade + card-rise so the curve matches the original.
-   Stagger collapses to instant under prefers-reduced-motion (global guard). */
-.dash__main > *,
-.dash__page > * {
-  animation:
-    card-fade 300ms cubic-bezier(.2, 0, .2, 1) backwards,
-    card-rise 540ms cubic-bezier(.16, 1, .3, 1) backwards;
-}
-.dash__main > *:nth-child(1), .dash__page > *:nth-child(1) { animation-delay: 0ms; }
-.dash__main > *:nth-child(2), .dash__page > *:nth-child(2) { animation-delay: 46ms; }
-.dash__main > *:nth-child(3), .dash__page > *:nth-child(3) { animation-delay: 92ms; }
-.dash__main > *:nth-child(4), .dash__page > *:nth-child(4) { animation-delay: 138ms; }
-.dash__main > *:nth-child(5), .dash__page > *:nth-child(5) { animation-delay: 184ms; }
-.dash__main > *:nth-child(6), .dash__page > *:nth-child(6) { animation-delay: 230ms; }
-/* Cap so long pages don't drag — everything past the 7th lands together. */
-.dash__main > *:nth-child(n+7), .dash__page > *:nth-child(n+7) { animation-delay: 270ms; }
 @keyframes activity-rise {
   from { transform: translateY(8px); }
   to   { transform: translateY(0); }
