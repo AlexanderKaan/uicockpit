@@ -47,6 +47,13 @@ const ARCH_LABEL: Record<string, string> = {
   workspace: 'Workspace',
 }
 
+/* The design width a drilled showcase keeps on a phone. We DON'T reflow the screen
+ * to mobile (these are deliberately desktop product screens — that's a separate,
+ * much larger job); instead we hold the true desktop layout and scale the whole
+ * thing down to the phone width (zoom), the same "see the composition, themed by
+ * your kit" idea as the wall miniatures. Matches the wall's 1200px render. */
+const MOBILE_SHELL_W = 1200
+
 /**
  * Pages — the loupe (H3b manifest model · Fase J).
  *
@@ -78,6 +85,31 @@ export interface AppNav {
 function ShowcaseStage({ m, appNav, width, onWidth }: { m: ShowcaseManifest; appNav?: AppNav; width: number; onWidth: (w: number) => void }) {
   // Width is OWNED by the parent (the one app) so it PERSISTS across screen switches.
   const setWidth = onWidth
+  // Phone drill: a 1200px desktop screen can't be read on a phone, and a horizontal-
+  // scroll sliver (the old behaviour) is worse. So on phones we hold the true desktop
+  // layout (MOBILE_SHELL_W) and scale the WHOLE screen to the measured stage width via
+  // `zoom` — you see the composition + colours, themed by your kit; a hint points at
+  // rotate/desktop for detail. The width slider is a desktop tool, so it's hidden here.
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const [fit, setFit] = useState(1) // 1 = desktop, no scaling
+  const [isMobile, setIsMobile] = useState(false)
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(max-width: 768px)')
+    const el = bodyRef.current
+    const measure = () => {
+      const mobile = mq.matches
+      setIsMobile(mobile)
+      const avail = el?.clientWidth ?? 0
+      setFit(mobile && avail > 0 ? Math.min(1, avail / MOBILE_SHELL_W) : 1)
+    }
+    measure()
+    mq.addEventListener('change', measure)
+    const ro = el && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
+    if (el) ro?.observe(el)
+    return () => { mq.removeEventListener('change', measure); ro?.disconnect() }
+  }, [])
+  const effWidth = isMobile ? MOBILE_SHELL_W : width
   // Fase J-9 — the showcase is a REAL, interactive app: the sidebar switches screens,
   // invoice rows open the detail, menus open. Inspecting a component's contract lives
   // in the Components tab now, so the two concerns never fight — no in-app drill or
@@ -94,37 +126,46 @@ function ShowcaseStage({ m, appNav, width, onWidth }: { m: ShowcaseManifest; app
           component's contract over in the Components tab. */}
       <p className="shc__caption">{caption}</p>
 
-      {/* The stage — the live, interactive app, centred on the canvas. */}
-      <div className="lyt__stage shc__loupebody">
+      {/* The stage — the live, interactive app, centred on the canvas. On phones the
+          `zoom` scales the whole desktop screen to fit (see the scale logic above). */}
+      <div className="lyt__stage shc__loupebody" ref={bodyRef}>
         <div className="shc__loupestage">
-          <div className="shc__previewwrap">
-            <ShowcaseShell m={m} width={width} appNav={appNav} />
+          <div className="shc__previewwrap" style={isMobile ? { zoom: fit } : undefined}>
+            <ShowcaseShell m={m} width={effWidth} appNav={appNav} />
           </div>
         </div>
       </div>
 
-      {/* The dock — a slim bottom toolbar with the width scrubber. Sized (same width
-       * clamp as the app shell) + left-aligned to match the app preview above it, so
-       * the two read as one aligned block at every width. */}
-      <div className="shc__dock" style={{ width, maxWidth: '100%' }}>
-        <div className="lyt__scrub shc__dock-scrub">
-          <span className="lyt__scrub-label">Width</span>
-          {/* Dogfood: the kit's OWN slider (InteractiveSlider → the exported `.slider`
-           * recipe), not a bespoke native range. Fixed track width + a fixed-width
-           * value column: the label text changes length across breakpoints
-           * (Compact→Medium, 3→4 digits), and a flex track would resize under the
-           * thumb on every change — that was the jitter. Fixed width = stable. */}
-          <InteractiveSlider
-            value={width}
-            min={360}
-            max={1680}
-            width={220}
-            onChange={(v) => setWidth(Math.round(v / 10) * 10)}
-            ariaLabel="Shell width in pixels"
-          />
-          <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong>{navState && <> · {navState}</>}</span>
+      {isMobile ? (
+        // Phones: no width slider (a desktop tool); an honest note that this is a
+        // desktop screen scaled to fit, with the way to see it at full size.
+        <p className="shc__mobilehint">
+          Desktop screen, scaled to fit — rotate your phone or open on a larger screen for full detail.
+        </p>
+      ) : (
+        /* The dock — a slim bottom toolbar with the width scrubber. Sized (same width
+         * clamp as the app shell) + left-aligned to match the app preview above it, so
+         * the two read as one aligned block at every width. */
+        <div className="shc__dock" style={{ width, maxWidth: '100%' }}>
+          <div className="lyt__scrub shc__dock-scrub">
+            <span className="lyt__scrub-label">Width</span>
+            {/* Dogfood: the kit's OWN slider (InteractiveSlider → the exported `.slider`
+             * recipe), not a bespoke native range. Fixed track width + a fixed-width
+             * value column: the label text changes length across breakpoints
+             * (Compact→Medium, 3→4 digits), and a flex track would resize under the
+             * thumb on every change — that was the jitter. Fixed width = stable. */}
+            <InteractiveSlider
+              value={width}
+              min={360}
+              max={1680}
+              width={220}
+              onChange={(v) => setWidth(Math.round(v / 10) * 10)}
+              ariaLabel="Shell width in pixels"
+            />
+            <span className="lyt__scrub-val">{width}px · <strong>{wc}</strong>{navState && <> · {navState}</>}</span>
+          </div>
         </div>
-      </div>
+      )}
     </>
   )
 }
@@ -343,7 +384,16 @@ function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => voi
   useLayoutEffect(() => {
     const el = gridRef.current
     if (!el || typeof ResizeObserver === 'undefined') return
-    const measure = () => { const w = el.clientWidth; if (w > 0) setTw(Math.floor((w - 24 * 2) / 3)) }
+    // Phones drop to a single, larger preview per row (a legible list of screens);
+    // wider viewports keep the 3-up wall. --tw = the live column px so the fixed
+    // 1200px miniature scales to exactly the column, whatever the column count.
+    const measure = () => {
+      const w = el.clientWidth
+      if (w <= 0) return
+      const cols = (typeof window !== 'undefined' && window.innerWidth < 560) ? 1 : 3
+      const GAP = 24 // --k-s-24, the 3-up gutter (unused at 1 col)
+      setTw(Math.floor((w - GAP * (cols - 1)) / cols))
+    }
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)

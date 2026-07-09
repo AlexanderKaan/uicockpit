@@ -797,6 +797,15 @@
 /* minmax(0,1fr): the scaled 1200px miniatures don't have their min-content blow
    out the column — the frame's overflow:hidden clips them to the fluid width. */
 .shc-wall__grid { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--k-s-24); }
+/* Phones: one larger preview per row — a legible, tappable list of screens rather
+   than a 3-up grid of ~100px thumbnails. (--tw is measured to match, in JS.) */
+@media (max-width: 560px) {
+  .shc-wall { padding-left: var(--k-s-12); padding-right: var(--k-s-12); }
+  /* minmax(0,1fr), NOT 1fr: a plain 1fr is minmax(auto,1fr), whose auto-min lets the
+     1200px miniature's min-content blow the column out to 1200 (scale → 1). The 0 min
+     lets the frame's overflow:hidden clip it to the fluid column instead. */
+  .shc-wall__grid { grid-template-columns: minmax(0, 1fr); gap: var(--k-s-16); }
+}
 .shc-wall__tile { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: var(--k-s-8); }
 .shc-wall__frame {
   width: 100%; aspect-ratio: 4 / 3; overflow: hidden;
@@ -1125,6 +1134,27 @@
 @media (max-width: 768px) {
   .shc__topsearch { width: auto; flex: 1 1 auto; min-width: 0; }
   .shc__dock-scrub { flex: 1 1 100%; }
+
+  /* --- Showcase drill: scale the whole desktop screen to fit the phone ----------
+   * These are deliberately DESKTOP product screens; we don't reflow them (a much
+   * larger job). Instead the screen keeps its true 1200px layout (max-width:none)
+   * and its wrapper is zoom-scaled to the measured stage width (set inline in
+   * ShowcaseStage). Trim the nested preview paddings so the scaled screen gets
+   * nearly the full phone width, and clip overflow so nothing scrolls sideways. */
+  .stage__body:has(.shc--app) { padding-left: var(--k-s-8); padding-right: var(--k-s-8); }
+  .cockpit-preview:has(.shc--app) { padding-left: var(--k-s-4); padding-right: var(--k-s-4); }
+  .shc--app { overflow-x: hidden; max-width: 100%; padding-left: var(--k-s-4); padding-right: var(--k-s-4); }
+  .shc--app .shc__loupebody { overflow: hidden; max-width: 100%; }
+  .shc--app .shc__previewwrap { display: block; width: max-content; margin-inline: auto; overflow: visible; }
+  .shc--app .shc__previewwrap .scaffold { max-width: none; }
+  /* The honest note under the scaled screen (replaces the width slider on phones). */
+  .shc__mobilehint {
+    margin: var(--k-s-10) auto 0;
+    max-width: 34ch;
+    text-align: center;
+    font-size: var(--k-type-caption);
+    color: var(--k-fg-faint);
+  }
 }
 
 /* The body — stage alone, or stage + a sticky inspector rail (Show/Hide recipe). */
