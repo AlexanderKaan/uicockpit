@@ -113,11 +113,6 @@ export type SectionSpec =
       rows: Array<{ vendor: string; logo: string; category: string; date: string; amount: string; status: string; tone: 'success' | 'warning' | 'danger' | 'info' }>
       footInfo: string
     } }
-  // KIT-COVERAGE-AUDIT — the page-assembly PROOF: each archetype is built purely
-  // by STACKING section recipes (page-head/section/entity-card) + component fillers
-  // (data-table/stat-strip/form/timeline/empty). Proves "you can build almost any
-  // page from the kit"; whatever can't assemble cleanly is the next section to add.
-  | { kind: 'proof'; seed: { archetype: 'list' | 'detail' | 'dashboard' | 'settings' | 'feed' | 'empty'; label: string } }
 
 export interface PaneSpec {
   role: 'flex' | 'fixed' | 'detail' | 'supporting'

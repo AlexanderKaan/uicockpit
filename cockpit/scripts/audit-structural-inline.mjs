@@ -34,7 +34,7 @@ const REPORT_ONLY = process.argv.slice(2).includes('--report')
 
 // The pinned count of structural-inline styles in the app surface. Lower this
 // (never raise it) as headers/regions adopt kit recipes. See RATCHET CONTRACT.
-const BASELINE = 32
+const BASELINE = 30
 
 const SRC = 'src/showcases/sections.tsx'
 

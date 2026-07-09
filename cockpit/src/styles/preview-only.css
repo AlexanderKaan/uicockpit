@@ -156,12 +156,6 @@
 /* Gallery search/filter (C5) — filters the Atoms/Blocks wall by component name.
    Lives inside .cockpit-preview, so it's themed live by the kit. */
 .gallerywrap { width: 100%; }
-/* Pages sub-wall — stack the full-bleed page templates with a real container
-   `gap` equal to the gallery gutter, so the inter-block spacing matches the
-   other sub-walls. (Container gap resolves --gallery-gap here on .pagestack —
-   not in scope, so the 40px fallback — unlike .l-stack's child-margin, which
-   would read each proof block's own --l-gap and collapse to ~10px.) */
-.pagestack { display: flex; flex-direction: column; gap: var(--gallery-gap, 40px); }
 /* Layout-only — the visual styling (filled bg, border, focus halo, hover, ghost
    clear) comes from the kit's own .searchinput recipe, which this element ALSO
    wears (class="searchinput gallery-search"), so the gallery filter dogfoods the
