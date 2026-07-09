@@ -97,17 +97,27 @@ function ShowcaseStage({ m, appNav, width, onWidth }: { m: ShowcaseManifest; app
     if (typeof window === 'undefined') return
     const mq = window.matchMedia('(max-width: 768px)')
     const el = bodyRef.current
+    let raf = 0
+    let tries = 0
     const measure = () => {
       const mobile = mq.matches
-      setIsMobile(mobile)
       const avail = el?.clientWidth ?? 0
+      // On a phone the stage can measure 0 for a frame or two at mount — the enter
+      // is a View Transition, so the element is a frozen snapshot with no layout
+      // box yet. Falling back to fit=1 there leaves the 1200px screen UNSCALED (a
+      // cropped top-left fragment — the drill "fit" bug). Retry next frame (capped)
+      // until it has a real width instead of locking to full size.
+      if (mobile && avail === 0 && tries < 60) { tries += 1; raf = requestAnimationFrame(measure); return }
+      setIsMobile(mobile)
       setFit(mobile && avail > 0 ? Math.min(1, avail / MOBILE_SHELL_W) : 1)
     }
     measure()
     mq.addEventListener('change', measure)
-    const ro = el && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
+    // The RO catches the real layout landing after the transition; reset the retry
+    // budget so a later 0→N width change is always re-measured to the right scale.
+    const ro = el && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => { tries = 0; measure() }) : null
     if (el) ro?.observe(el)
-    return () => { mq.removeEventListener('change', measure); ro?.disconnect() }
+    return () => { cancelAnimationFrame(raf); mq.removeEventListener('change', measure); ro?.disconnect() }
   }, [])
   const effWidth = isMobile ? MOBILE_SHELL_W : width
   // Fase J-9 — the showcase is a REAL, interactive app: the sidebar switches screens,
