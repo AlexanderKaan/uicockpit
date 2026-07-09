@@ -3,7 +3,7 @@
 // A component's CONTRACT lists which role each of its parts wears. This is the
 // data the loupe's contract card reads — and the truth a future audit/ENFORCE
 // rail will check. See ROLE-CANVAS.md for the thesis (role → treatment, on one
-// canvas; bind to ARIA states + data-slot). Keyed by componentAt() ids.
+// canvas; bind to ARIA states + data-slot). Keyed by CLASS_MAP ids.
 
 export type Role =
   | 'control' // interactive: a button, field, toggle, row-action
@@ -26,7 +26,7 @@ export const ROLE_GUARANTEE: Record<Role, string> = {
 export type Part = { part: string; role: Role }
 
 /** component-type → its parts and the role each part plays. The breadth mirrors
- *  what componentAt() can resolve (CLASS_MAP). */
+ *  what CLASS_MAP enumerates (the pickable types). */
 export const CONTRACT: Record<string, Part[]> = {
   button: [{ part: 'Button', role: 'control' }, { part: 'Label', role: 'text-slot' }],
   input: [{ part: 'Field', role: 'control' }, { part: 'Label', role: 'text-slot' }],
