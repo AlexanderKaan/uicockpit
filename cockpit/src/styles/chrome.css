@@ -236,6 +236,20 @@
   .topbar .view-toggle__btn { padding: 6px 10px; }
   .topbar .topbar__wordmark--full { display: none; }
 
+  /* Rebalance the phone topbar. The desktop 1fr/auto/1fr grid floats the view-
+     toggle dead-centre, which on a narrow screen leaves the brand marooned far
+     left with a dead gap and clusters the toggle against the right-hand actions
+     (the lopsided, cramped "rotzooi"). Switch to a flex row: brand + view-toggle
+     as one left group, the actions (dark-mode · Use kit) pushed to the right, so
+     the two bordered toggle-blobs are separated and the row reads balanced. */
+  /* `.topbar.topbar` (0,2,0) so this beats stage.css's base `.topbar { display:grid }`
+     (0,1,0) — chrome.css loads BEFORE stage.css, so an equal-specificity rule here
+     would lose on source order (same reason the rules above carry a `.topbar` prefix). */
+  .topbar.topbar { display: flex; align-items: center; }
+  .topbar .topbar__center { margin-right: auto; }
+  /* Harmonise heights so the view-toggle pill and the icon buttons line up. */
+  .topbar .view-toggle { height: var(--topbar-ctrl-h); align-items: center; }
+
   /* iOS HIG — comfortable touch targets on the phone sheet. The desktop panel is
      deliberately dense (built for pointer precision); on touch the interactive
      rows and the inline segmented options need a bigger, thumb-reliable hit area
