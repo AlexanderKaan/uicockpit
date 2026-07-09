@@ -182,6 +182,8 @@
     box-shadow: 0 -16px 44px -18px rgba(0, 0, 0, 0.34);
     transform: translateY(var(--sheet-ty, 100%));
     will-change: transform;
+    /* Clear the iPhone home-indicator so the last control row isn't under it. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .app__body .panel.panel--anim { transition: transform 0.32s cubic-bezier(0.22, 0.72, 0.2, 1); }
 

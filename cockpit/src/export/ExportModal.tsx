@@ -242,6 +242,38 @@ export function ExportModal({ cfg, onClose, onToast }: ExportModalProps) {
           </button>
         </div>
         <div className="modal__split">
+          {/* Phones: the vertical rail can't stack 13 tools without a long
+              horizontal scroll (tools 5–13 hide off-screen). A native select with
+              optgroups puts every destination one tap away, grouped, in the OS
+              picker. CSS shows this on ≤720px and the rail on desktop. */}
+          <label className="modal__navselect-wrap">
+            <span className="modal__navselect-label">Destination</span>
+            <select
+              className="modal__navselect"
+              value={view}
+              onChange={(e) => setView(e.target.value as View)}
+              aria-label="Pick your tool"
+            >
+              <option value="overview">In this kit</option>
+              <option value="link">Kit URL</option>
+              <optgroup label="Web builders">
+                {TOOLS.filter((t) => t.track === 'web').map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Coding agents">
+                <option value="cli">CLI + MCP</option>
+                {TOOLS.filter((t) => t.track === 'agent').map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Plain files">
+                {FORMATS.map((f) => (
+                  <option key={f.id} value={f.id}>{f.label}</option>
+                ))}
+              </optgroup>
+            </select>
+          </label>
           <nav className="modal__nav" role="tablist" aria-label="Pick your tool">
             <NavBtn id="overview" label="In this kit" hint="Settings · a11y · outputs" icon={<Package size={15} strokeWidth={1.75} />} view={view} onView={setView} />
             <NavBtn id="link" label="Kit URL" hint="One link — live, no install" icon={<Link2 size={15} strokeWidth={1.75} />} view={view} onView={setView} />

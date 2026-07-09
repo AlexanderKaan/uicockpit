@@ -432,33 +432,51 @@
   font-weight: 500;
 }
 
+/* The select only exists on phones; the vertical rail is the desktop control.
+   (Base rule BEFORE the media query so the ≤720px display:flex override wins —
+   media queries don't add specificity, so source order decides.) */
+.modal__navselect-wrap { display: none; }
+
 @media (max-width: 720px) {
   .export-ov__choices,
   .export-ov__a11y-grid { grid-template-columns: 1fr; }
 
   /* Use-kit modal — on a phone the 240px rail + pane crushes the content to a
-   * sliver. Stack it: the tool rail becomes a horizontal chip scroller on top,
-   * the picked tool's steps fill the space below. */
+   * sliver, and a horizontal chip strip hides tools 5–13 off-screen. Replace the
+   * rail with a native <select> (grouped, every destination one tap away in the OS
+   * picker); the picked tool's pane fills the space below. */
   .modal-overlay { padding: 12px; }
   .modal__split {
     grid-template-columns: 1fr;
     grid-template-rows: auto minmax(0, 1fr);
   }
-  .modal__nav {
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    border-right: 0;
+  .modal__nav { display: none; }
+  .modal__navselect-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px 14px;
     border-bottom: 1px solid var(--app-border);
-    padding: 8px 10px;
   }
-  .modal__navgroup { display: none; } /* section headings off in the compact strip */
-  /* Chip = icon + label only, centred (the base flex-start top-aligns the icon to
-     the desktop two-line label+hint block; on the single-line chip that reads off). */
-  .modal__navitem { flex: none; padding: 8px 12px; align-items: center; justify-content: center; }
-  .modal__navitem-hint { display: none; }
+  .modal__navselect-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--app-fg-faint);
+  }
+  .modal__navselect {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--app-border);
+    border-radius: 9px;
+    background: var(--app-surface);
+    color: var(--app-fg);
+    font: inherit;
+    font-size: 16px; /* 16px avoids iOS zoom-on-focus; native chevron kept */
+    font-weight: 500;
+  }
 }
 
 /* ============================================================================

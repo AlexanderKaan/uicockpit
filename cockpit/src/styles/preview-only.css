@@ -151,9 +151,13 @@
    math is untouched; only the outer padding changes.) */
 @media (max-width: 768px) {
   .cockpit-preview:has(.gallerywrap) { padding: var(--k-s-16); }
-  /* Fill the columns on phones + tablet-portrait instead of stranding one fixed
-     360px card in a wide space (the desktop wall keeps its fixed-width columns).
-     min 320 → a phone stays one full-width column; a ~680px tablet fits two. */
+}
+/* Fill the columns up through tablet + small-laptop widths instead of stranding one
+   fixed 360px card in a wide space. min 320 → a phone stays one full-width column, a
+   ~680px stage fits two, a ~1000px stage three. Above 1024 the desktop wall keeps its
+   fixed-width columns (more columns, not wider cards). The masonry span JS re-measures
+   on resize, so stretched card heights stay correct. */
+@media (max-width: 1024px) {
   .gallery { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
 }
 
@@ -1147,7 +1151,9 @@
    * and its wrapper is zoom-scaled to the measured stage width (set inline in
    * ShowcaseStage). Trim the nested preview paddings so the scaled screen gets
    * nearly the full phone width, and clip overflow so nothing scrolls sideways. */
-  .stage__body:has(.shc--app) { padding-left: var(--k-s-8); padding-right: var(--k-s-8); }
+  /* Vertically centre the scaled screen so it doesn't sit at the top with a big
+     empty band below it (the zoom-to-fit render is short on a phone). */
+  .stage__body:has(.shc--app) { padding-left: var(--k-s-8); padding-right: var(--k-s-8); align-content: center; }
   .cockpit-preview:has(.shc--app) { padding-left: var(--k-s-4); padding-right: var(--k-s-4); }
   .shc--app { overflow-x: hidden; max-width: 100%; padding-left: var(--k-s-4); padding-right: var(--k-s-4); }
   .shc--app .shc__loupebody { overflow: hidden; max-width: 100%; }
