@@ -85,11 +85,10 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
           </div>
           <h1>Ship AI apps that look designed, not generated.</h1>
           <p className="mkt__hero-sub">
-            UIcockpit is <strong>the design system generator for AI-built apps</strong>: dial in
-            your design language — colour, type, shape and motion — preview it live, and export it as{' '}
-            <strong>framework-neutral tokens + components</strong> you drop into any app and
-            keep tweaking behind one link. Then hand it to your AI, and a checker keeps every
-            new screen on it instead of drifting back to generic.
+            UIcockpit is <strong>the design system generator for AI-built apps</strong>. Dial in
+            your colour, type, shape and motion, preview it live, and export it as{' '}
+            <strong>framework-neutral tokens + components</strong> behind one link. Then hand it
+            to your AI — a checker keeps every new screen on it, instead of drifting back to generic.
           </p>
           <div className="mkt__hero-ctas">
             <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>

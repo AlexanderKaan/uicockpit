@@ -218,7 +218,10 @@
   .topbar .view-toggle__btn { padding: 6px 10px; }
   .topbar .topbar__wordmark--full { display: none; }
 }
-.topbar__wordmark--mark { display: none; }
+/* .topbar prefix (0,2,0) so this beats the base `.topbar__wordmark { display:block }`
+   in stage.css (0,1,0) regardless of file order — else the mark shows on desktop
+   too, doubling the logo. The ≤768 rule below (also 0,2,0) wins by coming later. */
+.topbar .topbar__wordmark--mark { display: none; }
 @media (max-width: 768px) {
   .topbar .topbar__wordmark--mark { display: block; }
 }
