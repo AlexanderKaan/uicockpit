@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { buildTokens } from './tokens/buildTokens'
 import { Panel } from './panel/Panel'
 import { Stage, type ViewKind } from './stage/Stage'
@@ -48,6 +48,89 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const [exportOpen, setExportOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+
+  // --- Mobile bottom-sheet controls ------------------------------------------
+  // On phones the panel is NOT a left drawer that hides the canvas — it's a
+  // non-modal bottom SHEET with two detents (half / full) that floats over the
+  // LIVE component wall, so tuning a knob restyles what you can see above it
+  // (the see-while-adjust loop the whole product is about). Drag the grabber to
+  // resize; drag down past half to dismiss. Desktop keeps the inline column and
+  // this all no-ops. See the field study (bottom-sheet is the token-editor norm).
+  const panelRef = useRef<HTMLElement>(null)
+  const gripRef = useRef<HTMLDivElement>(null)
+  const isPhone = () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+
+  // Animated dismiss so drag-down and the collapse button feel identical.
+  const closeMenu = useCallback(() => {
+    const p = panelRef.current
+    const reduce = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!p || !isPhone() || reduce) { setMenuOpen(false); return }
+    p.classList.add('panel--anim')
+    p.style.setProperty('--sheet-ty', p.offsetHeight + 'px')
+    window.setTimeout(() => setMenuOpen(false), 300)
+  }, [])
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const p = panelRef.current
+    const grip = gripRef.current
+    if (!p || !grip || !isPhone()) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    let halfTy = 0, closeTy = 0
+    const measure = () => {
+      const ph = p.offsetHeight
+      halfTy = Math.max(0, ph - Math.round(window.innerHeight * 0.48)) // ~48dvh visible
+      closeTy = ph
+    }
+    measure()
+
+    // Enter: start fully down (off-screen), then animate up to the half detent.
+    p.classList.remove('panel--anim')
+    p.style.setProperty('--sheet-ty', closeTy + 'px')
+    void p.offsetHeight // reflow so the next change transitions
+    requestAnimationFrame(() => {
+      p.classList.toggle('panel--anim', !reduce)
+      p.style.setProperty('--sheet-ty', halfTy + 'px')
+    })
+
+    const cur = () => parseFloat(getComputedStyle(p).getPropertyValue('--sheet-ty')) || 0
+    let dragging = false, startY = 0, startTy = 0, moved = 0
+    const down = (e: PointerEvent) => {
+      dragging = true; moved = 0; startY = e.clientY; startTy = cur()
+      p.classList.remove('panel--anim')
+      grip.setPointerCapture?.(e.pointerId)
+    }
+    const move = (e: PointerEvent) => {
+      if (!dragging) return
+      const dy = e.clientY - startY; moved = Math.max(moved, Math.abs(dy))
+      p.style.setProperty('--sheet-ty', Math.min(closeTy, Math.max(0, startTy + dy)) + 'px')
+      if (e.cancelable) e.preventDefault()
+    }
+    const up = () => {
+      if (!dragging) return
+      dragging = false
+      p.classList.toggle('panel--anim', !reduce)
+      const y = cur()
+      if (moved < 6) { // a tap on the grabber toggles full <-> half
+        p.style.setProperty('--sheet-ty', (y > halfTy / 2 ? 0 : halfTy) + 'px'); return
+      }
+      const dismissBelow = halfTy + Math.min(140, (closeTy - halfTy) * 0.5)
+      if (y > dismissBelow) { closeMenu(); return }
+      p.style.setProperty('--sheet-ty', (y < halfTy / 2 ? 0 : halfTy) + 'px') // snap full/half
+    }
+    grip.addEventListener('pointerdown', down)
+    window.addEventListener('pointermove', move, { passive: false })
+    window.addEventListener('pointerup', up)
+    const onResize = () => { measure(); if (!dragging) p.style.setProperty('--sheet-ty', halfTy + 'px') }
+    window.addEventListener('resize', onResize)
+    return () => {
+      grip.removeEventListener('pointerdown', down)
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [menuOpen, closeMenu])
 
   // Dogfood: the configurator chrome runs on UIcockpit's OWN default kit. We emit
   // the DEFAULT_CONFIG tokens (in the current light/dark mode) onto .app, and the
@@ -138,20 +221,18 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         canRedo={canRedo}
       />
       <div className="app__body">
-        {/* Mobile-only backdrop behind the drawer (display:none on desktop). */}
-        {menuOpen && (
-          <div className="app__scrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />
-        )}
         {menuOpen && (
           <Panel
             cfg={cfg}
             tokens={tokens}
             dispatch={dispatch}
-            onCollapse={() => setMenuOpen(false)}
+            onCollapse={closeMenu}
             onRandomize={onRandomize}
             onReset={onReset}
             lockedKeys={lockedKeys}
             onToggleLock={onToggleLock}
+            rootRef={panelRef}
+            gripRef={gripRef}
           />
         )}
         <Stage

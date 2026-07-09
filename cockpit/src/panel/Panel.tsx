@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type Dispatch, type ReactNode } from 'react'
+import { Fragment, useEffect, useState, type Dispatch, type ReactNode, type Ref } from 'react'
 import { Check, ChevronRight, Lock, LockOpen, PanelLeftClose, RotateCcw, Shuffle } from 'lucide-react'
 import { STYLE_KITS, activeKitId } from '../tokens/styleKits'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
@@ -30,6 +30,10 @@ interface PanelProps {
   /** Per-knob locks (by row key) — a pinned knob is skipped by Shuffle. */
   lockedKeys: Set<string>
   onToggleLock: (key: string) => void
+  /** Mobile bottom-sheet wiring (desktop leaves both undefined): a ref to the panel
+   *  root and to the drag grabber, so CockpitApp can run the detent drag. */
+  rootRef?: Ref<HTMLElement>
+  gripRef?: Ref<HTMLDivElement>
 }
 
 /* Option arrays — the single source for each control's choices + captions. */
@@ -201,7 +205,7 @@ interface RowDef {
 }
 
 
-export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset, lockedKeys, onToggleLock }: PanelProps) {
+export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset, lockedKeys, onToggleLock, rootRef, gripRef }: PanelProps) {
   // Already on the curated default? → dim the Reset button (nothing to undo to).
   const atDefault = (Object.keys(DEFAULT_CONFIG) as (keyof Config)[]).every((k) => cfg[k] === DEFAULT_CONFIG[k])
   const set = <K extends keyof Config>(field: K, value: Config[K]) =>
@@ -505,7 +509,12 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
   ]
 
   return (
-    <aside className="panel">
+    <aside className="panel" ref={rootRef}>
+      {/* Drag grabber — only shown on phones (CSS), where the panel is a bottom
+          sheet. Sticky-pinned to the sheet's top so it's always draggable. */}
+      <div className="panel__grip" ref={gripRef} role="button" tabIndex={-1} aria-label="Drag to resize controls">
+        <span className="panel__handle" />
+      </div>
       <div className="fmenu">
         <div className="fmenu__bar">
           <span className="fmenu__bar-title">Foundation</span>
