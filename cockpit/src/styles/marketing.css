@@ -774,6 +774,7 @@
   white-space: nowrap;
 }
 .mkt__theme-dot {
+  flex: 0 0 auto; /* never let the flex row squeeze a circle into an oval */
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -788,6 +789,13 @@
 .mkt__theme-dot:hover { transform: scale(1.14); }
 .mkt__theme-dot.is-on { outline-color: var(--mkt-fg); }
 @media (prefers-reduced-motion: reduce) { .mkt__theme-dot { transition: none; } }
+/* Phones: 7 non-shrinking dots + label would overrun the pill; tighten gaps and
+ * dot size so the whole row still fits within calc(100vw - 32px). */
+@media (max-width: 560px) {
+  .mkt__theme-switch { gap: 6px; padding-left: 14px; }
+  .mkt__theme-switch-label { font-size: 14px; margin-right: 2px; }
+  .mkt__theme-dot { width: 22px; height: 22px; }
+}
 
 /* === Sections ===
  *
