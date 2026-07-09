@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { ComponentGallery } from './ComponentGallery'
 
 /* Components — ONE flat, searchable overview (atoms + components + sections in a
@@ -13,10 +14,14 @@ import { ComponentGallery } from './ComponentGallery'
  *
  * Extracted from Stage.tsx (IA-2) so the PUBLIC /components catalog renders the exact
  * same audited gallery the configurator does — one source, no drift. */
-export function ComponentsView() {
+/* memo: the view takes no props and reads the kit only through CSS vars (on
+ * `.cockpit-preview`), so a knob change must NOT re-render its ~116 cards — that
+ * full-subtree re-render on every slider tick is what made mobile crawl. Icons
+ * still update through IconProvider context; everything else restyles via CSS. */
+export const ComponentsView = memo(function ComponentsView() {
   return (
     <div className="stagewrap">
       <ComponentGallery tier="all" />
     </div>
   )
-}
+})

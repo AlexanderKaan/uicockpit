@@ -174,8 +174,13 @@
     width: auto; max-width: none;
     height: 90dvh;
     z-index: 60;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    /* Flex column: a FIXED grabber header + a scrolling body + a pinned foot, so the
+       body scrolls cleanly UNDER the grabber. (A sticky grabber inside this scrolling,
+       transformed panel drops out of place on mobile Safari — content ran under it.)
+       The panel itself never scrolls; the .fmenu inside does. */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     background: var(--app-bg);
     border-radius: 18px 18px 0 0;
     border-top: 1px solid var(--app-border);
@@ -186,14 +191,15 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .app__body .panel.panel--anim { transition: transform 0.32s cubic-bezier(0.22, 0.72, 0.2, 1); }
+  /* The body scrolls; the grabber + foot don't. */
+  .app__body .panel > .fmenu { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .app__body .panel > .panel__foot { flex: 0 0 auto; }
 
-  /* Grabber — sticky at the sheet's top so it stays draggable as the body scrolls;
+  /* Grabber — a fixed header at the sheet's top (flex item, not sticky).
      touch-action:none so a vertical drag resizes the sheet instead of scrolling. */
   .panel__grip {
     display: block;
-    position: sticky;
-    top: 0;
-    z-index: 3;
+    flex: 0 0 auto;
     padding: 9px 0 7px;
     background: var(--app-bg);
     border-radius: 18px 18px 0 0;

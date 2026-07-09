@@ -1,4 +1,4 @@
-import { Fragment, useState, useRef, useLayoutEffect, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
+import { Fragment, memo, useState, useRef, useLayoutEffect, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
 import { flushSync } from 'react-dom'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
@@ -441,7 +441,10 @@ function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => voi
   )
 }
 
-export function PagesView() {
+// memo: reads the kit only via CSS vars, so a knob change must NOT re-render the
+// wall's nine full-scaffold miniatures / the drilled screen (that whole-subtree
+// re-render on every slider tick was a big mobile perf sink). Own state still drives it.
+export const PagesView = memo(function PagesView() {
   // Showcases = ONE believable product (Ledger). The WALL is the entry (every
   // screen as a live miniature); clicking a tile zooms IN to the single screen +
   // its sidebar (Catalyst-style). `screenId` is the rendered manifest (may be a
@@ -492,4 +495,4 @@ export function PagesView() {
       <ShowcaseStage m={m} key={m.id} appNav={appNav} width={width} onWidth={setWidth} />
     </div>
   )
-}
+})
