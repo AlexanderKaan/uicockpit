@@ -187,7 +187,15 @@
     box-shadow: 0 -16px 44px -18px rgba(0, 0, 0, 0.34);
     transform: translateY(var(--sheet-ty, 100%));
     will-change: transform;
-    /* Clear the iPhone home-indicator so the last control row isn't under it. */
+    /* The base .panel's 28px top + asymmetric 22/12 side insets are a DESKTOP
+       alignment (line the card up with the stage frame + topbar logo). On the
+       sheet the top inset just leaves dead space above the grabber (the grabber
+       must sit flush at the sheet's rounded top — iOS HIG), and the asymmetric
+       sides push the centred grabber ~5px off. Reset to a flush top + symmetric
+       sides; keep the safe-area inset at the bottom for the home bar. */
+    padding-top: 0;
+    padding-left: 16px;
+    padding-right: 16px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .app__body .panel.panel--anim { transition: transform 0.32s cubic-bezier(0.22, 0.72, 0.2, 1); }
@@ -223,6 +231,15 @@
   .topbar .view-toggle__lbl { display: none; }
   .topbar .view-toggle__btn { padding: 6px 10px; }
   .topbar .topbar__wordmark--full { display: none; }
+
+  /* iOS HIG — comfortable touch targets on the phone sheet. The desktop panel is
+     deliberately dense (built for pointer precision); on touch the interactive
+     rows and the inline segmented options need a bigger, thumb-reliable hit area
+     (Apple's ~44pt guidance). Scoped to the sheet so the dense desktop panel is
+     untouched. */
+  .app__body .panel .fmrow__head { min-height: 44px; }
+  .app__body .panel .fmseg__opt { min-height: 34px; padding-top: 8px; padding-bottom: 8px; }
+  .app__body .panel .fmopt { min-height: 40px; }
 }
 /* .topbar prefix (0,2,0) so this beats the base `.topbar__wordmark { display:block }`
    in stage.css (0,1,0) regardless of file order — else the mark shows on desktop

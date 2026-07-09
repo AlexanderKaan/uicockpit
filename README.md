@@ -190,7 +190,7 @@ the build, and you can flip it on and off live in the app's loupe.
 ## Run it locally
 
 ```bash
-git clone https://github.com/alexanderkaan/uicockpit.git
+git clone https://github.com/AlexanderKaan/uicockpit.git
 cd uicockpit/cockpit
 npm install
 npm run dev          # configurator at http://localhost:5173

@@ -85,7 +85,7 @@ interface Fmt {
   generator: (cfg: Config) => string
 }
 const FORMATS: Fmt[] = [
-  { id: 'css', label: 'tokens.css', hint: ':root + .dark, 60+ vars + recipes', filename: 'tokens.css', icon: FileCode, generator: genCss },
+  { id: 'css', label: 'tokens.css', hint: ':root + .dark, 250+ vars + recipes', filename: 'tokens.css', icon: FileCode, generator: genCss },
   { id: 'tailwind', label: 'Tailwind v4', hint: '@theme block, full system', filename: 'tailwind-theme.css', icon: Palette, generator: genTailwind },
   { id: 'shadcn', label: 'shadcn/ui', hint: '--background, --primary, …', filename: 'shadcn-globals.css', icon: Layers, generator: genShadcn },
 ]
@@ -613,8 +613,8 @@ function LinkPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void 
       <p className="tool__overview-lead">
         This URL <strong>is</strong> your kit. Paste the one <code>&lt;link&gt;</code> into your{' '}
         <code>&lt;head&gt;</code> and every <code>--k-*</code> token and component recipe is live —
-        no install, no build step. The hash is the version: this exact link always serves this exact
-        kit, byte-identical anywhere it loads.
+        no install, no build step. The hash is the version: this exact link serves this exact kit
+        wherever it loads.
       </p>
 
       <div className="tool__steps" style={{ marginTop: 16 }}>

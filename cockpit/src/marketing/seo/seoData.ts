@@ -215,7 +215,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
         { feature: 'Runtime', us: 'Zero runtime — just CSS variables', them: 'Component-library runtime', winner: 'us' },
         { feature: 'Component breadth', us: '100+ recipe CSS (state contracts), not a runtime library', them: 'Large, mature component set', winner: 'them' },
         { feature: 'Theming', us: '19 visual controls → tokens', them: 'JS theme object (in code)', winner: 'us' },
-        { feature: 'Output', us: 'Framework-neutral tokens (7 formats)', them: 'React components + theme', winner: 'tie' },
+        { feature: 'Output', us: 'Framework-neutral tokens (6 formats)', them: 'React components + theme', winner: 'tie' },
         { feature: 'Lock-in', us: 'None — eject to files', them: 'React + MUI runtime', winner: 'us' },
       ],
     },
@@ -290,7 +290,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
     ],
     faq: [
       { q: 'Will I have to replace my shadcn components?', a: 'No. UIcockpit is a theming layer — export the shadcn globals.css and keep every component.' },
-      { q: 'Is it really framework-neutral?', a: 'Yes. The core output is plain CSS custom properties; the shadcn export is one of eight formats.' },
+      { q: 'Is it really framework-neutral?', a: 'Yes. The core output is plain CSS custom properties; the shadcn export is one of six formats.' },
     ],
     related: ['/compare/shadcn', '/uses/shadcn-theme-generator', '/alternatives/tweakcn'],
   },
@@ -332,7 +332,7 @@ export const SEO_ENTRIES: SeoEntry[] = [
     sub: 'TweakCN is a focused shadcn theme editor. If you want the same visual ease but framework-neutral and across a whole design system, UIcockpit is the wider tool.',
     intro: [
       'TweakCN nails visual shadcn theming. People look for an alternative when they need more than colour and radius, or a stack other than shadcn — both of which are UIcockpit’s home turf.',
-      'You still get a drop-in shadcn export; you just also get type, density, motion, recipes, eight formats and a returnable hosted kit.',
+      'You still get a drop-in shadcn export; you just also get type, density, motion, recipes, six formats and a returnable hosted kit.',
     ],
     points: [
       { h: 'Beyond colour + radius', p: 'A full system — type scale, density, motion, elevation, chart palette and component recipes.' },

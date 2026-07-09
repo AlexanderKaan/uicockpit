@@ -10,7 +10,7 @@ Telemetry: None
 
 ## What it is
 
-UIcockpit is a design system generator: a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About two dozen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery and live showcases as the user tweaks. Start from a curated Style or shuffle and refine — every kit is your own, not a preset picked from a shelf. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
+UIcockpit is a design system generator: a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About nineteen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery and live showcases as the user tweaks. Start from a curated Style or shuffle and refine — every kit is your own, not a preset picked from a shelf. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
 
 ## Who it's for
 
@@ -31,7 +31,7 @@ Export is framed as an install experience, not a format dump — a hosted link p
 
 **Other formats** (eject to raw files)
 
-3. **tokens.css** — `:root` + `.dark` blocks with 120+ CSS custom properties. Drop-in. Includes a `@font-face`/Google Fonts import, full motion system (durations, easings, named animations), state tokens (disabled, focus ring, validation), z-index stack, breakpoints, container widths, chart palette, plus reusable component CSS recipes (Button, Input, Card, Badge, Tabs, Dialog, Menu, Tooltip, Avatar, Progress, Skeleton, Spinner, Kbd, Separator, etc.)
+3. **tokens.css** — `:root` + `.dark` blocks with 250+ CSS custom properties. Drop-in. Includes a `@font-face`/Google Fonts import, full motion system (durations, easings, named animations), state tokens (disabled, focus ring, validation), z-index stack, breakpoints, container widths, chart palette, plus reusable component CSS recipes (Button, Input, Card, Badge, Tabs, Dialog, Menu, Tooltip, Avatar, Progress, Skeleton, Spinner, Kbd, Separator, etc.)
 
 4. **Tailwind v4 globals.css** — `@theme` block ready to drop into Next.js/Vite projects. Every utility (`bg-primary`, `text-muted`, `shadow-md`, `font-display`, etc.) resolves to the configured value.
 
@@ -70,7 +70,7 @@ Use-case landing pages: design system generator (https://uicockpit.com/uses/desi
 - No backend, no database, no telemetry
 - Static deployable to any CDN (Cloudflare Pages, Vercel, Netlify)
 - PWA with service-worker caching
-- 120+ design tokens computed via in-browser color engine
+- 250+ design tokens computed via in-browser color engine
 - 5 icon libraries (Lucide, Iconoir, Phosphor regular/bold, Heroicons solid), dynamically imported
 
 ## Common questions
