@@ -151,6 +151,10 @@
    math is untouched; only the outer padding changes.) */
 @media (max-width: 768px) {
   .cockpit-preview:has(.gallerywrap) { padding: var(--k-s-16); }
+  /* Fill the columns on phones + tablet-portrait instead of stranding one fixed
+     360px card in a wide space (the desktop wall keeps its fixed-width columns).
+     min 320 → a phone stays one full-width column; a ~680px tablet fits two. */
+  .gallery { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
 }
 
 /* Gallery search/filter (C5) — filters the Atoms/Blocks wall by component name.

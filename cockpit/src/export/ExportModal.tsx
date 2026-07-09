@@ -839,7 +839,7 @@ function OverviewPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => v
       <p className="tool__overview-lead">
         Everything this kit contains, in one place. Every output — tokens, a Tailwind or
         shadcn theme, an AI prompt, the machine-readable contract — derives from these
-        exact settings, so they can never disagree. Pick a destination on the left to use it.
+        exact settings, so they can never disagree. Pick a destination to use it.
       </p>
 
       <div className="tool__overview-sec">Settings</div>

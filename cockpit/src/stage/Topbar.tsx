@@ -56,17 +56,19 @@ export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, token
             aria-label="Back to UIcockpit home"
             title="Back to home"
           >
-            <Wordmark height={22} className="topbar__wordmark" />
+            <Wordmark height={22} className="topbar__wordmark topbar__wordmark--full" />
+            <Wordmark height={24} markOnly className="topbar__wordmark topbar__wordmark--mark" />
           </button>
         ) : (
           <span className="topbar__brand">
-            <Wordmark height={22} className="topbar__wordmark" />
+            <Wordmark height={22} className="topbar__wordmark topbar__wordmark--full" />
+            <Wordmark height={24} markOnly className="topbar__wordmark topbar__wordmark--mark" />
           </span>
         )}
         {/* Toggle the floating control menu. */}
         <button
           type="button"
-          className={`topbar__icon-btn ${menuOpen ? 'topbar__icon-btn--on' : ''}`}
+          className={`topbar__icon-btn topbar__icon-btn--menu ${menuOpen ? 'topbar__icon-btn--on' : ''}`}
           onClick={onToggleMenu}
           aria-pressed={menuOpen}
           aria-label={menuOpen ? 'Hide controls' : 'Show controls'}

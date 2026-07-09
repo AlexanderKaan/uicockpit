@@ -59,6 +59,16 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const panelRef = useRef<HTMLElement>(null)
   const gripRef = useRef<HTMLDivElement>(null)
   const isPhone = () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+  // Track the phone breakpoint as STATE so the sheet effect re-runs when the
+  // viewport crosses 768 (e.g. a tablet rotating) — otherwise, crossing in with the
+  // menu open leaves --sheet-ty unset and the sheet parks off-screen (translateY 100%).
+  const [phone, setPhone] = useState(isPhone)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)')
+    const on = () => setPhone(mq.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [])
 
   // Animated dismiss so drag-down and the collapse button feel identical.
   const closeMenu = useCallback(() => {
@@ -71,7 +81,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   }, [])
 
   useEffect(() => {
-    if (!menuOpen) return
+    if (!menuOpen || !phone) return
     const p = panelRef.current
     const grip = gripRef.current
     if (!p || !grip || !isPhone()) return
@@ -130,7 +140,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
       window.removeEventListener('pointerup', up)
       window.removeEventListener('resize', onResize)
     }
-  }, [menuOpen, closeMenu])
+  }, [menuOpen, phone, closeMenu])
 
   // Dogfood: the configurator chrome runs on UIcockpit's OWN default kit. We emit
   // the DEFAULT_CONFIG tokens (in the current light/dark mode) onto .app, and the

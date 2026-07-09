@@ -969,3 +969,35 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+/* === Mobile — the panel is a bottom SHEET (chrome.css) =========================
+ * Two things break the desktop panel model on a phone:
+ *  1. Knob flyouts float to the RIGHT of the column (`left: calc(100% + 10px)`),
+ *     which lands off-screen in a full-width sheet — so you couldn't pick a colour,
+ *     style or font at all. Render them INLINE instead: an accordion-style dropdown
+ *     that expands within the row and pushes the rows below it down (still scrolls
+ *     inside the sheet). This is the fix for "you can't open a sub-nav in the drawer".
+ *  2. On a wide (tablet) sheet the rows stretch edge-to-edge and read as sparse —
+ *     cap the content width and centre it. */
+@media (max-width: 768px) {
+  .fmrow__pop,
+  .fmrow__pop--font {
+    position: static;
+    inset: auto;
+    left: auto;
+    top: auto;
+    width: auto;
+    min-width: 0;
+    max-height: 46vh;
+    overflow-y: auto;
+    margin-top: 6px;
+    box-shadow: none;
+    animation: none;
+    background: var(--app-bg);
+  }
+  .fmpop__grid { width: auto; }
+  .fmrow--open { z-index: auto; }
+  /* Tablet-width sheet: keep the controls in a comfortable, centred measure
+     instead of stretching the segmented strips across the whole width. */
+  .fmenu { max-width: 620px; margin-inline: auto; }
+}
