@@ -87,10 +87,16 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
     if (!p || !grip || !isPhone()) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+    // The sheet is `height: 90dvh` (chrome.css) and the half detent shows ~48dvh of
+    // it. Derive BOTH from the panel's own height, not window.innerHeight: on iOS
+    // `innerHeight` = the LARGE viewport while the toolbar is visible, so mixing it
+    // with a dvh-sized sheet made the half-snap land a few px off and jump when the
+    // toolbar hid mid-session. `offsetHeight` always matches the sheet's dvh sizing.
+    const SHEET_DVH = 0.9, HALF_VISIBLE_DVH = 0.48
     let halfTy = 0, closeTy = 0
     const measure = () => {
       const ph = p.offsetHeight
-      halfTy = Math.max(0, ph - Math.round(window.innerHeight * 0.48)) // ~48dvh visible
+      halfTy = Math.max(0, Math.round(ph * (1 - HALF_VISIBLE_DVH / SHEET_DVH)))
       closeTy = ph
     }
     measure()

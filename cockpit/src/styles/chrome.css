@@ -98,7 +98,11 @@
 .app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  /* dvh, not vh: on iOS Safari `100vh` is the LARGE viewport (toolbars hidden),
+     so the app runs taller than what's visible and the fixed bottom bar + sheet
+     get shoved under the toolbar, re-laying-out on every toolbar show/hide (the
+     "viewport jump" glitch). `dvh` tracks the actual visible height. */
+  height: 100dvh;
   background: var(--app-bg);
   color: var(--app-fg);
   font-size: 13px;
@@ -268,11 +272,14 @@
 .app__mobilebar { display: none; }
 .app__mobilebar-btn {
   flex: 1;
+  min-width: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   min-height: 44px;
+  /* One line per label ("Customize" etc.) — never wrap in the tight 320px cell. */
+  white-space: nowrap;
   padding: 0 10px;
   border: 1px solid var(--app-border);
   border-radius: 10px;

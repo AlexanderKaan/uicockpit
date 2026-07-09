@@ -1,6 +1,11 @@
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 html, body, #root { height: 100%; }
+/* Mobile robustness: clip any sub-pixel horizontal poke at the document level so
+   the page can never pan sideways / "wobble", and stop the whole-page rubber-band
+   bounce (e.g. behind the non-modal bottom-sheet). Vertical scroll is unaffected;
+   `clip` (not `hidden`) establishes no scroll container, so sticky/fixed are safe. */
+html, body { overflow-x: clip; overscroll-behavior-y: none; }
 body {
   font-family: 'Inter', -apple-system, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;

@@ -164,6 +164,10 @@
   height: var(--topbar-ctrl-h);
   box-sizing: border-box;
   line-height: 1;
+  /* Never let a two-word label ("Use kit") wrap to two stacked lines when the
+     topbar's 1fr track gets tight on small phones — keep it on one line. */
+  white-space: nowrap;
+  flex: none;
   padding: 0 12px;
   font-size: 12px;
   font-weight: 500;
@@ -391,7 +395,13 @@
 /* === Stage body === */
 .stage__body {
   flex: 1;
-  overflow: auto;
+  /* Scroll root for both walls. Clip X (not `auto`) so a descendant that's 1px
+     wider than the stage can't hand the whole canvas a horizontal scrollbar and
+     rubber-band — the reported "canvas moves sideways when scrolling". Contain the
+     overscroll so a boundary bounce doesn't chain to the page behind the sheet. */
+  overflow-y: auto;
+  overflow-x: clip;
+  overscroll-behavior: contain;
   padding: 28px;
   display: grid;
   place-items: start center;
