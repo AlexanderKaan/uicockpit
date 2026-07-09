@@ -455,8 +455,10 @@
     padding: 8px 10px;
   }
   .modal__navgroup { display: none; } /* section headings off in the compact strip */
-  .modal__navitem { flex: none; padding: 8px 12px; }
-  .modal__navitem-hint { display: none; } /* chip = icon + label only */
+  /* Chip = icon + label only, centred (the base flex-start top-aligns the icon to
+     the desktop two-line label+hint block; on the single-line chip that reads off). */
+  .modal__navitem { flex: none; padding: 8px 12px; align-items: center; justify-content: center; }
+  .modal__navitem-hint { display: none; }
 }
 
 /* ============================================================================

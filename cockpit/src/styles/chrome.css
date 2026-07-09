@@ -208,14 +208,12 @@
     margin: 0 auto;
   }
 
-  /* Mobile nav clarity: KEEP the view-toggle labels ("Components" / "Showcases")
-     so the two tabs aren't cryptic icons, and drop the redundant control-toggle
-     from the topbar — Customize in the bottom bar already opens the sheet. The full
-     wordmark is too wide (it overruns its 1fr grid track into the centre tabs), so
-     collapse it to the circular mark only. */
+  /* Mobile topbar: keep it uncrowded. The two view tabs are ICON-ONLY (labels off);
+     drop the redundant control-toggle (Customize in the bottom bar opens the sheet);
+     and collapse the wide wordmark to the circular mark (it overran its 1fr track). */
   .topbar .topbar__icon-btn--menu { display: none; }
-  .topbar .view-toggle__lbl { display: inline; }
-  .topbar .view-toggle__btn { padding: 5px 10px; }
+  .topbar .view-toggle__lbl { display: none; }
+  .topbar .view-toggle__btn { padding: 6px 10px; }
   .topbar .topbar__wordmark--full { display: none; }
 }
 .topbar__wordmark--mark { display: none; }
