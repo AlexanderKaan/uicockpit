@@ -16,7 +16,7 @@ export function genSkill(cfg: Config): string {
   // Matched button+input height per Scale (same mapping genBrief/genAiPrompt use).
   const h = cfg.scale === 'compact' ? '32px' : cfg.scale === 'comfortable' ? '40px' : '36px'
 
-  return `# UICockpit design-system rules
+  return `# UIcockpit design-system rules
 
 You are building inside a configured design system. Apply it to every component
 you create or restyle. These are the binding rules — load them every session.

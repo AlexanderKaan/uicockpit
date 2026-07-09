@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-/* Brand marks for the tools UICockpit plugs into — shared by the export router
+/* Brand marks for the tools UIcockpit plugs into — shared by the export router
  * (ExportModal) and the marketing "Use it in your tool" section. Monochrome,
  * single-path, rendered with currentColor so they inherit the surrounding text
  * colour. The v0/claude/cursor/windsurf/replit paths are from Simple Icons (CC0);

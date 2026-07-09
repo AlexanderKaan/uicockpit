@@ -10,7 +10,7 @@ import { useState, useRef, useId } from 'react'
  *
  * Why SVG and not Recharts: UIcockpit exports framework-neutral TOKENS, never
  * React component code. A charting lib can't ship in the export and is React-
- * only; the BRIEF/AI-prompt instead documents how --k-chart-1..6 maps onto any
+ * only; design.md/AGENTS.md instead document how --k-chart-1..6 maps onto any
  * chart lib (Recharts/Chart.js/visx). This component is the live proof. */
 
 export type ChartType = 'line' | 'area' | 'bar' | 'stacked' | 'stackedArea' | 'donut'

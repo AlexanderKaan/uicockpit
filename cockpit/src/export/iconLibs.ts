@@ -1,8 +1,8 @@
 import type { IconSet } from '../tokens/types'
 
 /**
- * Library recommendation + install info per icon style. Used by BRIEF.md,
- * AI prompt, tokens.json and the CSS export headers — so a user dropping
+ * Library recommendation + install info per icon style. Used by design.md,
+ * AGENTS.md, tokens.json and the CSS export headers — so a user dropping
  * any of those files into a fresh project knows exactly which npm package
  * to install and how to import an icon.
  *

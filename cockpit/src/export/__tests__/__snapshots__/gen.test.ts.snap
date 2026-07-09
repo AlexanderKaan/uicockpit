@@ -19122,7 +19122,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
 `;
 
 exports[`genSkill > matches snapshot for soft + cobalt sample 1`] = `
-"# UICockpit design-system rules
+"# UIcockpit design-system rules
 
 You are building inside a configured design system. Apply it to every component
 you create or restyle. These are the binding rules — load them every session.

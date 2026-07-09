@@ -516,9 +516,10 @@ npx uicockpit check --strict`}</code></pre>
   }
 }}`}</code></pre>
               <p>
-                <code>install_kit</code> · <code>get_design_context</code> ·
-                <code>check_conformance</code> — your agent reads the system and verifies
-                its own work, no copy-paste.
+                <code>create_kit</code> · <code>install_kit</code> ·
+                <code>get_design_context</code> · <code>check_conformance</code> — your
+                agent generates a kit, reads the system and verifies its own work, no
+                copy-paste.
               </p>
             </div>
           </div>

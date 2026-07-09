@@ -148,7 +148,7 @@ One configuration → **one single source** → every surface:
 
 ```
 19 visual controls ──▶ --k-* tokens ──▶ ┌─ live preview (gallery + a real app that dogfoods the export)
-   (Style · Brand · Type ·              ├─ tokens.css / json / Tailwind / shadcn / BRIEF / AI-prompt
+   (Style · Brand · Type ·              ├─ tokens.css / json / Tailwind / shadcn / design.md / AGENTS.md / contract.json
     Shape · Surface · Motion)           ├─ hosted kit: kit.uicockpit.com/k/<key>.css
                                         └─ npx uicockpit init/check · the MCP server
 ```

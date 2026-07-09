@@ -55,7 +55,7 @@ const HARNESS_EXACT = new Set([
   // Form width constraint utility (caps a form to a readable measure).
   'form-measure', 'form-measure--center',
 ])
-const HARNESS_PREFIXES = ['app-frame', 'viewtoggle', 'view-transition', 'm-statusbar', 'm-topbar', 'm-tabbar', 'm-shell', 'mp-frame']
+const HARNESS_PREFIXES = ['app-frame', 'view-transition']
 /* Generic structural/utility classes (not components). */
 const UTILITY_OK = new Set(['cockpit-preview', 'sr-only', 'visually-hidden'])
 /* Single-word ROOTS the app may render whose base rule legitimately lives in

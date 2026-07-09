@@ -1,7 +1,7 @@
 /**
  * Segment graph — the tier ladder (Foundation · Atom · Component · Section · Page).
  *
- * This is the single machine source for UICockpit's component MODEL (distinct from
+ * This is the single machine source for UIcockpit's component MODEL (distinct from
  * the component CSS, which lives in `recipes/`). Every recipe is one **segment**,
  * classified into a tier, with declared `uses` edges (the composition graph). From
  * this graph the manifest banner, the (future) front-end workbench/components-catalog,
@@ -21,7 +21,7 @@
 import { RECIPES } from './recipes'
 
 // NB: the `section` tier ≠ a recipe's `section` field (that field is the gallery-group label).
-export type Tier = 'foundation' | 'atom' | 'component' | 'section' | 'page'
+export type Tier = 'foundation' | 'atom' | 'component' | 'section'
 
 /**
  * SECTIONS (H3a — the page-region rung, public name "Layouts"): the app-frame

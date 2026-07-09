@@ -1,6 +1,6 @@
 # uicockpit
 
-The CLI for [UICockpit](https://uicockpit.com) — give a codebase a real,
+The CLI for [UIcockpit](https://uicockpit.com) — give a codebase a real,
 opinionated design system **and keep it consistent**. Generate → apply → **check**.
 
 Most token tools stop at "generate". The `check` command is the difference: it
@@ -35,7 +35,7 @@ directory:
 - `AGENTS.md` — the always-on agent rules (auto-discovered by Cursor, Codex, …)
 - `design.md` — the full spec + recipe catalog
 
-It also maintains a compact, marker-fenced UICockpit block inside your agent-doc
+It also maintains a compact, marker-fenced UIcockpit block inside your agent-doc
 files — `CLAUDE.md`, `.claude/CLAUDE.md`, `.cursorrules` (whichever exist; it
 creates `CLAUDE.md` when none do). Re-running `init` refreshes **only** the block
 between `<!-- UICOCKPIT:START -->` and `<!-- UICOCKPIT:END -->`; everything you

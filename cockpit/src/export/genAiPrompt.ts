@@ -86,7 +86,7 @@ trust it; don't wrap it in your own breakpoints.`
 /**
  * Ready-to-paste prompt for Cursor / v0 / Claude Code / Lovable / Bolt.
  *
- * The hidden moat of UIcockpit: while tokens.css and BRIEF.md are
+ * The hidden moat of UIcockpit: while tokens.css and design.md are
  * machine-readable, this format is *behavior-shaping* — it tells the AI
  * how to use the system, not just what it contains. Paste once into the
  * AI tool's system message / project rules / .cursorrules file and every

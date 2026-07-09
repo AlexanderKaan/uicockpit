@@ -14,7 +14,7 @@ import {
 /**
  * Fase D1 — `contract.json`, the machine-readable artefact.
  *
- * BRIEF.md / the AI-prompt are the HUMAN/LLM-prose views of a kit. This is the
+ * design.md / AGENTS.md are the HUMAN/LLM-prose views of a kit. This is the
  * view *tooling* builds on: a closed, enumerable description of the kit — its
  * token vocabulary, its component graph, the BEM class vocabulary, and the rules
  * as DATA (not prose) — generated from the same single source as every other

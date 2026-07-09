@@ -179,19 +179,27 @@ export function DocsBody({ onLaunch }: DocsBodyProps) {
                 <code>--radius</code>…) wired to your tokens — restyle an existing
                 shadcn project without touching components.
               </dd>
-              <dt><code>BRIEF.md</code></dt>
+              <dt><code>design.md</code></dt>
               <dd>
                 A human- and AI-readable spec of the whole system: the decisions,
-                the rules, the WCAG audit, the component decision tree. Hand it to
-                an engineer or an AI tool as the single source of intent.
+                the rules, the WCAG audit, the component decision tree, the recipe
+                catalog. Hand it to an engineer or an AI tool as the single source
+                of intent.
               </dd>
-              <dt>AI prompt</dt>
+              <dt><code>AGENTS.md</code></dt>
               <dd>
-                The behaviour-shaping export. Paste it into your AI tool's rules
-                file (<code>.cursorrules</code>, <code>CLAUDE.md</code>, a system
-                prompt) — it tells the AI <em>how</em> to use the system (which
-                token, which variant, what sits next to what), so every generation
-                stays on-system.
+                The behaviour-shaping export. Drop it in as your AI tool's rules
+                file (<code>AGENTS.md</code>, <code>.cursorrules</code>,{' '}
+                <code>CLAUDE.md</code>, a system prompt) — it tells the AI{' '}
+                <em>how</em> to use the system (which token, which variant, what
+                sits next to what), so every generation stays on-system.
+              </dd>
+              <dt><code>contract.json</code></dt>
+              <dd>
+                The machine-readable contract behind <code>uicockpit check</code> —
+                the exact tokens and rules a screen must honour. This is what lets
+                an agent (or CI) <em>verify</em> a new screen is on-system, instead
+                of trusting it not to drift back to generic.
               </dd>
             </dl>
           </section>
@@ -340,7 +348,8 @@ npx uicockpit check        # catch any drift from the contract`}</code></pre>
             <p>
               These are the rules tokens can't enforce on their own — the layer
               that decides <em>what sits next to what</em>. They're also baked into
-              the BRIEF and AI-prompt exports, so AI tools follow them too.
+              the <code>design.md</code> and <code>AGENTS.md</code> exports, so AI
+              tools follow them too.
             </p>
             <ul className="docs__list">
               <li>

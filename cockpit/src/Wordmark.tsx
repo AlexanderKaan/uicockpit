@@ -1,5 +1,5 @@
 /**
- * Wordmark — the full UICockpit logo (circle mark + "UIcockpit" wordmark) as one
+ * Wordmark — the full UIcockpit logo (circle mark + "UIcockpit" wordmark) as one
  * inline SVG. Everything adapts to light/dark:
  *   - the wordmark text + the mark DISC use `currentColor` (= the surrounding
  *     text colour: dark ink on light, white on dark),

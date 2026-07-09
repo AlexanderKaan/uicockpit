@@ -63,3 +63,7 @@ Thumbs.db
 # drift-bench generated outputs + fetched kit pack (harness + results.json stay)
 bench/runs/
 bench/kit/
+
+# Personal working artifact (the mobile-configurator study, exported as a blog
+# post) — kept locally, never part of the public repo.
+/mobile-configurator-study.article.html

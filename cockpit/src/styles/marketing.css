@@ -244,7 +244,7 @@
   align-items: center;
   gap: 0.375rem; /* 6px */
   padding: 0.5rem 1rem; /* 8px / 16px — on the 4px grid */
-  /* Match the default UICockpit kit's button radius ('soft' = --k-radius-button
+  /* Match the default UIcockpit kit's button radius ('soft' = --k-radius-button
    * = 0.625rem) so the marketing chrome reads as the same product as /app —
    * not a pill that diverges from every button the kit ships. */
   border-radius: 0.625rem;

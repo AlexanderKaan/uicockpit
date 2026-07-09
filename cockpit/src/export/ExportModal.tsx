@@ -115,11 +115,11 @@ const AGENT_FILE: Record<Agent, string> = {
 function skillFile(agent: Agent, cfg: Config): { filename: string; text: string } {
   const body = genSkill(cfg)
   if (agent === 'claude') {
-    const fm = '---\nname: uicockpit-design-system\ndescription: Apply the configured UICockpit design system — token commandments + a verify loop. Use whenever building or restyling UI in this project.\n---\n\n'
+    const fm = '---\nname: uicockpit-design-system\ndescription: Apply the configured UIcockpit design system — token commandments + a verify loop. Use whenever building or restyling UI in this project.\n---\n\n'
     return { filename: AGENT_FILE.claude, text: fm + body }
   }
   if (agent === 'cursor') {
-    const fm = '---\ndescription: UICockpit design-system rules\nalwaysApply: true\n---\n\n'
+    const fm = '---\ndescription: UIcockpit design-system rules\nalwaysApply: true\n---\n\n'
     return { filename: AGENT_FILE.cursor, text: fm + body }
   }
   return { filename: AGENT_FILE[agent], text: body }
@@ -369,7 +369,7 @@ function kitSummary(cfg: Config, tk: ReturnType<typeof buildTokens>): string {
 /* The prompt prefix for chat-based builders — they can't run `check`, so consistency
  * rides on the shadcn vars + this instruction. Short enough to paste above any prompt. */
 function webPrompt(cfg: Config, tk: ReturnType<typeof buildTokens>): string {
-  return `This project ships a custom design system (UICockpit), themed through the shadcn/ui CSS variables in globals.css. Follow it for every screen you build:
+  return `This project ships a custom design system (UIcockpit), themed through the shadcn/ui CSS variables in globals.css. Follow it for every screen you build:
 
 - Use the shadcn/ui tokens — --background, --foreground, --primary, --secondary, --muted, --accent, --border, --ring, --radius — for all colours, radii and spacing. Never hardcode a hex, pixel radius or font size.
 - Compose from the existing shadcn/ui components so they inherit the theme automatically.
