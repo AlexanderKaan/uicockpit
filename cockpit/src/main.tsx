@@ -21,3 +21,20 @@ createRoot(rootEl).render(
     <App />
   </StrictMode>,
 )
+
+// Close the "a fresh deploy only shows after a manual refresh" gap. The service
+// worker (VitePWA `registerType: 'autoUpdate'`) skip-waits and claims clients when
+// a new build ships, which fires `controllerchange`; reload once there so the new
+// assets take over immediately instead of on the visitor's NEXT reload. Guards:
+// only when a controller already existed at load (a genuine UPDATE — never the
+// first-ever install) and only once (no reload loop). Kit state lives in the URL
+// hash, so the reload is lossless. No-op in dev (SW off via devOptions.enabled).
+if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller
+  let reloaded = false
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloaded || !hadController) return
+    reloaded = true
+    window.location.reload()
+  })
+}
