@@ -144,6 +144,14 @@
 .cockpit-preview:has(.gallerywrap) {
   padding: var(--gallery-gap, 40px);
 }
+/* Phones: the 40px gallery gutter as outer padding is desktop-scale and, stacked on
+   the stage padding, pushes the single column past the viewport (a ~63px sideways
+   scroll). Trim the wall padding so the column fits — the column itself already
+   shrinks via min(320px, 100%). (--gallery-gap is left alone so the masonry span
+   math is untouched; only the outer padding changes.) */
+@media (max-width: 768px) {
+  .cockpit-preview:has(.gallerywrap) { padding: var(--k-s-16); }
+}
 
 /* Gallery search/filter (C5) — filters the Atoms/Blocks wall by component name.
    Lives inside .cockpit-preview, so it's themed live by the kit. */

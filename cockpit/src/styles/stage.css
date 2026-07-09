@@ -400,6 +400,12 @@
    * own surfaces carry the colour, not a background gradient. */
   background: var(--app-bg);
 }
+/* Phones: 28px each side is desktop-scale and eats the narrow viewport — trim it so
+ * the framed preview + its inner padding fit without a sideways scroll. (The showcase
+ * drill overrides this again, tighter, via .stage__body:has(.shc--app).) */
+@media (max-width: 768px) {
+  .stage__body { padding: 12px; }
+}
 /* The framed preview lifts off the canvas with a soft shadow (premium float). */
 .cockpit-preview {
   box-shadow: 0 1px 2px rgba(16, 18, 27, 0.04), 0 12px 34px -18px rgba(16, 18, 27, 0.22);
