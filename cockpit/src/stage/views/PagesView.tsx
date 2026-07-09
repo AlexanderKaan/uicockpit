@@ -1,4 +1,4 @@
-import { Fragment, memo, useState, useRef, useLayoutEffect, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
+import { Fragment, memo, useState, useRef, useLayoutEffect, useEffect, type MouseEvent as ReactMouseEvent, type ReactNode, type CSSProperties } from 'react'
 import { flushSync } from 'react-dom'
 import { Icon } from '../../icons/Icon'
 import { SHOWCASES, LEDGER_SCREENS, LEDGER_DETAIL_PARENT, type SectionSpec, type ShowcaseManifest, type LedgerScreen } from '../../showcases/manifests'
@@ -370,6 +370,55 @@ function LedgerSidebar({ appNav, pickable }: { appNav: AppNav; pickable: boolean
   )
 }
 
+/* One wall tile — a live miniature that mounts its (heavy) 1200px scaffold ONLY
+ * once the tile scrolls near the viewport, and stays mounted after (View
+ * Transitions + re-theming keep working). The `.shc-wall__frame`'s fixed 4:3
+ * aspect reserves the space, so a not-yet-mounted tile causes no layout shift.
+ * This is the mobile perf fix: the wall stacks 1-up on phones, so all nine
+ * full scaffolds used to mount at once on first paint; now only the ~1–2 in
+ * view do, and the rest hydrate as you scroll. */
+function WallTile({ s, sm, onPick }: { s: LedgerScreen; sm: ShowcaseManifest; onPick: (id: string, el: HTMLElement) => void }) {
+  const tileRef = useRef<HTMLDivElement>(null)
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    if (shown) return
+    const el = tileRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') { setShown(true); return }
+    // A generous rootMargin so a tile hydrates just before it's scrolled into
+    // view — the miniature is ready by the time the user reaches it, no flash.
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { setShown(true); io.disconnect() }
+    }, { rootMargin: '600px 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [shown])
+  const tileNav: AppNav = { screens: LEDGER_SCREENS, current: s.id, highlight: s.id, onNavigate: () => {} }
+  return (
+    // role="button" (not a <button>) because each tile embeds a full,
+    // interactive showcase scaffold — real <button>s inside a <button>
+    // is invalid HTML (hydration warnings). A div + keyboard handler
+    // keeps it activat­able without nesting buttons.
+    <div
+      role="button"
+      tabIndex={0}
+      className="shc-wall__tile"
+      ref={tileRef}
+      onClick={(e) => onPick(s.id, e.currentTarget)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(s.id, e.currentTarget) } }}
+      aria-label={`Open ${s.label}`}
+    >
+      <div className="shc-wall__frame">
+        {shown && (
+          <div className="shc-wall__mini" aria-hidden="true">
+            <ShowcaseShell m={sm} width={1200} appNav={tileNav} />
+          </div>
+        )}
+      </div>
+      <span className="shc-wall__cap"><Icon name={s.icon} /> {s.label}</span>
+    </div>
+  )
+}
+
 /* The WALL — the loupe entry: every Ledger screen as a live, scaled miniature,
  * themed by the user's kit (re-theme-everywhere, visible). Click a tile and it
  * macOS-Mission-Control-zooms up to fill (View Transitions). The first of the
@@ -412,29 +461,7 @@ function ShowcaseWall({ onPick }: { onPick: (id: string, el: HTMLElement) => voi
         {LEDGER_SCREENS.map((s) => {
           const sm = SHOWCASES.find((x) => x.id === s.id)
           if (!sm) return null
-          const tileNav: AppNav = { screens: LEDGER_SCREENS, current: s.id, highlight: s.id, onNavigate: () => {} }
-          return (
-            // role="button" (not a <button>) because each tile embeds a full,
-            // interactive showcase scaffold — real <button>s inside a <button>
-            // is invalid HTML (hydration warnings). A div + keyboard handler
-            // keeps it activat­able without nesting buttons.
-            <div
-              role="button"
-              tabIndex={0}
-              className="shc-wall__tile"
-              key={s.id}
-              onClick={(e) => onPick(s.id, e.currentTarget)}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(s.id, e.currentTarget) } }}
-              aria-label={`Open ${s.label}`}
-            >
-              <div className="shc-wall__frame">
-                <div className="shc-wall__mini" aria-hidden="true">
-                  <ShowcaseShell m={sm} width={1200} appNav={tileNav} />
-                </div>
-              </div>
-              <span className="shc-wall__cap"><Icon name={s.icon} /> {s.label}</span>
-            </div>
-          )
+          return <WallTile key={s.id} s={s} sm={sm} onPick={onPick} />
         })}
       </div>
     </div>
