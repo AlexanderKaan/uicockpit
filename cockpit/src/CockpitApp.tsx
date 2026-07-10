@@ -195,9 +195,10 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
 
   const onRandomize = useCallback(() => {
     // REPLACE flows through the history reducer, so a roll is undoable (⌘Z).
-    // Pinned knobs ride through unchanged.
+    // Pinned knobs ride through unchanged. No toast: Shuffle is a see-the-result
+    // action (the wall re-skins live), so the confirmation was noise — and on a
+    // phone it overlapped the bottom control bar and the ⌘Z hint doesn't apply.
     dispatch({ type: 'REPLACE', cfg: randomKit(cfg, Math.random, lockedKeys) })
-    setToast('🎲 Rolled a fresh kit — ⌘Z to undo')
   }, [cfg, dispatch, lockedKeys])
 
   const onReset = useCallback(() => {
