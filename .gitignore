@@ -64,6 +64,8 @@ Thumbs.db
 bench/runs/
 bench/kit/
 
-# Personal working artifact (the mobile-configurator study, exported as a blog
-# post) — kept locally, never part of the public repo.
+# Personal working artifacts (studies / case studies exported as articles for
+# Alexander's own site) — kept locally, never part of the public repo.
 /mobile-configurator-study.article.html
+/uicockpit-case-study.md
+/images/
