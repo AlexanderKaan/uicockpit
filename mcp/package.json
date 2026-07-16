@@ -1,7 +1,8 @@
 {
   "name": "uicockpit-mcp",
-  "version": "0.5.0",
-  "description": "MCP server for UICockpit, the design system generator - give an AI agent your generated design system and a check loop: install a kit, read its design context, and verify conformance natively.",
+  "mcpName": "com.uicockpit/mcp",
+  "version": "0.5.1",
+  "description": "MCP server for UIcockpit, the design system generator for AI-built apps: an agent generates a kit from a brief, reads its tokens + component grammar, and verifies its own code stays on-system (the check). Framework-neutral, free, no Figma or account.",
   "type": "module",
   "bin": {
     "uicockpit-mcp": "bin/server.mjs"
@@ -23,12 +24,20 @@
     "mcp",
     "model-context-protocol",
     "design-system",
+    "design-system-generator",
     "design-tokens",
+    "framework-neutral",
+    "ui-components",
+    "tailwind",
     "shadcn",
+    "wcag",
+    "conformance",
     "ai",
     "agent",
     "claude",
     "cursor",
+    "windsurf",
+    "cline",
     "uicockpit"
   ],
   "homepage": "https://uicockpit.com",
