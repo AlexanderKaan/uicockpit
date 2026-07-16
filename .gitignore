@@ -60,6 +60,11 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
+# MCP registry DNS-auth secrets — the ed25519 private key + well-known auth file.
+# NEVER commit these.
+*.pem
+mcp-registry-auth
+
 # drift-bench generated outputs + fetched kit pack (harness + results.json stay)
 bench/runs/
 bench/kit/

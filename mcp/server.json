@@ -8,7 +8,6 @@
     "url": "https://github.com/AlexanderKaan/uicockpit",
     "source": "github"
   },
-  "websiteUrl": "https://uicockpit.com",
   "packages": [
     {
       "registryType": "npm",
