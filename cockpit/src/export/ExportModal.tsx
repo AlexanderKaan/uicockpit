@@ -39,6 +39,7 @@ import { genContract } from './genContract'
 import { genDesignMd } from './genDesignMd'
 import { genSkill } from './genSkill'
 import { zipSync } from './zip'
+import { pingExport } from './beacon'
 
 /** Base URL of the Live Kit CDN Worker (cockpit/worker). The stateless lane
  *  `${BASE}/k/<hash>.css` serves genCss(decode(hash)) — the full kit, byte-identical
@@ -209,6 +210,7 @@ function downloadText(text: string, filename: string) {
   a.download = filename
   a.click()
   URL.revokeObjectURL(url)
+  pingExport('download', filename)
 }
 
 const basename = (p: string) => p.split('/').pop() ?? p
@@ -501,6 +503,7 @@ function ToolPane({ tool, cfg, onToast }: { tool: ToolDef; cfg: Config; onToast:
     a.download = `uicockpit-${tool.id}.zip`
     a.click()
     URL.revokeObjectURL(url)
+    pingExport('zip', tool.id)
     onToast('Files downloaded (.zip)')
   }
 
@@ -598,7 +601,7 @@ function LinkPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => void 
   const linkTag = `<link rel="stylesheet" href="${cssUrl}">`
   const importRule = `@import url("${cssUrl}");`
   const copy = (text: string, label: string) => async () => {
-    try { await navigator.clipboard.writeText(text); onToast(`${label} copied`) }
+    try { await navigator.clipboard.writeText(text); pingExport('link'); onToast(`${label} copied`) }
     catch { onToast('Copy failed — select & copy manually') }
   }
   return (

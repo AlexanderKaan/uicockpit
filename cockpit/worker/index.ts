@@ -55,6 +55,12 @@ export default {
     const url = new URL(request.url)
     const { pathname } = url
 
+    // Export beacon — a cookieless, PII-free ping the app fires when someone
+    // takes a kit out (download / .zip / hosted-link copy). Stores nothing;
+    // just 204s so the request lands in Worker analytics. Count in the dashboard
+    // (or GraphQL API) by path `/e`, split by the ?kind / ?fmt query params.
+    if (pathname === '/e') return new Response(null, { status: 204, headers: CORS })
+
     // POST-less "make me a kit" — a readable brief → the config hash + every kit
     // URL. The agent-native on-ramp (and a plain shareable link): an LLM describes
     // a kit in params instead of driving the GUI. GET /new?brand=cobalt&radius=soft
