@@ -34,7 +34,7 @@ import {
   GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE,
   extractCss, extractClasses, extractInline, classAttrs,
   extractClassStyles, extractCssVars, resolveVar,
-  cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar,
+  cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar, styledClassNames,
   countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX,
 } from './patterns.mjs'
 import {
@@ -572,7 +572,9 @@ export function auditFiles(files, opts = {}) {
   const events = []
   let readable = 0
   const unreadable = {}
-  const expressible = { recipe: 0, tokensOnly: 0, none: 0 }
+  const expressible = { recipe: 0, tokensOnly: 0, layout: 0, none: 0 }
+  const elements = []
+  const styledClasses = new Set()
   // Collected so the report can PAINT plain-CSS components instead of printing
   // their class names — the wall only converts if you can see the buttons.
   const classStyles = {}
@@ -591,6 +593,7 @@ export function auditFiles(files, opts = {}) {
       const key = isModule ? qualify(path, cls) : cls
       classStyles[key] = { ...(classStyles[key] || {}), ...decls }
     }
+    for (const cls of styledClassNames(css)) styledClasses.add(isModule ? qualify(path, cls) : cls)
   }
 
   // ── Pass 1: stylesheets first. A component file can be walked before the
@@ -627,35 +630,56 @@ export function auditFiles(files, opts = {}) {
 
     tally.moduleBindings += moduleEls.length
 
-    // Class attributes: events + the expressible bucket, per element.
+    // Every styled element is collected now and BUCKETED LATER — an element's
+    // styling may live in a stylesheet the walker has not reached yet, and for
+    // a CSS/SCSS codebase that stylesheet is where all of it lives.
     for (const { classes, at } of classAttrs(path, content)) {
       const evs = extractClasses(classes, at)
       events.push(...evs)
       for (const c of classes) if (UTILITY_RX.test(c)) tally.utilities++
-      const hasRecipe = classes.some((c) => {
-        const root = c.split('--')[0].split('__')[0].replace(/^.*:/, '')
-        return Object.prototype.hasOwnProperty.call(vocab, root)
-      })
-      if (hasRecipe) expressible.recipe++
-      else if (evs.length) expressible.tokensOnly++
-      else expressible.none++
+      elements.push({ classes, valueCarrying: evs.length > 0 })
     }
-
-    // A module-bound element is expressible when the class it points at carries
-    // real paint declarations — bespoke component, values a token can say.
-    for (const { classes } of moduleEls) {
-      const hasRecipe = classes.some((c) => Object.prototype.hasOwnProperty.call(vocab, c.split('#').pop().split('--')[0].split('__')[0]))
-      const painted = classes.some((c) => classStyles[c] && Object.keys(classStyles[c]).length)
-      if (hasRecipe) expressible.recipe++
-      else if (painted) expressible.tokensOnly++
-      else expressible.none++
-    }
+    for (const { classes } of moduleEls) elements.push({ classes, valueCarrying: false })
 
     const inline = extractInline(path, content)
     tally.inlineStyles += inline.length
     events.push(...inline)
     // HTML files also carry CSS-ish styling in <style> blocks.
     for (const m of content.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) absorbCss(path, m[1])
+  }
+
+  /* ── expressibility, decided once every stylesheet has been read ────────────
+   * The question §9 needs answered is "can this vocabulary say what this element
+   * is doing" — NOT "does this element's class attribute happen to carry values".
+   * The first version asked the second question, so any CSS or SCSS codebase came
+   * back at ~100% `none` regardless of what it actually rendered: Excalidraw
+   * scored 99% and it looked like beautiful evidence for the chrome-vs-canvas
+   * thesis, when it was only measuring that the values live in a stylesheet.
+   * An instrument that returns the desired answer for the wrong reason is worse
+   * than no instrument.
+   *
+   * So an element is judged on the styling that REACHES it, wherever authored:
+   *   recipe     — a class root the kit already has a component for
+   *   tokensOnly — bespoke, but it paints (colour · type · spacing · radius ·
+   *                shadow · border) and every one of those is token-expressible
+   *   none       — styled, yet nothing our vocabulary can express: pure layout,
+   *                transforms, cursors, canvas positioning
+   * That last bucket is now a real reading of the chrome/canvas line rather than
+   * a restatement of which file the CSS sits in. */
+  const rootOf = (c) => c.split('#').pop().split('--')[0].split('__')[0].replace(/^.*:/, '')
+  for (const el of elements) {
+    const hasRecipe = el.classes.some((c) => Object.prototype.hasOwnProperty.call(vocab, rootOf(c)))
+    const painted = el.valueCarrying
+      || el.classes.some((c) => classStyles[c] && Object.keys(classStyles[c]).length)
+    if (hasRecipe) { expressible.recipe++; continue }
+    if (painted) { expressible.tokensOnly++; continue }
+    // Styled somewhere, but in ways no token can say — transforms, cursors,
+    // clip-paths, canvas positioning. THIS is the §9 signal.
+    if (el.classes.some((c) => styledClasses.has(c))) { expressible.none++; continue }
+    // Never styled at all: a flex wrapper is structure, not a failure of our
+    // vocabulary, and lumping it in with the canvas case inflates `none` by
+    // 20-40% on any normal React app.
+    expressible.layout++
   }
 
   // Collapse token chains now that every definition has been seen. Done as a
@@ -700,7 +724,7 @@ export function auditFiles(files, opts = {}) {
     ? scored.reduce((a, d) => a + WEIGHTS[d] * dimensions[d].score, 0) / weightSum
     : null
 
-  const expressibleTotal = expressible.recipe + expressible.tokensOnly + expressible.none
+  const expressibleTotal = expressible.recipe + expressible.tokensOnly + expressible.layout + expressible.none
   const share = (n) => (expressibleTotal ? round(n / expressibleTotal, 3) : null)
 
   const result = {
@@ -719,6 +743,7 @@ export function auditFiles(files, opts = {}) {
       expressible: {
         recipe: share(expressible.recipe),
         tokensOnly: share(expressible.tokensOnly),
+        layout: share(expressible.layout),
         none: share(expressible.none),
         counts: { ...expressible },
       },

@@ -469,3 +469,43 @@ test('a BEM modifier class is not read as a utility value', () => {
   const colours = evs.filter((e) => e.dim === 'color').map((e) => e.value)
   assert.deepEqual(colours, ['red-500'])
 })
+
+test('nested CSS: the outer rule is not invisible', () => {
+  // The naive rule regex only matched innermost blocks, so a nested stylesheet
+  // was scored on a fraction of its styling. 52 of Excalidraw's 82 SCSS files
+  // nest, so this was the common case, not an edge case.
+  const evs = extractCss('a.scss', `
+    .stats { font-size: 12px; padding: 8px; color: #333;
+      &__row { background: #fff; border-radius: 4px; }
+      h2 { font-size: 20px; font-weight: bold; }
+    }
+  `)
+  const val = (dim) => evs.filter((e) => e.dim === dim).map((e) => e.value)
+  assert.ok(val('type').includes('12px/auto/auto'), "the outer block's own font-size must be seen")
+  assert.ok(val('spacing').includes('8px'), "and its padding")
+  assert.ok(val('color').includes('#333'), "and its colour")
+  assert.ok(val('radius').includes('4px'), 'while the nested block still counts too')
+})
+
+test('& resolves to the class the nested rule actually generates', () => {
+  const styles = extractClassStyles('.card { color: #111; &__title { font-weight: 700; } }')
+  assert.ok(styles['card__title'], `expected card__title, got ${Object.keys(styles)}`)
+  assert.equal(styles['card__title']['font-weight'], '700')
+})
+
+test('@media-wrapped rules are still read', () => {
+  const evs = extractCss('a.css', '@media (max-width: 700px) { .a { padding: 4px; } }')
+  assert.ok(evs.some((e) => e.dim === 'spacing' && e.value === '4px'))
+})
+
+test('expressible separates structure from the inexpressible', () => {
+  // A flex wrapper is not a failure of our vocabulary; a transform-only rule is.
+  const r = auditFiles([
+    file('s.css', '.painted { color: #111; padding: 8px; }\n.moved { transform: rotate(3deg); cursor: grab; }'),
+    file('a.tsx', '<div className="painted">a</div><div className="moved">b</div><div className="flex items-center">c</div>'),
+  ])
+  const c = r.meta.expressible.counts
+  assert.equal(c.tokensOnly, 1, 'the painted element')
+  assert.equal(c.none, 1, 'styled, but in ways no token can say')
+  assert.equal(c.layout, 1, 'pure structure — not counted against the vocabulary')
+})

@@ -161,6 +161,63 @@ const ev = (dim, value, at, opts = {}) => ({
 const blankComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '))
 
 /**
+ * Walk a stylesheet rule by rule, nesting included.
+ *
+ * The obvious `/([^{}]+)\{([^{}]*)\}/g` only ever matches the INNERMOST block,
+ * so for nested CSS the outer rule's own declarations are never seen at all:
+ *
+ *   .stats { font-size: 12px;   ← invisible to the naive regex
+ *     h2 { font-weight: bold }  ← the only thing it matched
+ *   }
+ *
+ * 52 of Excalidraw's 82 SCSS files nest, so this was not an edge case — it was
+ * scoring those repos on a fraction of their styling. SCSS/LESS nesting and
+ * native CSS nesting all go through here now.
+ *
+ * `visit(selector, declarations, ancestors, offset)` is called once per block,
+ * with only that block's OWN declarations.
+ */
+export function walkCss(source, visit) {
+  const s = blankComments(source)
+  const stack = [{ sel: '', decls: '', start: 0 }]
+  let buf = ''
+  let bufStart = 0
+
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i]
+    if (ch === '{') {
+      // buf holds this block's preceding declarations, then its selector.
+      const cut = buf.lastIndexOf(';')
+      const decls = cut === -1 ? '' : buf.slice(0, cut + 1)
+      const sel = (cut === -1 ? buf : buf.slice(cut + 1)).trim()
+      stack[stack.length - 1].decls += decls
+      stack.push({ sel, decls: '', start: i + 1 })
+      buf = ''
+      bufStart = i + 1
+    } else if (ch === '}') {
+      const frame = stack.pop()
+      if (!frame) { buf = ''; continue }
+      frame.decls += buf
+      visit(frame.sel, frame.decls, stack.map((f) => f.sel).filter(Boolean), frame.start)
+      buf = ''
+      bufStart = i + 1
+      if (!stack.length) stack.push({ sel: '', decls: '', start: i + 1 })
+    } else {
+      if (!buf) bufStart = i
+      buf += ch
+    }
+  }
+}
+
+/** Resolve `&__foo` / `&.bar` against the enclosing selectors, so a nested BEM
+ *  block reports the class it actually generates. */
+export function resolveSelector(selector, ancestors) {
+  if (!selector.includes('&')) return selector
+  const parent = ancestors.length ? ancestors[ancestors.length - 1] : ''
+  return selector.replace(/&/g, parent)
+}
+
+/**
  * Pull usage events out of a CSS/SCSS/LESS source.
  *
  * Type is collected PER RULE BLOCK as a font-size/line-height/weight triplet —
@@ -172,10 +229,13 @@ export function extractCss(path, content) {
   const src = blankComments(content)
   const lineOf = (idx) => src.slice(0, idx).split('\n').length
 
-  // Rule blocks — needed for the type triplet; declarations are scanned inside.
-  for (const rule of src.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
-    const body = rule[2]
-    const bodyStart = rule.index + rule[1].length + 1
+  // One pass per rule block, nesting included — see walkCss(). A nested rule's
+  // parent declarations used to be dropped entirely.
+  const blocks = []
+  walkCss(content, (sel, body, ancestors, start) => blocks.push({ sel, body, ancestors, start }))
+  for (const rule of blocks) {
+    const body = rule.body
+    const bodyStart = rule.start
     const decls = []
     for (const d of body.matchAll(/([-\w]+)\s*:\s*([^;]+)(;|$)/g)) {
       decls.push({ prop: d[1].toLowerCase(), value: d[2].trim(), at: bodyStart + d.index })
@@ -550,27 +610,39 @@ export function extractCssVars(content) {
  * Map each class name to the paint-ish declarations of the rules it appears in.
  * Later rules win, which approximates the cascade closely enough for a swatch.
  */
+/** Classes that appear in a stylesheet at all — including rules that set only
+ *  transforms, cursors or clip-paths. Knowing a class IS styled, just not in a
+ *  way tokens can express, is what separates "outside the vocabulary" from
+ *  "never styled in the first place". */
+export function styledClassNames(content) {
+  const names = new Set()
+  walkCss(content, (rawSel, body, ancestors) => {
+    if (/^\s*@/.test(rawSel) || !/[\w-]+\s*:/.test(body)) return
+    const selector = resolveSelector(rawSel, ancestors)
+    for (const m of selector.matchAll(/\.(-?[A-Za-z_][\w-]*)/g)) names.add(m[1])
+  })
+  return names
+}
+
 export function extractClassStyles(content) {
   const out = {}
-  const src = blankComments(content)
-  for (const rule of src.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-    const selector = rule[1]
-    const body = rule[2]
+  walkCss(content, (rawSel, body, ancestors) => {
+    const selector = resolveSelector(rawSel, ancestors)
     // Skip at-rules and anything with a pseudo-state — a hover colour is not
     // the resting appearance and would misrepresent the treatment.
-    if (/^\s*@/.test(selector) || /:(hover|focus|active|disabled|checked)/.test(selector)) continue
+    if (/^\s*@/.test(selector) || /:(hover|focus|active|disabled|checked)/.test(selector)) return
 
     const decls = {}
     for (const d of body.matchAll(/([-\w]+)\s*:\s*([^;]+)(;|$)/g)) {
       const prop = d[1].toLowerCase()
       if (PAINT_PROPS.has(prop)) decls[prop] = d[2].trim()
     }
-    if (!Object.keys(decls).length) continue
+    if (!Object.keys(decls).length) return
 
     for (const m of selector.matchAll(/\.(-?[A-Za-z_][\w-]*)/g)) {
       out[m[1]] = { ...(out[m[1]] || {}), ...decls }
     }
-  }
+  })
   return out
 }
 
