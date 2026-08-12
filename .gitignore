@@ -76,3 +76,10 @@ bench/kit/
 /images/
 /mcp-distribution.md
 /mcp-submit-checklist.md
+
+# `uicockpit audit` (the retroactive layer) — build briefing + heuristic, plus the
+# commercial/open-core layer. Internal deliberation and pricing strategy; the
+# public repo stays scrubbed of both.
+/BRIEFING-AUDIT-FEATURE.md
+/AUDIT-HEURISTIC.md
+/OPEN-CORE-CONTRACT.md
