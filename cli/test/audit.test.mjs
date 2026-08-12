@@ -231,12 +231,89 @@ test('the score only averages dimensions that had enough evidence', () => {
 })
 
 test('unreadable styling is counted and refused below the coverage floor', () => {
-  const styled = Array.from({ length: 30 }, (_, i) => `const S${i} = styled.div\`color:red\``).join('\n')
-  const r = auditFiles([file('styles.ts', `${styled}\n<div className="p-4">x</div>`)])
-  assert.ok(r.meta.unreadable['styled-components'] >= 30)
+  // Genuinely dynamic classNames remain the blind spot. (styled-components are
+  // READ now — see the CSS-in-JS block below.)
+  const dyn = Array.from({ length: 30 }, (_, i) => `<div className={cls${i}}>x</div>`).join('\n')
+  const r = auditFiles([file('a.tsx', `${dyn}\n<div className="p-4">x</div>`)])
+  assert.ok(r.meta.unreadable['dynamic-classname'] >= 30)
   assert.ok(r.meta.parsed < MIN_PARSED)
   assert.equal(r.refused, true)
   assert.match(r.refusal, /could be read/i)
+})
+
+/* ─────────────────────────────── CSS-in-JS ─────────────────────────────────── */
+
+test('a styled-components block is read, not written off', () => {
+  // The sweep refused twentyhq/twenty at 25% coverage — a whole CRM invisible
+  // because its styling lives in emotion template literals.
+  const r = auditFiles([file('a.ts', `
+    const Button = styled.button\`
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #ffffff;
+    \`
+  `)])
+  const val = (dim) => r.dimensions[dim].values.map((v) => v.value)
+  assert.ok(val('radius').includes('4px'))
+  assert.ok(val('spacing').includes('8px'))
+  assert.ok(val('color').includes('#ffffff'))
+  assert.equal(r.meta.unreadable['styled-components'], undefined, 'no longer a blind spot')
+})
+
+test('a theme interpolation is a token reference, not noise', () => {
+  // `${({theme}) => theme.font.color.primary}` is this stack's `var(--x)`.
+  const r = auditFiles([file('a.ts', `
+    const T = styled.div\`
+      color: \${({ theme }) => theme.font.color.primary};
+      border-radius: \${(props) => props.theme.border.radius.sm};
+    \`
+  `)])
+  const colour = r.dimensions.color.values[0]
+  assert.ok(colour, 'the declaration must survive its interpolation')
+  assert.match(colour.value, /font-color-primary/)
+  assert.equal(r.dimensions.color.events, 1)
+})
+
+test('the theme accessor may be called anything theme-ish', () => {
+  // twentyhq/twenty writes `themeCssVariables.…`; requiring a literal `theme.`
+  // left 6,338 declarations unreadable there and kept the repo under the floor.
+  // Built by join() rather than a nested template — backtick-in-backtick is how
+  // this very test got mangled the first time.
+  const src = [
+    'const A = styled.div`',
+    '  color: ${themeCssVariables.font.color.tertiary};',
+    '  gap: ${themeCssVariables.spacing[2]};',
+    '`',
+    'const B = styled.div` color: ${theme.font.color.tertiary}; `',
+  ].join('\n')
+  const r = auditFiles([file('a.ts', src)])
+  // The base identifier is dropped, so the two accessor styles are ONE token.
+  assert.equal(r.dimensions.color.distinct, 1, 'theme.x and themeCssVariables.x are the same token')
+  assert.match(r.dimensions.color.values[0].value, /font-color-tertiary/)
+  // Bracket indexing normalises onto the dotted path.
+  assert.match(r.dimensions.spacing.values[0].value, /spacing-2/)
+})
+
+test('a non-theme identifier is not mistaken for a token', () => {
+  const r = auditFiles([file('a.ts', 'const A = styled.div`color: ${userPickedColour};`')])
+  assert.equal(r.dimensions.color.events, 0)
+  assert.ok(r.meta.unreadable['css-in-js-interpolation'] >= 1, 'and it stays declared unreadable')
+})
+
+test('styled(Component) and css`` blocks are read too', () => {
+  const r = auditFiles([file('a.ts', `
+    const A = styled(Base)\` padding: 12px; \`
+    const B = css\` border-radius: 6px; \`
+  `)])
+  assert.ok(r.dimensions.spacing.values.some((v) => v.value === '12px'))
+  assert.ok(r.dimensions.radius.values.some((v) => v.value === '6px'))
+})
+
+test('an interpolation we cannot name is still declared unreadable', () => {
+  // Honesty holds: a value we cannot resolve is reported, not silently dropped.
+  const r = auditFiles([file('a.ts', 'const A = styled.div`color: ${mystery};`')])
+  assert.ok(r.meta.unreadable['css-in-js-interpolation'] >= 1)
 })
 
 test('the profile flag moves the budget, not the maths', () => {

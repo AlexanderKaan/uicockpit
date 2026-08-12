@@ -595,6 +595,124 @@ export function extractInline(path, content) {
   return events
 }
 
+/* ─────────────────────────────── CSS-in-JS ───────────────────────────────────
+ * The biggest remaining blind spot, measured: a 17-repo sweep refused 3 repos on
+ * coverage and the worst was twentyhq/twenty at 25% read — a whole CRM invisible
+ * because its styling lives in emotion template literals.
+ *
+ * The body of `styled.button` … `` IS css, so the existing CSS extractor can read
+ * it once interpolations are handled. And the interpolations are the interesting
+ * part: `color: ${({theme}) => theme.font.color.primary}` is not noise, it is a
+ * TOKEN REFERENCE — the CSS-in-JS equivalent of `var(--x)`. Treating it as
+ * unreadable both undercounts coverage and, worse, hides the fact that the repo
+ * has a token system at all.
+ *
+ * What we cannot do is resolve the theme object, so a theme path stays its own
+ * value — exactly the position we are already in with an unresolvable `var()`. */
+
+const CSS_IN_JS_START = /\b(?:styled(?:\.[A-Za-z][\w]*|\([^)]*\))|css|createGlobalStyle|keyframes)\s*`/g
+
+/** Read a template literal from just after its opening backtick. */
+function readTemplate(src, from) {
+  let i = from
+  while (i < src.length) {
+    const ch = src[i]
+    if (ch === '\\') { i += 2; continue }
+    if (ch === '`') return { body: src.slice(from, i), end: i }
+    if (ch === '$' && src[i + 1] === '{') {
+      // Skip the interpolation wholesale, tracking nested braces.
+      let depth = 0
+      i += 1
+      while (i < src.length) {
+        if (src[i] === '{') depth++
+        else if (src[i] === '}') { depth--; if (!depth) break }
+        i++
+      }
+    }
+    i++
+  }
+  return null
+}
+
+/**
+ * A `${…}` that reads a theme path is a token reference; name it.
+ *
+ * The accessor is not always called `theme`. twentyhq/twenty writes
+ * `themeCssVariables.font.color.tertiary`, and requiring a literal `theme.`
+ * left 6,338 declarations unreadable in that one repo — enough to keep a whole
+ * CRM under the coverage floor. Any theme-ish base counts, and the base name is
+ * DROPPED so `theme.x.y` and `themeCssVariables.x.y` resolve to one token
+ * rather than two.
+ */
+const THEME_BASE = /^(theme|tokens?|palette|vars|styles?)/i
+function themePath(expr) {
+  const m = expr.match(/\b([A-Za-z_$][\w$]*)((?:\s*\.\s*[\w$]+|\s*\[\s*['"]?[\w-]+['"]?\s*\])+)/)
+  if (!m) return null
+  const base = m[1].replace(/^props\./, '')
+  if (!THEME_BASE.test(base)) return null
+  // `.spacing[2]` and `.spacing.2` are the same token.
+  const path = m[2].replace(/\s+/g, '').replace(/\[['"]?([\w-]+)['"]?\]/g, '.$1').replace(/^\./, '')
+  return path || null
+}
+
+/**
+ * Swap every `${…}` for either a var()-shaped token name or a dropped marker.
+ *
+ * Brace-AWARE, not a regex: the single most common form in the wild is
+ * `${({ theme }) => theme.x.y}`, whose destructuring braces make a non-greedy
+ * `\$\{[\s\S]*?\}` stop at the wrong `}` and shred the declaration. That bug
+ * silently swallowed every colour in a styled block while radii came through
+ * fine, because radii rarely destructure.
+ */
+function replaceInterpolations(body) {
+  let out = ''
+  for (let i = 0; i < body.length; i++) {
+    if (body[i] !== '$' || body[i + 1] !== '{') { out += body[i]; continue }
+    let depth = 0
+    const start = i + 2
+    let j = i + 1
+    for (; j < body.length; j++) {
+      if (body[j] === '{') depth++
+      else if (body[j] === '}') { depth--; if (!depth) break }
+    }
+    const path = themePath(body.slice(start, j))
+    out += path ? `var(--${path.replace(/\./g, '-')})` : '/*·*/'
+    i = j
+  }
+  return out
+}
+
+/**
+ * Turn CSS-in-JS blocks into CSS the normal extractor can read.
+ * Interpolations become either a token-looking value (a theme path) or a marker
+ * the caller drops. Returns the rewritten blocks plus how many we read.
+ */
+export function cssInJsBlocks(content) {
+  const blocks = []
+  for (const m of content.matchAll(CSS_IN_JS_START)) {
+    const t = readTemplate(content, m.index + m[0].length)
+    if (!t) continue
+    // Rewrite each interpolation in place so declarations stay intact.
+    const css = replaceInterpolations(t.body)
+    // A styled body is BARE declarations with no selector, and the CSS walker
+    // needs a rule. Wrapping is safe now that nesting is handled — any `&:hover`
+    // or child rule inside simply becomes a nested block.
+    blocks.push(`.styled-block {\n${css}\n}`)
+  }
+  return blocks
+}
+
+/** Blocks we could NOT turn into readable CSS (an interpolation we can't name
+ *  sitting where a whole declaration should be). Kept honest, not hidden. */
+export function cssInJsUnreadable(content) {
+  let n = 0
+  for (const css of cssInJsBlocks(content)) {
+    // A marker standing where a value belongs means that declaration is lost.
+    n += (css.match(/:\s*\/\*·\*\//g) || []).length
+  }
+  return n
+}
+
 /* ──────────────────────────── the blind spots ────────────────────────────────
  * `parsed` must be honest or the whole audit is contestable (AUDIT-HEURISTIC.md
  * §4). Count what we KNOW we cannot read, per reason, and report it. */
@@ -603,10 +721,9 @@ export function countUnreadable(path, content, resolvedModuleElements = 0) {
   const reasons = {}
   const bump = (k, n) => { if (n > 0) reasons[k] = (reasons[k] || 0) + n }
 
-  // styled-components / emotion: styled.div`…` and styled(Foo)`…`
-  bump('styled-components', (content.match(/\bstyled(?:\.[a-zA-Z]+|\([^)]*\))\s*`/g) || []).length)
-  // css`` template blocks with interpolation
-  bump('css-in-js-interpolation', (content.match(/\bcss\s*`[^`]*\$\{/g) || []).length)
+  // CSS-in-JS is READ now (see cssInJsBlocks) — only the declarations whose value
+  // is an interpolation we cannot name are still lost.
+  bump('css-in-js-interpolation', cssInJsUnreadable(content))
   // className={expr} that is NOT a plain string or a plain template literal —
   // minus the ones a CSS-module binding resolved, which ARE readable (their
   // values sit in the .module.css we scanned).

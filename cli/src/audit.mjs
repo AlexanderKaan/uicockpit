@@ -35,7 +35,7 @@ import {
   extractCss, extractClasses, extractInline, classAttrs,
   extractClassStyles, extractCssVars, resolveVar,
   cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar, styledClassNames, walkElements,
-  countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX,
+  countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX, cssInJsBlocks,
 } from './patterns.mjs'
 import {
   METRIC, NEAR_DUPE_THRESHOLD, colorDistance, pxDistance, clusterNear, parseColor, toLab, deltaE00,
@@ -593,7 +593,9 @@ export function detectStack(files, pkg, counts) {
   if (counts.plainCssFiles) add('Plain CSS', null, counts.cssRules, `${plural(counts.plainCssFiles, 'file')}, ${plural(counts.cssRules, 'rule')}`)
   if (counts.inlineStyles) add('Inline styles', null, counts.inlineStyles, plural(counts.inlineStyles, 'declaration'))
   for (const [dep, label] of CSS_IN_JS) {
-    if (deps[dep]) add(label, null, Infinity, 'installed — not readable by this scan')
+    if (!deps[dep]) continue
+    add(label, null, counts.cssInJsBlocks || 1,
+      counts.cssInJsBlocks ? plural(counts.cssInJsBlocks, 'styled block') : 'installed, none found')
   }
 
   // Sort by how much of the codebase actually uses it, and drop the trace
@@ -787,7 +789,7 @@ export function auditFiles(files, opts = {}) {
   const classStyles = {}
   const cssVars = {}
   // Counted evidence for the detected-stack summary (never inferred from deps).
-  const tally = { utilities: 0, moduleFiles: 0, moduleBindings: 0, moduleRules: 0, plainCssFiles: 0, cssRules: 0, inlineStyles: 0 }
+  const tally = { utilities: 0, moduleFiles: 0, moduleBindings: 0, moduleRules: 0, plainCssFiles: 0, cssRules: 0, inlineStyles: 0, cssInJsBlocks: 0 }
 
   const absorbCss = (path, css) => {
     events.push(...extractCss(path, css))
@@ -847,6 +849,16 @@ export function auditFiles(files, opts = {}) {
       elements.push({ classes, valueCarrying: evs.length > 0 })
     }
     for (const { classes } of moduleEls) elements.push({ classes, valueCarrying: false })
+
+    // CSS-in-JS: the template body IS css once interpolations are rewritten, so
+    // it goes through the same extractor as a stylesheet. A theme path becomes a
+    // var()-shaped token reference, which is what it actually is.
+    const cssInJs = cssInJsBlocks(content)
+    for (const css of cssInJs) absorbCss(path, css)
+    if (cssInJs.length) {
+      tally.cssInJsBlocks += cssInJs.length
+      readable += cssInJs.length
+    }
 
     const inline = extractInline(path, content)
     tally.inlineStyles += inline.length

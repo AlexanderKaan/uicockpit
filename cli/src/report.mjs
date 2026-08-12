@@ -436,8 +436,8 @@ export function renderReport(r) {
 <h1>uicockpit audit</h1>
 <p class="sub">${r.meta.files.toLocaleString('en-US')} files · ${r.meta.elements.toLocaleString('en-US')} styled elements · profile ${r.meta.profile}${r.meta.vocabVersion ? ` · vocabulary ${r.meta.vocabVersion}` : ''}</p>
 ${detectedBlock(r)}
-${scoreBoard(r)}
 ${buttonWall(r.components, r.classStyles || {}, r.palette || null)}
+${scoreBoard(r)}
 ${colorSwatches(d.color, r.palette || null)}
 ${typeSpecimens(d.type)}
 ${shadowSquares(d.shadow)}
