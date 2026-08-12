@@ -409,3 +409,9 @@ test('auditFiles is deterministic — the score is a fact, not an opinion', () =
   const b = JSON.stringify(auditFiles(files))
   assert.equal(a, b, 'two runs over the same input must be byte-identical')
 })
+
+test('mx-auto is a layout decision, not a spacing value', () => {
+  const evs = extractClasses(['mx-auto', 'p-4'], at).filter((e) => e.dim === 'spacing')
+  assert.ok(evs.every((e) => e.value === '16px'), 'only p-4 should register')
+  assert.equal(evs.length, 4)
+})

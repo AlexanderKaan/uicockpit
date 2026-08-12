@@ -92,17 +92,31 @@ const TEXT_NON_COLOR = new Set([
   'transparent', 'current', 'inherit',
 ])
 
-/** Tailwind's numeric spacing scale: 1 unit = 4px (`p-4` → 16px). */
+/** Tailwind's numeric spacing scale: 1 unit = 4px (`p-4` → 16px).
+ *  `auto` and `full` are LAYOUT decisions (`mx-auto` centres a box, it does not
+ *  choose a rhythm) — returning them would inflate the spacing distribution with
+ *  values nobody picked off a scale. */
 export function twSpace(raw) {
   if (raw === 'px') return '1px'
-  if (raw === 'full') return '100%'
-  if (raw === 'auto') return 'auto'
+  if (raw === 'auto' || raw === 'full') return null
   const n = Number(raw)
   return Number.isFinite(n) ? `${n * 4}px` : null
 }
 
 /** The Tailwind grey ramps — three of these side by side is the classic AI tell. */
 export const TW_GRAY_RAMPS = ['gray', 'slate', 'zinc', 'neutral', 'stone']
+
+/** Does this class token look like a Tailwind utility? Used only to COUNT them
+ *  for the detected-stack summary, never to score — a package.json entry proves
+ *  an install, this proves people actually write them. */
+export const UTILITY_RX = new RegExp(
+  '^(?:[\\w-]+:)*(?:' +
+  'p|m|gap|space|w|h|min|max|inset|top|right|bottom|left|z|order|col|row|basis|' +
+  'text|font|leading|tracking|bg|border|rounded|shadow|ring|outline|opacity|' +
+  'flex|grid|items|justify|content|self|place|object|aspect|overflow|' +
+  'transition|duration|ease|animate|translate|scale|rotate|cursor|select|' +
+  'divide|backdrop|filter|blur|truncate|sr|container|block|inline|hidden|absolute|relative|fixed|sticky' +
+  ')(?:-[\\w./[\\]#%()-]+)?$')
 
 /* ─────────────────────────────── helpers ─────────────────────────────────── */
 

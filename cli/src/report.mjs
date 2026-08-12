@@ -93,7 +93,7 @@ function buttonWall(components, classStyles) {
       <div class="wall__stage">${resolved
         ? `<span class="wall__btn" style="${esc(style)}">Button</span>`
         : `<span class="wall__unresolved" title="Styled by CSS this report can't resolve">${esc(s.sig.split(' ').slice(0, 3).join(' ')) || '(no classes)'}</span>`}</div>
-      <figcaption><b>${label}</b>${files ? `<span>${esc(files)}</span>` : ''}</figcaption>
+      <figcaption><b>${label}</b>${files ? `<span title="${esc(files)}">${esc(files)}</span>` : ''}</figcaption>
     </figure>`
   }).join('')
 
@@ -129,7 +129,15 @@ function colorSwatches(d) {
   const dupeNote = d.nearDupes.length
     ? `<p class="note">${d.nearDupes.length} near-duplicate cluster${d.nearDupes.length > 1 ? 's' : ''} (ΔE00 &lt; 2, outlined) — nobody chose to have both.</p>`
     : ''
-  return section('Colour', `${d.distinct} distinct values across ${d.events} applications · nEff ${d.nEff} against a budget of ${d.budget}.`, `${dupeNote}<div class="grid grid--sw">${cells}</div>`)
+  // Say WHY a swatch is hatched. An unexplained placeholder reads as a bug; the
+  // truth is that we only resolve the grey ramps, so a named palette colour has
+  // no hex to paint — and it is also excluded from near-duplicate detection,
+  // which the reader deserves to know before trusting the count.
+  const unresolved = ordered.filter((v) => !cssColor(v.value)).length
+  const unresolvedNote = unresolved
+    ? `<p class="note">${unresolved} of ${d.distinct} values are palette names this scan cannot resolve to a colour (hatched) — they are counted, but excluded from near-duplicate detection.</p>`
+    : ''
+  return section('Colour', `${d.distinct} distinct values across ${d.events} applications · nEff ${d.nEff} against a budget of ${d.budget}.`, `${dupeNote}${unresolvedNote}<div class="grid grid--sw">${cells}</div>`)
 }
 
 function shadowSquares(d) {
@@ -189,6 +197,41 @@ const section = (title, lead, body) => `<section class="sec">
   ${lead ? `<p class="lead">${lead}</p>` : ''}
   ${body}
 </section>`
+
+/**
+ * "This is your codebase" — deliberately the FIRST thing on the page, above the
+ * score. A verdict from a black box is an assertion; a verdict that arrives after
+ * the reader has recognised their own stack is evidence. It is also the honest
+ * disclosure of what the scan could not see.
+ */
+function detectedBlock(r) {
+  const s = r.meta.stack
+  if (!s) return ''
+  const chips = []
+  if (s.framework) chips.push(s.framework.name + (s.framework.version ? ` ${s.framework.version}` : ''))
+  if (s.meta) chips.push(s.meta.name)
+  if (s.typescript) chips.push('TypeScript')
+  for (const lib of s.componentLibraries) chips.push(lib)
+
+  const rows = s.styling.map((x) => `<li>
+      <b>${esc(x.kind)}${x.version ? ` v${esc(x.version)}` : ''}</b>
+      <span>${esc(x.detail)}</span>
+    </li>`).join('')
+
+  const exts = Object.entries(s.byExt).sort((a, b) => b[1] - a[1]).slice(0, 6)
+    .map(([e, n]) => `${n} <code>.${esc(e)}</code>`).join(' · ')
+
+  const unread = Object.entries(r.meta.unreadable)
+  return `<section class="detected">
+    <h2>Detected</h2>
+    ${chips.length ? `<div class="chips">${chips.map((c) => `<span>${esc(c)}</span>`).join('')}</div>` : ''}
+    ${rows ? `<ul class="stack">${rows}</ul>` : ''}
+    <p class="detected__files">${s.files.toLocaleString('en-US')} files scanned — ${exts}</p>
+    <p class="detected__cov"><b>${pct(r.meta.parsed)}</b> of styled elements read${
+      unread.length ? ` · not readable: ${unread.map(([k, n]) => `${n} ${esc(k)}`).join(' · ')}` : ' — nothing skipped'}</p>
+    ${s.componentLibraries.length ? `<p class="note">A component library is in use, so much of the styling may live inside it. Few loose values here does not by itself mean a coherent system.</p>` : ''}
+  </section>`
+}
 
 function scoreBoard(r) {
   const DIMS = ['color', 'type', 'spacing', 'radius', 'shadow']
@@ -273,6 +316,17 @@ h2{font-size:18px;letter-spacing:-.01em;margin:0 0 6px}
 .lead{color:var(--muted);margin:0 0 18px;max-width:64ch;font-size:14px}
 .note{color:var(--warn);font-size:13px;margin:0 0 14px}
 code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
+.detected{margin:0 0 40px;padding:20px 22px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.detected h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chips span{font-size:12px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;background:var(--bg)}
+.stack{list-style:none;padding:0;margin:0 0 14px;display:grid;gap:7px}
+.stack li{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;font-size:14px}
+.stack b{font-weight:600}
+.stack span{color:var(--muted);font-size:13px}
+.detected__files,.detected__cov{margin:0;font-size:13px;color:var(--muted)}
+.detected__cov{margin-top:5px}
+.detected__cov b{color:var(--fg)}
 .board{display:grid;gap:20px}
 .board__score{display:flex;align-items:baseline;gap:12px}
 .board__n{font-size:56px;font-weight:650;letter-spacing:-.03em;line-height:1}
@@ -311,8 +365,11 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
 .wall__cell.is-singleton .wall__stage{border-color:var(--warn);border-style:dashed}
 .wall__btn{display:inline-block;font-family:inherit;line-height:1;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .wall__unresolved{font:11px/1.3 ui-monospace,Menlo,monospace;color:var(--muted);text-align:center;word-break:break-all}
-.wall figcaption{margin-top:6px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:1px}
+.wall figcaption{margin-top:6px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:1px;min-width:0}
 .wall figcaption b{color:var(--fg);font-weight:600}
+/* Paths are long and the cells are narrow — clip instead of letting captions
+   run under their neighbours. The full path stays available on hover. */
+.wall figcaption span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:rtl;text-align:left}
 .guns{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 .guns li{display:flex;flex-direction:column;gap:2px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:8px}
 .guns span{color:var(--muted);font-size:13px}
@@ -335,6 +392,7 @@ export function renderReport(r) {
 <body><div class="wrap">
 <h1>uicockpit audit</h1>
 <p class="sub">${r.meta.files.toLocaleString('en-US')} files · ${r.meta.elements.toLocaleString('en-US')} styled elements · profile ${r.meta.profile}${r.meta.vocabVersion ? ` · vocabulary ${r.meta.vocabVersion}` : ''}</p>
+${detectedBlock(r)}
 ${scoreBoard(r)}
 ${buttonWall(r.components, r.classStyles || {})}
 ${colorSwatches(d.color)}

@@ -35,7 +35,7 @@ import {
   extractCss, extractClasses, extractInline, classAttrs,
   extractClassStyles, extractCssVars, resolveVar,
   cssModuleBindings, moduleClassAttrs, qualify,
-  countUnreadable, countReadable, norm, TW_GRAY_RAMPS,
+  countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX,
 } from './patterns.mjs'
 import {
   METRIC, NEAR_DUPE_THRESHOLD, colorDistance, pxDistance, clusterNear, parseColor, toLab, deltaE00,
@@ -317,6 +317,81 @@ function collectComponents(files) {
  * Binary findings, their own section, NEVER in the score. They convert better
  * than any number because they cannot be relativised. */
 
+/* ──────────────────────────── what we detected ──────────────────────────────
+ * Shown BEFORE the verdict, on purpose. A score arriving out of a black box is
+ * just an assertion; a score arriving after "React · Tailwind v4 · 1,284
+ * utilities across 15 files · 97% read" arrives once the reader has already
+ * thought *that is exactly my codebase*. Recognition first, judgement second —
+ * and it doubles as an honest disclosure of what the scan could and could not
+ * see. Every number here is COUNTED, never inferred from a dependency alone: a
+ * package.json entry proves an install, not a usage. */
+
+const FRAMEWORKS = [
+  [/^react$/, 'React'], [/^vue$/, 'Vue'], [/^svelte$/, 'Svelte'],
+  [/^@angular\/core$/, 'Angular'], [/^solid-js$/, 'Solid'], [/^preact$/, 'Preact'],
+]
+const META_FRAMEWORKS = [
+  [/^next$/, 'Next.js'], [/^nuxt$/, 'Nuxt'], [/^astro$/, 'Astro'],
+  [/^@remix-run\/react$/, 'Remix'], [/^@sveltejs\/kit$/, 'SvelteKit'], [/^vite$/, 'Vite'],
+]
+const CSS_IN_JS = [
+  ['styled-components', 'styled-components'], ['@emotion/styled', 'Emotion'],
+  ['@stitches/react', 'Stitches'], ['@vanilla-extract/css', 'vanilla-extract'],
+]
+const COMPONENT_LIBS = ['@mui/material', 'antd', '@chakra-ui/react', '@mantine/core', 'react-bootstrap', '@radix-ui/themes']
+
+const major = (range) => (String(range).match(/(\d+)/) || [])[1] || null
+
+export function detectStack(files, pkg, counts) {
+  const deps = { ...(pkg?.dependencies || {}), ...(pkg?.devDependencies || {}) }
+  const hit = (table) => {
+    for (const [rx, name] of table) {
+      const key = Object.keys(deps).find((d) => rx.test(d))
+      if (key) return { name, version: major(deps[key]) }
+    }
+    return null
+  }
+
+  const byExt = {}
+  for (const f of files) {
+    const ext = (f.path.match(/\.(\w+)$/) || [, '?'])[1]
+    byExt[ext] = (byExt[ext] || 0) + 1
+  }
+
+  const plural = (n, one, many = `${one}s`) => `${nf(n)} ${n === 1 ? one : many}`
+
+  const styling = []
+  const add = (kind, version, weight, detail) => styling.push({ kind, version, weight, detail })
+
+  if (counts.utilities) add('Tailwind CSS', deps.tailwindcss ? major(deps.tailwindcss) : null, counts.utilities, plural(counts.utilities, 'utility class', 'utility classes'))
+  if (counts.moduleFiles) add('CSS Modules', null, counts.moduleBindings, `${plural(counts.moduleFiles, 'module')}, ${plural(counts.moduleRules, 'rule')}, ${plural(counts.moduleBindings, 'binding')}`)
+  if (counts.plainCssFiles) add('Plain CSS', null, counts.cssRules, `${plural(counts.plainCssFiles, 'file')}, ${plural(counts.cssRules, 'rule')}`)
+  if (counts.inlineStyles) add('Inline styles', null, counts.inlineStyles, plural(counts.inlineStyles, 'declaration'))
+  for (const [dep, label] of CSS_IN_JS) {
+    if (deps[dep]) add(label, null, Infinity, 'installed — not readable by this scan')
+  }
+
+  // Sort by how much of the codebase actually uses it, and drop the trace
+  // amounts. A dependency that is installed but barely used would otherwise be
+  // announced as "your stack" — the fastest way to lose the reader's trust in
+  // the very block that exists to earn it.
+  styling.sort((a, b) => b.weight - a.weight)
+  const dominant = styling.length ? styling[0].weight : 0
+  const kept = styling.filter((s, i) => i === 0 || s.weight >= 10 || s.weight >= dominant * 0.02)
+
+  return {
+    framework: hit(FRAMEWORKS),
+    meta: hit(META_FRAMEWORKS),
+    typescript: Boolean(deps.typescript || byExt.tsx || byExt.ts),
+    styling: kept,
+    // A component library changes what "few loose values" MEANS. Say it out loud
+    // rather than quietly scoring a themed repo as clean (AUDIT-HEURISTIC §7.1).
+    componentLibraries: COMPONENT_LIBS.filter((d) => deps[d]),
+    files: files.length,
+    byExt,
+  }
+}
+
 function smokingGuns(files, pkg, events) {
   const flags = []
   const paths = files.map((f) => f.path)
@@ -484,6 +559,8 @@ export function auditFiles(files, opts = {}) {
   // their class names — the wall only converts if you can see the buttons.
   const classStyles = {}
   const cssVars = {}
+  // Counted evidence for the detected-stack summary (never inferred from deps).
+  const tally = { utilities: 0, moduleFiles: 0, moduleBindings: 0, moduleRules: 0, plainCssFiles: 0, cssRules: 0, inlineStyles: 0 }
 
   const absorbCss = (path, css) => {
     events.push(...extractCss(path, css))
@@ -503,7 +580,12 @@ export function auditFiles(files, opts = {}) {
   // whether the class it points at actually paints anything.
   for (const { path, content } of files) {
     if (!/\.(css|scss|less)$/.test(path)) continue
-    readable += countReadable(path, content)
+    const rules = countReadable(path, content)
+    readable += rules
+    // Attribute rules to the idiom that owns them, or "9 plain CSS files" ends
+    // up reporting a rule count that includes every CSS module.
+    if (/\.module\.(css|scss|less)$/.test(path)) { tally.moduleFiles++; tally.moduleRules += rules }
+    else { tally.plainCssFiles++; tally.cssRules += rules }
     for (const [k, n] of Object.entries(countUnreadable(path, content))) {
       unreadable[k] = (unreadable[k] || 0) + n
     }
@@ -525,10 +607,13 @@ export function auditFiles(files, opts = {}) {
       unreadable[k] = (unreadable[k] || 0) + n
     }
 
+    tally.moduleBindings += moduleEls.length
+
     // Class attributes: events + the expressible bucket, per element.
     for (const { classes, at } of classAttrs(path, content)) {
       const evs = extractClasses(classes, at)
       events.push(...evs)
+      for (const c of classes) if (UTILITY_RX.test(c)) tally.utilities++
       const hasRecipe = classes.some((c) => {
         const root = c.split('--')[0].split('__')[0].replace(/^.*:/, '')
         return Object.prototype.hasOwnProperty.call(vocab, root)
@@ -548,7 +633,9 @@ export function auditFiles(files, opts = {}) {
       else expressible.none++
     }
 
-    events.push(...extractInline(path, content))
+    const inline = extractInline(path, content)
+    tally.inlineStyles += inline.length
+    events.push(...inline)
     // HTML files also carry CSS-ish styling in <style> blocks.
     for (const m of content.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) absorbCss(path, m[1])
   }
@@ -587,6 +674,8 @@ export function auditFiles(files, opts = {}) {
       files: files.length,
       elements: styledElements,
       profile,
+      // Recognition before judgement — see detectStack().
+      stack: detectStack(files, opts.pkg, tally),
       parsed: round(parsed, 3),
       unreadable,
       // parsed = "could I read it" (a scanner problem).
@@ -671,9 +760,27 @@ function wrap(text, width) {
   return out
 }
 
+/** One line of "this is your codebase" — the recognition beat before the verdict. */
+export function stackLine(stack) {
+  const bits = []
+  if (stack.framework) bits.push(stack.framework.name + (stack.framework.version ? ` ${stack.framework.version}` : ''))
+  if (stack.meta) bits.push(stack.meta.name)
+  if (stack.typescript) bits.push('TypeScript')
+  for (const s of stack.styling.slice(0, 3)) {
+    bits.push(s.version ? `${s.kind} v${s.version}` : s.kind)
+  }
+  for (const lib of stack.componentLibraries) bits.push(lib)
+  return bits.join(' · ')
+}
+
 export function renderTerminal(r, { reportPath = null } = {}) {
   const L = []
-  L.push(`  uicockpit audit — ${nf(r.meta.files)} files · ${nf(r.meta.elements)} styled elements · profile: ${r.meta.profile}`)
+  const s = r.meta.stack
+  L.push(`  uicockpit audit — ${nf(r.meta.files)} files · ${nf(r.meta.elements)} styled elements · ${pct(r.meta.parsed)} read`)
+  const line = stackLine(s)
+  if (line) L.push(`  ${line}`)
+  const detail = s.styling.map((x) => x.detail).filter(Boolean).slice(0, 2).join(' · ')
+  if (detail) L.push(`  ${detail}`)
   L.push('')
 
   if (r.refused) {
@@ -731,8 +838,7 @@ export function renderTerminal(r, { reportPath = null } = {}) {
   if (guns.length) L.push(`  ${guns.join(' · ')}`)
 
   if (r.meta.parsed < 1) {
-    L.push('')
-    L.push(`  Scan coverage ${pct(r.meta.parsed)} — ${Object.entries(r.meta.unreadable).map(([k, n]) => `${n} ${k}`).join(' · ')}`)
+    L.push(`  Unread: ${Object.entries(r.meta.unreadable).map(([k, n]) => `${n} ${k}`).join(' · ')}`)
   }
   if (reportPath) {
     L.push('')
