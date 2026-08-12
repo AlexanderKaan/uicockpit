@@ -444,6 +444,52 @@ export function extractClasses(classes, at) {
   return events
 }
 
+/* ─────────────────────── element tree (for sibling rules) ────────────────────
+ * Every rule we had until now judged ONE value in isolation. The failure people
+ * actually hit is relational: a row with the account button on the left and
+ * sign-in on the right, where the two are a few pixels different in height
+ * because nothing told the generator they belong together.
+ *
+ * Catching that needs sibling relationships, which a flat regex cannot give. A
+ * full parser is out of scope for a zero-dep CLI, so this is a tag scanner: it
+ * tracks open/close tags to a stack and reports each element with its parent.
+ * Approximate by construction — mismatched or unclosed tags just end a subtree
+ * early — so it feeds a REPORTED finding, never the score.                    */
+
+const VOID_TAGS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+  'link', 'meta', 'param', 'source', 'track', 'wbr'])
+
+const TAG_RX = /<(\/)?([A-Za-z][\w.-]*)((?:[^>"']|"[^"]*"|'[^']*')*?)(\/)?>/g
+
+/**
+ * Walk markup, calling `visit(el)` for every opening element with:
+ *   { tag, attrs, line, depth, parent }  — `parent` is the enclosing element or null.
+ */
+export function walkElements(content, visit) {
+  const stack = []
+  let line = 1
+  let last = 0
+
+  for (const m of content.matchAll(TAG_RX)) {
+    // Track line numbers without re-slicing the whole file each time.
+    for (let i = last; i < m.index; i++) if (content[i] === '\n') line++
+    last = m.index
+
+    const [, closing, tag, attrs = '', selfClose] = m
+    if (closing) {
+      // Pop to the matching tag if it is on the stack; otherwise ignore the
+      // stray close rather than unwinding the whole tree.
+      const at = stack.map((f) => f.tag).lastIndexOf(tag)
+      if (at !== -1) stack.length = at
+      continue
+    }
+
+    const el = { tag, attrs, line, depth: stack.length, parent: stack[stack.length - 1] || null }
+    visit(el)
+    if (!selfClose && !VOID_TAGS.has(tag.toLowerCase())) stack.push(el)
+  }
+}
+
 /* ──────────────────────────── CSS Modules support ───────────────────────────
  * `className={styles.title}` is one of the two dominant React styling idioms,
  * and treating it as unreadable is wrong twice over: the VALUES behind it were

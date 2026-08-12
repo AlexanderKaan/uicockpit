@@ -287,6 +287,31 @@ function scoreBoard(r) {
   </section>`
 }
 
+/**
+ * The first RELATIONAL finding. Every other section judges values against a
+ * budget; this one judges two siblings against each other — the mistake a
+ * generator makes constantly and a per-value rule can never see.
+ */
+function clustersBlock(r) {
+  const c = r.clusters
+  if (!c || !c.mismatched) return ''
+  const rows = c.findings.map((f) => `<li>
+      <div class="cl__head"><code>${esc(f.file)}:${f.line}</code>
+        <span>differs on ${f.differsOn.map((d) => `<b>${esc(d.replace('class:', ''))}</b>`).join(', ')}</span></div>
+      <div class="cl__kids">${f.controls.map((x) =>
+        `<span><code>&lt;${esc(x.tag)}&gt;</code> L${x.line} · ${esc(x.height)}</span>`).join('')}</div>
+    </li>`).join('')
+
+  return section(
+    'Rows that do not line up',
+    `<strong>${c.mismatched} of ${c.rows} control rows</strong> hold siblings whose height is set
+     differently. A row of controls reads as one object, so the eye catches a few pixels of
+     disagreement even when no single value is wrong — which is why no per-value rule finds this.
+     Only facets BOTH siblings declare are compared, and only vertical padding counts toward height.`,
+    `<ul class="clusters">${rows}</ul>`,
+  )
+}
+
 function gunsBlock(r) {
   if (!r.flags.length) return ''
   const NAMES = {
@@ -382,6 +407,12 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
 /* Paths are long and the cells are narrow — clip instead of letting captions
    run under their neighbours. The full path stays available on hover. */
 .wall figcaption span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:rtl;text-align:left}
+.clusters{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.clusters li{padding:12px 14px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:8px}
+.cl__head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;font-size:13px}
+.cl__head span{color:var(--muted)}
+.cl__head b{color:var(--warn);font-weight:600}
+.cl__kids{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px;font-size:12px;color:var(--muted)}
 .guns{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 .guns li{display:flex;flex-direction:column;gap:2px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:8px}
 .guns span{color:var(--muted);font-size:13px}
@@ -412,6 +443,7 @@ ${typeSpecimens(d.type)}
 ${shadowSquares(d.shadow)}
 ${radiusSquares(d.radius)}
 ${spacingBars(d.spacing)}
+${clustersBlock(r)}
 ${gunsBlock(r)}
 ${coverageBlock(r)}
 <footer>

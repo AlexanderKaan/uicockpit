@@ -546,3 +546,84 @@ test('component names are reported so the reader recognises their own', () => {
   const r = auditFiles([file('a.tsx', '<IconButton/><Button/><Button/>')])
   assert.deepEqual(r.components.button.componentNames, ['Button', 'IconButton'])
 })
+
+/* ───────────────────── relational coherence (sibling rows) ─────────────────── */
+
+test('siblings in a row at different heights are flagged', () => {
+  // Alexander's case: account on the left, sign-in on the right, not the same height.
+  const r = auditFiles([file('a.tsx', `
+    <div className="flex">
+      <button className="py-2 text-sm">Account</button>
+      <button className="py-3 text-sm">Sign in</button>
+    </div>
+  `)])
+  assert.equal(r.clusters.rows, 1)
+  assert.equal(r.clusters.mismatched, 1)
+  assert.deepEqual(r.clusters.findings[0].differsOn, ['class:py'])
+})
+
+test('a matched row is not flagged', () => {
+  const r = auditFiles([file('a.tsx', `
+    <div className="flex">
+      <button className="py-2 text-sm">Account</button>
+      <button className="py-2 text-sm">Sign in</button>
+    </div>
+  `)])
+  assert.equal(r.clusters.rows, 1)
+  assert.equal(r.clusters.mismatched, 0)
+})
+
+test('only VERTICAL padding counts — px differences are not height', () => {
+  // `9px 16px` vs `9px 18px` is the same height and a different width. Flagging
+  // it would lose the first argument about this feature.
+  const r = auditFiles([
+    file('s.css', '.a { padding: 9px 16px; } .b { padding: 9px 18px; }'),
+    file('a.tsx', '<div><button className="a">x</button><button className="b">y</button></div>'),
+  ])
+  assert.equal(r.clusters.mismatched, 0)
+
+  const tall = auditFiles([
+    file('s.css', '.a { padding: 9px 16px; } .b { padding: 12px 16px; }'),
+    file('a.tsx', '<div><button className="a">x</button><button className="b">y</button></div>'),
+  ])
+  assert.equal(tall.clusters.mismatched, 1)
+})
+
+test('it declines to judge when only one sibling declares the facet', () => {
+  // One sets font-size, the other inherits something we cannot see.
+  const r = auditFiles([
+    file('s.css', '.a { font-size: 14px; } .b { color: red; }'),
+    file('a.tsx', '<div><button className="a">x</button><button className="b">y</button></div>'),
+  ])
+  assert.equal(r.clusters.mismatched, 0, 'a partial reading must not become an accusation')
+})
+
+test('a component size prop is a declared height', () => {
+  const r = auditFiles([file('a.tsx', `
+    <div><Button size="sm">a</Button><Button size="lg">b</Button></div>
+  `)])
+  assert.equal(r.clusters.mismatched, 1)
+  assert.deepEqual(r.clusters.findings[0].differsOn, ['size'])
+})
+
+test('controls in different containers are not siblings', () => {
+  const r = auditFiles([file('a.tsx', `
+    <div><button className="py-2">a</button></div>
+    <div><button className="py-5">b</button></div>
+  `)])
+  assert.equal(r.clusters.rows, 0, 'two rows of one control each is not a cluster')
+  assert.equal(r.clusters.mismatched, 0)
+})
+
+test('the element walker survives self-closing and void tags', () => {
+  const r = auditFiles([file('a.tsx', `
+    <div>
+      <img src="x" />
+      <input className="py-2" />
+      <br>
+      <input className="py-4" />
+    </div>
+  `)])
+  assert.equal(r.clusters.rows, 1, 'both inputs must still read as siblings')
+  assert.equal(r.clusters.mismatched, 1)
+})

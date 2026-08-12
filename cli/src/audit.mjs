@@ -34,7 +34,7 @@ import {
   GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE,
   extractCss, extractClasses, extractInline, classAttrs,
   extractClassStyles, extractCssVars, resolveVar,
-  cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar, styledClassNames,
+  cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar, styledClassNames, walkElements,
   countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX,
 } from './patterns.mjs'
 import {
@@ -384,6 +384,158 @@ function collectComponents(files) {
     }
   }
   return out
+}
+
+/* ────────────────────── relational coherence (sibling rows) ──────────────────
+ * The failure this catches, in Alexander's words: a row of buttons at the top —
+ * account on the left, sign-in on the right — where the two are not the same
+ * height, because nothing in the codebase says they belong together.
+ *
+ * It is the first RELATIONAL check we have. Every other rule judges one value
+ * against the contract; this one judges two siblings against each other, which
+ * is the class of mistake a generator makes constantly and a per-value rule can
+ * never see.
+ *
+ * Two deliberate restraints:
+ *  · **Reported, never scored.** It rides on an approximate tag scanner and on
+ *    a height model that cannot see every source of height. A number that can
+ *    be wrong does not belong in a score that has to survive a CI gate.
+ *  · **Declines to judge when it cannot read both sides.** Same rule as the
+ *    translucent colours: if either sibling's height is unreadable, say nothing
+ *    rather than guess. A false "your buttons don't line up" is far more
+ *    expensive than a missed one.                                             */
+
+/** Class utilities that decide how tall a control ends up. */
+const HEIGHT_RX = /^(?:[\w-]+:)*(h|min-h|size|py|pt|pb|p|text|leading)-/
+/** …and the CSS declarations that do the same job in a stylesheet. */
+const HEIGHT_PROPS = ['padding', 'font-size', 'line-height']
+
+/**
+ * Only the VERTICAL half of a padding shorthand changes a control's height.
+ * Comparing the whole string flagged `9px 16px` against `9px 18px` — identical
+ * height, different width — which is exactly the false positive that would lose
+ * the first argument about this feature.
+ */
+function verticalPadding(value) {
+  const parts = String(value).trim().split(/\s+/)
+  if (!parts.length) return null
+  if (parts.length === 1) return parts[0]              // all sides
+  if (parts.length === 2) return parts[0]              // vertical horizontal
+  return `${parts[0]}/${parts[2] ?? parts[0]}`         // top / bottom
+}
+
+/** Is this element a control whose height a reader would expect to match? */
+function controlKind(tag) {
+  const t = tag.toLowerCase()
+  if (t === 'button') return 'button'
+  if (t === 'input' || t === 'select' || t === 'textarea') return 'input'
+  if (/^[A-Z]/.test(tag) && !NOT_A_CONTROL.test(tag)) {
+    for (const kind of ['button', 'input']) if (COMPONENTISH[kind].test(tag)) return kind
+  }
+  return null
+}
+
+/**
+ * The height-determining facts we can read off this control, as a map.
+ *
+ * A MAP rather than a string, because two siblings may declare different
+ * PROPERTIES rather than different values: if one sets `font-size: 14px` and
+ * the other sets none, the second inherits something we cannot see, and calling
+ * that a mismatch would be a guess. Comparison happens only on facets both
+ * siblings actually declare.
+ */
+function heightFacets(el, classStyles, bindings, path) {
+  const facets = {}
+
+  const cls = attrClasses(el.attrs, bindings, path)
+  if (cls) {
+    for (const c of cls) {
+      const bare = c.replace(/^(?:[\w-]+:)*/, '')
+      const m = bare.match(HEIGHT_RX)
+      if (m) facets[`class:${bare.split('-')[0]}`] = bare
+    }
+    for (const c of cls) {
+      const decls = classStyles[c]
+      if (!decls) continue
+      for (const p of HEIGHT_PROPS) {
+        if (!decls[p]) continue
+        facets[p] = p === 'padding' ? verticalPadding(decls[p]) : decls[p]
+      }
+    }
+  }
+
+  // `<Button size="sm">` — a component's size prop IS its declared height.
+  const size = el.attrs.match(/\bsize\s*=\s*(?:"([^"]*)"|'([^']*)'|\{\s*["']([^"']*)["']\s*\})/)
+  if (size) facets.size = size[1] ?? size[2] ?? size[3]
+  else if (/^[A-Z]/.test(el.tag)) facets.size = 'default'
+
+  return Object.keys(facets).length ? facets : null
+}
+
+/** Compare siblings only where they all declare the same facet. */
+function facetMismatch(all) {
+  const common = Object.keys(all[0]).filter((k) => all.every((f) => k in f))
+  if (!common.length) return null
+  const differing = common.filter((k) => new Set(all.map((f) => f[k])).size > 1)
+  return differing.length ? differing : null
+}
+
+/**
+ * Find rows of sibling controls whose heights disagree.
+ * @returns {{rows:number, mismatched:number, findings:object[]}}
+ */
+function findControlClusters(files, classStyles) {
+  let rows = 0
+  const findings = []
+
+  for (const { path, content } of files) {
+    if (/\.(css|scss|less)$/.test(path)) continue
+    const bindings = cssModuleBindings(path, content)
+
+    // Group controls by the element that contains them.
+    const byParent = new Map()
+    walkElements(content, (el) => {
+      const kind = controlKind(el.tag)
+      if (!kind || !el.parent) return
+      if (!byParent.has(el.parent)) byParent.set(el.parent, [])
+      byParent.get(el.parent).push({ el, kind })
+    })
+
+    for (const [parent, kids] of byParent) {
+      for (const kind of ['button', 'input']) {
+        const group = kids.filter((k) => k.kind === kind)
+        if (group.length < 2) continue
+        rows++
+
+        const read = group.map((k) => ({
+          tag: k.el.tag,
+          line: k.el.line,
+          facets: heightFacets(k.el, classStyles, bindings, path),
+        }))
+        // Decline unless every sibling's height is readable at all.
+        if (read.some((r) => r.facets === null)) continue
+        const differing = facetMismatch(read.map((r) => r.facets))
+        if (!differing) continue
+
+        findings.push({
+          kind,
+          file: path,
+          line: parent.line,
+          container: parent.tag,
+          // Name WHICH facet disagrees — "these two buttons differ on padding"
+          // is actionable; "these two buttons differ" is an accusation.
+          differsOn: differing,
+          controls: read.map((r) => ({
+            tag: r.tag,
+            line: r.line,
+            height: differing.map((k) => `${k}:${r.facets[k]}`).join(' '),
+          })),
+        })
+      }
+    }
+  }
+
+  return { rows, mismatched: findings.length, findings: findings.slice(0, 50) }
 }
 
 /* ───────────────────────────── the smoking guns ─────────────────────────────
@@ -815,6 +967,9 @@ export function auditFiles(files, opts = {}) {
     // Not part of the measurement — purely so the report can render a real
     // swatch for a class-based component instead of quoting its class list.
     classStyles: resolvedStyles,
+    // The first RELATIONAL finding: sibling controls whose heights disagree.
+    // Reported, never scored — see findControlClusters().
+    clusters: findControlClusters(files, resolvedStyles),
     // Only the entries this codebase actually uses, so `--json` stays readable
     // instead of carrying a few hundred palette rows nobody referenced.
     palette: Object.fromEntries(
@@ -967,6 +1122,12 @@ export function renderTerminal(r, { reportPath = null } = {}) {
   // everything through <Button/> is a number the reader cannot reconcile with
   // their own app, and that is how a report loses its credibility.
   L.push(buttonLine(r.components.button))
+
+  // The first relational finding — the one a per-value rule can never see.
+  const cl = r.clusters
+  if (cl && cl.mismatched) {
+    L.push(`  ${nf(cl.mismatched)} of ${nf(cl.rows)} control rows have siblings at different heights`)
+  }
 
   const guns = []
   for (const f of r.flags) {
