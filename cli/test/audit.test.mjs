@@ -2,8 +2,9 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   auditFiles, effectiveCount, cardinalityScore, grade,
-  BUDGETS, WEIGHTS, DIMENSIONS, MIN_EVENTS, MIN_PARSED, buttonLine,
+  BUDGETS, WEIGHTS, DIMENSIONS, MIN_EVENTS, MIN_PARSED, buttonLine, renderTerminal,
 } from '../src/audit.mjs'
+import { renderReport } from '../src/report.mjs'
 import {
   extractCss, extractClasses, extractCssVars, extractClassStyles, resolveVar, expandBox,
   cssModuleBindings, moduleClassAttrs, resolveRelative,
@@ -750,4 +751,31 @@ test('sprawl reports per kind as well as in total', () => {
   `)])
   assert.ok('button' in r.sprawl.byKind && 'input' in r.sprawl.byKind)
   assert.equal(r.sprawl.treatments, r.sprawl.byKind.button.treatments + r.sprawl.byKind.input.treatments)
+})
+
+test('a refusal still reports what it found, as a floor', () => {
+  // twentyhq/twenty refuses on coverage yet holds 31 of 32 treatments used
+  // exactly once. Throwing that away left a fifth of real repos with nothing.
+  const dyn = Array.from({ length: 40 }, (_, i) => `<div className={cls${i}}>x</div>`).join('\n')
+  const btns = Array.from({ length: 12 }, (_, i) => `<button className="bg-c${i} p-${i}">b</button>`).join('\n')
+  const r = auditFiles([file('a.tsx', `${dyn}\n${btns}`)])
+  assert.equal(r.refused, true)
+  assert.equal(r.score, null)
+  // …but the sprawl finding survives, and the terminal says so.
+  assert.ok(r.sprawl.singletons > 0)
+  const out = renderTerminal(r)
+  assert.match(out, /No score/)
+  assert.match(out, /at least \d+ used once/)
+  assert.match(out, /a floor/)
+})
+
+test('a refusal report shows the evidence but never a grade', () => {
+  const dyn = Array.from({ length: 40 }, (_, i) => `<div className={cls${i}}>x</div>`).join('\n')
+  const btns = Array.from({ length: 12 }, (_, i) => `<button className="bg-c${i} p-${i}">b</button>`).join('\n')
+  const html = renderReport(auditFiles([file('a.tsx', `${dyn}\n${btns}`)]))
+  const body = html.slice(html.indexOf('<body>'))
+  assert.match(html, /<title>uicockpit audit — no score<\/title>/, 'never "null/100"')
+  assert.ok(body.includes('The button wall'), 'the evidence stays')
+  assert.ok(!body.includes('<section class="board">'), 'the grade table does not')
+  assert.match(body, /floor/, 'and it says the numbers are a lower bound')
 })

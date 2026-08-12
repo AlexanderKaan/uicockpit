@@ -1156,6 +1156,18 @@ export function renderTerminal(r, { reportPath = null } = {}) {
     L.push('  No score')
     L.push('')
     for (const line of wrap(r.refusal, 76)) L.push(`  ${line}`)
+
+    // Refusing to SCORE is not the same as having nothing to say. What we did
+    // read still counts, as a floor — twentyhq/twenty refuses on coverage while
+    // holding 31 of 32 treatments used exactly once, and throwing that away
+    // leaves a fifth of repos with nothing at all.
+    const sp = r.sprawl
+    if (sp && sp.treatments) {
+      L.push('')
+      L.push(`  Sprawl       at least ${nf(sp.singletons)} used once of ${nf(sp.treatments)} hand-rolled treatments`)
+      L.push(`               a floor, counted over the ${pct(r.meta.parsed)} we could read`)
+    }
+
     const un = Object.entries(r.meta.unreadable)
     if (un.length) {
       L.push('')
@@ -1342,8 +1354,10 @@ export async function runAudit(argv = []) {
   const result = auditFiles(files, { profile, vocabulary, pkg, palette })
   result.meta.arbitrary = arbitraryRate(files)
 
+  // Write the report even on a refusal — the wall, the sprawl floor and the
+  // smoking guns are all still valid, and a fifth of real repos refuse.
   let reportPath = null
-  if (wantReport && !result.refused) {
+  if (wantReport) {
     const { renderReport } = await import('./report.mjs')
     const outDir = pathMod.join(dir, '.uicockpit')
     try {

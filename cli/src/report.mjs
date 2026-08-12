@@ -256,6 +256,31 @@ function detectedBlock(r) {
  */
 function headlines(r) {
   const sp = r.sprawl || {}
+
+  // A refusal is a refusal to SCORE, not a refusal to report. Everything we did
+  // read still holds as a floor — and it can be the whole finding: twentyhq/twenty
+  // refuses on coverage while 31 of its 32 treatments occur exactly once.
+  if (r.refused) {
+    const floor = sp.treatments
+      ? `<div class="hl">
+          <div class="hl__n">≥${sp.singletons.toLocaleString('en-US')}</div>
+          <div class="hl__lbl">used exactly once<span>of ${sp.treatments.toLocaleString('en-US')} hand-rolled treatments seen</span></div>
+        </div>`
+      : ''
+    return `<section class="headlines">
+      <div class="hl__row">
+        <div class="hl">
+          <div class="hl__n hl__n--none">no score</div>
+          <div class="hl__lbl">Consistency<span>withheld — see below</span></div>
+        </div>
+        ${floor}
+      </div>
+      <p class="hl__clash"><b>${esc(r.refusal)}</b>
+        Everything below is still real, but read it as a <b>floor</b>: it is what we found in the
+        ${pct(r.meta.parsed)} of styled elements we could parse, so the true numbers are higher, never lower.</p>
+    </section>`
+  }
+
   const sprawlCell = sp.treatments
     ? `<div class="hl">
         <div class="hl__n">${sp.singletons.toLocaleString('en-US')}</div>
@@ -402,6 +427,7 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
 .hl__row{display:flex;flex-wrap:wrap;gap:40px}
 .hl{min-width:180px}
 .hl__n{font-size:56px;font-weight:650;letter-spacing:-.03em;line-height:1}
+.hl__n--none{font-size:34px;color:var(--muted);font-weight:600}
 .hl__n small{font-size:20px;color:var(--muted);font-weight:400}
 .hl__lbl{margin-top:4px;font-size:15px;font-weight:600;display:flex;flex-direction:column;gap:2px}
 .hl__lbl span{font-weight:400;font-size:12.5px;color:var(--muted)}
@@ -472,7 +498,7 @@ export function renderReport(r) {
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>uicockpit audit — ${r.score}/100</title>
+<title>uicockpit audit — ${r.refused ? 'no score' : `${r.score}/100`}</title>
 <style>${CSS}</style></head>
 <body><div class="wrap">
 <h1>uicockpit audit</h1>
@@ -480,7 +506,7 @@ export function renderReport(r) {
 ${detectedBlock(r)}
 ${headlines(r)}
 ${buttonWall(r.components, r.classStyles || {}, r.palette || null)}
-${scoreBoard(r)}
+${r.refused ? '' : scoreBoard(r)}
 ${colorSwatches(d.color, r.palette || null)}
 ${typeSpecimens(d.type)}
 ${shadowSquares(d.shadow)}
