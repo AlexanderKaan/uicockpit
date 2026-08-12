@@ -83,3 +83,6 @@ bench/kit/
 /BRIEFING-AUDIT-FEATURE.md
 /AUDIT-HEURISTIC.md
 /OPEN-CORE-CONTRACT.md
+
+# `uicockpit audit` writes its local report here (never uploaded, never committed)
+.uicockpit/

@@ -25,6 +25,11 @@ Usage:
       flags unknown tokens, undefined modifiers, raw colours, off-grid spacing.
       Exit 0 = conforms · 1 = violations · 2 = setup error. --strict fails on warnings.
 
+  npx uicockpit audit [dir] [--json] [--profile=internal|product] [--no-report]
+      For a codebase that has NO kit yet: derive the design system your code
+      already implies, and score how far it sits from its own system.
+      Writes .uicockpit/audit.html — everything stays on your machine.
+
   npx uicockpit help | --version
 
 Docs: https://uicockpit.com`)
@@ -41,6 +46,10 @@ async function main() {
     case 'init': {
       const { runInit } = await import(new URL('../src/init.mjs', import.meta.url))
       return runInit(rest)
+    }
+    case 'audit': {
+      const { runAudit } = await import(new URL('../src/audit.mjs', import.meta.url))
+      return runAudit(rest)
     }
     case 'version':
     case '-v':

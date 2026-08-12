@@ -79,6 +79,55 @@ the list doubles as a record of where the system doesn't fit yet. The hatch neve
 covers the error-level reference checks (`tokens-exist`, `known-modifiers`): a
 broken reference is a bug, not a taste decision.
 
+### `uicockpit audit [dir] [--json] [--profile=internal|product] [--no-report]`
+
+For a codebase that has **no kit yet**. `check` compares your code against a
+contract you chose; `audit` derives the contract your code already *implies* and
+measures how far the code sits from its own system:
+
+```bash
+npx uicockpit audit
+```
+
+```
+  uicockpit audit — 41 files · 1,284 styled elements · profile: internal
+
+  Consistency score   34/100          ███░░░░░░░
+
+  Colour    F   40.2 eff. (budget 16)         ·  63 values, 27 near-dupes
+  Type      D   19.4 eff. (budget 8)          ·  61% hardcoded
+  Spacing   C   13.8 eff. (budget 10)         ·  23% off-grid
+  Radius    B    5.9 eff. (budget 5)
+  Shadow    F    9.9 eff. (budget 5)          ·  23 values, 18 occur once
+
+  47 button treatments — 31 occur exactly once
+  3 icon libraries · 4 grey ramps · 2 duplicated components
+
+  Report → .uicockpit/audit.html
+```
+
+The column is the **effective** variant count, not the raw one: eight radii where
+one is used 200× is one system with noise (nEff ≈ 1.3); eight used equally is
+eight systems (nEff = 8). It is scale-free, so a bigger repo does not score worse
+for being bigger.
+
+`.uicockpit/audit.html` renders the findings instead of listing them — the
+swatches, the type specimens, and the **button wall**: every treatment rebuilt
+from its own extracted values, singletons marked.
+
+Everything runs **locally**. Nothing is uploaded, there are no network calls, and
+no account is needed — free and MIT, permanently.
+
+Three things it deliberately will not do:
+
+- **No LLM in the score.** A number that changes between runs cannot be shared or
+  gated on. Counting is static; naming clusters is a separate, later job.
+- **No score it cannot justify.** Below 70% scan coverage, or when a dimension has
+  too few usages to measure, it says so instead of publishing a number. An absence
+  of evidence is never reported as perfect coherence.
+- **It measures coherence, not quality.** One global button reused everywhere
+  scores perfectly, even if it is ugly.
+
 ## How it fits
 
 `init` and `check` are stateless over the kit **hash** — the same payload behind

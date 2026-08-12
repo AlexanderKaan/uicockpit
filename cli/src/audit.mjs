@@ -1,0 +1,788 @@
+/**
+ * `uicockpit audit` — the retroactive layer.
+ *
+ * ── The reframe ──────────────────────────────────────────────────────────────
+ * `audit` is `check` with an INVERTED reference.
+ *
+ *   check:  code ⟷ YOUR contract                → violations
+ *   audit:  code ⟷ the contract your code IMPLIES → incoherence
+ *
+ * It derives the implicit design system out of a codebase and measures how far
+ * that codebase sits from its own implicit system. So it works before anyone has
+ * chosen a kit — which is the whole point: today the product starts at a default
+ * kit and exports outward, and has no answer to "I'm not at the start."
+ *
+ * ── What it actually returns ─────────────────────────────────────────────────
+ * Not a score — a **Config**. `genContract.ts` already says "The Config IS the
+ * kit's identity", so finding the dominant value per dimension fills the knobs
+ * in. The score then means something better than "how bad are you": it is *how
+ * many of your design decisions your codebase can answer by itself*.
+ *
+ * ── Two rules that keep it credible ──────────────────────────────────────────
+ * 1. **100% static.** No model anywhere in the score path. A score that returns
+ *    36 on the second run is worthless as a shareable artefact and can never be
+ *    a CI gate. Naming clusters is a v1.5 `--explain` job; counting never is.
+ * 2. **Report coverage, never go quiet.** Under 70% parsed we refuse to score
+ *    rather than publish a number over code we could not read. An audit that
+ *    shouts 34/100 while skipping half the source dies the first time someone
+ *    notices.
+ *
+ * `auditFiles()` is PURE over `{path, content}[]` — no Node imports — so the
+ * browser shell (PR 3) can bundle it untouched. `runAudit()` is the Node shell.
+ */
+import {
+  GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE,
+  extractCss, extractClasses, extractInline, classAttrs,
+  extractClassStyles, extractCssVars, resolveVar,
+  countUnreadable, countReadable, norm, TW_GRAY_RAMPS,
+} from './patterns.mjs'
+import {
+  METRIC, NEAR_DUPE_THRESHOLD, colorDistance, pxDistance, clusterNear, parseColor, toLab, deltaE00,
+} from './colorspace.mjs'
+
+/* ────────────────────────────── the constants ──────────────────────────────
+ * REASONED, NOT YET MEASURED. The contract gives the ceiling and the order of
+ * magnitude (a real shipped kit: 5 radii · 6 shadows · 9 type tiers · 13 spacing
+ * steps · 62 distinct colour values); the budgets below are a deliberate
+ * tightening for the internal-tool archetype — an admin panel does not need 62
+ * colours. Calibrate against the with/without pairs under bench/runs before the
+ * number goes anywhere public.
+ * (NB: never write that glob with a star-slash inside a block comment — it ends
+ * the comment early and the next word parses as code. It cost a run here.) */
+export const BUDGETS = {
+  internal: { color: 16, type: 8, spacing: 10, radius: 5, shadow: 5 },
+  product: { color: 30, type: 12, spacing: 13, radius: 5, shadow: 6 },
+}
+
+/** Weights follow observed incoherence, not report readability: colour and type
+ *  carry the most visual weight. Radius/shadow are the classic AI-slop tells and
+ *  earn their keep in the smoking guns instead. */
+export const WEIGHTS = { color: 0.25, type: 0.25, spacing: 0.20, radius: 0.15, shadow: 0.15 }
+
+export const DIMENSIONS = ['color', 'type', 'spacing', 'radius', 'shadow']
+
+/** 8× over budget scores 0 — past that, 20× and 40× are equally broken. */
+const LOG_CEILING = Math.log2(8)
+
+/** Coherence multiplies from 0.3 (none) to 1.0 (total). The floor is 0.3 and not
+ *  0.6 deliberately: 31 greys that fall into 4 clusters get a fine cardinality
+ *  and should still be punished hard. */
+const COH_FLOOR = 0.3
+
+/** Below this share of readable styled elements we refuse to score. */
+export const MIN_PARSED = 0.70
+
+/**
+ * A dimension needs at least this many usage events before its score means
+ * anything. Without it an ABSENCE of evidence scores as perfect coherence: a
+ * repo on MUI/Ant (or any file that simply doesn't set shadows) has almost no
+ * loose values, nEff lands at 0, and the curve happily returns 100 — the exact
+ * "a design system the audit doesn't recognise scores clean" failure mode.
+ * Under-supplied dimensions are reported as `insufficient` and DROPPED from the
+ * weighted score, with the remaining weights renormalised.
+ */
+export const MIN_EVENTS = 12
+
+/* ─────────────────────────────── the maths ─────────────────────────────────── */
+
+/**
+ * Effective variant count = perplexity of the usage distribution.
+ *
+ * Deliberately NOT a unique count: 8 radii where one is used 200× is nEff ≈ 1.3
+ * (one system with noise); 8 radii used equally is nEff = 8 (eight systems).
+ * And it is SCALE-FREE — multiply every count by 10 and nEff does not move,
+ * which is the robustness-against-repo-size the whole design needs, delivered
+ * mathematically instead of averaged away.
+ */
+export function effectiveCount(counts) {
+  const total = counts.reduce((a, b) => a + b, 0)
+  if (total === 0) return 0
+  let H = 0
+  for (const c of counts) {
+    if (c <= 0) continue
+    const p = c / total
+    H -= p * Math.log(p)
+  }
+  return Math.exp(H)
+}
+
+/** Cardinality score: how far over budget, on a log curve. */
+export function cardinalityScore(nEff, budget) {
+  if (nEff === 0) return 100
+  const r = Math.max(1, nEff / budget)
+  return 100 * Math.max(0, 1 - Math.log2(r) / LOG_CEILING)
+}
+
+export function grade(score) {
+  if (score >= 85) return 'A'
+  if (score >= 70) return 'B'
+  if (score >= 55) return 'C'
+  if (score >= 40) return 'D'
+  return 'F'
+}
+
+/* ─────────────────────────── layer A + B per dimension ─────────────────────── */
+
+function tally(events) {
+  const byValue = new Map()
+  for (const e of events) {
+    let entry = byValue.get(e.value)
+    if (!entry) { entry = { value: e.value, count: 0, at: [] }; byValue.set(e.value, entry) }
+    entry.count++
+    if (entry.at.length < 25) entry.at.push(e.at) // cap: a codemod needs addresses, not all 4000
+  }
+  return [...byValue.values()].sort((a, b) => b.count - a.count)
+}
+
+/** Near-duplicates: values nobody MEANT to be different. Colour uses ΔE00 < 2;
+ *  lengths < 1px; shadow blur < 2px. This is evidence, not opinion. */
+function findNearDupes(dim, values) {
+  const names = values.map((v) => v.value)
+  if (dim === 'color') return clusterNear(names, colorDistance, NEAR_DUPE_THRESHOLD)
+  if (dim === 'radius' || dim === 'spacing') return clusterNear(names, pxDistance, 1)
+  if (dim === 'shadow') return clusterNear(names, blurDistance, 2)
+  return []
+}
+
+/** Compare shadows on their blur radius — the perceptually dominant term. */
+function blurDistance(a, b) {
+  const blur = (s) => {
+    const nums = String(s).match(/-?[\d.]+px/g)
+    return nums && nums.length >= 3 ? parseFloat(nums[2]) : nums ? parseFloat(nums[nums.length - 1]) : null
+  }
+  const ba = blur(a), bb = blur(b)
+  return ba !== null && bb !== null ? Math.abs(ba - bb) : null
+}
+
+function analyseDimension(dim, events, budget) {
+  const values = tally(events)
+  const counts = values.map((v) => v.count)
+  const total = counts.reduce((a, b) => a + b, 0)
+  const nEff = effectiveCount(counts)
+  const C = cardinalityScore(nEff, budget)
+
+  // ── coherence: only these three signals may touch the score.
+  const tokenised = total ? events.filter((e) => e.tokenized).length / total : 1
+
+  const nearDupes = findNearDupes(dim, values)
+  const dupeValues = new Set(nearDupes.flat())
+  const dupeMass = total ? events.filter((e) => dupeValues.has(e.value)).length / total : 0
+
+  // Off-grid only means anything for spacing; elsewhere it is not part of the mix.
+  let offGrid = null
+  if (dim === 'spacing') {
+    const px = events.filter((e) => /^-?[\d.]+px$/.test(e.value))
+    const off = px.filter((e) => {
+      const n = Math.abs(parseFloat(e.value))
+      return n > 0 && n % GRID !== 0
+    })
+    offGrid = px.length ? off.length / px.length : 0
+  }
+
+  const parts = [tokenised, 1 - dupeMass]
+  if (offGrid !== null) parts.push(1 - offGrid)
+  const coherence = parts.reduce((a, b) => a + b, 0) / parts.length
+
+  const score = C * (COH_FLOOR + (1 - COH_FLOOR) * coherence)
+  const insufficient = total < MIN_EVENTS
+
+  return {
+    insufficient,
+    events: total,
+    distinct: values.length,
+    nEff: round(nEff, 1),
+    budget,
+    cardinalityScore: round(C, 1),
+    coherence: round(coherence, 3),
+    tokenisedRate: round(tokenised, 3),
+    offGridRate: offGrid === null ? null : round(offGrid, 3),
+    nearDupeMass: round(dupeMass, 3),
+    score: insufficient ? null : round(score, 1),
+    grade: insufficient ? null : grade(score),
+    values: values.slice(0, 200),
+    // Reported, never scored — too sensitive to repo quirks to carry a number,
+    // and it works better as a flat unarguable line in the report.
+    singletons: values.filter((v) => v.count === 1).map((v) => v.value),
+    nearDupes,
+  }
+}
+
+const round = (n, d) => Math.round(n * 10 ** d) / 10 ** d
+
+/* ─────────────────────── layer C — component signatures ─────────────────────
+ * "47 button variants" has a fatal comeback — "we NEED more than one" — and it
+ * is correct: our own contract defines 16. So the measure is not the variant
+ * count, it is whether the variants fall on AXES.
+ *
+ *   A design system is a PRODUCT of small axes.
+ *   Drift is a SUM of one-off cases.
+ *
+ * 16 buttons = {primary, secondary, ghost, outline, danger, link} × {xs…xl}:
+ * two axes, fully enumerable. 47 buttons that are each their own class soup is
+ * 47 axes of length 1. Hence the line that actually converts:
+ *   "47 button treatments — 31 occur exactly once."
+ * Layer C NEVER enters the score. It is the conversion sentence, reported apart. */
+
+/** Layout and positioning carry no style identity — drop them from signatures. */
+const LAYOUT_RX = /^(flex|inline-flex|grid|inline-grid|block|inline|inline-block|hidden|table|contents|flow-root|list-item|absolute|relative|fixed|sticky|static|isolate|float-\w+|clear-\w+|items-|justify-|content-|self-|place-|order-|col-|row-|basis-|grow|shrink|w-|h-|min-w-|min-h-|max-w-|max-h-|top-|right-|bottom-|left-|inset-|z-|overflow-|object-|aspect-|container|mx-auto|space-[xy]-|divide-)/
+
+const BUTTONISH = /<(button|a)\b([^>]*)>/gi
+const INPUTISH = /<(input|select|textarea)\b([^>]*)>/gi
+
+function attrClasses(attrs) {
+  const m = attrs.match(/class(?:Name)?\s*=\s*(?:"([^"]*)"|'([^']*)'|\{`([^`]*)`\})/)
+  if (!m) return null
+  return (m[1] ?? m[2] ?? m[3] ?? '').split(/\s+/).filter(Boolean)
+}
+
+/** Normalised style signature: style-bearing classes only, sorted, deduped. */
+function signature(classes) {
+  const style = classes
+    .map((c) => c.trim())
+    .filter((c) => c && !LAYOUT_RX.test(c))
+    .map((c) => c.toLowerCase())
+  return [...new Set(style)].sort().join(' ')
+}
+
+function collectComponents(files) {
+  const kinds = {
+    button: new Map(),
+    input: new Map(),
+    card: new Map(),
+  }
+
+  const record = (kind, sig, at) => {
+    if (!sig) return
+    let e = kinds[kind].get(sig)
+    if (!e) { e = { sig, count: 0, at: [] }; kinds[kind].set(sig, e) }
+    e.count++
+    if (e.at.length < 25) e.at.push(at)
+  }
+
+  const lineAt = (content, idx) => content.slice(0, idx).split('\n').length
+
+  for (const { path, content } of files) {
+    if (/\.(css|scss|less)$/.test(path)) continue
+
+    for (const m of content.matchAll(BUTTONISH)) {
+      const tag = m[1].toLowerCase()
+      const attrs = m[2] || ''
+      const cls = attrClasses(attrs)
+      const isRoleButton = /role\s*=\s*["']button["']/.test(attrs)
+      // An <a> only counts when it is styled LIKE a button (background + padding),
+      // otherwise every link in the app pollutes the count.
+      const looksButton = cls && cls.some((c) => /^bg-/.test(c)) && cls.some((c) => /^p[xytrbl]?-/.test(c))
+      if (tag === 'button' || isRoleButton || (tag === 'a' && looksButton)) {
+        record('button', signature(cls || []), { file: path, line: lineAt(content, m.index), col: 1 })
+      }
+    }
+
+    for (const m of content.matchAll(INPUTISH)) {
+      const cls = attrClasses(m[2] || '')
+      record('input', signature(cls || []), { file: path, line: lineAt(content, m.index), col: 1 })
+    }
+
+    // Card-ish container: background + padding + (radius or border/shadow).
+    for (const { classes, at } of classAttrs(path, content)) {
+      const has = (rx) => classes.some((c) => rx.test(c))
+      if (has(/^bg-/) && has(/^p[xytrbl]?-/) && (has(/^rounded/) || has(/^(border|shadow)/))) {
+        record('card', signature(classes), at)
+      }
+    }
+  }
+
+  const out = {}
+  for (const [kind, map] of Object.entries(kinds)) {
+    const sigs = [...map.values()].sort((a, b) => b.count - a.count)
+    out[kind] = {
+      treatments: sigs.length,
+      singletons: sigs.filter((s) => s.count === 1).length,
+      signatures: sigs.slice(0, 100),
+    }
+  }
+  return out
+}
+
+/* ───────────────────────────── the smoking guns ─────────────────────────────
+ * Binary findings, their own section, NEVER in the score. They convert better
+ * than any number because they cannot be relativised. */
+
+function smokingGuns(files, pkg, events) {
+  const flags = []
+  const paths = files.map((f) => f.path)
+
+  if (pkg) {
+    const deps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) }
+    const iconLibs = Object.keys(deps).filter((d) =>
+      /^(lucide-react|react-icons|@heroicons\/|@tabler\/icons|react-feather|@phosphor-icons\/|@radix-ui\/react-icons|iconoir-react|@fortawesome\/)/.test(d))
+    if (iconLibs.length >= 2) flags.push({ id: 'multiple-icon-libs', severity: 'high', detail: iconLibs })
+
+    const styleSystems = Object.keys(deps).filter((d) =>
+      /^(tailwindcss|styled-components|@emotion\/styled|@stitches\/|sass|less|@vanilla-extract\/)/.test(d))
+    if (styleSystems.length >= 2) flags.push({ id: 'multiple-styling-systems', severity: 'high', detail: styleSystems })
+
+    const fontPkgs = Object.keys(deps).filter((d) => /^(@fontsource|next\/font)/.test(d))
+    if (fontPkgs.length >= 2) flags.push({ id: 'multiple-font-packages', severity: 'low', detail: fontPkgs })
+  }
+
+  // Duplicate components: several Button.tsx / Card.tsx on different paths.
+  const byBase = new Map()
+  for (const p of paths) {
+    const base = p.split(/[/\\]/).pop().replace(/\.\w+$/, '').toLowerCase()
+    if (!/^(button|card|input|modal|dialog|badge|avatar|select)$/.test(base)) continue
+    if (!byBase.has(base)) byBase.set(base, [])
+    byBase.get(base).push(p)
+  }
+  const dupes = [...byBase.entries()].filter(([, v]) => v.length > 1)
+  if (dupes.length) {
+    flags.push({ id: 'duplicate-components', severity: 'high', detail: dupes.map(([k, v]) => `${k}: ${v.join(' · ')}`) })
+  }
+
+  // ≥3 Tailwind grey ramps side by side — extremely common in AI output and
+  // immediately lethal in a report.
+  const ramps = new Set()
+  for (const e of events) {
+    if (e.dim !== 'color') continue
+    const m = String(e.value).match(/^(gray|slate|zinc|neutral|stone)-\d{2,3}$/)
+    if (m) ramps.add(m[1])
+  }
+  if (ramps.size >= 3) flags.push({ id: 'mixed-gray-ramps', severity: 'high', detail: [...ramps] })
+
+  // ≥2 non-mono font families.
+  const fams = new Set()
+  for (const { path, content } of files) {
+    if (!/\.(css|scss|less)$/.test(path)) continue
+    for (const m of content.matchAll(/font-family\s*:\s*([^;]+);/gi)) {
+      const first = m[1].split(',')[0].trim().replace(/["']/g, '').toLowerCase()
+      if (first && !/mono|courier|consolas|menlo|var\(/.test(first)) fams.add(first)
+    }
+  }
+  if (fams.size >= 2) flags.push({ id: 'multiple-font-families', severity: 'medium', detail: [...fams] })
+
+  return flags
+}
+
+/* ─────────────────────────── the hinge: inferredConfig ──────────────────────
+ * The audit does not hand over a score, it hands over a Config — so the
+ * configurator opens on the design system the app was already unconsciously
+ * trying to be. `confidence: null` means no dominant value, i.e. nobody ever
+ * decided this, so the questionnaire (PR 4) must ask. */
+
+const THEME_ANCHORS = {
+  mono: '#3b3b42', cobalt: '#0A84FF', sky: '#0EA5E9', teal: '#14B8A6', jade: '#10B981',
+  ember: '#F97316', coral: '#EC4899', indigo: '#6366F1', violet: '#8B5CF6', rose: '#F43F5E',
+}
+
+/** The share the most-used value holds — our confidence that it was a decision. */
+function dominance(values) {
+  const total = values.reduce((a, v) => a + v.count, 0)
+  if (!total || !values.length) return { value: null, share: null }
+  return { value: values[0].value, share: values[0].count / total }
+}
+
+const px = (v) => {
+  const m = String(v).match(/^(-?[\d.]+)(px|rem)?$/)
+  if (!m) return null
+  return m[2] === 'rem' ? parseFloat(m[1]) * 16 : parseFloat(m[1])
+}
+
+function inferConfig(dims) {
+  const values = {}
+  const confidence = {}
+  const MIN_DOMINANCE = 0.4 // below this, nobody decided anything
+
+  // radius → Radius = 'none' | 'subtle' | 'soft' | 'round'
+  const r = dominance(dims.radius.values)
+  if (r.value && r.share >= MIN_DOMINANCE) {
+    const n = px(r.value)
+    values.radius = n === null ? 'soft' : n === 0 ? 'none' : n <= 5 ? 'subtle' : n <= 10 ? 'soft' : 'round'
+    confidence.radius = round(r.share, 2)
+  } else confidence.radius = null
+
+  // shadow presence/softness → Elevation = 'flat' | 'soft' | 'sharp' | 'default'
+  const shadowDistinct = dims.shadow.distinct
+  if (dims.shadow.events === 0) { values.elevation = 'flat'; confidence.elevation = 1 }
+  else {
+    const s = dominance(dims.shadow.values)
+    values.elevation = shadowDistinct <= 3 ? 'soft' : 'default'
+    confidence.elevation = s.share ? round(s.share, 2) : null
+  }
+
+  // body font-size → TypeScale = 'sm' | 'md' | 'lg' | 'xl'
+  const t = dominance(dims.type.values)
+  if (t.value && t.share >= MIN_DOMINANCE) {
+    const size = px(String(t.value).split('/')[0])
+    values.typeScale = size === null ? 'md' : size <= 13 ? 'sm' : size <= 15 ? 'md' : size <= 17 ? 'lg' : 'xl'
+    confidence.typeScale = round(t.share, 2)
+  } else confidence.typeScale = null
+
+  // spacing rhythm → Scale = 'compact' | 'default' | 'comfortable'
+  const spacings = dims.spacing.values.map((v) => ({ n: px(v.value), c: v.count })).filter((x) => x.n)
+  if (spacings.length) {
+    const weighted = spacings.reduce((a, x) => a + x.n * x.c, 0) / spacings.reduce((a, x) => a + x.c, 0)
+    values.scale = weighted <= 10 ? 'compact' : weighted <= 18 ? 'default' : 'comfortable'
+    confidence.scale = round(Math.min(1, spacings.length / dims.spacing.distinct), 2)
+  } else confidence.scale = null
+
+  // dominant brand colour → nearest ColorTheme anchor by ΔE00
+  const brand = pickBrandColor(dims.color.values)
+  if (brand) {
+    let best = null
+    for (const [name, hex] of Object.entries(THEME_ANCHORS)) {
+      const d = colorDistance(brand.value, hex)
+      if (d !== null && (!best || d < best.d)) best = { name, d }
+    }
+    if (best) { values.colorTheme = best.name; confidence.colorTheme = round(brand.share, 2) }
+  }
+  if (!values.colorTheme) confidence.colorTheme = null
+
+  return { values, confidence }
+}
+
+/** The brand colour is the most-used SATURATED colour — greys and near-whites
+ *  are surface, not identity. */
+function pickBrandColor(values) {
+  const total = values.reduce((a, v) => a + v.count, 0)
+  for (const v of values) {
+    const lab = toLab(v.value)
+    if (!lab) continue
+    const chroma = Math.hypot(lab[1], lab[2])
+    if (chroma > 25 && lab[0] > 15 && lab[0] < 92) return { value: v.value, share: v.count / total }
+  }
+  return null
+}
+
+/* ──────────────────────────────── the engine ───────────────────────────────── */
+
+/**
+ * Audit a set of files. PURE — no Node imports, no I/O, no clock.
+ *
+ * @param {{path:string, content:string}[]} files
+ * @param {{profile?: 'internal'|'product', vocabulary?: object, pkg?: object}} [opts]
+ */
+export function auditFiles(files, opts = {}) {
+  const profile = opts.profile === 'product' ? 'product' : 'internal'
+  const budgets = BUDGETS[profile]
+  const vocab = opts.vocabulary?.classes || {}
+  const vocabVersion = opts.vocabulary?.vocabVersion || null
+
+  const events = []
+  let readable = 0
+  const unreadable = {}
+  const expressible = { recipe: 0, tokensOnly: 0, none: 0 }
+  // Collected so the report can PAINT plain-CSS components instead of printing
+  // their class names — the wall only converts if you can see the buttons.
+  const classStyles = {}
+  const cssVars = {}
+
+  const absorbCss = (path, css) => {
+    events.push(...extractCss(path, css))
+    Object.assign(cssVars, extractCssVars(css))
+    for (const [cls, decls] of Object.entries(extractClassStyles(css))) {
+      classStyles[cls] = { ...(classStyles[cls] || {}), ...decls }
+    }
+  }
+
+  for (const { path, content } of files) {
+    const isCss = /\.(css|scss|less)$/.test(path)
+
+    readable += countReadable(path, content)
+    for (const [k, n] of Object.entries(countUnreadable(path, content))) {
+      unreadable[k] = (unreadable[k] || 0) + n
+    }
+
+    if (isCss) {
+      absorbCss(path, content)
+      continue
+    }
+
+    // Class attributes: events + the expressible bucket, per element.
+    for (const { classes, at } of classAttrs(path, content)) {
+      const evs = extractClasses(classes, at)
+      events.push(...evs)
+      const hasRecipe = classes.some((c) => {
+        const root = c.split('--')[0].split('__')[0].replace(/^.*:/, '')
+        return Object.prototype.hasOwnProperty.call(vocab, root)
+      })
+      if (hasRecipe) expressible.recipe++
+      else if (evs.length) expressible.tokensOnly++
+      else expressible.none++
+    }
+    events.push(...extractInline(path, content))
+    // HTML files also carry CSS-ish styling in <style> blocks.
+    for (const m of content.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) absorbCss(path, m[1])
+  }
+
+  // Flatten var() once, so the report never has to know about the cascade.
+  const resolvedStyles = {}
+  for (const [cls, decls] of Object.entries(classStyles)) {
+    const flat = {}
+    for (const [p, v] of Object.entries(decls)) flat[p] = resolveVar(v, cssVars)
+    resolvedStyles[cls] = flat
+  }
+
+  const unreadableTotal = Object.values(unreadable).reduce((a, b) => a + b, 0)
+  const styledElements = readable + unreadableTotal
+  const parsed = styledElements ? readable / styledElements : 1
+
+  const dimensions = {}
+  for (const dim of DIMENSIONS) {
+    dimensions[dim] = analyseDimension(dim, events.filter((e) => e.dim === dim), budgets[dim])
+  }
+
+  // Only dimensions with enough evidence may move the number; the rest are
+  // reported as insufficient and their weight is redistributed, so "we found
+  // nothing here" can never be mistaken for "this is perfect".
+  const scored = DIMENSIONS.filter((d) => !dimensions[d].insufficient)
+  const weightSum = scored.reduce((a, d) => a + WEIGHTS[d], 0)
+  const score = weightSum
+    ? scored.reduce((a, d) => a + WEIGHTS[d] * dimensions[d].score, 0) / weightSum
+    : null
+
+  const expressibleTotal = expressible.recipe + expressible.tokensOnly + expressible.none
+  const share = (n) => (expressibleTotal ? round(n / expressibleTotal, 3) : null)
+
+  const result = {
+    meta: {
+      files: files.length,
+      elements: styledElements,
+      profile,
+      parsed: round(parsed, 3),
+      unreadable,
+      // parsed = "could I read it" (a scanner problem).
+      // expressible = "can my vocabulary even say this" (a product question —
+      // the biggest open one in the plan; this field is how it gets answered
+      // with data instead of opinion). Low expressible is a FINDING, not a fault.
+      expressible: {
+        recipe: share(expressible.recipe),
+        tokensOnly: share(expressible.tokensOnly),
+        none: share(expressible.none),
+        counts: { ...expressible },
+      },
+      vocabVersion,
+      nearDupeMetric: { color: METRIC, threshold: NEAR_DUPE_THRESHOLD, length: 'px', lengthThreshold: 1, shadow: 'blur-px', shadowThreshold: 2 },
+    },
+    score: score === null ? null : round(score, 0),
+    grade: score === null ? null : grade(score),
+    scoredDimensions: scored,
+    insufficientDimensions: DIMENSIONS.filter((d) => dimensions[d].insufficient),
+    refused: parsed < MIN_PARSED || score === null,
+    dimensions,
+    components: collectComponents(files),
+    // Not part of the measurement — purely so the report can render a real
+    // swatch for a class-based component instead of quoting its class list.
+    classStyles: resolvedStyles,
+    flags: smokingGuns(files, opts.pkg, events),
+    // Emitted but unused in PR 1 — it is the hinge to the configurator (PR 4),
+    // and computing it now is cheaper than a second pass later.
+    inferredConfig: inferConfig(dimensions),
+  }
+
+  if (result.refused) {
+    result.score = null
+    result.grade = null
+    result.refusal = parsed < MIN_PARSED
+      ? `Only ${Math.round(parsed * 100)}% of styled elements could be read (minimum ${Math.round(MIN_PARSED * 100)}%). Scoring code we could not read would be contestable, so no score is given.`
+      : `Too little styling to measure — every dimension is under ${MIN_EVENTS} usage events. This is not a clean bill of health; it means the values live somewhere this scan cannot see (a component library, a theme file, or another stack).`
+  }
+
+  return result
+}
+
+/* ─────────────────────── arbitrary + ramp signals (reported) ───────────────── */
+
+/** Share of Tailwind utilities written as arbitrary values. Every one is a
+ *  DELIBERATE step outside the system — the cheapest strong signal we have. */
+export function arbitraryRate(files) {
+  let total = 0, arbitrary = 0
+  for (const { path, content } of files) {
+    if (/\.(css|scss|less)$/.test(path)) continue
+    for (const { classes } of classAttrs(path, content)) {
+      for (const c of classes) {
+        total++
+        if (/-\[[^\]]+\]$/.test(c)) arbitrary++
+      }
+    }
+  }
+  return { total, arbitrary, rate: total ? round(arbitrary / total, 3) : 0 }
+}
+
+export { GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE, TW_GRAY_RAMPS, norm, parseColor, deltaE00 }
+
+/* ────────────────────────────── terminal output ─────────────────────────────
+ * MAX 15 LINES. The viral unit is a screenshot, not a scroll buffer — anything
+ * that does not fit does not belong. No tips, no call to action, no sell: every
+ * sales line makes it less shareable. The number does the work. */
+
+const LABEL = { color: 'Colour', type: 'Type', spacing: 'Spacing', radius: 'Radius', shadow: 'Shadow' }
+
+const pct = (n) => `${Math.round(n * 100)}%`
+const nf = (n) => n.toLocaleString('en-US')
+
+/** Soft-wrap a sentence so the refusal stays inside the 15-line frame. */
+function wrap(text, width) {
+  const out = []
+  let line = ''
+  for (const word of String(text).split(/\s+/)) {
+    if (line && (line + ' ' + word).length > width) { out.push(line); line = word }
+    else line = line ? `${line} ${word}` : word
+  }
+  if (line) out.push(line)
+  return out
+}
+
+export function renderTerminal(r, { reportPath = null } = {}) {
+  const L = []
+  L.push(`  uicockpit audit — ${nf(r.meta.files)} files · ${nf(r.meta.elements)} styled elements · profile: ${r.meta.profile}`)
+  L.push('')
+
+  if (r.refused) {
+    L.push('  No score')
+    L.push('')
+    for (const line of wrap(r.refusal, 76)) L.push(`  ${line}`)
+    const un = Object.entries(r.meta.unreadable)
+    if (un.length) {
+      L.push('')
+      L.push(`  Unreadable: ${un.map(([k, n]) => `${n} ${k}`).join(' · ')}`)
+    }
+    return L.join('\n')
+  }
+
+  const filled = Math.round(r.score / 10)
+  L.push(`  Consistency score   ${r.score}/100          ${'█'.repeat(filled)}${'░'.repeat(10 - filled)}`)
+  L.push('')
+
+  for (const dim of DIMENSIONS) {
+    const d = r.dimensions[dim]
+    if (d.insufficient) {
+      L.push(`  ${LABEL[dim].padEnd(9)} –  ${String(d.events).padStart(5)} uses — too few to score`)
+      continue
+    }
+    // The column is N_eff, and the label must carry that. Raw count and
+    // effective count under one heading is exactly the confusion the whole
+    // measurement principle exists to remove: 23 shadows with 18 singletons
+    // means the mass sits on a handful of values, so nEff ≈ 10, not 23.
+    const head = `  ${LABEL[dim].padEnd(9)} ${d.grade}  ${String(d.nEff).padStart(5)} eff. (budget ${d.budget})`
+    const notes = []
+    if (d.nearDupes.length) notes.push(`${d.distinct} values, ${d.nearDupes.flat().length} near-dupes`)
+    else if (d.distinct) notes.push(`${d.distinct} values`)
+    if (d.tokenisedRate < 0.9) notes.push(`${pct(1 - d.tokenisedRate)} hardcoded`)
+    if (d.offGridRate) notes.push(`${pct(d.offGridRate)} off-grid`)
+    const singles = d.singletons.length
+    if (singles > 2) notes.push(`${singles} occur once`)
+    L.push(notes.length ? `${head.padEnd(46)}·  ${notes.slice(0, 2).join(', ')}` : head)
+  }
+  L.push('')
+
+  // The number that converts is not the score — it is the singleton rate.
+  const b = r.components.button
+  if (b.treatments) {
+    L.push(`  ${b.treatments} button treatments — ${b.singletons} occur exactly once`)
+  }
+
+  const guns = []
+  for (const f of r.flags) {
+    if (f.id === 'multiple-icon-libs') guns.push(`${f.detail.length} icon libraries`)
+    if (f.id === 'mixed-gray-ramps') guns.push(`${f.detail.length} grey ramps`)
+    if (f.id === 'duplicate-components') guns.push(`${f.detail.length} duplicated components`)
+    if (f.id === 'multiple-styling-systems') guns.push(`${f.detail.length} styling systems`)
+    if (f.id === 'multiple-font-families') guns.push(`${f.detail.length} font families`)
+  }
+  if (guns.length) L.push(`  ${guns.join(' · ')}`)
+
+  if (r.meta.parsed < 1) {
+    L.push('')
+    L.push(`  Scan coverage ${pct(r.meta.parsed)} — ${Object.entries(r.meta.unreadable).map(([k, n]) => `${n} ${k}`).join(' · ')}`)
+  }
+  if (reportPath) {
+    L.push('')
+    L.push(`  Report → ${reportPath}`)
+  }
+  return L.join('\n')
+}
+
+/* ─────────────────────────────── the CLI shell ─────────────────────────────── */
+
+/**
+ * Discover files under `dir`, audit them, print (or emit JSON).
+ * Node-only; the pure engine above stays importable in a browser bundle.
+ *
+ * Exit codes: 0 = audited · 2 = setup error / refused for coverage.
+ */
+export async function runAudit(argv = []) {
+  const fs = await import('node:fs')
+  const pathMod = await import('node:path')
+
+  const args = argv.filter((a) => !a.startsWith('-'))
+  const flag = (name) => argv.some((a) => a === `--${name}` || a.startsWith(`--${name}=`))
+  const flagVal = (name, dflt) => {
+    const hit = argv.find((a) => a.startsWith(`--${name}=`))
+    return hit ? hit.slice(name.length + 3) : dflt
+  }
+
+  const dir = args[0] || '.'
+  const profile = flagVal('profile', 'internal')
+  const asJson = flag('json')
+  const wantReport = !flag('no-report')
+
+  if (!fs.existsSync(dir)) {
+    console.error(`uicockpit audit: no such directory: ${dir}`)
+    return 2
+  }
+
+  const SKIP_DIR = /(^|[/\\])(node_modules|\.git|dist|build|\.next|out|coverage|\.uicockpit)([/\\]|$)/
+  const files = []
+  const walk = (d) => {
+    let entries
+    try { entries = fs.readdirSync(d, { withFileTypes: true }) } catch { return }
+    for (const e of entries) {
+      const p = pathMod.join(d, e.name)
+      if (e.isDirectory()) { if (!SKIP_DIR.test(p)) walk(p); continue }
+      if (!AUDIT_SCAN_EXT.test(e.name) || AUDIT_SKIP_FILE.test(p)) continue
+      try {
+        const content = fs.readFileSync(p, 'utf8')
+        files.push({ path: pathMod.relative(dir, p) || e.name, content })
+      } catch { /* unreadable file — skip, it can't carry style either */ }
+    }
+  }
+  walk(dir)
+
+  if (!files.length) {
+    console.error(`uicockpit audit: no scannable files under ${dir}`)
+    return 2
+  }
+
+  // The kit vocabulary that powers `expressible` — shipped with the package, so
+  // the audit works on a codebase that has no kit yet (which is the whole point).
+  let vocabulary = null
+  try {
+    vocabulary = JSON.parse(fs.readFileSync(new URL('./vocabulary.json', import.meta.url), 'utf8'))
+  } catch { /* absent → expressible.recipe simply stays 0 */ }
+
+  let pkg = null
+  for (const c of [pathMod.join(dir, 'package.json'), 'package.json']) {
+    try { if (fs.existsSync(c)) { pkg = JSON.parse(fs.readFileSync(c, 'utf8')); break } } catch { /* malformed */ }
+  }
+
+  const result = auditFiles(files, { profile, vocabulary, pkg })
+  result.meta.arbitrary = arbitraryRate(files)
+
+  let reportPath = null
+  if (wantReport && !result.refused) {
+    const { renderReport } = await import('./report.mjs')
+    const outDir = pathMod.join(dir, '.uicockpit')
+    try {
+      fs.mkdirSync(outDir, { recursive: true })
+      reportPath = pathMod.join(outDir, 'audit.html')
+      fs.writeFileSync(reportPath, renderReport(result))
+    } catch { reportPath = null }
+  }
+
+  if (asJson) {
+    console.log(JSON.stringify(result, null, 2))
+    return result.refused ? 2 : 0
+  }
+
+  console.log(renderTerminal(result, { reportPath }))
+  return result.refused ? 2 : 0
+}
