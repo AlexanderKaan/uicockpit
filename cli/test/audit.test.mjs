@@ -171,7 +171,7 @@ test('class styles resolve through one level of var(), skipping pseudo-states', 
 
 /* ────────────────────────────── the engine end-to-end ───────────────────────── */
 
-const messy = `
+const messyCss = `
   .a { color: #111111; background: #fff; border-radius: 7px; padding: 13px; font-size: 15px; box-shadow: 0 1px 2px #0001; }
   .b { color: #111112; background: #fefefe; border-radius: 8px; padding: 14px; font-size: 16px; box-shadow: 0 1px 3px #0001; }
   .c { color: #222; background: #f9f9f9; border-radius: 9px; padding: 15px; font-size: 17px; box-shadow: 0 2px 4px #0002; }
@@ -181,7 +181,7 @@ const messy = `
 `
 
 test('a messy stylesheet scores badly and a disciplined one scores well', () => {
-  const bad = auditFiles([file('messy.css', messy)])
+  const bad = auditFiles([file('messy.css', messyCss)])
   const tidy = auditFiles([file('tidy.css', `
     .a { color: var(--k-fg); background: var(--k-bg); border-radius: var(--k-radius-md); padding: var(--k-s-8); }
     .b { color: var(--k-fg); background: var(--k-bg); border-radius: var(--k-radius-md); padding: var(--k-s-8); }
@@ -192,14 +192,14 @@ test('a messy stylesheet scores badly and a disciplined one scores well', () => 
 })
 
 test('off-grid spacing and near-dupes land in the score, not just the report', () => {
-  const r = auditFiles([file('messy.css', messy)])
+  const r = auditFiles([file('messy.css', messyCss)])
   assert.ok(r.dimensions.spacing.offGridRate > 0, '13px/15px/17px are off the 4px grid')
   assert.ok(r.dimensions.color.nearDupes.length > 0, '#111111 vs #111112 is a near-duplicate')
   assert.ok(r.dimensions.color.coherence < 1)
 })
 
 test('singleton and arbitrary rates are reported but never scored', () => {
-  const r = auditFiles([file('messy.css', messy)])
+  const r = auditFiles([file('messy.css', messyCss)])
   assert.ok(r.dimensions.radius.singletons.length > 0)
   // Coherence is built only from tokenisation, near-dupes and the grid.
   const d = r.dimensions.radius
@@ -223,7 +223,7 @@ test('when every dimension is too thin, the audit refuses instead of guessing', 
 })
 
 test('the score only averages dimensions that had enough evidence', () => {
-  const r = auditFiles([file('messy.css', messy)])
+  const r = auditFiles([file('messy.css', messyCss)])
   const scored = r.scoredDimensions
   const weightSum = scored.reduce((a, d) => a + WEIGHTS[d], 0)
   const expected = scored.reduce((a, d) => a + WEIGHTS[d] * r.dimensions[d].score, 0) / weightSum
@@ -317,8 +317,8 @@ test('an interpolation we cannot name is still declared unreadable', () => {
 })
 
 test('the profile flag moves the budget, not the maths', () => {
-  const internal = auditFiles([file('m.css', messy)], { profile: 'internal' })
-  const product = auditFiles([file('m.css', messy)], { profile: 'product' })
+  const internal = auditFiles([file('m.css', messyCss)], { profile: 'internal' })
+  const product = auditFiles([file('m.css', messyCss)], { profile: 'product' })
   assert.equal(internal.dimensions.color.budget, BUDGETS.internal.color)
   assert.equal(product.dimensions.color.budget, BUDGETS.product.color)
   assert.ok(product.score >= internal.score, 'a wider budget cannot score worse')
@@ -337,9 +337,9 @@ test('button treatments are counted by normalised signature, layout stripped', (
 })
 
 test('layer C never touches the score', () => {
-  const one = auditFiles([file('m.css', messy)])
+  const one = auditFiles([file('m.css', messyCss)])
   const many = auditFiles([
-    file('m.css', messy),
+    file('m.css', messyCss),
     file('b.tsx', Array.from({ length: 20 }, (_, i) => `<button className="bg-x-${i} p-${i}">b</button>`).join('\n')),
   ])
   assert.ok(many.components.button.treatments > one.components.button.treatments)
@@ -457,7 +457,7 @@ test('the dominant saturated colour picks a theme, greys do not', () => {
 /* ───────────────────────────── meta and reporting ───────────────────────────── */
 
 test('the near-dupe metric and threshold are emitted so anyone can recompute', () => {
-  const r = auditFiles([file('m.css', messy)])
+  const r = auditFiles([file('m.css', messyCss)])
   assert.equal(r.meta.nearDupeMetric.color, 'CIEDE2000')
   assert.equal(r.meta.nearDupeMetric.threshold, 2)
 })
@@ -481,7 +481,7 @@ test('values carry file/line addresses — a codemod cannot act on a filename', 
 })
 
 test('auditFiles is deterministic — the score is a fact, not an opinion', () => {
-  const files = [file('m.css', messy), file('b.tsx', '<button className="bg-blue-500 p-3">x</button>')]
+  const files = [file('m.css', messyCss), file('b.tsx', '<button className="bg-blue-500 p-3">x</button>')]
   const a = JSON.stringify(auditFiles(files))
   const b = JSON.stringify(auditFiles(files))
   assert.equal(a, b, 'two runs over the same input must be byte-identical')
@@ -703,4 +703,51 @@ test('the element walker survives self-closing and void tags', () => {
   `)])
   assert.equal(r.clusters.rows, 1, 'both inputs must still read as siblings')
   assert.equal(r.clusters.mismatched, 1)
+})
+
+/* ─────────────────────── the two headlines (§2.5 made equal) ───────────────── */
+
+test('a button is not also counted as a card', () => {
+  // `<button className="bg-x p-2 rounded">` satisfies the card test too, and
+  // counting it twice roughly doubled the sprawl total.
+  const r = auditFiles([file('a.tsx',
+    Array.from({ length: 14 }, (_, i) => `<button className="bg-c${i} p-${i} rounded-lg">b</button>`).join('\n'))])
+  assert.equal(r.components.card.treatments, 0, 'a control is not a card')
+  assert.equal(r.sprawl.treatments, r.components.button.treatments)
+})
+
+test('sprawl is a count, never a score out of 100', () => {
+  const r = auditFiles([file('a.tsx',
+    Array.from({ length: 12 }, (_, i) => `<button className="bg-c${i} p-${i}">b</button>`).join('\n'))])
+  assert.equal(r.sprawl.singletons, 12)
+  assert.equal(r.sprawl.singletonRate, 1)
+  // There is no calibrated budget for "how many treatments is acceptable", so
+  // there must be no invented scale either.
+  assert.equal(r.sprawl.score, undefined)
+})
+
+test('the headlines are flagged as disagreeing when they do', () => {
+  // A healthy value score sitting on a pile of one-off components — the normal
+  // shape of a utility-first codebase, and the thing the score cannot see.
+  const tidyValuesMessyComponents = auditFiles([file('a.tsx',
+    Array.from({ length: 14 }, (_, i) =>
+      `<button className="bg-blue-500 p-4 rounded-lg text-sm gap-${i}">b</button>`).join('\n'))])
+  assert.ok(tidyValuesMessyComponents.score >= 70)
+  assert.equal(tidyValuesMessyComponents.headlinesDisagree, true)
+})
+
+test('a repo that is bad at both is not flagged as a contradiction', () => {
+  const messy = auditFiles([file('m.css', messyCss), file('b.tsx',
+    Array.from({ length: 14 }, (_, i) => `<button className="bg-c${i} p-${i}">b</button>`).join('\n'))])
+  assert.ok(messy.score < 70)
+  assert.equal(messy.headlinesDisagree, false, 'both bad is not a disagreement')
+})
+
+test('sprawl reports per kind as well as in total', () => {
+  const r = auditFiles([file('a.tsx', `
+    <button className="bg-a p-1">x</button>
+    <input className="bg-b p-2" />
+  `)])
+  assert.ok('button' in r.sprawl.byKind && 'input' in r.sprawl.byKind)
+  assert.equal(r.sprawl.treatments, r.sprawl.byKind.button.treatments + r.sprawl.byKind.input.treatments)
 })

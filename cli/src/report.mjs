@@ -245,6 +245,44 @@ function detectedBlock(r) {
   </section>`
 }
 
+/**
+ * The two headlines, side by side and equal in weight.
+ *
+ * They were already two numbers (`AUDIT-HEURISTIC.md` §2.5) — but one was set as
+ * a 56px score and the other as a footnote, and that asymmetry let a repo read
+ * as healthy while holding 234 one-off treatments. Sprawl is a COUNT, not a
+ * score out of 100: there is no calibrated budget for "how many treatments is
+ * acceptable", and inventing a scale would fake a precision we do not have.
+ */
+function headlines(r) {
+  const sp = r.sprawl || {}
+  const sprawlCell = sp.treatments
+    ? `<div class="hl">
+        <div class="hl__n">${sp.singletons.toLocaleString('en-US')}</div>
+        <div class="hl__lbl">used exactly once<span>of ${sp.treatments.toLocaleString('en-US')} hand-rolled treatments${
+          sp.componentShare ? ` · ${pct(sp.componentShare)} via components` : ''}</span></div>
+      </div>`
+    : ''
+
+  const clash = r.headlinesDisagree
+    ? `<p class="hl__clash"><b>These two disagree, and that is the finding.</b> The values are under
+       control and the components are not — the usual shape of a utility-first codebase, where the
+       framework constrains what colours and sizes exist and does nothing about how many one-off
+       treatments get written. The consistency score cannot see this; the wall below can.</p>`
+    : ''
+
+  return `<section class="headlines">
+    <div class="hl__row">
+      <div class="hl">
+        <div class="hl__n">${r.score}<small>/100</small></div>
+        <div class="hl__lbl">Consistency<span>value-level · deterministic · CI-gateable</span></div>
+      </div>
+      ${sprawlCell}
+    </div>
+    ${clash}
+  </section>`
+}
+
 function scoreBoard(r) {
   const DIMS = ['color', 'type', 'spacing', 'radius', 'shadow']
   const rows = DIMS.map((k) => {
@@ -274,10 +312,6 @@ function scoreBoard(r) {
   const budgetTotal = counted.reduce((a, k) => a + r.dimensions[k].budget, 0)
 
   return `<section class="board">
-    <div class="board__score">
-      <div class="board__n">${r.score}<small>/100</small></div>
-      <div class="board__lbl">Consistency score</div>
-    </div>
     <p class="board__framing">Your code implies a design system of <b>${impliedTotal} values</b>.
       One complete system has <b>${budgetTotal}</b>.</p>
     <table class="tbl">
@@ -364,6 +398,14 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
 .detected__files,.detected__cov{margin:0;font-size:13px;color:var(--muted)}
 .detected__cov{margin-top:5px}
 .detected__cov b{color:var(--fg)}
+.headlines{margin:0 0 36px}
+.hl__row{display:flex;flex-wrap:wrap;gap:40px}
+.hl{min-width:180px}
+.hl__n{font-size:56px;font-weight:650;letter-spacing:-.03em;line-height:1}
+.hl__n small{font-size:20px;color:var(--muted);font-weight:400}
+.hl__lbl{margin-top:4px;font-size:15px;font-weight:600;display:flex;flex-direction:column;gap:2px}
+.hl__lbl span{font-weight:400;font-size:12.5px;color:var(--muted)}
+.hl__clash{margin:22px 0 0;padding:13px 15px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:8px;font-size:13.5px;max-width:76ch}
 .board{display:grid;gap:20px}
 .board__score{display:flex;align-items:baseline;gap:12px}
 .board__n{font-size:56px;font-weight:650;letter-spacing:-.03em;line-height:1}
@@ -436,6 +478,7 @@ export function renderReport(r) {
 <h1>uicockpit audit</h1>
 <p class="sub">${r.meta.files.toLocaleString('en-US')} files · ${r.meta.elements.toLocaleString('en-US')} styled elements · profile ${r.meta.profile}${r.meta.vocabVersion ? ` · vocabulary ${r.meta.vocabVersion}` : ''}</p>
 ${detectedBlock(r)}
+${headlines(r)}
 ${buttonWall(r.components, r.classStyles || {}, r.palette || null)}
 ${scoreBoard(r)}
 ${colorSwatches(d.color, r.palette || null)}

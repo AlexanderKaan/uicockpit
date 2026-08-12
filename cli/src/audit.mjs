@@ -356,12 +356,18 @@ function collectComponents(files) {
     }
 
     // Card-ish container: background + padding + (radius or border/shadow).
-    for (const { classes, at } of classAttrs(path, content)) {
+    // Walked as ELEMENTS rather than raw class attributes so the tag is known —
+    // a `<button className="bg-x p-2 rounded">` satisfies the card test too, and
+    // counting it twice inflated the sprawl total by roughly double.
+    walkElements(content, (el) => {
+      if (controlKind(el.tag)) return
+      const classes = attrClasses(el.attrs, bindings, path)
+      if (!classes) return
       const has = (rx) => classes.some((c) => rx.test(c))
       if (has(/^bg-/) && has(/^p[xytrbl]?-/) && (has(/^rounded/) || has(/^(border|shadow)/))) {
-        record('card', signature(classes), at)
+        record('card', signature(classes), { file: path, line: el.line, col: 1 })
       }
-    }
+    })
   }
 
   const out = {}
@@ -384,6 +390,57 @@ function collectComponents(files) {
     }
   }
   return out
+}
+
+/* ──────────────────────────── the second headline ────────────────────────────
+ * `AUDIT-HEURISTIC.md` §2.5 says two numbers, not one: the consistency score is
+ * value-level and CI-gateable, variant sprawl is component-level and is the
+ * sentence that converts. They were already separate — but one was rendered as
+ * a big 82/100 and the other as a footnote, and that asymmetry is what let a
+ * repo read as healthy while holding 82 one-off buttons.
+ *
+ * So sprawl gets equal billing. Deliberately NOT expressed as a 0-100 score:
+ * there is no budget for "how many button treatments is acceptable", and
+ * inventing one would fake a calibration we do not have. A count of things that
+ * exist exactly once needs no scale to be damning.
+ *
+ * It also stays OUT of the consistency score, and the reason got stronger today
+ * rather than weaker: layer C's numbers moved twice in one session as the
+ * detector improved (blind to `<Button/>`, then the ratio). A number that shifts
+ * when we improve our own scanner cannot sit behind a CI gate.
+ */
+function summariseSprawl(components) {
+  const kinds = ['button', 'input', 'card']
+  let treatments = 0, singletons = 0, handRolled = 0, throughComponent = 0
+  const byKind = {}
+  for (const k of kinds) {
+    const c = components[k]
+    if (!c) continue
+    treatments += c.treatments
+    singletons += c.singletons
+    handRolled += c.handRolled
+    throughComponent += c.throughComponent
+    byKind[k] = { treatments: c.treatments, singletons: c.singletons, componentShare: c.componentShare }
+  }
+  const total = handRolled + throughComponent
+  return {
+    treatments,
+    singletons,
+    singletonRate: treatments ? round(singletons / treatments, 3) : null,
+    componentShare: total ? round(throughComponent / total, 3) : null,
+    byKind,
+  }
+}
+
+/**
+ * The two headlines disagree — which is the most interesting thing the report
+ * can say. It means values are under control and components are not, and it is
+ * the normal state of a Tailwind codebase: utilities constrain the values and
+ * do nothing about how many one-off treatments get written.
+ */
+function headlinesContradict(score, sprawl) {
+  return score !== null && score >= 70
+    && sprawl.treatments >= 10 && sprawl.singletonRate !== null && sprawl.singletonRate >= 0.5
 }
 
 /* ────────────────────── relational coherence (sibling rows) ──────────────────
@@ -995,6 +1052,10 @@ export function auditFiles(files, opts = {}) {
     inferredConfig: inferConfig(dimensions, palette),
   }
 
+  // The second headline, given equal billing rather than a footnote.
+  result.sprawl = summariseSprawl(result.components)
+  result.headlinesDisagree = headlinesContradict(result.score, result.sprawl)
+
   if (result.refused) {
     result.score = null
     result.grade = null
@@ -1104,7 +1165,18 @@ export function renderTerminal(r, { reportPath = null } = {}) {
   }
 
   const filled = Math.round(r.score / 10)
-  L.push(`  Consistency score   ${r.score}/100          ${'█'.repeat(filled)}${'░'.repeat(10 - filled)}`)
+  L.push(`  Consistency  ${String(r.score).padStart(3)}/100  ${'█'.repeat(filled)}${'░'.repeat(10 - filled)}   values`)
+
+  // The second headline, level with the first. A repo can hold both a healthy
+  // score and a pile of one-off components; that pairing IS the finding.
+  const sp = r.sprawl
+  if (sp && sp.treatments) {
+    const via = sp.componentShare ? ` · ${pct(sp.componentShare)} via components` : ''
+    L.push(`  Sprawl       ${nf(sp.singletons)} used once of ${nf(sp.treatments)} hand-rolled treatments${via}`)
+    if (r.headlinesDisagree) {
+      L.push('               values are in hand, components are not — the score cannot see this')
+    }
+  }
   L.push('')
 
   for (const dim of DIMENSIONS) {
@@ -1129,11 +1201,6 @@ export function renderTerminal(r, { reportPath = null } = {}) {
   }
   L.push('')
 
-  // The number that converts is not the score — it is the singleton rate. But
-  // say WHICH buttons: "134 button treatments" over a codebase that routes
-  // everything through <Button/> is a number the reader cannot reconcile with
-  // their own app, and that is how a report loses its credibility.
-  L.push(buttonLine(r.components.button))
 
   // The first relational finding — the one a per-value rule can never see.
   const cl = r.clusters
