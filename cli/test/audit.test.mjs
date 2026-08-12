@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   auditFiles, effectiveCount, cardinalityScore, grade,
-  BUDGETS, WEIGHTS, DIMENSIONS, MIN_EVENTS, MIN_PARSED,
+  BUDGETS, WEIGHTS, DIMENSIONS, MIN_EVENTS, MIN_PARSED, buttonLine,
 } from '../src/audit.mjs'
 import {
   extractCss, extractClasses, extractCssVars, extractClassStyles, resolveVar, expandBox,
@@ -508,4 +508,41 @@ test('expressible separates structure from the inexpressible', () => {
   assert.equal(c.tokensOnly, 1, 'the painted element')
   assert.equal(c.none, 1, 'styled, but in ways no token can say')
   assert.equal(c.layout, 1, 'pure structure — not counted against the vocabulary')
+})
+
+test('the button line distinguishes a solved codebase from a sprawling one', () => {
+  // Measured reality: shadcn-ui/ui had 80 raw <button> against 3,070 <Button/>.
+  // Reporting only the raw count described that repo the same way as one with
+  // 134 one-off treatments.
+  const solved = auditFiles([file('a.tsx', `
+    ${'<Button variant="primary">go</Button>\n'.repeat(30)}
+    <button className="bg-red-500 px-2">odd one out</button>
+  `)])
+  assert.equal(solved.components.button.throughComponent, 30)
+  assert.equal(solved.components.button.treatments, 1)
+  assert.ok(solved.components.button.componentShare > 0.9)
+  assert.match(buttonLine(solved.components.button), /go through a component/)
+
+  const sprawl = auditFiles([file('b.tsx',
+    Array.from({ length: 12 }, (_, i) => `<button className="bg-c${i} p-${i} rounded-lg">b</button>`).join('\n'))])
+  assert.equal(sprawl.components.button.throughComponent, 0)
+  assert.equal(sprawl.components.button.componentShare, 0)
+  assert.doesNotMatch(buttonLine(sprawl.components.button), /go through a component/)
+  assert.match(buttonLine(sprawl.components.button), /hand-rolled/)
+})
+
+test('container components are not counted as controls', () => {
+  const r = auditFiles([file('a.tsx', `
+    <ButtonGroup><Button>a</Button></ButtonGroup>
+    <CardHeader/><CardTitle/><Card>x</Card>
+    <SelectTrigger/><SelectItem/><Select/>
+  `)])
+  assert.equal(r.components.button.throughComponent, 1, 'ButtonGroup is not a button')
+  assert.equal(r.components.card.throughComponent, 1, 'CardHeader/CardTitle are not cards')
+  assert.equal(r.components.input.throughComponent, 1, 'SelectTrigger/SelectItem are not inputs')
+})
+
+test('component names are reported so the reader recognises their own', () => {
+  const r = auditFiles([file('a.tsx', '<IconButton/><Button/><Button/>')])
+  assert.deepEqual(r.components.button.componentNames, ['Button', 'IconButton'])
 })

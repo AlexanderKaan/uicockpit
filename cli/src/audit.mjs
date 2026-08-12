@@ -248,6 +248,43 @@ const LAYOUT_RX = /^(flex|inline-flex|grid|inline-grid|block|inline|inline-block
 const BUTTONISH = /<(button|a)\b([^>]*)>/gi
 const INPUTISH = /<(input|select|textarea)\b([^>]*)>/gi
 
+/**
+ * Buttons that go through a COMPONENT rather than being hand-rolled.
+ *
+ * Measured on real code: shadcn-ui/ui has 80 raw `<button>` against 3,070
+ * `<Button/>`; cal.com 98 against 536. Counting only raw elements meant the
+ * headline artefact was reading a small minority of the buttons in any modern
+ * React codebase — and then describing that minority as "134 button
+ * treatments", a number the reader cannot reconcile with their own app.
+ *
+ * The fix is NOT to add component usages to the treatment count: 3,070 usages
+ * of one component is not 3,070 treatments, it is the ABSENCE of sprawl. What
+ * matters is the ratio between the two, because they describe opposite worlds —
+ * a repo that routes every button through one component has already solved this,
+ * and a repo where 112 of 134 treatments occur once has not.
+ */
+const COMPONENTISH = {
+  button: /^(?:\w*Button|Btn|\w*Btn|IconButton|ToggleButton|SubmitButton|LinkButton|Cta)$/,
+  input: /^(?:\w*Input|TextField|\w*Field|Textarea|TextArea|Select|Combobox|Checkbox|Radio|Switch|Toggle)$/,
+  card: /^(?:\w*Card|Panel|Tile|Surface)$/,
+}
+/** Names that LOOK like the component but are containers or plurals. */
+const NOT_A_CONTROL = /^(?:ButtonGroup|Buttons|InputGroup|Inputs|CardGroup|CardHeader|CardTitle|CardContent|CardFooter|CardDescription|FieldGroup|Fieldset|SelectGroup|SelectLabel|SelectContent|SelectItem|SelectTrigger|SelectValue|RadioGroup|CheckboxGroup|ToggleGroup)$/
+
+/** Count `<Xxx …>` usages of control-like components, per kind. */
+function countComponentUsages(content) {
+  const found = { button: 0, input: 0, card: 0 }
+  const names = { button: new Set(), input: new Set(), card: new Set() }
+  for (const m of content.matchAll(/<([A-Z][\w.]*)[\s/>]/g)) {
+    const name = m[1].split('.').pop()
+    if (NOT_A_CONTROL.test(name)) continue
+    for (const kind of Object.keys(COMPONENTISH)) {
+      if (COMPONENTISH[kind].test(name)) { found[kind]++; names[kind].add(name); break }
+    }
+  }
+  return { found, names }
+}
+
 function attrClasses(attrs, bindings = {}, path = '') {
   const m = attrs.match(/class(?:Name)?\s*=\s*(?:"([^"]*)"|'([^']*)'|\{`([^`]*)`\})/)
   if (m) return (m[1] ?? m[2] ?? m[3] ?? '').split(/\s+/).filter(Boolean)
@@ -287,10 +324,18 @@ function collectComponents(files) {
   }
 
   const lineAt = (content, idx) => content.slice(0, idx).split('\n').length
+  const viaComponent = { button: 0, input: 0, card: 0 }
+  const componentNames = { button: new Set(), input: new Set(), card: new Set() }
 
   for (const { path, content } of files) {
     if (/\.(css|scss|less)$/.test(path)) continue
     const bindings = cssModuleBindings(path, content)
+
+    const usages = countComponentUsages(content)
+    for (const kind of Object.keys(viaComponent)) {
+      viaComponent[kind] += usages.found[kind]
+      for (const n of usages.names[kind]) componentNames[kind].add(n)
+    }
 
     for (const m of content.matchAll(BUTTONISH)) {
       const tag = m[1].toLowerCase()
@@ -322,9 +367,19 @@ function collectComponents(files) {
   const out = {}
   for (const [kind, map] of Object.entries(kinds)) {
     const sigs = [...map.values()].sort((a, b) => b.count - a.count)
+    const handRolled = sigs.reduce((a, s) => a + s.count, 0)
+    const throughComponent = viaComponent[kind]
+    const total = handRolled + throughComponent
     out[kind] = {
+      // `treatments` counts DISTINCT hand-rolled signatures — the sprawl.
       treatments: sigs.length,
       singletons: sigs.filter((s) => s.count === 1).length,
+      // …and these say how much of the codebase never hand-rolls at all.
+      handRolled,
+      throughComponent,
+      componentNames: [...componentNames[kind]].sort().slice(0, 12),
+      // The ratio IS the finding: high means this repo already solved it.
+      componentShare: total ? round(throughComponent / total, 3) : null,
       signatures: sigs.slice(0, 100),
     }
   }
@@ -826,6 +881,26 @@ function wrap(text, width) {
   return out
 }
 
+/**
+ * The button sentence, told honestly for both worlds.
+ *
+ * A repo where 3,070 of 3,150 buttons go through one component has SOLVED
+ * sprawl — the handful of hand-rolled leftovers are a footnote, not a verdict.
+ * A repo where 112 of 134 treatments occur exactly once has not. Reporting only
+ * the hand-rolled count describes those two with the same sentence.
+ */
+export function buttonLine(b) {
+  if (!b || (!b.treatments && !b.throughComponent)) return ''
+  const share = b.componentShare
+  const sprawl = b.treatments
+    ? `${nf(b.treatments)} hand-rolled button treatment${b.treatments === 1 ? '' : 's'}${b.singletons ? `, ${nf(b.singletons)} used once` : ''}`
+    : 'no hand-rolled buttons'
+  if (share !== null && b.throughComponent) {
+    return `  ${sprawl} · ${pct(share)} of buttons go through a component`
+  }
+  return `  ${sprawl}`
+}
+
 /** One line of "this is your codebase" — the recognition beat before the verdict. */
 export function stackLine(stack) {
   const bits = []
@@ -887,11 +962,11 @@ export function renderTerminal(r, { reportPath = null } = {}) {
   }
   L.push('')
 
-  // The number that converts is not the score — it is the singleton rate.
-  const b = r.components.button
-  if (b.treatments) {
-    L.push(`  ${b.treatments} button treatments — ${b.singletons} occur exactly once`)
-  }
+  // The number that converts is not the score — it is the singleton rate. But
+  // say WHICH buttons: "134 button treatments" over a codebase that routes
+  // everything through <Button/> is a number the reader cannot reconcile with
+  // their own app, and that is how a report loses its credibility.
+  L.push(buttonLine(r.components.button))
 
   const guns = []
   for (const f of r.flags) {

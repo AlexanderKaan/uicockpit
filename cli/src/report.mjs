@@ -99,12 +99,22 @@ function buttonWall(components, classStyles, palette) {
     </figure>`
   }).join('')
 
+  // Qualify the count. "89 button treatments" over a codebase that routes 3,070
+  // buttons through <Button/> is a number the reader cannot match to their own
+  // app — and once one number fails that test, the rest of the report goes with it.
+  const via = b.throughComponent
+    ? `<p class="lead">${b.throughComponent.toLocaleString('en-US')} more buttons go through a
+       component (${b.componentNames.map((n) => `<code>&lt;${esc(n)}/&gt;</code>`).join(', ')}) —
+       <strong>${pct(b.componentShare)}</strong> of all buttons. Those are not sprawl; they are the
+       system this codebase already has. The wall below is what sits outside it.</p>`
+    : ''
+
   return section(
     'The button wall',
-    `<strong>${b.treatments} button treatments</strong> — ${b.singletons} occur exactly once.
-     A treatment used once was never designed; it is the migration worklist.
-     Each swatch is rebuilt from that element's own extracted values.`,
-    `<div class="wall">${cells}</div>`,
+    `<strong>${b.treatments} hand-rolled button treatment${b.treatments === 1 ? '' : 's'}</strong> —
+     ${b.singletons} occur exactly once. A treatment used once was never designed; it is the
+     migration worklist. Each swatch is rebuilt from that element's own extracted values.`,
+    `${via}<div class="wall">${cells}</div>`,
   )
 }
 
