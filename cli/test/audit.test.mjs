@@ -438,3 +438,34 @@ test('a resolved palette makes the brand colour findable', () => {
   assert.equal(withPalette.inferredConfig.values.colorTheme, 'jade')
   assert.equal(without.inferredConfig.values.colorTheme, undefined, 'unresolvable → no guess')
 })
+
+test('a layered token system counts as one colour, not two', () => {
+  // `--button-hover-bg: var(--color-primary-light)` is two NAMES for one colour.
+  // Counting names would make a well-layered design system score WORSE than a
+  // pile of hex literals — punishing exactly what we advocate.
+  const r = auditFiles([file('a.css', `
+    :root { --brand: #4f46e5; --primary-light: var(--brand); --button-bg: var(--primary-light); }
+    .a { background: var(--button-bg); } .b { background: var(--primary-light); }
+    .c { background: var(--brand); }     .d { background: var(--button-bg); }
+  `)])
+  const values = r.dimensions.color.values.map((v) => v.value)
+  assert.deepEqual(values, ['#4f46e5'], `three aliases must collapse to one colour, got ${values}`)
+  assert.equal(r.dimensions.color.nEff, 1)
+})
+
+test('an unresolvable token keeps its name instead of vanishing', () => {
+  const r = auditFiles([file('a.css', '.a { background: var(--from-somewhere-else); }')])
+  assert.equal(r.dimensions.color.values[0].value, '--from-somewhere-else')
+})
+
+test('circular token definitions terminate', () => {
+  const r = auditFiles([file('a.css', ':root { --a: var(--b); --b: var(--a); }\n.x { color: var(--a); }')])
+  assert.ok(r.dimensions.color.values.length <= 1, 'must not hang or explode')
+})
+
+test('a BEM modifier class is not read as a utility value', () => {
+  // Docusaurus/Infima ship `text--center`; its tail was being read as a colour.
+  const evs = extractClasses(['text--center', 'bg--dark', 'text-red-500'], at)
+  const colours = evs.filter((e) => e.dim === 'color').map((e) => e.value)
+  assert.deepEqual(colours, ['red-500'])
+})

@@ -34,7 +34,7 @@ import {
   GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE,
   extractCss, extractClasses, extractInline, classAttrs,
   extractClassStyles, extractCssVars, resolveVar,
-  cssModuleBindings, moduleClassAttrs, qualify,
+  cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar,
   countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX,
 } from './patterns.mjs'
 import {
@@ -656,6 +656,16 @@ export function auditFiles(files, opts = {}) {
     events.push(...inline)
     // HTML files also carry CSS-ish styling in <style> blocks.
     for (const m of content.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) absorbCss(path, m[1])
+  }
+
+  // Collapse token chains now that every definition has been seen. Done as a
+  // post-pass on purpose: a custom property is regularly defined in a file the
+  // walker reaches after the one that uses it.
+  for (const e of events) {
+    if (typeof e.value === 'string' && e.value.startsWith('--')) {
+      const literal = deepResolveVar(e.value, cssVars)
+      if (literal !== e.value) e.value = norm(literal)
+    }
   }
 
   // The palette the repo actually uses: its own @theme / :root overrides beat the

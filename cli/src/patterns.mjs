@@ -281,6 +281,10 @@ export function extractClasses(classes, at) {
 
   for (const rawCls of classes) {
     const c = bare(rawCls)
+    // A BEM modifier is not a utility. Docusaurus/Infima ship `text--center`,
+    // and reading its tail as a value had us reporting `-center` as a colour.
+    // Tailwind never puts `--` in a class; arbitrary values use `[...]`.
+    if (c.includes('--')) continue
     const arb = c.match(ARBITRARY_RX)
     const prefix = arb ? arb[1] : null
     const arbVal = arb ? arb[2] : null
@@ -575,6 +579,29 @@ export function resolveVar(value, vars) {
   if (typeof value !== 'string') return value
   return value.replace(/var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)/g, (_, name, fallback) =>
     vars[name] ?? (fallback ? fallback.trim() : ''))
+}
+
+/**
+ * Follow a custom property down to the literal it ultimately holds.
+ *
+ * This is what stops the audit from punishing the very thing we advocate. A
+ * layered token system says `--button-hover-bg: var(--color-primary-light)` and
+ * `--color-primary-light: #c9d5ff`: two NAMES, one colour. Counting the names
+ * would report two systems where the author built one, so a well-layered design
+ * system would score WORSE than a pile of hex literals. Chains are followed to
+ * the literal; a name that leads nowhere stays itself.
+ */
+export function deepResolveVar(name, vars, depth = 0) {
+  if (depth > 8) return name // pathological or circular — stop, don't hang
+  const raw = vars[name]
+  if (!raw) return name
+  const inner = raw.match(/^var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)$/)
+  if (inner) {
+    const next = deepResolveVar(inner[1], vars, depth + 1)
+    // Unresolvable alias with a fallback → use the fallback rather than a name.
+    return next === inner[1] && inner[2] ? inner[2].trim() : next
+  }
+  return raw.trim()
 }
 
 /** Readable styling units in a file — the denominator half of `parsed`.
