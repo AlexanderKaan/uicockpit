@@ -415,3 +415,26 @@ test('mx-auto is a layout decision, not a spacing value', () => {
   assert.ok(evs.every((e) => e.value === '16px'), 'only p-4 should register')
   assert.equal(evs.length, 4)
 })
+
+test('opacity variants of one colour are not near-duplicates', () => {
+  // emerald-500 · /10 · /20 is one deliberate colour at three opacities. A
+  // translucent value renders as whatever it sits on, so it is not comparable —
+  // reporting these as duplicates loses the first argument with a good engineer.
+  const palette = { 'emerald-500': '#10b981', 'zinc-50': '#fafafa', 'zinc-100': '#f4f4f5' }
+  const css = ['emerald-500', 'emerald-500/10', 'emerald-500/20', 'zinc-50', 'zinc-100']
+    .map((c, i) => `<div className="bg-${c} p-4">x${i}</div>`).join('\n').repeat(4)
+  const r = auditFiles([file('a.tsx', css)], { palette })
+  const flat = r.dimensions.color.nearDupes.flat()
+  assert.ok(!flat.some((v) => v.includes('/')), `no alpha variant may be flagged: ${JSON.stringify(r.dimensions.color.nearDupes)}`)
+  // Two genuinely near-identical, differently named greys still are.
+  assert.ok(r.dimensions.color.nearDupes.some((g) => g.includes('zinc-50') && g.includes('zinc-100')))
+})
+
+test('a resolved palette makes the brand colour findable', () => {
+  const palette = { 'emerald-500': '#10b981' }
+  const src = '<div className="bg-emerald-500 p-4">x</div>'.repeat(20)
+  const withPalette = auditFiles([file('a.tsx', src)], { palette })
+  const without = auditFiles([file('a.tsx', src)])
+  assert.equal(withPalette.inferredConfig.values.colorTheme, 'jade')
+  assert.equal(without.inferredConfig.values.colorTheme, undefined, 'unresolvable → no guess')
+})

@@ -23,10 +23,12 @@ import { parseColor } from './colorspace.mjs'
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 const pct = (n) => `${Math.round(n * 100)}%`
 
-/** Turn a value into something a browser can paint, or null if we can't. */
-const cssColor = (v) => {
-  const rgb = parseColor(v)
-  return rgb ? `rgb(${rgb.join(',')})` : (/^(#|rgb|hsl)/.test(String(v)) ? String(v) : null)
+/** Turn a value into something a browser can paint, or null if we can't.
+ *  `palette` is the repo's resolved design palette, so a Tailwind name like
+ *  `emerald-500` paints as the colour that repo actually renders. */
+const cssColor = (v, palette = null) => {
+  const rgb = parseColor(v, palette)
+  return rgb ? `rgb(${rgb.join(',')})` : (/^(#|rgb|hsl|oklch)/.test(String(v)) ? String(v) : null)
 }
 
 /* ─────────────────────────────── the button wall ───────────────────────────── */
@@ -36,7 +38,7 @@ const cssColor = (v) => {
  * the SAME extractor the audit used, so the swatch is the repo's real values —
  * not an approximation drawn by hand.
  */
-function reconstruct(sig, classStyles = {}) {
+function reconstruct(sig, classStyles = {}, palette = null) {
   const classes = sig.split(/\s+/).filter(Boolean)
 
   // Plain-CSS repos: the values live in the stylesheet, not the class name.
@@ -57,8 +59,8 @@ function reconstruct(sig, classStyles = {}) {
     const hit = evs.find((e) => e.dim === dim && (role === null || e.role === role))
     return hit ? hit.value : null
   }
-  const bg = cssColor(pick('color', 'bg'))
-  const fg = cssColor(pick('color', 'fg'))
+  const bg = cssColor(pick('color', 'bg'), palette)
+  const fg = cssColor(pick('color', 'fg'), palette)
   const radius = pick('radius')
   const shadow = pick('shadow')
   const padding = evs.filter((e) => e.dim === 'spacing')
@@ -82,11 +84,11 @@ function reconstruct(sig, classStyles = {}) {
   return { style, resolved }
 }
 
-function buttonWall(components, classStyles) {
+function buttonWall(components, classStyles, palette) {
   const b = components.button
   if (!b || !b.treatments) return ''
   const cells = b.signatures.map((s) => {
-    const { style, resolved } = reconstruct(s.sig, classStyles)
+    const { style, resolved } = reconstruct(s.sig, classStyles, palette)
     const label = s.count === 1 ? 'once' : `${s.count}×`
     const files = [...new Set(s.at.map((a) => a.file))].slice(0, 2).join(' · ')
     return `<figure class="wall__cell${s.count === 1 ? ' is-singleton' : ''}">
@@ -108,7 +110,7 @@ function buttonWall(components, classStyles) {
 
 /* ────────────────────────────── rendered dimensions ────────────────────────── */
 
-function colorSwatches(d) {
+function colorSwatches(d, palette) {
   if (!d.values.length) return ''
   const dupeIndex = new Map()
   d.nearDupes.forEach((group, gi) => group.forEach((v) => dupeIndex.set(v, gi)))
@@ -119,7 +121,7 @@ function colorSwatches(d) {
     return ga - gb
   })
   const cells = ordered.map((v) => {
-    const c = cssColor(v.value)
+    const c = cssColor(v.value, palette)
     const dupe = dupeIndex.has(v.value)
     return `<figure class="sw${dupe ? ' is-dupe' : ''}">
       <div class="sw__chip" style="background:${c ? esc(c) : 'repeating-linear-gradient(45deg,#ddd,#ddd 4px,#eee 4px,#eee 8px)'}"></div>
@@ -133,7 +135,7 @@ function colorSwatches(d) {
   // truth is that we only resolve the grey ramps, so a named palette colour has
   // no hex to paint — and it is also excluded from near-duplicate detection,
   // which the reader deserves to know before trusting the count.
-  const unresolved = ordered.filter((v) => !cssColor(v.value)).length
+  const unresolved = ordered.filter((v) => !cssColor(v.value, palette)).length
   const unresolvedNote = unresolved
     ? `<p class="note">${unresolved} of ${d.distinct} values are palette names this scan cannot resolve to a colour (hatched) — they are counted, but excluded from near-duplicate detection.</p>`
     : ''
@@ -394,8 +396,8 @@ export function renderReport(r) {
 <p class="sub">${r.meta.files.toLocaleString('en-US')} files · ${r.meta.elements.toLocaleString('en-US')} styled elements · profile ${r.meta.profile}${r.meta.vocabVersion ? ` · vocabulary ${r.meta.vocabVersion}` : ''}</p>
 ${detectedBlock(r)}
 ${scoreBoard(r)}
-${buttonWall(r.components, r.classStyles || {})}
-${colorSwatches(d.color)}
+${buttonWall(r.components, r.classStyles || {}, r.palette || null)}
+${colorSwatches(d.color, r.palette || null)}
 ${typeSpecimens(d.type)}
 ${shadowSquares(d.shadow)}
 ${radiusSquares(d.radius)}

@@ -39,6 +39,7 @@ import {
 } from './patterns.mjs'
 import {
   METRIC, NEAR_DUPE_THRESHOLD, colorDistance, pxDistance, clusterNear, parseColor, toLab, deltaE00,
+  resolvePalette, stripAlpha,
 } from './colorspace.mjs'
 
 /* ────────────────────────────── the constants ──────────────────────────────
@@ -137,12 +138,29 @@ function tally(events) {
 
 /** Near-duplicates: values nobody MEANT to be different. Colour uses ΔE00 < 2;
  *  lengths < 1px; shadow blur < 2px. This is evidence, not opinion. */
-function findNearDupes(dim, values) {
+function findNearDupes(dim, values, palette) {
   const names = values.map((v) => v.value)
-  if (dim === 'color') return clusterNear(names, colorDistance, NEAR_DUPE_THRESHOLD)
+  if (dim === 'color') return clusterNear(names, colorPairDistance(palette), NEAR_DUPE_THRESHOLD)
   if (dim === 'radius' || dim === 'spacing') return clusterNear(names, pxDistance, 1)
   if (dim === 'shadow') return clusterNear(names, blurDistance, 2)
   return []
+}
+
+/**
+ * Colour distance for near-duplicate clustering — with one refusal built in.
+ *
+ * A translucent colour is NOT comparable: `emerald-500/10` renders as whatever
+ * it sits on, and we do not know the backdrop. Resolving it to its base (which
+ * is right for counting) makes it look identical to `emerald-500`, so a naive
+ * comparison reports `emerald-500 · /10 · /20 · /30` as four near-duplicates.
+ * They are one deliberate colour used at four opacities — the kind of false
+ * positive that loses the first argument with a good engineer. So: if either
+ * side carries an alpha modifier, we decline to judge.
+ */
+const hasAlpha = (v) => /\/[\d.]+%?$/.test(String(v))
+const colorPairDistance = (palette) => (a, b) => {
+  if (hasAlpha(a) || hasAlpha(b)) return null
+  return colorDistance(a, b, palette)
 }
 
 /** Compare shadows on their blur radius — the perceptually dominant term. */
@@ -155,7 +173,7 @@ function blurDistance(a, b) {
   return ba !== null && bb !== null ? Math.abs(ba - bb) : null
 }
 
-function analyseDimension(dim, events, budget) {
+function analyseDimension(dim, events, budget, palette) {
   const values = tally(events)
   const counts = values.map((v) => v.count)
   const total = counts.reduce((a, b) => a + b, 0)
@@ -165,7 +183,7 @@ function analyseDimension(dim, events, budget) {
   // ── coherence: only these three signals may touch the score.
   const tokenised = total ? events.filter((e) => e.tokenized).length / total : 1
 
-  const nearDupes = findNearDupes(dim, values)
+  const nearDupes = findNearDupes(dim, values, palette)
   const dupeValues = new Set(nearDupes.flat())
   const dupeMass = total ? events.filter((e) => dupeValues.has(e.value)).length / total : 0
 
@@ -471,7 +489,7 @@ const px = (v) => {
   return m[2] === 'rem' ? parseFloat(m[1]) * 16 : parseFloat(m[1])
 }
 
-function inferConfig(dims) {
+function inferConfig(dims, palette) {
   const values = {}
   const confidence = {}
   const MIN_DOMINANCE = 0.4 // below this, nobody decided anything
@@ -510,11 +528,11 @@ function inferConfig(dims) {
   } else confidence.scale = null
 
   // dominant brand colour → nearest ColorTheme anchor by ΔE00
-  const brand = pickBrandColor(dims.color.values)
+  const brand = pickBrandColor(dims.color.values, palette)
   if (brand) {
     let best = null
     for (const [name, hex] of Object.entries(THEME_ANCHORS)) {
-      const d = colorDistance(brand.value, hex)
+      const d = colorDistance(brand.value, hex, palette)
       if (d !== null && (!best || d < best.d)) best = { name, d }
     }
     if (best) { values.colorTheme = best.name; confidence.colorTheme = round(brand.share, 2) }
@@ -526,10 +544,10 @@ function inferConfig(dims) {
 
 /** The brand colour is the most-used SATURATED colour — greys and near-whites
  *  are surface, not identity. */
-function pickBrandColor(values) {
+function pickBrandColor(values, palette) {
   const total = values.reduce((a, v) => a + v.count, 0)
   for (const v of values) {
-    const lab = toLab(v.value)
+    const lab = toLab(v.value, palette)
     if (!lab) continue
     const chroma = Math.hypot(lab[1], lab[2])
     if (chroma > 25 && lab[0] > 15 && lab[0] < 92) return { value: v.value, share: v.count / total }
@@ -640,6 +658,12 @@ export function auditFiles(files, opts = {}) {
     for (const m of content.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) absorbCss(path, m[1])
   }
 
+  // The palette the repo actually uses: its own @theme / :root overrides beat the
+  // Tailwind build installed alongside it, which beats our grey ramps. Derived,
+  // never shipped as a table — so it is always this repo's real palette and it
+  // cannot rot when Tailwind changes its defaults.
+  const palette = resolvePalette(cssVars, opts.palette || {})
+
   // Flatten var() once, so the report never has to know about the cascade.
   const resolvedStyles = {}
   for (const [cls, decls] of Object.entries(classStyles)) {
@@ -654,7 +678,7 @@ export function auditFiles(files, opts = {}) {
 
   const dimensions = {}
   for (const dim of DIMENSIONS) {
-    dimensions[dim] = analyseDimension(dim, events.filter((e) => e.dim === dim), budgets[dim])
+    dimensions[dim] = analyseDimension(dim, events.filter((e) => e.dim === dim), budgets[dim], palette)
   }
 
   // Only dimensions with enough evidence may move the number; the rest are
@@ -701,10 +725,17 @@ export function auditFiles(files, opts = {}) {
     // Not part of the measurement — purely so the report can render a real
     // swatch for a class-based component instead of quoting its class list.
     classStyles: resolvedStyles,
+    // Only the entries this codebase actually uses, so `--json` stays readable
+    // instead of carrying a few hundred palette rows nobody referenced.
+    palette: Object.fromEntries(
+      dimensions.color.values
+        .map((v) => [stripAlpha(v.value), palette[stripAlpha(v.value)]])
+        .filter(([, hex]) => hex),
+    ),
     flags: smokingGuns(files, opts.pkg, events),
     // Emitted but unused in PR 1 — it is the hinge to the configurator (PR 4),
     // and computing it now is cheaper than a second pass later.
-    inferredConfig: inferConfig(dimensions),
+    inferredConfig: inferConfig(dimensions, palette),
   }
 
   if (result.refused) {
@@ -850,6 +881,52 @@ export function renderTerminal(r, { reportPath = null } = {}) {
 /* ─────────────────────────────── the CLI shell ─────────────────────────────── */
 
 /**
+ * Read the colour palette from the Tailwind build installed in the repo under
+ * audit. Node-only, best-effort: a repo with no dependencies installed simply
+ * gets fewer resolved colours, and the report says so rather than pretending.
+ *
+ * We read the INSTALLED copy rather than shipping our own table, so the numbers
+ * are that repo's real palette — including its version — and so a hand-typed
+ * table can never silently drift from what the project actually renders.
+ */
+async function loadInstalledPalette(fs, pathMod, dir) {
+  const roots = [dir, '.']
+  const out = {}
+
+  for (const root of roots) {
+    // Tailwind v4 — the whole palette lives in theme.css as `--color-*`.
+    const themeCss = pathMod.join(root, 'node_modules', 'tailwindcss', 'theme.css')
+    try {
+      if (fs.existsSync(themeCss)) {
+        const css = fs.readFileSync(themeCss, 'utf8')
+        for (const m of css.matchAll(/--color-([\w-]+)\s*:\s*([^;]+);/g)) out[m[1]] = m[2].trim()
+        if (Object.keys(out).length) return out
+      }
+    } catch { /* unreadable → fall through */ }
+
+    // Tailwind v3 — colors.js exports nested { hue: { shade: hex } }.
+    for (const rel of [['node_modules', 'tailwindcss', 'colors.js'], ['node_modules', 'tailwindcss', 'lib', 'public', 'colors.js']]) {
+      const p = pathMod.join(root, ...rel)
+      try {
+        if (!fs.existsSync(p)) continue
+        const mod = await import(`file://${pathMod.resolve(p)}`)
+        const colors = mod.default ?? mod
+        for (const [hue, val] of Object.entries(colors)) {
+          if (typeof val === 'string') out[hue] = val
+          else if (val && typeof val === 'object') {
+            for (const [shade, hex] of Object.entries(val)) {
+              if (typeof hex === 'string') out[`${hue}-${shade}`] = hex
+            }
+          }
+        }
+        if (Object.keys(out).length) return out
+      } catch { /* not importable → fall through */ }
+    }
+  }
+  return out
+}
+
+/**
  * Discover files under `dir`, audit them, print (or emit JSON).
  * Node-only; the pure engine above stays importable in a browser bundle.
  *
@@ -910,7 +987,9 @@ export async function runAudit(argv = []) {
     try { if (fs.existsSync(c)) { pkg = JSON.parse(fs.readFileSync(c, 'utf8')); break } } catch { /* malformed */ }
   }
 
-  const result = auditFiles(files, { profile, vocabulary, pkg })
+  const palette = await loadInstalledPalette(fs, pathMod, dir)
+
+  const result = auditFiles(files, { profile, vocabulary, pkg, palette })
   result.meta.arbitrary = arbitraryRate(files)
 
   let reportPath = null

@@ -41,12 +41,64 @@ export const TW_GRAYS = {
   white: '#ffffff', black: '#000000',
 }
 
-/** Parse a CSS colour into [r,g,b] 0–255, or null when we can't (a var(), an
- *  unresolvable palette name, oklch()). Null means "skip in near-dupe", never
- *  "pretend it matched". */
-export function parseColor(input) {
+/**
+ * oklch() → sRGB. Tailwind v4 writes its entire palette in oklch, so without
+ * this the resolution chain would read the theme and still not be able to paint
+ * a single swatch.
+ *
+ * Unlike a hardcoded palette table — where every one of ~242 entries is an
+ * independent chance to be silently wrong — this is one transform with known
+ * anchors (white, black, sRGB primaries), so it is verifiable. Coefficients are
+ * Ottosson's OKLab matrices; the tests pin them.
+ */
+export function oklchToRgb(L, C, H) {
+  const h = (H * Math.PI) / 180
+  const a = C * Math.cos(h)
+  const b = C * Math.sin(h)
+
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b
+  const s_ = L - 0.0894841775 * a - 1.2914855480 * b
+  const l = l_ ** 3, m = m_ ** 3, s = s_ ** 3
+
+  const lin = [
+    +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s,
+  ]
+  return lin.map((v) => {
+    const c = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(Math.max(v, 0), 1 / 2.4) - 0.055
+    return Math.round(Math.max(0, Math.min(1, c)) * 255)
+  })
+}
+
+/** Strip a Tailwind opacity modifier: `zinc-200/80` is still zinc-200. */
+export const stripAlpha = (name) => String(name).replace(/\/[\d.]+%?$/, '')
+
+/**
+ * Parse a CSS colour into [r,g,b] 0–255, or null when we can't. Null means
+ * "skip in near-dupe", never "pretend it matched".
+ *
+ * `palette` is the resolved design-token palette for the repo under audit
+ * (Tailwind's theme, the project's own @theme overrides) — see resolvePalette().
+ */
+export function parseColor(input, palette = null) {
   if (typeof input !== 'string') return null
   const s = input.trim().toLowerCase()
+
+  if (palette) {
+    const named = palette[stripAlpha(s)]
+    if (named && named !== s) return parseColor(named, null)
+  }
+
+  const ok = s.match(/^oklch\(([^)]+)\)$/)
+  if (ok) {
+    const p = ok[1].split(/[\s,/]+/).filter(Boolean)
+    const L = p[0].endsWith('%') ? parseFloat(p[0]) / 100 : parseFloat(p[0])
+    const C = parseFloat(p[1])
+    const H = parseFloat(p[2]) || 0
+    return [L, C].every(Number.isFinite) ? oklchToRgb(L, C, H) : null
+  }
 
   const hex = s.match(HEX_RX)
   if (hex) {
@@ -71,8 +123,32 @@ export function parseColor(input) {
     return hslToRgb(h, sat, l)
   }
 
-  if (TW_GRAYS[s]) return parseColor(TW_GRAYS[s])
+  const grey = TW_GRAYS[stripAlpha(s)]
+  if (grey) return parseColor(grey)
   return null
+}
+
+/**
+ * Build the palette for the repo under audit, most specific source winning:
+ *   1. the project's own `@theme` / `:root` custom properties (a project that
+ *      overrides `emerald` means ITS emerald, not Tailwind's)
+ *   2. the Tailwind build actually installed in that repo
+ *   3. our grey ramps, as the last resort
+ *
+ * Deriving it beats shipping a table: it is always the palette that repo really
+ * uses, and it cannot rot when Tailwind changes its defaults.
+ *
+ * @param {Record<string,string>} cssVars  custom properties seen while scanning
+ * @param {Record<string,string>} [installed]  name → colour, from node_modules
+ */
+export function resolvePalette(cssVars = {}, installed = {}) {
+  const palette = { ...TW_GRAYS, ...installed }
+  // `--color-emerald-500: oklch(...)` → `emerald-500`
+  for (const [k, v] of Object.entries(cssVars)) {
+    const m = k.match(/^--color-(.+)$/)
+    if (m && v) palette[m[1]] = v.trim()
+  }
+  return palette
 }
 
 function hslToRgb(h, s, l) {
@@ -115,8 +191,8 @@ export function xyzToLab([x, y, z]) {
 }
 
 /** Full pipeline: a CSS colour string → CIE Lab, or null if unparseable. */
-export function toLab(input) {
-  const rgb = parseColor(input)
+export function toLab(input, palette = null) {
+  const rgb = parseColor(input, palette)
   return rgb ? xyzToLab(rgbToXyz(rgb)) : null
 }
 
@@ -188,9 +264,9 @@ export function deltaE00([L1, a1, b1], [L2, a2, b2]) {
 }
 
 /** Convenience: distance between two CSS colour strings, or null if either is
- *  unparseable (a var(), an oklch(), a non-grey palette name). */
-export function colorDistance(a, b) {
-  const la = toLab(a), lb = toLab(b)
+ *  unparseable (a var(), a palette name outside the resolved palette). */
+export function colorDistance(a, b, palette = null) {
+  const la = toLab(a, palette), lb = toLab(b, palette)
   return la && lb ? deltaE00(la, lb) : null
 }
 

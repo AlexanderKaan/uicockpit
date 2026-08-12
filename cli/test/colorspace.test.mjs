@@ -1,6 +1,9 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { deltaE00, toLab, parseColor, colorDistance, clusterNear, pxDistance } from '../src/colorspace.mjs'
+import {
+  deltaE00, toLab, parseColor, colorDistance, clusterNear, pxDistance,
+  oklchToRgb, stripAlpha, resolvePalette,
+} from '../src/colorspace.mjs'
 
 /**
  * The official CIEDE2000 reference data (Sharma, Wu & Dalal — "The CIEDE2000
@@ -71,9 +74,53 @@ test('parseColor handles hex (3/6/8), rgb(), hsl() and the grey ramps', () => {
 })
 
 test('parseColor returns null rather than guessing', () => {
-  for (const v of ['var(--k-primary)', 'oklch(0.7 0.1 250)', 'indigo-500', 'currentColor', '']) {
+  // oklch() is NOT in this list any more — Tailwind v4 writes its whole palette
+  // that way, so reading it is the difference between painting the swatches and
+  // hatching them.
+  for (const v of ['var(--k-primary)', 'indigo-500', 'currentColor', '']) {
     assert.equal(parseColor(v), null, `${v} should be unparseable, not guessed`)
   }
+})
+
+test('oklch round-trips the sRGB anchors exactly', () => {
+  // One transform with verifiable anchors, unlike a hardcoded palette table
+  // where every entry is an independent chance to be silently wrong.
+  const anchors = [
+    ['white', [1, 0, 0], [255, 255, 255]],
+    ['black', [0, 0, 0], [0, 0, 0]],
+    ['red', [0.62796, 0.25768, 29.234], [255, 0, 0]],
+    ['green', [0.86644, 0.29483, 142.495], [0, 255, 0]],
+    ['blue', [0.45201, 0.31321, 264.052], [0, 0, 255]],
+    ['mid grey', [0.59987, 0, 0], [128, 128, 128]],
+  ]
+  for (const [name, [L, C, H], expected] of anchors) {
+    const got = oklchToRgb(L, C, H)
+    const worst = Math.max(...got.map((v, i) => Math.abs(v - expected[i])))
+    assert.ok(worst <= 2, `${name}: got rgb(${got}), expected rgb(${expected})`)
+  }
+  assert.deepEqual(parseColor('oklch(0.62796 0.25768 29.234)'), [255, 0, 0])
+  assert.deepEqual(parseColor('oklch(62.796% 0.25768 29.234)'), [255, 0, 0])
+})
+
+test('a resolved palette turns a name into a real colour', () => {
+  const palette = { 'emerald-500': 'oklch(0.696 0.17 162.48)', 'brand': '#ff0000' }
+  assert.ok(parseColor('emerald-500', palette), 'a palette name must resolve')
+  assert.deepEqual(parseColor('brand', palette), [255, 0, 0])
+  assert.equal(parseColor('emerald-500'), null, 'and stay unresolved without one')
+})
+
+test('a Tailwind opacity modifier does not hide the base colour', () => {
+  assert.equal(stripAlpha('zinc-200/80'), 'zinc-200')
+  assert.deepEqual(parseColor('zinc-200/80'), parseColor('zinc-200'))
+})
+
+test('resolvePalette lets the project override the installed Tailwind', () => {
+  const installed = { 'emerald-500': '#10b981' }
+  const projectVars = { '--color-emerald-500': '#00ff00' }
+  const p = resolvePalette(projectVars, installed)
+  assert.equal(p['emerald-500'], '#00ff00', "the repo's own @theme wins")
+  assert.equal(resolvePalette({}, installed)['emerald-500'], '#10b981')
+  assert.equal(resolvePalette({}, {})['zinc-500'], '#71717a', 'grey ramps are the floor')
 })
 
 test('white is far from black, and a hex equals its own rgb()', () => {
