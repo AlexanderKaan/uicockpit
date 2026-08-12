@@ -34,6 +34,7 @@ import {
   GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE,
   extractCss, extractClasses, extractInline, classAttrs,
   extractClassStyles, extractCssVars, resolveVar,
+  cssModuleBindings, moduleClassAttrs, qualify,
   countUnreadable, countReadable, norm, TW_GRAY_RAMPS,
 } from './patterns.mjs'
 import {
@@ -229,18 +230,26 @@ const LAYOUT_RX = /^(flex|inline-flex|grid|inline-grid|block|inline|inline-block
 const BUTTONISH = /<(button|a)\b([^>]*)>/gi
 const INPUTISH = /<(input|select|textarea)\b([^>]*)>/gi
 
-function attrClasses(attrs) {
+function attrClasses(attrs, bindings = {}, path = '') {
   const m = attrs.match(/class(?:Name)?\s*=\s*(?:"([^"]*)"|'([^']*)'|\{`([^`]*)`\})/)
-  if (!m) return null
-  return (m[1] ?? m[2] ?? m[3] ?? '').split(/\s+/).filter(Boolean)
+  if (m) return (m[1] ?? m[2] ?? m[3] ?? '').split(/\s+/).filter(Boolean)
+  // CSS-module binding: `<button className={styles.primary}>`. Without this the
+  // wall silently under-reports — a 312-file app showed 4 button treatments.
+  const expr = attrs.match(/class(?:Name)?\s*=\s*\{([^}]*)\}/)
+  if (!expr) return null
+  const found = moduleClassAttrs(path, `className={${expr[1]}}`, bindings)
+  return found.length ? found[0].classes : null
 }
 
-/** Normalised style signature: style-bearing classes only, sorted, deduped. */
+/** Normalised style signature: style-bearing classes only, sorted, deduped.
+ *  Case is folded for plain classes but PRESERVED for module-qualified ones —
+ *  those carry a file path, and lower-casing it breaks the lookup that lets the
+ *  report paint the swatch. */
 function signature(classes) {
   const style = classes
     .map((c) => c.trim())
     .filter((c) => c && !LAYOUT_RX.test(c))
-    .map((c) => c.toLowerCase())
+    .map((c) => (c.includes('#') ? c : c.toLowerCase()))
   return [...new Set(style)].sort().join(' ')
 }
 
@@ -263,11 +272,12 @@ function collectComponents(files) {
 
   for (const { path, content } of files) {
     if (/\.(css|scss|less)$/.test(path)) continue
+    const bindings = cssModuleBindings(path, content)
 
     for (const m of content.matchAll(BUTTONISH)) {
       const tag = m[1].toLowerCase()
       const attrs = m[2] || ''
-      const cls = attrClasses(attrs)
+      const cls = attrClasses(attrs, bindings, path)
       const isRoleButton = /role\s*=\s*["']button["']/.test(attrs)
       // An <a> only counts when it is styled LIKE a button (background + padding),
       // otherwise every link in the app pollutes the count.
@@ -278,7 +288,7 @@ function collectComponents(files) {
     }
 
     for (const m of content.matchAll(INPUTISH)) {
-      const cls = attrClasses(m[2] || '')
+      const cls = attrClasses(m[2] || '', bindings, path)
       record('input', signature(cls || []), { file: path, line: lineAt(content, m.index), col: 1 })
     }
 
@@ -478,22 +488,41 @@ export function auditFiles(files, opts = {}) {
   const absorbCss = (path, css) => {
     events.push(...extractCss(path, css))
     Object.assign(cssVars, extractCssVars(css))
+    // CSS Modules are file-scoped, so their classes are stored qualified —
+    // `Card.module.css#title` — and never merged with an identically named
+    // class from another module.
+    const isModule = /\.module\.(css|scss|less)$/.test(path)
     for (const [cls, decls] of Object.entries(extractClassStyles(css))) {
-      classStyles[cls] = { ...(classStyles[cls] || {}), ...decls }
+      const key = isModule ? qualify(path, cls) : cls
+      classStyles[key] = { ...(classStyles[key] || {}), ...decls }
     }
   }
 
+  // ── Pass 1: stylesheets first. A component file can be walked before the
+  // module it imports, so every class must be known before any element asks
+  // whether the class it points at actually paints anything.
   for (const { path, content } of files) {
-    const isCss = /\.(css|scss|less)$/.test(path)
-
+    if (!/\.(css|scss|less)$/.test(path)) continue
     readable += countReadable(path, content)
     for (const [k, n] of Object.entries(countUnreadable(path, content))) {
       unreadable[k] = (unreadable[k] || 0) + n
     }
+    absorbCss(path, content)
+  }
 
-    if (isCss) {
-      absorbCss(path, content)
-      continue
+  // ── Pass 2: everything that carries markup.
+  for (const { path, content } of files) {
+    if (/\.(css|scss|less)$/.test(path)) continue
+
+    // Elements styled through a CSS-module binding are READABLE: their values
+    // live in the .module.css we scanned. Counting them as a blind spot is what
+    // pushed a real repo to 72% coverage and nearly triggered a false refusal.
+    const bindings = cssModuleBindings(path, content)
+    const moduleEls = moduleClassAttrs(path, content, bindings)
+
+    readable += countReadable(path, content, moduleEls.length)
+    for (const [k, n] of Object.entries(countUnreadable(path, content, moduleEls.length))) {
+      unreadable[k] = (unreadable[k] || 0) + n
     }
 
     // Class attributes: events + the expressible bucket, per element.
@@ -508,6 +537,17 @@ export function auditFiles(files, opts = {}) {
       else if (evs.length) expressible.tokensOnly++
       else expressible.none++
     }
+
+    // A module-bound element is expressible when the class it points at carries
+    // real paint declarations — bespoke component, values a token can say.
+    for (const { classes } of moduleEls) {
+      const hasRecipe = classes.some((c) => Object.prototype.hasOwnProperty.call(vocab, c.split('#').pop().split('--')[0].split('__')[0]))
+      const painted = classes.some((c) => classStyles[c] && Object.keys(classStyles[c]).length)
+      if (hasRecipe) expressible.recipe++
+      else if (painted) expressible.tokensOnly++
+      else expressible.none++
+    }
+
     events.push(...extractInline(path, content))
     // HTML files also carry CSS-ish styling in <style> blocks.
     for (const m of content.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) absorbCss(path, m[1])

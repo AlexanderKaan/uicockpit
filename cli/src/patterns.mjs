@@ -366,6 +366,80 @@ export function extractClasses(classes, at) {
   return events
 }
 
+/* ──────────────────────────── CSS Modules support ───────────────────────────
+ * `className={styles.title}` is one of the two dominant React styling idioms,
+ * and treating it as unreadable is wrong twice over: the VALUES behind it were
+ * read (they live in the co-located `.module.css`, which we scan in full), and
+ * counting the binding as a blind spot deflates `parsed` toward a FALSE refusal.
+ * A real repo measured 72% purely because of this.
+ *
+ * Class names are qualified with the resolved module path, because CSS Modules
+ * are file-scoped: `styles.button` in Card.module.css and in Modal.module.css
+ * are two different treatments, and merging them would UNDERCOUNT exactly the
+ * sprawl the audit exists to find.                                             */
+
+/** `import styles from './Card.module.css'` → `{ styles: 'src/Card.module.css' }` */
+export function cssModuleBindings(path, content) {
+  const out = {}
+  const rx = /import\s+(?:\*\s+as\s+)?([A-Za-z_$][\w$]*)\s+from\s+['"]([^'"]+\.module\.(?:css|scss|less))['"]/g
+  for (const m of content.matchAll(rx)) out[m[1]] = resolveRelative(path, m[2])
+  return out
+}
+
+/** Join an import specifier onto the importing file's directory. Non-relative
+ *  specifiers (aliases like `@/styles/x.module.css`) fall back to the basename —
+ *  imperfect, but better than dropping the element entirely. */
+export function resolveRelative(fromFile, spec) {
+  if (!spec.startsWith('.')) return spec.split('/').pop()
+  const parts = fromFile.split(/[/\\]/).slice(0, -1)
+  for (const seg of spec.split('/')) {
+    if (seg === '.' || seg === '') continue
+    if (seg === '..') parts.pop()
+    else parts.push(seg)
+  }
+  return parts.join('/')
+}
+
+/** A module-scoped class reference, qualified by its module. */
+export const qualify = (modulePath, name) => `${modulePath}#${name}`
+
+const escapeRx = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/**
+ * Elements styled through a CSS-module binding. Handles the shapes that cover
+ * essentially all real code:
+ *   className={styles.a} · {styles['a']} · {cn(styles.a, styles.b)} · {`${styles.a} …`}
+ * Returns the same `{classes, at}` shape as `classAttrs`, so callers can treat
+ * both kinds of element identically.
+ */
+export function moduleClassAttrs(path, content, bindings) {
+  const names = Object.keys(bindings)
+  if (!names.length) return []
+  const refRx = new RegExp(
+    `\\b(${names.map(escapeRx).join('|')})(?:\\.([A-Za-z_$][\\w$]*)|\\[\\s*['"]([^'"]+)['"]\\s*\\])`, 'g')
+
+  const out = []
+  const lines = content.split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    for (const attr of lines[i].matchAll(/class(?:Name)?\s*=\s*\{([^}]*)\}/g)) {
+      const classes = []
+      // Mask each module reference as it is consumed, so the literal sweep below
+      // cannot also harvest the quoted key inside `styles['title']`.
+      const masked = attr[1].replace(refRx, (whole, binding, dot, bracket) => {
+        const name = dot ?? bracket
+        if (name) classes.push(qualify(bindings[binding], name))
+        return ' '.repeat(whole.length)
+      })
+      // Static strings can sit alongside the module refs inside cn(…).
+      for (const lit of masked.matchAll(/['"]([^'"]+)['"]/g)) {
+        for (const c of lit[1].split(/\s+/)) if (c && !/^[.#]/.test(c)) classes.push(c)
+      }
+      if (classes.length) out.push({ classes, at: { file: path, line: i + 1, col: attr.index + 1 } })
+    }
+  }
+  return out
+}
+
 /* ─────────────────────── inline style={{ }} extraction ─────────────────────── */
 
 const CAMEL = { borderRadius: 'border-radius', boxShadow: 'box-shadow', fontSize: 'font-size', lineHeight: 'line-height', fontWeight: 'font-weight', backgroundColor: 'background-color', borderColor: 'border-color', paddingTop: 'padding-top', paddingRight: 'padding-right', paddingBottom: 'padding-bottom', paddingLeft: 'padding-left', marginTop: 'margin-top', marginRight: 'margin-right', marginBottom: 'margin-bottom', marginLeft: 'margin-left' }
@@ -401,16 +475,19 @@ export function extractInline(path, content) {
  * `parsed` must be honest or the whole audit is contestable (AUDIT-HEURISTIC.md
  * §4). Count what we KNOW we cannot read, per reason, and report it. */
 
-export function countUnreadable(path, content) {
+export function countUnreadable(path, content, resolvedModuleElements = 0) {
   const reasons = {}
-  const bump = (k, n) => { if (n) reasons[k] = (reasons[k] || 0) + n }
+  const bump = (k, n) => { if (n > 0) reasons[k] = (reasons[k] || 0) + n }
 
   // styled-components / emotion: styled.div`…` and styled(Foo)`…`
   bump('styled-components', (content.match(/\bstyled(?:\.[a-zA-Z]+|\([^)]*\))\s*`/g) || []).length)
   // css`` template blocks with interpolation
   bump('css-in-js-interpolation', (content.match(/\bcss\s*`[^`]*\$\{/g) || []).length)
-  // className={expr} that is NOT a plain string or a plain template literal
-  bump('dynamic-classname', (content.match(/class(?:Name)?\s*=\s*\{(?!\s*`)[^}]*\}/g) || []).length)
+  // className={expr} that is NOT a plain string or a plain template literal —
+  // minus the ones a CSS-module binding resolved, which ARE readable (their
+  // values sit in the .module.css we scanned).
+  bump('dynamic-classname',
+    (content.match(/class(?:Name)?\s*=\s*\{(?!\s*`)[^}]*\}/g) || []).length - resolvedModuleElements)
   // template-literal classNames WITH interpolation (partly readable)
   bump('dynamic-classname', (content.match(/class(?:Name)?\s*=\s*\{`[^`]*\$\{/g) || []).length)
   // CSS modules composition
@@ -486,10 +563,12 @@ export function resolveVar(value, vars) {
     vars[name] ?? (fallback ? fallback.trim() : ''))
 }
 
-/** Readable styling units in a file — the denominator half of `parsed`. */
-export function countReadable(path, content) {
+/** Readable styling units in a file — the denominator half of `parsed`.
+ *  `resolvedModuleElements` are CSS-module-bound elements we could resolve. */
+export function countReadable(path, content, resolvedModuleElements = 0) {
   const isCss = /\.(css|scss|less)$/.test(path)
   if (isCss) return (blankComments(content).match(/\{[^{}]*\}/g) || []).length
   return (content.match(/class(?:Name)?\s*=\s*(?:"|'|\{`)/g) || []).length
     + (content.match(/style\s*=\s*\{\{/g) || []).length
+    + resolvedModuleElements
 }

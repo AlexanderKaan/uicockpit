@@ -6,6 +6,7 @@ import {
 } from '../src/audit.mjs'
 import {
   extractCss, extractClasses, extractCssVars, extractClassStyles, resolveVar, expandBox,
+  cssModuleBindings, moduleClassAttrs, resolveRelative,
 } from '../src/patterns.mjs'
 
 const at = { file: 'x.tsx', line: 1, col: 1 }
@@ -281,6 +282,72 @@ test('two icon libraries in package.json are flagged', () => {
   })
   const flag = r.flags.find((f) => f.id === 'multiple-icon-libs')
   assert.ok(flag && flag.detail.length === 2)
+})
+
+/* ──────────────────────────────── CSS Modules ──────────────────────────────── */
+
+test('module imports resolve relative to the importing file', () => {
+  assert.equal(resolveRelative('src/ui/Card.tsx', './Card.module.css'), 'src/ui/Card.module.css')
+  assert.equal(resolveRelative('src/ui/Card.tsx', '../styles/x.module.css'), 'src/styles/x.module.css')
+  assert.deepEqual(
+    cssModuleBindings('src/Card.tsx', "import styles from './Card.module.css'"),
+    { styles: 'src/Card.module.css' },
+  )
+  assert.deepEqual(
+    cssModuleBindings('src/M.tsx', "import * as s from './M.module.scss'"),
+    { s: 'src/M.module.scss' },
+  )
+})
+
+test('module class references are read, in all four shapes', () => {
+  const bindings = { styles: 'a.module.css' }
+  const grab = (src) => moduleClassAttrs('a.tsx', src, bindings).flatMap((e) => e.classes)
+  assert.deepEqual(grab('<b className={styles.title}/>'), ['a.module.css#title'])
+  assert.deepEqual(grab("<b className={styles['title']}/>"), ['a.module.css#title'])
+  assert.deepEqual(grab('<b className={cn(styles.a, styles.b)}/>'), ['a.module.css#a', 'a.module.css#b'])
+  assert.ok(grab('<b className={`${styles.a} pad`}/>').includes('a.module.css#a'))
+})
+
+const MODULES = [
+  file('src/Card.module.css', '.primary { background:#4f46e5; padding:8px 16px; border-radius:8px; }\n.ghost { background:transparent; padding:8px 16px; }'),
+  file('src/Modal.module.css', '.primary { background:#db2777; padding:10px 20px; border-radius:14px; }'),
+  file('src/Card.tsx', "import styles from './Card.module.css'\n<button className={styles.primary}>a</button>\n<button className={styles.ghost}>b</button>"),
+  file('src/Modal.tsx', "import s from './Modal.module.css'\n<button className={s.primary}>c</button>"),
+]
+
+test('CSS-module elements count as read, not as a blind spot', () => {
+  // The bug that took a real repo to 72% coverage and nearly a false refusal.
+  const r = auditFiles(MODULES)
+  assert.equal(r.meta.unreadable['dynamic-classname'], undefined)
+  assert.equal(r.meta.parsed, 1)
+  assert.equal(r.refused, false)
+})
+
+test('the same class name in two modules stays two treatments', () => {
+  // CSS Modules are file-scoped. Merging them would UNDERCOUNT the sprawl.
+  const r = auditFiles(MODULES)
+  assert.equal(r.components.button.treatments, 3)
+  const sigs = r.components.button.signatures.map((s) => s.sig)
+  assert.ok(sigs.includes('src/Card.module.css#primary'))
+  assert.ok(sigs.includes('src/Modal.module.css#primary'))
+})
+
+test('a module-qualified signature keeps its path case, so the swatch resolves', () => {
+  const r = auditFiles(MODULES)
+  const sig = r.components.button.signatures.find((s) => s.sig.includes('Card.module.css#primary'))
+  assert.ok(r.classStyles[sig.sig], 'the signature must key straight into classStyles')
+  assert.equal(r.classStyles[sig.sig].background, '#4f46e5')
+})
+
+test('a module-bound element with real declarations is expressible', () => {
+  const r = auditFiles(MODULES)
+  assert.equal(r.meta.expressible.counts.tokensOnly, 3)
+  assert.equal(r.meta.expressible.counts.none, 0)
+})
+
+test('genuinely dynamic classNames are still counted as unreadable', () => {
+  const r = auditFiles([file('a.tsx', '<div className={someVar}>x</div>'.repeat(5))])
+  assert.ok(r.meta.unreadable['dynamic-classname'] >= 5)
 })
 
 /* ────────────────────────── the hinge: inferredConfig ───────────────────────── */
