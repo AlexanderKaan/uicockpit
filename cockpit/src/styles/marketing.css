@@ -2125,19 +2125,17 @@
 /* ── The one conversion — floats over the wall ───────────────────────────────
  * Over it, not below it: the wall is the argument, so the thing that answers it
  * should not need scrolling to find.                                           */
-/* A halo that pulls the eye off the busy wall and onto the one control. The
- * wall stays legible at the edges — the chaos IS the argument — but everything
- * within arm's reach of the control is quietened so it reads first.
+/* NO veil over the wall.
  *
- * In BOTH states. It used to be drift-only, so the panel arrived with a white
- * pool around it and then lost it on the very flip it was there to announce —
- * the one control on the page changing presence depending on which side it is
- * showing. A control should sit still while the thing it controls moves. */
-.mkt__resolve::before{content:"";position:absolute;
-  left:50%;top:50%;transform:translate(-50%,-50%);width:190%;height:340%;
-  border-radius:50%;z-index:-1;pointer-events:none;
-  background:radial-gradient(closest-side,
-    rgb(255 255 255/.96) 0%, rgb(255 255 255/.86) 45%, rgb(255 255 255/0) 100%)}
+ * There used to be a large radial white gradient here to quieten the components
+ * around the control. It could not work: `.mkt__resolve` carries z-index 4 and
+ * therefore its own stacking context, so a negative z-index on the pseudo
+ * element puts it behind the CARD but still in front of the wall. The result
+ * was a white wash sitting on top of real components — which reads as a
+ * rendering fault, not as depth, because that is exactly what it was.
+ *
+ * The card separates itself now: a visible edge, a small lift, and a tight
+ * white ring at its own boundary. Depth you can believe beats haze. */
 .mkt__resolve{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   z-index:4;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;
   padding:30px 38px;border-radius:18px;pointer-events:auto;
@@ -2152,8 +2150,11 @@
      to lift it off the surface. The white ring stays, because a dark or
      saturated card behind the panel still needs something between the two. */
   border:1.5px solid rgb(0 0 0/.30);
+  /* The ring hugs the card rather than spreading across the wall — enough to
+     hold it off a dark or saturated component passing underneath, not enough
+     to look like anything has been painted over. */
   box-shadow:0 8px 24px -10px rgb(0 0 0/.20),
-             0 0 0 10px rgb(255 255 255/.8);
+             0 0 0 5px rgb(255 255 255/.9);
   animation:mkt-resolve-in .5s .25s cubic-bezier(.2,.8,.3,1) both;
   transition:opacity .4s, transform .4s}
 @keyframes mkt-resolve-in{from{opacity:0;transform:translate(-50%,-42%) scale(.96)}
