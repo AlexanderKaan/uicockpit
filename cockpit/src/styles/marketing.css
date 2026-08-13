@@ -2139,7 +2139,13 @@
 .mkt__resolve{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   z-index:4;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;
   padding:30px 38px;border-radius:18px;pointer-events:auto;
-  background:var(--mkt-bg,#fff);
+  /* DARK, because the wall is twenty pale cards and a white panel is simply the
+     twenty-first. Contrast of VALUE is the only thing left that a card cannot
+     accidentally borrow — the drifted state gives them wild borders and tints,
+     but none of them are near-black. The one control has to be the one thing on
+     this page that could not be mistaken for a component. */
+  background:var(--mkt-fg,#16161a);
+  color:var(--mkt-bg,#fff);
   /* A real edge, not just a shadow. The panel sits on a pale wall, so without a
      border its own white dissolved into the background and only the drop shadow
      held it — which reads as a smudge rather than a surface. */
@@ -2149,12 +2155,12 @@
      in front of them. So: a border you can actually see, and just enough shadow
      to lift it off the surface. The white ring stays, because a dark or
      saturated card behind the panel still needs something between the two. */
-  border:1.5px solid rgb(0 0 0/.30);
+  border:1px solid rgb(255 255 255/.14);
   /* The ring hugs the card rather than spreading across the wall — enough to
-     hold it off a dark or saturated component passing underneath, not enough
-     to look like anything has been painted over. */
-  box-shadow:0 8px 24px -10px rgb(0 0 0/.20),
-             0 0 0 5px rgb(255 255 255/.9);
+     hold it off whatever passes underneath, not enough to look like anything
+     has been painted over. */
+  box-shadow:0 14px 40px -12px rgb(0 0 0/.45),
+             0 0 0 5px rgb(255 255 255/.85);
   animation:mkt-resolve-in .5s .25s cubic-bezier(.2,.8,.3,1) both;
   transition:opacity .4s, transform .4s}
 @keyframes mkt-resolve-in{from{opacity:0;transform:translate(-50%,-42%) scale(.96)}
@@ -2169,22 +2175,22 @@
  * the change, and flicking back and forth is exactly the behaviour that sells
  * this — so the control invites it instead of hiding a replay link elsewhere.  */
 .mkt__switch{position:relative;display:inline-flex;padding:5px;border-radius:999px;
-  background:color-mix(in oklab, var(--mkt-fg,#16161a) 7%, transparent);
-  border:1px solid rgb(0 0 0/.08)}
+  background:rgb(255 255 255/.10);
+  border:1px solid rgb(255 255 255/.16)}
 .mkt__switch-knob{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);
-  border-radius:999px;background:var(--mkt-fg,#16161a);
-  box-shadow:0 6px 18px -6px rgb(0 0 0/.5);
+  border-radius:999px;background:#fff;
+  box-shadow:0 6px 18px -6px rgb(0 0 0/.55);
   transition:transform .42s cubic-bezier(.34,1.3,.5,1)}
 .mkt__switch-knob.is-right{transform:translateX(100%)}
 @media (prefers-reduced-motion: reduce){.mkt__switch-knob{transition:none}}
 .mkt__switch-opt{position:relative;z-index:1;border:0;background:none;cursor:pointer;
   font:600 15.5px/1 inherit;letter-spacing:-.01em;padding:15px 26px;border-radius:999px;
-  color:var(--mkt-fg-muted,#6b6b76);white-space:nowrap;
+  color:rgb(255 255 255/.62);white-space:nowrap;
   transition:color .3s;flex:1}
-.mkt__switch-opt.is-on{color:var(--mkt-bg,#fff)}
-.mkt__switch-opt:not(.is-on):hover{color:var(--mkt-fg,#16161a)}
+.mkt__switch-opt.is-on{color:var(--mkt-fg,#16161a)}
+.mkt__switch-opt:not(.is-on):hover{color:#fff}
 @media (max-width:640px){.mkt__switch-opt{font-size:13.5px;padding:13px 14px}}
-.mkt__resolve-sub{margin:0;font-size:12.5px;color:var(--mkt-fg-faint,#9096a1)}
+.mkt__resolve-sub{margin:0;font-size:12.5px;color:rgb(255 255 255/.55)}
 @media (max-width:640px){.mkt__resolve{top:26%;padding:20px 18px}}
 
 
@@ -2441,14 +2447,14 @@
   font-size: 1.0625rem;
   font-weight: 550;
   letter-spacing: -0.01em;
-  color: var(--mkt-fg-muted);
+  color: rgb(255 255 255/.72);
   font-variant-numeric: tabular-nums;
 }
-.mkt__tally-head b { color: var(--mkt-fg); font-weight: 680; }
+.mkt__tally-head b { color: #fff; font-weight: 680; }
 /* The separators are structure, not content — they should not compete with the
  * numbers they divide. */
-.mkt__tally-head i { font-style: normal; color: var(--mkt-border); margin: 0 2px; }
-.mkt__tally-body { margin: 0; font-size: 0.8125rem; line-height: 1.5; color: var(--mkt-fg-faint, var(--mkt-fg-muted)); }
+.mkt__tally-head i { font-style: normal; color: rgb(255 255 255/.28); margin: 0 2px; }
+.mkt__tally-body { margin: 0; font-size: 0.8125rem; line-height: 1.5; color: rgb(255 255 255/.6); }
 @media (max-width: 560px) {
   .mkt__tally-head { font-size: 0.9375rem; }
   .mkt__tally-body { font-size: 0.75rem; }
