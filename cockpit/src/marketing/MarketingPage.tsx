@@ -78,7 +78,13 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
       {/* Hero */}
       <section className="mkt__hero">
         <HeroDotGrid />
-        <div className="mkt__container">
+        {/* Hero showcase FIRST — the demonstration is the headline. A visitor
+            meets a broken wall, fixes it in one click, and only then reads what
+            the product is. The copy explains what they have already seen. */}
+        <div className="mkt__showcase">
+          <ComponentBouquet />
+        </div>
+              <div className="mkt__container">
           <div className="mkt__eyebrow">
             <span className="mkt__eyebrow-dot" />
             Free &amp; open source
@@ -121,13 +127,7 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
           </div>
         </div>
 
-        {/* Hero showcase — the REAL <ComponentGallery/>, full-bleed and brand-blue,
-            edges dissolved by a CSS mask. It IS the live component library (built by
-            the token engine), so it can never drift from the actual components. */}
-        <div className="mkt__showcase">
-          <ComponentBouquet />
-        </div>
-      </section>
+</section>
 
       {/* Stats strip */}
       <section className="mkt__container">

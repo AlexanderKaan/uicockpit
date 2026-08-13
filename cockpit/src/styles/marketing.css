@@ -307,7 +307,7 @@
  * win, and consistent with how the rest of the design tokens behave.
  */
 .mkt__hero {
-  padding: 6rem 1.5rem;
+  padding: 0 1.5rem 6rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -426,9 +426,11 @@
   line-height: 1.02;
   letter-spacing: -0.035em;
   font-weight: 600;
-  /* h1 and subtitle share max-width (40rem = 640px) so their boxes
-     align — same optical column when stacked. */
-  max-width: 40rem;
+  /* The headline gets its OWN measure. It used to share the subtitle's 40rem,
+     which is right for reading prose and wrong for display type — at 4.5rem it
+     forced a 46-character line into three cramped lines. A headline wants ~23
+     characters a line; the sub wants ~65. Different jobs, different widths. */
+  max-width: 54rem;
   margin: 0 auto 1.5rem; /* 24px to subtitle */
   text-align: center;
   text-wrap: balance;
@@ -697,7 +699,9 @@
   /* Full-bleed — break out of the page flow to span the whole viewport. */
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  margin-top: 64px;
+  /* It leads now, so it sits under the nav and pushes the copy down — no top gap. */
+  margin-top: 0;
+  margin-bottom: 60px;
   padding: 0;
 }
 
@@ -713,7 +717,9 @@
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  max-height: 1024px;
+  /* Capped so the headline still lands above the fold on a 13" laptop — the
+     wall is the opening act, not the whole first screen. */
+  max-height: min(46vh, 560px);
   overflow: hidden;
   /* Interactive: the wall is the REAL component library, so visitors can drive
      the controls (sliders slide, switches toggle, menus open + dismiss). The CTA
@@ -2083,13 +2089,6 @@
  * card's `grid-row-end` from its measured height, so those would force a
  * relayout on the click. Verified: heights are identical in both states, so the
  * transition is a pure repaint.                                                */
-.mkt__bouquet--drift .gallery > .card,
-.mkt__bouquet .gallery > .card {
-  transition: box-shadow .45s cubic-bezier(.2,.7,.3,1), border-color .45s;
-}
-@media (prefers-reduced-motion: reduce) {
-  .mkt__bouquet .gallery > .card { transition: none; }
-}
 
 /* Nine buckets. The colours are deliberately un-harmonised — this is the point. */
 .mkt__bouquet--drift .gallery > .card:nth-child(9n+1){
@@ -2132,28 +2131,132 @@
 /* ── The one conversion — floats over the wall ───────────────────────────────
  * Over it, not below it: the wall is the argument, so the thing that answers it
  * should not need scrolling to find.                                           */
-.mkt__resolve{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);
-  z-index:4;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;
-  padding:26px 30px;border-radius:16px;pointer-events:auto;
-  background:color-mix(in oklab, var(--mkt-bg,#fff) 88%, transparent);
-  backdrop-filter:blur(10px) saturate(1.1);
-  box-shadow:0 20px 60px rgb(0 0 0/.14), 0 0 0 1px rgb(0 0 0/.05);
+/* A halo that pulls the eye off the busy wall and onto the one control. The
+ * wall stays legible at the edges — the chaos IS the argument — but everything
+ * within arm's reach of the button is quietened so the button reads first. */
+.mkt__bouquet--drift + .mkt__resolve::before{content:"";position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%);width:190%;height:340%;
+  border-radius:50%;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,
+    rgb(255 255 255/.96) 0%, rgb(255 255 255/.86) 45%, rgb(255 255 255/0) 100%)}
+.mkt__resolve{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  z-index:4;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:30px 38px;border-radius:18px;pointer-events:auto;
+  background:var(--mkt-bg,#fff);
+  /* A real edge, not just a shadow. The panel sits on a pale wall, so without a
+     border its own white dissolved into the background and only the drop shadow
+     held it — which reads as a smudge rather than a surface. */
+  border:1px solid rgb(0 0 0/.14);
+  box-shadow:0 30px 70px -18px rgb(0 0 0/.35),
+             0 0 0 9px rgb(255 255 255/.55);
+  animation:mkt-resolve-in .5s .25s cubic-bezier(.2,.8,.3,1) both;
   transition:opacity .4s, transform .4s}
-.mkt__resolve-lead{margin:0;font-size:15.5px;color:var(--mkt-fg-muted,#6b6b76)}
+@keyframes mkt-resolve-in{from{opacity:0;transform:translate(-50%,-42%) scale(.96)}
+  to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion: reduce){.mkt__resolve{animation:none}}
+.mkt__resolve-lead{margin:0;font-size:16.5px;color:var(--mkt-fg-muted,#6b6b76)}
 .mkt__resolve-lead b{color:var(--mkt-fg,#16161a);font-weight:600}
-.mkt__resolve-btn{border:0;cursor:pointer;font:600 17px/1 inherit;letter-spacing:-.01em;
-  padding:16px 30px;border-radius:11px;background:var(--mkt-fg,#16161a);color:var(--mkt-bg,#fff);
+.mkt__resolve-btn{border:0;cursor:pointer;font:600 19px/1 inherit;letter-spacing:-.015em;
+  padding:19px 36px;border-radius:12px;background:var(--mkt-fg,#16161a);color:var(--mkt-bg,#fff);
   transition:transform .18s, filter .18s}
 .mkt__resolve-btn:hover{transform:translateY(-2px);filter:brightness(1.12)}
 .mkt__resolve-sub{margin:0;font-size:12.5px;color:var(--mkt-fg-faint,#9096a1)}
-.mkt__resolve.is-done{top:auto;bottom:16px;transform:translate(-50%,0);padding:0;
-  background:none;backdrop-filter:none;box-shadow:none}
-.mkt__resolve-again{border:0;background:none;cursor:pointer;font:400 13px/1 inherit;
-  color:var(--mkt-fg-faint,#9096a1);padding:8px 12px;text-decoration:underline;
-  text-underline-offset:3px}
-.mkt__resolve-again:hover{color:var(--mkt-fg-muted,#6b6b76)}
+/* After the reveal the control has to get out of the way without becoming
+ * invisible. As a bare link it floated over card text and was unreadable, so it
+ * keeps a surface of its own — just a much quieter one than the panel it replaces. */
+.mkt__resolve.is-done{top:auto;bottom:26px;transform:translate(-50%,0);
+  padding:0;background:none;backdrop-filter:none;box-shadow:none;animation:none}
+.mkt__resolve.is-done::before{content:none}
+.mkt__resolve-again{cursor:pointer;font:500 13px/1 inherit;
+  color:var(--mkt-fg-muted,#6b6b76);padding:11px 18px;border-radius:999px;
+  background:var(--mkt-bg,#fff);border:1px solid rgb(0 0 0/.09);
+  box-shadow:0 6px 20px -6px rgb(0 0 0/.22);
+  display:inline-flex;align-items:center;gap:7px;
+  transition:color .18s, box-shadow .18s, transform .18s}
+.mkt__resolve-again:hover{color:var(--mkt-fg,#16161a);transform:translateY(-1px);
+  box-shadow:0 10px 26px -8px rgb(0 0 0/.28)}
 @media (max-width:640px){.mkt__resolve{top:26%;padding:20px 18px}
   .mkt__resolve-btn{font-size:15px;padding:14px 22px}}
+
+
+/* ── The wall on small screens ───────────────────────────────────────────────
+ * Cropping a phone-width column showed two cards and lost the whole point: the
+ * argument is MANY components disagreeing at once, which you cannot see two at
+ * a time. So the wall is scaled down rather than cropped — same band of height,
+ * roughly four times the components inside it.
+ *
+ * The transform sits on the wall only. The button is its sibling, so it keeps
+ * full size and stays comfortably tappable.                                    */
+@media (max-width: 760px) {
+  .mkt__bouquet-wrap { overflow: hidden; max-height: min(42vh, 420px); }
+  .mkt__bouquet.cockpit-preview {
+    max-height: none;
+    width: 250%;
+    transform: scale(.4);
+    transform-origin: top left;
+    /* Undo the space the un-scaled box would still occupy. */
+    margin-bottom: -60%;
+  }
+  .mkt__showcase { margin-bottom: 36px; }
+  .mkt__resolve { padding: 22px 24px; gap: 9px; width: max-content; max-width: 88vw; }
+  .mkt__resolve-btn { font-size: 16px; padding: 15px 24px; }
+  .mkt__resolve-lead { font-size: 14px; }
+}
+@media (max-width: 480px) {
+  .mkt__bouquet.cockpit-preview { width: 320%; transform: scale(.31); margin-bottom: -68%; }
+}
+
+
+/* At 31-40% scale a 1px border is sub-pixel and the clash disappears, so on
+ * small screens the disorder has to be carried by AREA instead of by edges:
+ * the wrong-hued surface tint goes from a whisper to something you can read at
+ * a glance. Same nine hues, just louder where they have less room. */
+@media (max-width: 760px) {
+  .mkt__bouquet-wrap { max-height: min(48vh, 460px); }
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n+1){--k-surface:color-mix(in oklab,#e11d48 14%,#fff)}
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n+2){--k-surface:color-mix(in oklab,#16a34a 14%,#fff)}
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n+3){--k-surface:color-mix(in oklab,#f59e0b 16%,#fff)}
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n+4){--k-surface:color-mix(in oklab,#7c3aed 13%,#fff)}
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n+5){--k-surface:color-mix(in oklab,#0891b2 14%,#fff)}
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n+6){--k-surface:color-mix(in oklab,#db2777 13%,#fff)}
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n+7){--k-surface:color-mix(in oklab,#65a30d 15%,#fff)}
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n+8){--k-surface:color-mix(in oklab,#4f46e5 13%,#fff)}
+  .mkt__bouquet--drift .gallery > .card:nth-child(9n){--k-surface:color-mix(in oklab,#c2410c 14%,#fff)}
+}
+
+
+/* ── The reveal ──────────────────────────────────────────────────────────────
+ * A band of light crosses the wall once, and the cards resolve in a staggered
+ * wave beneath it. The stagger is what sells it: without it the wall snaps and
+ * the light looks pasted on top; with it, the light appears to be doing the
+ * work. ~850ms total — long enough to register, short enough to click again. */
+.mkt__sweep { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.mkt__sweep::before {
+  content: ""; position: absolute; left: -25%; right: -25%; height: 34%; top: -40%;
+  transform: skewY(-2.5deg); filter: blur(12px);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0) 0%, rgb(255 255 255 / .55) 32%,
+    rgb(255 255 255 / .98) 50%, rgb(255 255 255 / .55) 68%, rgb(255 255 255 / 0) 100%);
+  animation: mkt-sweep 1s cubic-bezier(.32,.06,.22,1) forwards;
+}
+/* A short bloom over everything, so the whole frame lifts as the light passes. */
+.mkt__sweep::after {
+  content: ""; position: absolute; inset: 0; background: #fff; opacity: 0;
+  animation: mkt-bloom 1s ease-out forwards;
+}
+@keyframes mkt-sweep { to { top: 118%; } }
+@keyframes mkt-bloom { 0% { opacity: 0 } 16% { opacity: .30 } 100% { opacity: 0 } }
+
+/* The wave. Cards animate what CAN animate — border, surface, shadow — and the
+   radius snaps under cover of the light, which is exactly what the light is for.
+   The per-card delay is set in JS from each card's measured y, because a masonry's
+   DOM order is not its visual order (see ComponentBouquet.resolve). */
+.mkt__bouquet .gallery > .card {
+  transition: background-color .5s ease, border-color .5s ease, box-shadow .5s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mkt__sweep { display: none }
+  .mkt__bouquet .gallery > .card { transition: none; transition-delay: 0ms !important }
+}
 
 /* ── Hero fork — the two doors ───────────────────────────────────────────────
  * Audit sits FIRST: more visitors have a codebase than don't, and it is the half

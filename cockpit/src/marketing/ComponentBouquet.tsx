@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useMemo, useRef, useState, type CSSProperties } from 'react'
 import { IconProvider } from '../icons/Icon'
 import { ComponentGallery } from '../stage/views/ComponentGallery'
 import { buildTokens } from '../tokens/buildTokens'
@@ -40,6 +40,31 @@ const SYSTEM_VARS = buildTokens(applyColorTheme(BASE, 'cobalt')).vars as CSSProp
 export function ComponentBouquet() {
   // Starts BROKEN on purpose — the drift is the before, not an easter egg.
   const [drift, setDrift] = useState(true)
+  // A light sweeps across at the moment of the switch. It is not decoration: the
+  // cards resolve in a staggered wave underneath it, so the light reads as the
+  // thing DOING the change rather than a flourish played afterwards.
+  const [sweep, setSweep] = useState(false)
+  const wallRef = useRef<HTMLDivElement>(null)
+
+  /**
+   * Delays are measured, not guessed. The wall is a masonry, so DOM order is not
+   * visual order — an nth-child stagger would wave diagonally and look like a
+   * glitch. Reading each card's real vertical position makes the light and the
+   * resolve travel together, at any column count.
+   */
+  const resolve = () => {
+    const root = wallRef.current
+    if (root) {
+      const box = root.getBoundingClientRect()
+      root.querySelectorAll<HTMLElement>('.gallery > .card').forEach((card) => {
+        const rel = (card.getBoundingClientRect().top - box.top) / Math.max(1, box.height)
+        card.style.transitionDelay = `${Math.round(Math.min(1, Math.max(0, rel)) * 460)}ms`
+      })
+    }
+    setSweep(true)
+    setDrift(false)
+    window.setTimeout(() => setSweep(false), 1050)
+  }
 
   // Mount the gallery ONCE. Memoised, so resolving the system re-tints via the
   // wrapper's CSS vars without re-rendering / re-laying-out the 34 cards.
@@ -55,6 +80,7 @@ export function ComponentBouquet() {
   return (
     <div className="mkt__bouquet-wrap">
       <div
+        ref={wallRef}
         className={`cockpit-preview mkt__bouquet${drift ? ' mkt__bouquet--drift' : ''}`}
         style={SYSTEM_VARS}
         role="region"
@@ -65,22 +91,24 @@ export function ComponentBouquet() {
         {gallery}
       </div>
 
+      {sweep && <span className="mkt__sweep" aria-hidden="true" />}
+
       {/* The conversion. Sits over the wall because the wall IS the argument —
           you should not have to scroll to find the thing that fixes it. */}
       <div className={`mkt__resolve${drift ? '' : ' is-done'}`}>
         {drift ? (
           <>
             <p className="mkt__resolve-lead">
-              34 components. No system. <b>Sound familiar?</b>
+              34 components. Nine accent colours. <b>No system.</b>
             </p>
             <button
               type="button"
               className="mkt__resolve-btn"
-              onClick={() => setDrift(false)}
+              onClick={resolve}
             >
-              Put it on one system
+              Snap it into line
             </button>
-            <p className="mkt__resolve-sub">one click · nothing else changes</p>
+            <p className="mkt__resolve-sub">one click · the components never changed</p>
           </>
         ) : (
           <button
