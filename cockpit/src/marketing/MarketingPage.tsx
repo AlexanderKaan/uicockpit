@@ -1,5 +1,5 @@
 import { Sparkles, Palette, FileCode2, BarChart3, ShieldCheck, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
 import { LoopAnimation } from './LoopAnimation'
 import { MktDriftBench } from './MktDriftBench'
@@ -71,6 +71,8 @@ function HeroDotGrid() {
  * the onLaunch prop (parent-managed client-side routing — no React Router).
  */
 export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
+  // Which door the visitor is considering — drives the wall's two states.
+  const [drift, setDrift] = useState(false)
   return (
     <div className="mkt">
       <MktNav navigate={navigate} />
@@ -90,13 +92,40 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             <strong>framework-neutral tokens + components</strong> behind one link. Then hand it
             to your AI — a checker keeps every new screen on it, instead of drifting back to generic.
           </p>
-          <div className="mkt__hero-ctas">
-            <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
-              Build my UI kit →
+          {/* Two doors. Hovering one previews its world in the wall below: Audit
+              pulls the same components apart, Configure clicks them together. */}
+          <div className="mkt__fork">
+            <button
+              type="button"
+              className="mkt__door mkt__door--audit"
+              onMouseEnter={() => setDrift(true)}
+              onMouseLeave={() => setDrift(false)}
+              onFocus={() => setDrift(true)}
+              onBlur={() => setDrift(false)}
+              onClick={() => navigate('/audit')}
+            >
+              <span className="mkt__door-tag">Audit</span>
+              <span className="mkt__door-h">Find the system you already have.</span>
+              <span className="mkt__door-p">
+                Point at your code. See what it already implies — and how far it has drifted.
+              </span>
+              <span className="mkt__door-meta">a folder or a zip · nothing is uploaded</span>
             </button>
-            <a href="#how" className="mkt-btn mkt-btn--ghost mkt-btn--lg">
-              See how it works
-            </a>
+
+            <button
+              type="button"
+              className="mkt__door mkt__door--make"
+              onMouseEnter={() => setDrift(false)}
+              onFocus={() => setDrift(false)}
+              onClick={onLaunch}
+            >
+              <span className="mkt__door-tag">Configure</span>
+              <span className="mkt__door-h">Start a design system.</span>
+              <span className="mkt__door-p">
+                Pick a direction, tune it, and export tokens your agent will actually follow.
+              </span>
+              <span className="mkt__door-meta">19 controls · Tailwind · shadcn · plain CSS</span>
+            </button>
           </div>
         </div>
 
@@ -104,7 +133,7 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             edges dissolved by a CSS mask. It IS the live component library (built by
             the token engine), so it can never drift from the actual components. */}
         <div className="mkt__showcase">
-          <ComponentBouquet />
+          <ComponentBouquet drift={drift} />
         </div>
       </section>
 

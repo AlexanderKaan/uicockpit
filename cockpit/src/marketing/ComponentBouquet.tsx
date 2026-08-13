@@ -31,7 +31,22 @@ const THEME_VARS: Record<string, CSSProperties> = Object.fromEntries(
   SWITCH_THEMES.map((t) => [t, buildTokens(applyColorTheme(BASE, t)).vars as CSSProperties]),
 )
 
-export function ComponentBouquet() {
+/**
+ * `drift` — the hero's second state. Hovering the Audit door takes the SAME
+ * mounted wall and pulls its decisions apart: mismatched radii, three accents
+ * that don't agree, shadows that were never chosen together. Hovering Configure
+ * clicks it back into one system.
+ *
+ * Only HEIGHT-NEUTRAL variables are varied (radius · colour · shadow). Padding
+ * and type would change card heights, and the masonry derives each card's
+ * `grid-row-end` from its measured height — so those would force a relayout on
+ * hover, which is exactly the stall we fixed once already.
+ *
+ * It is a DEMONSTRATION, not a measurement: these are our own components shown
+ * with and without a contract. The measured article — a real wall from a real
+ * repo, with its real numbers — lives in its own section further down the page.
+ */
+export function ComponentBouquet({ drift = false }: { drift?: boolean } = {}) {
   const [theme, setTheme] = useState<ColorTheme>('cobalt')
   const [userPicked, setUserPicked] = useState(false) // a manual pick takes over for good
   const [hovering, setHovering] = useState(false)      // pause while the visitor inspects
@@ -55,7 +70,7 @@ export function ComponentBouquet() {
   // touching anything. Runs only while in view; stops the moment they take control
   // (pick) or hover to read, and never under prefers-reduced-motion. Dots advance
   // with it; the wall crossfades between colours (see .mkt__bouquet--morphing).
-  const autoMorph = !userPicked && !hovering && inView
+  const autoMorph = !userPicked && !hovering && inView && !drift
   useEffect(() => {
     if (!autoMorph) return
     if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
@@ -84,7 +99,7 @@ export function ComponentBouquet() {
       onMouseLeave={() => setHovering(false)}
     >
       <div
-        className={`cockpit-preview mkt__bouquet${autoMorph ? ' mkt__bouquet--morphing' : ''}`}
+        className={`cockpit-preview mkt__bouquet${autoMorph ? ' mkt__bouquet--morphing' : ''}${drift ? ' mkt__bouquet--drift' : ''}`}
         style={THEME_VARS[theme]}
         role="region"
         aria-label="Interactive component preview — try the controls, then re-tint with the brand colours below"
