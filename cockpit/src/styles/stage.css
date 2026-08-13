@@ -752,7 +752,12 @@
 }
 .audv__n { font-weight: 500; color: var(--app-fg-faint); }
 .audv__stage {
-  padding: 16px 14px; display: flex; align-items: center; justify-content: center;
+  padding: 16px 14px; display: flex; align-items: center;
+  /* `safe` is load-bearing: a specimen wider than its cell, centred, gets
+   * clipped at BOTH ends with the left edge unreachable — a table whose first
+   * column simply cannot be scrolled to. `safe center` falls back to start
+   * alignment exactly when overflow would otherwise eat content. */
+  justify-content: safe center;
   min-height: 88px; background: var(--k-bg); overflow: auto;
 }
 /* Absent kinds stay on the wall. A grid of only what we found reads as a

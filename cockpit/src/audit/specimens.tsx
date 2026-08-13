@@ -288,9 +288,9 @@ export const SHELL_SPECIMENS: Record<string, Specimen> = {
     wide: true,
     render: () => (
       <div className="page-head" style={{ width: '100%' }}>
-        <div>
+        <div className="page-head__titles">
           <div className="page-head__eyebrow">Workspace</div>
-          <h2 style={{ margin: '2px 0 0', fontSize: 'var(--k-type-h2)' }}>Records</h2>
+          <h2 className="page-head__title">Records</h2>
         </div>
         <div className="page-head__actions">
           <button type="button" className="btn btn--ghost btn--sm">Export</button>
@@ -317,7 +317,10 @@ export const SHELL_SPECIMENS: Record<string, Specimen> = {
     label: 'Command menu',
     render: () => (
       <div className="cmdp" style={{ position: 'static', minWidth: 210 }}>
-        <input className="cmdp__in" defaultValue="rec" aria-label="Command" />
+        <div className="cmdp__in">
+          <Icon name="search" size={14} />
+          <input defaultValue="rec" aria-label="Command" />
+        </div>
         <div className="cmdp__list">
           <div className="cmdp__section">Go to</div>
           <div className="cmdp__item cmdp__item--on">Records<span className="cmdp__shortcut">⌘R</span></div>

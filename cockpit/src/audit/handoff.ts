@@ -42,7 +42,14 @@ export interface AuditHandoff {
    *  honest "before" possible: we cannot reconstruct any single component of
    *  theirs, but we know their values exactly, and drift IS having nineteen
    *  radii with nothing deciding between them. */
-  spread: { radius: string[]; shadow: string[]; spacing: string[]; color: string[]; neutral: string[]; type: string[] }
+  spread: {
+    radius: string[]; shadow: string[]; spacing: string[]; color: string[]
+    neutral: string[]; type: string[]
+    /** Measured by ROLE and checked for legibility — not inferred from
+     *  luminance, which is a guess wearing a measurement's clothes. */
+    bg: string | null; fg: string | null; border: string | null
+    polarity: 'light' | 'dark' | null
+  }
   /** What the drift actually amounts to — measured, for the tally. */
   distinct: { radius: number; shadow: number; color: number; spacing: number }
   treatments: number
@@ -133,6 +140,18 @@ export function configFromAudit(inferred: RawInferred): Config {
   let cfg: Config = { ...DEFAULT_CONFIG }
   const theme = typeof v.colorTheme === 'string' ? (v.colorTheme as ColorTheme) : null
   if (theme && theme in COLOR_THEMES) cfg = applyColorTheme(cfg, theme)
+  /* Then their EXACT colour on top. The named theme is only the nearest anchor
+   * — snapping documenso's #a2e771 to our jade would hand them a kit that is
+   * merely near their brand, which is the drift this tool exists to end. The
+   * configurator accepts a custom hex, so the kit they land on is genuinely
+   * theirs rather than ours in their neighbourhood. */
+  if (typeof v.brandHex === 'string' && /^#[0-9a-f]{6}$/i.test(v.brandHex)) {
+    // The theme stays the nearest NAMED anchor — that is what the panel row
+    // reads — while cPrimary carries their exact hex, which is what actually
+    // drives the tokens. There is no 'custom' theme to set; inventing one would
+    // have put an invalid value straight into the shareable URL.
+    cfg = { ...cfg, cPrimary: v.brandHex as Config['cPrimary'] }
+  }
   const radius = oneOf<Radius>(v.radius, RADII)
   if (radius) cfg = { ...cfg, radius }
   const scale = oneOf<Scale>(v.scale, SCALES)

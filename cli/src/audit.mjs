@@ -814,7 +814,16 @@ function inferConfig(dims, palette, cssVars = {}) {
     }
     confidence.colorTheme = named ? 1 : round(brand.share, 2)
     confidence.colorThemeSource = named ? `declared as ${named.name}` : 'most-used literal colour'
-    if (best && (named || brand.share >= MIN_DOMINANCE)) values.colorTheme = best.name
+    if (best && (named || brand.share >= MIN_DOMINANCE)) {
+      // The nearest anchor names the starting point...
+      values.colorTheme = best.name
+      /* ...but the EXACT colour is the one they actually declared, and we have
+       * it. Snapping documenso's #a2e771 to our jade would hand them a kit that
+       * is merely near their brand — which is precisely the drift this tool
+       * exists to end. The configurator takes a custom hex, so give it theirs. */
+      const exact = toHex(brand.value, palette, 'saturated')
+      if (exact) values.brandHex = exact
+    }
   }
   if (confidence.colorTheme === undefined) confidence.colorTheme = null
 
@@ -900,6 +909,56 @@ function toHex(value, palette, want = 'saturated') {
   const spread = Math.max(r, g, b) - Math.min(r, g, b)
   if (want === 'saturated' ? spread < 60 : spread >= 60) return null
   return '#' + [r, g, b].map((n) => Math.round(n).toString(16).padStart(2, '0')).join('')
+}
+
+const hexLum = (hex) => {
+  const n = parseInt(hex.slice(1), 16)
+  return (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255
+}
+
+/** Decide an app's polarity from its backgrounds, then take the page from the
+ *  end of the ramp that polarity implies. */
+function pageSurface(bgs) {
+  if (!bgs.length) return { bg: null, polarity: null }
+  const dark = bgs.filter((h) => hexLum(h) < 0.5).length
+  const polarity = dark > bgs.length / 2 ? 'dark' : 'light'
+  const sorted = [...bgs].sort((a, b) => hexLum(b) - hexLum(a))
+  return { bg: polarity === 'dark' ? sorted[sorted.length - 1] : sorted[0], polarity }
+}
+
+/** WCAG-ish relative contrast between two hexes. */
+function ratio(a, b) {
+  const l = (h) => {
+    const n = parseInt(h.slice(1), 16)
+    const f = (v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 }
+    return 0.2126 * f((n >> 16) & 255) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255)
+  }
+  const [x, y] = [l(a), l(b)]
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)
+}
+
+/** The busiest text and border that are actually legible on the page. */
+function inkAndEdge(fgs, borders, bg) {
+  if (!bg) return { fg: fgs[0] || null, border: borders[0] || null }
+  return {
+    fg: fgs.find((h) => ratio(h, bg) >= 4.5) || fgs.find((h) => ratio(h, bg) >= 3) || null,
+    // A border only has to separate, not to be read — a lower bar, but it still
+    // has to be visible, and the busiest one often is not.
+    border: borders.find((h) => ratio(h, bg) >= 1.2 && ratio(h, bg) <= 6) || borders[0] || null,
+  }
+}
+
+/** Most-used colours for one measured ROLE, busiest first. */
+function roleHexes(events, role, palette, want) {
+  const tally = new Map()
+  for (const e of events) {
+    if (e.dim !== 'color' || e.role !== role) continue
+    tally.set(e.value, (tally.get(e.value) || 0) + 1)
+  }
+  return [...tally.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([v]) => toHex(v, palette, want))
+    .filter(Boolean)
 }
 
 /* ──────────────────────────────── the engine ───────────────────────────────── */
@@ -1141,10 +1200,35 @@ export function auditFiles(files, opts = {}) {
         .map((v) => toHex(v.value, palette, 'saturated'))
         .filter(Boolean)
         .slice(0, 10),
-      /* And the greys, which matter just as much. An app's surfaces, borders
-       * and text are what make it FEEL like a different app — leaving them out
-       * meant a "before" that still wore our neutrals, so the switch barely
-       * changed anything and the whole comparison fell flat. */
+      /* And the greys, which matter just as much: an app's surfaces, borders and
+       * text are what make it FEEL like a different app.
+       *
+       * By measured ROLE, not by guessing. The events carry bg/fg/border and
+       * aggregation was throwing that away, leaving the consumer to infer role
+       * from luminance — which says "the lightest grey is the page", and that is
+       * simply a guess wearing the clothes of a measurement. A light grey can be
+       * text on a dark panel. Now we report the most-used colour that the code
+       * actually USES as a background. */
+      /* The PAGE background, which is not simply the most-used one.
+       *
+       * Measured across four real apps: cal.com's busiest bg-role neutral is
+       * #262626 and Zero's second is #313131 — their black buttons and dark-mode
+       * tokens, not their pages. "Most used" answers a different question than
+       * "what is the canvas".
+       *
+       * A page is the EXTREME of the ramp: the lightest thing in a light app,
+       * the darkest in a dark one. Which of those an app is gets decided by
+       * where the mass of its backgrounds sits, rather than assumed. */
+      ...pageSurface(roleHexes(events, 'bg', palette, 'neutral')),
+      /* Text and borders are chosen against the page we just settled, not by
+       * frequency. cal.com's busiest fg-role neutral is #ffffff — the label on
+       * their black buttons — which on their white page renders invisible. What
+       * makes something body text is that you can READ it on the canvas. */
+      ...inkAndEdge(
+        roleHexes(events, 'fg', palette, 'neutral'),
+        roleHexes(events, 'border', palette, 'neutral'),
+        pageSurface(roleHexes(events, 'bg', palette, 'neutral')).bg,
+      ),
       neutral: dimensions.color.values
         .map((v) => toHex(v.value, palette, 'neutral'))
         .filter(Boolean)

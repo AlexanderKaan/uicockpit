@@ -6,6 +6,7 @@ import { auditFiles, renderReport } from '../audit/engine'
 import { readPickedFiles, loadVocabulary, type ScanResult } from '../audit/readFiles'
 import { ping } from '../analytics/beacon'
 import { FolderDrop } from '../audit/FolderDrop'
+import type { AuditHandoff } from '../audit/handoff'
 import { saveHandoff, saveReport, readReport, clearHandoff, configFromAudit, provenanceFromAudit, derivedFromAudit } from '../audit/handoff'
 import { encode } from '../state/hash'
 
@@ -91,7 +92,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       inferredConfig: { values?: Record<string, unknown>; confidence?: Record<string, unknown> }
       kinds?: Record<string, { files: number }>
       shell?: Record<string, { files: number }>
-      spread?: { radius: string[]; shadow: string[]; spacing: string[]; color: string[]; neutral: string[]; type: string[] }
+      spread?: AuditHandoff['spread']
       dimensions?: Record<string, { distinct: number }>
       sprawl?: { treatments: number; singletons: number }
       score: number | null
@@ -105,7 +106,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       parsed: r.meta.parsed,
       kinds: Object.fromEntries(Object.entries(r.kinds || {}).map(([k, v]) => [k, v.files])),
       shell: Object.fromEntries(Object.entries(r.shell || {}).map(([k, v]) => [k, v.files])),
-      spread: r.spread || { radius: [], shadow: [], spacing: [], color: [], neutral: [], type: [] },
+      spread: r.spread || { radius: [], shadow: [], spacing: [], color: [], neutral: [], type: [], bg: null, fg: null, border: null, polarity: null },
       distinct: {
         radius: r.dimensions?.radius?.distinct ?? 0,
         shadow: r.dimensions?.shadow?.distinct ?? 0,

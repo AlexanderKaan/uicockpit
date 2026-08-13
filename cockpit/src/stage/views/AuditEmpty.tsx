@@ -44,7 +44,7 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
         inferredConfig: { values?: Record<string, unknown>; confidence?: Record<string, unknown> }
         kinds?: Record<string, { files: number }>
         shell?: Record<string, { files: number }>
-        spread?: { radius: string[]; shadow: string[]; spacing: string[]; color: string[]; neutral: string[]; type: string[] }
+        spread?: AuditHandoff['spread']
         dimensions?: Record<string, { distinct: number }>
         sprawl?: { treatments: number; singletons: number }
         score: number | null
@@ -60,7 +60,7 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
         parsed: result.meta.parsed,
         kinds: Object.fromEntries(Object.entries(result.kinds || {}).map(([k, v]) => [k, v.files])),
         shell: Object.fromEntries(Object.entries(result.shell || {}).map(([k, v]) => [k, v.files])),
-        spread: result.spread || { radius: [], shadow: [], spacing: [], color: [], neutral: [], type: [] },
+        spread: result.spread || { radius: [], shadow: [], spacing: [], color: [], neutral: [], type: [], bg: null, fg: null, border: null, polarity: null },
         distinct: {
           radius: result.dimensions?.radius?.distinct ?? 0,
           shadow: result.dimensions?.shadow?.distinct ?? 0,
