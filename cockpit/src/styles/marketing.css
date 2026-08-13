@@ -2145,13 +2145,15 @@
   /* A real edge, not just a shadow. The panel sits on a pale wall, so without a
      border its own white dissolved into the background and only the drop shadow
      held it — which reads as a smudge rather than a surface. */
-  /* Two edges, because one is not enough on a wall this busy: a hairline that
-     holds the shape against pale cards, and a wider white ring that separates
-     it from dark or saturated ones. */
-  border:1px solid rgb(0 0 0/.16);
-  box-shadow:0 30px 70px -18px rgb(0 0 0/.38),
-             0 0 0 1px rgb(0 0 0/.05),
-             0 0 0 10px rgb(255 255 255/.72);
+  /* The EDGE does the separating, not the shadow. A big soft drop shadow reads
+     as depth over a plain background and as haze over a wall of cards — the
+     panel looked like it was dissolving into the components rather than sitting
+     in front of them. So: a border you can actually see, and just enough shadow
+     to lift it off the surface. The white ring stays, because a dark or
+     saturated card behind the panel still needs something between the two. */
+  border:1.5px solid rgb(0 0 0/.30);
+  box-shadow:0 8px 24px -10px rgb(0 0 0/.20),
+             0 0 0 10px rgb(255 255 255/.8);
   animation:mkt-resolve-in .5s .25s cubic-bezier(.2,.8,.3,1) both;
   transition:opacity .4s, transform .4s}
 @keyframes mkt-resolve-in{from{opacity:0;transform:translate(-50%,-42%) scale(.96)}
