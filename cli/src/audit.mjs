@@ -891,13 +891,14 @@ function isCssLength(v) {
 
 /** Resolve a measured colour to a hex a browser can render, keeping only the
  *  SATURATED ones — greys are an app's surfaces, not its decisions. */
-function toHex(value, palette) {
+function toHex(value, palette, want = 'saturated') {
   const rgb = parseColor(stripAlpha(String(value)), palette)
   if (!rgb) return null
   const [r, g, b] = rgb
-  // 30 let tinted greys through — slate-500 spans 39 — and a wall of slate
-  // reads as "your app is grey", which is a statement about surfaces, not drift.
-  if (Math.max(r, g, b) - Math.min(r, g, b) < 60) return null
+  // 60, not 30: slate spans 39, and slate is a surface decision rather than an
+  // identity one. The two lists are used for different jobs and must not mix.
+  const spread = Math.max(r, g, b) - Math.min(r, g, b)
+  if (want === 'saturated' ? spread < 60 : spread >= 60) return null
   return '#' + [r, g, b].map((n) => Math.round(n).toString(16).padStart(2, '0')).join('')
 }
 
@@ -1135,12 +1136,25 @@ export function auditFiles(files, opts = {}) {
       radius: dimensions.radius.values.map((v) => v.value).filter(isCssLength).slice(0, 12),
       shadow: dimensions.shadow.values.map((v) => v.value).filter((v) => !/var\(/.test(v)).slice(0, 8),
       spacing: dimensions.spacing.values.map((v) => v.value).filter(isCssLength).slice(0, 10),
-      // Saturated only: an app's greys are its surfaces, its colours are its
-      // decisions, and only the second kind reads as drift.
+      // The decisions: saturated colours, the ones an app chose on purpose.
       color: dimensions.color.values
-        .map((v) => toHex(v.value, palette))
+        .map((v) => toHex(v.value, palette, 'saturated'))
         .filter(Boolean)
         .slice(0, 10),
+      /* And the greys, which matter just as much. An app's surfaces, borders
+       * and text are what make it FEEL like a different app — leaving them out
+       * meant a "before" that still wore our neutrals, so the switch barely
+       * changed anything and the whole comparison fell flat. */
+      neutral: dimensions.color.values
+        .map((v) => toHex(v.value, palette, 'neutral'))
+        .filter(Boolean)
+        .slice(0, 8),
+      /* Their type sizes. Typography is half of what makes an interface
+       * recognisable, and ours would otherwise leak straight through. */
+      type: dimensions.type.values
+        .map((v) => String(v.value).split('/')[0])
+        .filter((v) => /^[\d.]+(px|rem)$/.test(v))
+        .slice(0, 6),
     },
 
     /* The skeleton, as opposed to the parts. Which regions — never how they are

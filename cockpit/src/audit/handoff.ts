@@ -42,7 +42,7 @@ export interface AuditHandoff {
    *  honest "before" possible: we cannot reconstruct any single component of
    *  theirs, but we know their values exactly, and drift IS having nineteen
    *  radii with nothing deciding between them. */
-  spread: { radius: string[]; shadow: string[]; spacing: string[]; color: string[] }
+  spread: { radius: string[]; shadow: string[]; spacing: string[]; color: string[]; neutral: string[]; type: string[] }
   /** What the drift actually amounts to — measured, for the tally. */
   distinct: { radius: number; shadow: number; color: number; spacing: number }
   treatments: number
@@ -198,7 +198,14 @@ export function readHandoff(): AuditHandoff | null {
     const ok =
       h && typeof h.rootName === 'string' &&
       !!h.kinds && !!h.shell && !!h.provenance && !!h.derived &&
-      !!h.spread && Array.isArray(h.spread.color) && !!h.distinct
+      // Check every field the view actually reads, not a representative one:
+      // `spread` grew `neutral` and `type` after the first version, and testing
+      // only `color` let a half-shaped object through — it rendered, silently
+      // wearing our neutrals, which is precisely the bug this guard exists for.
+      !!h.spread && Array.isArray(h.spread.color) &&
+      Array.isArray(h.spread.neutral) && Array.isArray(h.spread.type) &&
+      Array.isArray(h.spread.radius) && Array.isArray(h.spread.shadow) &&
+      !!h.distinct
     if (!ok) { clearHandoff(); return null }
     return h as AuditHandoff
   } catch {

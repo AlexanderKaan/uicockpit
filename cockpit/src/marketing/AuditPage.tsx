@@ -91,7 +91,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       inferredConfig: { values?: Record<string, unknown>; confidence?: Record<string, unknown> }
       kinds?: Record<string, { files: number }>
       shell?: Record<string, { files: number }>
-      spread?: { radius: string[]; shadow: string[]; spacing: string[]; color: string[] }
+      spread?: { radius: string[]; shadow: string[]; spacing: string[]; color: string[]; neutral: string[]; type: string[] }
       dimensions?: Record<string, { distinct: number }>
       sprawl?: { treatments: number; singletons: number }
       score: number | null
@@ -105,7 +105,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       parsed: r.meta.parsed,
       kinds: Object.fromEntries(Object.entries(r.kinds || {}).map(([k, v]) => [k, v.files])),
       shell: Object.fromEntries(Object.entries(r.shell || {}).map(([k, v]) => [k, v.files])),
-      spread: r.spread || { radius: [], shadow: [], spacing: [], color: [] },
+      spread: r.spread || { radius: [], shadow: [], spacing: [], color: [], neutral: [], type: [] },
       distinct: {
         radius: r.dimensions?.radius?.distinct ?? 0,
         shadow: r.dimensions?.shadow?.distinct ?? 0,

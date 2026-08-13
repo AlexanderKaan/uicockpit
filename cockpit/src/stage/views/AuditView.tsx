@@ -35,17 +35,67 @@ interface AuditViewProps {
  * Overriding the --k-* vars per cell also shadows the panel, which is exactly
  * right: "before" means the Foundation is not applied yet.
  */
+const lum = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16)
+  return (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255
+}
+
+/**
+ * Their palette, shared across every cell.
+ *
+ * An app has ONE grey ramp — its surfaces, borders and text are the same
+ * everywhere — so painting these per cell would invent a chaos they do not
+ * have. Sorted by luminance and mapped by role, because the engine reports the
+ * greys by frequency and frequency says nothing about which one is a page and
+ * which one is a word.
+ *
+ * Leaving them out entirely was the bug: the "before" kept OUR neutrals and our
+ * type, so a foreign app rendered in our skin, and the switch looked like it
+ * barely did anything.
+ */
+function paletteStyle(audit: AuditHandoff): Record<string, string> {
+  const out: Record<string, string> = {}
+  const greys = [...(audit.spread.neutral || [])].sort((a, b) => lum(b) - lum(a))
+  if (greys.length >= 3) {
+    const light = greys[0]!
+    const dark = greys[greys.length - 1]!
+    const mid = greys[Math.floor(greys.length / 2)]!
+    out['--k-surface'] = light
+    out['--k-bg'] = greys[1] ?? light
+    out['--k-surface-2'] = greys[1] ?? light
+    out['--k-border'] = mid
+    out['--k-input-border'] = mid
+    out['--k-fg'] = dark
+    out['--k-fg-muted'] = greys[Math.max(0, greys.length - 3)] ?? mid
+    out['--k-fg-faint'] = mid
+  }
+  const t = [...(audit.spread.type || [])]
+  if (t.length) {
+    const px = (v: string) => parseFloat(v)
+    const sorted = [...new Set(t)].sort((a, b) => px(a) - px(b))
+    out['--k-type-small'] = sorted[0]!
+    out['--k-type-body'] = sorted[Math.min(1, sorted.length - 1)]!
+    out['--k-type-h3'] = sorted[sorted.length - 1]!
+  }
+  return out
+}
+
+/** And the part that genuinely varies per component: shape, depth, accent. */
 function driftStyle(audit: AuditHandoff, i: number): CSSProperties {
   const s = audit.spread
   const pick = (list: string[], n: number) => (list.length ? list[n % list.length] : undefined)
+  const out: Record<string, string> = { ...paletteStyle(audit) }
   const r = pick(s.radius, i)
   const sh = pick(s.shadow, i)
   const c = pick(s.color, i)
   const sp = pick(s.spacing, i)
-  const out: Record<string, string> = {}
   if (r) { out['--k-radius-sm'] = r; out['--k-radius-md'] = r; out['--k-radius-lg'] = r; out['--k-radius-button'] = r }
   if (sh) { out['--k-shadow-sm'] = sh; out['--k-shadow-md'] = sh }
-  if (c) { out['--k-primary'] = c; out['--k-accent'] = c; out['--k-fill'] = c; out['--k-ring'] = c }
+  if (c) {
+    out['--k-primary'] = c; out['--k-accent'] = c; out['--k-fill'] = c; out['--k-ring'] = c
+    out['--k-primary-soft'] = c + '22'
+    out['--k-state-selected-bg'] = c + '22'
+  }
   if (sp) { out['--k-s-8'] = sp; out['--k-s-12'] = sp }
   return out as CSSProperties
 }
@@ -121,14 +171,19 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
       </div>
 
       <div className="audv__toggle">
-        <div className="mkt__switch" role="radiogroup" aria-label="Your values, or your kit">
-          <span className={`mkt__switch-knob${drift ? '' : ' is-right'}`} aria-hidden="true" />
+        {/* The app's own segmented idiom, not the hero's. Reusing .mkt__switch
+            here put a sliding knob with hard-coded 5px insets — calibrated for
+            a 26px-padded marketing button — into a stage that sizes nothing the
+            same, and its --mkt-* colours are not even defined in this chrome.
+            The result was a dark blob beside the label. This toggle and the
+            mode switch above it are siblings and should look like it. */}
+        <div className="modesw" role="radiogroup" aria-label="Your values, or your kit">
           <button type="button" role="radio" aria-checked={drift}
-            className={`mkt__switch-opt${drift ? ' is-on' : ''}`} onClick={() => setDrift(true)}>
+            className="modesw__btn" onClick={() => setDrift(true)}>
             Your code today
           </button>
           <button type="button" role="radio" aria-checked={!drift}
-            className={`mkt__switch-opt${drift ? '' : ' is-on'}`} onClick={() => setDrift(false)}>
+            className="modesw__btn" onClick={() => setDrift(false)}>
             On your kit
           </button>
         </div>
