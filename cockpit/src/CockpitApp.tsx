@@ -1,7 +1,8 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { buildTokens } from './tokens/buildTokens'
 import { Panel } from './panel/Panel'
-import { Stage } from './stage/Stage'
+import { Stage, type StageMode } from './stage/Stage'
+import { readHandoff, type AuditHandoff } from './audit/handoff'
 import { Topbar } from './stage/Topbar'
 import { MobileControlBar } from './stage/MobileControlBar'
 import { CommandPalette } from './stage/CommandPalette'
@@ -18,6 +19,8 @@ const ExportModal = lazy(() =>
 interface CockpitAppProps {
   /** Called when user clicks the brand — sends them back to /. */
   onHome?: () => void
+  /** Back to the full report — the evidence behind the audit view. */
+  onAudit?: () => void
 }
 
 /** The configurator itself — what was previously the App root. Now lives at
@@ -26,13 +29,18 @@ interface CockpitAppProps {
  *  Layout: a full-width top bar (brand · view switcher · actions) runs across
  *  the whole app; below it the stage fills the width and the control menu
  *  *floats* over the top-left (absolute), never reserving a column. */
-export function CockpitApp({ onHome }: CockpitAppProps = {}) {
+export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
   const { cfg, tokens, dispatch, undo, redo, canUndo, canRedo } = useConfig()
   // Default closed on phones — there the panel becomes an overlay drawer, so the
   // stage gets the full width; open inline as a column on desktop.
   const [menuOpen, setMenuOpen] = useState(() =>
     typeof window === 'undefined' ? true : window.innerWidth > 768,
   )
+  /* An audit carried over from /audit, if the visitor came that way. Read once:
+   * the stage mode is theirs to change after that, and re-reading would yank it
+   * back on every render. */
+  const [audit] = useState<AuditHandoff | null>(() => readHandoff())
+  const [stageMode, setStageMode] = useState<StageMode>(() => (readHandoff() ? 'audit' : 'catalogue'))
   const [exportOpen, setExportOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -203,6 +211,8 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   return (
     <div className={`app ${menuOpen ? '' : 'app--menu-closed'} ${cfg.mode === 'dark' ? 'app--theme-dark' : ''}`} style={chromeTokens}>
       <Topbar
+        stageMode={audit ? stageMode : undefined}
+        onStageMode={audit ? setStageMode : undefined}
         mode={cfg.mode}
         onToggleMode={() =>
           dispatch({ type: 'SET', patch: { mode: cfg.mode === 'light' ? 'dark' : 'light' } })
@@ -234,7 +244,13 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
             gripRef={gripRef}
           />
         )}
-        <Stage cfg={cfg} tokens={tokens} />
+        <Stage
+          cfg={cfg}
+          tokens={tokens}
+          audit={audit}
+          mode={stageMode}
+          onSeeEvidence={onAudit}
+        />
       </div>
       <MobileControlBar
         onCustomize={() => setMenuOpen(true)}

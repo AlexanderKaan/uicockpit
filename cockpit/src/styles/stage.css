@@ -712,3 +712,62 @@
 @media (prefers-reduced-motion: reduce) {
   .cmdk-scrim, .cmdk-host.cockpit-preview { animation: none; }
 }
+
+/* === Audit view — the stage pointed at the visitor's own app ================
+ * Chrome uses --app-*, so the frame stays OUR product while everything inside a
+ * specimen stage wears THEIR kit. That separation is the whole trick: the panel
+ * and the strip must not shift when they change their brand colour, or the tool
+ * stops feeling like a tool. */
+.audv { padding: 22px 26px 60px; max-width: 1180px; margin: 0 auto; }
+
+.audv__strip {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 18px; flex-wrap: wrap;
+  background: var(--app-surface); border: 1px solid var(--app-border);
+  border-radius: 14px; padding: 13px 16px;
+}
+.audv__lead { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; font-size: 13px; }
+.audv__lead strong { font-size: 14px; }
+.audv__tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--app-fg); background: var(--app-hover); border-radius: 5px; padding: 2px 6px;
+}
+.audv__meta { color: var(--app-fg-faint); font-size: 12px; }
+.audv__facts { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--app-fg-muted); }
+.audv__facts b { color: var(--app-fg); font-variant-numeric: tabular-nums; }
+.audv__dot { width: 3px; height: 3px; border-radius: 99px; background: var(--app-fg-faint); }
+.audv__link {
+  appearance: none; border: 0; background: transparent; font: inherit; font-size: 12px;
+  font-weight: 600; color: var(--app-fg); cursor: pointer; padding: 0; text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.audv__lede { margin: 14px 2px 16px; font-size: 13px; line-height: 1.6; color: var(--app-fg-muted); max-width: 74ch; }
+
+.audv__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; align-items: start; }
+.audv__spec { margin: 0; background: var(--app-surface); border: 1px solid var(--app-border); border-radius: 13px; overflow: hidden; }
+.audv__spec--wide { grid-column: 1 / -1; }
+.audv__spec figcaption {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  padding: 9px 12px; border-bottom: 1px solid var(--app-border); font-size: 11px; font-weight: 650;
+}
+.audv__n { font-weight: 500; color: var(--app-fg-faint); }
+.audv__stage {
+  padding: 16px 14px; display: flex; align-items: center; justify-content: center;
+  min-height: 88px; background: var(--k-bg); overflow: auto;
+}
+/* Absent kinds stay on the wall. A grid of only what we found reads as a
+ * complete inventory; the gaps are what make it a measurement. */
+.audv__spec--absent { opacity: 0.6; border-style: dashed; }
+.audv__none { font-size: 11px; color: var(--app-fg-faint); font-style: italic; }
+.audv__foot { margin: 22px 2px 0; font-size: 12px; line-height: 1.6; color: var(--app-fg-muted); max-width: 74ch; }
+.audv__foot b { color: var(--app-fg); }
+
+/* === Mode switch — two modes, one shell ================================== */
+.modesw { display: inline-flex; background: var(--app-hover); border-radius: 9px; padding: 2px; }
+.modesw__btn {
+  appearance: none; border: 0; background: transparent; font: inherit; font-size: 11px;
+  font-weight: 600; color: var(--app-fg-muted); padding: 5px 11px; border-radius: 7px;
+  cursor: pointer; white-space: nowrap;
+}
+.modesw__btn[aria-checked='true'] { background: var(--app-surface); color: var(--app-fg); box-shadow: var(--app-shadow-sm); }
+@media (max-width: 700px) { .modesw__btn { padding: 5px 8px; } }

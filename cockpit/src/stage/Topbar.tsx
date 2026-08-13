@@ -19,6 +19,9 @@ interface TopbarProps {
   onToggleMenu: () => void
   /** Brand click → back to the marketing home. */
   onHome?: () => void
+  /** Present only when an audit is loaded — drives the stage's two modes. */
+  stageMode?: 'catalogue' | 'audit'
+  onStageMode?: (m: 'catalogue' | 'audit') => void
   /** Undo/redo (C2) — config history. Buttons mirror ⌘Z / ⇧⌘Z. */
   onUndo: () => void
   onRedo: () => void
@@ -26,7 +29,7 @@ interface TopbarProps {
   canRedo: boolean
 }
 
-export function Topbar({ mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
+export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -74,6 +77,20 @@ export function Topbar({ mode, onToggleMode, onExport, tokens, cfg, onLoadKit, m
           <PanelLeft size={15} strokeWidth={1.75} />
         </button>
         <A11yBadge audit={audit} pass={pass} total={total} allPass={allPass} />
+        {/* Two modes, one shell. Only appears when there IS an audit to show —
+         *  a switch with one meaningful position is furniture, not a control. */}
+        {stageMode && onStageMode && (
+          <div className="modesw" role="radiogroup" aria-label="What the stage shows">
+            <button
+              type="button" role="radio" aria-checked={stageMode === 'audit'}
+              className="modesw__btn" onClick={() => onStageMode('audit')}
+            >Your app</button>
+            <button
+              type="button" role="radio" aria-checked={stageMode === 'catalogue'}
+              className="modesw__btn" onClick={() => onStageMode('catalogue')}
+            >Full catalogue</button>
+          </div>
+        )}
       </div>
       <div className="topbar__center">
       </div>

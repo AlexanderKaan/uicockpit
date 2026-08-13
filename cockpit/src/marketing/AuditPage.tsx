@@ -5,6 +5,8 @@ import { MktFooter } from './MktFooter'
 import { auditFiles, renderReport } from '../audit/engine'
 import { readPickedFiles, loadVocabulary, type ScanResult } from '../audit/readFiles'
 import { ping } from '../analytics/beacon'
+import { saveHandoff, configFromAudit, provenanceFromAudit } from '../audit/handoff'
+import { encode } from '../state/hash'
 
 /**
  * `/audit` — the retroactive door.
@@ -69,6 +71,38 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
 
   const reset = () => { setState(null); setPhase('door'); setError(null) }
 
+  /**
+   * Into the configurator, carrying the audit.
+   *
+   * The kit goes in the URL (so it is shareable and survives a reload) and the
+   * shape of their app goes in sessionStorage (so it dies with the tab). Two
+   * different lifetimes because they are two different things: a kit is theirs
+   * to keep, a scan of their private codebase is not something we should hold
+   * a moment longer than the visit.
+   */
+  const bridge = () => {
+    if (!state) return
+    ping('audit', 'bridge')
+    const r = state.result as unknown as {
+      inferredConfig: { values?: Record<string, unknown>; confidence?: Record<string, unknown> }
+      kinds?: Record<string, { files: number }>
+      sprawl?: { treatments: number; singletons: number }
+      score: number | null
+      meta: { files: number; parsed: number }
+    }
+    saveHandoff({
+      rootName: state.scan.rootName,
+      filesRead: r.meta.files,
+      parsed: r.meta.parsed,
+      kinds: Object.fromEntries(Object.entries(r.kinds || {}).map(([k, v]) => [k, v.files])),
+      treatments: r.sprawl?.treatments ?? 0,
+      singletons: r.sprawl?.singletons ?? 0,
+      score: r.score,
+      provenance: provenanceFromAudit(r.inferredConfig),
+    })
+    window.location.href = `/app#${encode(configFromAudit(r.inferredConfig))}`
+  }
+
   const download = () => {
     if (!state) return
     const blob = new Blob([renderReport(state.result)], { type: 'text/html' })
@@ -101,7 +135,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
           />
         )}
         {phase === 'findings' && state && (
-          <Findings result={state.result} onDownload={download} onReset={reset} navigate={navigate} />
+          <Findings result={state.result} onDownload={download} onReset={reset} onBridge={bridge} />
         )}
 
         {/* Universal: webkitdirectory works in Safari and Firefox too, where the
@@ -243,12 +277,12 @@ function Row({ ok, label, sub, n }: { ok?: boolean; label: string; sub: string; 
 /* ───────────────────────────── 3 · the findings ───────────────────────────── */
 
 function Findings({
-  result, onDownload, onReset, navigate,
+  result, onDownload, onReset, onBridge,
 }: {
   result: ReturnType<typeof auditFiles>
   onDownload: () => void
   onReset: () => void
-  navigate: (to: string) => void
+  onBridge: () => void
 }) {
   // The exact document the CLI writes, rendered here. Sandboxed: it is generated
   // from the visitor's own code, so it is treated as untrusted content.
@@ -267,8 +301,8 @@ function Findings({
         {/* The bridge. If the audit is a wedge this is the number that says so;
             if it is a product in its own right, this stays near zero and that is
             an answer too. */}
-        <button type="button" className="mkt-btn mkt-btn--primary" onClick={() => { ping('audit', 'bridge'); navigate('/app') }}>
-          Build the kit that fixes this <ArrowRight size={16} strokeWidth={2} />
+        <button type="button" className="mkt-btn mkt-btn--primary" onClick={onBridge}>
+          Open this as my kit <ArrowRight size={16} strokeWidth={2} />
         </button>
       </div>
       <iframe

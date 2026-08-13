@@ -54,7 +54,7 @@ export function App() {
 
   // The configurator — the fullscreen instrument layer.
   if (path.startsWith('/app'))
-    return <CockpitApp onHome={() => navigate('/')} />
+    return <CockpitApp onHome={() => navigate('/')} onAudit={() => navigate('/audit')} />
 
   // The guide + the catalog + the showcase wall — content destinations in the
   // site shell (IA-1/IA-2).
