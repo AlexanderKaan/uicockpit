@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FolderOpen, ShieldCheck, Download, RotateCcw, ArrowRight } from 'lucide-react'
 import { MktNav } from './MktNav'
 import { MktFooter } from './MktFooter'
 import { auditFiles, renderReport } from '../audit/engine'
 import { readPickedFiles, loadVocabulary, type ScanResult } from '../audit/readFiles'
+import { ping } from '../analytics/beacon'
 
 /**
  * `/audit` — the retroactive door.
@@ -36,6 +37,12 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  useEffect(() => {
+    const prev = document.title
+    document.title = 'Audit — find the design system your code already has — UIcockpit'
+    return () => { document.title = prev }
+  }, [])
+
   const run = async (list: FileList | File[]) => {
     setError(null)
     setPhase('reading')
@@ -49,6 +56,10 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       const vocabulary = await loadVocabulary()
       const result = auditFiles(scan.files, { pkg: scan.pkg, vocabulary })
       setState({ result, scan })
+      // Counted as a milestone, not a click: a completed scan is the moment the
+      // door stopped being a landing page. The value is a bucket, never the
+      // score, the stack or anything else derived from their code.
+      ping('audit', result.refused ? 'refused' : 'scanned')
       setPhase('recognise')
     } catch {
       setError('That folder could not be read. Try a smaller one — a single app rather than a monorepo.')
@@ -85,7 +96,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
           <Recognise
             result={state.result}
             scan={state.scan}
-            onContinue={() => setPhase('findings')}
+            onContinue={() => { ping('audit', 'findings'); setPhase('findings') }}
             onReset={reset}
           />
         )}
@@ -253,7 +264,10 @@ function Findings({
             <Download size={15} strokeWidth={1.9} /> Download the report
           </button>
         </div>
-        <button type="button" className="mkt-btn mkt-btn--primary" onClick={() => navigate('/app')}>
+        {/* The bridge. If the audit is a wedge this is the number that says so;
+            if it is a product in its own right, this stays near zero and that is
+            an answer too. */}
+        <button type="button" className="mkt-btn mkt-btn--primary" onClick={() => { ping('audit', 'bridge'); navigate('/app') }}>
           Build the kit that fixes this <ArrowRight size={16} strokeWidth={2} />
         </button>
       </div>

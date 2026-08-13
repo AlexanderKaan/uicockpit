@@ -8,6 +8,7 @@ import { MktNav } from './MktNav'
 import { ToolLogo } from '../brand/toolLogos'
 import { MktFooter } from './MktFooter'
 import { MktStats } from './MktStats'
+import { ping } from '../analytics/beacon'
 // Note: feature icons stay Lucide (decorative). The brand mark uses the
 // actual /logo.svg so the nav matches the panel inside /app exactly.
 
@@ -97,25 +98,27 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             to your AI — a checker keeps every new screen on it, instead of drifting back to generic.
           </p>
           {/* Two doors — navigation only. The wall below carries its own single
-              control, because one click should do the whole demonstration. */}
+              control, because one click should do the whole demonstration.
+              Both are counted: which door people take is the one question we
+              could not reason our way through, and it is cheap to just measure. */}
           <div className="mkt__fork">
             <button
               type="button"
               className="mkt__door mkt__door--audit"
-              onClick={() => navigate('/audit')}
+              onClick={() => { ping('door', 'audit'); navigate('/audit') }}
             >
               <span className="mkt__door-tag">Audit</span>
               <span className="mkt__door-h">Find the system you already have.</span>
               <span className="mkt__door-p">
                 Point at your code. See what it already implies — and how far it has drifted.
               </span>
-              <span className="mkt__door-meta">a folder or a zip · nothing is uploaded</span>
+              <span className="mkt__door-meta">point at a folder · nothing is uploaded</span>
             </button>
 
             <button
               type="button"
               className="mkt__door mkt__door--make"
-              onClick={onLaunch}
+              onClick={() => { ping('door', 'configure'); onLaunch() }}
             >
               <span className="mkt__door-tag">Configure</span>
               <span className="mkt__door-h">Start a design system.</span>
