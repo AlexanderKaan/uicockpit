@@ -2156,27 +2156,30 @@
 @media (prefers-reduced-motion: reduce){.mkt__resolve{animation:none}}
 .mkt__resolve-lead{margin:0;font-size:16.5px;color:var(--mkt-fg-muted,#6b6b76)}
 .mkt__resolve-lead b{color:var(--mkt-fg,#16161a);font-weight:600}
-.mkt__resolve-btn{border:0;cursor:pointer;font:600 19px/1 inherit;letter-spacing:-.015em;
-  padding:19px 36px;border-radius:12px;background:var(--mkt-fg,#16161a);color:var(--mkt-bg,#fff);
-  transition:transform .18s, filter .18s}
-.mkt__resolve-btn:hover{transform:translateY(-2px);filter:brightness(1.12)}
+
+/* ── The switch ──────────────────────────────────────────────────────────────
+ * Two labelled states rather than a one-way button. The plain button proved the
+ * effect and left nobody knowing who had done it; naming both sides attributes
+ * the change, and flicking back and forth is exactly the behaviour that sells
+ * this — so the control invites it instead of hiding a replay link elsewhere.  */
+.mkt__switch{position:relative;display:inline-flex;padding:5px;border-radius:999px;
+  background:color-mix(in oklab, var(--mkt-fg,#16161a) 7%, transparent);
+  border:1px solid rgb(0 0 0/.08)}
+.mkt__switch-knob{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);
+  border-radius:999px;background:var(--mkt-fg,#16161a);
+  box-shadow:0 6px 18px -6px rgb(0 0 0/.5);
+  transition:transform .42s cubic-bezier(.34,1.3,.5,1)}
+.mkt__switch-knob.is-right{transform:translateX(100%)}
+@media (prefers-reduced-motion: reduce){.mkt__switch-knob{transition:none}}
+.mkt__switch-opt{position:relative;z-index:1;border:0;background:none;cursor:pointer;
+  font:600 15.5px/1 inherit;letter-spacing:-.01em;padding:15px 26px;border-radius:999px;
+  color:var(--mkt-fg-muted,#6b6b76);white-space:nowrap;
+  transition:color .3s;flex:1}
+.mkt__switch-opt.is-on{color:var(--mkt-bg,#fff)}
+.mkt__switch-opt:not(.is-on):hover{color:var(--mkt-fg,#16161a)}
+@media (max-width:640px){.mkt__switch-opt{font-size:13.5px;padding:13px 14px}}
 .mkt__resolve-sub{margin:0;font-size:12.5px;color:var(--mkt-fg-faint,#9096a1)}
-/* After the reveal the control has to get out of the way without becoming
- * invisible. As a bare link it floated over card text and was unreadable, so it
- * keeps a surface of its own — just a much quieter one than the panel it replaces. */
-.mkt__resolve.is-done{top:auto;bottom:26px;transform:translate(-50%,0);
-  padding:0;background:none;backdrop-filter:none;box-shadow:none;animation:none}
-.mkt__resolve.is-done::before{content:none}
-.mkt__resolve-again{cursor:pointer;font:500 13px/1 inherit;
-  color:var(--mkt-fg-muted,#6b6b76);padding:11px 18px;border-radius:999px;
-  background:var(--mkt-bg,#fff);border:1px solid rgb(0 0 0/.09);
-  box-shadow:0 6px 20px -6px rgb(0 0 0/.22);
-  display:inline-flex;align-items:center;gap:7px;
-  transition:color .18s, box-shadow .18s, transform .18s}
-.mkt__resolve-again:hover{color:var(--mkt-fg,#16161a);transform:translateY(-1px);
-  box-shadow:0 10px 26px -8px rgb(0 0 0/.28)}
-@media (max-width:640px){.mkt__resolve{top:26%;padding:20px 18px}
-  .mkt__resolve-btn{font-size:15px;padding:14px 22px}}
+@media (max-width:640px){.mkt__resolve{top:26%;padding:20px 18px}}
 
 
 /* ── The wall on small screens ───────────────────────────────────────────────
@@ -2199,7 +2202,6 @@
   }
   .mkt__showcase { margin-bottom: 36px; }
   .mkt__resolve { padding: 22px 24px; gap: 9px; width: max-content; max-width: 88vw; }
-  .mkt__resolve-btn { font-size: 16px; padding: 15px 24px; }
   .mkt__resolve-lead { font-size: 14px; }
 }
 @media (max-width: 480px) {

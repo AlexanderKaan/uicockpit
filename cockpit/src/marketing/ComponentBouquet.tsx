@@ -91,35 +91,41 @@ export function ComponentBouquet() {
         {gallery}
       </div>
 
-      {sweep && <span className="mkt__sweep" aria-hidden="true" />}
+      {/* The control names the product at the moment it proves itself. A plain
+          button demonstrated the effect beautifully and left the visitor with no
+          idea who did it; labelling the two states fixes the attribution, and it
+          folds the awkward "show me again" link back into one control. */}
+      <div className="mkt__resolve">
+        <p className="mkt__resolve-lead">
+          34 components. Nine accent colours. <b>One wall.</b>
+        </p>
 
-      {/* The conversion. Sits over the wall because the wall IS the argument —
-          you should not have to scroll to find the thing that fixes it. */}
-      <div className={`mkt__resolve${drift ? '' : ' is-done'}`}>
-        {drift ? (
-          <>
-            <p className="mkt__resolve-lead">
-              34 components. Nine accent colours. <b>No system.</b>
-            </p>
-            <button
-              type="button"
-              className="mkt__resolve-btn"
-              onClick={resolve}
-            >
-              Snap it into line
-            </button>
-            <p className="mkt__resolve-sub">one click · the components never changed</p>
-          </>
-        ) : (
+        <div className="mkt__switch" role="radiogroup" aria-label="Preview the same components with and without a design system">
+          <span className={`mkt__switch-knob${drift ? '' : ' is-right'}`} aria-hidden="true" />
           <button
             type="button"
-            className="mkt__resolve-again"
+            role="radio"
+            aria-checked={drift}
+            className={`mkt__switch-opt${drift ? ' is-on' : ''}`}
             onClick={() => setDrift(true)}
           >
-            ↺ Show me the drift again
+            Without UIcockpit
           </button>
-        )}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={!drift}
+            className={`mkt__switch-opt${drift ? '' : ' is-on'}`}
+            onClick={resolve}
+          >
+            With UIcockpit
+          </button>
+        </div>
+
+        <p className="mkt__resolve-sub">the components never changed — only the system did</p>
       </div>
+
+      {sweep && <span className="mkt__sweep" aria-hidden="true" />}
     </div>
   )
 }
