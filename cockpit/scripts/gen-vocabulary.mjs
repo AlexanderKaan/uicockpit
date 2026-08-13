@@ -29,6 +29,10 @@ import { dirname, join } from 'node:path'
 const HERE = dirname(fileURLToPath(import.meta.url))
 const RECIPES = join(HERE, '../src/kit/recipes/index.ts')
 const OUT = join(HERE, '../../cli/src/vocabulary.json')
+/* The browser audit (PR 3) fetches the same slice from our own origin, so the
+ * generator writes both copies. One source, two consumers — the CLI bundles it,
+ * the web door fetches it, and they can never disagree about what a recipe is. */
+const OUT_WEB = join(HERE, '../public/uicockpit.vocabulary.json')
 
 /* The SAME selector regex genContract.ts uses — keep them identical, or the
  * audit's idea of "a kit class" drifts from the contract's. */
@@ -80,12 +84,14 @@ const isCheck = process.argv.includes('--check')
 
 if (isCheck) {
   const current = existsSync(OUT) ? readFileSync(OUT, 'utf8') : ''
-  if (current !== next) {
+  const web = existsSync(OUT_WEB) ? readFileSync(OUT_WEB, 'utf8') : ''
+  if (current !== next || web !== next) {
     console.error('✗ cli/src/vocabulary.json is stale — run `npm run gen:vocabulary`')
     process.exit(1)
   }
   console.log(`✓ vocabulary current (${roots.length} roots, ${payload.vocabVersion})`)
 } else {
   writeFileSync(OUT, next)
-  console.log(`✓ cli/src/vocabulary.json — ${roots.length} roots, version ${payload.vocabVersion}`)
+  writeFileSync(OUT_WEB, next)
+  console.log(`✓ vocabulary.json (cli + cockpit/public) — ${roots.length} roots, version ${payload.vocabVersion}`)
 }

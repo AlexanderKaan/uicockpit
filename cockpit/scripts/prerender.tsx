@@ -139,6 +139,9 @@ for (const entry of entries) {
 // ── sitemap.xml, generated from the same source (no drift) ───────────────────
 const staticRoutes: Array<{ loc: string; freq: string; pri: string }> = [
   { loc: '/', freq: 'weekly', pri: '1.0' },
+  // The retroactive door — its own entrance, its own intent, and the landing
+  // spot for the CLI one-liner and shared reports.
+  { loc: '/audit', freq: 'weekly', pri: '0.9' },
   { loc: '/components', freq: 'weekly', pri: '0.9' },
   { loc: '/styles', freq: 'monthly', pri: '0.8' },
   { loc: '/showcases', freq: 'monthly', pri: '0.8' },

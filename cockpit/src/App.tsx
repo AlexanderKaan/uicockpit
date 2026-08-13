@@ -10,6 +10,7 @@ import { ComponentsIndexPage, ComponentDetailPage } from './marketing/ComponentD
 import { componentPageBySlug } from './stage/views/ComponentGallery'
 import { StylesPage } from './marketing/StylesPage'
 import { findEntry } from './marketing/seo/seoData'
+import { AuditPage } from './marketing/AuditPage'
 import './styles/marketing.css'
 
 /**
@@ -20,6 +21,7 @@ import './styles/marketing.css'
  *   /app                 → The configurator (also any /app/* future deep links)
  *   /docs                → The guide, in the SITE shell (was: inside the app shell)
  *   /showcases           → The Ledger showcase wall as a public destination
+ *   /audit               → Scan an existing codebase (client-side; nothing uploaded)
  *   /compare/<slug>      → SEO comparison page  ("UIcockpit vs X")
  *   /alternatives/<slug> → SEO alternative page ("X alternative")
  *   /uses/<slug>         → SEO use-case / keyword landing
@@ -63,6 +65,9 @@ export function App() {
   }
   if (path.startsWith('/showcases')) return <ShowcasesPage navigate={navigate} />
   if (path.startsWith('/styles')) return <StylesPage navigate={navigate} />
+
+  // The retroactive door — point at existing code, entirely client-side.
+  if (path.startsWith('/audit')) return <AuditPage navigate={navigate} />
 
   // The social-preview / OG card (1280×640) — not linked; screenshotted to a PNG.
   if (path === '/og') return <OgCard />

@@ -2286,3 +2286,69 @@
 .mkt__door-h { font-size: 18px; font-weight: 600; letter-spacing: -.015em; line-height: 1.2; }
 .mkt__door-p { font-size: 13.5px; color: var(--mkt-fg-muted, #6b6b76); line-height: 1.45; }
 .mkt__door-meta { margin-top: 2px; font-size: 11.5px; color: var(--mkt-fg-faint, #9096a1); }
+
+/* ── /audit — the retroactive door ───────────────────────────────────────────
+ * Same site shell as everything else: two doors, ONE product. The instrument
+ * language stays inside the report itself.                                     */
+.aud { padding: 40px 0 90px; }
+.aud__local { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 30px;
+  font-size: 12.5px; color: var(--mkt-fg-muted); padding: 7px 13px; border-radius: 999px;
+  background: color-mix(in oklab, var(--mkt-fg) 5%, transparent); }
+.aud__local svg { color: #2f855a; }
+
+.aud__door { max-width: 42rem; }
+.aud__door h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); line-height: 1.06;
+  letter-spacing: -.032em; font-weight: 600; margin: 0 0 16px; text-wrap: balance; }
+.aud__reading { opacity: .55; }
+.aud__lede { font-size: 17px; color: var(--mkt-fg-muted); margin: 0 0 28px; max-width: 52ch; }
+.aud__hint { font-size: 13px; color: var(--mkt-fg-faint); margin: 12px 0 0; }
+.aud__error { margin: 16px 0 0; font-size: 14px; color: #b3320f;
+  background: #fdf1ec; border: 1px solid #f3cdbc; border-radius: 10px; padding: 11px 14px; }
+.aud__promises { list-style: none; margin: 44px 0 0; padding: 26px 0 0; display: grid; gap: 14px;
+  border-top: 1px solid var(--mkt-line); }
+.aud__promises li { font-size: 14px; color: var(--mkt-fg-muted); max-width: 62ch; }
+.aud__promises b { color: var(--mkt-fg); font-weight: 600; }
+
+/* ── the recognition panel ─────────────────────────────────────────────────── */
+.aud__panel { max-width: 44rem; background: var(--mkt-card, #fff);
+  border: 1px solid var(--mkt-line); border-radius: 16px; padding: 30px 32px 26px; }
+.aud__panel h2 { font-size: 26px; letter-spacing: -.022em; font-weight: 600; margin: 0 0 8px; }
+.aud__chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 22px; }
+.aud__chip { font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--mkt-line); color: var(--mkt-fg-muted); }
+.aud__chip.is-key { color: var(--mkt-fg); border-color: color-mix(in oklab, var(--mkt-fg) 26%, transparent); }
+
+.aud__rows { list-style: none; margin: 0; padding: 0; }
+.aud__row { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: baseline;
+  padding: 13px 0; border-bottom: 1px solid var(--mkt-line); }
+.aud__row:last-child { border-bottom: 0; }
+.aud__row-i { font-size: 13px; font-weight: 700; }
+.aud__row.is-ok .aud__row-i { color: #2f855a; }
+.aud__row.is-flag .aud__row-i { color: #c2410c; }
+.aud__row-t { font-size: 14.5px; font-weight: 500; }
+.aud__row-t span { display: block; font-weight: 400; font-size: 13px; color: var(--mkt-fg-muted); margin-top: 2px; }
+.aud__row-n { font-family: var(--mkt-mono, ui-monospace, monospace); font-size: 14.5px;
+  font-variant-numeric: tabular-nums; white-space: nowrap; }
+.aud__row.is-flag .aud__row-n { color: #c2410c; }
+
+.aud__meter { margin: 20px 0 6px; }
+.aud__meter-bar { height: 3px; background: var(--mkt-line); border-radius: 2px; overflow: hidden; }
+.aud__meter-bar span { display: block; height: 100%; background: var(--mkt-accent, #0a84ff);
+  transition: width .9s cubic-bezier(.2,.7,.3,1); }
+.aud__meter-lbl { display: flex; justify-content: space-between; margin-top: 8px;
+  font-size: 11.5px; color: var(--mkt-fg-faint); font-family: var(--mkt-mono, ui-monospace, monospace); }
+
+.aud__foot { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--mkt-line);
+  display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.aud__actions { display: flex; align-items: center; gap: 10px; }
+
+/* ── the findings ──────────────────────────────────────────────────────────── */
+.aud__findings-bar { display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.aud__frame { width: 100%; height: min(78vh, 900px); border: 1px solid var(--mkt-line);
+  border-radius: 14px; background: #fff; }
+@media (max-width: 640px) {
+  .aud__panel { padding: 22px 18px 20px; }
+  .aud__foot, .aud__findings-bar { flex-direction: column; align-items: stretch; }
+  .aud__actions { justify-content: space-between; }
+}
