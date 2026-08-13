@@ -871,3 +871,40 @@ test('stays quiet about kinds a codebase does not build', () => {
   assert.equal(r.kinds.calendar.files, 0)
   assert.equal(r.kinds.pagination.files, 0)
 })
+
+/* ── reading the conventions real codebases actually use ────────────────────
+ * Both of these were found by auditing four public repos and then opening the
+ * products themselves to check. Documenso came back "indigo" while their app is
+ * unmistakably lime green — the sort of error that is invisible from inside a
+ * test suite and obvious the moment you look at the thing. */
+
+test('reads shadcn bare-HSL tokens, which is how most modern apps declare a brand', () => {
+  // shadcn stores components and wraps at use: hsl(var(--primary))
+  const r = auditFiles([
+    { path: 'globals.css', content: ':root { --primary: 95.08 71.08% 67.45%; }' },
+    { path: 'a.tsx', content: '<button className="btn">Go</button>' },
+  ])
+  // hue 95 is yellow-green — jade is the nearest anchor we ship
+  assert.equal(r.inferredConfig.values.colorTheme, 'jade')
+  assert.match(r.inferredConfig.confidence.colorThemeSource, /declared as --primary/)
+})
+
+test('a component-scoped token is not a brand declaration', () => {
+  // The shadcn default sidebar colour, in an app whose real primary is black.
+  const r = auditFiles([
+    { path: 'globals.css', content: ':root { --primary: 240 5.9% 10%; --sidebar-primary: 224.3 76.3% 48%; }' },
+    { path: 'a.tsx', content: '<button className="btn">Go</button>' },
+  ])
+  // Reading --sidebar-primary made two unrelated products report the same
+  // indigo. Silence is correct here: their primary genuinely is near-black.
+  assert.equal(r.inferredConfig.values.colorTheme, undefined)
+})
+
+test('a namespaced brand token still counts', () => {
+  const r = auditFiles([
+    { path: 'globals.css', content: ':root { --color-brand: #00C4B8; }' },
+    { path: 'a.tsx', content: '<button className="btn">Go</button>' },
+  ])
+  assert.equal(r.inferredConfig.values.colorTheme, 'teal')
+  assert.match(r.inferredConfig.confidence.colorThemeSource, /--color-brand/)
+})

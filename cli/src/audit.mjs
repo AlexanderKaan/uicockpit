@@ -836,6 +836,16 @@ function inferConfig(dims, palette, cssVars = {}) {
  *  goes ON it — usually near-white, and never the brand. */
 const BRAND_VAR = /^--?(?:[\w-]*?-)?(?:brand|primary|accent)$/i
 
+/* Component-SCOPED tokens that happen to end in a brand-ish word. shadcn ships
+ * every one of these with a default, and most apps never touch them — so
+ * `--sidebar-primary` is not a declaration of anything, it is the colour of one
+ * widget that came with the library. Reading it as a brand made two entirely
+ * different products report the same indigo, which is what gave it away.
+ *
+ * A prefix like `--color-` or `--app-` is a NAMESPACE and stays allowed; these
+ * are the fixed set of shadcn component scopes. */
+const SCOPED_VAR = /^--?(?:sidebar|card|popover|muted|destructive|input|ring|chart|border|secondary)-/i
+
 /**
  * A colour the codebase NAMED as its identity, which beats one it merely used
  * often. This matters more the better the codebase is: tokenise your brand
@@ -847,7 +857,7 @@ const BRAND_VAR = /^--?(?:[\w-]*?-)?(?:brand|primary|accent)$/i
 function pickNamedBrand(cssVars, palette) {
   const hits = []
   for (const [name, raw] of Object.entries(cssVars)) {
-    if (!BRAND_VAR.test(name)) continue
+    if (!BRAND_VAR.test(name) || SCOPED_VAR.test(name)) continue
     const value = deepResolveVar(raw, cssVars)
     const lab = toLab(value, palette)
     if (!lab) continue

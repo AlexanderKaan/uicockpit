@@ -91,6 +91,19 @@ export function parseColor(input, palette = null) {
     if (named && named !== s) return parseColor(named, null)
   }
 
+  /* shadcn/ui writes its tokens as BARE HSL components — `--primary: 95.08
+   * 71.08% 67.45%` — and wraps them at the point of use with hsl(var(--primary)).
+   * Without this, every shadcn codebase looks like it declares no brand at all:
+   * documenso's --primary (a lime green) failed to parse, so the scan fell
+   * through to --sidebar-primary and reported their product as indigo. Since
+   * shadcn is the dominant convention in exactly the codebases this tool is for,
+   * that one gap mis-read a whole class of app.
+   *
+   * The shape is specific enough to be safe: a hue number, then two percentages,
+   * nothing else. */
+  const bareHsl = s.match(/^(-?[\d.]+)(?:deg)?\s+(-?[\d.]+)%\s+(-?[\d.]+)%$/)
+  if (bareHsl) return parseColor(`hsl(${bareHsl[1]} ${bareHsl[2]}% ${bareHsl[3]}%)`, null)
+
   const ok = s.match(/^oklch\(([^)]+)\)$/)
   if (ok) {
     const p = ok[1].split(/[\s,/]+/).filter(Boolean)

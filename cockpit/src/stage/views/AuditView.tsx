@@ -44,6 +44,12 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
   const absentRest = allAbsent.slice(ABSENT_SHOWN).map((a) => a.spec.label)
 
   const nf = (n: number) => n.toLocaleString('en-US')
+  /* Did the scan actually find a brand? When it did not, everything below is
+   * wearing OUR colour, and the lede's "the kit your code implies" quietly
+   * becomes false. cal.com is the real case: a black product that declares no
+   * brand token and has no dominant literal — painting it cobalt and saying
+   * nothing would be us putting words in their app's mouth. */
+  const brandKnown = audit.provenance?.Brand?.confidence != null
 
   return (
     <div className="audv">
@@ -71,8 +77,14 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
       </div>
 
       <p className="audv__lede">
-        These are the components your codebase actually builds, on the kit your code implies. Change
-        anything on the left and this updates — it is the same live preview, pointed at your app.
+        {brandKnown ? (
+          <>These are the components your codebase actually builds, on the kit your code implies. Change
+          anything on the left and this updates — it is the same live preview, pointed at your app.</>
+        ) : (
+          <>These are the components your codebase actually builds. The <b>colour is ours, not yours</b> —
+          nothing in your code declared a brand and no single colour dominated enough to infer one. Set
+          Brand on the left and this becomes your app rather than our guess.</>
+        )}
       </p>
 
       <div className="audv__grid">

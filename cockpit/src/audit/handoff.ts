@@ -17,6 +17,7 @@ import type { Config, ColorTheme, Radius, Scale, TypeScale } from '../tokens/typ
  */
 
 const KEY = 'uicockpit.audit.handoff.v1'
+const REPORT_KEY = 'uicockpit.audit.report.v1'
 
 /** Which of the 19 controls the scan actually decided, and how sure it was. */
 export interface Provenance {
@@ -178,6 +179,29 @@ export function readHandoff(): AuditHandoff | null {
   }
 }
 
+/**
+ * The rendered report, kept for the tab's lifetime.
+ *
+ * "See the evidence →" used to land people back on the empty door and ask them
+ * to scan again — a link that promises a document and delivers a form. The
+ * report is ~120 KB against a ~5 MB budget, so keeping it costs nothing.
+ *
+ * It DOES contain their file paths, which the handoff deliberately excludes.
+ * That is not a contradiction: the handoff is the thing we hold while they work
+ * in the configurator, and the report is a document already rendered on their
+ * screen. Neither leaves the machine, and both die with the tab.
+ */
+export function saveReport(html: string): void {
+  try { sessionStorage.setItem(REPORT_KEY, html) } catch { /* over quota → the link just re-scans */ }
+}
+
+export function readReport(): string | null {
+  try { return sessionStorage.getItem(REPORT_KEY) } catch { return null }
+}
+
 export function clearHandoff(): void {
-  try { sessionStorage.removeItem(KEY) } catch { /* nothing to clear */ }
+  try {
+    sessionStorage.removeItem(KEY)
+    sessionStorage.removeItem(REPORT_KEY)
+  } catch { /* nothing to clear */ }
 }

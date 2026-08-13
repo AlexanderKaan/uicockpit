@@ -2411,17 +2411,12 @@
 }
 
 .mkt__final-doors { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-/* The final CTA sits on a dark band, where the ghost button's default border
- * disappears. Give it one that survives the inversion. */
-.mkt__final-doors .mkt-btn--ghost {
-  border-color: rgb(255 255 255 / 0.28);
-  color: #fff;
-  background: transparent;
-}
-.mkt__final-doors .mkt-btn--ghost:hover {
-  border-color: rgb(255 255 255 / 0.5);
-  background: rgb(255 255 255 / 0.08);
-}
+/* NO override here, deliberately. An earlier version painted this ghost button
+ * white-on-white for a dark band that does not exist — .mkt__final has no
+ * background at all, it sits on the page. The result was an invisible CTA on
+ * the page's most important click. The default .mkt-btn--ghost is already built
+ * for a light surface; anything added here has to earn it by being checked
+ * against the actual background. */
 
 
 /* === The tally — the before/after argument, as a headline ==================

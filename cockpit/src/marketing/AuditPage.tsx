@@ -5,7 +5,7 @@ import { MktFooter } from './MktFooter'
 import { auditFiles, renderReport } from '../audit/engine'
 import { readPickedFiles, loadVocabulary, type ScanResult } from '../audit/readFiles'
 import { ping } from '../analytics/beacon'
-import { saveHandoff, configFromAudit, provenanceFromAudit, derivedFromAudit } from '../audit/handoff'
+import { saveHandoff, saveReport, readReport, clearHandoff, configFromAudit, provenanceFromAudit, derivedFromAudit } from '../audit/handoff'
 import { encode } from '../state/hash'
 
 /**
@@ -26,7 +26,7 @@ import { encode } from '../state/hash'
  * the web report and the local file can never drift apart.
  */
 
-type Phase = 'door' | 'reading' | 'recognise' | 'findings'
+type Phase = 'door' | 'reading' | 'recognise' | 'findings' | 'kept'
 
 interface AuditState {
   result: ReturnType<typeof auditFiles>
@@ -34,7 +34,10 @@ interface AuditState {
 }
 
 export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
-  const [phase, setPhase] = useState<Phase>('door')
+  /* Someone arriving from the app's "See the evidence" link already has a
+   * report; show it instead of asking them to scan the same folder twice. */
+  const [kept] = useState<string | null>(() => readReport())
+  const [phase, setPhase] = useState<Phase>(() => (readReport() ? 'kept' : 'door'))
   const [state, setState] = useState<AuditState | null>(null)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -58,6 +61,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       const vocabulary = await loadVocabulary()
       const result = auditFiles(scan.files, { pkg: scan.pkg, vocabulary })
       setState({ result, scan })
+      saveReport(renderReport(result))
       // Counted as a milestone, not a click: a completed scan is the moment the
       // door stopped being a landing page. The value is a bucket, never the
       // score, the stack or anything else derived from their code.
@@ -136,6 +140,9 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
             onContinue={() => { ping('audit', 'findings'); setPhase('findings') }}
             onReset={reset}
           />
+        )}
+        {phase === 'kept' && kept && (
+          <KeptFindings html={kept} onReset={() => { clearHandoff(); reset() }} onBridge={() => navigate('/app')} />
         )}
         {phase === 'findings' && state && (
           <Findings result={state.result} onDownload={download} onReset={reset} onBridge={bridge} />
@@ -314,6 +321,32 @@ function Findings({
         sandbox=""
         srcDoc={html}
       />
+    </section>
+  )
+}
+
+
+/**
+ * A report carried over from the app.
+ *
+ * Same document, same frame — the only difference is that it arrives without a
+ * scan, so the actions differ: back to the kit they were tuning, or throw this
+ * audit away and start again.
+ */
+function KeptFindings({ html, onReset, onBridge }: { html: string; onReset: () => void; onBridge: () => void }) {
+  return (
+    <section className="aud__findings">
+      <div className="aud__findings-bar">
+        <div className="aud__actions">
+          <button type="button" className="mkt-btn mkt-btn--ghost" onClick={onReset}>
+            <RotateCcw size={15} strokeWidth={1.9} /> Scan another
+          </button>
+        </div>
+        <button type="button" className="mkt-btn mkt-btn--primary" onClick={onBridge}>
+          Back to my kit <ArrowRight size={16} strokeWidth={2} />
+        </button>
+      </div>
+      <iframe className="aud__frame" title="Your audit report" sandbox="" srcDoc={html} />
     </section>
   )
 }
