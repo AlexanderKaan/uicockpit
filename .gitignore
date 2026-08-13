@@ -77,6 +77,9 @@ bench/kit/
 /mcp-distribution.md
 /mcp-submit-checklist.md
 
+# Design mockups for the two-door IA — internal, not part of the shipped site
+/design-mockups/
+
 # `uicockpit audit` (the retroactive layer) — build briefing + heuristic, plus the
 # commercial/open-core layer. Internal deliberation and pricing strategy; the
 # public repo stays scrubbed of both.
