@@ -7,6 +7,7 @@ import { nameColor } from '../tokens/color'
 import { COLOR_THEMES } from '../tokens/stylesAndThemes'
 import { applyHarmonyPreset } from '../tokens/harmony'
 import type { ColorTheme, Config, Harmony, Tokens } from '../tokens/types'
+import type { ProvenanceState } from '../audit/handoff'
 import type { ConfigAction } from '../state/configReducer'
 import { FontPicker } from './FontPicker'
 import {
@@ -19,6 +20,10 @@ import {
 
 interface PanelProps {
   cfg: Config
+  /** Row label → where its value came from, when the visitor arrived from an
+   *  audit. Absent labels say nothing, which is right for the controls the scan
+   *  never looks at — silence beats a badge that means "we didn't check". */
+  provenance?: Record<string, ProvenanceState>
   tokens: Tokens
   dispatch: Dispatch<ConfigAction>
   /** Collapse the floating menu — drops back to the full-width preview. */
@@ -205,7 +210,22 @@ interface RowDef {
 }
 
 
-export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset, lockedKeys, onToggleLock, rootRef, gripRef }: PanelProps) {
+/**
+ * Where a control's value came from, under its label.
+ *
+ * Three states, and the third is the one that matters: once the visitor drags a
+ * control somewhere else it is no longer what their code said, so the badge
+ * stops claiming it. A provenance marker that outlives its evidence is worse
+ * than none — it turns an honest signal into decoration.
+ */
+function Provenance({ state }: { state?: ProvenanceState }) {
+  if (!state) return null
+  if (state === 'derived') return <span className="fmrow__prov">from your code</span>
+  if (state === 'changed') return <span className="fmrow__prov fmrow__prov--changed">you changed this</span>
+  return <span className="fmrow__prov fmrow__prov--default">your code didn&rsquo;t decide this</span>
+}
+
+export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset, lockedKeys, onToggleLock, rootRef, gripRef, provenance }: PanelProps) {
   // Already on the curated default? → dim the Reset button (nothing to undo to).
   const atDefault = (Object.keys(DEFAULT_CONFIG) as (keyof Config)[]).every((k) => cfg[k] === DEFAULT_CONFIG[k])
   const set = <K extends keyof Config>(field: K, value: Config[K]) =>
@@ -551,7 +571,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
                 )}
                 {inline ? (
                   <div className={`fmrow__inline ${r.stack ? 'fmrow__inline--stack' : ''}`}>
-                    <span className="fmrow__label">{r.label}</span>
+                    <span className="fmrow__label">{r.label}<Provenance state={provenance?.[r.label]} /></span>
                     {r.kind === 'slider' ? (
                       <Slider opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
                     ) : (
@@ -566,7 +586,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
                       onClick={() => setOpenKey((k) => (k === r.key ? null : r.key))}
                       aria-expanded={openKey === r.key}
                     >
-                      <span className="fmrow__label">{r.label}</span>
+                      <span className="fmrow__label">{r.label}<Provenance state={provenance?.[r.label]} /></span>
                       <span className="fmrow__val" title={r.value}>
                         {r.dot && <span className="fmrow__dot fmrow__dot--viz">{r.dot}</span>}
                         <span className="fmrow__val-text">{r.value}</span>

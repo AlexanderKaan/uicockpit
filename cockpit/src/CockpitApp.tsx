@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type
 import { buildTokens } from './tokens/buildTokens'
 import { Panel } from './panel/Panel'
 import { Stage, type StageMode } from './stage/Stage'
-import { readHandoff, type AuditHandoff } from './audit/handoff'
+import { readHandoff, provenanceState, type AuditHandoff } from './audit/handoff'
 import { Topbar } from './stage/Topbar'
 import { MobileControlBar } from './stage/MobileControlBar'
 import { CommandPalette } from './stage/CommandPalette'
@@ -232,6 +232,7 @@ export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
       <div className="app__body">
         {menuOpen && (
           <Panel
+        provenance={provenanceState(cfg as unknown as Record<string, unknown>, audit)}
             cfg={cfg}
             tokens={tokens}
             dispatch={dispatch}

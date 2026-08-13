@@ -38,7 +38,14 @@ export interface AuditHandoff {
   singletons: number
   score: number | null
   provenance: Record<string, Provenance>
+  /** The config fields the scan actually set. Kept so the app can tell whether
+   *  a control STILL says what their code said — the moment they drag it
+   *  somewhere else, "from your code" stops being true and must stop claiming
+   *  to be. A badge that outlives its evidence is worse than no badge. */
+  derived: Partial<Record<DerivedKey, string>>
 }
+
+export type DerivedKey = 'colorTheme' | 'radius' | 'scale' | 'typeScale'
 
 /* The audit's own vocabulary → the panel control it maps to, so the app can say
  * "this control came from your code" against the right row. */
@@ -48,6 +55,38 @@ const CONTROL_LABEL: Record<string, string> = {
   scale: 'Scale',
   typeScale: 'Text size',
   elevation: 'Elevation',
+}
+
+/** Config fields the scan can set, and the panel row each one drives. */
+export const DERIVED_FIELDS: Array<{ key: DerivedKey; label: string }> = [
+  { key: 'colorTheme', label: 'Brand' },
+  { key: 'radius', label: 'Box radius' },
+  { key: 'scale', label: 'Scale' },
+  { key: 'typeScale', label: 'Text size' },
+]
+
+/** What a panel row should say about where its value came from. */
+export type ProvenanceState = 'derived' | 'changed' | 'default'
+
+/**
+ * Compare the live config against what the scan derived.
+ *
+ * Done here rather than in the panel because the panel renders DISPLAY strings
+ * ("Teal", "Soft") while the audit speaks config values — matching those two by
+ * eye is exactly the sort of thing that works until someone renames a label.
+ */
+export function provenanceState(
+  cfg: Record<string, unknown>,
+  audit: AuditHandoff | null,
+): Record<string, ProvenanceState> {
+  if (!audit) return {}
+  const out: Record<string, ProvenanceState> = {}
+  for (const { key, label } of DERIVED_FIELDS) {
+    const was = audit.derived[key]
+    if (was == null) { out[label] = 'default'; continue }
+    out[label] = String(cfg[key]) === was ? 'derived' : 'changed'
+  }
+  return out
 }
 
 export interface RawInferred {
@@ -87,6 +126,19 @@ export function configFromAudit(inferred: RawInferred): Config {
 
 /** Which panel rows to badge, and how. Rows absent from this map say nothing —
  *  silence is correct for the controls the audit never looks at. */
+/** The values the scan committed to, as strings, for the comparison above. */
+export function derivedFromAudit(inferred: RawInferred): Partial<Record<DerivedKey, string>> {
+  const cfg = configFromAudit(inferred) as unknown as Record<string, unknown>
+  const v = inferred.values || {}
+  const out: Partial<Record<DerivedKey, string>> = {}
+  for (const { key } of DERIVED_FIELDS) {
+    // Only record what the ENGINE set — a field it declined to infer is our
+    // default, and must not be badged as theirs.
+    if (v[key] != null) out[key] = String(cfg[key])
+  }
+  return out
+}
+
 export function provenanceFromAudit(inferred: RawInferred): Record<string, Provenance> {
   const values = (inferred.values || {}) as Record<string, unknown>
   const conf = inferred.confidence || {}

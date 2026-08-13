@@ -1001,3 +1001,26 @@
      instead of stretching the segmented strips across the whole width. */
   .fmenu { max-width: 620px; margin-inline: auto; }
 }
+
+/* === Provenance — where a control's value came from ========================
+ * Only present when the visitor arrived from an audit. Sits UNDER the label,
+ * not beside it: the value column is already tight and a badge next to the
+ * label squeezed sliders and segmented controls into unreadable stubs.
+ *
+ * Deliberately quiet type. This is a footnote on a control, not a status the
+ * eye should keep returning to — the controls stay the subject. */
+.fmrow__label { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.fmrow__prov {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1.2;
+  color: var(--app-fg-muted);
+}
+/* Green reads as "verified", which is exactly the claim: your code said this. */
+.fmrow__prov { color: #0f766e; }
+/* Amber, because it is an open question rather than a problem — the codebase
+   never settled this and the choice is genuinely theirs. */
+.fmrow__prov--default { color: #a16207; }
+/* Neutral once they take over: no longer evidence, just history. */
+.fmrow__prov--changed { color: var(--app-fg-faint); font-weight: 500; }

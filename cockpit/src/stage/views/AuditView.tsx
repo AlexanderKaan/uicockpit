@@ -31,10 +31,17 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
     const spec = SPECIMENS[k]
     return spec ? [{ kind: k, n, spec }] : []
   })
-  const absent = entries.flatMap(([k, n]) => {
+  const allAbsent = entries.flatMap(([k, n]) => {
     const spec = SPECIMENS[k]
     return n === 0 && spec ? [{ kind: k, spec }] : []
   })
+  /* Absent kinds belong on the wall — a grid of only what we found reads as a
+   * complete inventory. But past a handful they stop being a finding and start
+   * being the whole picture: a small app then looks like a broken tool rather
+   * than a small app. Show a few, count the rest in words. */
+  const ABSENT_SHOWN = 5
+  const absent = allAbsent.slice(0, ABSENT_SHOWN)
+  const absentRest = allAbsent.slice(ABSENT_SHOWN).map((a) => a.spec.label)
 
   const nf = (n: number) => n.toLocaleString('en-US')
 
@@ -94,8 +101,11 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
         ))}
       </div>
 
-      {(undrawable.length > 0 || NO_SPECIMEN.length > 0) && (
+      {(undrawable.length > 0 || absentRest.length > 0 || NO_SPECIMEN.length > 0) && (
         <p className="audv__foot">
+          {absentRest.length > 0 && (
+            <>Also not found in your code: <b>{absentRest.join(', ')}</b>. </>
+          )}
           {undrawable.length > 0 && (
             <>Your code also builds <b>{undrawable.join(', ')}</b> — the kit ships those, this view
             cannot draw them yet. </>
