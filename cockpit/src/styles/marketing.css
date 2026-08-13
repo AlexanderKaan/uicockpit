@@ -2234,18 +2234,23 @@
  * work. ~850ms total — long enough to register, short enough to click again. */
 .mkt__sweep { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
 .mkt__sweep::before {
-  content: ""; position: absolute; left: -25%; right: -25%; height: 34%; top: -40%;
-  transform: skewY(-2.5deg); filter: blur(12px);
-  background: linear-gradient(180deg, rgb(255 255 255 / 0) 0%, rgb(255 255 255 / .55) 32%,
+  content: ""; position: absolute; top: -25%; bottom: -25%; width: 38%;
+  transform: skewX(-13deg); filter: blur(12px);
+  background: linear-gradient(90deg, rgb(255 255 255 / 0) 0%, rgb(255 255 255 / .55) 32%,
     rgb(255 255 255 / .98) 50%, rgb(255 255 255 / .55) 68%, rgb(255 255 255 / 0) 100%);
-  animation: mkt-sweep 1s cubic-bezier(.32,.06,.22,1) forwards;
+  animation-duration: 1s; animation-timing-function: cubic-bezier(.32,.06,.22,1);
+  animation-fill-mode: forwards;
 }
+/* The light leaves from the side the switch came from. */
+.mkt__sweep--ltr::before { left: -45%; animation-name: mkt-sweep-ltr }
+.mkt__sweep--rtl::before { left: 107%; animation-name: mkt-sweep-rtl }
+@keyframes mkt-sweep-ltr { to { left: 107% } }
+@keyframes mkt-sweep-rtl { to { left: -45% } }
 /* A short bloom over everything, so the whole frame lifts as the light passes. */
 .mkt__sweep::after {
   content: ""; position: absolute; inset: 0; background: #fff; opacity: 0;
   animation: mkt-bloom 1s ease-out forwards;
 }
-@keyframes mkt-sweep { to { top: 118%; } }
 @keyframes mkt-bloom { 0% { opacity: 0 } 16% { opacity: .30 } 100% { opacity: 0 } }
 
 /* The wave. Cards animate what CAN animate — border, surface, shadow — and the

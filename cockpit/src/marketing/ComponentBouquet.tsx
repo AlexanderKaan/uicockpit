@@ -43,27 +43,33 @@ export function ComponentBouquet() {
   // A light sweeps across at the moment of the switch. It is not decoration: the
   // cards resolve in a staggered wave underneath it, so the light reads as the
   // thing DOING the change rather than a flourish played afterwards.
-  const [sweep, setSweep] = useState(false)
+  // Which way the light is travelling, or null when it is not. The direction
+  // mirrors the toggle: flipping right sweeps right, flipping back sweeps back,
+  // so the light reads as following your hand rather than playing at it.
+  const [sweepDir, setSweepDir] = useState<'ltr' | 'rtl' | null>(null)
   const wallRef = useRef<HTMLDivElement>(null)
 
   /**
    * Delays are measured, not guessed. The wall is a masonry, so DOM order is not
    * visual order — an nth-child stagger would wave diagonally and look like a
-   * glitch. Reading each card's real vertical position makes the light and the
-   * resolve travel together, at any column count.
+   * glitch. Reading each card's real x makes the light and the resolve travel
+   * together, in whichever direction the switch just moved.
    */
-  const resolve = () => {
+  const setMode = (nextDrift: boolean) => {
+    const dir: 'ltr' | 'rtl' = nextDrift ? 'rtl' : 'ltr'
     const root = wallRef.current
     if (root) {
       const box = root.getBoundingClientRect()
       root.querySelectorAll<HTMLElement>('.gallery > .card').forEach((card) => {
-        const rel = (card.getBoundingClientRect().top - box.top) / Math.max(1, box.height)
-        card.style.transitionDelay = `${Math.round(Math.min(1, Math.max(0, rel)) * 460)}ms`
+        const r = card.getBoundingClientRect()
+        const rel = (r.left + r.width / 2 - box.left) / Math.max(1, box.width)
+        const t = dir === 'ltr' ? rel : 1 - rel
+        card.style.transitionDelay = `${Math.round(Math.min(1, Math.max(0, t)) * 380)}ms`
       })
     }
-    setSweep(true)
-    setDrift(false)
-    window.setTimeout(() => setSweep(false), 1050)
+    setSweepDir(dir)
+    setDrift(nextDrift)
+    window.setTimeout(() => setSweepDir(null), 1050)
   }
 
   // Mount the gallery ONCE. Memoised, so resolving the system re-tints via the
@@ -107,7 +113,7 @@ export function ComponentBouquet() {
             role="radio"
             aria-checked={drift}
             className={`mkt__switch-opt${drift ? ' is-on' : ''}`}
-            onClick={() => setDrift(true)}
+            onClick={() => setMode(true)}
           >
             Without UIcockpit
           </button>
@@ -116,7 +122,7 @@ export function ComponentBouquet() {
             role="radio"
             aria-checked={!drift}
             className={`mkt__switch-opt${drift ? '' : ' is-on'}`}
-            onClick={resolve}
+            onClick={() => setMode(false)}
           >
             With UIcockpit
           </button>
@@ -125,7 +131,7 @@ export function ComponentBouquet() {
         <p className="mkt__resolve-sub">the components never changed — only the system did</p>
       </div>
 
-      {sweep && <span className="mkt__sweep" aria-hidden="true" />}
+      {sweepDir && <span className={`mkt__sweep mkt__sweep--${sweepDir}`} aria-hidden="true" />}
     </div>
   )
 }
