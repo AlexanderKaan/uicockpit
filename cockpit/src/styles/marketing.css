@@ -2127,8 +2127,13 @@
  * should not need scrolling to find.                                           */
 /* A halo that pulls the eye off the busy wall and onto the one control. The
  * wall stays legible at the edges — the chaos IS the argument — but everything
- * within arm's reach of the button is quietened so the button reads first. */
-.mkt__bouquet--drift + .mkt__resolve::before{content:"";position:absolute;
+ * within arm's reach of the control is quietened so it reads first.
+ *
+ * In BOTH states. It used to be drift-only, so the panel arrived with a white
+ * pool around it and then lost it on the very flip it was there to announce —
+ * the one control on the page changing presence depending on which side it is
+ * showing. A control should sit still while the thing it controls moves. */
+.mkt__resolve::before{content:"";position:absolute;
   left:50%;top:50%;transform:translate(-50%,-50%);width:190%;height:340%;
   border-radius:50%;z-index:-1;pointer-events:none;
   background:radial-gradient(closest-side,
@@ -2140,9 +2145,13 @@
   /* A real edge, not just a shadow. The panel sits on a pale wall, so without a
      border its own white dissolved into the background and only the drop shadow
      held it — which reads as a smudge rather than a surface. */
-  border:1px solid rgb(0 0 0/.14);
-  box-shadow:0 30px 70px -18px rgb(0 0 0/.35),
-             0 0 0 9px rgb(255 255 255/.55);
+  /* Two edges, because one is not enough on a wall this busy: a hairline that
+     holds the shape against pale cards, and a wider white ring that separates
+     it from dark or saturated ones. */
+  border:1px solid rgb(0 0 0/.16);
+  box-shadow:0 30px 70px -18px rgb(0 0 0/.38),
+             0 0 0 1px rgb(0 0 0/.05),
+             0 0 0 10px rgb(255 255 255/.72);
   animation:mkt-resolve-in .5s .25s cubic-bezier(.2,.8,.3,1) both;
   transition:opacity .4s, transform .4s}
 @keyframes mkt-resolve-in{from{opacity:0;transform:translate(-50%,-42%) scale(.96)}
