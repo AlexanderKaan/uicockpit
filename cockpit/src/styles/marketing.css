@@ -2072,48 +2072,88 @@
   color: var(--k-fg);
 }
 
-/* ── Hero drift state ────────────────────────────────────────────────────────
- * Hovering the Audit door pulls the SAME mounted wall apart: every few cards
- * gets a radius, an accent and a shadow nobody chose together. Hovering
- * Configure clicks it back. One slot, two states — the product argument made
- * without a sentence.
+/* ── Hero drift — the "before" the page opens on ─────────────────────────────
+ * The wall STARTS like this: nine accents that fight each other, radii from
+ * square to pill, shadows nobody chose together. It is what an app looks like
+ * with no contract, and it is what most visitors arrive with. One button
+ * resolves the whole thing.
  *
- * ONLY height-neutral variables are varied. Padding and type would change card
- * heights, and the masonry computes each card's `grid-row-end` from its measured
- * height, so varying those would force a relayout mid-hover — the exact stall
- * that cost us a fix in the configurator. Radius, colour and shadow are free.  */
-.mkt__bouquet--drift .gallery > .card {
-  transition: --k-radius-md .35s, box-shadow .35s;
+ * ONLY height-neutral variables are varied — colour, radius, shadow, border.
+ * Padding and type would change card heights, and the masonry derives each
+ * card's `grid-row-end` from its measured height, so those would force a
+ * relayout on the click. Verified: heights are identical in both states, so the
+ * transition is a pure repaint.                                                */
+.mkt__bouquet--drift .gallery > .card,
+.mkt__bouquet .gallery > .card {
+  transition: box-shadow .45s cubic-bezier(.2,.7,.3,1), border-color .45s;
 }
 @media (prefers-reduced-motion: reduce) {
-  .mkt__bouquet--drift .gallery > .card { transition: none; }
+  .mkt__bouquet .gallery > .card { transition: none; }
 }
-/* Six recurring "decisions" — three accents that do not agree, radii from
-   almost-square to almost-pill, shadows from flat to heavy. */
-.mkt__bouquet--drift .gallery > .card:nth-child(6n + 1) {
-  --k-radius-md: 3px; --k-radius-sm: 2px; --k-radius-lg: 4px; --k-radius-button: 3px;
-  --k-shadow-sm: 0 1px 1px rgb(0 0 0 / .10);
-}
-.mkt__bouquet--drift .gallery > .card:nth-child(6n + 2) {
-  --k-radius-md: 14px; --k-radius-sm: 12px; --k-radius-lg: 18px; --k-radius-button: 999px;
-  --k-accent: #18a377; --k-accent-1: #18a377;
-}
-.mkt__bouquet--drift .gallery > .card:nth-child(6n + 3) {
-  --k-radius-md: 7px; --k-radius-sm: 7px; --k-radius-lg: 7px; --k-radius-button: 7px;
-  --k-shadow-sm: 0 6px 16px rgb(0 0 0 / .28); --k-shadow-md: 0 10px 26px rgb(0 0 0 / .30);
-}
-.mkt__bouquet--drift .gallery > .card:nth-child(6n + 4) {
-  --k-radius-md: 22px; --k-radius-sm: 16px; --k-radius-lg: 26px; --k-radius-button: 22px;
-  --k-accent: #4c86ef; --k-accent-1: #4c86ef;
-}
-.mkt__bouquet--drift .gallery > .card:nth-child(6n + 5) {
-  --k-radius-md: 0px; --k-radius-sm: 0px; --k-radius-lg: 0px; --k-radius-button: 0px;
-  --k-accent: #2fae83; --k-accent-1: #2fae83; --k-shadow-sm: none; --k-shadow-md: none;
-}
-.mkt__bouquet--drift .gallery > .card:nth-child(6n) {
-  --k-radius-md: 10px; --k-radius-sm: 4px; --k-radius-lg: 16px; --k-radius-button: 14px;
-  --k-accent: #1d4fb0; --k-accent-1: #1d4fb0;
-}
+
+/* Nine buckets. The colours are deliberately un-harmonised — this is the point. */
+.mkt__bouquet--drift .gallery > .card:nth-child(9n+1){
+  --k-accent:#e11d48;--k-accent-1:#e11d48;--k-accent-1-ink:#fff;
+  --k-radius-md:2px;--k-radius-sm:2px;--k-radius-lg:2px;--k-radius-button:2px;
+  --k-shadow-sm:none;--k-shadow-md:none;--k-border:#e11d48;--k-surface:color-mix(in oklab, #e11d48 5%, #fff)}
+.mkt__bouquet--drift .gallery > .card:nth-child(9n+2){
+  --k-accent:#16a34a;--k-accent-1:#16a34a;--k-accent-1-ink:#fff;
+  --k-radius-md:20px;--k-radius-sm:16px;--k-radius-lg:24px;--k-radius-button:999px;
+  --k-shadow-sm:0 8px 22px rgb(0 0 0/.20);--k-border:#16a34a;--k-surface:color-mix(in oklab, #16a34a 5%, #fff)}
+.mkt__bouquet--drift .gallery > .card:nth-child(9n+3){
+  --k-accent:#f59e0b;--k-accent-1:#f59e0b;--k-accent-1-ink:#1a1206;
+  --k-radius-md:6px;--k-radius-sm:10px;--k-radius-lg:3px;--k-radius-button:14px;
+  --k-shadow-sm:0 1px 0 rgb(0 0 0/.30);--k-border:#f59e0b;--k-surface:color-mix(in oklab, #f59e0b 5%, #fff)}
+.mkt__bouquet--drift .gallery > .card:nth-child(9n+4){
+  --k-accent:#7c3aed;--k-accent-1:#7c3aed;--k-accent-1-ink:#fff;
+  --k-radius-md:26px;--k-radius-sm:4px;--k-radius-lg:26px;--k-radius-button:8px;
+  --k-shadow-sm:0 14px 34px rgb(0 0 0/.24);--k-border:#7c3aed;--k-surface:color-mix(in oklab, #7c3aed 5%, #fff)}
+.mkt__bouquet--drift .gallery > .card:nth-child(9n+5){
+  --k-accent:#0891b2;--k-accent-1:#0891b2;--k-accent-1-ink:#fff;
+  --k-radius-md:0px;--k-radius-sm:0px;--k-radius-lg:0px;--k-radius-button:0px;
+  --k-shadow-sm:none;--k-border:#0891b2;--k-surface:color-mix(in oklab, #0891b2 5%, #fff)}
+.mkt__bouquet--drift .gallery > .card:nth-child(9n+6){
+  --k-accent:#db2777;--k-accent-1:#db2777;--k-accent-1-ink:#fff;
+  --k-radius-md:12px;--k-radius-sm:2px;--k-radius-lg:18px;--k-radius-button:999px;
+  --k-shadow-sm:0 3px 6px rgb(0 0 0/.18);--k-border:#db2777;--k-surface:color-mix(in oklab, #db2777 5%, #fff)}
+.mkt__bouquet--drift .gallery > .card:nth-child(9n+7){
+  --k-accent:#65a30d;--k-accent-1:#65a30d;--k-accent-1-ink:#fff;
+  --k-radius-md:4px;--k-radius-sm:18px;--k-radius-lg:8px;--k-radius-button:4px;
+  --k-shadow-sm:0 10px 18px rgb(0 0 0/.14);--k-border:#65a30d;--k-surface:color-mix(in oklab, #65a30d 5%, #fff)}
+.mkt__bouquet--drift .gallery > .card:nth-child(9n+8){
+  --k-accent:#4f46e5;--k-accent-1:#4f46e5;--k-accent-1-ink:#fff;
+  --k-radius-md:18px;--k-radius-sm:6px;--k-radius-lg:10px;--k-radius-button:26px;
+  --k-shadow-sm:0 2px 3px rgb(0 0 0/.22);--k-border:#4f46e5;--k-surface:color-mix(in oklab, #4f46e5 5%, #fff)}
+.mkt__bouquet--drift .gallery > .card:nth-child(9n){
+  --k-accent:#c2410c;--k-accent-1:#c2410c;--k-accent-1-ink:#fff;
+  --k-radius-md:9px;--k-radius-sm:22px;--k-radius-lg:2px;--k-radius-button:9px;
+  --k-shadow-sm:0 6px 30px rgb(0 0 0/.26);--k-border:#c2410c;--k-surface:color-mix(in oklab, #c2410c 5%, #fff)}
+
+/* ── The one conversion — floats over the wall ───────────────────────────────
+ * Over it, not below it: the wall is the argument, so the thing that answers it
+ * should not need scrolling to find.                                           */
+.mkt__resolve{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);
+  z-index:4;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:26px 30px;border-radius:16px;pointer-events:auto;
+  background:color-mix(in oklab, var(--mkt-bg,#fff) 88%, transparent);
+  backdrop-filter:blur(10px) saturate(1.1);
+  box-shadow:0 20px 60px rgb(0 0 0/.14), 0 0 0 1px rgb(0 0 0/.05);
+  transition:opacity .4s, transform .4s}
+.mkt__resolve-lead{margin:0;font-size:15.5px;color:var(--mkt-fg-muted,#6b6b76)}
+.mkt__resolve-lead b{color:var(--mkt-fg,#16161a);font-weight:600}
+.mkt__resolve-btn{border:0;cursor:pointer;font:600 17px/1 inherit;letter-spacing:-.01em;
+  padding:16px 30px;border-radius:11px;background:var(--mkt-fg,#16161a);color:var(--mkt-bg,#fff);
+  transition:transform .18s, filter .18s}
+.mkt__resolve-btn:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.mkt__resolve-sub{margin:0;font-size:12.5px;color:var(--mkt-fg-faint,#9096a1)}
+.mkt__resolve.is-done{top:auto;bottom:16px;transform:translate(-50%,0);padding:0;
+  background:none;backdrop-filter:none;box-shadow:none}
+.mkt__resolve-again{border:0;background:none;cursor:pointer;font:400 13px/1 inherit;
+  color:var(--mkt-fg-faint,#9096a1);padding:8px 12px;text-decoration:underline;
+  text-underline-offset:3px}
+.mkt__resolve-again:hover{color:var(--mkt-fg-muted,#6b6b76)}
+@media (max-width:640px){.mkt__resolve{top:26%;padding:20px 18px}
+  .mkt__resolve-btn{font-size:15px;padding:14px 22px}}
 
 /* ── Hero fork — the two doors ───────────────────────────────────────────────
  * Audit sits FIRST: more visitors have a codebase than don't, and it is the half

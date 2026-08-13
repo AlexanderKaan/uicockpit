@@ -1,5 +1,5 @@
 import { Sparkles, Palette, FileCode2, BarChart3, ShieldCheck, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
 import { LoopAnimation } from './LoopAnimation'
 import { MktDriftBench } from './MktDriftBench'
@@ -71,8 +71,6 @@ function HeroDotGrid() {
  * the onLaunch prop (parent-managed client-side routing — no React Router).
  */
 export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
-  // Which door the visitor is considering — drives the wall's two states.
-  const [drift, setDrift] = useState(false)
   return (
     <div className="mkt">
       <MktNav navigate={navigate} />
@@ -92,16 +90,12 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             <strong>framework-neutral tokens + components</strong> behind one link. Then hand it
             to your AI — a checker keeps every new screen on it, instead of drifting back to generic.
           </p>
-          {/* Two doors. Hovering one previews its world in the wall below: Audit
-              pulls the same components apart, Configure clicks them together. */}
+          {/* Two doors — navigation only. The wall below carries its own single
+              control, because one click should do the whole demonstration. */}
           <div className="mkt__fork">
             <button
               type="button"
               className="mkt__door mkt__door--audit"
-              onMouseEnter={() => setDrift(true)}
-              onMouseLeave={() => setDrift(false)}
-              onFocus={() => setDrift(true)}
-              onBlur={() => setDrift(false)}
               onClick={() => navigate('/audit')}
             >
               <span className="mkt__door-tag">Audit</span>
@@ -115,8 +109,6 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             <button
               type="button"
               className="mkt__door mkt__door--make"
-              onMouseEnter={() => setDrift(false)}
-              onFocus={() => setDrift(false)}
               onClick={onLaunch}
             >
               <span className="mkt__door-tag">Configure</span>
@@ -133,7 +125,7 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             edges dissolved by a CSS mask. It IS the live component library (built by
             the token engine), so it can never drift from the actual components. */}
         <div className="mkt__showcase">
-          <ComponentBouquet drift={drift} />
+          <ComponentBouquet />
         </div>
       </section>
 

@@ -1,14 +1,23 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { IconProvider } from '../icons/Icon'
 import { ComponentGallery } from '../stage/views/ComponentGallery'
 import { buildTokens } from '../tokens/buildTokens'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
-import { applyColorTheme, COLOR_THEMES } from '../tokens/stylesAndThemes'
-import type { ColorTheme } from '../tokens/types'
+import { applyColorTheme } from '../tokens/stylesAndThemes'
 
 /**
  * Hero "bouquet" — the REAL <ComponentGallery/> (the exact wall the configurator
- * shows) rendered full-bleed behind the landing, wearing a UIcockpit brand colour.
+ * shows) rendered full-bleed behind the landing.
+ *
+ * ── The one interaction on this page ─────────────────────────────────────────
+ * It STARTS broken. Every card wears a decision nobody made: nine accents that
+ * fight, radii from square to pill, shadows that were never chosen together.
+ * That is what an app looks like without a contract, and it is what most
+ * visitors arrive with.
+ *
+ * One button sits over it. Click, and the whole wall resolves into a single
+ * system in one motion. No configuring, no reading — the product demonstrated
+ * in a second, which is the only pitch that survives a five-second visit.
  *
  * Why this instead of a hand-built showcase: it IS the live component library,
  * built by the real token engine — so it can never drift from the actual
@@ -22,65 +31,17 @@ import type { ColorTheme } from '../tokens/types'
  * Performance: the wall is capped to the first `limit` cards (the hero only shows
  * the top), so the ~47 cards below the fade never mount.
  */
-const SWITCH_THEMES: ColorTheme[] = ['cobalt', 'sky', 'jade', 'violet', 'ember', 'rose', 'mono']
 const BASE = DEFAULT_CONFIG
 
-/* Pre-bake the --k-* var set for every switchable theme — pure, computed once at
- * module load — so clicking a swatch is just a style swap (no token recompute). */
-const THEME_VARS: Record<string, CSSProperties> = Object.fromEntries(
-  SWITCH_THEMES.map((t) => [t, buildTokens(applyColorTheme(BASE, t)).vars as CSSProperties]),
-)
+/* One pre-baked --k-* set: the resolved system the button snaps to. Computed
+ * once at module load, so the click is a style swap and nothing more. */
+const SYSTEM_VARS = buildTokens(applyColorTheme(BASE, 'cobalt')).vars as CSSProperties
 
-/**
- * `drift` — the hero's second state. Hovering the Audit door takes the SAME
- * mounted wall and pulls its decisions apart: mismatched radii, three accents
- * that don't agree, shadows that were never chosen together. Hovering Configure
- * clicks it back into one system.
- *
- * Only HEIGHT-NEUTRAL variables are varied (radius · colour · shadow). Padding
- * and type would change card heights, and the masonry derives each card's
- * `grid-row-end` from its measured height — so those would force a relayout on
- * hover, which is exactly the stall we fixed once already.
- *
- * It is a DEMONSTRATION, not a measurement: these are our own components shown
- * with and without a contract. The measured article — a real wall from a real
- * repo, with its real numbers — lives in its own section further down the page.
- */
-export function ComponentBouquet({ drift = false }: { drift?: boolean } = {}) {
-  const [theme, setTheme] = useState<ColorTheme>('cobalt')
-  const [userPicked, setUserPicked] = useState(false) // a manual pick takes over for good
-  const [hovering, setHovering] = useState(false)      // pause while the visitor inspects
-  const [inView, setInView] = useState(false)          // only morph while the block is on screen
-  const wrapRef = useRef<HTMLDivElement>(null)
+export function ComponentBouquet() {
+  // Starts BROKEN on purpose — the drift is the before, not an easter egg.
+  const [drift, setDrift] = useState(true)
 
-  // Only cycle while the hero is actually in view. Otherwise it keeps advancing
-  // off-screen and a visitor who scrolls back up lands on a colour that changed
-  // behind their back (the "unexpected jump"). Pausing off-screen means they
-  // return to the exact colour they left, and it resumes morphing as they watch.
-  useEffect(() => {
-    const el = wrapRef.current
-    if (!el || typeof IntersectionObserver === 'undefined') { setInView(true); return }
-    const io = new IntersectionObserver(([e]) => setInView(!!e?.isIntersecting), { threshold: 0.15 })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
-  // Auto-morph (C6) — practice-what-you-preach: the hero cycles the kit through its
-  // brand colours on its own, so a visitor SEES "your kit, any colour" without
-  // touching anything. Runs only while in view; stops the moment they take control
-  // (pick) or hover to read, and never under prefers-reduced-motion. Dots advance
-  // with it; the wall crossfades between colours (see .mkt__bouquet--morphing).
-  const autoMorph = !userPicked && !hovering && inView && !drift
-  useEffect(() => {
-    if (!autoMorph) return
-    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
-    const id = setInterval(() => {
-      setTheme((cur) => SWITCH_THEMES[(SWITCH_THEMES.indexOf(cur) + 1) % SWITCH_THEMES.length]!)
-    }, 2800)
-    return () => clearInterval(id)
-  }, [autoMorph])
-
-  // Mount the gallery ONCE. Memoised, so switching themes re-tints via the
+  // Mount the gallery ONCE. Memoised, so resolving the system re-tints via the
   // wrapper's CSS vars without re-rendering / re-laying-out the 34 cards.
   const gallery = useMemo(
     () => (
@@ -92,37 +53,44 @@ export function ComponentBouquet({ drift = false }: { drift?: boolean } = {}) {
   )
 
   return (
-    <div
-      ref={wrapRef}
-      className="mkt__bouquet-wrap"
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
-    >
+    <div className="mkt__bouquet-wrap">
       <div
-        className={`cockpit-preview mkt__bouquet${autoMorph ? ' mkt__bouquet--morphing' : ''}${drift ? ' mkt__bouquet--drift' : ''}`}
-        style={THEME_VARS[theme]}
+        className={`cockpit-preview mkt__bouquet${drift ? ' mkt__bouquet--drift' : ''}`}
+        style={SYSTEM_VARS}
         role="region"
-        aria-label="Interactive component preview — try the controls, then re-tint with the brand colours below"
+        aria-label={drift
+          ? 'The same components without a design system — inconsistent on purpose'
+          : 'The same components on one design system'}
       >
         {gallery}
       </div>
 
-      {/* Colour switcher sits BELOW the wall — the wall dissolves into it, and
-          it's out of the busy CTA zone up top. */}
-      <div className="mkt__theme-switch" role="radiogroup" aria-label="Preview a brand colour">
-        <span className="mkt__theme-switch-label">Brand colour</span>
-        {SWITCH_THEMES.map((t) => (
+      {/* The conversion. Sits over the wall because the wall IS the argument —
+          you should not have to scroll to find the thing that fixes it. */}
+      <div className={`mkt__resolve${drift ? '' : ' is-done'}`}>
+        {drift ? (
+          <>
+            <p className="mkt__resolve-lead">
+              34 components. No system. <b>Sound familiar?</b>
+            </p>
+            <button
+              type="button"
+              className="mkt__resolve-btn"
+              onClick={() => setDrift(false)}
+            >
+              Put it on one system
+            </button>
+            <p className="mkt__resolve-sub">one click · nothing else changes</p>
+          </>
+        ) : (
           <button
-            key={t}
             type="button"
-            role="radio"
-            aria-checked={t === theme}
-            aria-label={t}
-            className={`mkt__theme-dot${t === theme ? ' is-on' : ''}`}
-            style={{ background: COLOR_THEMES[t].cPrimary }}
-            onClick={() => { setUserPicked(true); setTheme(t) }}
-          />
-        ))}
+            className="mkt__resolve-again"
+            onClick={() => setDrift(true)}
+          >
+            ↺ Show me the drift again
+          </button>
+        )}
       </div>
     </div>
   )
