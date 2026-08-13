@@ -30,6 +30,29 @@ function mix(a: string, b: string, t: number) {
  * type, so a foreign app rendered in our skin, and the switch looked like it
  * barely did anything.
  */
+const chan = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)) as [number, number, number]
+
+const relLum = ([r, g, b]: [number, number, number]) => {
+  const f = (c: number) => { const x = c / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4 }
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+}
+
+const contrast = (a: string, b: string) => {
+  const [x, y] = [relLum(chan(a)), relLum(chan(b))]
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)
+}
+
+/** Blend `ink` toward `bg` as far as it can go while staying above `floor`. */
+function fadeToFloor(ink: string, bg: string, floor: number) {
+  let best = ink
+  for (let t = 0.05; t <= 0.6; t += 0.05) {
+    const candidate = mix(ink, bg, t)
+    if (contrast(candidate, bg) < floor) break
+    best = candidate
+  }
+  return best
+}
+
 export function paletteStyle(audit: AuditHandoff): Record<string, string> {
   const out: Record<string, string> = {}
   const { bg, fg, border } = audit.spread
@@ -41,8 +64,13 @@ export function paletteStyle(audit: AuditHandoff): Record<string, string> {
     out['--k-border'] = border
     out['--k-input-border'] = border
     out['--k-fg'] = fg
-    out['--k-fg-muted'] = mix(fg, bg, 0.28)
-    out['--k-fg-faint'] = mix(fg, bg, 0.5)
+    /* Muted and faint are DERIVED, so they must be derived to a floor rather
+     * than to a fixed blend. A flat 28%/50% mix put every secondary label at
+     * 2.7–2.9:1 across all five fixtures — the only remaining conformance
+     * failure, and one we would be introducing ourselves while claiming to show
+     * them their own app. Fade as far as the text can go and still be read. */
+    out['--k-fg-muted'] = fadeToFloor(fg, bg, 4.5)
+    out['--k-fg-faint'] = fadeToFloor(fg, bg, 3)
   }
   const t = [...(audit.spread.type || [])]
   if (t.length) {
@@ -85,6 +113,13 @@ export function driftStyle(audit: AuditHandoff, i: number): CSSProperties {
     out['--k-primary'] = c; out['--k-accent'] = c; out['--k-fill'] = c; out['--k-ring'] = c
     out['--k-primary-soft'] = c + '22'
     out['--k-state-selected-bg'] = c + '22'
+    /* And the INK that goes on it. Setting a fill without its foreground left
+     * white text on documenso's lime at 1.5:1 — we would have been introducing
+     * an unreadable button while claiming to show them their own app. The kit
+     * derives readable ink for a real config; the drift path has to as well. */
+    out['--k-primary-fg'] = contrast('#ffffff', c) >= contrast('#111111', c) ? '#ffffff' : '#111111'
+    out['--k-accent-fg'] = out['--k-primary-fg']!
+    out['--k-fill-fg'] = out['--k-primary-fg']!
   }
   if (sp) { out['--k-s-8'] = sp; out['--k-s-12'] = sp }
   return out as CSSProperties

@@ -71,10 +71,34 @@ async function kitClasses(): Promise<Set<string>> {
   return found
 }
 
+/**
+ * Resolve ANY paintable colour to rgba, by painting it.
+ *
+ * Hand-parsing computed colour strings is not viable in this kit: the tokens
+ * emit `oklch(...)`, Chrome returns that verbatim from getComputedStyle, and a
+ * `/[\d.]+/g` match reads `oklch(0.564 0.1689 253.9)` as RGB(0.5, 0.2, 254).
+ * That single mistake produced the 1.0:1 readings on avatars and buttons that
+ * are plainly legible. The browser already knows how to turn any of this into
+ * pixels — so ask it, instead of reimplementing four colour spaces.
+ */
+let CTX: CanvasRenderingContext2D | null = null
 const rgba = (v: string): [number, number, number, number] | null => {
-  const m = v.match(/[\d.]+/g)
-  if (!m || m.length < 3) return null
-  return [Number(m[0]), Number(m[1]), Number(m[2]), m[3] === undefined ? 1 : Number(m[3])]
+  if (!v || v === 'transparent') return [0, 0, 0, 0]
+  if (!CTX) {
+    const c = document.createElement('canvas')
+    c.width = c.height = 1
+    CTX = c.getContext('2d', { willReadFrequently: true })
+  }
+  if (!CTX) return null
+  CTX.clearRect(0, 0, 1, 1)
+  CTX.fillStyle = '#000'
+  CTX.fillStyle = v
+  // An unparseable value leaves fillStyle at the previous one; that is the
+  // browser telling us it could not read it, and guessing would be worse.
+  if (CTX.fillStyle === '#000' && !/^(#000|black|rgb\(0, 0, 0)/.test(v)) return null
+  CTX.fillRect(0, 0, 1, 1)
+  const d = CTX.getImageData(0, 0, 1, 1).data
+  return [d[0]!, d[1]!, d[2]!, d[3]! / 255]
 }
 
 const relLum = ([r, g, b]: [number, number, number]) => {
@@ -155,7 +179,15 @@ export async function inspect(root: HTMLElement, fixture: string, mode: 'before'
           const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
           // 3:1, not 4.5 — a specimen is a swatch, and much of its text is
           // deliberately secondary. Below 3 nothing is readable at any size.
-          if (ratio < 3) add('unreadable', `"${text.slice(0, 18)}" at ${ratio.toFixed(1)}:1`)
+          if (ratio < 3) {
+            /* Carry the resolved colours, not just the verdict. Every previous
+             * calibration pass cost a round of opening one case by hand in the
+             * browser; a violation that cannot be diagnosed from its own report
+             * makes the harness as slow to use as the eyeballing it replaced. */
+            const hex = (c: [number, number, number, number]) =>
+              '#' + c.slice(0, 3).map((n) => Math.round(n).toString(16).padStart(2, '0')).join('')
+            add('unreadable', `"${text.slice(0, 16)}" ${ratio.toFixed(1)}:1 — ${hex(fgc)} on ${hex([...bgc, 1] as [number, number, number, number])} <${String(el.className).slice(0, 20) || el.tagName}>`)
+          }
         }
       }
     }
@@ -241,7 +273,12 @@ export function ConformancePage() {
   }, [fixtures, done])
 
   return (
-    <div className="cockpit-preview" style={{ padding: 20 }}>
+    /* No `.cockpit-preview` on the outer wrapper. It sets `color: var(--k-fg)`,
+       and with no tokens defined at that level the inherited colour resolved to
+       white — so every element that does not set its own colour rendered white
+       on white. One harness bug, 89 of 173 violations. The sheets carry the
+       tokens; the page around them must not pretend to. */
+    <div style={{ padding: 20, color: '#18181b', background: '#fff' }}>
       {/* Measurement must be deterministic. Several recipes animate in with
           `both` fill and a stagger, so a specimen sampled mid-entrance reads as
           a 2px-tall transparent box — the harness reporting 90 "invisible"
