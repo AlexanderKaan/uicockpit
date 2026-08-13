@@ -89,3 +89,8 @@ bench/kit/
 
 # `uicockpit audit` writes its local report here (never uploaded, never committed)
 .uicockpit/
+
+# Conformance fixtures — generated from public repos by the CLI, consumed by the
+# dev-only /__conformance route. Regenerate rather than commit; they are large
+# and they change whenever the engine's spread changes.
+/cockpit/public/fixtures/

@@ -10,6 +10,7 @@ import { componentPageBySlug } from './stage/views/ComponentGallery'
 import { StylesPage } from './marketing/StylesPage'
 import { findEntry } from './marketing/seo/seoData'
 import { AuditPage } from './marketing/AuditPage'
+import { ConformancePage } from './audit/conformance'
 import './styles/marketing.css'
 
 /**
@@ -66,6 +67,12 @@ export function App() {
     return <ComponentsIndexPage navigate={navigate} /> // unknown slug → the index
   }
   if (path.startsWith('/styles')) return <StylesPage navigate={navigate} />
+
+  /* Render-conformance harness. DEV ONLY — `import.meta.env.DEV` is statically
+   * false in a build, so the route and its import are dropped entirely. */
+  if (import.meta.env.DEV && path.startsWith('/__conformance')) {
+    return <ConformancePage />
+  }
 
   // The retroactive door — point at existing code, entirely client-side.
   if (path.startsWith('/audit')) return <AuditPage navigate={navigate} />
