@@ -57,20 +57,54 @@ export function paletteStyle(audit: AuditHandoff): Record<string, string> {
   const out: Record<string, string> = {}
   const { bg, fg, border } = audit.spread
   if (bg && fg && border) {
-    // Straight from the engine, where role was MEASURED and legibility checked.
-    out['--k-surface'] = bg
+    /* The WHOLE neutral family, from the two colours we actually measured.
+     *
+     * Overriding a handful of tokens and leaving their siblings on the kit's
+     * values is what left our dark ink on Zero's black page: their surface was
+     * theirs, the badge's foreground was still ours. A palette is a system —
+     * take half of it and the halves fight.
+     *
+     * Every step mixes FROM the page TOWARD the ink, which is polarity-agnostic
+     * by construction: that direction is darker in a light app and lighter in a
+     * dark one, so Zero and formbricks need no special case between them. */
+    const step = (t: number) => mix(bg, fg, t)
+
     out['--k-bg'] = bg
-    out['--k-surface-2'] = bg
+    out['--k-surface'] = bg
+    out['--k-surface-2'] = step(0.03)
+    out['--k-chrome-bg'] = step(0.02)
+    out['--k-surface-sunken'] = step(0.06)
+    out['--k-surface-raised'] = bg
+    out['--k-surface-overlay'] = bg
+    out['--k-surface-container-lowest'] = bg
+    out['--k-surface-container-low'] = step(0.03)
+    out['--k-surface-container'] = step(0.05)
+    out['--k-surface-container-high'] = step(0.08)
+    out['--k-surface-container-highest'] = step(0.11)
+    out['--k-track'] = step(0.08)
+    out['--k-input-bg'] = step(0.04)
+    out['--k-neutral'] = step(0.06)
+    out['--k-disabled-bg'] = step(0.04)
+    out['--k-state-hover'] = step(0.05)
+    out['--k-state-press'] = step(0.12)
+
     out['--k-border'] = border
     out['--k-input-border'] = border
+
     out['--k-fg'] = fg
-    /* Muted and faint are DERIVED, so they must be derived to a floor rather
-     * than to a fixed blend. A flat 28%/50% mix put every secondary label at
-     * 2.7–2.9:1 across all five fixtures — the only remaining conformance
-     * failure, and one we would be introducing ourselves while claiming to show
-     * them their own app. Fade as far as the text can go and still be read. */
+    out['--k-neutral-fg'] = fg
+    /* Inks are DERIVED, so they are derived to a floor rather than to a fixed
+     * blend. A flat 28%/50% mix put every secondary label at 2.7–2.9:1 across
+     * all five fixtures — a failure we would have been introducing ourselves
+     * while claiming to show them their own app. */
     out['--k-fg-muted'] = fadeToFloor(fg, bg, 4.5)
     out['--k-fg-faint'] = fadeToFloor(fg, bg, 3)
+    out['--k-disabled-fg'] = fadeToFloor(fg, bg, 3)
+
+    // The inverse pair simply swaps the two ends we measured.
+    out['--k-inverse-surface'] = fg
+    out['--k-inverse-fg'] = bg
+    out['--k-inverse-fg-muted'] = fadeToFloor(bg, fg, 3)
   }
   const t = [...(audit.spread.type || [])]
   if (t.length) {

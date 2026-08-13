@@ -210,6 +210,10 @@ export function ConformanceSheet({ audit, mode, style }: { audit: AuditHandoff; 
    * that looks like work and points at nothing. */
   const tokens = buildTokens(configFromAudit({ values: audit.derived as Record<string, unknown> })).vars as React.CSSProperties
   return (
+    /* `color` comes from the fixture's OWN --k-fg, not from the page. Putting a
+       literal on the wrapper made every element that inherits its colour wear
+       ours — which on Zero, a black-page app, read as our dark ink on their
+       black and looked exactly like a product bug. */
     <div data-sheet={`${audit.rootName}:${mode}`} style={{ ...tokens, ...style }}>
       {Object.entries(all).map(([key, spec], i) => (
         <figure key={key} data-specimen={key} style={{ margin: 0, width: 260 }}>
@@ -218,6 +222,11 @@ export function ConformanceSheet({ audit, mode, style }: { audit: AuditHandoff; 
             data-stage
             style={{
               ...(mode === 'before' ? driftStyle(audit, i) : {}),
+              /* `color` belongs HERE, not on the sheet. Inheritance passes the
+                 COMPUTED colour, so a `var(--k-fg)` resolved one level up hands
+                 children our dark ink even after the stage overrides --k-fg —
+                 which on Zero's black page looked exactly like a product bug. */
+              color: 'var(--k-fg)',
               padding: 16, display: 'flex', alignItems: 'center',
               justifyContent: 'safe center', minHeight: 88,
               background: 'var(--k-bg)', overflow: 'auto',
@@ -278,7 +287,7 @@ export function ConformancePage() {
        white — so every element that does not set its own colour rendered white
        on white. One harness bug, 89 of 173 violations. The sheets carry the
        tokens; the page around them must not pretend to. */
-    <div style={{ padding: 20, color: '#18181b', background: '#fff' }}>
+    <div style={{ padding: 20 }}>
       {/* Measurement must be deterministic. Several recipes animate in with
           `both` fill and a stagger, so a specimen sampled mid-entrance reads as
           a 2px-tall transparent box — the harness reporting 90 "invisible"
