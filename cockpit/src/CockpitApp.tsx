@@ -39,7 +39,7 @@ export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
   /* An audit carried over from /audit, if the visitor came that way. Read once:
    * the stage mode is theirs to change after that, and re-reading would yank it
    * back on every render. */
-  const [audit] = useState<AuditHandoff | null>(() => readHandoff())
+  const [audit, setAudit] = useState<AuditHandoff | null>(() => readHandoff())
   const [stageMode, setStageMode] = useState<StageMode>(() => (readHandoff() ? 'audit' : 'catalogue'))
   const [exportOpen, setExportOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)
@@ -211,8 +211,8 @@ export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
   return (
     <div className={`app ${menuOpen ? '' : 'app--menu-closed'} ${cfg.mode === 'dark' ? 'app--theme-dark' : ''}`} style={chromeTokens}>
       <Topbar
-        stageMode={audit ? stageMode : undefined}
-        onStageMode={audit ? setStageMode : undefined}
+        stageMode={stageMode}
+        onStageMode={setStageMode}
         mode={cfg.mode}
         onToggleMode={() =>
           dispatch({ type: 'SET', patch: { mode: cfg.mode === 'light' ? 'dark' : 'light' } })
@@ -251,6 +251,17 @@ export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
           audit={audit}
           mode={stageMode}
           onSeeEvidence={onAudit}
+          onScanned={(h, hash) => {
+            // Same landing as the marketing door's bridge: the kit goes in the
+            // URL so it is shareable and survives a reload, and the scan lives
+            // in state for this visit.
+            setAudit(h)
+            setStageMode('audit')
+            // Setting the hash is enough: useConfig already listens for
+            // hashchange (it exists for back/forward), so the kit lands without
+            // a reload and the stage simply becomes their app in front of them.
+            window.location.hash = hash
+          }}
         />
       </div>
       <MobileControlBar

@@ -3,6 +3,7 @@ import type { Config, Tokens } from '../tokens/types'
 import { IconProvider } from '../icons/Icon'
 import { ComponentsView } from './views/ComponentsView'
 import { AuditView } from './views/AuditView'
+import { AuditEmpty } from './views/AuditEmpty'
 import type { AuditHandoff } from '../audit/handoff'
 
 /* One stage, one job: the vocabulary — every component in the configured kit on
@@ -20,9 +21,11 @@ interface StageProps {
   audit?: AuditHandoff | null
   mode?: StageMode
   onSeeEvidence?: () => void
+  /** A scan started from inside the app, rather than from the marketing door. */
+  onScanned?: (h: AuditHandoff, hash: string) => void
 }
 
-export function Stage({ cfg, tokens, audit, mode = 'catalogue', onSeeEvidence }: StageProps) {
+export function Stage({ cfg, tokens, audit, mode = 'catalogue', onSeeEvidence, onScanned }: StageProps) {
   const previewStyle = tokens.vars as CSSProperties
 
   return (
@@ -32,9 +35,11 @@ export function Stage({ cfg, tokens, audit, mode = 'catalogue', onSeeEvidence }:
           <div className="cockpit-preview" style={previewStyle}>
             <IconProvider set={cfg.iconSet}>
               <div className="view-transition-root" key={mode}>
-                {mode === 'audit' && audit
-                  ? <AuditView audit={audit} onSeeEvidence={onSeeEvidence} />
-                  : <ComponentsView />}
+                {mode !== 'audit'
+                  ? <ComponentsView />
+                  : audit
+                    ? <AuditView audit={audit} onSeeEvidence={onSeeEvidence} />
+                    : <AuditEmpty onScanned={onScanned ?? (() => {})} />}
               </div>
             </IconProvider>
           </div>

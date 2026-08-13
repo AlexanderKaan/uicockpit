@@ -771,3 +771,36 @@
 }
 .modesw__btn[aria-checked='true'] { background: var(--app-surface); color: var(--app-fg); box-shadow: var(--app-shadow-sm); }
 @media (max-width: 700px) { .modesw__btn { padding: 5px 8px; } }
+
+/* === "Your app", before there is one ====================================== */
+.audv--empty { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+.audz {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center; max-width: 480px; padding: 44px 32px;
+  /* --app-border is a hairline meant to SEPARATE surfaces; on white it is
+   * invisible as a dashed outline, which left the drop target looking like a
+   * plain card. A target has to read as a target before anything is dragged. */
+  border: 2px dashed color-mix(in srgb, var(--app-fg) 22%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--app-fg) 2%, var(--app-surface));
+  transition: border-color 140ms ease, background 140ms ease;
+}
+/* The drop target has to LOOK like one before anything is dragged, or the
+ * affordance only exists for people who already guessed it was there. */
+.audz--over {
+  border-color: var(--app-fg);
+  background: color-mix(in srgb, var(--app-fg) 6%, var(--app-surface));
+}
+.audz--busy { border-style: solid; }
+.audz__icon { color: var(--app-fg-faint); }
+.audz h2 { margin: 2px 0 0; font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
+.audz p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--app-fg-muted); }
+.audz .btn { margin-top: 6px; }
+.audz__hint { font-size: 11px; color: var(--app-fg-faint); }
+.audz__error { color: #b91c1c; font-size: 12px; }
+.audz__promise {
+  display: flex; align-items: center; gap: 6px; margin-top: 14px !important;
+  font-size: 11px; color: var(--app-fg-faint);
+}
+/* The shield was being squeezed to 9px by the flex row. */
+.audz__promise svg { flex: none; }
