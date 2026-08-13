@@ -818,3 +818,56 @@ test('an elevation is not asserted off a shadow nobody agreed on', () => {
   const r = auditFiles(files)
   assert.equal(r.inferredConfig.values.elevation, undefined)
 })
+
+/* ── which KINDS of UI a codebase builds ────────────────────────────────────
+ * The reason this exists: value extraction reaches about half of a real repo's
+ * treatments, while asking "does this app have a dialog" answers on 13–15 of 16
+ * kinds everywhere we have measured. So this is the signal the visitor's own
+ * component set gets rendered from, and it has to survive every styling
+ * fashion — none of which rename <table>. */
+
+test('detects a kind through Tailwind, CSS modules and plain CSS alike', () => {
+  const r = auditFiles([
+    { path: 'a.tsx', content: '<table className="w-full text-sm"><tbody/></table>' },
+    { path: 'b.tsx', content: 'import s from "./b.module.css"\n<table className={s.grid}/>' },
+    { path: 'c.tsx', content: '<table class="data"/>' },
+  ])
+  assert.equal(r.kinds.table.files, 3)
+})
+
+test('believes an ARIA role even when nothing is named after the thing', () => {
+  const r = auditFiles([
+    { path: 'x.tsx', content: '<div role="dialog" aria-modal="true"><p>Are you sure?</p></div>' },
+    { path: 'y.tsx', content: '<div role="tablist"><span role="tab">One</span></div>' },
+  ])
+  assert.equal(r.kinds.dialog.files, 1)
+  assert.equal(r.kinds.tabs.files, 1)
+})
+
+test('counts files, not mentions — one busy file cannot outvote a codebase', () => {
+  const busy = { path: 'busy.tsx', content: Array(50).fill('<Dropdown/>').join('\n') }
+  const spread = Array.from({ length: 3 }, (_, i) => ({ path: `p${i}.tsx`, content: '<Dropdown/>' }))
+  assert.equal(auditFiles([busy]).kinds.menu.files, 1)
+  assert.equal(auditFiles(spread).kinds.menu.files, 3)
+})
+
+test('a stylesheet names no components', () => {
+  const r = auditFiles([{ path: 'app.css', content: '.card { padding: 8px } .badge { color: red }' }])
+  assert.equal(r.kinds.card.files, 0)
+  assert.equal(r.kinds.badge.files, 0)
+})
+
+test('keeps example paths so a reader can check the claim', () => {
+  const r = auditFiles([
+    { path: 'src/Nav.tsx', content: '<nav aria-label="main"/>' },
+    { path: 'src/Foot.tsx', content: '<nav aria-label="footer"/>' },
+  ])
+  assert.equal(r.kinds.nav.files, 2)
+  assert.deepEqual(r.kinds.nav.at, ['src/Nav.tsx', 'src/Foot.tsx'])
+})
+
+test('stays quiet about kinds a codebase does not build', () => {
+  const r = auditFiles([{ path: 'only.tsx', content: '<button className="px-4">Go</button>' }])
+  assert.equal(r.kinds.calendar.files, 0)
+  assert.equal(r.kinds.pagination.files, 0)
+})

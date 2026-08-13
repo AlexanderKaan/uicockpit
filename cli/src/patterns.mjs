@@ -848,3 +848,62 @@ export function countReadable(path, content, resolvedModuleElements = 0) {
     + (content.match(/style\s*=\s*\{\{/g) || []).length
     + resolvedModuleElements
 }
+
+/* ─────────────────────── which KINDS of UI does this build? ─────────────────
+ *
+ * A different question from every other measurement in this file, and a far
+ * more reliable one. Reconstructing what a button LOOKS like tops out near half
+ * of a real codebase's treatments; asking whether an app HAS a dropdown, a
+ * table, a dialog answers cleanly on 13–15 of these 16 across every real repo
+ * we have measured. So it is the signal recognition should ride on.
+ *
+ * Structural evidence only — an element name, an ARIA role, or a component
+ * named after the thing. That survives Tailwind, CSS modules, CSS-in-JS and
+ * every styling fashion equally, because none of them rename `<table>`.
+ *
+ * Counted per FILE, not per occurrence: "sixty files build dropdowns" says
+ * something about an app, while "four hundred dropdown mentions" mostly says
+ * one component got imported a lot. File counts are also far harder to skew by
+ * accident — one busy file cannot outvote a whole codebase.
+ */
+export const UI_KINDS = {
+  nav:        [/<nav\b/i, /role=["']navigation["']/, /<(Navbar|NavBar|Navigation|Sidebar|SideNav|TopBar|AppBar)\b/],
+  menu:       [/role=["']menu["']/, /<(DropdownMenu|Dropdown|Menu|Popover|ContextMenu|Select)\b/],
+  tabs:       [/role=["']tablist["']/, /<(Tabs|TabList|TabGroup)\b/],
+  table:      [/<table\b/i, /role=["']table["']/, /<(Table|DataTable|DataGrid)\b/],
+  dialog:     [/role=["'](dialog|alertdialog)["']/, /<(Dialog|Modal|Sheet|Drawer|AlertDialog)\b/],
+  toast:      [/<(Toast|Toaster|Snackbar)\b/, /from ["'](sonner|react-hot-toast|react-toastify)["']/],
+  badge:      [/<(Badge|Tag|Pill|Chip)\b/, /class(?:Name)?=["'][^"']*\bbadge\b/],
+  avatar:     [/<(Avatar|UserAvatar|ProfilePicture)\b/, /class(?:Name)?=["'][^"']*\bavatar\b/],
+  toggle:     [/role=["']switch["']/, /<(Switch|Toggle|ToggleGroup)\b/],
+  tooltip:    [/role=["']tooltip["']/, /<(Tooltip|HoverCard)\b/],
+  card:       [/<(Card|CardHeader|CardContent|CardBody)\b/, /class(?:Name)?=["'][^"']*\bcard\b/],
+  form:       [/<(Form|FormField|FormItem)\b/, /<label\b/i],
+  breadcrumb: [/<(Breadcrumb|Breadcrumbs)\b/, /aria-label=["']breadcrumb["']/i],
+  pagination: [/<(Pagination|Paginator)\b/, /aria-label=["']pagination["']/i],
+  chart:      [/<(LineChart|BarChart|AreaChart|PieChart|Chart|Sparkline)\b/, /from ["'](recharts|chart\.js|victory|nivo)/],
+  calendar:   [/<(Calendar|DatePicker|DayPicker)\b/, /from ["'](react-day-picker|@fullcalendar)/],
+}
+
+/** Files that can carry markup. Stylesheets name no components. */
+const MARKUP_FILE = /\.(tsx|jsx|vue|svelte|astro|html|ts|js|mts|cts)$/
+
+/**
+ * Count, per kind, how many files show evidence of it — and keep one example
+ * path per kind so a reader can check the claim instead of trusting it.
+ */
+export function detectKinds(files) {
+  const out = {}
+  for (const kind of Object.keys(UI_KINDS)) out[kind] = { files: 0, at: [] }
+
+  for (const { path, content } of files) {
+    if (!MARKUP_FILE.test(path)) continue
+    for (const [kind, patterns] of Object.entries(UI_KINDS)) {
+      if (!patterns.some((p) => p.test(content))) continue
+      const e = out[kind]
+      e.files++
+      if (e.at.length < 5) e.at.push(path)
+    }
+  }
+  return out
+}

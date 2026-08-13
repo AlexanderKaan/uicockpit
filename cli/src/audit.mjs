@@ -33,7 +33,7 @@
 import {
   GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE,
   extractCss, extractClasses, extractInline, classAttrs,
-  extractClassStyles, extractCssVars, resolveVar,
+  extractClassStyles, extractCssVars, resolveVar, detectKinds,
   cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar, styledClassNames, walkElements,
   countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX, cssInJsBlocks,
 } from './patterns.mjs'
@@ -1086,6 +1086,13 @@ export function auditFiles(files, opts = {}) {
     refused: parsed < MIN_PARSED || score === null,
     dimensions,
     components: collectComponents(files),
+    /* WHICH kinds of UI this codebase builds. Deliberately separate from
+     * `components` above: that one measures sprawl inside a kind (117 button
+     * treatments), this one measures the app's vocabulary (does it have a
+     * dialog at all). Structural, so it holds up on codebases whose values we
+     * cannot read — and it is what lets the result be shown as the visitor's
+     * OWN component set rather than our catalogue. */
+    kinds: detectKinds(files),
     // Not part of the measurement — purely so the report can render a real
     // swatch for a class-based component instead of quoting its class list.
     classStyles: resolvedStyles,
@@ -1195,6 +1202,13 @@ export function stackLine(stack) {
   return bits.join(' · ')
 }
 
+/** The kinds a codebase actually builds, busiest first. */
+export function kindsFound(kinds) {
+  return Object.entries(kinds || {})
+    .filter(([, v]) => v.files > 0)
+    .sort((a, b) => b[1].files - a[1].files)
+}
+
 export function renderTerminal(r, { reportPath = null } = {}) {
   const L = []
   const s = r.meta.stack
@@ -1221,6 +1235,13 @@ export function renderTerminal(r, { reportPath = null } = {}) {
       L.push(`               a floor, counted over the ${pct(r.meta.parsed)} we could read`)
     }
 
+    const kf = kindsFound(r.kinds)
+    if (kf.length) {
+      L.push('')
+      L.push(`  Builds       ${kf.length} of ${Object.keys(r.kinds).length} component kinds`)
+      L.push(`               ${kf.slice(0, 8).map(([k]) => k).join(' · ')}`)
+    }
+
     const un = Object.entries(r.meta.unreadable)
     if (un.length) {
       L.push('')
@@ -1241,6 +1262,14 @@ export function renderTerminal(r, { reportPath = null } = {}) {
     if (r.headlinesDisagree) {
       L.push('               values are in hand, components are not — the score cannot see this')
     }
+  }
+
+  // Not a score and never one: a vocabulary. It is what lets the report show
+  // YOUR component set rather than our catalogue, and unlike the two headlines
+  // above it holds up on codebases whose values we could not read.
+  const kf = kindsFound(r.kinds)
+  if (kf.length) {
+    L.push(`  Builds       ${kf.length} of ${Object.keys(r.kinds).length} component kinds · ${kf.slice(0, 6).map(([k]) => k).join(' · ')}`)
   }
   L.push('')
 

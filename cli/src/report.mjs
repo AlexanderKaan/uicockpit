@@ -385,6 +385,34 @@ function gunsBlock(r) {
   return section('Findings that need no score', 'Binary, and hard to argue with — which is why they are reported separately and never folded into the number.', `<ul class="guns">${items}</ul>`)
 }
 
+/**
+ * The app's VOCABULARY — which kinds of UI it builds. Deliberately not a score:
+ * there is no right number of component kinds, and an app that has no calendar
+ * is not worse than one that does. It answers a different question from the
+ * headlines above ("how consistent are you") — namely "what are you made of" —
+ * and it is the one measurement here that survives a codebase whose values we
+ * could not read, because nobody renames <table>.
+ *
+ * The absent kinds are shown too. A list of only what we found looks like a
+ * complete inventory; showing the gaps makes it a measurement.
+ */
+function kindsBlock(r) {
+  if (!r.kinds) return ''
+  const all = Object.entries(r.kinds)
+  const found = all.filter(([, v]) => v.files > 0).sort((a, b) => b[1].files - a[1].files)
+  if (!found.length) return ''
+  const absent = all.filter(([, v]) => v.files === 0).map(([k]) => k)
+  return section(
+    'What this app is made of',
+    `<strong>${found.length} of ${all.length} component kinds.</strong> Detected structurally — an element,
+     an ARIA role or a component named after the thing — so it holds up whether you style with
+     utilities, modules or plain CSS.`,
+    `<div class="kinds">${found.map(([k, v]) =>
+      `<span class="kind" title="${esc(v.at.join(' · '))}">${esc(k)}<b>${v.files}</b></span>`).join('')}
+     </div>${absent.length ? `<p class="kinds__absent">Not found: ${absent.map(esc).join(' · ')}</p>` : ''}`,
+  )
+}
+
 function coverageBlock(r) {
   const un = Object.entries(r.meta.unreadable)
   const e = r.meta.expressible
@@ -484,6 +512,11 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
 .guns{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 .guns li{display:flex;flex-direction:column;gap:2px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:8px}
 .guns span{color:var(--muted);font-size:13px}
+.kinds{display:flex;flex-wrap:wrap;gap:7px}
+.kind{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:550;padding:5px 10px;
+  border:1px solid var(--line);border-radius:99px;background:var(--card)}
+.kind b{font-weight:650;font-variant-numeric:tabular-nums;color:var(--muted);font-size:11px}
+.kinds__absent{margin:12px 0 0;font-size:12px;color:var(--faint)}
 .cov{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:14px}
 .cov div{padding:14px;background:var(--card);border:1px solid var(--line);border-radius:10px}
 .cov b{display:block;font-size:24px;letter-spacing:-.02em}
@@ -513,6 +546,7 @@ ${shadowSquares(d.shadow)}
 ${radiusSquares(d.radius)}
 ${spacingBars(d.spacing)}
 ${clustersBlock(r)}
+${kindsBlock(r)}
 ${gunsBlock(r)}
 ${coverageBlock(r)}
 <footer>
