@@ -1,4 +1,4 @@
-import { SPECIMENS, NO_SPECIMEN } from '../../audit/specimens'
+import { SPECIMENS, SHELL_SPECIMENS, NO_SPECIMEN } from '../../audit/specimens'
 import type { AuditHandoff } from '../../audit/handoff'
 
 /**
@@ -44,6 +44,18 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
   const absentRest = allAbsent.slice(ABSENT_SHOWN).map((a) => a.spec.label)
 
   const nf = (n: number) => n.toLocaleString('en-US')
+
+  /* The skeleton, first. You recognise your own app by its silhouette before
+   * you read a word, so the shell earns the top of the page — cut into kit
+   * pieces, which is the honest form: we know WHICH regions you hold to, and a
+   * static read genuinely cannot recover how they are arranged. */
+  const shell = Object.entries(audit.shell || {})
+    .filter(([, n]) => n > 0)
+    .sort((a, b) => b[1] - a[1])
+    .flatMap(([k, n]) => {
+      const spec = SHELL_SPECIMENS[k]
+      return spec ? [{ kind: k, n, spec }] : []
+    })
   /* Did the scan actually find a brand? When it did not, everything below is
    * wearing OUR colour, and the lede's "the kit your code implies" quietly
    * becomes false. cal.com is the real case: a black product that declares no
@@ -86,6 +98,29 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
           Brand on the left and this becomes your app rather than our guess.</>
         )}
       </p>
+
+      {shell.length > 0 && (
+        <>
+          <h3 className="audv__h">Your app shell</h3>
+          <p className="audv__sub">
+            The regions your codebase holds to, as kit pieces. <b>Which</b> regions is measured;
+            how you arrange them is not — a shell is assembled across nested layouts, so we show
+            the parts rather than guess the floor plan.
+          </p>
+          <div className="audv__grid audv__grid--shell">
+            {shell.map(({ kind, n, spec }) => (
+              <figure key={kind} className={`audv__spec${spec.wide ? ' audv__spec--wide' : ''}`}>
+                <figcaption>
+                  <span>{spec.label}</span>
+                  <span className="audv__n">in {nf(n)} file{n === 1 ? '' : 's'}</span>
+                </figcaption>
+                <div className="audv__stage">{spec.render()}</div>
+              </figure>
+            ))}
+          </div>
+          <h3 className="audv__h">The parts you build with</h3>
+        </>
+      )}
 
       <div className="audv__grid">
         {drawable.map(({ kind, n, spec }) => {

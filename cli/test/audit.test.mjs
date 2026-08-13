@@ -908,3 +908,41 @@ test('a namespaced brand token still counts', () => {
   assert.equal(r.inferredConfig.values.colorTheme, 'teal')
   assert.match(r.inferredConfig.confidence.colorThemeSource, /--color-brand/)
 })
+
+/* ── the shell an app holds to ──────────────────────────────────────────────
+ * You recognise your own app by its silhouette before you read a word, so this
+ * is the strongest recognition a static scan can offer. It also has a hard
+ * limit that has to stay visible in the tests: WHICH regions, never how they
+ * are arranged. */
+
+test('detects shell regions, and tells two products apart by them', () => {
+  const mail = auditFiles([
+    { path: 'layout.tsx', content: '<SidebarProvider><AppSidebar/><SidebarTrigger/></SidebarProvider>' },
+    { path: 'thread.tsx', content: '<ThreadDisplay/>' },
+  ])
+  const booking = auditFiles([
+    { path: 'layout.tsx', content: '<SiteHeader/><PageHeader title="Bookings"/>' },
+  ])
+  assert.equal(mail.shell['side-nav'].files, 1)
+  assert.equal(mail.shell.rail.files, 1)
+  // a reading pane is what makes a mail client look like a mail client
+  assert.equal(mail.shell['right-panel'].files, 1)
+  assert.equal(booking.shell['right-panel'].files, 0)
+  assert.equal(booking.shell['top-bar'].files, 1)
+})
+
+test('a shell region is defined once, so low counts are the signal', () => {
+  // 1 sidebar and 40 dialogs is what a real app looks like; the sidebar is not
+  // weaker evidence for being rarer, it is a skeleton rather than a part.
+  const files = [{ path: 'shell.tsx', content: '<AppSidebar/>' }]
+  for (let i = 0; i < 40; i++) files.push({ path: `p${i}.tsx`, content: '<Dialog/>' })
+  const r = auditFiles(files)
+  assert.equal(r.shell['side-nav'].files, 1)
+  assert.equal(r.kinds.dialog.files, 40)
+})
+
+test('stylesheets define no shell', () => {
+  const r = auditFiles([{ path: 'a.css', content: '.sidebar { width: 240px } header { height: 56px }' }])
+  assert.equal(r.shell['side-nav'].files, 0)
+  assert.equal(r.shell['top-bar'].files, 0)
+})

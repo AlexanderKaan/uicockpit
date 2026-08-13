@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
-import { FolderOpen, ShieldCheck } from 'lucide-react'
-import { readPickedFiles, loadVocabulary, filesFromDrop } from '../../audit/readFiles'
+import { useState } from 'react'
+import { readPickedFiles, loadVocabulary } from '../../audit/readFiles'
+import { FolderDrop } from '../../audit/FolderDrop'
 import { auditFiles } from '../../audit/engine'
 import {
   saveHandoff, configFromAudit, provenanceFromAudit, derivedFromAudit, type AuditHandoff,
@@ -28,9 +28,7 @@ interface AuditEmptyProps {
 
 export function AuditEmpty({ onScanned }: AuditEmptyProps) {
   const [busy, setBusy] = useState(false)
-  const [over, setOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   const run = async (files: FileList | File[]) => {
     setError(null)
@@ -45,6 +43,7 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
       const result = auditFiles(scan.files, { pkg: scan.pkg, vocabulary }) as unknown as {
         inferredConfig: { values?: Record<string, unknown>; confidence?: Record<string, unknown> }
         kinds?: Record<string, { files: number }>
+        shell?: Record<string, { files: number }>
         sprawl?: { treatments: number; singletons: number }
         score: number | null
         refused?: boolean
@@ -58,6 +57,7 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
         filesRead: result.meta.files,
         parsed: result.meta.parsed,
         kinds: Object.fromEntries(Object.entries(result.kinds || {}).map(([k, v]) => [k, v.files])),
+        shell: Object.fromEntries(Object.entries(result.shell || {}).map(([k, v]) => [k, v.files])),
         treatments: result.sprawl?.treatments ?? 0,
         singletons: result.sprawl?.singletons ?? 0,
         score: result.score,
@@ -75,51 +75,7 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
 
   return (
     <div className="audv audv--empty">
-      <div
-        className={`audz${over ? ' audz--over' : ''}${busy ? ' audz--busy' : ''}`}
-        onDragOver={(e) => { e.preventDefault(); setOver(true) }}
-        onDragLeave={() => setOver(false)}
-        onDrop={async (e) => {
-          e.preventDefault()
-          setOver(false)
-          const files = await filesFromDrop(e.dataTransfer.items)
-          if (files.length) void run(files)
-          else setError('That drop had no folder in it — drag the folder itself, not a shortcut.')
-        }}
-      >
-        <FolderOpen size={26} strokeWidth={1.6} className="audz__icon" />
-        <h2>{busy ? 'Reading your code…' : 'Point this at your app'}</h2>
-        <p>
-          {busy
-            ? 'Everything stays on this machine.'
-            : 'Drop a folder here, and the components you already build appear on this stage — themed by the kit your code implies.'}
-        </p>
-        {!busy && (
-          <>
-            <button type="button" className="btn btn--primary" onClick={() => inputRef.current?.click()}>
-              Choose a folder
-            </button>
-            <span className="audz__hint">one app, not a monorepo root · node_modules is skipped</span>
-          </>
-        )}
-        {error && <p className="audz__error">{error}</p>}
-        <p className="audz__promise">
-          <ShieldCheck size={13} strokeWidth={2} />
-          Runs in this tab. Nothing is uploaded — open your network panel and watch it stay quiet.
-        </p>
-      </div>
-
-      <input
-        ref={inputRef}
-        type="file"
-        hidden
-        // @ts-expect-error — non-standard, but the only directory picker that
-        // works in Safari and Firefox too.
-        webkitdirectory=""
-        directory=""
-        multiple
-        onChange={(e) => e.target.files && void run(e.target.files)}
-      />
+      <FolderDrop onFiles={(f) => void run(f)} busy={busy} error={error} />
     </div>
   )
 }

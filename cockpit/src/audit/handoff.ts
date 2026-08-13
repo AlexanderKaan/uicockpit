@@ -35,6 +35,9 @@ export interface AuditHandoff {
   /** kind → how many of their files build it. Zero-count kinds are kept: an
    *  absent kind is a finding, and dropping it would imply we found everything. */
   kinds: Record<string, number>
+  /** The skeleton: region → how many of their files build it. Regions only —
+   *  never an arrangement, which a static read genuinely cannot recover. */
+  shell: Record<string, number>
   treatments: number
   singletons: number
   score: number | null

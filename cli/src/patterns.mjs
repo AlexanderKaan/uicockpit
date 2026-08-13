@@ -907,3 +907,51 @@ export function detectKinds(files) {
   }
   return out
 }
+
+/* ────────────────────────── the SHELL an app holds to ───────────────────────
+ *
+ * Separate from UI_KINDS on purpose. Those are the parts an app builds WITH;
+ * these are the skeleton it builds INSIDE — top bar, side nav, the rail, the
+ * inspector — and that silhouette is what its own developers recognise before
+ * they read a single label.
+ *
+ * A shell region shows up in ONE or FOUR files while a dialog shows up in a
+ * hundred, and that is not a weak signal: a skeleton is defined once and used
+ * everywhere. Low counts here are the evidence, not the noise.
+ *
+ * ⚠️ What this CANNOT do, measured rather than assumed: recover the
+ * ARRANGEMENT. A modern shell is assembled across nested layouts through
+ * components named for their job (`MainNavigation`, `EnvironmentLayout`), so no
+ * single file names two regions together — across four real repos the layout
+ * files named a region 0, 1, 1 and 2 times out of 2, 4, 22 and 21. We can say
+ * which regions an app has. We cannot say which side its sidebar is on, and
+ * anything rendered from this has to say so.
+ */
+export const SHELL_REGIONS = {
+  'side-nav':    [/<(Sidebar|AppSidebar|SideNav|SidebarProvider|MainNavigation)\b/, /<aside\b[^>]*(nav|menu)/i],
+  'top-bar':     [/<(TopBar|AppBar|SiteHeader|Navbar|TopControlBar)\b/, /<header\b[^>]*(app|top|site)/i],
+  'rail':        [/<SidebarTrigger\b/, /isCollapsed|sidebarCollapsed|collapsible=["']icon["']/],
+  'right-panel': [/<(Inspector|DetailPanel|RightPanel|PropertiesPanel|ThreadDisplay|PreviewPane)\b/],
+  'page-header': [/<(PageHeader|PageTitle|SettingsHeader|SectionHeader)\b/],
+  'breadcrumbs': [/<(Breadcrumb|Breadcrumbs)\b/, /aria-label=["']breadcrumb["']/i],
+  'command-menu':[/<(CommandDialog|CommandMenu|CommandK)\b/, /from ["']cmdk["']/],
+  'toolbar':     [/<(Toolbar|ActionBar|FilterBar)\b/],
+}
+
+const SHELL_FILE = /\.(tsx|jsx|vue|svelte|astro)$/
+
+/** Which shell regions this app holds to, with an example path each. */
+export function detectShell(files) {
+  const out = {}
+  for (const region of Object.keys(SHELL_REGIONS)) out[region] = { files: 0, at: [] }
+  for (const { path, content } of files) {
+    if (!SHELL_FILE.test(path)) continue
+    for (const [region, patterns] of Object.entries(SHELL_REGIONS)) {
+      if (!patterns.some((p) => p.test(content))) continue
+      const e = out[region]
+      e.files++
+      if (e.at.length < 5) e.at.push(path)
+    }
+  }
+  return out
+}

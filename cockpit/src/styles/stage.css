@@ -804,3 +804,11 @@
 }
 /* The shield was being squeezed to 9px by the flex row. */
 .audz__promise svg { flex: none; }
+
+/* The shell gets its own band above the parts — it is the silhouette, and the
+ * silhouette is what someone recognises first. */
+.audv__h { margin: 24px 2px 4px; font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
+.audv__h:first-of-type { margin-top: 4px; }
+.audv__sub { margin: 0 2px 14px; font-size: 12px; line-height: 1.55; color: var(--app-fg-muted); max-width: 74ch; }
+.audv__sub b { color: var(--app-fg); }
+.audv__grid--shell { margin-bottom: 6px; }

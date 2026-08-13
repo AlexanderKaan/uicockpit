@@ -33,7 +33,7 @@
 import {
   GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE,
   extractCss, extractClasses, extractInline, classAttrs,
-  extractClassStyles, extractCssVars, resolveVar, detectKinds,
+  extractClassStyles, extractCssVars, resolveVar, detectKinds, detectShell,
   cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar, styledClassNames, walkElements,
   countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX, cssInJsBlocks,
 } from './patterns.mjs'
@@ -1103,6 +1103,10 @@ export function auditFiles(files, opts = {}) {
      * cannot read — and it is what lets the result be shown as the visitor's
      * OWN component set rather than our catalogue. */
     kinds: detectKinds(files),
+    /* The skeleton, as opposed to the parts. Which regions — never how they are
+     * arranged; see the note on SHELL_REGIONS for why that is unknowable from a
+     * static read, and why anything rendering this must say so. */
+    shell: detectShell(files),
     // Not part of the measurement — purely so the report can render a real
     // swatch for a class-based component instead of quoting its class list.
     classStyles: resolvedStyles,

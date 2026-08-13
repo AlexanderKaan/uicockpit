@@ -2441,3 +2441,30 @@
   .mkt__tally-head { font-size: 0.9375rem; }
   .mkt__tally-body { font-size: 0.75rem; }
 }
+
+/* === The shared intake, on the marketing page ==============================
+ * Same component as the configurator's, so the two doors accept code
+ * identically; only the surrounding tone differs. `page` sits on white with the
+ * page's own headline above it, `stage` is a card on the app canvas. */
+.audz--page {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center; max-width: 520px; margin: 26px 0 8px; padding: 40px 32px;
+  border: 2px dashed color-mix(in srgb, var(--mkt-fg) 18%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--mkt-fg) 2%, #fff);
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.audz--page.audz--over {
+  border-color: var(--mkt-fg);
+  background: color-mix(in srgb, var(--mkt-fg) 5%, #fff);
+}
+.audz--page .audz__icon { color: var(--mkt-fg-faint, #a1a1aa); }
+.audz--page h2 { margin: 2px 0 0; font-size: 1.0625rem; font-weight: 650; letter-spacing: -0.01em; }
+.audz--page p { margin: 0; font-size: 0.875rem; line-height: 1.6; color: var(--mkt-fg-muted); }
+.audz--page .audz__hint { font-size: 0.75rem; color: var(--mkt-fg-faint, #a1a1aa); }
+.audz--page .audz__promise {
+  display: flex; align-items: center; gap: 6px; margin-top: 12px !important;
+  font-size: 0.75rem; color: var(--mkt-fg-faint, #a1a1aa);
+}
+.audz--page .audz__promise svg { flex: none; }
+.audz--page .audz__error { color: #b91c1c; font-size: 0.8125rem; }

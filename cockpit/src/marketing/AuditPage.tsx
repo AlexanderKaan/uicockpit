@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { FolderOpen, ShieldCheck, Download, RotateCcw, ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ShieldCheck, Download, RotateCcw, ArrowRight } from 'lucide-react'
 import { MktNav } from './MktNav'
 import { MktFooter } from './MktFooter'
 import { auditFiles, renderReport } from '../audit/engine'
 import { readPickedFiles, loadVocabulary, type ScanResult } from '../audit/readFiles'
 import { ping } from '../analytics/beacon'
+import { FolderDrop } from '../audit/FolderDrop'
 import { saveHandoff, saveReport, readReport, clearHandoff, configFromAudit, provenanceFromAudit, derivedFromAudit } from '../audit/handoff'
 import { encode } from '../state/hash'
 
@@ -40,7 +41,6 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
   const [phase, setPhase] = useState<Phase>(() => (readReport() ? 'kept' : 'door'))
   const [state, setState] = useState<AuditState | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const prev = document.title
@@ -90,6 +90,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
     const r = state.result as unknown as {
       inferredConfig: { values?: Record<string, unknown>; confidence?: Record<string, unknown> }
       kinds?: Record<string, { files: number }>
+      shell?: Record<string, { files: number }>
       sprawl?: { treatments: number; singletons: number }
       score: number | null
       meta: { files: number; parsed: number }
@@ -101,6 +102,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       filesRead: r.meta.files,
       parsed: r.meta.parsed,
       kinds: Object.fromEntries(Object.entries(r.kinds || {}).map(([k, v]) => [k, v.files])),
+      shell: Object.fromEntries(Object.entries(r.shell || {}).map(([k, v]) => [k, v.files])),
       treatments: r.sprawl?.treatments ?? 0,
       singletons: r.sprawl?.singletons ?? 0,
       score: r.score,
@@ -131,7 +133,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
           Runs in this tab · no upload, no account, no server
         </p>
 
-        {phase === 'door' && <Door onPick={() => inputRef.current?.click()} error={error} />}
+        {phase === 'door' && <Door onFiles={(f) => void run(f)} error={error} />}
         {phase === 'reading' && <Reading />}
         {phase === 'recognise' && state && (
           <Recognise
@@ -148,18 +150,6 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
           <Findings result={state.result} onDownload={download} onReset={reset} onBridge={bridge} />
         )}
 
-        {/* Universal: webkitdirectory works in Safari and Firefox too, where the
-            File System Access API does not. The floor matters more than the frill. */}
-        <input
-          ref={inputRef}
-          type="file"
-          hidden
-          // @ts-expect-error — non-standard but supported everywhere that matters
-          webkitdirectory=""
-          directory=""
-          multiple
-          onChange={(e) => e.target.files && run(e.target.files)}
-        />
       </main>
 
       <MktFooter navigate={navigate} />
@@ -169,7 +159,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
 
 /* ─────────────────────────────── 1 · the door ─────────────────────────────── */
 
-function Door({ onPick, error }: { onPick: () => void; error: string | null }) {
+function Door({ onFiles, error }: { onFiles: (f: FileList | File[]) => void; error: string | null }) {
   return (
     <section className="aud__door">
       <h1>Find the design system your code already has.</h1>
@@ -178,12 +168,15 @@ function Door({ onPick, error }: { onPick: () => void; error: string | null }) {
         and measures how far the code has drifted from them.
       </p>
 
-      <button type="button" className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onPick}>
-        <FolderOpen size={18} strokeWidth={1.9} /> Choose a folder
-      </button>
-      <p className="aud__hint">Pick one app, not a monorepo root · node_modules is skipped</p>
-
-      {error && <p className="aud__error">{error}</p>}
+      {/* The SAME intake the configurator uses. Two doors into one product have
+          to accept code the same way, or they stop being one product. */}
+      <FolderDrop
+        onFiles={onFiles}
+        error={error}
+        tone="page"
+        heading="Drop your app here"
+        lede="Or choose a folder. It never leaves this tab."
+      />
 
       <ul className="aud__promises">
         <li><b>Your code is never sent anywhere.</b> The scan runs in this tab. Open your network panel and
