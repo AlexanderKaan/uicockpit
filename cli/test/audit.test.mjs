@@ -779,3 +779,42 @@ test('a refusal report shows the evidence but never a grade', () => {
   assert.ok(!body.includes('<section class="board">'), 'the grade table does not')
   assert.match(body, /floor/, 'and it says the numbers are a lower bound')
 })
+
+/* ── the brand a codebase NAMED beats the one it merely used often ──────────
+ * Regression: run against our own source, the counted-literal rule christened a
+ * cobalt product "ember" — the incidental status oranges outnumbered a brand
+ * that lives entirely in tokens. The better a codebase tokenises, the more
+ * reliably counting literals picks the wrong colour. */
+test('a declared --primary outranks a more frequent incidental colour', () => {
+  const files = [
+    { path: 'tokens.css', content: ':root { --primary: #0A84FF; }' },
+    // amber wins on raw count by 4:1 and is genuinely saturated
+    { path: 'status.css', content: [
+      '.a { color: #f59e0b; }', '.b { color: #f59e0b; }',
+      '.c { color: #f59e0b; }', '.d { color: #f59e0b; }',
+      '.e { color: #0A84FF; }',
+    ].join('\n') },
+  ]
+  const r = auditFiles(files)
+  // The declared blue wins outright over the amber that leads 4:1 on count.
+  assert.equal(r.inferredConfig.values.colorTheme, 'cobalt')
+  assert.notEqual(r.inferredConfig.values.colorTheme, 'ember')
+  assert.match(r.inferredConfig.confidence.colorThemeSource, /declared as --primary/)
+  assert.equal(r.inferredConfig.confidence.colorTheme, 1)
+})
+
+test('with nothing declared it falls back to counting, and stays silent when no colour dominates', () => {
+  const spread = ['#f59e0b', '#e11d48', '#0b5cff', '#16a34a', '#8b5cf6']
+    .map((c, i) => ({ path: `c${i}.css`, content: `.c${i} { color: ${c}; }` }))
+  const r = auditFiles(spread)
+  assert.equal(r.inferredConfig.values.colorTheme, undefined)
+  assert.equal(r.inferredConfig.confidence.colorThemeSource, 'most-used literal colour')
+})
+
+test('an elevation is not asserted off a shadow nobody agreed on', () => {
+  const files = Array.from({ length: 10 }, (_, i) => ({
+    path: `s${i}.css`, content: `.s${i} { box-shadow: 0 ${i + 1}px ${i + 2}px rgba(0,0,0,.1); }`,
+  }))
+  const r = auditFiles(files)
+  assert.equal(r.inferredConfig.values.elevation, undefined)
+})

@@ -755,7 +755,7 @@ const px = (v) => {
   return m[2] === 'rem' ? parseFloat(m[1]) * 16 : parseFloat(m[1])
 }
 
-function inferConfig(dims, palette) {
+function inferConfig(dims, palette, cssVars = {}) {
   const values = {}
   const confidence = {}
   const MIN_DOMINANCE = 0.4 // below this, nobody decided anything
@@ -770,10 +770,16 @@ function inferConfig(dims, palette) {
 
   // shadow presence/softness → Elevation = 'flat' | 'soft' | 'sharp' | 'default'
   const shadowDistinct = dims.shadow.distinct
-  if (dims.shadow.events === 0) { values.elevation = 'flat'; confidence.elevation = 1 }
-  else {
+  if (dims.shadow.events === 0) {
+    // "No shadow anywhere" is a real, certain finding, not a failure to decide.
+    values.elevation = 'flat'
+    confidence.elevation = 1
+  } else {
     const s = dominance(dims.shadow.values)
-    values.elevation = shadowDistinct <= 3 ? 'soft' : 'default'
+    // Same floor radius and typeScale already respected. Without it this set an
+    // elevation off a 14%-dominant shadow — a confident answer to a question the
+    // codebase never actually settled.
+    if (s.share >= MIN_DOMINANCE) values.elevation = shadowDistinct <= 3 ? 'soft' : 'default'
     confidence.elevation = s.share ? round(s.share, 2) : null
   }
 
@@ -794,31 +800,78 @@ function inferConfig(dims, palette) {
   } else confidence.scale = null
 
   // dominant brand colour → nearest ColorTheme anchor by ΔE00
-  const brand = pickBrandColor(dims.color.values, palette)
+  // A DECLARED brand outranks a counted one: naming a colour `--primary` is the
+  // decision itself, so it needs no dominance share to be believed. Only when
+  // nobody named one do we fall back to counting literals — and that fallback is
+  // gated, because ungated it christened our own cobalt product "ember".
+  const named = pickNamedBrand(cssVars, palette)
+  const brand = named || pickBrandColor(dims.color.values, palette)
   if (brand) {
     let best = null
     for (const [name, hex] of Object.entries(THEME_ANCHORS)) {
       const d = colorDistance(brand.value, hex, palette)
       if (d !== null && (!best || d < best.d)) best = { name, d }
     }
-    if (best) { values.colorTheme = best.name; confidence.colorTheme = round(brand.share, 2) }
+    confidence.colorTheme = named ? 1 : round(brand.share, 2)
+    confidence.colorThemeSource = named ? `declared as ${named.name}` : 'most-used literal colour'
+    if (best && (named || brand.share >= MIN_DOMINANCE)) values.colorTheme = best.name
   }
-  if (!values.colorTheme) confidence.colorTheme = null
+  if (confidence.colorTheme === undefined) confidence.colorTheme = null
 
   return { values, confidence }
 }
 
 /** The brand colour is the most-used SATURATED colour — greys and near-whites
- *  are surface, not identity. */
+ *  are surface, not identity.
+ *
+ *  `share` is measured against the OTHER SATURATED colours, not against every
+ *  colour in the codebase. Greys are not candidates for the brand, so counting
+ *  them in the denominator made every share look tiny and incomparable between
+ *  a grey-heavy admin panel and a colourful marketing page. What we want to know
+ *  is narrower and answerable: among the colours that could be an identity, does
+ *  one dominate? */
+/** Names a codebase gives its own identity. Deliberately narrow: `--primary`
+ *  and `--brand` are declarations, while `--primary-hover` or `--accent-border`
+ *  are derivations OF one, and `--primary-foreground` (shadcn) is the ink that
+ *  goes ON it — usually near-white, and never the brand. */
+const BRAND_VAR = /^--?(?:[\w-]*?-)?(?:brand|primary|accent)$/i
+
+/**
+ * A colour the codebase NAMED as its identity, which beats one it merely used
+ * often. This matters more the better the codebase is: tokenise your brand
+ * properly and the only literal colours left are incidental — status ambers,
+ * chart series — so counting literals reliably picks the wrong colour on
+ * exactly the repos that did the most things right. Asking "what did you call
+ * your brand" is the question a human would ask first.
+ */
+function pickNamedBrand(cssVars, palette) {
+  const hits = []
+  for (const [name, raw] of Object.entries(cssVars)) {
+    if (!BRAND_VAR.test(name)) continue
+    const value = deepResolveVar(raw, cssVars)
+    const lab = toLab(value, palette)
+    if (!lab) continue
+    if (Math.hypot(lab[1], lab[2]) <= 25 || lab[0] <= 15 || lab[0] >= 92) continue
+    hits.push({ name, value })
+  }
+  if (!hits.length) return null
+  // Shortest name wins: `--primary` is the declaration, `--color-ui-primary` is
+  // someone's scoped copy of it.
+  hits.sort((a, b) => a.name.length - b.name.length)
+  return { value: hits[0].value, name: hits[0].name }
+}
+
 function pickBrandColor(values, palette) {
-  const total = values.reduce((a, v) => a + v.count, 0)
+  const saturated = []
   for (const v of values) {
     const lab = toLab(v.value, palette)
     if (!lab) continue
-    const chroma = Math.hypot(lab[1], lab[2])
-    if (chroma > 25 && lab[0] > 15 && lab[0] < 92) return { value: v.value, share: v.count / total }
+    if (Math.hypot(lab[1], lab[2]) > 25 && lab[0] > 15 && lab[0] < 92) saturated.push(v)
   }
-  return null
+  if (!saturated.length) return null
+  const total = saturated.reduce((a, v) => a + v.count, 0)
+  const top = saturated.reduce((a, v) => (v.count > a.count ? v : a), saturated[0])
+  return { value: top.value, share: total ? top.count / total : 0 }
 }
 
 /* ──────────────────────────────── the engine ───────────────────────────────── */
@@ -1049,7 +1102,7 @@ export function auditFiles(files, opts = {}) {
     flags: smokingGuns(files, opts.pkg, events),
     // Emitted but unused in PR 1 — it is the hinge to the configurator (PR 4),
     // and computing it now is cheaper than a second pass later.
-    inferredConfig: inferConfig(dimensions, palette),
+    inferredConfig: inferConfig(dimensions, palette, cssVars),
   }
 
   // The second headline, given equal billing rather than a footnote.
