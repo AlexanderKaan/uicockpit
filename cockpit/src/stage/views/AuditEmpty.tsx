@@ -51,7 +51,9 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
         meta: { files: number; parsed: number }
       }
       ping('audit', result.refused ? 'refused' : 'scanned')
+      const hash = encode(configFromAudit(result.inferredConfig))
       const handoff: AuditHandoff = {
+        hash,
         rootName: scan.rootName,
         filesRead: result.meta.files,
         parsed: result.meta.parsed,
@@ -63,7 +65,7 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
         derived: derivedFromAudit(result.inferredConfig),
       }
       saveHandoff(handoff)
-      onScanned(handoff, encode(configFromAudit(result.inferredConfig)))
+      onScanned(handoff, hash)
     } catch {
       setError('That folder could not be read. Try a smaller one — a single app, not a monorepo.')
     } finally {

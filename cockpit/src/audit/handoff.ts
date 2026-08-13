@@ -43,6 +43,13 @@ export interface AuditHandoff {
    *  somewhere else, "from your code" stops being true and must stop claiming
    *  to be. A badge that outlives its evidence is worse than no badge. */
   derived: Partial<Record<DerivedKey, string>>
+  /** The derived kit, encoded. The kit lives in the URL, but the URL is easy to
+   *  lose — leaving /app and coming back drops the hash by design (it belongs to
+   *  the configurator, not to every route). Without this, the config silently
+   *  reverts to our default while the provenance still remembers what was
+   *  derived, and every row starts claiming "you changed this" about a change
+   *  nobody made. Keeping the hash lets the app put the kit back. */
+  hash: string
 }
 
 export type DerivedKey = 'colorTheme' | 'radius' | 'scale' | 'typeScale'

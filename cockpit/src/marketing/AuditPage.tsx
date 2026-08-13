@@ -90,7 +90,9 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       score: number | null
       meta: { files: number; parsed: number }
     }
+    const hash = encode(configFromAudit(r.inferredConfig))
     saveHandoff({
+      hash,
       rootName: state.scan.rootName,
       filesRead: r.meta.files,
       parsed: r.meta.parsed,
@@ -101,7 +103,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       provenance: provenanceFromAudit(r.inferredConfig),
       derived: derivedFromAudit(r.inferredConfig),
     })
-    window.location.href = `/app#${encode(configFromAudit(r.inferredConfig))}`
+    window.location.href = `/app#${hash}`
   }
 
   const download = () => {

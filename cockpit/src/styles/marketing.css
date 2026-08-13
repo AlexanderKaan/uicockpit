@@ -2422,3 +2422,27 @@
   border-color: rgb(255 255 255 / 0.5);
   background: rgb(255 255 255 / 0.08);
 }
+
+
+/* === The tally — the before/after argument, as a headline ==================
+ * Replaces a single run-on line. The numbers carry the point, so they get the
+ * size; the sentence underneath explains and gets out of the way. Both sets are
+ * measured off the cards themselves, so they cannot drift from the demo. */
+.mkt__tally { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.mkt__tally-head {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  color: var(--mkt-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.mkt__tally-head b { color: var(--mkt-fg); font-weight: 680; }
+/* The separators are structure, not content — they should not compete with the
+ * numbers they divide. */
+.mkt__tally-head i { font-style: normal; color: var(--mkt-border); margin: 0 2px; }
+.mkt__tally-body { margin: 0; font-size: 0.8125rem; line-height: 1.5; color: var(--mkt-fg-faint, var(--mkt-fg-muted)); }
+@media (max-width: 560px) {
+  .mkt__tally-head { font-size: 0.9375rem; }
+  .mkt__tally-body { font-size: 0.75rem; }
+}

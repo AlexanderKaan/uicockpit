@@ -102,9 +102,35 @@ export function ComponentBouquet() {
           idea who did it; labelling the two states fixes the attribution, and it
           folds the awkward "show me again" link back into one control. */}
       <div className="mkt__resolve">
-        <p className="mkt__resolve-lead">
-          34 components. Nine accent colours. <b>One wall.</b>
-        </p>
+        {/* Chaos → order, in one line each. The mess is COUNTED, because mess is
+            what counting feels like; the resolved state is NAMED, because that is
+            what having a system feels like. Digits on both sides would invite the
+            pedantry of explaining why one of them isn't 1 — and a hero has no
+            room to defend a number.
+
+            The nine and the seventeen are real: measured off these very cards, so
+            the claim cannot drift from the demo standing under it.
+
+            The sentence names drift as INEVITABLE rather than careless. "Nobody
+            decided any of this" pointed at the visitor; drift happens to teams
+            who own a design system too, and saying so is both kinder and more
+            true — it is the reason a checker has to exist at all. And the answer
+            line ANSWERS it: things drift OFF a system, so the fix is putting
+            them back ON one. */}
+        <div className="mkt__tally">
+          <p className="mkt__tally-head">
+            {drift ? (
+              <><b>9</b> accents <i>·</i> <b>17</b> radii <i>·</i> <b>8</b> shadows</>
+            ) : (
+              <>One accent <i>·</i> one scale <i>·</i> one shadow</>
+            )}
+          </p>
+          <p className="mkt__tally-body">
+            {drift
+              ? 'Even with a design system, every build adds drift.'
+              : 'Every component back on the system.'}
+          </p>
+        </div>
 
         <div className="mkt__switch" role="radiogroup" aria-label="Preview the same components with and without a design system">
           <span className={`mkt__switch-knob${drift ? '' : ' is-right'}`} aria-hidden="true" />
@@ -128,7 +154,7 @@ export function ComponentBouquet() {
           </button>
         </div>
 
-        <p className="mkt__resolve-sub">the components never changed — only the system did</p>
+        <p className="mkt__resolve-sub">nothing was rewritten — only the system changed</p>
       </div>
 
       {sweepDir && <span className={`mkt__sweep mkt__sweep--${sweepDir}`} aria-hidden="true" />}

@@ -39,7 +39,19 @@ export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
   /* An audit carried over from /audit, if the visitor came that way. Read once:
    * the stage mode is theirs to change after that, and re-reading would yank it
    * back on every render. */
-  const [audit, setAudit] = useState<AuditHandoff | null>(() => readHandoff())
+  const [audit, setAudit] = useState<AuditHandoff | null>(() => {
+    const h = readHandoff()
+    /* Put the derived kit back when the URL lost it. Leaving /app and returning
+     * drops the hash by design — it belongs to the configurator, not to every
+     * route — but the audit survives in sessionStorage, so without this the
+     * config silently reverts to our default while provenance still remembers
+     * what was derived, and every row starts reporting "you changed this" about
+     * a change nobody made. A badge that lies is worse than no badge. */
+    if (h?.hash && typeof window !== 'undefined' && !window.location.hash) {
+      window.location.hash = h.hash
+    }
+    return h
+  })
   const [stageMode, setStageMode] = useState<StageMode>(() => (readHandoff() ? 'audit' : 'catalogue'))
   const [exportOpen, setExportOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)

@@ -166,8 +166,12 @@
   position: absolute; left: 4px; top: 50%; transform: translateY(-50%);
   display: inline-flex; align-items: center; justify-content: center;
   width: 19px; height: 19px; padding: 0; border: 0; border-radius: 5px;
-  background: transparent; color: var(--app-fg-muted); cursor: pointer;
-  opacity: 0.85;
+  background: transparent; color: var(--app-fg-faint); cursor: pointer;
+  /* Locking is a secondary affordance — it protects a row from Shuffle, which
+   * most visits never touch. At 0.85 it sat level with the control labels and
+   * pulled the eye down the left edge; the controls are the subject. It comes
+   * up to full on row hover, so it is still one glance away. */
+  opacity: 0.45;
   transition: opacity var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease),
               background var(--app-dur) var(--app-ease);
 }
