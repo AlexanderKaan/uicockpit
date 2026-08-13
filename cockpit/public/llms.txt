@@ -10,7 +10,7 @@ Telemetry: None
 
 ## What it is
 
-UIcockpit is a design system generator: a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About nineteen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery and live showcases as the user tweaks. Start from a curated Style or shuffle and refine — every kit is your own, not a preset picked from a shelf. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
+UIcockpit is a design system generator: a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About nineteen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery as the user tweaks. Start from a curated Style or shuffle and refine — every kit is your own, not a preset picked from a shelf. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
 
 ## Who it's for
 
@@ -41,7 +41,7 @@ Export is framed as an install experience, not a format dump — a hosted link p
 
 The kit's decisions, the full WCAG audit, the per-component **Do/Don't best practices** and the agent rules all live in **design.md** (the old BRIEF.md + AI-prompt, merged). A W3C `tokens.json` (Tokens Studio / Figma) is available on request but no longer a default tab.
 
-Live proof: https://uicockpit.com/showcases — Ledger, a complete billing product built purely from the kit's components (8 interactive screens, one design system).
+Retroactive door: https://uicockpit.com/audit — point the auditor at an existing codebase and it derives the design system that code already implies, then measures how far the code has drifted from it. Runs entirely in the browser; no upload. Same engine as `npx uicockpit audit`.
 
 ## Distinctive features vs. competitors
 

@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AppWindow, Boxes, Check, Code, Heart, Moon, Palette, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
-import type { ViewKind } from './Stage'
+import { Check, Code, Heart, Moon, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
 import { SavedKits } from '../panel/SavedKits'
@@ -8,8 +7,6 @@ import { useSavedKits } from '../state/savedKits'
 import { Wordmark } from '../Wordmark'
 
 interface TopbarProps {
-  view: ViewKind
-  onViewChange: (v: ViewKind) => void
   mode: 'light' | 'dark'
   onToggleMode: () => void
   onExport: () => void
@@ -29,7 +26,7 @@ interface TopbarProps {
   canRedo: boolean
 }
 
-export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
+export function Topbar({ mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
@@ -79,31 +76,6 @@ export function Topbar({ view, onViewChange, mode, onToggleMode, onExport, token
         <A11yBadge audit={audit} pass={pass} total={total} allPass={allPass} />
       </div>
       <div className="topbar__center">
-        {/* The two modi (Fase J-6) — the loupe IA settled to TWO tabs. The old
-         * Foundations + Sections rungs live INSIDE the Pages loupe now (Foundations
-         * = the deepest "All tokens" zoom; Sections = the width slider's nav morph),
-         * so the topbar is just the vocabulary and the screens that use it. */}
-        <div className="view-toggle" role="tablist" aria-label="View">
-          {/* Tooltips bridge the taxonomy to plain language for the vibe-coder
-           * audience (C7) — the meaning is one hover away. */}
-          {([
-            ['components', 'Components', Boxes, 'The catalog — every component in your kit, one searchable wall'],
-            ['pages', 'Showcases', AppWindow, 'Real screens — drill a showcase Screen › Section › Atom › All tokens'],
-          ] as [ViewKind, string, typeof Palette, string][]).map(([k, label, Ico, sub]) => (
-            <button
-              key={k}
-              type="button"
-              role="tab"
-              aria-selected={view === k}
-              title={`${label} — ${sub}`}
-              className={`view-toggle__btn ${view === k ? 'view-toggle__btn--on' : ''}`}
-              onClick={() => onViewChange(k)}
-            >
-              <Ico size={14} strokeWidth={1.75} />
-              <span className="view-toggle__lbl">{label}</span>
-            </button>
-          ))}
-        </div>
       </div>
       <div className="topbar__right">
         {/* Undo / redo (C2) — config history; mirrors ⌘Z / ⇧⌘Z. */}

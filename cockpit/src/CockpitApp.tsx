@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { buildTokens } from './tokens/buildTokens'
 import { Panel } from './panel/Panel'
-import { Stage, type ViewKind } from './stage/Stage'
+import { Stage } from './stage/Stage'
 import { Topbar } from './stage/Topbar'
 import { MobileControlBar } from './stage/MobileControlBar'
 import { CommandPalette } from './stage/CommandPalette'
@@ -20,14 +20,6 @@ interface CockpitAppProps {
   onHome?: () => void
 }
 
-// View Transitions API — Chrome/Edge/Safari 18+, falls back to instant switch elsewhere.
-type DocWithVT = Document & { startViewTransition?: (cb: () => void) => unknown }
-function startViewTransition(cb: () => void): void {
-  const d = document as DocWithVT
-  if (typeof d.startViewTransition === 'function') d.startViewTransition(cb)
-  else cb()
-}
-
 /** The configurator itself — what was previously the App root. Now lives at
  *  /app so /  can be the marketing landing page.
  *
@@ -41,10 +33,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   const [menuOpen, setMenuOpen] = useState(() =>
     typeof window === 'undefined' ? true : window.innerWidth > 768,
   )
-  // Land on Blocks (C7): the ladder runs abstract→concrete, but visitor curiosity
-  // runs concrete→abstract — real, instantly-themeable surfaces are the hook;
-  // Foundations stays the inspect layer one tab away.
-  const [view, setView] = useState<ViewKind>('components')
   const [exportOpen, setExportOpen] = useState(false)
   const [cmdkOpen, setCmdkOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -157,10 +145,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
     [cfg.mode],
   )
 
-  const handleViewChange = (next: ViewKind) => {
-    if (next === view) return
-    startViewTransition(() => setView(next))
-  }
 
   // Undo/redo keyboard shortcuts (C2): ⌘Z / Ctrl+Z = undo, ⇧⌘Z / Ctrl+Y = redo.
   // Skip when a text field is focused so the browser's native field-undo wins
@@ -219,8 +203,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
   return (
     <div className={`app ${menuOpen ? '' : 'app--menu-closed'} ${cfg.mode === 'dark' ? 'app--theme-dark' : ''}`} style={chromeTokens}>
       <Topbar
-        view={view}
-        onViewChange={handleViewChange}
         mode={cfg.mode}
         onToggleMode={() =>
           dispatch({ type: 'SET', patch: { mode: cfg.mode === 'light' ? 'dark' : 'light' } })
@@ -252,11 +234,7 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
             gripRef={gripRef}
           />
         )}
-        <Stage
-          cfg={cfg}
-          tokens={tokens}
-          view={view}
-        />
+        <Stage cfg={cfg} tokens={tokens} />
       </div>
       <MobileControlBar
         onCustomize={() => setMenuOpen(true)}
@@ -278,7 +256,6 @@ export function CockpitApp({ onHome }: CockpitAppProps = {}) {
         onClose={() => setCmdkOpen(false)}
         tokens={tokens}
         dispatch={dispatch}
-        onViewChange={handleViewChange}
         onShare={onShare}
         onExport={() => setExportOpen(true)}
         onRandomize={onRandomize}

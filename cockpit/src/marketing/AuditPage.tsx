@@ -82,7 +82,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
 
   return (
     <div className="mkt">
-      <MktNav navigate={navigate} />
+      <MktNav navigate={navigate} current="audit" />
 
       <main className="mkt__container aud">
         <p className="aud__local">

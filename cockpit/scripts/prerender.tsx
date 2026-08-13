@@ -6,7 +6,7 @@
  *
  * We prerender the CONTENT routes only (landing · manifesto · the data-driven
  * SEO pages). The tool (/app) and the app-like reference surfaces (/components,
- * /showcases) stay client-rendered — Googlebot renders JS, and their value is
+ * /audit) stay client-rendered — Googlebot renders JS, and their value is
  * interaction, not indexable prose.
  *
  * On the client, main.tsx's createRoot renders fresh over the snapshot (not
@@ -144,7 +144,6 @@ const staticRoutes: Array<{ loc: string; freq: string; pri: string }> = [
   { loc: '/audit', freq: 'weekly', pri: '0.9' },
   { loc: '/components', freq: 'weekly', pri: '0.9' },
   { loc: '/styles', freq: 'monthly', pri: '0.8' },
-  { loc: '/showcases', freq: 'monthly', pri: '0.8' },
   { loc: '/docs', freq: 'monthly', pri: '0.8' },
   { loc: '/manifesto', freq: 'monthly', pri: '0.6' },
 ]

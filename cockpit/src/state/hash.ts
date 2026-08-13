@@ -44,8 +44,24 @@ export function readHash(): Config | null {
   return decode(window.location.hash)
 }
 
+/** The untouched kit, serialised once. Compared through `encode` rather than a
+ *  field-by-field deep equal so the two can never drift apart: whatever the hash
+ *  represents is exactly what counts as "unchanged". */
+const DEFAULT_ENCODED = encode(DEFAULT_CONFIG)
+
 export function writeHash(cfg: Config): void {
   if (typeof window === 'undefined') return
+
+  // An untouched kit gets NO hash. Encoding the default meant the very first URL
+  // a visitor saw was already 700 characters of state describing nothing they
+  // had chosen — unshareable, and it rode along to every other page.
+  if (encode(cfg) === DEFAULT_ENCODED) {
+    if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
+    return
+  }
+
   const next = '#' + encode(cfg)
   if (window.location.hash !== next) {
     history.replaceState(null, '', next)

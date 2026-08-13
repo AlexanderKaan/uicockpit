@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ComponentType, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import {
-  AppWindow, Boxes, Code, Dices, Link2, Moon, Palette, RotateCcw, Search, Square, Sun, Redo2, Undo2, Layers,
+  Code, Dices, Link2, Moon, Palette, RotateCcw, Search, Square, Sun, Redo2, Undo2, Layers,
 } from 'lucide-react'
 import type { Config, Tokens } from '../tokens/types'
 import type { ConfigAction } from '../state/configReducer'
 import { COLOR_THEMES } from '../tokens/stylesAndThemes'
 import type { ColorTheme } from '../tokens/types'
-import type { ViewKind } from './Stage'
 
 /* ⌘K command palette (C3) — DOGFOODS the kit's own `.cmdp` recipe. The surface
  * is rendered inside a themed `.cockpit-preview` wrapper (tokens.vars applied),
@@ -27,7 +26,6 @@ interface CommandPaletteProps {
   onClose: () => void
   tokens: Tokens
   dispatch: (a: ConfigAction) => void
-  onViewChange: (v: ViewKind) => void
   onShare: () => void
   onExport: () => void
   onRandomize: () => void
@@ -47,7 +45,7 @@ const RADII: { id: Config['radius']; label: string }[] = [
   { id: 'none', label: 'None' }, { id: 'subtle', label: 'Subtle' }, { id: 'soft', label: 'Soft' }, { id: 'round', label: 'Round' },
 ]
 
-export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, onShare, onExport, onRandomize, onReset, undo, redo }: CommandPaletteProps) {
+export function CommandPalette({ open, onClose, tokens, dispatch, onShare, onExport, onRandomize, onReset, undo, redo }: CommandPaletteProps) {
   const [q, setQ] = useState('')
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -67,12 +65,6 @@ export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, 
 
   const commands = useMemo<Cmd[]>(() => {
     const cmds: Cmd[] = []
-    // Navigate
-    const views: { v: ViewKind; label: string; icon: Cmd['icon'] }[] = [
-      { v: 'components', label: 'Components', icon: Boxes },
-      { v: 'pages', label: 'Pages', icon: AppWindow },
-    ]
-    for (const { v, label, icon } of views) cmds.push({ group: 'Go to', label: `Go to ${label}`, icon, run: () => onViewChange(v) })
     // Brand color theme
     for (const id of Object.keys(COLOR_THEMES) as ColorTheme[]) {
       cmds.push({ group: 'Brand color', label: `Brand: ${THEME_LABELS[id]}`, icon: Palette, run: () => dispatch({ type: 'APPLY_COLOR_THEME', id }) })
@@ -92,7 +84,7 @@ export function CommandPalette({ open, onClose, tokens, dispatch, onViewChange, 
     cmds.push({ group: 'Actions', label: 'Redo', icon: Redo2, hint: '⇧⌘Z', run: redo })
     cmds.push({ group: 'Actions', label: 'Reset to the default kit', icon: RotateCcw, run: onReset })
     return cmds
-  }, [dispatch, onViewChange, onShare, onExport, onRandomize, onReset, undo, redo])
+  }, [dispatch, onShare, onExport, onRandomize, onReset, undo, redo])
 
   // Token-AND filter over (label + group) so "radius round" surfaces "Box radius: Round".
   const matches = useMemo(() => {

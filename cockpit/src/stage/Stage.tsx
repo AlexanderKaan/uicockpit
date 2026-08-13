@@ -1,23 +1,20 @@
 import { type CSSProperties } from 'react'
 import type { Config, Tokens } from '../tokens/types'
 import { IconProvider } from '../icons/Icon'
-import { PagesView } from './views/PagesView'
 import { ComponentsView } from './views/ComponentsView'
 
-/* The two modi:
- *   components → the vocabulary: one gallery, Atom/Component is a sub-toggle
- *   pages      → the loupe: Showcases you drill Page › Section › Atom › All tokens. */
-export type ViewKind = 'components' | 'pages'
-
+/* One stage, one job: the vocabulary — every component in the configured kit on
+ * a single searchable wall. The Showcases loupe that used to sit beside it is
+ * gone; with two front doors the app's whole job is "tune it and take it", and
+ * a second browsing mode inside the tool competed with that instead of serving
+ * it. (The showcase manifests survive as the build gate's conformance fixture —
+ * see cockpit/CLAUDE.md — they are just no longer a screen.) */
 interface StageProps {
   cfg: Config
   tokens: Tokens
-  /** Active view — owned by CockpitApp now that the topbar (the view switcher)
-   *  lives above the stage as a full-width bar. */
-  view: ViewKind
 }
 
-export function Stage({ cfg, tokens, view }: StageProps) {
+export function Stage({ cfg, tokens }: StageProps) {
   const previewStyle = tokens.vars as CSSProperties
 
   return (
@@ -26,9 +23,8 @@ export function Stage({ cfg, tokens, view }: StageProps) {
         <div className="stage__body">
           <div className="cockpit-preview" style={previewStyle}>
             <IconProvider set={cfg.iconSet}>
-              <div className="view-transition-root" key={view}>
-                {view === 'components' && <ComponentsView />}
-                {view === 'pages' && <PagesView />}
+              <div className="view-transition-root">
+                <ComponentsView />
               </div>
             </IconProvider>
           </div>

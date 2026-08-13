@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react'
 import { Wordmark } from '../Wordmark'
+import { ping } from '../analytics/beacon'
 
 /** The published npm package version (`uicockpit` CLI) — the public number. */
 // Derived from cli/package.json at build time (see vite.config.ts) — auto-syncs
@@ -20,7 +21,7 @@ interface MktNavProps {
   /** Client-side navigate (App's pushState router). */
   navigate: (to: string) => void
   /** Which page we're on — drives aria-current on the matching destination. */
-  current?: 'manifesto' | 'docs' | 'showcases' | 'components' | 'styles'
+  current?: 'manifesto' | 'docs' | 'audit' | 'components' | 'styles'
 }
 
 /**
@@ -54,7 +55,6 @@ export function MktNav({ navigate, current }: MktNavProps) {
         <nav className="mkt__nav-links">
           <a href="/components" className="mkt__nav-link" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
           <a href="/styles" className="mkt__nav-link" {...ariaCurrent('styles')} onClick={(e) => go(e, '/styles')}>Styles</a>
-          <a href="/showcases" className="mkt__nav-link" {...ariaCurrent('showcases')} onClick={(e) => go(e, '/showcases')}>Showcases</a>
           <a href="/docs" className="mkt__nav-link" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
         </nav>
 
@@ -85,7 +85,25 @@ export function MktNav({ navigate, current }: MktNavProps) {
             <GithubMark />
           </a>
 
-          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={() => navigate('/app')}>
+          {/* Both entrances, on every page — the nav is where someone who
+              arrived on the wrong side of the fork changes their mind. */}
+          <button
+            className="mkt-btn mkt-btn--ghost mkt-btn--lg mkt__nav-door"
+            onClick={() => { ping('door', 'audit'); navigate('/audit') }}
+          >
+            Audit my UI
+          </button>
+          <button
+            className="mkt-btn mkt-btn--primary mkt-btn--lg"
+            onClick={() => {
+              // From inside the audit this button IS the bridge, not a door —
+              // counting it as a door would quietly undercount the crossing we
+              // are trying to measure.
+              if (current === 'audit') ping('audit', 'bridge')
+              else ping('door', 'configure')
+              navigate('/app')
+            }}
+          >
             Build my UI kit
           </button>
         </div>

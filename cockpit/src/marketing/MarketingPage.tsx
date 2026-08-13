@@ -1,4 +1,4 @@
-import { Sparkles, Palette, FileCode2, BarChart3, ShieldCheck, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
+import { ArrowRight, ScanSearch, Sparkles, Palette, FileCode2, BarChart3, ShieldCheck, Smartphone, Link2, RefreshCw, Lock, Braces, MousePointerClick, Accessibility, Check, Terminal, Wand2 } from 'lucide-react'
 import { useEffect, useRef, type CSSProperties } from 'react'
 import { ComponentBouquet } from './ComponentBouquet'
 import { LoopAnimation } from './LoopAnimation'
@@ -137,6 +137,86 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
         <MktStats />
       </section>
 
+      {/* The retroactive door. It sits this high on purpose: everything below is
+          written for someone starting a system, and most visitors are not. */}
+      <section className="mkt__section" id="audit">
+        <div className="mkt__container">
+          <div className="mkt__section-head">
+            <div className="mkt__eyebrow">
+              <span className="mkt__eyebrow-dot" />
+              The other door
+            </div>
+            <h2>Most design-system advice assumes an empty repo.</h2>
+            <p className="mkt__section-sub">
+              Yours isn&apos;t. Once there are forty screens, the useful question stops being{' '}
+              <em>what should my design system be</em> and becomes{' '}
+              <strong>what is it already, and where has the code drifted from it?</strong>{' '}
+              So the audit inverts the checker: instead of measuring your code against a
+              system you picked, it derives the system your code already implies — then
+              measures the distance back to it.
+            </p>
+          </div>
+
+          <div className="mkt__aud">
+            <ul className="mkt__aud-claims">
+              <li>
+                <span className="mkt__feature-icon"><ScanSearch size={18} strokeWidth={1.9} /></span>
+                <h3>It reads your code in your browser</h3>
+                <p>
+                  Point at a folder. Nothing is uploaded, nothing is stored, no account is
+                  made — open your network panel and watch it stay quiet.
+                </p>
+              </li>
+              <li>
+                <span className="mkt__feature-icon"><Palette size={18} strokeWidth={1.9} /></span>
+                <h3>It returns a config, not a grade</h3>
+                <p>
+                  The colours, type steps, radii and shadows your code already implies come
+                  back as a starting kit you can open in the configurator — the number is
+                  just how far the code sits from it.
+                </p>
+              </li>
+              <li>
+                <span className="mkt__feature-icon"><ShieldCheck size={18} strokeWidth={1.9} /></span>
+                <h3>It refuses when it cannot see</h3>
+                <p>
+                  Below 70% of your styling readable, it declines to score at all rather
+                  than publish a confident number over code it could not parse. It still
+                  shows you everything it did find.
+                </p>
+              </li>
+            </ul>
+
+            <div className="mkt__aud-side">
+              <pre className="mkt__kit-code"><code>npx uicockpit audit</code></pre>
+              <p className="mkt__aud-note">
+                Same engine as the button above — one implementation, so the browser and
+                your terminal can never disagree about a radius.
+              </p>
+              <div className="mkt__aud-evidence">
+                <p>
+                  Run across <strong>17 real codebases</strong> — dashboards, CRMs, mail
+                  clients, ERP, weekend apps. One of them scores a respectable{' '}
+                  <strong>82</strong> and still contains{' '}
+                  <strong>117 hand-rolled button treatments, 82 of them used exactly once.</strong>
+                </p>
+                <p>
+                  That is the finding a score alone walks straight past — which is why the
+                  report puts the wall of your own buttons above the number, not below it.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="mkt-btn mkt-btn--primary mkt-btn--lg"
+                onClick={() => { ping('door', 'audit'); navigate('/audit') }}
+              >
+                Audit my UI <ArrowRight size={17} strokeWidth={2} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Where it fits — triangulate the stack: what UIcockpit IS, by what it isn't */}
       <section className="mkt__section" id="fits">
         <div className="mkt__container">
@@ -179,43 +259,54 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               <span className="mkt__eyebrow-dot" />
               In your build loop
             </div>
-            <h2>One language, three jobs.</h2>
+            <h2>Two entrances, one loop.</h2>
             <p className="mkt__section-sub">
-              UIcockpit isn't a one-time download — it's a layer in your build loop. Set the
-              language once, let your AI apply it on every screen, and check that nothing drifts
-              as the app grows.
+              The two doors are not two products. Audit is simply where you join if the
+              app already exists — it hands you the same kit the configurator would have
+              produced, derived from your own code instead of picked from scratch. From
+              there the loop is identical.
             </p>
           </div>
           <div className="mkt__loop-viz">
             <LoopAnimation />
           </div>
           <div className="mkt__loop">
-            <div className="mkt__loop-card">
+            <div className="mkt__loop-card mkt__loop-card--entry">
+              <span className="mkt__loop-step"><ScanSearch size={18} strokeWidth={1.9} /> Audit</span>
+              <p>
+                Already have an app? Point the auditor at it. It derives the system your
+                code implies and shows you where the code has drifted from it.
+              </p>
+              <span className="mkt__loop-tag">start here if the app exists</span>
+            </div>
+            <span className="mkt__loop-arrow" aria-hidden="true">→</span>
+            <div className="mkt__loop-card mkt__loop-card--entry">
               <span className="mkt__loop-step"><Palette size={18} strokeWidth={1.9} /> Define</span>
               <p>
-                Make your taste decisions once in the configurator — colour, type, shape, density —
-                and export framework-neutral <code>--k-*</code> tokens, the component recipes, and a
-                machine-readable contract. Your whole design language, in one artefact.
+                Tune the decisions — colour, type, shape, density — and export
+                framework-neutral <code>--k-*</code> tokens, the component recipes and a
+                machine-readable contract.
               </p>
+              <span className="mkt__loop-tag">start here if it doesn&apos;t</span>
             </div>
             <span className="mkt__loop-arrow" aria-hidden="true">→</span>
             <div className="mkt__loop-card">
               <span className="mkt__loop-step"><Sparkles size={18} strokeWidth={1.9} /> Apply</span>
               <p>
-                Hand the kit to your AI — over MCP, a skill, or your rules file. It builds on-brand
-                UI in one shot, composing real recipes instead of reaching for the same grey default.
+                Hand the kit to your AI — over MCP, a skill, or your rules file. It composes
+                real recipes instead of reaching for the same grey default.
               </p>
             </div>
             <span className="mkt__loop-arrow" aria-hidden="true">→</span>
             <div className="mkt__loop-card">
               <span className="mkt__loop-step"><ShieldCheck size={18} strokeWidth={1.9} /> Verify</span>
               <p>
-                Run <code>npx uicockpit check --strict</code>. It fails on a hardcoded hex, off-grid
-                spacing, or the wrong token — so what the agent ships stays coherent, screen after screen.
+                Run <code>npx uicockpit check --strict</code>. It fails on a hardcoded hex,
+                off-grid spacing or the wrong token — so screen forty still matches screen one.
               </p>
             </div>
           </div>
-          <p className="mkt__loop-foot">Define → Apply → Verify — every time the UI changes.</p>
+          <p className="mkt__loop-foot">Apply → Verify — every time the UI changes.</p>
         </div>
       </section>
 
@@ -555,12 +646,23 @@ npx uicockpit check --strict`}</code></pre>
         <div className="mkt__container">
           <h2>Stop shipping the generic AI look.<br />Start shipping yours.</h2>
           <p className="mkt__final-sub">
-            Build a coherent, opinion-rich design system in under a minute — 100% free,
-            no account.
+            Free, no account, nothing to install. Take whichever door matches where the
+            app actually is.
           </p>
-          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
-            Build my UI kit →
-          </button>
+          <div className="mkt__final-doors">
+            <button
+              className="mkt-btn mkt-btn--primary mkt-btn--lg"
+              onClick={() => { ping('door', 'configure'); onLaunch() }}
+            >
+              Build my UI kit →
+            </button>
+            <button
+              className="mkt-btn mkt-btn--ghost mkt-btn--lg"
+              onClick={() => { ping('door', 'audit'); navigate('/audit') }}
+            >
+              Audit the app I already have
+            </button>
+          </div>
         </div>
       </section>
 

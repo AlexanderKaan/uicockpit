@@ -13,7 +13,13 @@
 # (off-thesis: a design-system generator ships tokens + components + check, not
 # ready-made screens). The static /templates/* files are gone, so a plain wildcard
 # is safe now; old inbound links land on the live showcase wall.
-/templates      /showcases   301
-/templates/*    /showcases   301
+/templates      /components  301
+/templates/*    /components  301
+# Showcases retired with the loupe (the app narrowed to one door). The wall of
+# real components is the closest surviving evidence, so the links keep landing
+# on something rather than 404-ing. Chained redirects are avoided: /templates
+# points at /components directly, not via /showcases.
+/showcases      /components  301
+/showcases/*    /components  301
 
 /*    /index.html   200

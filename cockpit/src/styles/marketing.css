@@ -233,9 +233,23 @@
 }
 .mkt__gh:hover { background: var(--mkt-sunken); color: var(--mkt-fg); }
 
-@media (max-width: 700px) {
+/* Two entrances now live in this row, so the shed-order on narrow screens is
+ * explicit: version first, then the GitHub mark, and the two doors last. A
+ * phone visitor can lose the repo link; losing an entrance is the one thing
+ * this bar exists to prevent. */
+@media (max-width: 860px) {
   .mkt__nav-tools { gap: 8px; }
-  .mkt__ver { display: none; } /* keep GitHub + CTA on phones */
+  .mkt__ver { display: none; }
+}
+@media (max-width: 700px) {
+  .mkt__gh { display: none; }
+}
+@media (max-width: 420px) {
+  /* Below this the two full labels collide; the hero carries both doors at
+   * full size a few hundred pixels down, so the nav keeps the primary only.
+   * Scoped to the tools row on purpose: `.mkt-btn` sets display:inline-flex
+   * further down this file, and at equal specificity the later rule would win. */
+  .mkt__nav-tools .mkt__nav-door { display: none; }
 }
 
 /* === Buttons === */
@@ -490,7 +504,8 @@
 }
 .mkt__loop {
   display: grid;
-  grid-template-columns: 1fr auto 1fr auto 1fr;
+  /* Four steps now: the two entrances, then the two things everyone does. */
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
   align-items: stretch;
   gap: 16px;
 }
@@ -1534,7 +1549,7 @@
    wall + the component catalog as public destinations. Each is a
    full-bleed band holding a REAL view (PagesView / ComponentsView)
    inside a .cockpit-preview token scope. IA-3: the scope carries the
-   default kit OR the visitor's own (see .mkt__kittoggle).
+   default kit OR the visitor's own.
    ============================================================ */
 .mkt__section--showcases,
 .mkt__section--catalog { padding-bottom: 0; }
@@ -1716,27 +1731,6 @@
 
 /* Kit bridge toggle (IA-3) — Default kit ↔ Your kit, above the stage. */
 .mkt__catalog-tools { margin-top: 20px; display: flex; justify-content: center; }
-.mkt__kittoggle {
-  display: inline-flex;
-  gap: 2px;
-  padding: 3px;
-  border: 1px solid var(--mkt-border);
-  border-radius: 999px;
-  background: var(--mkt-bg-soft, #f7f8fa);
-}
-.mkt__kittoggle-btn {
-  border: 0;
-  background: transparent;
-  padding: 6px 16px;
-  border-radius: 999px;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--mkt-fg-muted);
-  cursor: pointer;
-  transition: background 120ms ease, color 120ms ease;
-}
-.mkt__kittoggle-btn--on { background: var(--mkt-surface, #fff); color: var(--mkt-fg); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06); }
 .mkt__kit-hint { font-size: 13px; }
 
 /* ============================================================
@@ -2351,4 +2345,80 @@
   .aud__panel { padding: 22px 18px 20px; }
   .aud__foot, .aud__findings-bar { flex-direction: column; align-items: stretch; }
   .aud__actions { justify-content: space-between; }
+}
+
+
+/* === The retroactive door (#audit) ====================================
+ * Claims on the left, the proof on the right. The evidence block is the one
+ * element that has to survive a skim, so it is the only thing here that gets a
+ * fill — the section's argument is a number most readers will not expect. */
+.mkt__aud {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+.mkt__aud-claims { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.mkt__aud-claims li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 14px;
+  row-gap: 4px;
+}
+.mkt__aud-claims .mkt__feature-icon { grid-row: 1 / span 2; }
+.mkt__aud-claims h3 { margin: 0; font-size: 1rem; font-weight: 650; letter-spacing: -0.01em; color: var(--mkt-fg); }
+.mkt__aud-claims p { margin: 0; font-size: 0.9375rem; line-height: 1.6; color: var(--mkt-fg-muted); }
+
+.mkt__aud-side { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.mkt__aud-side .mkt__kit-code { width: 100%; margin: 0; }
+.mkt__aud-note { margin: 0; font-size: 0.8125rem; line-height: 1.55; color: var(--mkt-fg-subtle, var(--mkt-fg-muted)); }
+.mkt__aud-evidence {
+  width: 100%;
+  border: 1px solid var(--mkt-border);
+  border-radius: 14px;
+  background: var(--mkt-sunken);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mkt__aud-evidence p { margin: 0; font-size: 0.9375rem; line-height: 1.6; color: var(--mkt-fg-muted); }
+.mkt__aud-evidence strong { color: var(--mkt-fg); font-weight: 650; }
+
+@media (max-width: 900px) {
+  .mkt__aud { grid-template-columns: 1fr; gap: 28px; }
+}
+
+
+/* The two entry cards carry a marker: which door you came through decides where
+ * you join the loop, and that is the whole point of the section. */
+.mkt__loop-card--entry { border-color: color-mix(in oklab, var(--mkt-accent) 32%, var(--mkt-border)); }
+.mkt__loop-tag {
+  margin-top: auto;
+  padding-top: 10px;
+  font-size: 0.75rem;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+  color: var(--mkt-accent);
+}
+
+/* Between wide and phone, four across is too narrow to read — go 2x2 and drop
+ * the arrows rather than let the cards become columns of single words. */
+@media (max-width: 1140px) and (min-width: 801px) {
+  .mkt__loop { grid-template-columns: 1fr 1fr; }
+  .mkt__loop-arrow { display: none; }
+}
+
+.mkt__final-doors { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+/* The final CTA sits on a dark band, where the ghost button's default border
+ * disappears. Give it one that survives the inversion. */
+.mkt__final-doors .mkt-btn--ghost {
+  border-color: rgb(255 255 255 / 0.28);
+  color: #fff;
+  background: transparent;
+}
+.mkt__final-doors .mkt-btn--ghost:hover {
+  border-color: rgb(255 255 255 / 0.5);
+  background: rgb(255 255 255 / 0.08);
 }

@@ -27,15 +27,20 @@ const ROOT = resolve(HERE, '..')
 const REPORT = process.argv.includes('--report')
 
 const VIEWS = resolve(ROOT, 'src/stage/views')
-// H3c — SupaDash retired. The product surface is now the manifest-driven showcase
-// layer ONLY: sections.tsx (SectionSpec → kit recipes) + manifests.ts (the seeds) +
-// PagesView.tsx (the theater's shell chrome) + ChartFrame (the chart presenter
-// blocks compose). Coverage now tracks what the SHOWCASES demonstrate — a smaller,
-// honest set than the old 58-deep SupaDash surface (a deliberate trade, recorded
-// in ROADMAP H3c). Components only shown bare in the gallery are gallery-only.
+// The surface this audit holds the kit to is the manifest-driven showcase layer:
+// sections.tsx (SectionSpec → kit recipes) + shell.tsx (the section tier — the
+// adaptive scaffold + panes) + manifests.ts (the seeds) + ChartFrame (the chart
+// presenter blocks compose). Components only shown bare in the gallery are
+// gallery-only.
+//
+// Those showcase files are no longer a SCREEN — the loupe that rendered them was
+// retired when the app narrowed to one door. They are a CONFORMANCE FIXTURE now,
+// read from disk by this audit and five others. That is why shell.tsx exists at
+// all: it carries the scaffold/pane composition the deleted view used to be the
+// only consumer of. See src/showcases/shell.tsx.
 const SHOWCASES = resolve(ROOT, 'src/showcases')
 const FILES = [
-  ...['ChartFrame.tsx', 'PagesView.tsx'].map((f) => resolve(VIEWS, f)),
+  resolve(VIEWS, 'ChartFrame.tsx'),
   ...readdirSync(SHOWCASES).filter((f) => f.endsWith('.ts') || f.endsWith('.tsx')).map((f) => resolve(SHOWCASES, f)),
 ]
 const HAYSTACK = FILES.map((f) => readFileSync(f, 'utf8')).join('\n')
@@ -51,7 +56,7 @@ const MARKERS = {
   TreeView: 'tree__row', Timeline: 'timeline__', SettingsRow: 'list--settings',
   Switch: 'toggle', WizardStepper: 'wstepper', Stepper: 'stepper__',
   Dropzone: 'dropzone', Media: 'aspect--1x1', Badge: 'badge badge--',
-  // Section tier — the adaptive scaffold the showcase theater renders (PagesView)
+  // Section tier — the adaptive scaffold the fixture shell renders (shell.tsx)
   Scaffold: 'scaffold scaffold--', NavSuite: 'navsuite', Pane: 'PANE_CLASS',
   Avatar: 'avatar avatar--', Tab: 'tab ', Segmented: 'segctrl',
 }

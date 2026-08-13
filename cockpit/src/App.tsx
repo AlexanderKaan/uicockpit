@@ -5,7 +5,6 @@ import { MarketingManifesto } from './marketing/MarketingManifesto'
 import { OgCard } from './marketing/OgCard'
 import { SeoPage } from './marketing/SeoPage'
 import { DocsPage } from './marketing/DocsPage'
-import { ShowcasesPage } from './marketing/ShowcasesPage'
 import { ComponentsIndexPage, ComponentDetailPage } from './marketing/ComponentDocs'
 import { componentPageBySlug } from './stage/views/ComponentGallery'
 import { StylesPage } from './marketing/StylesPage'
@@ -20,7 +19,6 @@ import './styles/marketing.css'
  *   /                    → Marketing landing
  *   /app                 → The configurator (also any /app/* future deep links)
  *   /docs                → The guide, in the SITE shell (was: inside the app shell)
- *   /showcases           → The Ledger showcase wall as a public destination
  *   /audit               → Scan an existing codebase (client-side; nothing uploaded)
  *   /compare/<slug>      → SEO comparison page  ("UIcockpit vs X")
  *   /alternatives/<slug> → SEO alternative page ("X alternative")
@@ -41,7 +39,11 @@ function useRoute() {
   }, [])
   const navigate = (to: string) => {
     if (window.location.pathname === to) return
-    history.pushState({}, '', to + window.location.hash)
+    // The kit hash belongs to the configurator. It used to ride along to every
+    // route, so clicking the logo from a tuned kit landed you on a home page
+    // wearing 700 characters of someone else's state.
+    const keepHash = to.startsWith('/app') && window.location.pathname.startsWith('/app')
+    history.pushState({}, '', to + (keepHash ? window.location.hash : ''))
     setPath(to)
   }
   return { path, navigate }
@@ -63,7 +65,6 @@ export function App() {
     if (componentPageBySlug(slug)) return <ComponentDetailPage slug={slug} navigate={navigate} />
     return <ComponentsIndexPage navigate={navigate} /> // unknown slug → the index
   }
-  if (path.startsWith('/showcases')) return <ShowcasesPage navigate={navigate} />
   if (path.startsWith('/styles')) return <StylesPage navigate={navigate} />
 
   // The retroactive door — point at existing code, entirely client-side.
