@@ -1,3 +1,4 @@
+import { useState, type CSSProperties } from 'react'
 import { SPECIMENS, SHELL_SPECIMENS, NO_SPECIMEN } from '../../audit/specimens'
 import type { AuditHandoff } from '../../audit/handoff'
 
@@ -21,7 +22,38 @@ interface AuditViewProps {
   onSeeEvidence?: () => void
 }
 
+/**
+ * Their own values, dealt out one per cell.
+ *
+ * This is the honest form of "before". We measured what reconstructing any
+ * SINGLE component of theirs costs — about half a codebase, with a guess on top
+ * — and threw it away. But their values we know exactly, and drift is not a
+ * property of one button: it is having nineteen radii with nothing deciding
+ * between them. So each cell wears a different real value, and the claim is
+ * about the spread, never about that particular element.
+ *
+ * Overriding the --k-* vars per cell also shadows the panel, which is exactly
+ * right: "before" means the Foundation is not applied yet.
+ */
+function driftStyle(audit: AuditHandoff, i: number): CSSProperties {
+  const s = audit.spread
+  const pick = (list: string[], n: number) => (list.length ? list[n % list.length] : undefined)
+  const r = pick(s.radius, i)
+  const sh = pick(s.shadow, i)
+  const c = pick(s.color, i)
+  const sp = pick(s.spacing, i)
+  const out: Record<string, string> = {}
+  if (r) { out['--k-radius-sm'] = r; out['--k-radius-md'] = r; out['--k-radius-lg'] = r; out['--k-radius-button'] = r }
+  if (sh) { out['--k-shadow-sm'] = sh; out['--k-shadow-md'] = sh }
+  if (c) { out['--k-primary'] = c; out['--k-accent'] = c; out['--k-fill'] = c; out['--k-ring'] = c }
+  if (sp) { out['--k-s-8'] = sp; out['--k-s-12'] = sp }
+  return out as CSSProperties
+}
+
 export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
+  /* Starts on BEFORE. The point of the switch is the moment it resolves, and
+   * that moment only exists if they saw the mess first. */
+  const [drift, setDrift] = useState(true)
   const entries = Object.entries(audit.kinds)
   const found = entries.filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1])
   // Kinds they build that we cannot draw yet, kept separate from kinds they
@@ -88,8 +120,36 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
         </div>
       </div>
 
+      <div className="audv__toggle">
+        <div className="mkt__switch" role="radiogroup" aria-label="Your values, or your kit">
+          <span className={`mkt__switch-knob${drift ? '' : ' is-right'}`} aria-hidden="true" />
+          <button type="button" role="radio" aria-checked={drift}
+            className={`mkt__switch-opt${drift ? ' is-on' : ''}`} onClick={() => setDrift(true)}>
+            Your code today
+          </button>
+          <button type="button" role="radio" aria-checked={!drift}
+            className={`mkt__switch-opt${drift ? '' : ' is-on'}`} onClick={() => setDrift(false)}>
+            On your kit
+          </button>
+        </div>
+        <p className="audv__tally">
+          {drift ? (
+            <>
+              <b>{audit.distinct.color}</b> colours <i>·</i> <b>{audit.distinct.radius}</b> radii{' '}
+              <i>·</i> <b>{audit.distinct.shadow}</b> shadows <i>·</i> <b>{audit.distinct.spacing}</b> spacings
+            </>
+          ) : (
+            <>One accent <i>·</i> one scale <i>·</i> one shadow <i>·</i> one rhythm</>
+          )}
+        </p>
+      </div>
+
       <p className="audv__lede">
-        {brandKnown ? (
+        {drift ? (
+          <>Every value below is one your own code uses — dealt out one per component, which is what
+          having <b>{audit.distinct.radius} radii</b> looks like when nothing decides between them.
+          The Foundation on the left is not applied yet.</>
+        ) : brandKnown ? (
           <>These are the components your codebase actually builds, on the kit your code implies. Change
           anything on the left and this updates — it is the same live preview, pointed at your app.</>
         ) : (
@@ -108,13 +168,15 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
             the parts rather than guess the floor plan.
           </p>
           <div className="audv__grid audv__grid--shell">
-            {shell.map(({ kind, n, spec }) => (
+            {shell.map(({ kind, n, spec }, i) => (
               <figure key={kind} className={`audv__spec${spec.wide ? ' audv__spec--wide' : ''}`}>
                 <figcaption>
                   <span>{spec.label}</span>
                   <span className="audv__n">in {nf(n)} file{n === 1 ? '' : 's'}</span>
                 </figcaption>
-                <div className="audv__stage">{spec.render()}</div>
+                <div className="audv__stage" style={drift ? driftStyle(audit, i) : undefined}>
+                  {spec.render()}
+                </div>
               </figure>
             ))}
           </div>
@@ -123,14 +185,16 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
       )}
 
       <div className="audv__grid">
-        {drawable.map(({ kind, n, spec }) => {
+        {drawable.map(({ kind, n, spec }, i) => {
           return (
             <figure key={kind} className={`audv__spec${spec.wide ? ' audv__spec--wide' : ''}`}>
               <figcaption>
                 <span>{spec.label}</span>
                 <span className="audv__n">in {nf(n)} file{n === 1 ? '' : 's'}</span>
               </figcaption>
-              <div className="audv__stage">{spec.render()}</div>
+              <div className="audv__stage" style={drift ? driftStyle(audit, i + 3) : undefined}>
+                {spec.render()}
+              </div>
             </figure>
           )
         })}

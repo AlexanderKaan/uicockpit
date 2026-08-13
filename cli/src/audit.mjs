@@ -884,6 +884,23 @@ function pickBrandColor(values, palette) {
   return { value: top.value, share: total ? top.count / total : 0 }
 }
 
+/** A length a browser will accept verbatim. */
+function isCssLength(v) {
+  return typeof v === 'string' && /^-?[\d.]+(px|rem|em|%)$/.test(v)
+}
+
+/** Resolve a measured colour to a hex a browser can render, keeping only the
+ *  SATURATED ones — greys are an app's surfaces, not its decisions. */
+function toHex(value, palette) {
+  const rgb = parseColor(stripAlpha(String(value)), palette)
+  if (!rgb) return null
+  const [r, g, b] = rgb
+  // 30 let tinted greys through — slate-500 spans 39 — and a wall of slate
+  // reads as "your app is grey", which is a statement about surfaces, not drift.
+  if (Math.max(r, g, b) - Math.min(r, g, b) < 60) return null
+  return '#' + [r, g, b].map((n) => Math.round(n).toString(16).padStart(2, '0')).join('')
+}
+
 /* ──────────────────────────────── the engine ───────────────────────────────── */
 
 /**
@@ -1103,6 +1120,29 @@ export function auditFiles(files, opts = {}) {
      * cannot read — and it is what lets the result be shown as the visitor's
      * OWN component set rather than our catalogue. */
     kinds: detectKinds(files),
+    /* Their real value SPREAD, resolved to CSS.
+     *
+     * This is what an honest "before" is made of. Not a reconstruction of any
+     * one component — we measured that ceiling and it is about half a codebase
+     * with a guess on top — but the values themselves, which we know exactly.
+     * Nineteen radii is not an opinion; showing what nineteen radii look like
+     * when nothing decides between them is not a claim about any single
+     * element, it is the definition of drift.
+     *
+     * Resolved HERE because this is where the palette lives: `slate-500` means
+     * nothing to a browser, and the consumer must never have to guess. */
+    spread: {
+      radius: dimensions.radius.values.map((v) => v.value).filter(isCssLength).slice(0, 12),
+      shadow: dimensions.shadow.values.map((v) => v.value).filter((v) => !/var\(/.test(v)).slice(0, 8),
+      spacing: dimensions.spacing.values.map((v) => v.value).filter(isCssLength).slice(0, 10),
+      // Saturated only: an app's greys are its surfaces, its colours are its
+      // decisions, and only the second kind reads as drift.
+      color: dimensions.color.values
+        .map((v) => toHex(v.value, palette))
+        .filter(Boolean)
+        .slice(0, 10),
+    },
+
     /* The skeleton, as opposed to the parts. Which regions — never how they are
      * arranged; see the note on SHELL_REGIONS for why that is unknowable from a
      * static read, and why anything rendering this must say so. */

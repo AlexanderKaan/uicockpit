@@ -812,3 +812,18 @@
 .audv__sub { margin: 0 2px 14px; font-size: 12px; line-height: 1.55; color: var(--app-fg-muted); max-width: 74ch; }
 .audv__sub b { color: var(--app-fg); }
 .audv__grid--shell { margin-bottom: 6px; }
+
+/* === Before / after, on their own app ======================================
+ * Same switch as the hero, because it is the same argument — only here both
+ * sides are measured from their code rather than staged by us. */
+.audv__toggle {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin: 16px 2px 4px;
+}
+.audv__tally { margin: 0; font-size: 13px; font-weight: 550; color: var(--app-fg-muted); font-variant-numeric: tabular-nums; }
+.audv__tally b { color: var(--app-fg); font-weight: 680; }
+.audv__tally i { font-style: normal; color: var(--app-border); margin: 0 3px; }
+/* The cells repaint rather than move: same grid, same order, same counts, so
+ * the eye can follow every swap instead of re-finding the layout. */
+.audv__stage { transition: background 260ms ease; }
+.audv__stage > * { transition: all 300ms cubic-bezier(.4, 0, .2, 1); }

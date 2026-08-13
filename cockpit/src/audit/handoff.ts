@@ -38,6 +38,13 @@ export interface AuditHandoff {
   /** The skeleton: region → how many of their files build it. Regions only —
    *  never an arrangement, which a static read genuinely cannot recover. */
   shell: Record<string, number>
+  /** Their real values, resolved to CSS by the engine. This is what makes an
+   *  honest "before" possible: we cannot reconstruct any single component of
+   *  theirs, but we know their values exactly, and drift IS having nineteen
+   *  radii with nothing deciding between them. */
+  spread: { radius: string[]; shadow: string[]; spacing: string[]; color: string[] }
+  /** What the drift actually amounts to — measured, for the tally. */
+  distinct: { radius: number; shadow: number; color: number; spacing: number }
   treatments: number
   singletons: number
   score: number | null
@@ -173,10 +180,27 @@ export function saveHandoff(h: AuditHandoff): void {
   }
 }
 
+/**
+ * Read a stored handoff, and DISCARD one written by an older build.
+ *
+ * The shape grows — spread and distinct arrived after the first version — and a
+ * visitor who scanned before a deploy still has the old object in their tab.
+ * Reading it optimistically crashed the whole app on `spread.color` for exactly
+ * the people who had already used the feature. Anything missing a field we now
+ * rely on is dropped, which lands them on the drop zone instead of a white
+ * screen: losing an audit is a nuisance, losing the app is not survivable.
+ */
 export function readHandoff(): AuditHandoff | null {
   try {
     const raw = sessionStorage.getItem(KEY)
-    return raw ? (JSON.parse(raw) as AuditHandoff) : null
+    if (!raw) return null
+    const h = JSON.parse(raw) as Partial<AuditHandoff>
+    const ok =
+      h && typeof h.rootName === 'string' &&
+      !!h.kinds && !!h.shell && !!h.provenance && !!h.derived &&
+      !!h.spread && Array.isArray(h.spread.color) && !!h.distinct
+    if (!ok) { clearHandoff(); return null }
+    return h as AuditHandoff
   } catch {
     return null
   }
@@ -194,17 +218,17 @@ export function readHandoff(): AuditHandoff | null {
  * in the configurator, and the report is a document already rendered on their
  * screen. Neither leaves the machine, and both die with the tab.
  */
+export function clearHandoff(): void {
+  try {
+    sessionStorage.removeItem(KEY)
+    sessionStorage.removeItem(REPORT_KEY)
+  } catch { /* nothing to clear */ }
+}
+
 export function saveReport(html: string): void {
   try { sessionStorage.setItem(REPORT_KEY, html) } catch { /* over quota → the link just re-scans */ }
 }
 
 export function readReport(): string | null {
   try { return sessionStorage.getItem(REPORT_KEY) } catch { return null }
-}
-
-export function clearHandoff(): void {
-  try {
-    sessionStorage.removeItem(KEY)
-    sessionStorage.removeItem(REPORT_KEY)
-  } catch { /* nothing to clear */ }
 }
