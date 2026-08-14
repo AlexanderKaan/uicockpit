@@ -331,12 +331,16 @@ export function DatePicker({
               if (on) cls.push('calendar__cell--on')
               if (c.out) cls.push('calendar__cell--out')
               if (isToday) cls.push('calendar__cell--today')
+              /* An out-of-month cell is padding, not a control. Rendered as a
+                 disabled button it is an empty button — 10 of them, each one a
+                 `button-name` violation, and a keyboard stop that leads nowhere.
+                 `sections.tsx` already does it this way. */
+              if (c.out) return <span key={i} className={cls.join(' ')} aria-hidden="true" />
               return (
                 <button
                   key={i}
                   type="button"
                   className={cls.join(' ')}
-                  disabled={c.out}
                   aria-current={on ? 'date' : undefined}
                   onClick={() => { setSelected(c.date); setView({ y: c.date.getFullYear(), m: c.date.getMonth() }); setOpen(false) }}
                 >{c.day}</button>

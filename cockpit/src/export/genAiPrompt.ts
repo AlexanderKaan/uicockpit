@@ -659,12 +659,14 @@ headless lib sets them for you; if you hand-roll, this is the checklist):
 | Select trigger (.select-trigger) | \`aria-haspopup="listbox"\` + \`aria-expanded\`; the panel is a listbox |
 | Tooltip (.tt) | trigger \`aria-describedby="\<tipId\>"\`; tip \`role="tooltip"\` |
 | Popover / hover-card (.popover) | trigger \`aria-expanded\` + \`aria-controls\`; panel \`role="dialog"\` if interactive |
-| Switch / toggle (.toggle) | \`role="switch"\` + \`aria-checked\` |
+| Switch / toggle (.toggle) | \`role="switch"\` + \`aria-checked\` + an accessible NAME (wrap in \`<label>\`, or \`aria-label\`/\`aria-labelledby\`) + \`tabindex="0"\` if not a \`<button>\` |
 | Slider (.slider) | \`role="slider"\` + \`aria-valuemin/max/now\` + \`aria-label\` |
-| Progress (.progress/.usage) | \`role="progressbar"\` + \`aria-valuenow/min/max\` |
+| Progress (.progress/.usage) | \`role="progressbar"\` + \`aria-valuenow/min/max\` + an accessible NAME (\`aria-label\`/\`aria-labelledby\`) |
 | OTP (.otp) | group \`role="group"\` + \`aria-label\`; each slot \`aria-label="Digit N of M"\` |
 | Sortable table header (.tbl th) | \`aria-sort="ascending"\|"descending"\|"none"\` |
 | Toast / status (.toast-stack) | \`role="status"\` (polite) or \`role="alert"\` (assertive) + \`aria-live\` |
+| Resize handle (.resizable__handle) | \`role="separator"\` + \`tabindex="0"\` + \`aria-valuenow\` (a FOCUSABLE separator is a widget and needs a value) + \`aria-label\` |
+| Any scrollable box (\`overflow:auto\`) | \`tabindex="0"\` + \`role="region"\` + \`aria-label\` — without it a keyboard cannot scroll it at all (WCAG 2.1.1) |
 
 Disabled = native \`disabled\` (or \`aria-disabled="true"\` on non-form elements);
 invalid fields = \`aria-invalid="true"\` (pairs with \`.in.is-error\` / \`.select-trigger.is-error\`).

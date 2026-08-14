@@ -1005,7 +1005,7 @@ function DialogCard() {
       <div className="dialog-frame">
         {open ? (
           <>
-            <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} aria-label="Close dialog" />
+            <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
             <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" style={{ maxBlockSize: 188 }}>
               <h3 id="dialog-title" className="dialog__title">Delete project?</h3>
               <div className="dialog__body">
@@ -1076,7 +1076,7 @@ function CmdPaletteCard() {
             {groups.map((g) => (
               <Fragment key={g}>
                 <div className="cmdp__section">{g}</div>
-                <ul className="cmdp__list">
+                <ul className="cmdp__list" role="group" aria-label={g}>
                   {matches.map((c, i) =>
                     c.group === g ? (
                       <li
@@ -2152,12 +2152,12 @@ function SpinnerCard() {
   return (
     <Card title="Workspace">
       <div className="card__row" style={{ alignItems: 'center', gap: 12 }}>
-        <span className="spinner" aria-label="Loading" />
+        <span className="spinner" role="status" aria-label="Loading" />
         <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>Loading workspace…</span>
       </div>
       <div className="card__row" style={{ alignItems: 'center', gap: 14, marginTop: 8 }}>
         <span className="spinner spinner--sm" aria-label="Loading" />
-        <span className="spinner" aria-label="Loading" />
+        <span className="spinner" role="status" aria-label="Loading" />
         <span className="spinner spinner--lg" aria-label="Loading" />
         <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>sm · md · lg</span>
       </div>
@@ -2790,20 +2790,27 @@ function DateCard() {
               {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
                 <span key={i} className="calendar__head">{d}</span>
               ))}
-              {days.map((d, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className={cellClass(d)}
-                  disabled={d < 1 || d > 31 || isBlocked(d)}
-                  aria-label={d >= 1 && d <= 31 ? `May ${d}${isBlocked(d) ? ' (unavailable)' : ''}` : undefined}
-                  aria-current={d === today ? 'date' : undefined}
-                  onClick={() => handleClick(d)}
-                  onMouseEnter={() => d >= 1 && d <= 31 && setHover(d)}
-                >
-                  {d >= 1 && d <= 31 ? d : ''}
-                </button>
-              ))}
+              {days.map((d, i) => {
+                /* Out-of-month cells are PADDING. As empty disabled buttons they
+                   are ten `button-name` violations and ten keyboard stops that
+                   go nowhere; `sections.tsx` already renders them as inert
+                   spans, and this is the copy that drifted. */
+                if (d < 1 || d > 31) return <span key={i} className={cellClass(d)} aria-hidden="true" />
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    className={cellClass(d)}
+                    disabled={isBlocked(d)}
+                    aria-label={`May ${d}${isBlocked(d) ? ' (unavailable)' : ''}`}
+                    aria-current={d === today ? 'date' : undefined}
+                    onClick={() => handleClick(d)}
+                    onMouseEnter={() => setHover(d)}
+                  >
+                    {d}
+                  </button>
+                )
+              })}
             </div>
             <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
               <span style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }}>{summary}</span>
@@ -3015,9 +3022,16 @@ function CalendarRangeCard() {
       <div className="calendar">
         {DOW.map((d, i) => <span key={i} className="calendar__head">{d}</span>)}
         {miniMonthDays(offset).map((d, i) => (
-          <button key={i} type="button" className={rangeCell(d, dim, side, bound)} disabled={d < 1 || d > dim} aria-label={d >= 1 && d <= dim ? `${title.split(' ')[0]} ${d}` : undefined}>
-            {d >= 1 && d <= dim ? d : ''}
-          </button>
+          /* Padding, not a control — see the note on the single-month calendar.
+             This is the fourth copy of the same day-cell loop in this file, and
+             all four had drifted apart; the duplication is the real defect. */
+          d < 1 || d > dim
+            ? <span key={i} className={rangeCell(d, dim, side, bound)} aria-hidden="true" />
+            : (
+              <button key={i} type="button" className={rangeCell(d, dim, side, bound)} aria-label={`${title.split(' ')[0]} ${d}`}>
+                {d}
+              </button>
+            )
         ))}
       </div>
     </div>
@@ -3127,7 +3141,7 @@ function CardTableCard() {
   ]
   return (
     <Card title="Files" desc="Card-framed — rounded frame, sticky header, scrolls.">
-      <div style={{ maxHeight: '12rem', overflow: 'auto' }}>
+      <div style={{ maxHeight: '12rem', overflow: 'auto' }} tabIndex={0} role="region" aria-label="Scrollable list">
         <table className="tbl tbl--card">
           <thead>
             <tr>
@@ -3166,7 +3180,7 @@ function FrozenColumnTableCard() {
   ]
   return (
     <Card title="Metrics" desc="Frozen first column — the Metric pins while months scroll.">
-      <div style={{ overflowX: 'auto' }}>
+      <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="tbl tbl--card" style={{ minWidth: '32rem' }}>
           <thead>
             <tr>
@@ -3346,7 +3360,7 @@ function TwoColumnListCard() {
           </Fragment>
         ))}
       </div>
-      <div className="scroll-area" style={{ maxHeight: 160, overflow: 'auto', marginTop: 'var(--k-s-12)' }}>
+      <div className="scroll-area" style={{ maxHeight: 160, overflow: 'auto', marginTop: 'var(--k-s-12)' }} tabIndex={0} role="region" aria-label="Scrollable content">
         <div className="list list--sticky">
           {['A', 'B', 'C', 'D'].map((letter) => (
             <Fragment key={letter}>
@@ -4016,11 +4030,11 @@ function NumberInputCard() {
     <Card title="Quantity" desc="Adjust amounts with steppers.">
       <div className="numinput">
         <button className="numinput__step" onClick={() => setV((n) => Math.max(0, n - 1))} aria-label="Decrement">−</button>
-        <input className="numinput__field" value={v} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setV(n) }} />
+        <input className="numinput__field" value={v} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setV(n) }} aria-label="Quantity" />
         <button className="numinput__step" onClick={() => setV((n) => n + 1)} aria-label="Increment">+</button>
       </div>
       <div className="numinput numinput--with-suffix">
-        <input className="numinput__field" value={px} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setPx(n) }} />
+        <input className="numinput__field" value={px} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setPx(n) }} aria-label="Size in pixels" />
         <span className="numinput__suffix">px</span>
         <div className="numinput__steps">
           <button className="numinput__chev" onClick={() => setPx((n) => n + 1)} aria-label="Increment">
@@ -4192,7 +4206,7 @@ function SettingsRowCard() {
             <div className="list__title">Force HTTPS</div>
             <div className="list__sub">Redirect all website requests over HTTPS.</div>
           </div>
-          <div className={'toggle ' + (https ? 'toggle--on' : '')} onClick={() => setHttps((v) => !v)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setHttps((v) => !v) } }} role="switch" aria-checked={https} tabIndex={0}>
+          <div className={'toggle ' + (https ? 'toggle--on' : '')} onClick={() => setHttps((v) => !v)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setHttps((v) => !v) } }} role="switch" aria-checked={https} aria-label="Force HTTPS" tabIndex={0}>
             <div className="toggle__knob" />
           </div>
         </div>
@@ -4201,7 +4215,7 @@ function SettingsRowCard() {
             <div className="list__title">Maintenance mode</div>
             <div className="list__sub">Other users will not be able to discover your content.</div>
           </div>
-          <div className={'toggle ' + (maint ? 'toggle--on' : '')} onClick={() => setMaint((v) => !v)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMaint((v) => !v) } }} role="switch" aria-checked={maint} tabIndex={0}>
+          <div className={'toggle ' + (maint ? 'toggle--on' : '')} onClick={() => setMaint((v) => !v)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMaint((v) => !v) } }} role="switch" aria-checked={maint} aria-label="Maintenance mode" tabIndex={0}>
             <div className="toggle__knob" />
           </div>
         </div>
