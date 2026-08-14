@@ -6,6 +6,7 @@ import { buildTokens } from '../tokens/buildTokens'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { COMPONENT_PAGES, componentPageBySlug, type ComponentPage } from '../stage/views/ComponentGallery'
 import { RECIPES } from '../kit'
+import { explainerFor } from '../kit/explainer'
 import { tierOf, usesOf } from '../kit/segments'
 
 /** The component reference always shows the DEFAULT kit — one canonical look for
@@ -109,6 +110,7 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
   const tier = tierOf(page.recipeId)
   const composes = usesOf(page.recipeId)
   const doc = recipe?.doc
+  const ex = explainerFor(page.recipeId)
 
   useEffect(() => {
     const prev = document.title
@@ -136,6 +138,78 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
           <page.Preview />
         </IconProvider>
       </div>
+
+      {/* The explainer: parts · states · behaviour · accessibility · tests.
+        *
+        * Open UI specifies every control under those five headings, and the
+        * fifth is the one nobody ships — a claim about behaviour with the tests
+        * that hold it up. Parts and states are DERIVED from the recipe's own CSS
+        * on every build, so they cannot drift into a comfortable fiction; the
+        * behaviour half is normative and cites WAI-ARIA APG, because "keyboard
+        * accessible" is a promise and a key map is something an auditor can
+        * check. */}
+      {ex && (ex.apg || ex.apgNote || ex.parts.length > 0 || ex.states.length > 0) && (
+        <section className="cmpdoc__block cmpdoc__spec">
+          <h2>Specification</h2>
+
+          {ex.apg ? (
+            <div className="cmpdoc__spec-group">
+              <h3>Behaviour</h3>
+              <p className="cmpdoc__spec-note">
+                Implements the WAI-ARIA APG{' '}
+                <a href={ex.apg.url} target="_blank" rel="noreferrer">{ex.apg.pattern}</a> pattern.
+                {ex.apg.free && <> <strong>The platform already gives you most of this:</strong> {ex.apg.free}</>}
+              </p>
+              {ex.apg.keys.length > 0 && (
+                <table className="cmpdoc__spec-keys">
+                  <tbody>
+                    {ex.apg.keys.map(([k, what]: [string, string]) => (
+                      <tr key={k}><th scope="row"><kbd className="kbd">{k}</kbd></th><td>{what}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              <h3>Accessibility requirements</h3>
+              <ul className="cmpdoc__spec-list">
+                {ex.apg.aria.map((a: string) => <li key={a}>{a}</li>)}
+              </ul>
+            </div>
+          ) : ex.apgNote ? (
+            <div className="cmpdoc__spec-group">
+              <h3>Behaviour</h3>
+              <p className="cmpdoc__spec-note">{ex.apgNote}</p>
+            </div>
+          ) : null}
+
+          {ex.parts.length > 0 && (
+            <div className="cmpdoc__spec-group">
+              <h3>Parts</h3>
+              <p className="cmpdoc__spec-classes">
+                {ex.parts.map((c: string, i: number) => <span key={c}>{i > 0 ? ' ' : ''}<code>.{c}</code></span>)}
+              </p>
+            </div>
+          )}
+
+          {ex.states.length > 0 && (
+            <div className="cmpdoc__spec-group">
+              <h3>States and variants</h3>
+              <p className="cmpdoc__spec-classes">
+                {ex.states.map((c: string, i: number) => <span key={c}>{i > 0 ? ' ' : ''}<code>{c}</code></span>)}
+              </p>
+            </div>
+          )}
+
+          <div className="cmpdoc__spec-group">
+            <h3>Tests</h3>
+            <p className="cmpdoc__spec-note">
+              What actually holds the above up. Every one of these runs in the build.
+            </p>
+            <ul className="cmpdoc__spec-list">
+              {ex.tests.map((t: string) => <li key={t}>{t}</li>)}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {composes.length > 0 && (
         <p className="cmpdoc__composes">

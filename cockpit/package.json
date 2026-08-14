@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run audit:backticks && npm run verify:icons && npm run audit:vocabulary && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && npm run audit:layout && npm run audit:inline && npm run audit:craft && npm run audit:naming && node scripts/gen-openui-entry.mjs --check && npm run audit:state-edge && npm run audit:contract && npm run audit:role-treatments && npm run audit:control-h && npm run audit:focus && npm run audit:hit-target && tsc -b && vite build && npm run prerender",
+    "build": "npm run audit:backticks && npm run verify:icons && npm run audit:vocabulary && npm run audit:tokens && npm run audit:type && npm run audit:cascade && npm run audit:parity && npm run audit:components && npm run audit:coverage && npm run audit:modifiers && npm run audit:provenance && npm run audit:controls && npm run audit:layout && npm run audit:inline && npm run audit:craft && npm run audit:naming && npm run audit:apg && node scripts/gen-openui-entry.mjs --check && npm run audit:state-edge && npm run audit:contract && npm run audit:role-treatments && npm run audit:control-h && npm run audit:focus && npm run audit:hit-target && tsc -b && vite build && npm run prerender",
     "shoot:og": "node scripts/shoot-og.mjs public/og-image.png",
     "a11y": "node scripts/a11y-scan.mjs",
     "prerender": "npx vite-node scripts/prerender.tsx",
@@ -41,7 +41,8 @@
     "a11y:tree": "node scripts/a11y-tree.mjs",
     "audit:naming": "node scripts/audit-naming.mjs",
     "gen:openui-entry": "node scripts/gen-openui-entry.mjs",
-    "audit:backticks": "node scripts/audit-backticks.mjs"
+    "audit:backticks": "node scripts/audit-backticks.mjs",
+    "audit:apg": "node scripts/audit-apg.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

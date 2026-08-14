@@ -2565,3 +2565,62 @@
   .audz--page { padding: 30px 18px; margin-top: 18px; }
   .audz--page h2 { font-size: 1rem; }
 }
+
+/* === Component specification (Open UI explainer shape) =====================
+   parts · states · behaviour · accessibility · tests. Reads as reference
+   material rather than marketing: dense, monospaced where it names code, and
+   quiet enough that the key table is the thing the eye lands on. */
+.cmpdoc__spec-group { margin: 0 0 22px; }
+.cmpdoc__spec-group h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mkt-fg);
+}
+.cmpdoc__spec-note {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--mkt-fg-muted);
+}
+.cmpdoc__spec-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--mkt-fg-muted);
+}
+.cmpdoc__spec-list li { margin-bottom: 4px; }
+.cmpdoc__spec-classes {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cmpdoc__spec-classes code {
+  font-size: 12px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--mkt-surface-2);
+  color: var(--mkt-fg);
+}
+.cmpdoc__spec-keys {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 16px;
+  font-size: 13px;
+}
+.cmpdoc__spec-keys th {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 14px 6px 0;
+  white-space: nowrap;
+  font-weight: 400;
+}
+.cmpdoc__spec-keys td {
+  padding: 6px 0;
+  color: var(--mkt-fg-muted);
+  line-height: 1.55;
+}
+.cmpdoc__spec-keys tr + tr th,
+.cmpdoc__spec-keys tr + tr td { border-top: 1px solid var(--mkt-border); }
