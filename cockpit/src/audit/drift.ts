@@ -97,9 +97,14 @@ export function paletteStyle(audit: AuditHandoff): Record<string, string> {
      * blend. A flat 28%/50% mix put every secondary label at 2.7–2.9:1 across
      * all five fixtures — a failure we would have been introducing ourselves
      * while claiming to show them their own app. */
-    out['--k-fg-muted'] = fadeToFloor(fg, bg, 4.5)
-    out['--k-fg-faint'] = fadeToFloor(fg, bg, 3)
-    out['--k-disabled-fg'] = fadeToFloor(fg, bg, 3)
+    /* Floored against the most extreme surface in this family, not against the
+     * page. `.nav-group` and `.cmdp__shortcut` sit on sunken and container
+     * surfaces, so a floor computed on the page alone let them land at 2.7:1 —
+     * legible where it was measured and not where it is used. */
+    const deepest = step(0.11)
+    out['--k-fg-muted'] = fadeToFloor(fg, deepest, 4.5)
+    out['--k-fg-faint'] = fadeToFloor(fg, deepest, 3)
+    out['--k-disabled-fg'] = fadeToFloor(fg, deepest, 3)
 
     // The inverse pair simply swaps the two ends we measured.
     out['--k-inverse-surface'] = fg
@@ -154,6 +159,25 @@ export function driftStyle(audit: AuditHandoff, i: number): CSSProperties {
     out['--k-primary-fg'] = contrast('#ffffff', c) >= contrast('#111111', c) ? '#ffffff' : '#111111'
     out['--k-accent-fg'] = out['--k-primary-fg']!
     out['--k-fill-fg'] = out['--k-primary-fg']!
+    /* The brand is used as INK too — `.toast__action` and the selected row read
+     * `--k-primary` for text — and a light brand cannot be ink. documenso's
+     * lime landed at 1.7:1 on their white page. Darkening it toward their own
+     * text colour until it clears 4.5:1 is what any designer does with a pale
+     * brand, and it keeps the hue theirs; leaving it would mean shipping an
+     * unreadable label while claiming to show them their own app. */
+    const page = audit.spread.bg
+    const ink = audit.spread.fg
+    if (page && ink && contrast(c, page) < 4.5) {
+      let readable = c
+      for (let t = 0.1; t <= 0.9; t += 0.1) {
+        readable = mix(c, ink, t)
+        if (contrast(readable, page) >= 4.5) break
+      }
+      out['--k-primary'] = readable
+      out['--k-state-selected-fg'] = readable
+    } else {
+      out['--k-state-selected-fg'] = c
+    }
   }
   if (sp) { out['--k-s-8'] = sp; out['--k-s-12'] = sp }
   return out as CSSProperties
