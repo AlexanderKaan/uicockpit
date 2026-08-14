@@ -241,16 +241,71 @@
   .mkt__nav-tools { gap: 8px; }
   .mkt__ver { display: none; }
 }
+/* One breakpoint, and EVERYTHING moves — including both doors.
+ *
+ * The old rules dropped things one at a time as the row tightened, which meant
+ * that at 375px the bar held a single CTA and the audit door had quietly
+ * disappeared: on a phone it was reachable only by typing the URL, immediately
+ * after two sprints spent making /audit work there. Hiding whichever door fits
+ * worst is how a two-door product becomes a one-door product without anyone
+ * deciding to. Scoped to the tools row because `.mkt-btn` sets
+ * display:inline-flex later in this file and would win at equal specificity. */
 @media (max-width: 700px) {
-  .mkt__gh { display: none; }
+  .mkt__nav-links,
+  .mkt__gh,
+  .mkt__nav-tools .mkt-btn { display: none; }
+  /* Scoped for the same reason as the line above: the base rule that hides the
+     burger is declared further down this file, and at equal specificity the
+     later rule wins — which left the sheet open with no way to close it. */
+  .mkt__nav-tools .mkt__burger { display: inline-flex; }
 }
-@media (max-width: 420px) {
-  /* Below this the two full labels collide; the hero carries both doors at
-   * full size a few hundred pixels down, so the nav keeps the primary only.
-   * Scoped to the tools row on purpose: `.mkt-btn` sets display:inline-flex
-   * further down this file, and at equal specificity the later rule would win. */
-  .mkt__nav-tools .mkt__nav-door { display: none; }
+
+/* === The mobile sheet ===================================================== */
+.mkt__burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  /* 44px — the touch floor, not the icon's own size. */
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--mkt-fg);
+  cursor: pointer;
 }
+.mkt__burger:hover { background: color-mix(in srgb, var(--mkt-fg) 6%, transparent); }
+.mkt__sheet {
+  border-top: 1px solid var(--mkt-border);
+  background: var(--mkt-bg);
+  /* The bar is sticky; the sheet hangs off it and must clear everything below. */
+  box-shadow: 0 12px 28px -18px rgb(0 0 0 / 0.3);
+}
+.mkt__sheet-inner { display: flex; flex-direction: column; gap: 10px; padding-block: 16px 20px; }
+.mkt__sheet-door { justify-content: center; width: 100%; }
+.mkt__sheet-links {
+  display: flex; flex-direction: column;
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px solid var(--mkt-border);
+}
+.mkt__sheet-links a {
+  padding: 12px 2px; /* 44px rows */
+  font-size: 0.9375rem; font-weight: 500;
+  color: var(--mkt-fg); text-decoration: none;
+}
+.mkt__sheet-links a[aria-current='page'] { color: var(--mkt-fg-muted); }
+.mkt__sheet-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 4px; padding-top: 12px;
+  border-top: 1px solid var(--mkt-border);
+  font-size: 0.8125rem; color: var(--mkt-fg-muted);
+}
+.mkt__sheet-meta a {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--mkt-fg-muted); text-decoration: none;
+}
+.mkt__sheet-ver { font-family: var(--mkt-mono, ui-monospace, monospace); }
 
 /* === Buttons === */
 .mkt-btn {

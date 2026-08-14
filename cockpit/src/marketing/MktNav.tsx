@@ -1,4 +1,5 @@
-import { ChevronDown } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ChevronDown, Menu, X } from 'lucide-react'
 import { Wordmark } from '../Wordmark'
 import { ping } from '../analytics/beacon'
 
@@ -38,8 +39,28 @@ interface MktNavProps {
  * its items point at the real repo (release/repo meta only).
  */
 export function MktNav({ navigate, current }: MktNavProps) {
+  /* The sheet is React state rather than a native <details> like the version
+   * menu, for one reason: navigation here is client-side, so a <details> would
+   * stay open behind the page it just moved you to. */
+  const [menu, setMenu] = useState(false)
+  useEffect(() => {
+    if (!menu) return
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenu(false) }
+    window.addEventListener('keydown', esc)
+    return () => window.removeEventListener('keydown', esc)
+  }, [menu])
+
   const go = (e: React.MouseEvent, to: string) => {
     e.preventDefault()
+    setMenu(false)
+    navigate(to)
+  }
+  const door = (to: string, kind: 'audit' | 'configure') => () => {
+    setMenu(false)
+    // From inside the audit, "Build my UI kit" IS the bridge, not a door —
+    // counting it as a door would undercount the crossing we want to measure.
+    if (kind === 'configure' && current === 'audit') ping('audit', 'bridge')
+    else ping('door', kind)
     navigate(to)
   }
   const ariaCurrent = (page: MktNavProps['current']) =>
@@ -86,27 +107,57 @@ export function MktNav({ navigate, current }: MktNavProps) {
 
           {/* Both entrances, on every page — the nav is where someone who
               arrived on the wrong side of the fork changes their mind. */}
-          <button
-            className="mkt-btn mkt-btn--ghost mkt-btn--lg mkt__nav-door"
-            onClick={() => { ping('door', 'audit'); navigate('/audit') }}
-          >
+          <button className="mkt-btn mkt-btn--ghost mkt-btn--lg mkt__nav-door" onClick={door('/audit', 'audit')}>
             Audit my UI
           </button>
-          <button
-            className="mkt-btn mkt-btn--primary mkt-btn--lg"
-            onClick={() => {
-              // From inside the audit this button IS the bridge, not a door —
-              // counting it as a door would quietly undercount the crossing we
-              // are trying to measure.
-              if (current === 'audit') ping('audit', 'bridge')
-              else ping('door', 'configure')
-              navigate('/app')
-            }}
-          >
+          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={door('/app', 'configure')}>
             Build my UI kit
+          </button>
+
+          {/* Below 700px the row cannot hold two equal doors plus the links, and
+              the old answer was to hide whichever fitted worst — which happened
+              to be Audit. The audit door was then reachable on a phone only by
+              typing the URL, right after two sprints spent making it work there. */}
+          <button
+            className="mkt__burger"
+            aria-label={menu ? 'Close menu' : 'Menu'}
+            aria-expanded={menu}
+            aria-controls="mkt-menu"
+            onClick={() => setMenu((v) => !v)}
+          >
+            {menu ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
           </button>
         </div>
       </div>
+
+      {menu && (
+        <div className="mkt__sheet" id="mkt-menu">
+          <div className="mkt__container mkt__sheet-inner">
+            {/* The two doors first and EQUAL — the whole proposition is that
+                there are two ways in, and a menu that leads with one of them
+                is the one-door product wearing a hamburger. */}
+            <button className="mkt-btn mkt-btn--ghost mkt-btn--lg mkt__sheet-door" onClick={door('/audit', 'audit')}>
+              Audit my UI
+            </button>
+            <button className="mkt-btn mkt-btn--primary mkt-btn--lg mkt__sheet-door" onClick={door('/app', 'configure')}>
+              Build my UI kit
+            </button>
+
+            <nav className="mkt__sheet-links">
+              <a href="/components" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
+              <a href="/docs" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
+              <a href="/manifesto" {...ariaCurrent('manifesto')} onClick={(e) => go(e, '/manifesto')}>Manifesto</a>
+            </nav>
+
+            <div className="mkt__sheet-meta">
+              <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
+                <GithubMark /> GitHub
+              </a>
+              <span className="mkt__sheet-ver">{UICOCKPIT_VERSION}</span>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   )
 }
