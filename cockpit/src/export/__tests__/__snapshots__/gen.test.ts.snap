@@ -2979,6 +2979,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
 
 :root {
   --k-s-0: 0;
+  --k-hit-min: 1.5rem;
   --k-s-2: 0.125rem;
   --k-s-4: 0.25rem;
   --k-s-6: 0.375rem;
@@ -3153,7 +3154,6 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-control-h-md: var(--k-in-h-default);
   --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
-  --k-hit-min: 1.5rem;
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
   --k-cal-cell: 2.5rem;
@@ -3275,6 +3275,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
 
 .dark {
   --k-s-0: 0;
+  --k-hit-min: 1.5rem;
   --k-s-2: 0.125rem;
   --k-s-4: 0.25rem;
   --k-s-6: 0.375rem;
@@ -3449,7 +3450,6 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-control-h-md: var(--k-in-h-default);
   --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
-  --k-hit-min: 1.5rem;
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
   --k-cal-cell: 2.5rem;
@@ -8333,13 +8333,29 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--k-s-4);
+  /* 18px, not 4. The dots each claim a 24px pointer target through the
+   * ::before below, and at a 4px gap those targets OVERLAP — so each dot steals
+   * from its neighbour and neither actually has 24px to itself. That overlap is
+   * exactly what WCAG 2.5.8's spacing rule exists to prevent, and it is why the
+   * ::before trick alone was not enough here: measured in the browser, the
+   * target reached 24px vertically and was clipped by the neighbour
+   * horizontally. Widening the gap is the fix; the dots stay 6px.
+   *
+   * 20 and not 18: two 6px dots need 18px of gap for their targets to clear
+   * each other, and 18 is off the 4px grid — audit:craft was right to reject
+   * it. --k-s-20 is the next step up and on the scale. */
+  gap: var(--k-s-20);
   padding: var(--k-s-4) 0;
 }
 .cdots__dot {
   width: 6px;
   height: 6px;
   border-radius: 999px;
+  /* The glyph is 6px and must stay 6px — a carousel indicator is meant to be
+   * small. The TARGET is what has to be 24, so it is extended underneath with
+   * a transparent box rather than by inflating the dot. Same trick the kit
+   * already uses on close buttons; it had never been applied here. */
+  position: relative;
   background: var(--k-fg-faint);
   border: 0;
   padding: 0;
@@ -8349,6 +8365,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     width var(--k-dur-fast, 110ms) var(--k-ease, ease),
     background var(--k-dur-fast, 110ms) var(--k-ease, ease),
     opacity var(--k-dur-fast, 110ms) var(--k-ease, ease);
+}
+.cdots__dot::before {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: var(--k-hit-min);
+  height: var(--k-hit-min);
+  transform: translate(-50%, -50%);
 }
 .cdots__dot.is-on {
   width: 18px;
@@ -8572,6 +8596,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .numinput__chev {
   flex: 1;
   width: 24px;
+  /* 24px in BOTH axes, not just across. Two chevrons splitting a 36px field
+   * gave each one ~17px of height — six real WCAG 2.5.8 failures that our own
+   * hit-target gate never saw, because it only inspects close/clear controls.
+   * The stepper column now sets the field's height (48px), which also carries
+   * the whole control closer to the 44px bar every accessibility-led system in
+   * the study holds itself to. */
+  min-height: var(--k-hit-min);
   border: 0;
   background: transparent;
   color: var(--k-fg-muted);
@@ -10386,6 +10417,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
 
 :root {
   --k-s-0: 0;
+  --k-hit-min: 1.5rem;
   --k-s-2: 0.125rem;
   --k-s-4: 0.25rem;
   --k-s-6: 0.375rem;
@@ -10560,7 +10592,6 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-control-h-md: var(--k-in-h-default);
   --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
-  --k-hit-min: 1.5rem;
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
   --k-cal-cell: 2.5rem;
@@ -10682,6 +10713,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
 
 .dark {
   --k-s-0: 0;
+  --k-hit-min: 1.5rem;
   --k-s-2: 0.125rem;
   --k-s-4: 0.25rem;
   --k-s-6: 0.375rem;
@@ -10856,7 +10888,6 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-control-h-md: var(--k-in-h-default);
   --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
-  --k-hit-min: 1.5rem;
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
   --k-cal-cell: 2.5rem;
@@ -15740,13 +15771,29 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--k-s-4);
+  /* 18px, not 4. The dots each claim a 24px pointer target through the
+   * ::before below, and at a 4px gap those targets OVERLAP — so each dot steals
+   * from its neighbour and neither actually has 24px to itself. That overlap is
+   * exactly what WCAG 2.5.8's spacing rule exists to prevent, and it is why the
+   * ::before trick alone was not enough here: measured in the browser, the
+   * target reached 24px vertically and was clipped by the neighbour
+   * horizontally. Widening the gap is the fix; the dots stay 6px.
+   *
+   * 20 and not 18: two 6px dots need 18px of gap for their targets to clear
+   * each other, and 18 is off the 4px grid — audit:craft was right to reject
+   * it. --k-s-20 is the next step up and on the scale. */
+  gap: var(--k-s-20);
   padding: var(--k-s-4) 0;
 }
 .cdots__dot {
   width: 6px;
   height: 6px;
   border-radius: 999px;
+  /* The glyph is 6px and must stay 6px — a carousel indicator is meant to be
+   * small. The TARGET is what has to be 24, so it is extended underneath with
+   * a transparent box rather than by inflating the dot. Same trick the kit
+   * already uses on close buttons; it had never been applied here. */
+  position: relative;
   background: var(--k-fg-faint);
   border: 0;
   padding: 0;
@@ -15756,6 +15803,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     width var(--k-dur-fast, 110ms) var(--k-ease, ease),
     background var(--k-dur-fast, 110ms) var(--k-ease, ease),
     opacity var(--k-dur-fast, 110ms) var(--k-ease, ease);
+}
+.cdots__dot::before {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: var(--k-hit-min);
+  height: var(--k-hit-min);
+  transform: translate(-50%, -50%);
 }
 .cdots__dot.is-on {
   width: 18px;
@@ -15979,6 +16034,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .numinput__chev {
   flex: 1;
   width: 24px;
+  /* 24px in BOTH axes, not just across. Two chevrons splitting a 36px field
+   * gave each one ~17px of height — six real WCAG 2.5.8 failures that our own
+   * hit-target gate never saw, because it only inspects close/clear controls.
+   * The stepper column now sets the field's height (48px), which also carries
+   * the whole control closer to the 44px bar every accessibility-led system in
+   * the study holds itself to. */
+  min-height: var(--k-hit-min);
   border: 0;
   background: transparent;
   color: var(--k-fg-muted);

@@ -596,7 +596,7 @@ function FormCard() {
         <span>Search</span>
         <div className="in in--inline">
           <Icon name="search" />
-          <input placeholder="Filter results" />
+          <input placeholder="Filter results" aria-label="Filter results" />
         </div>
       </label>
       <label className="lab">
@@ -1008,7 +1008,7 @@ function DialogCard() {
             <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
             <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" style={{ maxBlockSize: 188 }}>
               <h3 id="dialog-title" className="dialog__title">Delete project?</h3>
-              <div className="dialog__body">
+              <div className="dialog__body" tabIndex={0} role="region" aria-label="Dialog content">
                 <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>
                   This permanently removes:
                 </p>
@@ -2156,9 +2156,9 @@ function SpinnerCard() {
         <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>Loading workspace…</span>
       </div>
       <div className="card__row" style={{ alignItems: 'center', gap: 14, marginTop: 8 }}>
-        <span className="spinner spinner--sm" aria-label="Loading" />
+        <span className="spinner spinner--sm" role="status" aria-label="Loading" />
         <span className="spinner" role="status" aria-label="Loading" />
-        <span className="spinner spinner--lg" aria-label="Loading" />
+        <span className="spinner spinner--lg" role="status" aria-label="Loading" />
         <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>sm · md · lg</span>
       </div>
     </Card>
@@ -2209,7 +2209,7 @@ function ResizableCard() {
           grip horizontal. Visual orientation; wire the row-drag like the column one. */}
       <div className="resizable resizable--vertical" style={{ height: 132, marginTop: 'var(--k-s-12)' }}>
         <div className="resizable__pane" style={{ padding: 'var(--k-s-12)', fontSize: 'var(--k-type-small)', fontWeight: 600 }}>Preview</div>
-        <div className="resizable__handle" role="separator" aria-orientation="horizontal" aria-label="Resize rows" tabIndex={0} />
+        <div className="resizable__handle" role="separator" aria-orientation="horizontal" aria-label="Resize rows" aria-valuenow={50} aria-valuemin={0} aria-valuemax={100} tabIndex={0} />
         <div className="resizable__pane" style={{ padding: 'var(--k-s-12)', fontSize: 11.5, fontFamily: 'var(--k-font-mono)', color: 'var(--k-fg-muted)' }}>$ build — done in 4.1s</div>
       </div>
     </Card>
@@ -3431,7 +3431,7 @@ function ComboboxCard() {
   return (
     <Card title="Framework" desc="Choose a starter for your app.">
       <div className="combobox" ref={ref}>
-        <button type="button" className="select-trigger" onClick={() => setOpen((v) => !v)} role="combobox" aria-haspopup="listbox" aria-expanded={open}>
+        <button type="button" className="select-trigger" onClick={() => setOpen((v) => !v)} role="combobox" aria-haspopup="listbox" aria-expanded={open} aria-label="Framework">
           <span>{picked ?? 'Select a framework…'}</span>
           <Icon name="chevD" />
         </button>
@@ -3681,6 +3681,7 @@ function TagInputCard() {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); add() } }}
           onBlur={add}
           placeholder={tags.length === 0 ? 'Add tags…' : ''}
+          aria-label="Add a tag"
         />
       </div>
       <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>Enter or , to add</span>
@@ -3882,6 +3883,7 @@ function InputOtpCard() {
             key={i}
             ref={refs[i]}
             className="otp__slot"
+            aria-label={`Digit ${i + 1} of ${code.length}`}
             value={c}
             maxLength={1}
             inputMode="numeric"
@@ -3899,6 +3901,7 @@ function InputOtpCard() {
               key={idx}
               ref={refs[idx]}
               className="otp__slot"
+              aria-label={`Digit ${i + 1} of ${code.length}`}
               value={c}
               maxLength={1}
               inputMode="numeric"
@@ -4075,6 +4078,7 @@ function PasswordInputCard() {
           onKeyDown={onCaps}
           onKeyUp={onCaps}
           placeholder="At least 8 characters"
+          aria-label="Password"
         />
         <button className="pwinput__eye" onClick={() => setShow((v) => !v)} aria-label={show ? 'Hide' : 'Show'}>
           {show ? (
@@ -4169,6 +4173,7 @@ function PhoneInputCard() {
           value={num}
           onChange={(e) => setNum(e.target.value)}
           placeholder="6 12 34 56 78"
+          aria-label="Phone number"
         />
       </div>
       <div className="phoneinput phoneinput--invalid">
@@ -4182,6 +4187,7 @@ function PhoneInputCard() {
           value="555-013"
           readOnly
           aria-invalid="true"
+          aria-label="Phone number"
         />
       </div>
       <div style={{ fontSize: 11, color: 'var(--k-danger)' }}>Enter a valid 10-digit number.</div>

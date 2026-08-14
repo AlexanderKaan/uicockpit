@@ -551,7 +551,16 @@ export function buildTokens(cfg: Config): Tokens {
   // Fine-grained spacing grid emitted as named tokens (--k-s-2 … --k-s-32, REM,
   // keyed by px-at-16-root). Components reference these for internal padding/gap
   // instead of hardcoding px — same scale in the preview AND every export.
-  const sVars: Record<string, string> = { '--k-s-0': '0' }
+  /* The touch-target floor, as ONE named value instead of a 24 scattered
+   * through the recipes.
+   *
+   * WCAG 2.5.8 AA asks for 24x24 CSS px. Every accessibility-led design system
+   * in the study holds itself to 2.5.5 AAA at 44 instead, which is a decision
+   * we have not made yet — and the only reason we can defer it is that the
+   * number now lives in one place. It is deliberately NOT on the spacing scale:
+   * a hit target is a guarantee about a person's finger, not a rhythm, and
+   * re-scaling it with density is exactly the bug this prevents. */
+  const sVars: Record<string, string> = { '--k-s-0': '0', '--k-hit-min': '24px' }
   for (const px of [2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32]) sVars[`--k-s-${px}`] = rem(px)
   // Measure — readable line-length caps (in ch, so they track the body font).
   // The layout grammar uses these instead of arbitrary px max-widths: a prose
