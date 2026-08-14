@@ -3790,7 +3790,7 @@ function SlotPickerCard() {
     <Card title="Slot picker" desc="Time-slot grid for booking — available, selected, disabled.">
       <div className="slotpicker">
         {slots.map((t) => (
-          <button key={t} type="button" className={'slot' + (off.has(t) ? ' slot--off' : slot === t ? ' slot--on' : '')} onClick={() => !off.has(t) && setSlot(t)}>{t}</button>
+          <button key={t} type="button" disabled={off.has(t)} className={'slot' + (off.has(t) ? ' slot--off' : slot === t ? ' slot--on' : '')} onClick={() => !off.has(t) && setSlot(t)}>{t}</button>
         ))}
       </div>
     </Card>
@@ -5111,7 +5111,7 @@ function TwoColumnLayoutCard() {
         <div className="twocol__side">
           <div className="twocol__tile">
             <div style={{ fontSize: 'var(--k-type-eyebrow)', fontWeight: 600 }}>Database</div>
-            <div style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-primary)' }}>u609103235 ↗</div>
+            <div style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-primary-soft-fg)' }}>u609103235 ↗</div>
           </div>
           <div className="twocol__tile">
             <div style={{ fontSize: 'var(--k-type-eyebrow)', fontWeight: 600 }}>Backup</div>

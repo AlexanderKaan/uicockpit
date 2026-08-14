@@ -4381,7 +4381,10 @@ body {
 .btn--outline:hover { background: var(--k-state-hover); }
 .btn--link {
   background: transparent;
-  color: var(--k-primary);
+  /* The brand as INK, not as a fill. --k-primary is tuned to be a background
+   * and measured 4.24:1 as text on a tinted section; --k-primary-soft-fg is the
+   * same hue with a contrast floor already applied. */
+  color: var(--k-primary-soft-fg);
   padding-inline: 0;
   padding-block: 0;
   text-decoration: underline;
@@ -9753,7 +9756,12 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 }
 .slot:hover { border-color: var(--k-ring); background: var(--k-state-hover); }
 .slot--on { background: var(--k-primary-soft); border-color: var(--k-ring); color: var(--k-primary-soft-fg); font-weight: var(--k-weight-semibold); }
-.slot--off { opacity: 0.4; pointer-events: none; text-decoration: line-through; }
+/* Was opacity 0.4, which composited near-black text down to 2.66:1. pointer-
+ * events:none stops the MOUSE and does nothing about the keyboard, so a tab
+ * still lands on an unreadable control. The state now says what it is with a
+ * token and a line-through; the markup carries the disabled attribute, which removes it
+ * from the tab order and is what actually makes it unavailable. */
+.slot--off { color: var(--k-disabled-fg); text-decoration: line-through; cursor: not-allowed; }
 
 /* === Colour picker (Tailwind radio-group "color picker") =================
  * A radio group rendered as colour swatches — pick a colour; the selected one
@@ -10268,7 +10276,10 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    with the name (avatar + name left, time right). Was justify-content:space-between
    on the head; an avatar there would have spread away from the name. */
 .msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); margin-left: auto; }
-.msg--me .msg__time { color: inherit; opacity: 0.7; }
+/* No opacity on text — it composites the ink toward the bubble and dropped this
+ * to 2.81:1. The quieter tier comes from a token that is derived to stay
+ * legible on the fill it sits on. */
+.msg--me .msg__time { color: var(--k-primary-soft-fg); }
 .msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
 .msg--me .msg__body { color: inherit; }
 /* The assistant's turn — a distinct THIRD voice. It's not a narrow bubble: an
@@ -11954,7 +11965,10 @@ body {
 .btn--outline:hover { background: var(--k-state-hover); }
 .btn--link {
   background: transparent;
-  color: var(--k-primary);
+  /* The brand as INK, not as a fill. --k-primary is tuned to be a background
+   * and measured 4.24:1 as text on a tinted section; --k-primary-soft-fg is the
+   * same hue with a contrast floor already applied. */
+  color: var(--k-primary-soft-fg);
   padding-inline: 0;
   padding-block: 0;
   text-decoration: underline;
@@ -17326,7 +17340,12 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 }
 .slot:hover { border-color: var(--k-ring); background: var(--k-state-hover); }
 .slot--on { background: var(--k-primary-soft); border-color: var(--k-ring); color: var(--k-primary-soft-fg); font-weight: var(--k-weight-semibold); }
-.slot--off { opacity: 0.4; pointer-events: none; text-decoration: line-through; }
+/* Was opacity 0.4, which composited near-black text down to 2.66:1. pointer-
+ * events:none stops the MOUSE and does nothing about the keyboard, so a tab
+ * still lands on an unreadable control. The state now says what it is with a
+ * token and a line-through; the markup carries the disabled attribute, which removes it
+ * from the tab order and is what actually makes it unavailable. */
+.slot--off { color: var(--k-disabled-fg); text-decoration: line-through; cursor: not-allowed; }
 
 /* === Colour picker (Tailwind radio-group "color picker") =================
  * A radio group rendered as colour swatches — pick a colour; the selected one
@@ -17841,7 +17860,10 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    with the name (avatar + name left, time right). Was justify-content:space-between
    on the head; an avatar there would have spread away from the name. */
 .msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); margin-left: auto; }
-.msg--me .msg__time { color: inherit; opacity: 0.7; }
+/* No opacity on text — it composites the ink toward the bubble and dropped this
+ * to 2.81:1. The quieter tier comes from a token that is derived to stay
+ * legible on the fill it sits on. */
+.msg--me .msg__time { color: var(--k-primary-soft-fg); }
 .msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
 .msg--me .msg__body { color: inherit; }
 /* The assistant's turn — a distinct THIRD voice. It's not a narrow bubble: an
