@@ -7,7 +7,6 @@ import { SeoPage } from './marketing/SeoPage'
 import { DocsPage } from './marketing/DocsPage'
 import { ComponentsIndexPage, ComponentDetailPage } from './marketing/ComponentDocs'
 import { componentPageBySlug } from './stage/views/ComponentGallery'
-import { StylesPage } from './marketing/StylesPage'
 import { findEntry } from './marketing/seo/seoData'
 import { AuditPage } from './marketing/AuditPage'
 import { ConformancePage } from './audit/conformance'
@@ -66,7 +65,6 @@ export function App() {
     if (componentPageBySlug(slug)) return <ComponentDetailPage slug={slug} navigate={navigate} />
     return <ComponentsIndexPage navigate={navigate} /> // unknown slug → the index
   }
-  if (path.startsWith('/styles')) return <StylesPage navigate={navigate} />
 
   /* Render-conformance harness. DEV ONLY — `import.meta.env.DEV` is statically
    * false in a build, so the route and its import are dropped entirely. */

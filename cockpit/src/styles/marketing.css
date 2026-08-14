@@ -1693,42 +1693,6 @@
   .cmpdoc__dodont { grid-template-columns: 1fr; }
 }
 
-/* ============================================================
-   Styles page (/styles, IA-5) — named kits as live specimens.
-   ============================================================ */
-.mkt__style-grid {
-  margin-top: 48px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  /* Cards size to their own content — no stretching a short specimen into a
-     tall grey void to match the tallest card in the row. */
-  align-items: start;
-}
-.mkt__style-card {
-  border: 1px solid var(--mkt-border);
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--mkt-surface, #fff);
-  display: flex;
-  flex-direction: column;
-}
-/* The specimen sits on the kit's own canvas; its .cockpit-preview scope carries
-   that kit's tokens so the card, button, input and badge show its character. */
-.mkt__style-specimen {
-  padding: 24px;
-  background: var(--k-bg);
-  border-bottom: 1px solid var(--mkt-border);
-}
-/* The bouquet — a few real components floating on the kit canvas with air. */
-.mkt__style-bouquet { display: flex; flex-direction: column; gap: var(--k-s-12); }
-.mkt__style-specimen .card { display: flex; flex-direction: column; gap: var(--k-s-8); }
-.mkt__style-metric { padding: var(--k-space, 16px); }
-.mkt__style-meta { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 4px; }
-.mkt__style-name { font-size: 15px; font-weight: 650; color: var(--mkt-fg); }
-.mkt__style-blurb { font-size: 13px; color: var(--mkt-fg-muted); }
-.mkt__style-use { align-self: flex-start; margin-top: 10px; font-size: 13px; text-decoration: none; }
-
 /* Kit bridge toggle (IA-3) — Default kit ↔ Your kit, above the stage. */
 .mkt__catalog-tools { margin-top: 20px; display: flex; justify-content: center; }
 .mkt__kit-hint { font-size: 13px; }
@@ -2060,17 +2024,6 @@
   width: 820px; height: auto; display: block;
 }
 .og-card__accent { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--mkt-accent, #007aff); z-index: 2; }
-
-/* /styles specimen — lead with a large display line so each kit's display font +
-   weight (serif / mono / ultralight) is unmistakable, not a subtle title. */
-.mkt__style-spec-display {
-  font-family: var(--k-font-display);
-  font-weight: var(--k-weight-display-hero, var(--k-weight-semibold));
-  font-size: var(--k-type-h1);
-  letter-spacing: var(--k-track-display, -0.02em);
-  line-height: 1.1;
-  color: var(--k-fg);
-}
 
 /* ── Hero drift — the "before" the page opens on ─────────────────────────────
  * The wall STARTS like this: nine accents that fight each other, radii from

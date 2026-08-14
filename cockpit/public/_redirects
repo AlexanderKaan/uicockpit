@@ -9,6 +9,12 @@
 # Specific rule sits ABOVE the catch-all so it wins (first match).
 /uses/astryx-theme-generator   /uses/design-system-generator   301
 
+# Retired page — /styles offered a third entrance ("pick a named style") beside
+# the two doors, which blurred what the product does: it sold the IDENTITY axis
+# as the thing you buy, when the identity is the part that should be yours.
+# Same cut as Showcases and Templates.
+/styles                        /                               301
+
 # Retired feature — the page templates / `npx uicockpit template` scaffold was cut
 # (off-thesis: a design-system generator ships tokens + components + check, not
 # ready-made screens). The static /templates/* files are gone, so a plain wildcard

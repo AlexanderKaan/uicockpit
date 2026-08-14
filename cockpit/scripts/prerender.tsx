@@ -22,7 +22,6 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { MarketingPage } from '../src/marketing/MarketingPage'
 import { MarketingManifesto } from '../src/marketing/MarketingManifesto'
 import { SeoPage } from '../src/marketing/SeoPage'
-import { StylesPage } from '../src/marketing/StylesPage'
 import { ComponentsIndexPage, ComponentDetailPage } from '../src/marketing/ComponentDocs'
 import { COMPONENT_PAGES } from '../src/stage/views/ComponentGallery'
 import { SEO_ENTRIES, pathFor, type SeoEntry } from '../src/marketing/seo/seoData'
@@ -118,13 +117,6 @@ for (const c of COMPONENT_PAGES) {
   }))
 }
 
-write('/styles', renderPage({
-  path: '/styles',
-  markup: renderToStaticMarkup(<StylesPage navigate={noop} />),
-  title: 'Styles — named starting points you tune into your own — UIcockpit',
-  description: 'Seven named style kits — Linear-crisp, Vercel-mono, Stripe-refined and more. Each opens the configurator as a starting point you tune, not a fixed theme you settle for.',
-}))
-
 const entries: SeoEntry[] = SEO_ENTRIES
 for (const entry of entries) {
   write(pathFor(entry), renderPage({
@@ -143,7 +135,6 @@ const staticRoutes: Array<{ loc: string; freq: string; pri: string }> = [
   // spot for the CLI one-liner and shared reports.
   { loc: '/audit', freq: 'weekly', pri: '0.9' },
   { loc: '/components', freq: 'weekly', pri: '0.9' },
-  { loc: '/styles', freq: 'monthly', pri: '0.8' },
   { loc: '/docs', freq: 'monthly', pri: '0.8' },
   { loc: '/manifesto', freq: 'monthly', pri: '0.6' },
 ]
