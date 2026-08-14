@@ -32,7 +32,6 @@ export type Radius = 'none' | 'subtle' | 'soft' | 'round'
 // values are explicit opt-OUTs for deliberate divergence: a pill button on a
 // soft-corner card is a valid combo (think Airbnb: round cards, pill CTAs),
 // or square buttons on rounded cards. 'none' = square.
-export type ButtonShape = 'match' | 'none' | 'subtle' | 'soft' | 'round' | 'pill'
 /** Density (user-facing label; internal name kept as `Stature`/`stature`) —
  * the macro decision before all others. Cascades to --k-space, button/input/
  * toggle defaults, date picker cell size, row grammar default. ONE knob,
@@ -109,7 +108,15 @@ export type Contrast = 'soft' | 'balanced' | 'crisp'
  * whisper neutral tint · or the brand gradient mesh. Exported as --k-bg and
  * usable tactically behind key blocks (a KPI strip, a hero). 'neutral' is the
  * house default (the muted near-white that makes crisp white cards pop). */
-export type Canvas = 'white' | 'brand' | 'neutral' | 'gradient'
+/* The page ground. `gradient` was removed with the gold-standard pass: it was the
+ * only setting in the whole foundation whose output is not a COLOUR but three
+ * layered radial stops, which means the contrast of text over it differs per
+ * pixel. Our own pair-table could not read it (it scored the base as black and
+ * "found" body text at 1.08:1 on ten theme/mode combinations), and more to the
+ * point a value we cannot state in the contract is a value we cannot put in an
+ * accessibility declaration. The whole proposition is provable, and a gradient
+ * page is the one knob that is only defensible-in-practice. */
+export type Canvas = 'white' | 'brand' | 'neutral'
 /* === Interaction states (H2) — now a fixed house formula, no controls =====
  * Hover/selected/press are ONE neutral wash at stepped alphas. The two former
  * dials (States intensity · State tint) were removed: every benchmark (shadcn/
@@ -184,7 +191,6 @@ export interface Config {
   colorTheme: ColorTheme
   color: ColorMode
   radius: Radius
-  buttonShape: ButtonShape
   /* Scale — interface size + presence macro (drives sizing, spacing AND UI
    * weight; replaces Style + Density + the separate UI-weight control). */
   scale: Scale
@@ -221,7 +227,13 @@ export interface Config {
    * state-at-a-glance zone: KPI strips, hero metric, amount card). Same palette
    * as Canvas; drives --k-fill (exported). House rule: apply only to the focal
    * summary block, never to working surfaces (tables/forms/lists stay white). */
-  fill: Canvas
+  /* The summary-band wash (--k-surface-fill) — the ONE focal block per screen.
+   * Typed as Canvas but only ever 'brand': no panel row sets it, randomKit does
+   * not roll it, and every Style preset takes the base value. Three values, one
+   * reachable. Kept as a field rather than hard-coded because it IS a real token
+   * a consumer may override in their own CSS — but it is no longer pretending to
+   * be a configurator choice. */
+  fill: Extract<Canvas, 'brand' | 'white'>
   mode: Mode
 }
 

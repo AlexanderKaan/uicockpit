@@ -9,7 +9,6 @@ export const DEFAULT_CONFIG: Config = {
   colorTheme: 'cobalt',        // friendly Apple system blue (#0A84FF) — the always-works brand
   color: 'tone',               // chromatic mode (brand hue drives primary/links/focus + auto-tints neutrals)
   radius: 'soft',
-  buttonShape: 'match',        // follow the box radius by default (unified look)
   // AA, because AA is what the law actually requires — see the Conformance type.
   // 'aaa' raises the target-size floor to 44 for the teams whose own baseline
   // demands it (public services, NLDS), without inflating everyone else's kit.

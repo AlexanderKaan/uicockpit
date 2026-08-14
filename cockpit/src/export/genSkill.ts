@@ -71,7 +71,7 @@ Radix / Headless UI / cmdk):
 
 ## This kit at a glance
 - Brand \`var(--k-primary)\` = ${tk.primaryHex} · Scale ${cfg.scale} (control height ${h})
-- Radius ${cfg.radius} · Button shape ${cfg.buttonShape} · Surface ${cfg.surface} · Elevation ${({ flat: 'Flat', soft: 'Soft', deep: 'Deep' } as const)[cfg.surfaceDepth]}
+- Radius ${cfg.radius} · Surface ${cfg.surface} · Elevation ${({ flat: 'Flat', soft: 'Soft', deep: 'Deep' } as const)[cfg.surfaceDepth]}
 - Type: ${cfg.fontDisplay} display / ${cfg.fontBody} body · Icons ${lib.label}
 - Full values + rationale live in **design.md**; the live \`tokens.css\` link is the source of truth.
 

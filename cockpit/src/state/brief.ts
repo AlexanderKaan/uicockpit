@@ -1,4 +1,4 @@
-import type { Config, ColorTheme, Radius, Scale, IconSet, ButtonShape } from '../tokens/types'
+import type { Config, ColorTheme, Radius, Scale, IconSet } from '../tokens/types'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { applyColorTheme, COLOR_THEMES } from '../tokens/stylesAndThemes'
 import { encode } from './hash'
@@ -19,7 +19,6 @@ export interface Brief {
   /** compact · default · comfortable (interface size + density) */
   density?: string
   /** match · none · subtle · soft · round · pill */
-  buttonShape?: string
   /** hairline · line · rounded · bold · solid */
   icons?: string
 }
@@ -28,7 +27,6 @@ const THEMES = new Set<string>(Object.keys(COLOR_THEMES))
 const RADII = new Set<Radius>(['none', 'subtle', 'soft', 'round'])
 const SCALES = new Set<Scale>(['compact', 'default', 'comfortable'])
 const ICONS = new Set<IconSet>(['hairline', 'line', 'rounded', 'bold', 'solid'])
-const SHAPES = new Set<ButtonShape>(['match', 'none', 'subtle', 'soft', 'round', 'pill'])
 const HEX = /^#?[0-9a-fA-F]{6}$/
 
 /** Map a readable brief onto the default Config, validating every field. */
@@ -46,7 +44,6 @@ export function configFromBrief(b: Brief): Config {
   }
   if (b.radius && RADII.has(b.radius as Radius)) cfg.radius = b.radius as Radius
   if (b.density && SCALES.has(b.density as Scale)) cfg.scale = b.density as Scale
-  if (b.buttonShape && SHAPES.has(b.buttonShape as ButtonShape)) cfg.buttonShape = b.buttonShape as ButtonShape
   if (b.icons && ICONS.has(b.icons as IconSet)) cfg.iconSet = b.icons as IconSet
 
   return cfg

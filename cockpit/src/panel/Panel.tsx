@@ -11,7 +11,6 @@ import type { ProvenanceState } from '../audit/handoff'
 import type { ConfigAction } from '../state/configReducer'
 import { FontPicker } from './FontPicker'
 import {
-  VIZ_BUTTON_SHAPE,
   VIZ_COLOR_THEME,
   VIZ_ICONS,
   VIZ_MOTION,
@@ -65,14 +64,6 @@ const RADIUS_OPTS = [
   { id: 'soft' as const, cap: 'Soft' },
   { id: 'round' as const, cap: 'Round' },
 ]
-const BUTTON_SHAPE_OPTS = [
-  { id: 'match' as const, cap: 'Match' },
-  { id: 'none' as const, cap: 'None' },
-  { id: 'subtle' as const, cap: 'Subtle' },
-  { id: 'soft' as const, cap: 'Soft' },
-  { id: 'round' as const, cap: 'Round' },
-  { id: 'pill' as const, cap: 'Pill' },
-]
 const NEUTRAL_OPTS = [
   // 'Auto' tints the grey ramp toward the brand hue; it sits first as the default,
   // so the bare word reads clearly beside Cool/Neutral/Warm in the segmented strip.
@@ -124,7 +115,6 @@ const CANVAS_OPTS = [
   { id: 'white' as const, cap: 'White' },
   { id: 'neutral' as const, cap: 'Neutral' },
   { id: 'brand' as const, cap: 'Brand' },
-  { id: 'gradient' as const, cap: 'Gradient' },
 ]
 const ICON_OPTS = [
   { id: 'hairline' as const, cap: 'Iconoir' },
@@ -475,15 +465,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
       opts: optsFrom(RADIUS_OPTS, VIZ_RADIUS),
       selected: cfg.radius,
       onPick: pick('radius'),
-    },
-    {
-      key: 'buttonShape',
-      label: 'Button radius',
-      value: cap(BUTTON_SHAPE_OPTS, cfg.buttonShape),
-      kind: 'slider',
-      opts: optsFrom(BUTTON_SHAPE_OPTS, VIZ_BUTTON_SHAPE),
-      selected: cfg.buttonShape,
-      onPick: pick('buttonShape'),
     },
     {
       sec: 'Surface',

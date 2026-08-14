@@ -42,7 +42,7 @@ colors, radii or spacing — always reference a token.
 - Neutrals: ${cfg.neutral} gray ramp${cfg.neutral === 'auto' ? ' (auto-tinted toward the brand hue — cohesive "tinted neutral", not flat grey)' : ''}
 - Harmony: ${cfg.harmony} (spread ${cfg.spread}° · expression ${cfg.expression}%) — secondary/accent/decoratives derive from the brand hue via these dials; the brand primary itself never rotates. Status colors lean ≤15° toward the brand (always-on harmonization).
 - Layout grammar: adaptive shell tier — .scaffold (container-query app frame, window classes 600/840/1200/1600) · .navsuite (bar → rail → expanded) · .pane (fixed 360/412 + flexible; content reflows per pane). Archetypes: feed · list-detail · supporting pane.
-- Radius: ${cfg.radius} (cards/dialogs/inputs) · Button radius: ${cfg.buttonShape}${cfg.buttonShape === 'match' ? ' (matches the box radius — buttons share corners with cards & inputs, the default)' : ''}${cfg.buttonShape === 'pill' ? ' (pill — fully capsule buttons regardless of card radius)' : ''}${cfg.buttonShape === 'none' ? ' (square — no button corner radius)' : ''}
+- Radius: ${cfg.radius} — cards, dialogs, inputs AND buttons share one corner language.
 - **Scale: ${cfg.scale}** — the size + density macro (does NOT change font-weight). ${
   cfg.scale === 'compact'
     ? 'Dense pro-tool feel (Linear/Cursor). Button + input 32px, date cells 28px.'

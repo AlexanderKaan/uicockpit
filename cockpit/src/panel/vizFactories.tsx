@@ -70,29 +70,6 @@ export const VIZ_RADIUS = {
   round: <CornerSvg r={12} />,
 }
 
-/* 'Match' = button radius follows the box radius. An equals glyph reads
- * "same as the box" — distinct from the absolute corner glyphs below it. */
-function MatchSvg() {
-  return (
-    <svg width="22" height="18" viewBox="0 0 22 18" fill="none" aria-hidden="true">
-      <path d="M6 7 H16 M6 11 H16" stroke="#1a1a1d" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-export const VIZ_BUTTON_SHAPE = {
-  match: <MatchSvg />,
-  none: <CornerSvg r={0} />,
-  subtle: <CornerSvg r={3} />,
-  soft: <CornerSvg r={7} />,
-  round: <CornerSvg r={12} />,
-  pill: <CornerSvg r={14} />,
-}
-
-// === Icons — actual library glyphs, same concept (Bell) per ICONS.md spec.
-// Bell shows outline-vs-fill clearly because the bell body has a substantial
-// silhouette. Heroicons solid renders fully filled; the rest are outlined
-// with their library's signature stroke + terminals.
 export const VIZ_ICONS = {
   hairline: (
     <span style={{ color: '#1a1a1d', display: 'inline-flex', padding: '3px 4px' }}>

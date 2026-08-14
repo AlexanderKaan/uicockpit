@@ -1,5 +1,4 @@
 import type {
-  ButtonShape,
   Config,
   DisplayWeight,
   Scale,
@@ -39,13 +38,6 @@ const RAD: Record<Radius, number> = { none: 0, subtle: 5, soft: 10, round: 16 }
 // Spotify Continue / GitHub Save button shape.
 // Absolute button radii — the explicit opt-OUTs. 'match' is NOT here; it
 // resolves to the box radius at build time (see below).
-const BTN: Record<Exclude<ButtonShape, 'match'>, number> = {
-  none: 0,
-  subtle: 5,
-  soft: 10,
-  round: 16,
-  pill: 999,
-}
 /* === Scale cascade table ====================================
  * One row per Scale step — the SIZE + DENSITY macro. Columns are everything the
  * one knob drives: spacing, control heights, row/toggle/cell sizing. It does
@@ -693,8 +685,16 @@ export function buildTokens(cfg: Config): Tokens {
   // explicit opt-OUTs for deliberate divergence (Airbnb's soft cards + pill
   // CTAs; square buttons on rounded cards). The `?? r` guards a stale
   // shared-hash value — degrades to "match the box" instead of NaNpx.
-  const btnShape = cfg.buttonShape ?? 'match'
-  const btnRadius = btnShape === 'match' ? r : (BTN[btnShape] ?? r)
+  /* Buttons follow the box radius. Full stop.
+   *
+   * There used to be a second axis here — six positions (match · none · subtle ·
+   * soft · round · pill) sitting on top of Box radius' four, with `match` as the
+   * default. It failed GOV.UK's `unique` admission test: a control that mostly
+   * echoes another control is a decision the reader has to make twice. The
+   * deliberate-divergence case it existed for (soft cards, capsule CTAs) is a
+   * whole-kit character choice, so it belongs in a Style preset rather than on
+   * the front panel next to the knob it contradicts. */
+  const btnRadius = r
   const radius = {
     // Inner/nested radius — for elements that sit INSIDE a box (kanban cards,
     // tree rows, tags, art thumbnails, tooltips). Scales off the box radius but
@@ -922,19 +922,15 @@ export function buildTokens(cfg: Config): Tokens {
   // Cards floating on it is the intended modern look, not a bug. [BEAUTY-SPEC §1.1]
   // Canvas (--k-bg) — the page background, chosen by the Canvas control. 'neutral'
   // (house default) is the muted near-white (step 1) that makes crisp white cards
-  // pop; 'white' is the lightest base; 'brand' a whisper brand tint; 'gradient'
-  // the brand mesh. Exported as --k-bg → also usable tactically behind key blocks.
+  // pop; 'white' is the lightest base; 'brand' a whisper brand tint. Exported as
+  // --k-bg → also usable tactically behind key blocks. The fourth option was a
+  // brand mesh of three radial stops; see the Canvas type for why it is gone.
   const pageBg =
     cfg.canvas === 'white'
       ? nStep(0)
       : cfg.canvas === 'brand'
         ? `color-mix(in srgb, var(--k-primary) 6%, ${nStep(0)})`
-        : cfg.canvas === 'gradient'
-          ? 'radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%),' +
-            ' radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%),' +
-            ' radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%),' +
-            ` ${nStep(1)}`
-          : nStep(1)
+        : nStep(1)
 
   // Fill (--k-fill) — the tactical tint for the SUMMARY BAND only (the focal
   // top-of-screen KPI/hero/amount zone; house rule: never on working surfaces).
@@ -943,14 +939,7 @@ export function buildTokens(cfg: Config): Tokens {
   const fillBg =
     cfg.fill === 'white'
       ? 'var(--k-surface)'
-      : cfg.fill === 'brand'
-        ? `color-mix(in srgb, var(--k-primary) 6%, ${nStep(0)})`
-        : cfg.fill === 'gradient'
-          ? 'radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%),' +
-            ' radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%),' +
-            ' radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%),' +
-            ` ${nStep(1)}`
-          : nStep(1)
+      : `color-mix(in srgb, var(--k-primary) 6%, ${nStep(0)})`
 
   // Input border — TRACKS the Border control (Faint→Strong), one neutral step
   // firmer than the decorative --k-border so a field still reads as a field.

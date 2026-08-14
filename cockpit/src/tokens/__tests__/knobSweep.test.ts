@@ -40,7 +40,6 @@ const MODES = ['light', 'dark'] as const
 const KNOBS: Record<string, unknown[]> = {
   conformance: ['aa', 'aaa'],
   radius: ['none', 'subtle', 'soft', 'round'],
-  buttonShape: ['match', 'none', 'subtle', 'soft', 'round', 'pill'],
   scale: ['compact', 'default', 'comfortable'],
   typeScale: ['sm', 'md', 'lg', 'xl'],
   labelCase: ['sentence', 'caps'],
@@ -50,12 +49,12 @@ const KNOBS: Record<string, unknown[]> = {
   surface: ['outlined', 'filled', 'plain'],
   borders: ['faint', 'subtle', 'medium', 'strong'],
   motion: ['none', 'snappy', 'smooth', 'playful'],
-  canvas: ['white', 'brand', 'neutral', 'gradient'],
+  canvas: ['white', 'brand', 'neutral'],
   neutral: ['auto', 'cool', 'neutral', 'warm'],
   harmony: ['mono', 'tonal', 'complement', 'expressive'],
   palette: ['pastel', 'vivid', 'bright'],
   color: ['mono', 'tone'],
-  fill: ['brand', 'neutral', 'none'],
+  fill: ['brand', 'white'], // the real union — the old list named a value that does not exist
   spread: [0, 30, 60, 90, 120],
   expression: [50, 100, 150],
 }

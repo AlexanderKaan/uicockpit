@@ -5,12 +5,11 @@ import { DEFAULT_CONFIG } from '../../tokens/defaults'
 
 describe('configFromBrief', () => {
   it('applies a theme id + overrides, validated against the enums', () => {
-    const cfg = configFromBrief({ brand: 'jade', radius: 'round', density: 'comfortable', buttonShape: 'pill', icons: 'bold' })
+    const cfg = configFromBrief({ brand: 'jade', radius: 'round', density: 'comfortable', icons: 'bold' })
     expect(cfg.colorTheme).toBe('jade')
     expect(cfg.color).toBe('tone')
     expect(cfg.radius).toBe('round')
     expect(cfg.scale).toBe('comfortable')
-    expect(cfg.buttonShape).toBe('pill')
     expect(cfg.iconSet).toBe('bold')
   })
 

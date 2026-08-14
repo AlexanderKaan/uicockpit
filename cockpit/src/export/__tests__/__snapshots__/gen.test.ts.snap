@@ -9,7 +9,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "colorTheme": "cobalt",
     "color": "tone",
     "radius": "round",
-    "buttonShape": "match",
     "conformance": "aa",
     "scale": "comfortable",
     "typeScale": "md",
@@ -10732,7 +10731,7 @@ colors, radii or spacing — always reference a token.
 - Neutrals: auto gray ramp (auto-tinted toward the brand hue — cohesive "tinted neutral", not flat grey)
 - Harmony: tonal (spread 60° · expression 100%) — secondary/accent/decoratives derive from the brand hue via these dials; the brand primary itself never rotates. Status colors lean ≤15° toward the brand (always-on harmonization).
 - Layout grammar: adaptive shell tier — .scaffold (container-query app frame, window classes 600/840/1200/1600) · .navsuite (bar → rail → expanded) · .pane (fixed 360/412 + flexible; content reflows per pane). Archetypes: feed · list-detail · supporting pane.
-- Radius: round (cards/dialogs/inputs) · Button radius: match (matches the box radius — buttons share corners with cards & inputs, the default)
+- Radius: round — cards, dialogs, inputs AND buttons share one corner language.
 - **Scale: comfortable** — the size + density macro (does NOT change font-weight). Calm, roomy feel (Notion). Button + input 40px, date cells 40px. Scale cascades to button/input/toggle/date-cell sizing and spacing — don't fight it by overriding individual sizes. UI text weight is fixed (semibold), separate from Scale.
 - Type rhythm: md
 - Elevation: Deep (shadow default — shadow ladder only) · Surface: Outlined (box + border) · Border: subtle · Motion: smooth
@@ -19049,7 +19048,6 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "colorTheme": "mono",
     "color": "mono",
     "radius": "soft",
-    "buttonShape": "match",
     "conformance": "aa",
     "scale": "default",
     "typeScale": "md",
@@ -19931,7 +19929,7 @@ Radix / Headless UI / cmdk):
 
 ## This kit at a glance
 - Brand \`var(--k-primary)\` = #1575d5 · Scale comfortable (control height 40px)
-- Radius round · Button shape match · Surface outlined · Elevation Deep
+- Radius round · Surface outlined · Elevation Deep
 - Type: Inter display / Inter body · Icons Lucide (1.75px stroke, balanced)
 - Full values + rationale live in **design.md**; the live \`tokens.css\` link is the source of truth.
 

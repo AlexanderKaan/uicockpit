@@ -26,7 +26,7 @@ const TONAL = applyHarmonyPreset('tonal')
 // The shared base — the constants that keep the family coherent. A kit overrides
 // only the few levers that give it character.
 const BASE: Partial<Config> = {
-  scale: 'default', typeScale: 'md', buttonShape: 'match', labelCase: 'sentence',
+  scale: 'default', typeScale: 'md', labelCase: 'sentence',
   displayWeight: 'semibold', surface: 'outlined', surfaceDepth: 'soft', borders: 'subtle',
   motion: 'smooth',
   palette: 'vivid', canvas: 'neutral', fill: 'brand', iconSet: 'line', ...TONAL,
@@ -55,7 +55,7 @@ export const STYLE_KITS: StyleKit[] = [
   {
     id: 'refined', name: 'Refined', blurb: 'Airy, ultralight, pill buttons — Stripe',
     // Signature = PILL BUTTONS + AIR. Ultralight headings, comfortable density, pastel.
-    config: { ...BASE, radius: 'soft', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'cool', displayWeight: 'light', palette: 'pastel', buttonShape: 'pill', scale: 'comfortable', typeScale: 'lg' },
+    config: { ...BASE, radius: 'soft', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'cool', displayWeight: 'light', palette: 'pastel', scale: 'comfortable', typeScale: 'lg' },
   },
   {
     id: 'calm', name: 'Calm', blurb: 'Borderless, system font — Notion',

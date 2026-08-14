@@ -15,7 +15,6 @@ const pick = <T>(arr: readonly T[], rnd: () => number): T => arr[Math.floor(rnd(
 const CHROMATIC_THEMES: readonly ColorTheme[] = ['cobalt', 'sky', 'teal', 'jade', 'ember', 'coral', 'indigo', 'violet', 'rose']
 const SCALES = ['compact', 'default', 'comfortable'] as const
 const RADII = ['none', 'subtle', 'soft', 'round'] as const
-const BTN_SHAPES = ['match', 'none', 'subtle', 'soft', 'round', 'pill'] as const
 const TYPE_SCALES = ['sm', 'md', 'lg', 'xl'] as const
 const ICON_SETS = ['hairline', 'line', 'rounded', 'bold', 'solid'] as const
 const SURFACE_DEPTHS = ['flat', 'soft', 'deep'] as const
@@ -45,7 +44,6 @@ export function randomKit(current: Config, rnd: () => number = Math.random, lock
     ...harmonyVals,
     scale: roll('scale', SCALES),
     radius: roll('radius', RADII),
-    buttonShape: roll('buttonShape', BTN_SHAPES),
     typeScale: roll('typeScale', TYPE_SCALES),
     fontDisplay: keep('fontDisplay') ? current.fontDisplay : pick(displayFonts, rnd),
     fontBody: keep('fontBody') ? current.fontBody : pick(bodyFonts, rnd),
