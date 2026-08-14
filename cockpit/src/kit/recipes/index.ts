@@ -741,7 +741,7 @@ export const RECIPES: readonly Recipe[] = [
  * hairline frames the card and the title takes the danger role. Pair the action
  * with a .btn--danger. */
 .action-panel--danger { border-color: var(--k-danger); }
-.action-panel--danger .action-panel__title { color: var(--k-danger); }`,
+.action-panel--danger .action-panel__title { color: var(--k-danger-text); }`,
   },
   {
     id: 'button-group',
@@ -1002,7 +1002,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .field__hint { font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.4; }
 /* Error message — only render when the control is invalid; pairs with
  * aria-invalid="true" + aria-describedby on the control. */
-.field__error { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-danger); line-height: 1.4; }
+.field__error { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-danger-text); line-height: 1.4; }
 .check, .radio {
   display: inline-flex;
   align-items: center;
@@ -1399,7 +1399,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-faint);
   transition: color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
-.is-sortable.is-active .tbl__sort-chevron { color: var(--k-primary); }
+.is-sortable.is-active .tbl__sort-chevron { color: var(--k-primary-text); }
 
 /* Two-line cell (B★5) — the canonical "primary name + secondary meta" stack
    inside a table cell (issue key · type · points, file · size, user · email).
@@ -1616,7 +1616,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .datatable__state-icon { color: var(--k-fg-faint); line-height: 0; }
 .datatable__state-title { font-weight: var(--k-weight-semibold); color: var(--k-fg); }
 .datatable__state-msg { font-size: var(--k-type-small); max-width: 40ch; }
-.datatable__state--error .datatable__state-icon { color: var(--k-danger); }
+.datatable__state--error .datatable__state-icon { color: var(--k-danger-text); }
 
 /* Loading — skeleton rows in <tbody> (pair each cell with a .sk bar); the body
  * dims a touch so the table reads as "busy" rather than empty. */
@@ -2339,7 +2339,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-weight: var(--k-weight-semibold);
   /* Header text sits on the card surface (transparent over white/dark), so use
    * the actual --k-danger hue. *-fg is reserved for text ON a coloured fill. */
-  color: var(--k-danger);
+  color: var(--k-danger-text);
   margin-bottom: var(--k-s-6);
 }`,
   },
@@ -2393,7 +2393,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .auth__meta { display: flex; align-items: center; justify-content: space-between; font-size: var(--k-type-small); }
 /* Rendered as a real <button> so it is keyboard-focusable (an href-less <a>
    is not) — these resets make the button read as an inline text link. */
-.auth__link { color: var(--k-primary); text-decoration: none; cursor: pointer; font-weight: var(--k-weight-medium); background: none; border: 0; padding: 0; font: inherit; }
+.auth__link { color: var(--k-primary-text); text-decoration: none; cursor: pointer; font-weight: var(--k-weight-medium); background: none; border: 0; padding: 0; font: inherit; }
 .auth__link:hover { text-decoration: underline; }
 .auth__link:focus-visible { outline: var(--k-focus-ring-width, 2px) solid var(--k-ring); outline-offset: 2px; border-radius: var(--k-radius-sm, 4px); }
 .auth__foot { text-align: center; font-size: var(--k-type-small); color: var(--k-fg-muted); }
@@ -2920,7 +2920,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   color: var(--k-fg-muted);
 }
-.fieldset--invalid .fieldset__legend { color: var(--k-danger); }`,
+.fieldset--invalid .fieldset__legend { color: var(--k-danger-text); }`,
   },
   {
     id: 'errorsummary',
@@ -2962,7 +2962,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   gap: var(--k-s-4);
 }
 .errorsummary__link {
-  color: var(--k-danger);
+  color: var(--k-danger-text);
   font-size: var(--k-type-body);
   /* Underlined, because colour alone must never carry the meaning. */
   text-decoration: underline;
@@ -3666,7 +3666,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   cursor: pointer;
 }
 .combobox__item:hover, .combobox__item--on { background: var(--k-state-hover); }
-.combobox__item--selected .combobox__check { color: var(--k-primary); }
+.combobox__item--selected .combobox__check { color: var(--k-primary-text); }
 .combobox__check { width: 14px; flex: none; color: transparent; }
 .combobox__empty { padding: var(--k-s-10); text-align: center; color: var(--k-fg-faint); font-size: var(--k-type-small); }
 /* Loading: an async result fetch in flight — a spinner + label instead of a blank
@@ -3759,8 +3759,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * earlier \`--k-danger-fg\` value was the FOREGROUND used ON a danger fill
  * (white text on a red button), which rendered invisible white-on-white
  * when applied as \`color:\` on a transparent menu row. */
-.menu__item--danger { color: var(--k-danger); }
-.menu__item--danger:hover { background: var(--k-danger-soft); color: var(--k-danger); }
+.menu__item--danger { color: var(--k-danger-text); }
+.menu__item--danger:hover { background: var(--k-danger-soft); color: var(--k-danger-text); }
 .menu__item--check::before {
   content: '✓';
   /* Same reserved box as --uncheck so checked + unchecked labels share one left edge. */
@@ -3768,7 +3768,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   width: 12px;
   text-align: center;
   margin-right: var(--k-s-4);
-  color: var(--k-primary);
+  color: var(--k-primary-text);
   font-weight: var(--k-weight-semibold);
 }
 .menu__item--uncheck::before { content: ''; display: inline-block; width: 12px; margin-right: var(--k-s-4); }
@@ -3893,7 +3893,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .stepper__dot svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
 .stepper__step--done .stepper__dot { background: var(--k-primary); color: var(--k-primary-fg); border-color: var(--k-primary); }
-.stepper__step--current .stepper__dot { background: var(--k-surface); color: var(--k-primary); border-color: var(--k-primary); box-shadow: 0 0 0 var(--k-ring-w) var(--k-primary-soft); }
+.stepper__step--current .stepper__dot { background: var(--k-surface); color: var(--k-primary-text); border-color: var(--k-primary); box-shadow: 0 0 0 var(--k-ring-w) var(--k-primary-soft); }
 .stepper__step--current { color: var(--k-fg); font-weight: var(--k-weight-medium); }
 .stepper__step + .stepper__step::before {
   content: '';
@@ -4031,7 +4031,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font: inherit;
   font-size: var(--k-type-small);
   font-weight: var(--k-weight-semibold);
-  color: var(--k-primary);
+  color: var(--k-primary-text);
   cursor: pointer;
   flex: none;
 }
@@ -4175,7 +4175,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   text-decoration: underline;
   text-decoration-style: dotted;
   text-underline-offset: 3px;
-  color: var(--k-primary);
+  color: var(--k-primary-text);
 }
 .hover-card__pop {
   position: absolute;
@@ -4697,9 +4697,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-muted);
 }
 .att-chip--file .att-chip__thumb { background: var(--k-primary-soft); color: var(--k-primary-soft-fg); }
-.att-chip--link .att-chip__thumb { background: var(--k-info-soft); color: var(--k-info); }
-.att-chip--audio .att-chip__thumb { background: var(--k-warning-soft); color: var(--k-warning); }
-.att-chip--image .att-chip__thumb { background: var(--k-success-soft); color: var(--k-success); }
+.att-chip--link .att-chip__thumb { background: var(--k-info-soft); color: var(--k-info-text); }
+.att-chip--audio .att-chip__thumb { background: var(--k-warning-soft); color: var(--k-warning-text); }
+.att-chip--image .att-chip__thumb { background: var(--k-success-soft); color: var(--k-success-text); }
 .att-chip__thumb svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
 .att-chip__body {
   display: flex;
@@ -4857,7 +4857,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .meta-sort:hover { background: var(--k-state-hover); color: var(--k-fg); }
 .meta-sort__arrow {
-  color: var(--k-primary);
+  color: var(--k-primary-text);
   font-weight: var(--k-weight-bold);
 }
 .meta-sort--asc .meta-sort__arrow { color: var(--k-fg-muted); }`,
@@ -5152,7 +5152,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-bottom-right-radius: calc(var(--k-radius-md) - var(--k-bw, 1px));
 }
 .numinput__step:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.numinput__step:active { color: var(--k-primary); }
+.numinput__step:active { color: var(--k-primary-text); }
 .numinput--with-suffix .numinput__field { text-align: left; padding-right: var(--k-s-4); }
 .numinput__suffix {
   padding-right: var(--k-s-8);
@@ -5198,7 +5198,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-bottom-right-radius: calc(var(--k-radius-md) - var(--k-bw, 1px));
 }
 .numinput__chev:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.numinput__chev:active { color: var(--k-primary); }  /* press feedback */
+.numinput__chev:active { color: var(--k-primary-text); }  /* press feedback */
 .numinput__chev + .numinput__chev { border-top: var(--k-divider); }
 /* Suppress per-button focus outline — parent .numinput already shows
  * :focus-within ring, so a second outline on chev/step is visual noise.
@@ -5418,7 +5418,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   text-align: right;
 }
 .info-card__value--link {
-  color: var(--k-primary);
+  color: var(--k-primary-text);
   text-decoration: none;
   font-variant-numeric: tabular-nums;
 }
@@ -5541,7 +5541,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .list__trail--text {
   font-size: var(--k-type-eyebrow);
   font-weight: var(--k-weight-medium);
-  color: var(--k-primary);
+  color: var(--k-primary-text);
 }
 /* --- List CONTAINER variants — one row system; the container sets divider +
    hover behaviour, the slot/title modifiers do the rest.
@@ -5828,7 +5828,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--k-success);
+  color: var(--k-success-text);
   font-weight: var(--k-weight-semibold);
 }
 /* Tagline + CTA — the parts the a2ui test wanted. The CTA pins to the bottom of
@@ -5935,7 +5935,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   text-align: center;
 }
 /* Cell marks — a success check for "included", a quiet dash for "not". */
-.plan-compare__yes { color: var(--k-success); display: inline-flex; }
+.plan-compare__yes { color: var(--k-success-text); display: inline-flex; }
 .plan-compare__yes svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
 .plan-compare__no { color: var(--k-fg-faint); }`,
   },
@@ -6363,7 +6363,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .filterbar__active { display: flex; align-items: center; flex-wrap: wrap; gap: var(--k-s-8); padding-top: var(--k-s-10); border-top: var(--k-divider); }
 .filterbar__active-label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
 .filterbar__count { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); white-space: nowrap; }
-.filterbar__clear { font-size: var(--k-type-small); color: var(--k-primary); background: none; border: 0; cursor: pointer; padding: 0; }
+.filterbar__clear { font-size: var(--k-type-small); color: var(--k-primary-text); background: none; border: 0; cursor: pointer; padding: 0; }
 .filterbar__clear:hover { text-decoration: underline; }`,
   },
   {
@@ -6888,7 +6888,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .tool-call--running .tool-call__status::before { background: var(--k-info); }
 .tool-call--done .tool-call__status::before { background: var(--k-success); }
 .tool-call--error .tool-call__status::before { background: var(--k-danger); }
-.tool-call--error .tool-call__name { color: var(--k-danger); }
+.tool-call--error .tool-call__name { color: var(--k-danger-text); }
 .tool-call__chevron {
   width: var(--k-icon-xs);
   height: var(--k-icon-xs);
@@ -6929,7 +6929,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 }
 .reasoning summary::-webkit-details-marker { display: none; }
 .reasoning__time { color: var(--k-fg-faint); font-weight: normal; }
-.reasoning--live summary { color: var(--k-info); }
+.reasoning--live summary { color: var(--k-info-text); }
 .reasoning__chevron {
   width: var(--k-icon-xs);
   height: var(--k-icon-xs);
@@ -6974,7 +6974,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .cite:hover { border-color: var(--k-primary); color: var(--k-fg); }
 .cite__n {
   font-variant-numeric: tabular-nums;
-  color: var(--k-primary);
+  color: var(--k-primary-text);
   font-weight: var(--k-weight-semibold);
 }
 .cite-row {
@@ -6999,7 +6999,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .prose__kicker {
   font-size: var(--k-type-eyebrow);
   font-weight: var(--k-weight-semibold);
-  color: var(--k-primary);
+  color: var(--k-primary-text);
   margin-bottom: var(--k-s-6);
 }
 .prose h2 {
@@ -7038,7 +7038,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 }
 .prose ul, .prose ol { margin: 0 0 var(--k-s-12); padding-left: var(--k-s-20); }
 .prose li { font-size: var(--k-type-body); line-height: 1.65; margin-bottom: var(--k-s-6); }
-.prose a { color: var(--k-primary); text-decoration: underline; }
+.prose a { color: var(--k-primary-text); text-decoration: underline; }
 .prose > :last-child { margin-bottom: 0; }`,
   },
 ]

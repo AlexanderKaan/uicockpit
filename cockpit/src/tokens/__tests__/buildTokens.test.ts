@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildTokens } from '../buildTokens'
+import { contrast, oklchStrToHex, hexToOklch } from '../color'
 import { DEFAULT_CONFIG } from '../defaults'
 import { COLOR_THEMES, applyColorTheme } from '../stylesAndThemes'
 import type { Config, Mode, Scale } from '../types'
@@ -166,4 +167,64 @@ describe('the WCAG floors the study settled on', () => {
     expect(muted - fg).toBeGreaterThan(0.1)
     expect(faint - muted).toBeGreaterThan(0.05)
   })
+})
+
+/* ── Ink is legible in BOTH polarities, on every theme ──────────────────────
+ *
+ * Written after the matrix scan (`npm run a11y:matrix`) found 526 contrast
+ * violations in dark mode while light mode measured a clean zero — for months,
+ * because nothing ever ran the other polarity. Two separate polarity bugs sat
+ * under it, and the second one only became visible once the first was fixed:
+ *
+ *   1. the ink floor picked its worst-case surface as the DARKEST one, which is
+ *      the right extreme for dark ink on light and exactly the wrong one for
+ *      light ink on dark, so in dark mode the floor asked a question whose
+ *      answer was always yes and never engaged;
+ *   2. the tier-gap below it measured separation as `faint - muted` — positive
+ *      only in light mode — so in dark it fired every time and pushed muted 0.1
+ *      BELOW faint, throwing away the floor immediately above it.
+ *
+ * A snapshot cannot catch either: both produce perfectly stable output. Only a
+ * contrast assertion can, so the rule lives here as arithmetic rather than as a
+ * comment about intent. `-text` covers the third family — semantic colours used
+ * as ink, which had no floor at all because the fill token was doing both jobs.
+ */
+describe('ink reaches 4.5:1 on the worst surface it can land on', () => {
+  // `vars` mixes strings and numbers (z-index, weights), so normalise at the door.
+  const ratio = (a: string | number, b: string | number) =>
+    contrast(oklchStrToHex(String(a)), oklchStrToHex(String(b)))
+
+  for (const mode of MODES) {
+    for (const themeId of Object.keys(COLOR_THEMES) as Array<keyof typeof COLOR_THEMES>) {
+      it(`${themeId} / ${mode}`, () => {
+        const v = buildTokens(applyColorTheme({ ...DEFAULT_CONFIG, mode }, themeId)).vars
+        // In light the deepest surface is the hardest for dark ink; in dark it
+        // is the shallowest. Same reasoning as the engine, restated independently
+        // so a change there has to survive being disagreed with here.
+        const worst = mode === 'dark' ? v['--k-surface-overlay']! : v['--k-surface-sunken']!
+
+        for (const tier of ['--k-fg', '--k-fg-muted', '--k-fg-faint']) {
+          expect(ratio(v[tier]!, worst), `${tier} on ${worst}`).toBeGreaterThanOrEqual(4.5)
+        }
+        for (const role of ['primary', 'accent', 'success', 'warning', 'danger', 'info']) {
+          const t = `--k-${role}-text`
+          expect(v[t], `${t} must exist`).toBeTruthy()
+          expect(ratio(v[t]!, worst), `${t} on ${worst}`).toBeGreaterThanOrEqual(4.5)
+        }
+
+        // …and the three neutral tiers stay tellable apart, in whichever
+        // direction adds contrast for this polarity. A legal ramp that renders
+        // as one colour has traded the design away without saying so.
+        const L = (s: string | number): number => hexToOklch(oklchStrToHex(String(s)))[0]
+        const main = L(v['--k-fg']!), muted = L(v['--k-fg-muted']!), faint = L(v['--k-fg-faint']!)
+        if (mode === 'dark') {
+          expect(main).toBeGreaterThan(muted)
+          expect(muted).toBeGreaterThan(faint)
+        } else {
+          expect(main).toBeLessThan(muted)
+          expect(muted).toBeLessThan(faint)
+        }
+      })
+    }
+  }
 })

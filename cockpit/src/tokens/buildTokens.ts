@@ -15,7 +15,7 @@ import type {
   Tokens,
   TypeScale,
 } from './types'
-import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hexToOklch, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, oklchStrToHex, oklchToHex, readableInk, TEMP } from './color'
+import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hexToOklch, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, oklchStrToHex, readableInk, TEMP } from './color'
 import { resolveHarmony } from './harmony'
 import { guardedBorders } from './coherence'
 import { customFontFamily, isCustomFont, MONO_FONTS, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
@@ -346,19 +346,36 @@ export function buildTokens(cfg: Config): Tokens {
    * 2.7:1 once it sits on a sunken or container surface. The same bug was in our
    * own engine the whole time — we shipped the fix for other people's kits and
    * not for ours. */
+  /* The WORST-CASE surface for ink, which is not the same end of the ramp in
+   * both polarities — and getting that wrong is invisible until you measure the
+   * other mode. In LIGHT, dark ink is hardest to read on the DARKEST surface it
+   * lands on; in DARK, light ink is hardest on the LIGHTEST one. Flooring dark
+   * mode against `sunken` (its darkest step) asked "is this light ink readable
+   * on near-black" — always yes — so the floor never engaged and 526 elements
+   * shipped at 3.14:1. The audit's own palette avoids this by mixing from page
+   * TOWARD ink, which is polarity-agnostic by construction; this engine picks
+   * the extreme instead, so it has to pick the right extreme. */
+  const inkWorstSurface = dark ? surf.overlay : surf.sunken
+
   const inkFloor = (ink: string, onColor: string, min: number): string => {
     const on = oklchStrToHex(onColor)
-    let hex = oklchStrToHex(ink)
+    const hex = oklchStrToHex(ink)
     if (contrast(hex, on) >= min) return ink
     const [L, C, H] = hexToOklch(hex)
     const dir = dark ? 1 : -1
     for (let l = L; l >= 0.1 && l <= 0.98; l += dir * 0.01) {
-      hex = oklchToHex(l, C, H)
-      if (contrast(hex, on) >= min) return `oklch(${(l * 100).toFixed(1)}% ${C.toFixed(4)} ${H.toFixed(1)})`
+      /* Test the value we EMIT, not the one we computed. The emitted string
+       * rounds L to one decimal, and for a colour that lands within a hair of
+       * the bar that rounding can push it back under: violet/dark measured
+       * 4.484:1 from a floor that had verified 4.5 on the unrounded triple.
+       * Same shape as every other bug this scan turned up — the check and the
+       * artifact were not looking at the same thing. */
+      const out = `oklch(${(l * 100).toFixed(1)}% ${C.toFixed(4)} ${H.toFixed(1)})`
+      if (contrast(oklchStrToHex(out), on) >= min) return out
     }
     return ink
   }
-  const fgFaint = inkFloor(nStep(8), surf.sunken, 4.5)
+  const fgFaint = inkFloor(nStep(8), inkWorstSurface, 4.5)
   /* And then the tiers have to stay TELLABLE APART.
    *
    * Flooring faint to 4.5:1 pushed it from L64 to L52, which put it within 1.7%
@@ -369,14 +386,24 @@ export function buildTokens(cfg: Config): Tokens {
    *
    * So the law sets the floor and the design keeps its spacing: muted steps back
    * far enough from the floored faint to stay a distinct tier. Nothing here
-   * loosens the 4.5 — muted only ever gets DARKER, which cannot fail it. */
+   * loosens the 4.5 — muted only ever moves in the direction that ADDS contrast.
+   *
+   * Which direction that is depends on the polarity, and the first version of
+   * this block hard-coded the light-mode one twice over: it measured separation
+   * as `lf - lm` (positive only when faint is the lighter tier, i.e. dark ink)
+   * and it recovered by going DARKER. In dark mode both are inverted, so the
+   * comparison was negative for every kit, the fallback fired every time, and it
+   * pushed muted 0.1 BELOW faint — undoing the floor immediately above it. That
+   * is how 76 elements still measured 4.11:1 after the floor was "fixed": the
+   * floor worked and the next eight lines threw the result away. */
   const TIER_GAP = 0.1
   const fgMuted = (() => {
-    const base = inkFloor(nStep(10), surf.sunken, 4.5)
+    const base = inkFloor(nStep(10), inkWorstSurface, 4.5)
     const [lm, cm, hm] = hexToOklch(oklchStrToHex(base))
     const lf = hexToOklch(oklchStrToHex(fgFaint))[0]
-    if (lf - lm >= TIER_GAP) return base
-    const l = Math.max(0.18, lf - TIER_GAP)
+    const separation = dark ? lm - lf : lf - lm
+    if (separation >= TIER_GAP) return base
+    const l = dark ? Math.min(0.98, lf + TIER_GAP) : Math.max(0.18, lf - TIER_GAP)
     return `oklch(${(l * 100).toFixed(1)}% ${cm.toFixed(4)} ${hm.toFixed(1)})`
   })()
   const fg = {
@@ -538,6 +565,13 @@ export function buildTokens(cfg: Config): Tokens {
     const soft = hslToHex(h, softS, sysSoftL)
     sysVars['--k-' + k] = hsl(h, s, sysL)
     sysVars['--k-' + k + '-fg'] = aaInk(main)
+    /* The SAME hue as legible ink on a plain surface — a different role from the
+     * fill above, and the reason it needs its own token. `--k-danger` is picked
+     * to work as a FILL: saturated, around L60, so white sits on it. Ink has the
+     * opposite job, and a colour cannot do both. Ten recipes set
+     * `color: var(--k-danger)` directly and in dark mode that measured 2.77:1 —
+     * error text, the one string a person must be able to read. */
+    sysVars['--k-' + k + '-text'] = inkFloor(hsl(h, s, sysL), inkWorstSurface, 4.5)
     sysVars['--k-' + k + '-soft'] = hsl(h, softS, sysSoftL)
     sysVars['--k-' + k + '-soft-fg'] = aaInk(soft)
     sysList.push({ k, hex: main, soft })
@@ -927,6 +961,9 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-fg-muted': fg.muted,
       '--k-fg-faint': fg.faint,
       '--k-primary': primary,
+      // Brand-as-link-text. Same split as the status roles above: the brand solid
+      // is a fill, a link is ink. Eleven links measured 3.41:1 in dark mode.
+      '--k-primary-text': inkFloor(primary, inkWorstSurface, 4.5),
       '--k-primary-hover': primaryHover,
       '--k-primary-fg': primaryFg,
       '--k-primary-soft': primarySoft,
@@ -944,6 +981,7 @@ export function buildTokens(cfg: Config): Tokens {
         ? hslA(ph, dark ? 14 : 12, dark ? 70 : 50, dark ? 0.32 : 0.18)
         : hslA(ph, psat, dark ? 64 : 50, dark ? 0.28 : 0.18),
       '--k-accent': accent,
+      '--k-accent-text': inkFloor(accent, inkWorstSurface, 4.5),
       '--k-accent-fg': accentFg,
       '--k-accent-soft': accentSoft,
       '--k-accent-soft-fg': accentSoftFg,

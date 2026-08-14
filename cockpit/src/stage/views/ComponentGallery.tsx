@@ -2365,8 +2365,8 @@ function ResizableCard() {
         }
         right={
           <div style={{ padding: 'var(--k-s-12)', fontSize: 11.5, fontFamily: 'var(--k-font-mono)', color: 'var(--k-fg-muted)', lineHeight: 1.7 }}>
-            <div><span style={{ color: 'var(--k-primary)' }}>export</span> function App() {'{'}</div>
-            <div style={{ paddingLeft: 16 }}><span style={{ color: 'var(--k-primary)' }}>return</span> &lt;Hello /&gt;</div>
+            <div><span style={{ color: 'var(--k-primary-text)' }}>export</span> function App() {'{'}</div>
+            <div style={{ paddingLeft: 16 }}><span style={{ color: 'var(--k-primary-text)' }}>return</span> &lt;Hello /&gt;</div>
             <div>{'}'}</div>
           </div>
         }
@@ -4349,7 +4349,7 @@ function PhoneInputCard() {
           aria-label="Phone number"
         />
       </div>
-      <div style={{ fontSize: 11, color: 'var(--k-danger)' }}>Enter a valid 10-digit number.</div>
+      <div style={{ fontSize: 11, color: 'var(--k-danger-text)' }}>Enter a valid 10-digit number.</div>
       <button className="btn btn--primary btn--block">
         <Icon name="bell" /> Send code
       </button>

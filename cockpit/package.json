@@ -36,7 +36,8 @@
     "audit:hit-target": "node scripts/audit-hit-target.mjs",
     "check": "node scripts/uicockpit-check.mjs",
     "gen:vocabulary": "node scripts/gen-vocabulary.mjs",
-    "audit:vocabulary": "node scripts/gen-vocabulary.mjs --check"
+    "audit:vocabulary": "node scripts/gen-vocabulary.mjs --check",
+    "a11y:matrix": "node scripts/a11y-matrix.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
