@@ -377,7 +377,7 @@ export const RECIPES: readonly Recipe[] = [
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.btn--link:hover { color: var(--k-primary-hover); }
+.btn--link:hover { color: var(--k-primary-text-hover); }
 /* Icon buttons — always a perfect 1:1 square. Previously used asymmetric
  * padding (6px 8px) which let the glyph width drive the button width, so
  * a heart vs a magnifier vs a chevron all rendered different aspect ratios

@@ -228,3 +228,43 @@ describe('ink reaches 4.5:1 on the worst surface it can land on', () => {
     }
   }
 })
+
+/* ── A hover state cannot be less readable than the thing it responds to ────
+ *
+ * `--k-primary-fg` was clamped against `--k-primary` and never re-checked
+ * against the step the button actually swaps to: `.btn--primary:hover` moves the
+ * background to `--k-primary-hover` and keeps the same ink. On the default kit in
+ * dark mode the label read 4.63:1 at rest and 3.76:1 under the cursor. No scan we
+ * run could catch it — axe measures rendered text and does not hover — and no
+ * snapshot could, because the value was stable and simply wrong.
+ *
+ * Flooring that step then broke `.btn--link:hover`, which was borrowing the same
+ * token for TEXT: one token cannot be a fill and a piece of ink at once. Hence
+ * the third assertion — link hover has to stay legible AND stay visible, since a
+ * legal hover nobody can see is not a hover.
+ */
+describe('hover states stay legible and stay visible', () => {
+  const hx = (s: string | number) => (String(s).startsWith('#') ? String(s) : oklchStrToHex(String(s)))
+
+  for (const mode of MODES) {
+    for (const themeId of Object.keys(COLOR_THEMES) as Array<keyof typeof COLOR_THEMES>) {
+      it(`${themeId} / ${mode}`, () => {
+        const v = buildTokens(applyColorTheme({ ...DEFAULT_CONFIG, mode }, themeId)).vars
+        const worst = hx(v[mode === 'dark' ? '--k-surface-overlay' : '--k-surface-sunken']!)
+
+        // the primary button keeps its ink when the fill changes under the cursor
+        expect(contrast(hx(v['--k-primary-hover']!), hx(v['--k-primary-fg']!)),
+          'button ink on the hover fill').toBeGreaterThanOrEqual(4.5)
+
+        // the link's hover ink is still ink
+        expect(contrast(hx(v['--k-primary-text-hover']!), worst),
+          'link hover on the worst surface').toBeGreaterThanOrEqual(4.5)
+
+        // …and differs from rest by enough to be seen
+        const dL = Math.abs(hexToOklch(hx(v['--k-primary-soft-fg']!))[0]
+                          - hexToOklch(hx(v['--k-primary-text-hover']!))[0])
+        expect(dL, 'lightness step from the resting link colour').toBeGreaterThanOrEqual(0.05)
+      })
+    }
+  }
+})

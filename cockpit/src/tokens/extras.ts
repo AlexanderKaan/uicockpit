@@ -207,10 +207,17 @@ const REMEDIES: Record<string, string> = {
 
 export function auditContrast(tk: Tokens): ContrastPair[] {
   const v = tk.vars as Record<string, string>
-  // Resolve light-mode values explicitly — auditing both modes would
-  // double the count without surfacing new failures (the engine clamps
-  // both to AA already; failures here would be dark-mode-specific edge
-  // cases we'd rather catch via mode-specific audits if needed).
+  // Audits whatever mode `tk` was built in. The line that used to sit here said
+  // auditing both modes "would double the count without surfacing new failures
+  // (the engine clamps both to AA already)" — and it described behaviour this
+  // function does not have, since `tk.vars` is simply the current mode.
+  //
+  // It was also the reason nobody looked. `npm run a11y:matrix` measured the
+  // other polarity for the first time and found 526 contrast violations in dark
+  // mode against a clean zero in light: two polarity bugs in the ink ramp and a
+  // whole family of semantic colours with no floor at all. "Both are clamped
+  // already" was the assumption doing the hiding, so it is written down here as
+  // a wrong one rather than quietly deleted.
   const pairs: Array<[string, string, string, 4.5 | 3]> = [
     ['Body text on background',       '--k-fg',              '--k-bg',              4.5],
     ['Body text on surface',          '--k-fg',              '--k-surface',         4.5],
@@ -230,6 +237,13 @@ export function auditContrast(tk: Tokens): ContrastPair[] {
     ['Warning text on warning-soft',  '--k-warning-soft-fg', '--k-warning-soft',    4.5],
     ['Danger text on danger-soft',    '--k-danger-soft-fg',  '--k-danger-soft',     4.5],
     ['Info text on info-soft',        '--k-info-soft-fg',    '--k-info-soft',       4.5],
+    // The `-text` roles: the same hues as legible INK on a plain surface, added
+    // after the matrix scan found ten recipes setting `color: var(--k-danger)`
+    // and rendering error text at 2.77:1. The fill token and the ink token are
+    // different roles, so the audit has to name both.
+    ['Danger text on surface',        '--k-danger-text',     '--k-surface',         4.5],
+    ['Link text on surface',          '--k-primary-text',    '--k-surface',         4.5],
+    ['Link hover on surface',         '--k-primary-text-hover', '--k-surface',      4.5],
     ['Primary against background',       '--k-primary',       '--k-bg', 3],
     // `--k-border` is decorative (card dividers, hairlines between sections).
     // WCAG 1.4.11 only requires 3:1 for FUNCTIONAL UI elements — decorative

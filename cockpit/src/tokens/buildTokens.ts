@@ -459,6 +459,50 @@ export function buildTokens(cfg: Config): Tokens {
     return primary
   })()
   const primaryFg = readableInk(primaryHex)
+  /* The hover fill has to hold the SAME ink the resting fill does.
+   *
+   * `primaryFg` is clamped against `primary` and nothing re-checked it against
+   * the step the button actually swaps to on hover: `.btn--primary:hover` moves
+   * the background to `--k-primary-hover` and keeps `color: var(--k-primary-fg)`.
+   * Measured on the default kit in dark mode, the label went 4.63:1 at rest and
+   * 3.76:1 under the cursor — nobody designed a button that becomes less legible
+   * when you point at it, and no scan we run could see it: axe measures rendered
+   * text and does not hover.
+   *
+   * Walk the hover step AWAY from the ink until the pair clears AA. Vivid brands
+   * already pass, so this only moves the ones that were failing. */
+  const primaryHoverFloored = (() => {
+    /* `primaryHover` is an oklch STRING off the accent ladder and `primaryFg` is
+     * a hex. Comparing them directly is how the first version of this floor did
+     * nothing at all: `contrast()` takes two hexes, got one of each, returned a
+     * number that happened to clear the bar, and the early return fired. Same
+     * shape as every other bug in this pass — two things that were never
+     * measured against each other in the same units. */
+    const hoverHex = oklchStrToHex(primaryHover)
+    if (contrast(hoverHex, primaryFg) >= 4.5) return primaryHover
+    const [lf] = hexToOklch(primaryFg)
+    const [l0, c0, h0] = hexToOklch(hoverHex)
+    const dir = lf > l0 ? -1 : 1 // step away from the ink, not toward it
+    for (let l = l0; l >= 0.08 && l <= 0.97; l += dir * 0.01) {
+      const out = `oklch(${(l * 100).toFixed(1)}% ${c0.toFixed(4)} ${h0.toFixed(1)})`
+      if (contrast(oklchStrToHex(out), primaryFg) >= 4.5) return out
+    }
+    return primaryHover
+  })()
+  /* The brand as ink, and its hover.
+   *
+   * `.btn--link:hover` used to take `--k-primary-hover` — the FILL's hover step.
+   * Flooring that step against the button ink (above) pulled it toward the page
+   * and dropped link-hover text to 2.26:1 on some themes: one token cannot serve
+   * a fill and a piece of text at once, which is the same split the status roles
+   * needed. Pointing hover at `--k-primary-text` instead measured legal and
+   * INVISIBLE — in light mode the two differ by 0.009 in lightness, so the link
+   * would not visibly answer the cursor. A link that does not respond is a worse
+   * outcome than the contrast bug.
+   *
+   * So link-hover steps AWAY from the page: more contrast, never less, which is
+   * both the convention and the only direction that cannot fail. */
+  const primaryText = inkFloor(primary, inkWorstSurface, 4.5)
   const primarySoft = P[2]!
   /* Foreground on primary-soft fills (badges, chips, soft-tile icons).
    *
@@ -471,6 +515,27 @@ export function buildTokens(cfg: Config): Tokens {
   const primarySoftFg = mono
     ? (dark ? hsl(ph, 12, 88) : hsl(ph, 14, 22))
     : (dark ? hsl(ph, Math.max(70, psat), 82) : inkFloor(primary, primarySoft, 4.5))
+
+  /* Link hover, derived from the RESTING link colour so the delta is guaranteed.
+   *
+   * Deriving it from `--k-primary-text` instead measured legal everywhere and
+   * INVISIBLE on four themes in dark mode — 0.004 in lightness, which is no
+   * hover at all. Basing the step on what the link actually shows at rest fixes
+   * that by construction.
+   *
+   * Away from the page is the default: more contrast, and the direction that
+   * cannot fail. But in dark mode the resting link is already near the top of
+   * the ramp, so "away" clamps and the step vanishes again — there, move toward
+   * the page instead, which still leaves a resting 8:1 far above the bar. Checked
+   * against the worst surface a link can sit on, as everything else here is:
+   * the rule is a VISIBLE change that stays ≥4.5, not a fixed direction. */
+  const primaryTextHover = (() => {
+    const [l, c, h] = hexToOklch(oklchStrToHex(primarySoftFg))
+    const away = dark ? l + 0.09 : l - 0.09
+    const l2 = away > 0.97 || away < 0.06 ? (dark ? l - 0.11 : l + 0.11) : away
+    const out = `oklch(${(Math.min(0.97, Math.max(0.06, l2)) * 100).toFixed(1)}% ${c.toFixed(4)} ${h.toFixed(1)})`
+    return contrast(oklchStrToHex(out), oklchStrToHex(inkWorstSurface)) >= 4.5 ? out : primarySoftFg
+  })()
 
   // Secondary + accent are DERIVED from the single brand hue (ph/psat) — one
   // color in, a harmonious family out. Secondary = muted sibling (quiet
@@ -963,8 +1028,9 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-primary': primary,
       // Brand-as-link-text. Same split as the status roles above: the brand solid
       // is a fill, a link is ink. Eleven links measured 3.41:1 in dark mode.
-      '--k-primary-text': inkFloor(primary, inkWorstSurface, 4.5),
-      '--k-primary-hover': primaryHover,
+      '--k-primary-text': primaryText,
+      '--k-primary-text-hover': primaryTextHover,
+      '--k-primary-hover': primaryHoverFloored,
       '--k-primary-fg': primaryFg,
       '--k-primary-soft': primarySoft,
       '--k-primary-soft-fg': primarySoftFg,
