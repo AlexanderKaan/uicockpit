@@ -125,3 +125,45 @@ describe('buildTokens — invariants', () => {
     expect(tk.vars['--k-primary']).toMatch(/^oklch\([\d.]+% 0\.0000 /)
   })
 })
+
+/**
+ * The accessibility decisions from the design-system study, pinned.
+ *
+ * These are not implementation details — they are positions the study argued
+ * for, and a position that lives only in a commit message is a position that
+ * gets refactored away by someone acting in good faith.
+ */
+describe('the WCAG floors the study settled on', () => {
+  const at = (scale: Scale) => buildTokens({ ...DEFAULT_CONFIG, scale }).vars
+  const px = (v: string | number) => {
+    const t = String(v)
+    return t.endsWith('rem') ? parseFloat(t) * 16 : parseFloat(t)
+  }
+
+  it('names the touch-target floor once, off the spacing scale', () => {
+    // A hit target is a guarantee about a finger, not a rhythm — re-scaling it
+    // with density is the bug this token exists to prevent, so it must NOT move
+    // between the rungs even though every spacing value does.
+    const sizes = (['compact', 'default', 'comfortable'] as Scale[]).map((s) => px(at(s)['--k-hit-min']!))
+    expect(new Set(sizes).size).toBe(1)
+    expect(sizes[0]).toBe(24) // WCAG 2.5.8 AA
+  })
+
+  it('lets a team REACH the 44px AAA bar, without making it the default', () => {
+    // Every accessibility-led system in the study holds itself to 2.5.5 AAA.
+    // Our ladder used to stop at 40, so the stricter bar was unreachable at any
+    // setting; 44 everywhere would bloat the dense data UI we also serve.
+    expect(px(at('comfortable')['--k-btn-h-default']!)).toBeGreaterThanOrEqual(44)
+    expect(px(at('default')['--k-btn-h-default']!)).toBeLessThan(44)
+  })
+
+  it('keeps every text tier legible AND tellable apart', () => {
+    // Flooring faint to 4.5:1 once collapsed it to within 1.7% of muted: both
+    // legal, visually one colour, and the three-tier ramp destroyed silently.
+    const t = at('default')
+    const L = (v: string | number) => parseFloat(/oklch\(([\d.]+)/.exec(String(v))?.[1] ?? '0')
+    const [fg, muted, faint] = [L(t['--k-fg']!), L(t['--k-fg-muted']!), L(t['--k-fg-faint']!)]
+    expect(muted - fg).toBeGreaterThan(0.1)
+    expect(faint - muted).toBeGreaterThan(0.05)
+  })
+})

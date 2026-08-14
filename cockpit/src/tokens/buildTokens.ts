@@ -89,7 +89,18 @@ const SCALE: Record<Scale, ScaleRow> = {
   // (the 6 + 10 are on the named 2pt scale, --k-s-6 / --k-s-10).
   compact:     { space: 12, pad: 16, stackGap: 6, btnH: 32, inH: 32, rowDefault: 'sm', calCell: 28, toggleW: 28, toggleH: 14 },
   default:     { space: 16, pad: 24, stackGap: 8, btnH: 36, inH: 36, rowDefault: 'md', calCell: 32, toggleW: 32, toggleH: 18 },
-  comfortable: { space: 20, pad: 28, stackGap: 10, btnH: 40, inH: 40, rowDefault: 'lg', calCell: 40, toggleW: 40, toggleH: 22 },
+  /* 44, not 40. Every accessibility-led system in the design-system study holds
+   * itself to WCAG 2.5.5 AAA (44x44) rather than the 2.5.8 AA floor of 24 — NL
+   * Design System raises that criterion deliberately, and our ladder previously
+   * topped out at 40, so a team that WANTED the stricter bar could not reach it
+   * at any setting.
+   *
+   * It is the top rung and not the default on purpose: 44 everywhere bloats
+   * dense data UI (table rows, dropdown options, tree rows), which is a real
+   * constraint for the application surfaces we cover and not one a public-
+   * service system has to carry. So the law is reachable, the default stays
+   * practical, and the choice is now explicit instead of unavailable. */
+  comfortable: { space: 20, pad: 28, stackGap: 10, btnH: 44, inH: 44, rowDefault: 'lg', calCell: 44, toggleW: 44, toggleH: 24 },
 }
 // Motion table — speed setting controls all three duration tiers.
 // Easings are split into emphasized (standard state-change), decelerate

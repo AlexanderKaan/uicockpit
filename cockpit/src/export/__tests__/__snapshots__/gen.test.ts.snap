@@ -78,12 +78,12 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-avatar": "calc(var(--k-in-h-default) - 0.5rem)",
     "--k-bg": "oklch(98.0% 0.0063 249.9)",
     "--k-border": "oklch(89.2% 0.0077 249.9)",
-    "--k-btn-h-default": "2.5rem",
+    "--k-btn-h-default": "2.75rem",
     "--k-btn-lift": "-1px",
     "--k-btn-shadow": "0 1px 2px hsl(210 16% 18%/.06)",
     "--k-btn-shadow-press": "none",
     "--k-bw": "1px",
-    "--k-cal-cell": "2.5rem",
+    "--k-cal-cell": "2.75rem",
     "--k-canvas": "radial-gradient(46% 42% at 10% 2%, color-mix(in srgb, var(--k-primary) 12%, transparent), transparent 70%), radial-gradient(44% 40% at 92% 8%, color-mix(in srgb, var(--k-secondary) 9%, transparent), transparent 68%), radial-gradient(54% 50% at 82% 100%, color-mix(in srgb, var(--k-accent) 7%, transparent), transparent 72%), var(--k-bg)",
     "--k-chart-1": "oklch(62.3% 0.1589 252.4)",
     "--k-chart-2": "oklch(64.9% 0.2616 332.9)",
@@ -147,7 +147,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-icon-md": "1rem",
     "--k-icon-sm": "0.875rem",
     "--k-icon-xs": "0.6875rem",
-    "--k-in-h-default": "2.5rem",
+    "--k-in-h-default": "2.75rem",
     "--k-info": "oklch(56.8% 0.1572 253.9)",
     "--k-info-fg": "#ffffff",
     "--k-info-soft": "oklch(95.2% 0.0076 241.7)",
@@ -258,8 +258,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-surface-overlay": "oklch(100% 0 0)",
     "--k-surface-raised": "oklch(100% 0 0)",
     "--k-surface-sunken": "oklch(93.7% 0.0077 249.9)",
-    "--k-toggle-h-default": "1.375rem",
-    "--k-toggle-w-default": "2.5rem",
+    "--k-toggle-h-default": "1.5rem",
+    "--k-toggle-w-default": "2.75rem",
     "--k-touch-target": "44px",
     "--k-track": "color-mix(in srgb, oklch(16.0% 0.0140 249.9) 5%, oklch(98.0% 0.0063 249.9))",
     "--k-track-display": "-0.02em",
@@ -3197,16 +3197,16 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-stroke-2: 2px;
   --k-stroke-3: 3px;
   --k-stroke-progress: 6px;
-  --k-btn-h-default: 2.5rem;
-  --k-in-h-default: 2.5rem;
+  --k-btn-h-default: 2.75rem;
+  --k-in-h-default: 2.75rem;
   --k-control-h-md: var(--k-in-h-default);
   --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
-  --k-cal-cell: 2.5rem;
-  --k-toggle-w-default: 2.5rem;
-  --k-toggle-h-default: 1.375rem;
+  --k-cal-cell: 2.75rem;
+  --k-toggle-w-default: 2.75rem;
+  --k-toggle-h-default: 1.5rem;
   --k-slider-knob: calc(var(--k-toggle-h-default) - 6px);
   --k-avatar: calc(var(--k-in-h-default) - 0.5rem);
   --k-icon-chip: calc(var(--k-in-h-default) + 0.125rem);
@@ -3493,16 +3493,16 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-stroke-2: 2px;
   --k-stroke-3: 3px;
   --k-stroke-progress: 6px;
-  --k-btn-h-default: 2.5rem;
-  --k-in-h-default: 2.5rem;
+  --k-btn-h-default: 2.75rem;
+  --k-in-h-default: 2.75rem;
   --k-control-h-md: var(--k-in-h-default);
   --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
-  --k-cal-cell: 2.5rem;
-  --k-toggle-w-default: 2.5rem;
-  --k-toggle-h-default: 1.375rem;
+  --k-cal-cell: 2.75rem;
+  --k-toggle-w-default: 2.75rem;
+  --k-toggle-h-default: 1.5rem;
   --k-slider-knob: calc(var(--k-toggle-h-default) - 6px);
   --k-avatar: calc(var(--k-in-h-default) - 0.5rem);
   --k-icon-chip: calc(var(--k-in-h-default) + 0.125rem);
@@ -10781,16 +10781,16 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-stroke-2: 2px;
   --k-stroke-3: 3px;
   --k-stroke-progress: 6px;
-  --k-btn-h-default: 2.5rem;
-  --k-in-h-default: 2.5rem;
+  --k-btn-h-default: 2.75rem;
+  --k-in-h-default: 2.75rem;
   --k-control-h-md: var(--k-in-h-default);
   --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
-  --k-cal-cell: 2.5rem;
-  --k-toggle-w-default: 2.5rem;
-  --k-toggle-h-default: 1.375rem;
+  --k-cal-cell: 2.75rem;
+  --k-toggle-w-default: 2.75rem;
+  --k-toggle-h-default: 1.5rem;
   --k-slider-knob: calc(var(--k-toggle-h-default) - 6px);
   --k-avatar: calc(var(--k-in-h-default) - 0.5rem);
   --k-icon-chip: calc(var(--k-in-h-default) + 0.125rem);
@@ -11077,16 +11077,16 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-stroke-2: 2px;
   --k-stroke-3: 3px;
   --k-stroke-progress: 6px;
-  --k-btn-h-default: 2.5rem;
-  --k-in-h-default: 2.5rem;
+  --k-btn-h-default: 2.75rem;
+  --k-in-h-default: 2.75rem;
   --k-control-h-md: var(--k-in-h-default);
   --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
-  --k-cal-cell: 2.5rem;
-  --k-toggle-w-default: 2.5rem;
-  --k-toggle-h-default: 1.375rem;
+  --k-cal-cell: 2.75rem;
+  --k-toggle-w-default: 2.75rem;
+  --k-toggle-h-default: 1.5rem;
   --k-slider-knob: calc(var(--k-toggle-h-default) - 6px);
   --k-avatar: calc(var(--k-in-h-default) - 0.5rem);
   --k-icon-chip: calc(var(--k-in-h-default) + 0.125rem);

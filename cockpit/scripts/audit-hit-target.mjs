@@ -50,4 +50,14 @@ if (fails.length) {
   console.error(`\n${fails.length} sub-${AA}px tap target(s). Extend the click area; don't ship a 16px button.`)
   process.exit(1)
 }
-console.log(`audit:hit-target — clean (every small control reaches the ${AA}px WCAG-AA tap floor; I4 holds)`)
+/* Say what was actually checked. This used to read "every small control reaches
+ * the 24px tap floor", which is a claim about the whole kit made by a scan of
+ * remove/close/clear classes in one CSS file. It reported CLEAN on a page where
+ * a browser found six real target-size violations — a switch at 32x18, stepper
+ * chevrons at 24x17 — none of which match this pattern. A gate that overstates
+ * its scope is worse than one that has none, because it is believed.
+ *
+ * Rendered geometry and WCAG 2.5.8's spacing exception need a browser; that is
+ * `npm run a11y`. This file stays a cheap recipe-level guard and now says so. */
+console.log(`audit:hit-target — clean (${AA}px floor holds for remove/close/clear controls in ${SRC}).`)
+console.log('  NB: recipe-level only — rendered size + the 2.5.8 spacing exception are `npm run a11y`.')

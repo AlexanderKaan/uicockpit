@@ -167,37 +167,52 @@ const all = await run(null, 'WHOLE PAGE (kit + our chrome)')
  * has never actually been measured. */
 const targets = await page.evaluate(() => {
   const sel = 'button,a[href],input,select,textarea,[role="switch"],[role="checkbox"],[role="radio"],[role="tab"],[role="menuitem"],summary'
+  const els = [...document.querySelectorAll(`.cockpit-preview ${sel}`)]
+    .filter((e) => !e.disabled)
+    .map((e) => {
+      const r = e.getBoundingClientRect()
+      const cls = (e.className?.toString?.() || e.tagName).trim().split(/\s+/)[0] || e.tagName
+      return { cls, x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }
+    })
+    .filter((t) => t.w > 0 && t.h > 0)
+
+  /* WCAG 2.5.8's SPACING EXCEPTION, which is the whole reason a raw geometry
+   * check overstates the problem. An undersized target still passes when
+   * nothing else is close enough to mis-tap: the spec draws a 24px circle on
+   * each target's centre and asks whether they intersect. Reporting the 23
+   * classes under 24px as failures would have been a fifth of this session's
+   * findings that were not findings at all. */
   const out = []
-  for (const el of document.querySelectorAll(`.cockpit-preview ${sel}`)) {
-    const r = el.getBoundingClientRect()
-    if (!r.width || !r.height) continue
-    const cls = (el.className?.toString?.() || el.tagName).trim().split(/\s+/)[0] || el.tagName
-    out.push({ cls, w: Math.round(r.width), h: Math.round(r.height) })
+  for (const t of els) {
+    if (t.w >= 24 && t.h >= 24) continue
+    const crowded = els.some((o) => o !== t && Math.hypot(o.x - t.x, o.y - t.y) < 24)
+    out.push({ cls: t.cls, w: Math.round(t.w), h: Math.round(t.h), crowded })
   }
   return out
 })
 
 const byClass = new Map()
 for (const t of targets) {
-  const cur = byClass.get(t.cls) || { n: 0, minW: 1e9, minH: 1e9 }
-  cur.n++; cur.minW = Math.min(cur.minW, t.w); cur.minH = Math.min(cur.minH, t.h)
+  const cur = byClass.get(t.cls) || { n: 0, w: 1e9, h: 1e9, fails: false }
+  cur.n++; cur.w = Math.min(cur.w, t.w); cur.h = Math.min(cur.h, t.h)
+  cur.fails = cur.fails || t.crowded
   byClass.set(t.cls, cur)
 }
-const under24 = [...byClass.entries()].filter(([, v]) => v.minW < 24 || v.minH < 24)
-const under44 = [...byClass.entries()].filter(([, v]) => (v.minW < 44 || v.minH < 44) && !(v.minW < 24 || v.minH < 24))
+const failing = [...byClass.entries()].filter(([, v]) => v.fails)
+const spared = [...byClass.entries()].filter(([, v]) => !v.fails)
 
-console.log(`── HIT TARGETS — ${targets.length} interactive elements measured\n`)
-console.log(`  under 24×24 (WCAG 2.5.8 AA — ${under24.length} classes):`)
-for (const [cls, v] of under24.sort((a, b) => a[1].minH - b[1].minH)) {
-  console.log(`    ${String(v.minW).padStart(3)}×${String(v.minH).padStart(3)}  ${cls}  (${v.n}×)`)
+console.log(`── HIT TARGETS (WCAG 2.5.8 AA, with the spacing exception applied)\n`)
+console.log(`  ${failing.length} class(es) FAIL — under 24px AND crowded:`)
+for (const [cls, v] of failing.sort((a, b) => a[1].h - b[1].h)) {
+  console.log(`    ${String(v.w).padStart(3)}×${String(v.h).padStart(3)}  ${cls}  (${v.n}×)`)
 }
-if (!under24.length) console.log('    ✓ none')
-console.log(`\n  under 44×44 but ≥24 (WCAG 2.5.5 AAA, the NL DS bar — ${under44.length} classes)`)
+if (!failing.length) console.log('    ✓ none')
+console.log(`\n  ${spared.length} class(es) under 24px but SPARED by spacing — not failures.`)
 
 await browser.close()
 
 console.log(`\n${'═'.repeat(70)}`)
 console.log(`KIT: ${kit.rules} rules / ${kit.elements} elements   ·   ` +
   `PAGE: ${all.rules} rules / ${all.elements} elements   ·   ` +
-  `under-24 targets: ${under24.length} classes`)
-process.exit(kit.elements > 0 || under24.length > 0 ? 1 : 0)
+  `hit-target fails: ${failing.length} classes`)
+process.exit(kit.elements > 0 || failing.length > 0 ? 1 : 0)
