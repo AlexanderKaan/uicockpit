@@ -973,6 +973,21 @@ export function renderSection(spec: SectionSpec, key: number) {
         <div className="card" key={key}>
           <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>
           {spec.seed.intro && <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>{spec.seed.intro}</p>}
+          {/* The error summary sits ABOVE the fields, which is the whole point of
+              it — GOV.UK and NL Design System both state the rule that way. A
+              screen-reader user who submits a long form otherwise has no way to
+              learn that anything failed, or where. Rendered only when the seed
+              carries errors, so the happy path stays clean. */}
+          {spec.seed.errors && spec.seed.errors.length > 0 && (
+            <div className="errorsummary" role="alert" tabIndex={-1}>
+              <h3 className="errorsummary__title">There is a problem</h3>
+              <ul className="errorsummary__list">
+                {spec.seed.errors.map((e) => (
+                  <li key={e.field}><a className="errorsummary__link" href={`#${e.field}`}>{e.message}</a></li>
+                ))}
+              </ul>
+            </div>
+          )}
           {spec.seed.fields.map((f) => (
             <label className="lab" key={f.label}>
               <span>{f.label}</span>

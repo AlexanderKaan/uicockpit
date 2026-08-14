@@ -59,6 +59,9 @@ const CARD_KEYWORDS: Record<string, string> = {
   TabsCard: 'Northwind tabs segmented',
   NavMenuCard: 'Navigation menu navbar megamenu',
   BreadcrumbCard: 'Breadcrumb path trail',
+  SkipLinkCard: 'Skip link bypass blocks keyboard accessibility',
+  FieldsetCard: 'Fieldset legend group radio checkbox accessibility',
+  ErrorSummaryCard: 'Error summary form validation accessibility',
   PaginationCard: 'Search results pagination pages',
   StepperCard: 'Get started stepper steps progress',
   NavCard: 'Side navigation sidebar nav rail',
@@ -234,7 +237,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
-    [BreadcrumbCard, 'atom'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
+    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
@@ -339,9 +342,9 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
   ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, ColorPickerCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
-  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
+  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, PaginationCard, StepperCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
-  ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
+  ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
   ['AI thread', [ToolCallCard, ReasoningCard, CitationCard]],
   ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
@@ -436,6 +439,67 @@ function ChevronSvg({ size = 14 }: { size?: number }) {
  * Breadcrumb · Avatar · Accordion (standalone) · Carousel · Navigation menu ·
  * Context menu. The last three add new recipes (.carousel/.navmenu/.ctxmenu);
  * the first three compose existing primitives (.breadcrumb/.avatar/.accordion). */
+
+function SkipLinkCard() {
+  return (
+    <Card title="Skip link" desc="WCAG 2.4.1, Level A — the first thing a keyboard user meets.">
+      <p style={{ margin: '0 0 12px', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
+        Hidden until focused. <b>Tab into the box below</b> to see it appear.
+      </p>
+      {/* `position: relative` so the absolutely-positioned link lands inside
+          this demo box instead of the page corner. */}
+      <div style={{
+        position: 'relative', minHeight: 84, padding: 12, borderRadius: 'var(--k-radius-md)',
+        border: '1px dashed var(--k-border)', background: 'var(--k-surface-2)',
+      }}>
+        <a className="skiplink" href="#gallery-main">Skip to main content</a>
+        <p style={{ margin: 0, fontSize: 'var(--k-type-small)', color: 'var(--k-fg-faint)' }}>
+          Without one, every keyboard and screen-reader user walks the whole
+          navigation again on every single page.
+        </p>
+      </div>
+    </Card>
+  )
+}
+
+function FieldsetCard() {
+  return (
+    <Card title="Fieldset" desc="WCAG 1.3.1, Level A — a group of controls needs a NAME.">
+      <fieldset className="fieldset">
+        <legend className="fieldset__legend">How should we contact you?</legend>
+        <p className="fieldset__hint">We will only use this for order updates.</p>
+        {['Email', 'Text message', 'Phone call'].map((o) => (
+          <label key={o} className="check">
+            <input type="radio" name="contact-pref" defaultChecked={o === 'Email'} />
+            {o}
+          </label>
+        ))}
+      </fieldset>
+      <p style={{ margin: '12px 0 0', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
+        Without the legend a screen reader reads “Email, radio button” and never
+        says what the question was.
+      </p>
+    </Card>
+  )
+}
+
+function ErrorSummaryCard() {
+  return (
+    <Card title="Error summary" desc="Every failed field, above the form, each one a link.">
+      <div className="errorsummary" role="alert" tabIndex={-1}>
+        <h3 className="errorsummary__title">There is a problem</h3>
+        <ul className="errorsummary__list">
+          <li><a className="errorsummary__link" href="#es-email">Enter an email address</a></li>
+          <li><a className="errorsummary__link" href="#es-post">Enter a postcode in the right format</a></li>
+        </ul>
+      </div>
+      <p style={{ margin: '12px 0 0', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
+        Move focus here on a failed submit. Per-field messages alone are only
+        found by walking the whole form again.
+      </p>
+    </Card>
+  )
+}
 
 function BreadcrumbCard() {
   return (

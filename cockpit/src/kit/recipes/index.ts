@@ -2727,6 +2727,140 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }`,
   },
   {
+    id: 'skiplink',
+    section: "Skip link",
+    css: `/* === Skip link ===========================================================
+ * WCAG 2.4.1 Bypass Blocks — LEVEL A, the lowest bar in the standard, and the
+ * kit shipped none until the design-system study went looking. GOV.UK and
+ * NL Design System both ship one; it is the first thing a keyboard or screen
+ * reader user meets on every page, and without it they walk the whole nav on
+ * every single navigation.
+ *
+ * Visually hidden until focused, then a real, solid, high-contrast target —
+ * NOT \`display:none\` and NOT \`visibility:hidden\`, either of which removes it
+ * from the tab order and defeats the entire point. The clip-rect technique is
+ * the one every accessibility-led system converged on.
+ *
+ * Put it FIRST in the document, before the header, pointing at the main
+ * landmark: <a class="skiplink" href="#main">Skip to main content</a> */
+.skiplink {
+  position: absolute;
+  left: var(--k-s-8);
+  top: var(--k-s-8);
+  z-index: 999;
+  /* Out of sight, still in the tab order and still announced. */
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--k-hit-min);
+  padding: var(--k-s-8) var(--k-s-16);
+  border-radius: var(--k-radius-button);
+  background: var(--k-inverse-surface);
+  color: var(--k-inverse-fg);
+  font-size: var(--k-type-body);
+  font-weight: var(--k-weight-medium);
+  text-decoration: none;
+}
+.skiplink:focus-visible,
+.skiplink:focus {
+  /* Full size the moment it is reached. */
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+}`,
+  },
+  {
+    id: 'fieldset',
+    section: "Fieldset",
+    css: `/* === Fieldset + legend ===================================================
+ * WCAG 1.3.1 — LEVEL A. Radio groups and checkbox groups need a group NAME, and
+ * a heading floating above them is not one: a screen reader reads each option
+ * without ever saying what the question was. The legend supplies it, in the
+ * markup, where assistive technology can find it. NL Design System states it
+ * outright — group related fields in a <fieldset> with a descriptive <legend>.
+ *
+ * The browser's default fieldset border and legend positioning are reset,
+ * because the semantics are the point and the chrome is not. */
+.fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0; /* fieldsets refuse to shrink in flex/grid without this */
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+}
+.fieldset__legend {
+  /* A <legend> is not a flex item in every engine — the wrapper below carries
+   * the layout so the legend can stay a plain block. */
+  padding: 0;
+  margin-bottom: var(--k-s-4);
+  font-size: var(--k-type-body);
+  font-weight: var(--k-weight-medium);
+  color: var(--k-fg);
+}
+.fieldset__hint {
+  margin: calc(var(--k-s-4) * -1) 0 var(--k-s-4);
+  font-size: var(--k-type-small);
+  color: var(--k-fg-muted);
+}
+.fieldset--invalid .fieldset__legend { color: var(--k-danger); }`,
+  },
+  {
+    id: 'errorsummary',
+    section: "Error summary",
+    css: `/* === Error summary =======================================================
+ * The single highest-impact form accessibility pattern there is, and the kit
+ * shipped none. GOV.UK calls it Error summary, NL Design System calls it Form
+ * Summary, and both state the same rule: when a submission fails, put a
+ * summary of every error ABOVE the form, with each entry a link that moves
+ * focus to the field it names.
+ *
+ * Why it matters more than per-field messages: a screen reader user who submits
+ * a twenty-field form has no way to discover that three fields failed, or
+ * where. Per-field errors are only found by walking the whole form again.
+ *
+ * Wiring the kit cannot do for you: give the container tabindex="-1" and move
+ * focus to it on failed submit, and mark it role="alert" so it announces. */
+.errorsummary {
+  border: var(--k-stroke-2, 2px) solid var(--k-danger);
+  border-radius: var(--k-radius-md);
+  padding: var(--k-s-16);
+  background: var(--k-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+}
+.errorsummary:focus-visible { outline: var(--k-ring-w) solid var(--k-ring); outline-offset: 2px; }
+.errorsummary__title {
+  margin: 0;
+  font-size: var(--k-type-h3);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+}
+.errorsummary__list {
+  margin: 0;
+  padding-left: var(--k-s-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-4);
+}
+.errorsummary__link {
+  color: var(--k-danger);
+  font-size: var(--k-type-body);
+  /* Underlined, because colour alone must never carry the meaning. */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.errorsummary__link:hover { text-decoration-thickness: 2px; }`,
+  },
+  {
     id: 'kbd',
     section: "KBD",
     css: `/* === KBD ===

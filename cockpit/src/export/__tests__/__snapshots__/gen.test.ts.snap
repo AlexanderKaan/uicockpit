@@ -421,6 +421,9 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "spinner",
         "navigation-row",
         "interactive-list-row",
+        "skiplink",
+        "fieldset",
+        "errorsummary",
         "kbd",
         "code",
         "accordion",
@@ -754,6 +757,21 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "calendar",
           "buttons"
         ]
+      },
+      "skiplink": {
+        "tier": "atom",
+        "section": "Skip link",
+        "uses": []
+      },
+      "fieldset": {
+        "tier": "atom",
+        "section": "Fieldset",
+        "uses": []
+      },
+      "errorsummary": {
+        "tier": "atom",
+        "section": "Error summary",
+        "uses": []
       },
       "kbd": {
         "tier": "atom",
@@ -1132,6 +1150,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       }
     },
     "classes": {
+      "UK": {
+        "modifiers": [],
+        "parts": []
+      },
       "accordion": {
         "modifiers": [],
         "parts": [
@@ -1683,6 +1705,14 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "value"
         ]
       },
+      "errorsummary": {
+        "modifiers": [],
+        "parts": [
+          "link",
+          "list",
+          "title"
+        ]
+      },
       "eyebrow": {
         "modifiers": [],
         "parts": []
@@ -1694,6 +1724,15 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "hint",
           "label",
           "req"
+        ]
+      },
+      "fieldset": {
+        "modifiers": [
+          "invalid"
+        ],
+        "parts": [
+          "hint",
+          "legend"
         ]
       },
       "filegrid": {
@@ -2380,6 +2419,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "modifiers": [],
         "parts": []
       },
+      "skiplink": {
+        "modifiers": [],
+        "parts": []
+      },
       "slider": {
         "modifiers": [
           "disabled",
@@ -2701,6 +2744,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "combobox",
       "context-menu",
       "description-list",
+      "errorsummary",
+      "fieldset",
       "hover-card",
       "inline-status-meta-micro-components",
       "input-otp",
@@ -2715,6 +2760,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "segmented-control-toggle-group",
       "separator",
       "skeleton",
+      "skiplink",
       "spinner",
       "tabs",
       "tool-call",
@@ -3991,10 +4037,10 @@ body {
  *   the catalog:
  *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (55): the reusable elements with real
+ * ATOMS — the bare vocabulary (58): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
+ *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
  *
  * COMPONENTS — stand-alone pieces of app (26), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -6554,6 +6600,131 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 @container (max-width: 32rem) {
   .calendar-range__month + .calendar-range__month { padding-left: 0; border-left: 0; }
 }
+
+/* === Skip link ===========================================================
+ * WCAG 2.4.1 Bypass Blocks — LEVEL A, the lowest bar in the standard, and the
+ * kit shipped none until the design-system study went looking. GOV.UK and
+ * NL Design System both ship one; it is the first thing a keyboard or screen
+ * reader user meets on every page, and without it they walk the whole nav on
+ * every single navigation.
+ *
+ * Visually hidden until focused, then a real, solid, high-contrast target —
+ * NOT \`display:none\` and NOT \`visibility:hidden\`, either of which removes it
+ * from the tab order and defeats the entire point. The clip-rect technique is
+ * the one every accessibility-led system converged on.
+ *
+ * Put it FIRST in the document, before the header, pointing at the main
+ * landmark: <a class="skiplink" href="#main">Skip to main content</a> */
+.skiplink {
+  position: absolute;
+  left: var(--k-s-8);
+  top: var(--k-s-8);
+  z-index: 999;
+  /* Out of sight, still in the tab order and still announced. */
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--k-hit-min);
+  padding: var(--k-s-8) var(--k-s-16);
+  border-radius: var(--k-radius-button);
+  background: var(--k-inverse-surface);
+  color: var(--k-inverse-fg);
+  font-size: var(--k-type-body);
+  font-weight: var(--k-weight-medium);
+  text-decoration: none;
+}
+.skiplink:focus-visible,
+.skiplink:focus {
+  /* Full size the moment it is reached. */
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+}
+
+/* === Fieldset + legend ===================================================
+ * WCAG 1.3.1 — LEVEL A. Radio groups and checkbox groups need a group NAME, and
+ * a heading floating above them is not one: a screen reader reads each option
+ * without ever saying what the question was. The legend supplies it, in the
+ * markup, where assistive technology can find it. NL Design System states it
+ * outright — group related fields in a <fieldset> with a descriptive <legend>.
+ *
+ * The browser's default fieldset border and legend positioning are reset,
+ * because the semantics are the point and the chrome is not. */
+.fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0; /* fieldsets refuse to shrink in flex/grid without this */
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+}
+.fieldset__legend {
+  /* A <legend> is not a flex item in every engine — the wrapper below carries
+   * the layout so the legend can stay a plain block. */
+  padding: 0;
+  margin-bottom: var(--k-s-4);
+  font-size: var(--k-type-body);
+  font-weight: var(--k-weight-medium);
+  color: var(--k-fg);
+}
+.fieldset__hint {
+  margin: calc(var(--k-s-4) * -1) 0 var(--k-s-4);
+  font-size: var(--k-type-small);
+  color: var(--k-fg-muted);
+}
+.fieldset--invalid .fieldset__legend { color: var(--k-danger); }
+
+/* === Error summary =======================================================
+ * The single highest-impact form accessibility pattern there is, and the kit
+ * shipped none. GOV.UK calls it Error summary, NL Design System calls it Form
+ * Summary, and both state the same rule: when a submission fails, put a
+ * summary of every error ABOVE the form, with each entry a link that moves
+ * focus to the field it names.
+ *
+ * Why it matters more than per-field messages: a screen reader user who submits
+ * a twenty-field form has no way to discover that three fields failed, or
+ * where. Per-field errors are only found by walking the whole form again.
+ *
+ * Wiring the kit cannot do for you: give the container tabindex="-1" and move
+ * focus to it on failed submit, and mark it role="alert" so it announces. */
+.errorsummary {
+  border: var(--k-stroke-2, 2px) solid var(--k-danger);
+  border-radius: var(--k-radius-md);
+  padding: var(--k-s-16);
+  background: var(--k-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+}
+.errorsummary:focus-visible { outline: var(--k-ring-w) solid var(--k-ring); outline-offset: 2px; }
+.errorsummary__title {
+  margin: 0;
+  font-size: var(--k-type-h3);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+}
+.errorsummary__list {
+  margin: 0;
+  padding-left: var(--k-s-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-4);
+}
+.errorsummary__link {
+  color: var(--k-danger);
+  font-size: var(--k-type-body);
+  /* Underlined, because colour alone must never carry the meaning. */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.errorsummary__link:hover { text-decoration-thickness: 2px; }
 
 /* === KBD ===
    Fixed small radius (4px) — Kbd is a tactile metaphor, not a brand
@@ -11429,10 +11600,10 @@ body {
  *   the catalog:
  *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (55): the reusable elements with real
+ * ATOMS — the bare vocabulary (58): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
+ *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
  *
  * COMPONENTS — stand-alone pieces of app (26), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
@@ -13992,6 +14163,131 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 @container (max-width: 32rem) {
   .calendar-range__month + .calendar-range__month { padding-left: 0; border-left: 0; }
 }
+
+/* === Skip link ===========================================================
+ * WCAG 2.4.1 Bypass Blocks — LEVEL A, the lowest bar in the standard, and the
+ * kit shipped none until the design-system study went looking. GOV.UK and
+ * NL Design System both ship one; it is the first thing a keyboard or screen
+ * reader user meets on every page, and without it they walk the whole nav on
+ * every single navigation.
+ *
+ * Visually hidden until focused, then a real, solid, high-contrast target —
+ * NOT \`display:none\` and NOT \`visibility:hidden\`, either of which removes it
+ * from the tab order and defeats the entire point. The clip-rect technique is
+ * the one every accessibility-led system converged on.
+ *
+ * Put it FIRST in the document, before the header, pointing at the main
+ * landmark: <a class="skiplink" href="#main">Skip to main content</a> */
+.skiplink {
+  position: absolute;
+  left: var(--k-s-8);
+  top: var(--k-s-8);
+  z-index: 999;
+  /* Out of sight, still in the tab order and still announced. */
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--k-hit-min);
+  padding: var(--k-s-8) var(--k-s-16);
+  border-radius: var(--k-radius-button);
+  background: var(--k-inverse-surface);
+  color: var(--k-inverse-fg);
+  font-size: var(--k-type-body);
+  font-weight: var(--k-weight-medium);
+  text-decoration: none;
+}
+.skiplink:focus-visible,
+.skiplink:focus {
+  /* Full size the moment it is reached. */
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+}
+
+/* === Fieldset + legend ===================================================
+ * WCAG 1.3.1 — LEVEL A. Radio groups and checkbox groups need a group NAME, and
+ * a heading floating above them is not one: a screen reader reads each option
+ * without ever saying what the question was. The legend supplies it, in the
+ * markup, where assistive technology can find it. NL Design System states it
+ * outright — group related fields in a <fieldset> with a descriptive <legend>.
+ *
+ * The browser's default fieldset border and legend positioning are reset,
+ * because the semantics are the point and the chrome is not. */
+.fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0; /* fieldsets refuse to shrink in flex/grid without this */
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+}
+.fieldset__legend {
+  /* A <legend> is not a flex item in every engine — the wrapper below carries
+   * the layout so the legend can stay a plain block. */
+  padding: 0;
+  margin-bottom: var(--k-s-4);
+  font-size: var(--k-type-body);
+  font-weight: var(--k-weight-medium);
+  color: var(--k-fg);
+}
+.fieldset__hint {
+  margin: calc(var(--k-s-4) * -1) 0 var(--k-s-4);
+  font-size: var(--k-type-small);
+  color: var(--k-fg-muted);
+}
+.fieldset--invalid .fieldset__legend { color: var(--k-danger); }
+
+/* === Error summary =======================================================
+ * The single highest-impact form accessibility pattern there is, and the kit
+ * shipped none. GOV.UK calls it Error summary, NL Design System calls it Form
+ * Summary, and both state the same rule: when a submission fails, put a
+ * summary of every error ABOVE the form, with each entry a link that moves
+ * focus to the field it names.
+ *
+ * Why it matters more than per-field messages: a screen reader user who submits
+ * a twenty-field form has no way to discover that three fields failed, or
+ * where. Per-field errors are only found by walking the whole form again.
+ *
+ * Wiring the kit cannot do for you: give the container tabindex="-1" and move
+ * focus to it on failed submit, and mark it role="alert" so it announces. */
+.errorsummary {
+  border: var(--k-stroke-2, 2px) solid var(--k-danger);
+  border-radius: var(--k-radius-md);
+  padding: var(--k-s-16);
+  background: var(--k-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+}
+.errorsummary:focus-visible { outline: var(--k-ring-w) solid var(--k-ring); outline-offset: 2px; }
+.errorsummary__title {
+  margin: 0;
+  font-size: var(--k-type-h3);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+}
+.errorsummary__list {
+  margin: 0;
+  padding-left: var(--k-s-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-4);
+}
+.errorsummary__link {
+  color: var(--k-danger);
+  font-size: var(--k-type-body);
+  /* Underlined, because colour alone must never carry the meaning. */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.errorsummary__link:hover { text-decoration-thickness: 2px; }
 
 /* === KBD ===
    Fixed small radius (4px) — Kbd is a tactile metaphor, not a brand
@@ -18164,7 +18460,7 @@ layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
 \`max-width\`).
 
 **ATOMS** — the bare vocabulary; only meaningful inside something larger:
-Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose.
+Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose.
 
 **COMPONENTS** — stand-alone pieces of app. Each IS its surface; build it by COMPOSING
 the atoms listed, not by hand-rolling them inside a bare card:
@@ -18199,7 +18495,7 @@ the atoms listed, not by hand-rolling them inside a bare card:
 components per container width; they own arrangement, never look, and assemble into PAGES.
 
 **STANDALONE atoms** — attach to anything; use directly, no host component needed:
-Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Tool call, Reasoning, Citation, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list, Rating.
+Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Tool call, Reasoning, Citation, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list, Rating, Skip link, Fieldset, Error summary.
 
 **The rule of reach:** need a data surface? → the **Data table** component (it owns
 toolbar + selection + pagination + empty/loading/error). Need a form? → **Form
