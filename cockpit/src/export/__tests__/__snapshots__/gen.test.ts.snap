@@ -6426,7 +6426,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   cursor: pointer; text-align: left; border-top: 0; border-right: 0; border-bottom: 0;
 }
 .calendar__event:hover { filter: brightness(0.97); }
-.calendar__event-time { opacity: 0.75; font-variant-numeric: tabular-nums; flex: none; }
+/* No opacity. The ink here is --k-primary-soft-fg, which is floored to exactly
+ * 4.5:1 against the chip — so ANY alpha below 1 drops it under, and axe caught
+ * precisely that. Opacity on text is a contrast decision wearing a disguise:
+ * the token guarantees the pair and the recipe then dilutes it, somewhere the
+ * token engine cannot see. The quieter tier comes from WEIGHT, which costs no
+ * contrast — the same answer every accessibility-led system in the study gives. */
+.calendar__event-time { font-weight: var(--k-weight-regular, 400); font-variant-numeric: tabular-nums; flex: none; }
 .calendar__event-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .calendar__event--allday { border-left-width: 0; padding-left: var(--k-s-6); font-weight: var(--k-weight-medium); }
 .calendar__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
@@ -6567,7 +6573,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .calendar-week__event:hover { filter: brightness(0.97); }
 .calendar-week__event:active { filter: brightness(0.94); }
 .calendar-week__event-title { font-weight: var(--k-weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.calendar-week__event-time { opacity: 0.8; }
+.calendar-week__event-time { font-weight: var(--k-weight-regular, 400); }
 .calendar-week__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
 .calendar-week__event--accent { background: var(--k-accent-soft); color: var(--k-accent-soft-fg); border-left-color: var(--k-accent); }
 
@@ -7706,10 +7712,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-color: transparent;
   align-items: center;
 }
-.toast--snackbar .toast__sub { color: var(--k-inverse-fg); opacity: 0.72; }
+.toast--snackbar .toast__sub { color: var(--k-inverse-fg-muted, var(--k-inverse-fg)); }
 .toast--snackbar .toast__action { color: var(--k-inverse-primary); }
 .toast--snackbar .toast__action:hover { background: transparent; text-decoration: underline; text-underline-offset: 3px; }
-.toast--snackbar .toast__close { color: var(--k-inverse-fg); opacity: 0.75; }
+.toast--snackbar .toast__close { color: var(--k-inverse-fg); }
 .toast--snackbar .toast__close:hover { color: var(--k-inverse-fg); background: transparent; opacity: 1; }
 
 /* === Tag input ===
@@ -8240,8 +8246,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .stat-tile__delta svg { flex-shrink: 0; }
 /* Delta tone modifiers — avoid per-instance inline colours. */
-.stat-tile__delta--up { color: var(--k-success); background: var(--k-success-soft); }
-.stat-tile__delta--down { color: var(--k-danger); background: var(--k-danger-soft); }
+/* A SOLID is a fill, not an ink. Both of these put the solid status colour on
+ * its own soft tint — success landed at 2.03:1, which is not a near miss, it is
+ * illegible. The --soft-fg tokens exist for exactly this pairing and are
+ * derived through aaInk against the tint they sit on. */
+.stat-tile__delta--up { color: var(--k-success-soft-fg); background: var(--k-success-soft); }
+.stat-tile__delta--down { color: var(--k-danger-soft-fg); background: var(--k-danger-soft); }
 /* Clickable KPI tile — drills into a detail view (hover lift + a trailing
  * chevron that nudges right, "there's more behind this number"). */
 .stat-tile--clickable { cursor: pointer; transition: border-color var(--k-dur-fast, 140ms) var(--k-ease, ease), box-shadow var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease); }
@@ -13989,7 +13999,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   cursor: pointer; text-align: left; border-top: 0; border-right: 0; border-bottom: 0;
 }
 .calendar__event:hover { filter: brightness(0.97); }
-.calendar__event-time { opacity: 0.75; font-variant-numeric: tabular-nums; flex: none; }
+/* No opacity. The ink here is --k-primary-soft-fg, which is floored to exactly
+ * 4.5:1 against the chip — so ANY alpha below 1 drops it under, and axe caught
+ * precisely that. Opacity on text is a contrast decision wearing a disguise:
+ * the token guarantees the pair and the recipe then dilutes it, somewhere the
+ * token engine cannot see. The quieter tier comes from WEIGHT, which costs no
+ * contrast — the same answer every accessibility-led system in the study gives. */
+.calendar__event-time { font-weight: var(--k-weight-regular, 400); font-variant-numeric: tabular-nums; flex: none; }
 .calendar__event-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .calendar__event--allday { border-left-width: 0; padding-left: var(--k-s-6); font-weight: var(--k-weight-medium); }
 .calendar__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
@@ -14130,7 +14146,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .calendar-week__event:hover { filter: brightness(0.97); }
 .calendar-week__event:active { filter: brightness(0.94); }
 .calendar-week__event-title { font-weight: var(--k-weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.calendar-week__event-time { opacity: 0.8; }
+.calendar-week__event-time { font-weight: var(--k-weight-regular, 400); }
 .calendar-week__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
 .calendar-week__event--accent { background: var(--k-accent-soft); color: var(--k-accent-soft-fg); border-left-color: var(--k-accent); }
 
@@ -15269,10 +15285,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-color: transparent;
   align-items: center;
 }
-.toast--snackbar .toast__sub { color: var(--k-inverse-fg); opacity: 0.72; }
+.toast--snackbar .toast__sub { color: var(--k-inverse-fg-muted, var(--k-inverse-fg)); }
 .toast--snackbar .toast__action { color: var(--k-inverse-primary); }
 .toast--snackbar .toast__action:hover { background: transparent; text-decoration: underline; text-underline-offset: 3px; }
-.toast--snackbar .toast__close { color: var(--k-inverse-fg); opacity: 0.75; }
+.toast--snackbar .toast__close { color: var(--k-inverse-fg); }
 .toast--snackbar .toast__close:hover { color: var(--k-inverse-fg); background: transparent; opacity: 1; }
 
 /* === Tag input ===
@@ -15803,8 +15819,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .stat-tile__delta svg { flex-shrink: 0; }
 /* Delta tone modifiers — avoid per-instance inline colours. */
-.stat-tile__delta--up { color: var(--k-success); background: var(--k-success-soft); }
-.stat-tile__delta--down { color: var(--k-danger); background: var(--k-danger-soft); }
+/* A SOLID is a fill, not an ink. Both of these put the solid status colour on
+ * its own soft tint — success landed at 2.03:1, which is not a near miss, it is
+ * illegible. The --soft-fg tokens exist for exactly this pairing and are
+ * derived through aaInk against the tint they sit on. */
+.stat-tile__delta--up { color: var(--k-success-soft-fg); background: var(--k-success-soft); }
+.stat-tile__delta--down { color: var(--k-danger-soft-fg); background: var(--k-danger-soft); }
 /* Clickable KPI tile — drills into a detail view (hover lift + a trailing
  * chevron that nudges right, "there's more behind this number"). */
 .stat-tile--clickable { cursor: pointer; transition: border-color var(--k-dur-fast, 140ms) var(--k-ease, ease), box-shadow var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease); }
