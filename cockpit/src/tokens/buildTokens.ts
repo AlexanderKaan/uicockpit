@@ -447,12 +447,30 @@ export function buildTokens(cfg: Config): Tokens {
   // it sits on. The raw primary can be a pale / low-chroma brand that fails; walk
   // its lightness toward the foreground until it clears 3:1 (capped so it never
   // hits black/white). Vivid brands already pass, so this only changes pale ones.
+  /* This function had never floored anything, for any kit, since it was written.
+   *
+   * `primary` and `surf.base` are both OKLCH STRINGS; `contrast()` reads hex with
+   * `parseInt(s.slice(i, i+2), 16)`. On "oklch(…" that yields NaN, and `NaN >= 3`
+   * is false — so the early return did not fire, `hexToHsl` on the same string
+   * gave NaN, every candidate in the walk compared NaN, and control fell through
+   * to `return primary` unchanged. A guard whose failure mode is "silently return
+   * the input" cannot be caught by reading it; the sweep found it by measuring
+   * indigo/dark at 1.78:1 — which is exactly the raw primary.
+   *
+   * The focus indicator is the one thing a keyboard user has. Convert first. */
   const ringFloored = (() => {
-    const surfHex = surf.base
-    if (contrast(primary, surfHex) >= 3) return primary
-    const [h, s, l] = hexToHsl(primary)
+    const surfHex = oklchStrToHex(surf.base)
+    const primaryHexNow = oklchStrToHex(primary)
+    if (contrast(primaryHexNow, surfHex) >= 3) return primary
+    const [h, s, l] = hexToHsl(primaryHexNow)
     const dir = dark ? 1 : -1
     for (let li = l; li >= 14 && li <= 90; li += dir * 2) {
+      const hex = hslToHex(h, s, li)
+      if (contrast(hex, surfHex) >= 3) return hex
+    }
+    // The walk ran out of room in its preferred direction — go the other way
+    // rather than hand back a ring nobody can see.
+    for (let li = l; li >= 14 && li <= 90; li -= dir * 2) {
       const hex = hslToHex(h, s, li)
       if (contrast(hex, surfHex) >= 3) return hex
     }
@@ -911,7 +929,54 @@ export function buildTokens(cfg: Config): Tokens {
   // Like shadcn's opinionated input: Faint/Subtle give a soft light rim;
   // Medium/Strong clear WCAG 1.4.11 (3:1) for a11y-first kits — the user's
   // Border choice IS the accessibility lever. .in keeps bg = --k-surface.
-  const inputBorder = nStep(Math.min(9, BORDER_STEP[cfg.borders][dark ? 1 : 0] + 1))
+  /* The knob travels ABOVE the floor, it does not travel through it.
+   *
+   * What stood here was `nStep(step + 1)` and nothing else, while the comment
+   * above it said "Medium/Strong clear WCAG 1.4.11 (3:1) for a11y-first kits —
+   * the user's Border choice IS the accessibility lever", and CLAUDE.md stated
+   * as fact that this token "is floored to 3:1 WCAG". Measured on the rendered
+   * field, against the fill it encloses: faint 1.23 · subtle 1.37 (the DEFAULT)
+   * · medium 1.66 · strong 2.98. Not one setting reached 3:1, including the two
+   * the comment named. The lever did not reach the floor at either end.
+   *
+   * A border is the boundary that says "a field is here", so 1.4.11 applies to
+   * it — extras.ts already argues exactly that when it explains why the audit
+   * tests this border and not the decorative one. Making the user's taste the
+   * accessibility lever was defensible when the product sold taste. It is not
+   * a knob any more: the floor is fixed and the choice moves above it. Faint
+   * still reads lighter than Strong; it just cannot disappear. */
+  const inputBorderRaw = nStep(Math.min(9, BORDER_STEP[cfg.borders][dark ? 1 : 0] + 1))
+  const inputBorder = (() => {
+    /* Against BOTH neighbours, because a field lands on either: the fill it
+     * encloses and the page it sits on. Flooring against one and measuring
+     * against the other left ten of thirty-two combinations at 2.85. */
+    /* Against BOTH neighbours, because a field lands on either: the fill it
+     * encloses and the page it sits on. Flooring against one and measuring
+     * against the other left ten of thirty-two combinations at 2.85.
+     *
+     * And the knob keeps its RANGE above the floor rather than collapsing onto
+     * it. A plain 3:1 clamp made all four settings land within 0.15 of each
+     * other — legal, and no longer a control. These targets keep Faint→Strong an
+     * ordered, visible progression where the quietest rung is still the legal
+     * minimum. The user's preference decides how far above the floor to sit; it
+     * no longer decides whether there is one. */
+    const TARGET: Record<Borders, number> = { faint: 3.0, subtle: 3.35, medium: 3.9, strong: 4.6 }
+    const want = TARGET[cfg.borders]
+    const neighbours = [oklchStrToHex(surf.base), oklchStrToHex(pageBg)]
+    const clears = (hex: string, bar: number) => neighbours.every((n) => contrast(hex, n) >= bar)
+    const raw = oklchStrToHex(inputBorderRaw)
+    if (clears(raw, want)) return inputBorderRaw
+    const [l0, c0, h0] = hexToOklch(raw)
+    const dir = dark ? 1 : -1 // away from the surfaces, which differs by polarity
+    let fallback: string | null = null
+    for (let l = l0; l >= 0.1 && l <= 0.95; l += dir * 0.01) {
+      const out = `oklch(${(l * 100).toFixed(1)}% ${c0.toFixed(4)} ${h0.toFixed(1)})`
+      if (!fallback && clears(oklchStrToHex(out), 3)) fallback = out
+      if (clears(oklchStrToHex(out), want)) return out
+    }
+    // Ran out of ramp before hitting this rung's target — the LAW still holds.
+    return fallback ?? inputBorderRaw
+  })()
 
   return {
     mode: cfg.mode,

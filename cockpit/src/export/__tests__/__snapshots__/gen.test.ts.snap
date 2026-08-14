@@ -156,7 +156,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-info-soft-fg": "#16160c",
     "--k-info-text": "oklch(51.8% 0.1572 253.9)",
     "--k-input-bg": "oklch(95.8% 0.0070 249.9)",
-    "--k-input-border": "oklch(85.8% 0.0084 249.9)",
+    "--k-input-border": "oklch(61.8% 0.0088 247.9)",
     "--k-input-error-border": "#ce2746",
     "--k-input-success-border": "#33c192",
     "--k-input-warning-border": "#e6e60f",
@@ -353,7 +353,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-info-soft-fg": "#ffffff",
     "--k-info-text": "oklch(72.7% 0.1186 251.5)",
     "--k-input-bg": "oklch(17.6% 0.0056 249.9)",
-    "--k-input-border": "oklch(31.7% 0.0077 249.9)",
+    "--k-input-border": "oklch(55.6% 0.0083 255.6)",
     "--k-input-error-border": "#d6516a",
     "--k-input-success-border": "#5ccca6",
     "--k-input-warning-border": "#e4e444",
@@ -3071,9 +3071,9 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       },
       {
         "label": "Input border against background",
-        "ratio": 1.45,
+        "ratio": 3.47,
         "required": 3,
-        "passes": false
+        "passes": true
       },
       {
         "label": "Focus ring against background",
@@ -3233,7 +3233,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-info-soft: oklch(95.2% 0.0076 241.7);
   --k-info-soft-fg: #16160c;
   --k-border: oklch(89.2% 0.0077 249.9);
-  --k-input-border: oklch(85.8% 0.0084 249.9);
+  --k-input-border: oklch(61.8% 0.0088 247.9);
   --k-ring: oklch(56.4% 0.1689 253.9);
   --k-ring-soft: oklch(95.8% 0.0372 253.9);
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
@@ -3536,7 +3536,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-info-soft: oklch(31.2% 0.0345 252.2);
   --k-info-soft-fg: #ffffff;
   --k-border: oklch(28.5% 0.0077 249.9);
-  --k-input-border: oklch(31.7% 0.0077 249.9);
+  --k-input-border: oklch(55.6% 0.0083 255.6);
   --k-ring: oklch(56.4% 0.1689 253.9);
   --k-ring-soft: oklch(25.4% 0.0372 253.9);
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
@@ -10922,7 +10922,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-info-soft: oklch(95.2% 0.0076 241.7);
   --k-info-soft-fg: #16160c;
   --k-border: oklch(89.2% 0.0077 249.9);
-  --k-input-border: oklch(85.8% 0.0084 249.9);
+  --k-input-border: oklch(61.8% 0.0088 247.9);
   --k-ring: oklch(56.4% 0.1689 253.9);
   --k-ring-soft: oklch(95.8% 0.0372 253.9);
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
@@ -11225,7 +11225,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-info-soft: oklch(31.2% 0.0345 252.2);
   --k-info-soft-fg: #ffffff;
   --k-border: oklch(28.5% 0.0077 249.9);
-  --k-input-border: oklch(31.7% 0.0077 249.9);
+  --k-input-border: oklch(55.6% 0.0083 255.6);
   --k-ring: oklch(56.4% 0.1689 253.9);
   --k-ring-soft: oklch(25.4% 0.0372 253.9);
   --k-ring-halo: color-mix(in srgb, oklch(56.4% 0.1689 253.9) 28%, transparent);
@@ -18612,10 +18612,10 @@ adjustment in code.
 | Link text on surface | 5.45:1 | 4.5:1 | ✓ |
 | Link hover on surface | 7.63:1 | 4.5:1 | ✓ |
 | Primary against background | 4.38:1 | 3:1 | ✓ |
-| Input border against background | 1.45:1 | 3:1 | ✗ |
+| Input border against background | 3.47:1 | 3:1 | ✓ |
 | Focus ring against background | 4.38:1 | 3:1 | ✓ |
 
-**Summary**: 18/19 pairs pass WCAG AA.
+**Summary**: 19/19 pairs pass WCAG AA.
 
 ## Layout — z-index, breakpoints, containers
 
@@ -19108,7 +19108,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "value": "oklch(89.2% 0.0000 0.0)"
       },
       "input-border": {
-        "value": "oklch(85.8% 0.0000 0.0)"
+        "value": "oklch(61.8% 0.0000 89.9)"
       },
       "ring": {
         "value": "oklch(23.9% 0.0000 89.9)"
@@ -19631,9 +19631,9 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
       },
       {
         "label": "Input border against background",
-        "ratio": 1.45,
+        "ratio": 3.47,
         "required": 3,
-        "passes": false
+        "passes": true
       },
       {
         "label": "Focus ring against background",
@@ -19738,7 +19738,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-info-soft": "oklch(31.2% 0.0345 252.2)",
     "--k-info-soft-fg": "#ffffff",
     "--k-border": "oklch(28.5% 0.0000 0.0)",
-    "--k-input-border": "oklch(31.7% 0.0000 0.0)",
+    "--k-input-border": "oklch(55.7% 0.0000 89.9)",
     "--k-ring": "oklch(94.0% 0.0000 89.9)",
     "--k-ring-soft": "oklch(25.4% 0.0000 89.9)",
     "--k-ring-halo": "color-mix(in srgb, oklch(94.0% 0.0000 89.9) 28%, transparent)",
@@ -19788,7 +19788,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "destructive": "oklch(55.7% 0.1997 17.4)",
       "destructive-foreground": "#ffffff",
       "border": "oklch(89.2% 0.0077 249.9)",
-      "input": "oklch(85.8% 0.0084 249.9)",
+      "input": "oklch(61.8% 0.0088 247.9)",
       "ring": "oklch(56.4% 0.1689 253.9)",
       "chart-1": "oklch(62.3% 0.1589 252.4)",
       "chart-2": "oklch(64.9% 0.2616 332.9)",
@@ -19823,7 +19823,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "destructive": "oklch(61.8% 0.1675 12.1)",
       "destructive-foreground": "#16160c",
       "border": "oklch(28.5% 0.0077 249.9)",
-      "input": "oklch(31.7% 0.0077 249.9)",
+      "input": "oklch(55.6% 0.0083 255.6)",
       "ring": "oklch(56.4% 0.1689 253.9)",
       "chart-1": "oklch(63.7% 0.1493 251.8)",
       "chart-2": "oklch(65.5% 0.2511 332.6)",
@@ -19969,7 +19969,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-accent-foreground: #ffffff;
   --color-fill: oklch(56.4% 0.1689 253.9);
   --color-border: oklch(89.2% 0.0077 249.9);
-  --color-input-border: oklch(85.8% 0.0084 249.9);
+  --color-input-border: oklch(61.8% 0.0088 247.9);
   --color-ring: oklch(56.4% 0.1689 253.9);
   --color-ring-soft: oklch(95.8% 0.0372 253.9);
   --color-secondary-soft-foreground: #16160c;
@@ -20123,7 +20123,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-secondary-soft: #263050;
   --color-accent: oklch(59.9% 0.2408 302.4);
   --color-border: oklch(28.5% 0.0077 249.9);
-  --color-input-border: oklch(31.7% 0.0077 249.9);
+  --color-input-border: oklch(55.6% 0.0083 255.6);
   --color-ring-soft: oklch(25.4% 0.0372 253.9);
   --color-secondary-soft-foreground: #ffffff;
   --color-selection: oklch(70.0% 0.1338 250.3 / 0.28);

@@ -33,7 +33,59 @@ function toHex(val: string): string {
     const l = parseFloat(m[3] as string)
     return hslToHex(h, s, l)
   }
-  return '#000000'
+  /* A layered gradient — what `canvas: gradient` emits: three radial tints of
+   * 7-12% over one opaque base. A pair table cannot score a gradient, because
+   * "the background" is a different colour at every pixel; the RENDERED scan
+   * (`npm run a11y:matrix`, which measures composited pixels) is the authority
+   * there and reads zero. What this table can honestly do is take the base
+   * layer — the last top-level stop, the only opaque one — and note that the
+   * tints above it are capped low enough not to move it far. */
+  if (/(^|[\s,])(radial|linear|conic)-gradient\(/.test(val)) {
+    let depth = 0
+    let last = ''
+    let cur = ''
+    for (const chunk of val) {
+      if (chunk === '(') depth++
+      if (chunk === ')') depth--
+      if (chunk === ',' && depth === 0) { if (cur.trim()) last = cur.trim(); cur = '' } else cur += chunk
+    }
+    const base = (cur.trim() || last).trim()
+    if (base && !/gradient\(/.test(base)) return toHex(base)
+  }
+  /* Checked BEFORE color-mix, and that ordering is the whole point: the
+   * color-mix pattern is anchored to a closing paren at the end of the string,
+   * and a gradient built FROM color-mix stops also ends in one. Tried the other
+   * way round it matched the entire gradient as a single mix, produced nonsense,
+   * and landed in the unparseable branch below. */
+
+  /* color-mix() — what `canvas: brand` and `gradient` emit for --k-bg:
+   * `color-mix(in srgb, <brand> 6%, <near-white>)`. Without this branch it fell
+   * through to the black fallback below and the audit reported body text at
+   * 1.08:1 on ten of thirty-two theme×mode combinations, while axe measured the
+   * rendered page at zero. That is the SAME failure the note at the top of this
+   * file already describes ("compared black-on-black and reported a perfectly
+   * accessible theme as failing") — it came back through a syntax the parser
+   * had not met yet, because the fallback silently invents an answer instead of
+   * admitting it cannot read the value. */
+  const mix = val.match(/color-mix\(\s*in\s+srgb\s*,\s*(.+?)\s+([\d.]+)%\s*,\s*(.+?)\s*\)\s*$/)
+  if (mix) {
+    const a = toHex(mix[1] as string)
+    const b = toHex(mix[3] as string)
+    const w = parseFloat(mix[2] as string) / 100
+    const ch = (h: string, i: number) => parseInt(h.slice(1 + i * 2, 3 + i * 2), 16)
+    const out = [0, 1, 2]
+      .map((i) => Math.round(ch(a, i) * w + ch(b, i) * (1 - w)))
+      .map((n) => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0'))
+      .join('')
+    return `#${out}`
+  }
+  /* Anything still unrecognised. Returning '#000000' here is what turned an
+   * unreadable value into a confident wrong number twice; a colour the audit
+   * cannot parse must not be scored as if it could be. Magenta is deliberate:
+   * it makes an unhandled syntax show up as an absurd ratio in the badge rather
+   * than a plausible failure someone spends an afternoon chasing. */
+  if (typeof console !== 'undefined') console.warn(`[uicockpit] contrast audit cannot parse: ${val}`)
+  return '#ff00ff'
 }
 
 /* ───────── Z-index stack ─────────
