@@ -249,6 +249,19 @@ function Recognise({
         {scan.skipped.tooBig > 0 && (
           <Row label="Skipped as generated" sub="single files over 512 KB" n={scan.skipped.tooBig.toLocaleString('en-US')} />
         )}
+        {/* The read caps at 8,000 files so a monorepo cannot hang the tab, and
+            that ceiling was reported nowhere: a 9,000-file repo came back as
+            "8,000 files read" with no hint that a thousand were dropped. A
+            silent truncation reads as complete coverage, which is the exact
+            dishonesty the 70% floor exists to prevent — the floor cannot work
+            if the denominator is quietly wrong. */}
+        {scan.skipped.overCap > 0 && (
+          <Row
+            label="Past the read limit"
+            sub="the scan stops at 8,000 files — point it at one app for a full read"
+            n={scan.skipped.overCap.toLocaleString('en-US')}
+          />
+        )}
         <Row ok label="Your code that left this machine" sub="not read, not sent, not stored — the scan ran here" n="0 bytes" />
       </ul>
 

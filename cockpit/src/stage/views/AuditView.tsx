@@ -91,12 +91,23 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
             {nf(audit.filesRead)} files · {Math.round(audit.parsed * 100)}% read · {found.length} of{' '}
             {entries.length} component kinds
           </span>
+          {/* A refusal has to SAY so here. The strip otherwise shows a stage
+              full of their components with a bare "26% read" beside it, which
+              reads as a complete result — overclaiming by omission, on the one
+              screen whose whole argument is that we do not do that. */}
+          {audit.score === null && (
+            <span className="audv__refused">no score — below the 70% floor</span>
+          )}
         </div>
         <div className="audv__facts">
           {audit.score !== null && (
             <><span><b>{audit.score}</b>/100 consistency</span><span className="audv__dot" /></>
           )}
-          <span><b>{nf(audit.singletons)}</b> of {nf(audit.treatments)} treatments used once</span>
+          {/* Silence beats "0 of 0", which looks like a measurement and is the
+              absence of one. */}
+          {audit.treatments > 0 && (
+            <span><b>{nf(audit.singletons)}</b> of {nf(audit.treatments)} treatments used once</span>
+          )}
           {onSeeEvidence && (
             <>
               <span className="audv__dot" />
@@ -126,8 +137,10 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
         <p className="audv__tally">
           {drift ? (
             <>
-              <b>{audit.distinct.color}</b> colours <i>·</i> <b>{audit.distinct.radius}</b> radii{' '}
-              <i>·</i> <b>{audit.distinct.shadow}</b> shadows <i>·</i> <b>{audit.distinct.spacing}</b> spacings
+              <b>{audit.distinct.color}</b> colour{audit.distinct.color === 1 ? '' : 's'} <i>·</i>{' '}
+              <b>{audit.distinct.radius}</b> radi{audit.distinct.radius === 1 ? 'us' : 'i'} <i>·</i>{' '}
+              <b>{audit.distinct.shadow}</b> shadow{audit.distinct.shadow === 1 ? '' : 's'} <i>·</i>{' '}
+              <b>{audit.distinct.spacing}</b> spacing{audit.distinct.spacing === 1 ? '' : 's'}
             </>
           ) : (
             <>One accent <i>·</i> one scale <i>·</i> one shadow <i>·</i> one rhythm</>
