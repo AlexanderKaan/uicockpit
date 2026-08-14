@@ -1812,7 +1812,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ],
         "parts": [
           "affix",
-          "label",
           "overlap"
         ]
       },
@@ -4966,8 +4965,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * contract: reach for .field when a row needs a hint, an error or a required *.) */
 .field { display: flex; flex-direction: column; gap: var(--k-s-6); }
 .field__label { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-small); font-weight: var(--k-weight-medium); color: var(--k-fg); }
-/* Required marker — a danger-toned asterisk after the label text. */
-.field__req { color: var(--k-danger); }
+/* Required marker — the WORD, not an asterisk.
+ *
+ * NL Design System: an asterisk "vergt een extra denkstap" and is not their
+ * preferred form; write "verplicht" / "required" into the label text, and mark
+ * the input required in the markup as well so assistive technology hears it.
+ * Quiet rather than alarming — a required field is normal, not an error — so it
+ * is muted and not danger-toned, which is what the asterisk implied. */
+.field__req { font-weight: var(--k-weight-regular, 400); color: var(--k-fg-muted); }
 .field__hint { font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.4; }
 /* Error message — only render when the control is invalid; pairs with
  * aria-invalid="true" + aria-describedby on the control. */
@@ -5076,8 +5081,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  *                    idiom); the input keeps its focus halo, lifted above neighbours.
  *   .in__affix       an inline unit INSIDE the field ($ … USD), as a muted span in
  *                    an .in--inline wrapper.
- *   .in--inset       the label lives inside the field at the top, input below.
- *   .in-field + .in__overlap   the label straddles the top border in a surface chip. */
+ *
+ * RETIRED, 2026-08-14 — .in--inset (label inside the field) and
+ * .in-field/.in__overlap (label straddling the border). The design-system study
+ * settled this against us: NL Design System's own user research led them to
+ * MANDATE the label above the field, and GOV.UK and USWDS place it there in
+ * every example they ship. The only dissenter was Material, whose floating
+ * label is the named subject of the criticism — the label must shrink to fit,
+ * a long one is cropped, Nielsen Norman found a filled float reads as
+ * PRE-FILLED DATA, and WCAG stresses a visible label precisely for users with
+ * cognitive disabilities.
+ *
+ * Three accessibility-led systems and the literature on one side, one brand-
+ * expression system on the other. By this project's own rule that is law rather
+ * than taste, so these do not become a knob — they are gone. */
 .in-group { display: flex; align-items: stretch; width: 100%; }
 .in-group > * { border-radius: 0; }
 .in-group > *:not(:first-child) { margin-left: -1px; }
@@ -5093,18 +5110,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
 }
 .in__affix { color: var(--k-fg-muted); flex: none; user-select: none; }
-.in--inset {
-  flex-direction: column; align-items: stretch; justify-content: center; gap: var(--k-s-2);
-  min-height: calc(var(--k-in-h-default, 40px) * 1.35); padding-block: var(--k-s-6);
-}
-.in--inset .in__label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted); }
-.in--inset input { background: transparent; border: 0; outline: 0; padding: 0; font: inherit; color: inherit; width: 100%; }
-.in-field { position: relative; }
-.in__overlap {
-  position: absolute; top: 0; left: var(--k-s-8); transform: translateY(-50%);
-  padding: 0 var(--k-s-4); background: var(--k-surface); line-height: 1;
-  font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted);
-}
 
 /* === Badges & pills ===
    A badge is a TEXT chip (status "Healthy", tag "POPULAR") — so it FOLLOWS the
@@ -12550,8 +12555,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * contract: reach for .field when a row needs a hint, an error or a required *.) */
 .field { display: flex; flex-direction: column; gap: var(--k-s-6); }
 .field__label { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-small); font-weight: var(--k-weight-medium); color: var(--k-fg); }
-/* Required marker — a danger-toned asterisk after the label text. */
-.field__req { color: var(--k-danger); }
+/* Required marker — the WORD, not an asterisk.
+ *
+ * NL Design System: an asterisk "vergt een extra denkstap" and is not their
+ * preferred form; write "verplicht" / "required" into the label text, and mark
+ * the input required in the markup as well so assistive technology hears it.
+ * Quiet rather than alarming — a required field is normal, not an error — so it
+ * is muted and not danger-toned, which is what the asterisk implied. */
+.field__req { font-weight: var(--k-weight-regular, 400); color: var(--k-fg-muted); }
 .field__hint { font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.4; }
 /* Error message — only render when the control is invalid; pairs with
  * aria-invalid="true" + aria-describedby on the control. */
@@ -12660,8 +12671,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  *                    idiom); the input keeps its focus halo, lifted above neighbours.
  *   .in__affix       an inline unit INSIDE the field ($ … USD), as a muted span in
  *                    an .in--inline wrapper.
- *   .in--inset       the label lives inside the field at the top, input below.
- *   .in-field + .in__overlap   the label straddles the top border in a surface chip. */
+ *
+ * RETIRED, 2026-08-14 — .in--inset (label inside the field) and
+ * .in-field/.in__overlap (label straddling the border). The design-system study
+ * settled this against us: NL Design System's own user research led them to
+ * MANDATE the label above the field, and GOV.UK and USWDS place it there in
+ * every example they ship. The only dissenter was Material, whose floating
+ * label is the named subject of the criticism — the label must shrink to fit,
+ * a long one is cropped, Nielsen Norman found a filled float reads as
+ * PRE-FILLED DATA, and WCAG stresses a visible label precisely for users with
+ * cognitive disabilities.
+ *
+ * Three accessibility-led systems and the literature on one side, one brand-
+ * expression system on the other. By this project's own rule that is law rather
+ * than taste, so these do not become a knob — they are gone. */
 .in-group { display: flex; align-items: stretch; width: 100%; }
 .in-group > * { border-radius: 0; }
 .in-group > *:not(:first-child) { margin-left: -1px; }
@@ -12677,18 +12700,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
 }
 .in__affix { color: var(--k-fg-muted); flex: none; user-select: none; }
-.in--inset {
-  flex-direction: column; align-items: stretch; justify-content: center; gap: var(--k-s-2);
-  min-height: calc(var(--k-in-h-default, 40px) * 1.35); padding-block: var(--k-s-6);
-}
-.in--inset .in__label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted); }
-.in--inset input { background: transparent; border: 0; outline: 0; padding: 0; font: inherit; color: inherit; width: 100%; }
-.in-field { position: relative; }
-.in__overlap {
-  position: absolute; top: 0; left: var(--k-s-8); transform: translateY(-50%);
-  padding: 0 var(--k-s-4); background: var(--k-surface); line-height: 1;
-  font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted);
-}
 
 /* === Badges & pills ===
    A badge is a TEXT chip (status "Healthy", tag "POPULAR") — so it FOLLOWS the

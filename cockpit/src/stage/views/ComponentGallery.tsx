@@ -1538,7 +1538,7 @@ function FormPanelCard() {
             <label className="lab"><span>Workspace name</span><input className="in" defaultValue="Acme Inc." /></label>
             <label className="lab"><span>Subdomain</span><input className="in" defaultValue="acme" /></label>
             <div className="field formpanel__full">
-              <label className="field__label" htmlFor="fp-owner">Owner email <span className="field__req">*</span></label>
+              <label className="field__label" htmlFor="fp-owner">Owner email <span className="field__req">(required)</span></label>
               <input id="fp-owner" className="in" type="email" placeholder="you@company.com" aria-invalid={showError || undefined} aria-describedby={showError ? 'fp-owner-err' : undefined} />
               {showError && <span id="fp-owner-err" className="field__error"><Icon name="info" /> Enter a valid email address.</span>}
             </div>
@@ -1852,7 +1852,7 @@ function ValidationCard() {
   return (
     <Card title="Account details" desc="We'll check these as you type.">
       <div className="field">
-        <label className="field__label" htmlFor="acc-email">Email <span className="field__req" aria-hidden="true">*</span></label>
+        <label className="field__label" htmlFor="acc-email">Email <span className="field__req">(required)</span></label>
         <input className="in is-error" id="acc-email" defaultValue="not-an-email" aria-invalid="true" aria-describedby="acc-email-error" />
         <span className="field__error" id="acc-email-error"><Icon name="info" /> Enter a valid email address.</span>
       </div>
@@ -3444,10 +3444,11 @@ function TwoColumnListCard() {
 }
 
 function InputAddonsCard() {
-  // Input groups: a fused add-on segment (.in-group), an inline unit (.in__affix),
-  // an inset label (.in--inset), and an overlapping label (.in-field/.in__overlap).
+  // Input groups: a fused add-on segment (.in-group) and an inline unit
+  // (.in__affix). The inset and overlapping label variants were retired — see
+  // the recipe note; the label belongs above the field.
   return (
-    <Card title="Input add-ons" desc="Add-ons, inline units, and inset / overlapping labels.">
+    <Card title="Input add-ons" desc="Fused add-on segments and inline units.">
       <label className="lab">
         <span>Website</span>
         <span className="in-group">
@@ -3464,14 +3465,6 @@ function InputAddonsCard() {
           <span className="in__affix">USD</span>
         </span>
       </label>
-      <label className="in in--inset">
-        <span className="in__label">Quantity</span>
-        <input inputMode="numeric" defaultValue="12" aria-label="Quantity" />
-      </label>
-      <div className="in-field" style={{ marginTop: 'var(--k-s-4)' }}>
-        <span className="in__overlap">Email</span>
-        <input className="in" type="email" defaultValue="mara@acme.com" aria-label="Email" />
-      </div>
     </Card>
   )
 }
