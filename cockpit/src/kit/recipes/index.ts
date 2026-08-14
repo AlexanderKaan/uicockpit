@@ -368,7 +368,10 @@ export const RECIPES: readonly Recipe[] = [
 .btn--outline:hover { background: var(--k-state-hover); }
 .btn--link {
   background: transparent;
-  color: var(--k-primary);
+  /* The brand as INK, not as a fill. --k-primary is tuned to be a background
+   * and measured 4.24:1 as text on a tinted section; --k-primary-soft-fg is the
+   * same hue with a contrast floor already applied. */
+  color: var(--k-primary-soft-fg);
   padding-inline: 0;
   padding-block: 0;
   text-decoration: underline;
@@ -988,8 +991,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * contract: reach for .field when a row needs a hint, an error or a required *.) */
 .field { display: flex; flex-direction: column; gap: var(--k-s-6); }
 .field__label { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-small); font-weight: var(--k-weight-medium); color: var(--k-fg); }
-/* Required marker — a danger-toned asterisk after the label text. */
-.field__req { color: var(--k-danger); }
+/* Required marker — the WORD, not an asterisk.
+ *
+ * NL Design System: an asterisk "vergt een extra denkstap" and is not their
+ * preferred form; write "verplicht" / "required" into the label text, and mark
+ * the input required in the markup as well so assistive technology hears it.
+ * Quiet rather than alarming — a required field is normal, not an error — so it
+ * is muted and not danger-toned, which is what the asterisk implied. */
+.field__req { font-weight: var(--k-weight-regular, 400); color: var(--k-fg-muted); }
 .field__hint { font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.4; }
 /* Error message — only render when the control is invalid; pairs with
  * aria-invalid="true" + aria-describedby on the control. */
@@ -1098,8 +1107,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  *                    idiom); the input keeps its focus halo, lifted above neighbours.
  *   .in__affix       an inline unit INSIDE the field ($ … USD), as a muted span in
  *                    an .in--inline wrapper.
- *   .in--inset       the label lives inside the field at the top, input below.
- *   .in-field + .in__overlap   the label straddles the top border in a surface chip. */
+ *
+ * RETIRED, 2026-08-14 — .in--inset (label inside the field) and
+ * .in-field/.in__overlap (label straddling the border). The design-system study
+ * settled this against us: NL Design System's own user research led them to
+ * MANDATE the label above the field, and GOV.UK and USWDS place it there in
+ * every example they ship. The only dissenter was Material, whose floating
+ * label is the named subject of the criticism — the label must shrink to fit,
+ * a long one is cropped, Nielsen Norman found a filled float reads as
+ * PRE-FILLED DATA, and WCAG stresses a visible label precisely for users with
+ * cognitive disabilities.
+ *
+ * Three accessibility-led systems and the literature on one side, one brand-
+ * expression system on the other. By this project's own rule that is law rather
+ * than taste, so these do not become a knob — they are gone. */
 .in-group { display: flex; align-items: stretch; width: 100%; }
 .in-group > * { border-radius: 0; }
 .in-group > *:not(:first-child) { margin-left: -1px; }
@@ -1115,18 +1136,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
 }
 .in__affix { color: var(--k-fg-muted); flex: none; user-select: none; }
-.in--inset {
-  flex-direction: column; align-items: stretch; justify-content: center; gap: var(--k-s-2);
-  min-height: calc(var(--k-in-h-default, 40px) * 1.35); padding-block: var(--k-s-6);
-}
-.in--inset .in__label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted); }
-.in--inset input { background: transparent; border: 0; outline: 0; padding: 0; font: inherit; color: inherit; width: 100%; }
-.in-field { position: relative; }
-.in__overlap {
-  position: absolute; top: 0; left: var(--k-s-8); transform: translateY(-50%);
-  padding: 0 var(--k-s-4); background: var(--k-surface); line-height: 1;
-  font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted);
-}`,
+`,
   },
   {
     id: 'badges-pills',
@@ -2542,7 +2552,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   cursor: pointer; text-align: left; border-top: 0; border-right: 0; border-bottom: 0;
 }
 .calendar__event:hover { filter: brightness(0.97); }
-.calendar__event-time { opacity: 0.75; font-variant-numeric: tabular-nums; flex: none; }
+/* No opacity. The ink here is --k-primary-soft-fg, which is floored to exactly
+ * 4.5:1 against the chip — so ANY alpha below 1 drops it under, and axe caught
+ * precisely that. Opacity on text is a contrast decision wearing a disguise:
+ * the token guarantees the pair and the recipe then dilutes it, somewhere the
+ * token engine cannot see. The quieter tier comes from WEIGHT, which costs no
+ * contrast — the same answer every accessibility-led system in the study gives. */
+.calendar__event-time { font-weight: var(--k-weight-regular, 400); font-variant-numeric: tabular-nums; flex: none; }
 .calendar__event-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .calendar__event--allday { border-left-width: 0; padding-left: var(--k-s-6); font-weight: var(--k-weight-medium); }
 .calendar__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
@@ -2686,7 +2702,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .calendar-week__event:hover { filter: brightness(0.97); }
 .calendar-week__event:active { filter: brightness(0.94); }
 .calendar-week__event-title { font-weight: var(--k-weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.calendar-week__event-time { opacity: 0.8; }
+.calendar-week__event-time { font-weight: var(--k-weight-regular, 400); }
 .calendar-week__event--alt { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); border-left-color: var(--k-secondary); }
 .calendar-week__event--accent { background: var(--k-accent-soft); color: var(--k-accent-soft-fg); border-left-color: var(--k-accent); }`,
   },
@@ -2725,6 +2741,234 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 @container (max-width: 32rem) {
   .calendar-range__month + .calendar-range__month { padding-left: 0; border-left: 0; }
 }`,
+  },
+  {
+    id: 'tasklist',
+    section: "Task list",
+    css: `/* === Task list ===========================================================
+ * The multi-step service pattern: "apply for X" broken into sections you can
+ * complete in any order, each carrying its own status. GOV.UK ships it as Task
+ * list, NL Design System as Task Navigation — it is how a long form stops being
+ * a wall and starts being a plan.
+ *
+ * NOT our .stepper, which is the reason this earns a place under the study's
+ * "unique" criterion: a stepper is LINEAR and tells you where you are in a
+ * sequence; a task list is NON-LINEAR and tells you what is left. Different
+ * question, different component.
+ *
+ * Markup is an ordered list of links with a status beside each. The status is a
+ * .badge, so it inherits the tones the kit already guarantees, and it must read
+ * as TEXT — never colour alone, which is WCAG 1.4.1. */
+.tasklist { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--k-border); }
+.tasklist__item {
+  display: flex; align-items: center; gap: var(--k-s-12);
+  padding: var(--k-s-12) var(--k-s-2);
+  border-bottom: 1px solid var(--k-border);
+}
+.tasklist__name { flex: 1; min-width: 0; }
+.tasklist__link { color: var(--k-fg); text-decoration: underline; text-underline-offset: 2px; font-weight: var(--k-weight-medium); }
+.tasklist__link:hover { color: var(--k-primary-soft-fg); }
+/* A task that cannot be started yet is not a link — a dead link is a worse
+ * answer than plain text, because it invites a click that goes nowhere. */
+.tasklist__name--locked { color: var(--k-fg-muted); font-weight: var(--k-weight-medium); }
+.tasklist__hint { display: block; margin-top: var(--k-s-2); font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.tasklist__status { flex: none; }
+/* The section counter above the list ("2 of 5 sections complete"). */
+.tasklist__count { margin: 0 0 var(--k-s-8); font-size: var(--k-type-body); color: var(--k-fg-muted); }`,
+  },
+  {
+    id: 'toggletip',
+    section: "Toggletip",
+    css: `/* === Toggletip ===========================================================
+ * A tooltip you can actually reach. The difference is the interaction model,
+ * not the look: a TOOLTIP appears on hover and describes the thing it is
+ * attached to; a TOGGLETIP is opened by a button, stays until dismissed, and
+ * carries information that is genuinely additional.
+ *
+ * That distinction matters because hover is not available to a touch user and
+ * is awkward for anyone using magnification, so supplementary content behind a
+ * hover is content some people simply never get. NL Design System steers to the
+ * toggletip for exactly this reason; the study filed tooltip-vs-toggletip as a
+ * judgement call between systems, but SHIPPING BOTH is not a judgement call —
+ * it is giving people the reachable option.
+ *
+ * Wiring: a real <button> with aria-expanded, and a live region for the bubble
+ * so the text is announced when it opens rather than silently appearing. */
+.toggletip { position: relative; display: inline-flex; }
+.toggletip__trigger {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--k-hit-min); height: var(--k-hit-min);
+  padding: 0; border: 0; border-radius: 999px;
+  background: transparent; color: var(--k-fg-muted); cursor: pointer;
+}
+.toggletip__trigger:hover { background: var(--k-state-hover); color: var(--k-fg); }
+.toggletip__bubble {
+  position: absolute; bottom: calc(100% + var(--k-s-6)); left: 50%; transform: translateX(-50%);
+  z-index: 40; width: max-content; max-width: 16rem;
+  padding: var(--k-s-8) var(--k-s-10);
+  border: 1px solid var(--k-border); border-radius: var(--k-radius-md);
+  background: var(--k-surface-overlay); color: var(--k-fg);
+  box-shadow: var(--k-shadow-md);
+  font-size: var(--k-type-small); line-height: 1.45; text-align: left;
+}`,
+  },
+  {
+    id: 'langnav',
+    section: "Language navigation",
+    css: `/* === Language navigation =================================================
+ * Choosing the language of the page. A named component rather than a menu with
+ * links in it, because the accessibility of this one lives entirely in
+ * attributes a generic menu will not carry: each option needs \`lang\` and
+ * \`hreflang\` set to the language it leads to, and its name written IN that
+ * language — "Nederlands", never "Dutch" — or a screen reader announces it in
+ * the wrong voice and the person who needs it most cannot find it.
+ * WCAG 3.1.1 / 3.1.2.
+ *
+ * The current language is marked with aria-current, not by removing it: a list
+ * that hides where you are makes you count. */
+.langnav { display: flex; align-items: center; gap: var(--k-s-2); }
+.langnav__item {
+  display: inline-flex; align-items: center;
+  min-height: var(--k-hit-min); padding: 0 var(--k-s-8);
+  border-radius: var(--k-radius-sm);
+  color: var(--k-fg-muted); font-size: var(--k-type-small); text-decoration: none;
+}
+.langnav__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
+.langnav__item[aria-current='true'] { color: var(--k-fg); font-weight: var(--k-weight-medium); background: var(--k-state-selected-bg); }`,
+  },
+  {
+    id: 'skiplink',
+    section: "Skip link",
+    css: `/* === Skip link ===========================================================
+ * WCAG 2.4.1 Bypass Blocks — LEVEL A, the lowest bar in the standard, and the
+ * kit shipped none until the design-system study went looking. GOV.UK and
+ * NL Design System both ship one; it is the first thing a keyboard or screen
+ * reader user meets on every page, and without it they walk the whole nav on
+ * every single navigation.
+ *
+ * Visually hidden until focused, then a real, solid, high-contrast target —
+ * NOT \`display:none\` and NOT \`visibility:hidden\`, either of which removes it
+ * from the tab order and defeats the entire point. The clip-rect technique is
+ * the one every accessibility-led system converged on.
+ *
+ * Put it FIRST in the document, before the header, pointing at the main
+ * landmark: <a class="skiplink" href="#main">Skip to main content</a> */
+.skiplink {
+  position: absolute;
+  left: var(--k-s-8);
+  top: var(--k-s-8);
+  z-index: 999;
+  /* Out of sight, still in the tab order and still announced. */
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--k-hit-min);
+  padding: var(--k-s-8) var(--k-s-16);
+  border-radius: var(--k-radius-button);
+  background: var(--k-inverse-surface);
+  color: var(--k-inverse-fg);
+  font-size: var(--k-type-body);
+  font-weight: var(--k-weight-medium);
+  text-decoration: none;
+}
+.skiplink:focus-visible,
+.skiplink:focus {
+  /* Full size the moment it is reached. */
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+}`,
+  },
+  {
+    id: 'fieldset',
+    section: "Fieldset",
+    css: `/* === Fieldset + legend ===================================================
+ * WCAG 1.3.1 — LEVEL A. Radio groups and checkbox groups need a group NAME, and
+ * a heading floating above them is not one: a screen reader reads each option
+ * without ever saying what the question was. The legend supplies it, in the
+ * markup, where assistive technology can find it. NL Design System states it
+ * outright — group related fields in a <fieldset> with a descriptive <legend>.
+ *
+ * The browser's default fieldset border and legend positioning are reset,
+ * because the semantics are the point and the chrome is not. */
+.fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0; /* fieldsets refuse to shrink in flex/grid without this */
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+}
+.fieldset__legend {
+  /* A <legend> is not a flex item in every engine — the wrapper below carries
+   * the layout so the legend can stay a plain block. */
+  padding: 0;
+  margin-bottom: var(--k-s-4);
+  font-size: var(--k-type-body);
+  font-weight: var(--k-weight-medium);
+  color: var(--k-fg);
+}
+.fieldset__hint {
+  margin: calc(var(--k-s-4) * -1) 0 var(--k-s-4);
+  font-size: var(--k-type-small);
+  color: var(--k-fg-muted);
+}
+.fieldset--invalid .fieldset__legend { color: var(--k-danger); }`,
+  },
+  {
+    id: 'errorsummary',
+    section: "Error summary",
+    css: `/* === Error summary =======================================================
+ * The single highest-impact form accessibility pattern there is, and the kit
+ * shipped none. GOV.UK calls it Error summary, NL Design System calls it Form
+ * Summary, and both state the same rule: when a submission fails, put a
+ * summary of every error ABOVE the form, with each entry a link that moves
+ * focus to the field it names.
+ *
+ * Why it matters more than per-field messages: a screen reader user who submits
+ * a twenty-field form has no way to discover that three fields failed, or
+ * where. Per-field errors are only found by walking the whole form again.
+ *
+ * Wiring the kit cannot do for you: give the container tabindex="-1" and move
+ * focus to it on failed submit, and mark it role="alert" so it announces. */
+.errorsummary {
+  border: var(--k-stroke-2, 2px) solid var(--k-danger);
+  border-radius: var(--k-radius-md);
+  padding: var(--k-s-16);
+  background: var(--k-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-8);
+}
+.errorsummary:focus-visible { outline: var(--k-ring-w) solid var(--k-ring); outline-offset: 2px; }
+.errorsummary__title {
+  margin: 0;
+  font-size: var(--k-type-h3);
+  font-weight: var(--k-weight-semibold);
+  color: var(--k-fg);
+}
+.errorsummary__list {
+  margin: 0;
+  padding-left: var(--k-s-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-4);
+}
+.errorsummary__link {
+  color: var(--k-danger);
+  font-size: var(--k-type-body);
+  /* Underlined, because colour alone must never carry the meaning. */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.errorsummary__link:hover { text-decoration-thickness: 2px; }`,
   },
   {
     id: 'kbd',
@@ -3804,10 +4048,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-color: transparent;
   align-items: center;
 }
-.toast--snackbar .toast__sub { color: var(--k-inverse-fg); opacity: 0.72; }
+.toast--snackbar .toast__sub { color: var(--k-inverse-fg-muted, var(--k-inverse-fg)); }
 .toast--snackbar .toast__action { color: var(--k-inverse-primary); }
 .toast--snackbar .toast__action:hover { background: transparent; text-decoration: underline; text-underline-offset: 3px; }
-.toast--snackbar .toast__close { color: var(--k-inverse-fg); opacity: 0.75; }
+.toast--snackbar .toast__close { color: var(--k-inverse-fg); }
 .toast--snackbar .toast__close:hover { color: var(--k-inverse-fg); background: transparent; opacity: 1; }`,
   },
   {
@@ -4371,8 +4615,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .stat-tile__delta svg { flex-shrink: 0; }
 /* Delta tone modifiers — avoid per-instance inline colours. */
-.stat-tile__delta--up { color: var(--k-success); background: var(--k-success-soft); }
-.stat-tile__delta--down { color: var(--k-danger); background: var(--k-danger-soft); }
+/* A SOLID is a fill, not an ink. Both of these put the solid status colour on
+ * its own soft tint — success landed at 2.03:1, which is not a near miss, it is
+ * illegible. The --soft-fg tokens exist for exactly this pairing and are
+ * derived through aaInk against the tint they sit on. */
+.stat-tile__delta--up { color: var(--k-success-soft-fg); background: var(--k-success-soft); }
+.stat-tile__delta--down { color: var(--k-danger-soft-fg); background: var(--k-danger-soft); }
 /* Clickable KPI tile — drills into a detail view (hover lift + a trailing
  * chevron that nudges right, "there's more behind this number"). */
 .stat-tile--clickable { cursor: pointer; transition: border-color var(--k-dur-fast, 140ms) var(--k-ease, ease), box-shadow var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease); }
@@ -4646,13 +4894,29 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--k-s-4);
+  /* 18px, not 4. The dots each claim a 24px pointer target through the
+   * ::before below, and at a 4px gap those targets OVERLAP — so each dot steals
+   * from its neighbour and neither actually has 24px to itself. That overlap is
+   * exactly what WCAG 2.5.8's spacing rule exists to prevent, and it is why the
+   * ::before trick alone was not enough here: measured in the browser, the
+   * target reached 24px vertically and was clipped by the neighbour
+   * horizontally. Widening the gap is the fix; the dots stay 6px.
+   *
+   * 20 and not 18: two 6px dots need 18px of gap for their targets to clear
+   * each other, and 18 is off the 4px grid — audit:craft was right to reject
+   * it. --k-s-20 is the next step up and on the scale. */
+  gap: var(--k-s-20);
   padding: var(--k-s-4) 0;
 }
 .cdots__dot {
   width: 6px;
   height: 6px;
   border-radius: 999px;
+  /* The glyph is 6px and must stay 6px — a carousel indicator is meant to be
+   * small. The TARGET is what has to be 24, so it is extended underneath with
+   * a transparent box rather than by inflating the dot. Same trick the kit
+   * already uses on close buttons; it had never been applied here. */
+  position: relative;
   background: var(--k-fg-faint);
   border: 0;
   padding: 0;
@@ -4662,6 +4926,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     width var(--k-dur-fast, 110ms) var(--k-ease, ease),
     background var(--k-dur-fast, 110ms) var(--k-ease, ease),
     opacity var(--k-dur-fast, 110ms) var(--k-ease, ease);
+}
+.cdots__dot::before {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: var(--k-hit-min);
+  height: var(--k-hit-min);
+  transform: translate(-50%, -50%);
 }
 .cdots__dot.is-on {
   width: 18px;
@@ -4897,6 +5169,13 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .numinput__chev {
   flex: 1;
   width: 24px;
+  /* 24px in BOTH axes, not just across. Two chevrons splitting a 36px field
+   * gave each one ~17px of height — six real WCAG 2.5.8 failures that our own
+   * hit-target gate never saw, because it only inspects close/clear controls.
+   * The stepper column now sets the field's height (48px), which also carries
+   * the whole control closer to the 44px bar every accessibility-led system in
+   * the study holds itself to. */
+  min-height: var(--k-hit-min);
   border: 0;
   background: transparent;
   color: var(--k-fg-muted);
@@ -5925,7 +6204,12 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 }
 .slot:hover { border-color: var(--k-ring); background: var(--k-state-hover); }
 .slot--on { background: var(--k-primary-soft); border-color: var(--k-ring); color: var(--k-primary-soft-fg); font-weight: var(--k-weight-semibold); }
-.slot--off { opacity: 0.4; pointer-events: none; text-decoration: line-through; }
+/* Was opacity 0.4, which composited near-black text down to 2.66:1. pointer-
+ * events:none stops the MOUSE and does nothing about the keyboard, so a tab
+ * still lands on an unreadable control. The state now says what it is with a
+ * token and a line-through; the markup carries the disabled attribute, which removes it
+ * from the tab order and is what actually makes it unavailable. */
+.slot--off { color: var(--k-disabled-fg); text-decoration: line-through; cursor: not-allowed; }
 
 /* === Colour picker (Tailwind radio-group "color picker") =================
  * A radio group rendered as colour swatches — pick a colour; the selected one
@@ -6508,7 +6792,10 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    with the name (avatar + name left, time right). Was justify-content:space-between
    on the head; an avatar there would have spread away from the name. */
 .msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); margin-left: auto; }
-.msg--me .msg__time { color: inherit; opacity: 0.7; }
+/* No opacity on text — it composites the ink toward the bubble and dropped this
+ * to 2.81:1. The quieter tier comes from a token that is derived to stay
+ * legible on the fill it sits on. */
+.msg--me .msg__time { color: var(--k-primary-soft-fg); }
 .msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
 .msg--me .msg__body { color: inherit; }
 /* The assistant's turn — a distinct THIRD voice. It's not a narrow bubble: an

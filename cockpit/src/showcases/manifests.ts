@@ -41,7 +41,10 @@ export type SectionSpec =
       sources?: Array<{ n: number; label: string }> }> } }
   | { kind: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[]; greeting?: string } }
   | { kind: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[]; badgeToneByValue?: Record<string, 'success' | 'warning' | 'danger' | 'info'>; avatarCols?: number[] } }
-  | { kind: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string } }
+  /* `errors` renders the error summary ABOVE the fields — GOV.UK and NL Design
+   * System both state that rule, and it is the highest-impact form
+   * accessibility pattern there is. Optional, so the happy path stays clean. */
+  | { kind: 'form'; seed: { title: string; intro?: string; fields: Array<{ label: string; value?: string; placeholder?: string }>; submit: string; errors?: Array<{ field: string; message: string }> } }
   | { kind: 'pricing'; seed: { tiers: Array<{ name: string; price: string; period: string; feats: string[]; featured?: boolean; cta: string }> } }
   // The `.plan-compare` recipe — a tier × feature matrix with one highlighted
   // column (the current/recommended plan). Cells: true (✓) · false (—) · a value.

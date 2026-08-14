@@ -15,7 +15,7 @@ import type {
   Tokens,
   TypeScale,
 } from './types'
-import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
+import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hexToOklch, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, oklchStrToHex, oklchToHex, readableInk, TEMP } from './color'
 import { resolveHarmony } from './harmony'
 import { guardedBorders } from './coherence'
 import { customFontFamily, isCustomFont, MONO_FONTS, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
@@ -89,7 +89,18 @@ const SCALE: Record<Scale, ScaleRow> = {
   // (the 6 + 10 are on the named 2pt scale, --k-s-6 / --k-s-10).
   compact:     { space: 12, pad: 16, stackGap: 6, btnH: 32, inH: 32, rowDefault: 'sm', calCell: 28, toggleW: 28, toggleH: 14 },
   default:     { space: 16, pad: 24, stackGap: 8, btnH: 36, inH: 36, rowDefault: 'md', calCell: 32, toggleW: 32, toggleH: 18 },
-  comfortable: { space: 20, pad: 28, stackGap: 10, btnH: 40, inH: 40, rowDefault: 'lg', calCell: 40, toggleW: 40, toggleH: 22 },
+  /* 44, not 40. Every accessibility-led system in the design-system study holds
+   * itself to WCAG 2.5.5 AAA (44x44) rather than the 2.5.8 AA floor of 24 — NL
+   * Design System raises that criterion deliberately, and our ladder previously
+   * topped out at 40, so a team that WANTED the stricter bar could not reach it
+   * at any setting.
+   *
+   * It is the top rung and not the default on purpose: 44 everywhere bloats
+   * dense data UI (table rows, dropdown options, tree rows), which is a real
+   * constraint for the application surfaces we cover and not one a public-
+   * service system has to carry. So the law is reachable, the default stays
+   * practical, and the choice is now explicit instead of unavailable. */
+  comfortable: { space: 20, pad: 28, stackGap: 10, btnH: 44, inH: 44, rowDefault: 'lg', calCell: 44, toggleW: 44, toggleH: 24 },
 }
 // Motion table — speed setting controls all three duration tiers.
 // Easings are split into emphasized (standard state-change), decelerate
@@ -319,12 +330,59 @@ export function buildTokens(cfg: Config): Tokens {
         sunken: nStep(3 + emph),
       }
 
-  // Text tiers = the top of the ladder: step 12 (high-contrast), 11 (muted),
-  // 9 (faint). Structural contrast — fg(12) on bg(1) is guaranteed by the anchors.
+  /* Text tiers = the top of the ladder: step 12 (high-contrast), 11 (muted),
+   * 9 (faint).
+   *
+   * The line that used to sit here said "structural contrast — fg(12) on bg(1)
+   * is guaranteed by the anchors", and that is true of tier 12 and false of the
+   * two below it. Measured with axe on the default kit: faint rendered 3.35:1 on
+   * white — 63 of the 106 contrast failures in the whole gallery came from this
+   * one token, used as timestamps, counts, gutters and hints. A text tier that
+   * cannot reach 4.5:1 is not a text tier.
+   *
+   * Floored against the DEEPEST surface it can land on, not against the page.
+   * We already learned this the hard way in the audit's own palette
+   * (`fadeToFloor` in drift.ts): ink floored on the page alone still lands at
+   * 2.7:1 once it sits on a sunken or container surface. The same bug was in our
+   * own engine the whole time — we shipped the fix for other people's kits and
+   * not for ours. */
+  const inkFloor = (ink: string, onColor: string, min: number): string => {
+    const on = oklchStrToHex(onColor)
+    let hex = oklchStrToHex(ink)
+    if (contrast(hex, on) >= min) return ink
+    const [L, C, H] = hexToOklch(hex)
+    const dir = dark ? 1 : -1
+    for (let l = L; l >= 0.1 && l <= 0.98; l += dir * 0.01) {
+      hex = oklchToHex(l, C, H)
+      if (contrast(hex, on) >= min) return `oklch(${(l * 100).toFixed(1)}% ${C.toFixed(4)} ${H.toFixed(1)})`
+    }
+    return ink
+  }
+  const fgFaint = inkFloor(nStep(8), surf.sunken, 4.5)
+  /* And then the tiers have to stay TELLABLE APART.
+   *
+   * Flooring faint to 4.5:1 pushed it from L64 to L52, which put it within 1.7%
+   * of muted at L50.3 — both legal, and visually one colour. The ramp above says
+   * in as many words that the three text tiers exist to "gain real separation",
+   * and a contrast fix that silently destroys that is not a fix, it is a trade
+   * made without saying so.
+   *
+   * So the law sets the floor and the design keeps its spacing: muted steps back
+   * far enough from the floored faint to stay a distinct tier. Nothing here
+   * loosens the 4.5 — muted only ever gets DARKER, which cannot fail it. */
+  const TIER_GAP = 0.1
+  const fgMuted = (() => {
+    const base = inkFloor(nStep(10), surf.sunken, 4.5)
+    const [lm, cm, hm] = hexToOklch(oklchStrToHex(base))
+    const lf = hexToOklch(oklchStrToHex(fgFaint))[0]
+    if (lf - lm >= TIER_GAP) return base
+    const l = Math.max(0.18, lf - TIER_GAP)
+    return `oklch(${(l * 100).toFixed(1)}% ${cm.toFixed(4)} ${hm.toFixed(1)})`
+  })()
   const fg = {
     main: nStep(11),
-    muted: nStep(10),
-    faint: nStep(8),
+    muted: fgMuted,
+    faint: fgFaint,
   }
 
   // primary lightness — UI-safe clamp so button text stays readable.
@@ -375,14 +433,17 @@ export function buildTokens(cfg: Config): Tokens {
   })()
   const primaryFg = readableInk(primaryHex)
   const primarySoft = P[2]!
-  // Foreground on primary-soft fills (badges, chips, soft-tile icons).
-  // Light mode: primary text on light primary-soft already passes AA, so
-  // we keep the brand-tinted primary. Dark mode: primary is too dim against
-  // dark primary-soft, so we boost saturation + lightness to a brighter
-  // brand-tinted ink — preserves brand feel AND passes AA.
+  /* Foreground on primary-soft fills (badges, chips, soft-tile icons).
+   *
+   * The old light-mode branch was literally `primary`, on the stated assumption
+   * that "primary text on light primary-soft already passes AA". Measured: it
+   * lands at 4.06:1, and that single assumption produced 26 of the gallery's
+   * remaining contrast failures — every soft-tinted calendar event, chip and
+   * status tile. Now floored against the fill it actually sits on, which keeps
+   * the brand HUE and only takes lightness away until it clears. */
   const primarySoftFg = mono
     ? (dark ? hsl(ph, 12, 88) : hsl(ph, 14, 22))
-    : (dark ? hsl(ph, Math.max(70, psat), 82) : primary)
+    : (dark ? hsl(ph, Math.max(70, psat), 82) : inkFloor(primary, primarySoft, 4.5))
 
   // Secondary + accent are DERIVED from the single brand hue (ph/psat) — one
   // color in, a harmonious family out. Secondary = muted sibling (quiet
@@ -551,7 +612,16 @@ export function buildTokens(cfg: Config): Tokens {
   // Fine-grained spacing grid emitted as named tokens (--k-s-2 … --k-s-32, REM,
   // keyed by px-at-16-root). Components reference these for internal padding/gap
   // instead of hardcoding px — same scale in the preview AND every export.
-  const sVars: Record<string, string> = { '--k-s-0': '0' }
+  /* The touch-target floor, as ONE named value instead of a 24 scattered
+   * through the recipes.
+   *
+   * WCAG 2.5.8 AA asks for 24x24 CSS px. Every accessibility-led design system
+   * in the study holds itself to 2.5.5 AAA at 44 instead, which is a decision
+   * we have not made yet — and the only reason we can defer it is that the
+   * number now lives in one place. It is deliberately NOT on the spacing scale:
+   * a hit target is a guarantee about a person's finger, not a rhythm, and
+   * re-scaling it with density is exactly the bug this prevents. */
+  const sVars: Record<string, string> = { '--k-s-0': '0', '--k-hit-min': '24px' }
   for (const px of [2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32]) sVars[`--k-s-${px}`] = rem(px)
   // Measure — readable line-length caps (in ch, so they track the body font).
   // The layout grammar uses these instead of arbitrary px max-widths: a prose

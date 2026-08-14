@@ -59,6 +59,12 @@ const CARD_KEYWORDS: Record<string, string> = {
   TabsCard: 'Northwind tabs segmented',
   NavMenuCard: 'Navigation menu navbar megamenu',
   BreadcrumbCard: 'Breadcrumb path trail',
+  SkipLinkCard: 'Skip link bypass blocks keyboard accessibility',
+  TaskListCard: 'Task list sections progress service multi-step form',
+  ToggletipCard: 'Toggletip accessible tooltip help hint disclosure',
+  LanguageNavCard: 'Language navigation multilingual locale switcher',
+  FieldsetCard: 'Fieldset legend group radio checkbox accessibility',
+  ErrorSummaryCard: 'Error summary form validation accessibility',
   PaginationCard: 'Search results pagination pages',
   StepperCard: 'Get started stepper steps progress',
   NavCard: 'Side navigation sidebar nav rail',
@@ -234,7 +240,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
-    [BreadcrumbCard, 'atom'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
+    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
@@ -339,9 +345,9 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
   ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, ColorPickerCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
-  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, PaginationCard, StepperCard]],
-  ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
-  ['Feedback & status', [ValidationCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
+  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, LanguageNavCard, PaginationCard, StepperCard, TaskListCard]],
+  ['Overlays & disclosure', [PopoverCard, TooltipCard, ToggletipCard, HoverCardCard, AccordionCard]],
+  ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
   ['AI thread', [ToolCallCard, ReasoningCard, CitationCard]],
   ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
@@ -436,6 +442,166 @@ function ChevronSvg({ size = 14 }: { size?: number }) {
  * Breadcrumb · Avatar · Accordion (standalone) · Carousel · Navigation menu ·
  * Context menu. The last three add new recipes (.carousel/.navmenu/.ctxmenu);
  * the first three compose existing primitives (.breadcrumb/.avatar/.accordion). */
+
+function TaskListCard() {
+  const TASKS = [
+    { name: 'Your details', status: 'Completed', tone: 'success' as const },
+    { name: 'Company information', status: 'Completed', tone: 'success' as const },
+    { name: 'Payment details', status: 'In progress', tone: 'warn' as const, hint: 'You saved a draft on 12 May' },
+    { name: 'Review and submit', status: 'Cannot start yet', tone: '' as const, locked: true },
+  ]
+  const done = TASKS.filter((t) => t.status === 'Completed').length
+  return (
+    <Card title="Task list" desc="A long form as a plan — complete the sections in any order.">
+      <p className="tasklist__count">{done} of {TASKS.length} sections complete</p>
+      <ol className="tasklist">
+        {TASKS.map((t) => (
+          <li className="tasklist__item" key={t.name}>
+            <span className="tasklist__name">
+              {/* A task that cannot start yet is deliberately NOT a link. */}
+              {t.locked
+                ? <span className="tasklist__name--locked">{t.name}</span>
+                : <a className="tasklist__link" href="#task">{t.name}</a>}
+              {t.hint && <span className="tasklist__hint">{t.hint}</span>}
+            </span>
+            <span className={`badge tasklist__status ${t.tone ? `badge--${t.tone}` : ''}`}>{t.status}</span>
+          </li>
+        ))}
+      </ol>
+    </Card>
+  )
+}
+
+function ToggletipCard() {
+  const [open, setOpen] = useState(false)
+  return (
+    <Card title="Toggletip" desc="A tooltip you can reach — opened by a button, not by hovering.">
+      <label className="lab" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+          VAT number
+          <span className="toggletip">
+            <button
+              type="button"
+              className="toggletip__trigger"
+              aria-expanded={open}
+              aria-label="What is a VAT number?"
+              onClick={() => setOpen((v) => !v)}
+            >
+              <Icon name="info" />
+            </button>
+            {/* A live region, so the text is ANNOUNCED on open rather than
+                silently appearing somewhere a screen reader has already passed. */}
+            <span role="status">
+              {open && (
+                <span className="toggletip__bubble">
+                  Found on your VAT registration certificate. Two letters followed by
+                  up to twelve digits.
+                </span>
+              )}
+            </span>
+          </span>
+        </span>
+        <input className="in" defaultValue="NL 8123 4567 B01" aria-label="VAT number" />
+      </label>
+      <p style={{ margin: '10px 0 0', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
+        Hover is not available on touch. Supplementary content behind a hover is
+        content some people never get.
+      </p>
+    </Card>
+  )
+}
+
+function LanguageNavCard() {
+  const [cur, setCur] = useState('nl')
+  // Each option names itself IN its own language and carries lang/hreflang, or
+  // a screen reader announces it in the wrong voice.
+  const LANGS = [
+    { code: 'nl', label: 'Nederlands' },
+    { code: 'en', label: 'English' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'fr', label: 'Français' },
+  ]
+  return (
+    <Card title="Language navigation" desc="Each language, named in itself. WCAG 3.1.1 / 3.1.2.">
+      <nav className="langnav" aria-label="Language">
+        {LANGS.map((l) => (
+          <a
+            key={l.code}
+            className="langnav__item"
+            href={`#${l.code}`}
+            lang={l.code}
+            hrefLang={l.code}
+            aria-current={cur === l.code ? 'true' : undefined}
+            onClick={(e) => { e.preventDefault(); setCur(l.code) }}
+          >
+            {l.label}
+          </a>
+        ))}
+      </nav>
+    </Card>
+  )
+}
+
+function SkipLinkCard() {
+  return (
+    <Card title="Skip link" desc="WCAG 2.4.1, Level A — the first thing a keyboard user meets.">
+      <p style={{ margin: '0 0 12px', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
+        Hidden until focused. <b>Tab into the box below</b> to see it appear.
+      </p>
+      {/* `position: relative` so the absolutely-positioned link lands inside
+          this demo box instead of the page corner. */}
+      <div style={{
+        position: 'relative', minHeight: 84, padding: 12, borderRadius: 'var(--k-radius-md)',
+        border: '1px dashed var(--k-border)', background: 'var(--k-surface-2)',
+      }}>
+        <a className="skiplink" href="#gallery-main">Skip to main content</a>
+        <p style={{ margin: 0, fontSize: 'var(--k-type-small)', color: 'var(--k-fg-faint)' }}>
+          Without one, every keyboard and screen-reader user walks the whole
+          navigation again on every single page.
+        </p>
+      </div>
+    </Card>
+  )
+}
+
+function FieldsetCard() {
+  return (
+    <Card title="Fieldset" desc="WCAG 1.3.1, Level A — a group of controls needs a NAME.">
+      <fieldset className="fieldset">
+        <legend className="fieldset__legend">How should we contact you?</legend>
+        <p className="fieldset__hint">We will only use this for order updates.</p>
+        {['Email', 'Text message', 'Phone call'].map((o) => (
+          <label key={o} className="check">
+            <input type="radio" name="contact-pref" defaultChecked={o === 'Email'} />
+            {o}
+          </label>
+        ))}
+      </fieldset>
+      <p style={{ margin: '12px 0 0', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
+        Without the legend a screen reader reads “Email, radio button” and never
+        says what the question was.
+      </p>
+    </Card>
+  )
+}
+
+function ErrorSummaryCard() {
+  return (
+    <Card title="Error summary" desc="Every failed field, above the form, each one a link.">
+      <div className="errorsummary" role="alert" tabIndex={-1}>
+        <h3 className="errorsummary__title">There is a problem</h3>
+        <ul className="errorsummary__list">
+          <li><a className="errorsummary__link" href="#es-email">Enter an email address</a></li>
+          <li><a className="errorsummary__link" href="#es-post">Enter a postcode in the right format</a></li>
+        </ul>
+      </div>
+      <p style={{ margin: '12px 0 0', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
+        Move focus here on a failed submit. Per-field messages alone are only
+        found by walking the whole form again.
+      </p>
+    </Card>
+  )
+}
 
 function BreadcrumbCard() {
   return (
@@ -596,7 +762,7 @@ function FormCard() {
         <span>Search</span>
         <div className="in in--inline">
           <Icon name="search" />
-          <input placeholder="Filter results" />
+          <input placeholder="Filter results" aria-label="Filter results" />
         </div>
       </label>
       <label className="lab">
@@ -1005,10 +1171,10 @@ function DialogCard() {
       <div className="dialog-frame">
         {open ? (
           <>
-            <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} aria-label="Close dialog" />
+            <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
             <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" style={{ maxBlockSize: 188 }}>
               <h3 id="dialog-title" className="dialog__title">Delete project?</h3>
-              <div className="dialog__body">
+              <div className="dialog__body" tabIndex={0} role="region" aria-label="Dialog content">
                 <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>
                   This permanently removes:
                 </p>
@@ -1076,7 +1242,7 @@ function CmdPaletteCard() {
             {groups.map((g) => (
               <Fragment key={g}>
                 <div className="cmdp__section">{g}</div>
-                <ul className="cmdp__list">
+                <ul className="cmdp__list" role="group" aria-label={g}>
                   {matches.map((c, i) =>
                     c.group === g ? (
                       <li
@@ -1474,7 +1640,7 @@ function FormPanelCard() {
             <label className="lab"><span>Workspace name</span><input className="in" defaultValue="Acme Inc." /></label>
             <label className="lab"><span>Subdomain</span><input className="in" defaultValue="acme" /></label>
             <div className="field formpanel__full">
-              <label className="field__label" htmlFor="fp-owner">Owner email <span className="field__req">*</span></label>
+              <label className="field__label" htmlFor="fp-owner">Owner email <span className="field__req">(required)</span></label>
               <input id="fp-owner" className="in" type="email" placeholder="you@company.com" aria-invalid={showError || undefined} aria-describedby={showError ? 'fp-owner-err' : undefined} />
               {showError && <span id="fp-owner-err" className="field__error"><Icon name="info" /> Enter a valid email address.</span>}
             </div>
@@ -1788,7 +1954,7 @@ function ValidationCard() {
   return (
     <Card title="Account details" desc="We'll check these as you type.">
       <div className="field">
-        <label className="field__label" htmlFor="acc-email">Email <span className="field__req" aria-hidden="true">*</span></label>
+        <label className="field__label" htmlFor="acc-email">Email <span className="field__req">(required)</span></label>
         <input className="in is-error" id="acc-email" defaultValue="not-an-email" aria-invalid="true" aria-describedby="acc-email-error" />
         <span className="field__error" id="acc-email-error"><Icon name="info" /> Enter a valid email address.</span>
       </div>
@@ -2152,13 +2318,13 @@ function SpinnerCard() {
   return (
     <Card title="Workspace">
       <div className="card__row" style={{ alignItems: 'center', gap: 12 }}>
-        <span className="spinner" aria-label="Loading" />
+        <span className="spinner" role="status" aria-label="Loading" />
         <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>Loading workspace…</span>
       </div>
       <div className="card__row" style={{ alignItems: 'center', gap: 14, marginTop: 8 }}>
-        <span className="spinner spinner--sm" aria-label="Loading" />
-        <span className="spinner" aria-label="Loading" />
-        <span className="spinner spinner--lg" aria-label="Loading" />
+        <span className="spinner spinner--sm" role="status" aria-label="Loading" />
+        <span className="spinner" role="status" aria-label="Loading" />
+        <span className="spinner spinner--lg" role="status" aria-label="Loading" />
         <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>sm · md · lg</span>
       </div>
     </Card>
@@ -2209,7 +2375,7 @@ function ResizableCard() {
           grip horizontal. Visual orientation; wire the row-drag like the column one. */}
       <div className="resizable resizable--vertical" style={{ height: 132, marginTop: 'var(--k-s-12)' }}>
         <div className="resizable__pane" style={{ padding: 'var(--k-s-12)', fontSize: 'var(--k-type-small)', fontWeight: 600 }}>Preview</div>
-        <div className="resizable__handle" role="separator" aria-orientation="horizontal" aria-label="Resize rows" tabIndex={0} />
+        <div className="resizable__handle" role="separator" aria-orientation="horizontal" aria-label="Resize rows" aria-valuenow={50} aria-valuemin={0} aria-valuemax={100} tabIndex={0} />
         <div className="resizable__pane" style={{ padding: 'var(--k-s-12)', fontSize: 11.5, fontFamily: 'var(--k-font-mono)', color: 'var(--k-fg-muted)' }}>$ build — done in 4.1s</div>
       </div>
     </Card>
@@ -2790,20 +2956,27 @@ function DateCard() {
               {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
                 <span key={i} className="calendar__head">{d}</span>
               ))}
-              {days.map((d, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className={cellClass(d)}
-                  disabled={d < 1 || d > 31 || isBlocked(d)}
-                  aria-label={d >= 1 && d <= 31 ? `May ${d}${isBlocked(d) ? ' (unavailable)' : ''}` : undefined}
-                  aria-current={d === today ? 'date' : undefined}
-                  onClick={() => handleClick(d)}
-                  onMouseEnter={() => d >= 1 && d <= 31 && setHover(d)}
-                >
-                  {d >= 1 && d <= 31 ? d : ''}
-                </button>
-              ))}
+              {days.map((d, i) => {
+                /* Out-of-month cells are PADDING. As empty disabled buttons they
+                   are ten `button-name` violations and ten keyboard stops that
+                   go nowhere; `sections.tsx` already renders them as inert
+                   spans, and this is the copy that drifted. */
+                if (d < 1 || d > 31) return <span key={i} className={cellClass(d)} aria-hidden="true" />
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    className={cellClass(d)}
+                    disabled={isBlocked(d)}
+                    aria-label={`May ${d}${isBlocked(d) ? ' (unavailable)' : ''}`}
+                    aria-current={d === today ? 'date' : undefined}
+                    onClick={() => handleClick(d)}
+                    onMouseEnter={() => setHover(d)}
+                  >
+                    {d}
+                  </button>
+                )
+              })}
             </div>
             <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
               <span style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }}>{summary}</span>
@@ -3015,9 +3188,16 @@ function CalendarRangeCard() {
       <div className="calendar">
         {DOW.map((d, i) => <span key={i} className="calendar__head">{d}</span>)}
         {miniMonthDays(offset).map((d, i) => (
-          <button key={i} type="button" className={rangeCell(d, dim, side, bound)} disabled={d < 1 || d > dim} aria-label={d >= 1 && d <= dim ? `${title.split(' ')[0]} ${d}` : undefined}>
-            {d >= 1 && d <= dim ? d : ''}
-          </button>
+          /* Padding, not a control — see the note on the single-month calendar.
+             This is the fourth copy of the same day-cell loop in this file, and
+             all four had drifted apart; the duplication is the real defect. */
+          d < 1 || d > dim
+            ? <span key={i} className={rangeCell(d, dim, side, bound)} aria-hidden="true" />
+            : (
+              <button key={i} type="button" className={rangeCell(d, dim, side, bound)} aria-label={`${title.split(' ')[0]} ${d}`}>
+                {d}
+              </button>
+            )
         ))}
       </div>
     </div>
@@ -3127,7 +3307,7 @@ function CardTableCard() {
   ]
   return (
     <Card title="Files" desc="Card-framed — rounded frame, sticky header, scrolls.">
-      <div style={{ maxHeight: '12rem', overflow: 'auto' }}>
+      <div style={{ maxHeight: '12rem', overflow: 'auto' }} tabIndex={0} role="region" aria-label="Scrollable list">
         <table className="tbl tbl--card">
           <thead>
             <tr>
@@ -3166,7 +3346,7 @@ function FrozenColumnTableCard() {
   ]
   return (
     <Card title="Metrics" desc="Frozen first column — the Metric pins while months scroll.">
-      <div style={{ overflowX: 'auto' }}>
+      <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="tbl tbl--card" style={{ minWidth: '32rem' }}>
           <thead>
             <tr>
@@ -3346,7 +3526,7 @@ function TwoColumnListCard() {
           </Fragment>
         ))}
       </div>
-      <div className="scroll-area" style={{ maxHeight: 160, overflow: 'auto', marginTop: 'var(--k-s-12)' }}>
+      <div className="scroll-area" style={{ maxHeight: 160, overflow: 'auto', marginTop: 'var(--k-s-12)' }} tabIndex={0} role="region" aria-label="Scrollable content">
         <div className="list list--sticky">
           {['A', 'B', 'C', 'D'].map((letter) => (
             <Fragment key={letter}>
@@ -3366,10 +3546,11 @@ function TwoColumnListCard() {
 }
 
 function InputAddonsCard() {
-  // Input groups: a fused add-on segment (.in-group), an inline unit (.in__affix),
-  // an inset label (.in--inset), and an overlapping label (.in-field/.in__overlap).
+  // Input groups: a fused add-on segment (.in-group) and an inline unit
+  // (.in__affix). The inset and overlapping label variants were retired — see
+  // the recipe note; the label belongs above the field.
   return (
-    <Card title="Input add-ons" desc="Add-ons, inline units, and inset / overlapping labels.">
+    <Card title="Input add-ons" desc="Fused add-on segments and inline units.">
       <label className="lab">
         <span>Website</span>
         <span className="in-group">
@@ -3386,14 +3567,6 @@ function InputAddonsCard() {
           <span className="in__affix">USD</span>
         </span>
       </label>
-      <label className="in in--inset">
-        <span className="in__label">Quantity</span>
-        <input inputMode="numeric" defaultValue="12" aria-label="Quantity" />
-      </label>
-      <div className="in-field" style={{ marginTop: 'var(--k-s-4)' }}>
-        <span className="in__overlap">Email</span>
-        <input className="in" type="email" defaultValue="mara@acme.com" aria-label="Email" />
-      </div>
     </Card>
   )
 }
@@ -3417,7 +3590,7 @@ function ComboboxCard() {
   return (
     <Card title="Framework" desc="Choose a starter for your app.">
       <div className="combobox" ref={ref}>
-        <button type="button" className="select-trigger" onClick={() => setOpen((v) => !v)} role="combobox" aria-haspopup="listbox" aria-expanded={open}>
+        <button type="button" className="select-trigger" onClick={() => setOpen((v) => !v)} role="combobox" aria-haspopup="listbox" aria-expanded={open} aria-label="Framework">
           <span>{picked ?? 'Select a framework…'}</span>
           <Icon name="chevD" />
         </button>
@@ -3667,6 +3840,7 @@ function TagInputCard() {
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); add() } }}
           onBlur={add}
           placeholder={tags.length === 0 ? 'Add tags…' : ''}
+          aria-label="Add a tag"
         />
       </div>
       <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>Enter or , to add</span>
@@ -3711,7 +3885,7 @@ function SlotPickerCard() {
     <Card title="Slot picker" desc="Time-slot grid for booking — available, selected, disabled.">
       <div className="slotpicker">
         {slots.map((t) => (
-          <button key={t} type="button" className={'slot' + (off.has(t) ? ' slot--off' : slot === t ? ' slot--on' : '')} onClick={() => !off.has(t) && setSlot(t)}>{t}</button>
+          <button key={t} type="button" disabled={off.has(t)} className={'slot' + (off.has(t) ? ' slot--off' : slot === t ? ' slot--on' : '')} onClick={() => !off.has(t) && setSlot(t)}>{t}</button>
         ))}
       </div>
     </Card>
@@ -3868,6 +4042,7 @@ function InputOtpCard() {
             key={i}
             ref={refs[i]}
             className="otp__slot"
+            aria-label={`Digit ${i + 1} of ${code.length}`}
             value={c}
             maxLength={1}
             inputMode="numeric"
@@ -3885,6 +4060,7 @@ function InputOtpCard() {
               key={idx}
               ref={refs[idx]}
               className="otp__slot"
+              aria-label={`Digit ${i + 1} of ${code.length}`}
               value={c}
               maxLength={1}
               inputMode="numeric"
@@ -4016,11 +4192,11 @@ function NumberInputCard() {
     <Card title="Quantity" desc="Adjust amounts with steppers.">
       <div className="numinput">
         <button className="numinput__step" onClick={() => setV((n) => Math.max(0, n - 1))} aria-label="Decrement">−</button>
-        <input className="numinput__field" value={v} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setV(n) }} />
+        <input className="numinput__field" value={v} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setV(n) }} aria-label="Quantity" />
         <button className="numinput__step" onClick={() => setV((n) => n + 1)} aria-label="Increment">+</button>
       </div>
       <div className="numinput numinput--with-suffix">
-        <input className="numinput__field" value={px} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setPx(n) }} />
+        <input className="numinput__field" value={px} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setPx(n) }} aria-label="Size in pixels" />
         <span className="numinput__suffix">px</span>
         <div className="numinput__steps">
           <button className="numinput__chev" onClick={() => setPx((n) => n + 1)} aria-label="Increment">
@@ -4061,6 +4237,7 @@ function PasswordInputCard() {
           onKeyDown={onCaps}
           onKeyUp={onCaps}
           placeholder="At least 8 characters"
+          aria-label="Password"
         />
         <button className="pwinput__eye" onClick={() => setShow((v) => !v)} aria-label={show ? 'Hide' : 'Show'}>
           {show ? (
@@ -4155,6 +4332,7 @@ function PhoneInputCard() {
           value={num}
           onChange={(e) => setNum(e.target.value)}
           placeholder="6 12 34 56 78"
+          aria-label="Phone number"
         />
       </div>
       <div className="phoneinput phoneinput--invalid">
@@ -4168,6 +4346,7 @@ function PhoneInputCard() {
           value="555-013"
           readOnly
           aria-invalid="true"
+          aria-label="Phone number"
         />
       </div>
       <div style={{ fontSize: 11, color: 'var(--k-danger)' }}>Enter a valid 10-digit number.</div>
@@ -4192,7 +4371,7 @@ function SettingsRowCard() {
             <div className="list__title">Force HTTPS</div>
             <div className="list__sub">Redirect all website requests over HTTPS.</div>
           </div>
-          <div className={'toggle ' + (https ? 'toggle--on' : '')} onClick={() => setHttps((v) => !v)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setHttps((v) => !v) } }} role="switch" aria-checked={https} tabIndex={0}>
+          <div className={'toggle ' + (https ? 'toggle--on' : '')} onClick={() => setHttps((v) => !v)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setHttps((v) => !v) } }} role="switch" aria-checked={https} aria-label="Force HTTPS" tabIndex={0}>
             <div className="toggle__knob" />
           </div>
         </div>
@@ -4201,7 +4380,7 @@ function SettingsRowCard() {
             <div className="list__title">Maintenance mode</div>
             <div className="list__sub">Other users will not be able to discover your content.</div>
           </div>
-          <div className={'toggle ' + (maint ? 'toggle--on' : '')} onClick={() => setMaint((v) => !v)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMaint((v) => !v) } }} role="switch" aria-checked={maint} tabIndex={0}>
+          <div className={'toggle ' + (maint ? 'toggle--on' : '')} onClick={() => setMaint((v) => !v)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMaint((v) => !v) } }} role="switch" aria-checked={maint} aria-label="Maintenance mode" tabIndex={0}>
             <div className="toggle__knob" />
           </div>
         </div>
@@ -4701,7 +4880,17 @@ function ScrubberCard() {
     <Card title="Scrubber" desc="Media transport progress with a playhead — wire the seek yourself.">
       <div className="card__row" style={{ gap: 'var(--k-s-12)', alignItems: 'center', paddingTop: 8 }}>
         <span className="num" style={time}>1:48</span>
-        <div className="scrubber" style={{ flex: 1 }}>
+        <div
+          className="scrubber"
+          style={{ flex: 1 }}
+          role="slider"
+          aria-label="Playback position"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={45}
+          aria-valuetext="1:32 of 3:24"
+          tabIndex={0}
+        >
           <div className="scrubber__fill" style={{ width: '45%' }} />
           <div className="scrubber__knob" style={{ left: '45%' }} />
         </div>
@@ -5027,7 +5216,7 @@ function TwoColumnLayoutCard() {
         <div className="twocol__side">
           <div className="twocol__tile">
             <div style={{ fontSize: 'var(--k-type-eyebrow)', fontWeight: 600 }}>Database</div>
-            <div style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-primary)' }}>u609103235 ↗</div>
+            <div style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-primary-soft-fg)' }}>u609103235 ↗</div>
           </div>
           <div className="twocol__tile">
             <div style={{ fontSize: 'var(--k-type-eyebrow)', fontWeight: 600 }}>Backup</div>

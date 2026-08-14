@@ -254,7 +254,14 @@ export function paletteSet(
   const base = hsls.map(([H, S, L]) => hsl(H, S, L))
   // Perceptual ink (relative-luminance based) — fixes white-on-yellow/green
   // at high lightness, where a raw L threshold picks the wrong polarity.
-  const ink = hsls.map(([H, S, L]) => readableInk(hslToHex(H, S, L)))
+  /* aaInk, not readableInk. readableInk is a LUMINANCE THRESHOLD (>0.42 → dark
+   * ink), which is a perceptual guess and not a contrast check: an accent
+   * sitting just under the line takes white at 3.6:1. Measured on the default
+   * kit, the avatar ramp produced seven such failures. aaInk makes the same
+   * perceptual pick and then verifies it, flipping polarity when it cannot make
+   * AA — the docstring on it says this is exactly what derived, rotated hues
+   * need, and the avatar ramp is derived and rotated. */
+  const ink = hsls.map(([H, S, L]) => aaInk(hslToHex(H, S, L)))
   // Soft chip pair (Material container / on-container): a light tint and a
   // DEEP, contrast-safe hue for icons/text on top of it. Guards the
   // legibility of light hues (yellow/green) used as a foreground colour.
