@@ -54,6 +54,17 @@ const run = async (selector, label) => {
       return r.violations.map((v) => ({
         id: v.id, impact: v.impact, help: v.help, n: v.nodes.length,
         sample: v.nodes.slice(0, 2).map((n) => n.html.slice(0, 110)),
+        /* Contrast failures group by COLOUR PAIR, and that is the difference
+         * between a hundred bugs and three. The first run reported 106
+         * violations; they were 16 pairs, and one token accounted for 63. */
+        pairs: v.id !== 'color-contrast' ? [] : Object.entries(
+          v.nodes.reduce((acc, n) => {
+            const d = (n.any && n.any[0] && n.any[0].data) || {}
+            const k = `${d.fgColor} on ${d.bgColor} — ${d.contrastRatio}:1 (need ${d.expectedContrastRatio})`
+            acc[k] = (acc[k] || 0) + 1
+            return acc
+          }, {}),
+        ).sort((a, b) => b[1] - a[1]),
       }))
     },
     { sel: selector, tags: TAGS },
@@ -64,6 +75,7 @@ const run = async (selector, label) => {
     console.log(`  [${(v.impact || '?').padEnd(8)}] ${String(v.n).padStart(4)}×  ${v.id}`)
     console.log(`             ${v.help}`)
     for (const s of v.sample) console.log(`             · ${s}`)
+    for (const [pair, n] of v.pairs || []) console.log(`             ${String(n).padStart(4)}×  ${pair}`)
   }
   if (!res.length) console.log('  ✓ nothing')
   console.log()

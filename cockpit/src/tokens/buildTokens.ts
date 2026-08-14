@@ -15,7 +15,7 @@ import type {
   Tokens,
   TypeScale,
 } from './types'
-import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, readableInk, TEMP } from './color'
+import { aaInk, paletteSet, clampToAA, contrast, dislikeFix, harmonizeHue, hexToHsl, hexToOklch, hsl, hslA, hslToHex, okAccentScale, okNeutralScale, oklchStrToHex, oklchToHex, readableInk, TEMP } from './color'
 import { resolveHarmony } from './harmony'
 import { guardedBorders } from './coherence'
 import { customFontFamily, isCustomFont, MONO_FONTS, SERIF_FONTS, SYSTEM_FONT, SYSTEM_STACK, UI_MONO, UI_WEIGHTS } from './fonts'
@@ -319,12 +319,59 @@ export function buildTokens(cfg: Config): Tokens {
         sunken: nStep(3 + emph),
       }
 
-  // Text tiers = the top of the ladder: step 12 (high-contrast), 11 (muted),
-  // 9 (faint). Structural contrast — fg(12) on bg(1) is guaranteed by the anchors.
+  /* Text tiers = the top of the ladder: step 12 (high-contrast), 11 (muted),
+   * 9 (faint).
+   *
+   * The line that used to sit here said "structural contrast — fg(12) on bg(1)
+   * is guaranteed by the anchors", and that is true of tier 12 and false of the
+   * two below it. Measured with axe on the default kit: faint rendered 3.35:1 on
+   * white — 63 of the 106 contrast failures in the whole gallery came from this
+   * one token, used as timestamps, counts, gutters and hints. A text tier that
+   * cannot reach 4.5:1 is not a text tier.
+   *
+   * Floored against the DEEPEST surface it can land on, not against the page.
+   * We already learned this the hard way in the audit's own palette
+   * (`fadeToFloor` in drift.ts): ink floored on the page alone still lands at
+   * 2.7:1 once it sits on a sunken or container surface. The same bug was in our
+   * own engine the whole time — we shipped the fix for other people's kits and
+   * not for ours. */
+  const inkFloor = (ink: string, onColor: string, min: number): string => {
+    const on = oklchStrToHex(onColor)
+    let hex = oklchStrToHex(ink)
+    if (contrast(hex, on) >= min) return ink
+    const [L, C, H] = hexToOklch(hex)
+    const dir = dark ? 1 : -1
+    for (let l = L; l >= 0.1 && l <= 0.98; l += dir * 0.01) {
+      hex = oklchToHex(l, C, H)
+      if (contrast(hex, on) >= min) return `oklch(${(l * 100).toFixed(1)}% ${C.toFixed(4)} ${H.toFixed(1)})`
+    }
+    return ink
+  }
+  const fgFaint = inkFloor(nStep(8), surf.sunken, 4.5)
+  /* And then the tiers have to stay TELLABLE APART.
+   *
+   * Flooring faint to 4.5:1 pushed it from L64 to L52, which put it within 1.7%
+   * of muted at L50.3 — both legal, and visually one colour. The ramp above says
+   * in as many words that the three text tiers exist to "gain real separation",
+   * and a contrast fix that silently destroys that is not a fix, it is a trade
+   * made without saying so.
+   *
+   * So the law sets the floor and the design keeps its spacing: muted steps back
+   * far enough from the floored faint to stay a distinct tier. Nothing here
+   * loosens the 4.5 — muted only ever gets DARKER, which cannot fail it. */
+  const TIER_GAP = 0.1
+  const fgMuted = (() => {
+    const base = inkFloor(nStep(10), surf.sunken, 4.5)
+    const [lm, cm, hm] = hexToOklch(oklchStrToHex(base))
+    const lf = hexToOklch(oklchStrToHex(fgFaint))[0]
+    if (lf - lm >= TIER_GAP) return base
+    const l = Math.max(0.18, lf - TIER_GAP)
+    return `oklch(${(l * 100).toFixed(1)}% ${cm.toFixed(4)} ${hm.toFixed(1)})`
+  })()
   const fg = {
     main: nStep(11),
-    muted: nStep(10),
-    faint: nStep(8),
+    muted: fgMuted,
+    faint: fgFaint,
   }
 
   // primary lightness — UI-safe clamp so button text stays readable.
@@ -375,14 +422,17 @@ export function buildTokens(cfg: Config): Tokens {
   })()
   const primaryFg = readableInk(primaryHex)
   const primarySoft = P[2]!
-  // Foreground on primary-soft fills (badges, chips, soft-tile icons).
-  // Light mode: primary text on light primary-soft already passes AA, so
-  // we keep the brand-tinted primary. Dark mode: primary is too dim against
-  // dark primary-soft, so we boost saturation + lightness to a brighter
-  // brand-tinted ink — preserves brand feel AND passes AA.
+  /* Foreground on primary-soft fills (badges, chips, soft-tile icons).
+   *
+   * The old light-mode branch was literally `primary`, on the stated assumption
+   * that "primary text on light primary-soft already passes AA". Measured: it
+   * lands at 4.06:1, and that single assumption produced 26 of the gallery's
+   * remaining contrast failures — every soft-tinted calendar event, chip and
+   * status tile. Now floored against the fill it actually sits on, which keeps
+   * the brand HUE and only takes lightness away until it clears. */
   const primarySoftFg = mono
     ? (dark ? hsl(ph, 12, 88) : hsl(ph, 14, 22))
-    : (dark ? hsl(ph, Math.max(70, psat), 82) : primary)
+    : (dark ? hsl(ph, Math.max(70, psat), 82) : inkFloor(primary, primarySoft, 4.5))
 
   // Secondary + accent are DERIVED from the single brand hue (ph/psat) — one
   // color in, a harmonious family out. Secondary = muted sibling (quiet

@@ -36,11 +36,11 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
   "tokens": {
     "--k-accent": "oklch(54.1% 0.2701 298.9)",
     "--k-accent-1": "oklch(62.3% 0.1589 252.4)",
-    "--k-accent-1-ink": "#ffffff",
+    "--k-accent-1-ink": "#16160c",
     "--k-accent-1-soft": "oklch(89.0% 0.0437 248.3)",
     "--k-accent-1-soft-fg": "oklch(33.9% 0.0953 253.0)",
     "--k-accent-2": "oklch(64.9% 0.2616 332.9)",
-    "--k-accent-2-ink": "#ffffff",
+    "--k-accent-2-ink": "#16160c",
     "--k-accent-2-soft": "oklch(88.1% 0.0814 329.6)",
     "--k-accent-2-soft-fg": "oklch(35.9% 0.1527 333.0)",
     "--k-accent-3": "oklch(86.5% 0.1907 119.3)",
@@ -52,7 +52,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-accent-4-soft": "oklch(84.8% 0.0697 294.0)",
     "--k-accent-4-soft-fg": "oklch(25.9% 0.1456 278.3)",
     "--k-accent-5": "oklch(65.6% 0.1692 41.6)",
-    "--k-accent-5-ink": "#ffffff",
+    "--k-accent-5-ink": "#16160c",
     "--k-accent-5-soft": "oklch(89.5% 0.0444 44.5)",
     "--k-accent-5-soft-fg": "oklch(35.9% 0.1021 40.5)",
     "--k-accent-6": "oklch(80.6% 0.2079 150.0)",
@@ -100,7 +100,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-danger-soft": "oklch(94.8% 0.0101 2.0)",
     "--k-danger-soft-fg": "#16160c",
     "--k-disabled-bg": "oklch(98.0% 0.0063 249.9)",
-    "--k-disabled-fg": "oklch(64.0% 0.0112 249.9)",
+    "--k-disabled-fg": "oklch(52.0% 0.0114 248.0)",
     "--k-disabled-opacity": "0.55",
     "--k-divider": "var(--k-bw) solid var(--k-border)",
     "--k-dot": "calc(var(--k-in-h-default) / 4.5)",
@@ -115,8 +115,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-ease-out": "cubic-bezier(.05,.7,.1,1)",
     "--k-ease-spring": "cubic-bezier(.34, 1.56, .64, 1)",
     "--k-fg": "oklch(16.0% 0.0140 249.9)",
-    "--k-fg-faint": "oklch(64.0% 0.0112 249.9)",
-    "--k-fg-muted": "oklch(50.3% 0.0140 249.9)",
+    "--k-fg-faint": "oklch(52.0% 0.0114 248.0)",
+    "--k-fg-muted": "oklch(42.1% 0.0141 248.1)",
     "--k-field-bg": "var(--k-input-bg)",
     "--k-field-border-color": "var(--k-input-border)",
     "--k-field-focus-edge": "var(--k-ring)",
@@ -179,7 +179,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-primary-fg": "#ffffff",
     "--k-primary-hover": "oklch(51.4% 0.1638 253.9)",
     "--k-primary-soft": "oklch(95.8% 0.0372 253.9)",
-    "--k-primary-soft-fg": "oklch(56.4% 0.1689 253.9)",
+    "--k-primary-soft-fg": "oklch(53.4% 0.1689 253.9)",
     "--k-radius-button": "1rem",
     "--k-radius-lg": "1rem",
     "--k-radius-md": "1rem",
@@ -326,8 +326,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-danger-soft": "oklch(30.1% 0.0494 8.4)",
     "--k-danger-soft-fg": "#ffffff",
     "--k-disabled-bg": "oklch(28.5% 0.0077 249.9)",
+    "--k-disabled-fg": "oklch(64.0% 0.0112 249.9)",
     "--k-fg": "oklch(94.5% 0.0140 249.9)",
-    "--k-fg-muted": "oklch(77.5% 0.0140 249.9)",
+    "--k-fg-faint": "oklch(64.0% 0.0112 249.9)",
+    "--k-fg-muted": "oklch(54.0% 0.0145 248.0)",
     "--k-glass-bg": "hsl(210.12244897959184 14% 12.9% / 0.72)",
     "--k-glass-edge": "inset 0 1px 0 hsl(0 0% 100% / 0.08)",
     "--k-grad-1": "linear-gradient(135deg, oklch(63.7% 0.1493 251.8), oklch(64.1% 0.1434 271.1))",
@@ -2885,13 +2887,13 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       },
       {
         "label": "Muted text on background",
-        "ratio": 5.59,
+        "ratio": 7.98,
         "required": 4.5,
         "passes": true
       },
       {
         "label": "Muted text on surface-2",
-        "ratio": 5.59,
+        "ratio": 7.98,
         "required": 4.5,
         "passes": true
       },
@@ -3028,13 +3030,13 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-z-modal: 60;
   --k-z-tooltip: 70;
   --k-fg: oklch(16.0% 0.0140 249.9);
-  --k-fg-muted: oklch(50.3% 0.0140 249.9);
-  --k-fg-faint: oklch(64.0% 0.0112 249.9);
+  --k-fg-muted: oklch(42.1% 0.0141 248.1);
+  --k-fg-faint: oklch(52.0% 0.0114 248.0);
   --k-primary: oklch(56.4% 0.1689 253.9);
   --k-primary-hover: oklch(51.4% 0.1638 253.9);
   --k-primary-fg: #ffffff;
   --k-primary-soft: oklch(95.8% 0.0372 253.9);
-  --k-primary-soft-fg: oklch(56.4% 0.1689 253.9);
+  --k-primary-soft-fg: oklch(53.4% 0.1689 253.9);
   --k-selection: oklch(59.9% 0.1813 254.1 / 0.18);
   --k-accent: oklch(54.1% 0.2701 298.9);
   --k-accent-fg: #ffffff;
@@ -3052,11 +3054,11 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-accent-4: oklch(48.7% 0.2463 281.4);
   --k-accent-5: oklch(65.6% 0.1692 41.6);
   --k-accent-6: oklch(80.6% 0.2079 150.0);
-  --k-accent-1-ink: #ffffff;
-  --k-accent-2-ink: #ffffff;
+  --k-accent-1-ink: #16160c;
+  --k-accent-2-ink: #16160c;
   --k-accent-3-ink: #16160c;
   --k-accent-4-ink: #ffffff;
-  --k-accent-5-ink: #ffffff;
+  --k-accent-5-ink: #16160c;
   --k-accent-6-ink: #16160c;
   --k-accent-1-soft: oklch(89.0% 0.0437 248.3);
   --k-accent-2-soft: oklch(88.1% 0.0814 329.6);
@@ -3208,7 +3210,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-weight-display: 600;
   --k-weight-display-hero: 700;
   --k-disabled-bg: oklch(98.0% 0.0063 249.9);
-  --k-disabled-fg: oklch(64.0% 0.0112 249.9);
+  --k-disabled-fg: oklch(52.0% 0.0114 248.0);
   --k-disabled-opacity: 0.55;
   --k-focus-ring-offset: 2px;
   --k-focus-ring-width: 2px;
@@ -3324,7 +3326,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-z-modal: 60;
   --k-z-tooltip: 70;
   --k-fg: oklch(94.5% 0.0140 249.9);
-  --k-fg-muted: oklch(77.5% 0.0140 249.9);
+  --k-fg-muted: oklch(54.0% 0.0145 248.0);
   --k-fg-faint: oklch(64.0% 0.0112 249.9);
   --k-primary: oklch(56.4% 0.1689 253.9);
   --k-primary-hover: oklch(61.4% 0.1638 253.9);
@@ -3348,11 +3350,11 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-accent-4: oklch(50.5% 0.2342 283.2);
   --k-accent-5: oklch(66.7% 0.1582 42.5);
   --k-accent-6: oklch(80.6% 0.1979 150.8);
-  --k-accent-1-ink: #ffffff;
-  --k-accent-2-ink: #ffffff;
+  --k-accent-1-ink: #16160c;
+  --k-accent-2-ink: #16160c;
   --k-accent-3-ink: #16160c;
   --k-accent-4-ink: #ffffff;
-  --k-accent-5-ink: #ffffff;
+  --k-accent-5-ink: #16160c;
   --k-accent-6-ink: #16160c;
   --k-accent-1-soft: oklch(37.5% 0.0982 252.3);
   --k-accent-2-soft: oklch(39.1% 0.1608 333.0);
@@ -10466,13 +10468,13 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-z-modal: 60;
   --k-z-tooltip: 70;
   --k-fg: oklch(16.0% 0.0140 249.9);
-  --k-fg-muted: oklch(50.3% 0.0140 249.9);
-  --k-fg-faint: oklch(64.0% 0.0112 249.9);
+  --k-fg-muted: oklch(42.1% 0.0141 248.1);
+  --k-fg-faint: oklch(52.0% 0.0114 248.0);
   --k-primary: oklch(56.4% 0.1689 253.9);
   --k-primary-hover: oklch(51.4% 0.1638 253.9);
   --k-primary-fg: #ffffff;
   --k-primary-soft: oklch(95.8% 0.0372 253.9);
-  --k-primary-soft-fg: oklch(56.4% 0.1689 253.9);
+  --k-primary-soft-fg: oklch(53.4% 0.1689 253.9);
   --k-selection: oklch(59.9% 0.1813 254.1 / 0.18);
   --k-accent: oklch(54.1% 0.2701 298.9);
   --k-accent-fg: #ffffff;
@@ -10490,11 +10492,11 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-accent-4: oklch(48.7% 0.2463 281.4);
   --k-accent-5: oklch(65.6% 0.1692 41.6);
   --k-accent-6: oklch(80.6% 0.2079 150.0);
-  --k-accent-1-ink: #ffffff;
-  --k-accent-2-ink: #ffffff;
+  --k-accent-1-ink: #16160c;
+  --k-accent-2-ink: #16160c;
   --k-accent-3-ink: #16160c;
   --k-accent-4-ink: #ffffff;
-  --k-accent-5-ink: #ffffff;
+  --k-accent-5-ink: #16160c;
   --k-accent-6-ink: #16160c;
   --k-accent-1-soft: oklch(89.0% 0.0437 248.3);
   --k-accent-2-soft: oklch(88.1% 0.0814 329.6);
@@ -10646,7 +10648,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-weight-display: 600;
   --k-weight-display-hero: 700;
   --k-disabled-bg: oklch(98.0% 0.0063 249.9);
-  --k-disabled-fg: oklch(64.0% 0.0112 249.9);
+  --k-disabled-fg: oklch(52.0% 0.0114 248.0);
   --k-disabled-opacity: 0.55;
   --k-focus-ring-offset: 2px;
   --k-focus-ring-width: 2px;
@@ -10762,7 +10764,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-z-modal: 60;
   --k-z-tooltip: 70;
   --k-fg: oklch(94.5% 0.0140 249.9);
-  --k-fg-muted: oklch(77.5% 0.0140 249.9);
+  --k-fg-muted: oklch(54.0% 0.0145 248.0);
   --k-fg-faint: oklch(64.0% 0.0112 249.9);
   --k-primary: oklch(56.4% 0.1689 253.9);
   --k-primary-hover: oklch(61.4% 0.1638 253.9);
@@ -10786,11 +10788,11 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-accent-4: oklch(50.5% 0.2342 283.2);
   --k-accent-5: oklch(66.7% 0.1582 42.5);
   --k-accent-6: oklch(80.6% 0.1979 150.8);
-  --k-accent-1-ink: #ffffff;
-  --k-accent-2-ink: #ffffff;
+  --k-accent-1-ink: #16160c;
+  --k-accent-2-ink: #16160c;
   --k-accent-3-ink: #16160c;
   --k-accent-4-ink: #ffffff;
-  --k-accent-5-ink: #ffffff;
+  --k-accent-5-ink: #16160c;
   --k-accent-6-ink: #16160c;
   --k-accent-1-soft: oklch(37.5% 0.0982 252.3);
   --k-accent-2-soft: oklch(39.1% 0.1608 333.0);
@@ -17969,8 +17971,8 @@ adjustment in code.
 | Body text on surface | 19.38:1 | 4.5:1 | ✓ |
 | Body text on raised surface | 19.38:1 | 4.5:1 | ✓ |
 | Body text on overlay | 19.38:1 | 4.5:1 | ✓ |
-| Muted text on background | 5.59:1 | 4.5:1 | ✓ |
-| Muted text on surface-2 | 5.59:1 | 4.5:1 | ✓ |
+| Muted text on background | 7.98:1 | 4.5:1 | ✓ |
+| Muted text on surface-2 | 7.98:1 | 4.5:1 | ✓ |
 | Button text on primary | 4.63:1 | 4.5:1 | ✓ |
 | Button text on primary hover | 5.71:1 | 4.5:1 | ✓ |
 | Secondary button text | 14.19:1 | 4.5:1 | ✓ |
@@ -18418,10 +18420,10 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "value": "oklch(16.0% 0.0000 0.0)"
       },
       "foreground-muted": {
-        "value": "oklch(50.3% 0.0000 0.0)"
+        "value": "oklch(42.1% 0.0000 89.9)"
       },
       "foreground-faint": {
-        "value": "oklch(64.0% 0.0000 0.0)"
+        "value": "oklch(52.0% 0.0000 89.9)"
       },
       "surface": {
         "value": "oklch(100% 0 0)"
@@ -18521,7 +18523,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "value": "oklch(98.0% 0.0000 0.0)"
       },
       "disabled-foreground": {
-        "value": "oklch(64.0% 0.0000 0.0)"
+        "value": "oklch(52.0% 0.0000 89.9)"
       },
       "disabled-opacity": {
         "value": "0.55"
@@ -18773,7 +18775,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "value": "oklch(61.7% 0.0000 89.9)"
       },
       "accent-3-ink": {
-        "value": "#ffffff"
+        "value": "#16160c"
       },
       "accent-3-soft": {
         "value": "oklch(90.1% 0.0000 89.9)"
@@ -18791,7 +18793,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "value": "oklch(69.3% 0.0000 89.9)"
       },
       "accent-4-ink": {
-        "value": "#ffffff"
+        "value": "#16160c"
       },
       "accent-4-soft": {
         "value": "oklch(90.1% 0.0000 89.9)"
@@ -18920,13 +18922,13 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
       },
       {
         "label": "Muted text on background",
-        "ratio": 5.57,
+        "ratio": 7.96,
         "required": 4.5,
         "passes": true
       },
       {
         "label": "Muted text on surface-2",
-        "ratio": 5.57,
+        "ratio": 7.96,
         "required": 4.5,
         "passes": true
       },
@@ -19013,7 +19015,8 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-surface-raised": "oklch(31.7% 0.0000 0.0)",
     "--k-surface-overlay": "oklch(35.5% 0.0000 0.0)",
     "--k-fg": "oklch(94.5% 0.0000 0.0)",
-    "--k-fg-muted": "oklch(77.5% 0.0000 0.0)",
+    "--k-fg-muted": "oklch(54.0% 0.0000 89.9)",
+    "--k-fg-faint": "oklch(64.0% 0.0000 0.0)",
     "--k-primary": "oklch(94.0% 0.0000 89.9)",
     "--k-primary-hover": "oklch(99.0% 0.0000 89.9)",
     "--k-primary-fg": "#16160c",
@@ -19036,6 +19039,8 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-accent-5": "oklch(51.0% 0.0000 89.9)",
     "--k-accent-6": "oklch(43.9% 0.0000 89.9)",
     "--k-accent-1-ink": "#16160c",
+    "--k-accent-2-ink": "#16160c",
+    "--k-accent-4-ink": "#ffffff",
     "--k-accent-5-ink": "#ffffff",
     "--k-accent-6-ink": "#ffffff",
     "--k-accent-1-soft": "oklch(37.9% 0.0000 89.9)",
@@ -19093,6 +19098,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "--k-state-hover": "oklch(88.4% 0.0082 286.2 / 0.05)",
     "--k-state-press": "oklch(88.4% 0.0082 286.2 / 0.15000000000000002)",
     "--k-disabled-bg": "oklch(28.5% 0.0000 0.0)",
+    "--k-disabled-fg": "oklch(64.0% 0.0000 0.0)",
     "--k-input-error-border": "#d65a51",
     "--k-input-success-border": "#5ccc8b",
     "--k-input-warning-border": "#e4bc44",
@@ -19120,7 +19126,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "secondary": "#dee3f2",
       "secondary-foreground": "#16160c",
       "muted": "oklch(98.0% 0.0063 249.9)",
-      "muted-foreground": "oklch(50.3% 0.0140 249.9)",
+      "muted-foreground": "oklch(42.1% 0.0141 248.1)",
       "accent": "oklch(54.1% 0.2701 298.9)",
       "accent-foreground": "#ffffff",
       "destructive": "oklch(55.7% 0.1997 17.4)",
@@ -19155,7 +19161,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "secondary": "#263050",
       "secondary-foreground": "#ffffff",
       "muted": "oklch(28.5% 0.0077 249.9)",
-      "muted-foreground": "oklch(77.5% 0.0140 249.9)",
+      "muted-foreground": "oklch(54.0% 0.0145 248.0)",
       "accent": "oklch(59.9% 0.2408 302.4)",
       "accent-foreground": "#ffffff",
       "destructive": "oklch(61.8% 0.1675 12.1)",
@@ -19289,8 +19295,8 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
 @theme {
   --color-background: oklch(98.0% 0.0063 249.9);
   --color-foreground: oklch(16.0% 0.0140 249.9);
-  --color-muted: oklch(50.3% 0.0140 249.9);
-  --color-faint: oklch(64.0% 0.0112 249.9);
+  --color-muted: oklch(42.1% 0.0141 248.1);
+  --color-faint: oklch(52.0% 0.0114 248.0);
   --color-surface: oklch(100% 0 0);
   --color-surface-sunken: oklch(93.7% 0.0077 249.9);
   --color-surface-2: oklch(98.0% 0.0063 249.9);
@@ -19313,7 +19319,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-secondary-soft-foreground: #16160c;
   --color-selection: oklch(59.9% 0.1813 254.1 / 0.18);
   --color-disabled-bg: oklch(98.0% 0.0063 249.9);
-  --color-disabled-foreground: oklch(64.0% 0.0112 249.9);
+  --color-disabled-foreground: oklch(52.0% 0.0114 248.0);
   --color-input-error-border: #ce2746;
   --color-input-success-border: #33c192;
   --color-input-warning-border: #e6e60f;
@@ -19448,7 +19454,8 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
 .dark {
   --color-background: oklch(21.3% 0.0063 249.9);
   --color-foreground: oklch(94.5% 0.0140 249.9);
-  --color-muted: oklch(77.5% 0.0140 249.9);
+  --color-muted: oklch(54.0% 0.0145 248.0);
+  --color-faint: oklch(64.0% 0.0112 249.9);
   --color-surface: oklch(25.4% 0.0070 249.9);
   --color-surface-sunken: oklch(17.6% 0.0056 249.9);
   --color-surface-2: oklch(28.5% 0.0077 249.9);
@@ -19465,6 +19472,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-secondary-soft-foreground: #ffffff;
   --color-selection: oklch(70.0% 0.1338 250.3 / 0.28);
   --color-disabled-bg: oklch(28.5% 0.0077 249.9);
+  --color-disabled-foreground: oklch(64.0% 0.0112 249.9);
   --color-input-error-border: #d6516a;
   --color-input-success-border: #5ccca6;
   --color-input-warning-border: #e4e444;
