@@ -3281,6 +3281,23 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
       ],
     },
     css: `/* === Dialog === */
+/* Use the PLATFORM element: <dialog> + showModal().
+ *
+ * These styles work on a div, and the gallery demo uses one because it has to
+ * stay open for inspection. But a real modal should be a <dialog>, and the
+ * difference is not tidiness — showModal() gives you the focus trap, Escape to
+ * close, the rest of the page made inert, top-layer stacking above every
+ * z-index, and ::backdrop. Hand-rolled, that is the list a consumer silently
+ * owes us, and the list they will get partly wrong.
+ *
+ * Open UI's whole argument is that design systems keep re-implementing built-in
+ * controls; for a system a public body has to run for twenty years, the platform
+ * outlives our JavaScript. So: <dialog class="dialog"> and dialog.showModal().
+ *
+ * role="dialog" and aria-modal="true" become redundant on the element — it is
+ * already a dialog and showModal() already makes it modal. The global layer
+ * restores the UA's closed state (our display:flex would otherwise reveal a
+ * closed dialog) and styles ::backdrop to match the kit. */
 .dialog {
   border-radius: var(--k-radius-lg);
   border: var(--k-hairline, 1px solid var(--k-border));

@@ -410,6 +410,40 @@ ${s}.taginput[aria-disabled="true"] {
   pointer-events: none;
 }
 
+/* The platform's closed state wins over our layout. Non-negotiable.
+ *
+ * A user agent hides a closed <dialog> and a closed [popover] with
+ * display:none. That rule lives in the UA origin, and ANY author declaration
+ * beats it regardless of specificity — so the moment someone puts our .dialog or
+ * .popover class (which set display:flex / display:grid for their internal
+ * layout) on a real platform element, the closed content renders. Measured, not
+ * reasoned: a closed <dialog class="dialog"> laid out at 186x68 and a closed
+ * [popover] at 170x40.
+ *
+ * That is a bad failure for a CSS kit to have, because it only appears for the
+ * consumers doing the RIGHT thing — reaching for <dialog>/showModal() and the
+ * Popover API instead of re-implementing modality in JavaScript. Open UI's whole
+ * argument is that design systems should stop re-inventing built-in controls; a
+ * kit that punishes you for taking that advice is worse than one that never
+ * offered it.
+ *
+ * Restated here in the author origin so it outranks our own layout rules. Placed
+ * before them in the cascade would not be enough — these have to win on
+ * specificity too, hence the element/attribute qualifiers. */
+${s}dialog:not([open]),
+${s}[popover]:not(:popover-open) {
+  display: none;
+}
+
+/* And the modal backdrop, so showModal() looks like the rest of the kit rather
+ * than the UA's default black wash. Only reachable via the platform path — a
+ * hand-rolled div-with-a-scrim never renders ::backdrop, which is one more small
+ * reason to use the element. */
+${s}dialog::backdrop {
+  background: color-mix(in srgb, var(--k-fg) 55%, transparent);
+  backdrop-filter: blur(2px);
+}
+
 /* Visually hidden — text for assistive tech that takes no space on screen.
  *
  * A foundational primitive we did not have, which is how it ended up hand-rolled
