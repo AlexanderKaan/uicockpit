@@ -109,16 +109,16 @@ export const SPECIMENS: Record<string, Specimen> = {
       const sorts = (v?.['table.sortable'] ?? 0) > 0
       const selects = (v?.['table.selectable'] ?? 0) > 0
       return (
-        <table className="tbl" style={{ minWidth: selects ? 268 : 248 }}>
+        <table className="table" style={{ minWidth: selects ? 268 : 248 }}>
           <thead>
             <tr>
               {selects && (
                 <th className="datatable__check">
-                  <label className="check"><input type="checkbox" aria-label="Select all" /></label>
+                  <label className="checkbox"><input type="checkbox" aria-label="Select all" /></label>
                 </th>
               )}
               <th className={sorts ? 'is-sortable is-active' : undefined} aria-sort={sorts ? 'ascending' : undefined}>
-                {sorts ? <span className="tbl__sort">Name<span className="tbl__sort-chevron"><Icon name="chevD" size={11} /></span></span> : 'Name'}
+                {sorts ? <span className="table__sort">Name<span className="table__sort-chevron"><Icon name="chevD" size={11} /></span></span> : 'Name'}
               </th>
               <th>Status</th>
             </tr>
@@ -126,16 +126,16 @@ export const SPECIMENS: Record<string, Specimen> = {
           <tbody>
             <tr>
               {selects && (
-                <td><label className="check"><input type="checkbox" defaultChecked aria-label="Select row" /></label></td>
+                <td><label className="checkbox"><input type="checkbox" defaultChecked aria-label="Select row" /></label></td>
               )}
-              <td><div className="tbl__name">Northwind</div><div className="tbl__sub">12 items</div></td>
+              <td><div className="table__name">Northwind</div><div className="table__sub">12 items</div></td>
               <td><span className="badge badge--success">Live</span></td>
             </tr>
             <tr>
               {selects && (
-                <td><label className="check"><input type="checkbox" aria-label="Select row" /></label></td>
+                <td><label className="checkbox"><input type="checkbox" aria-label="Select row" /></label></td>
               )}
-              <td><div className="tbl__name">Renewal</div><div className="tbl__sub">4 items</div></td>
+              <td><div className="table__name">Renewal</div><div className="table__sub">4 items</div></td>
               <td><span className="badge badge--warn">Draft</span></td>
             </tr>
           </tbody>
@@ -276,12 +276,12 @@ export const SPECIMENS: Record<string, Specimen> = {
   tooltip: {
     label: 'Tooltip',
     render: () => (
-      // `.tt--always` is the recipe's own way to pin the popup open — a bare
-      // .tt__pop sits at opacity 0 until its parent is hovered, which in a
+      // `.tooltip--always` is the recipe's own way to pin the popup open — a bare
+      // .tooltip__pop sits at opacity 0 until its parent is hovered, which in a
       // specimen grid means an empty cell.
-      <span className="tt tt--always" style={{ display: 'inline-block' }}>
+      <span className="tooltip tooltip--always" style={{ display: 'inline-block' }}>
         <button type="button" className="btn btn--ghost btn--sm">Rename</button>
-        <span className="tt__pop tt__pop--bottom">Rename this record</span>
+        <span className="tooltip__pop tooltip__pop--bottom">Rename this record</span>
       </span>
     ),
   },

@@ -1,0 +1,293 @@
+{
+ "_source": "https://open-ui.org/research/component-matrix",
+ "_repo": "github.com/openui/open-ui \u2014 site/src/sources/*.json",
+ "_normaliser": "strip spaces+hyphens, lowercase, drop trailing plural/gerund: /(\\w+?)(e|er)?(s|ing)$/ -> $1 (ported from site/src/components/component-name-matrix.jsx)",
+ "_captured": "2026-08-14",
+ "_systems": 27,
+ "_systemNames": [
+  "Ant Design",
+  "Atlaskit",
+  "Auth0 Styleguide",
+  "Boosted",
+  "Bootstrap",
+  "Carbon Design System",
+  "Chromium",
+  "Evergreen",
+  "FAST",
+  "Firefox",
+  "GoodBarber Design System",
+  "KoliBri",
+  "Lightning Design System",
+  "Lion",
+  "Material Components Web",
+  "Material UI",
+  "Oat",
+  "Primer Design System",
+  "Semantic UI",
+  "Spectrum",
+  "Stardust UI",
+  "Tailwind Elements",
+  "U.S. Web Design System (USWDS)",
+  "UI Fabric",
+  "WAI-ARIA",
+  "Web Platform",
+  "WebKit"
+ ],
+ "names": {
+  "button": {
+   "systems": 25,
+   "pct": 93,
+   "spelled": "Button"
+  },
+  "checkbox": {
+   "systems": 20,
+   "pct": 74,
+   "spelled": "Checkbox"
+  },
+  "tooltip": {
+   "systems": 18,
+   "pct": 67,
+   "spelled": "Tooltip"
+  },
+  "select": {
+   "systems": 16,
+   "pct": 59,
+   "spelled": "Select"
+  },
+  "breadcrumb": {
+   "systems": 15,
+   "pct": 56,
+   "spelled": "Breadcrumb"
+  },
+  "accordion": {
+   "systems": 14,
+   "pct": 52,
+   "spelled": "Accordion"
+  },
+  "tab": {
+   "systems": 13,
+   "pct": 48,
+   "spelled": "Tabs"
+  },
+  "card": {
+   "systems": 12,
+   "pct": 44,
+   "spelled": "Card"
+  },
+  "dialog": {
+   "systems": 12,
+   "pct": 44,
+   "spelled": "Dialog"
+  },
+  "alert": {
+   "systems": 11,
+   "pct": 41,
+   "spelled": "Alert"
+  },
+  "menu": {
+   "systems": 11,
+   "pct": 41,
+   "spelled": "Menu"
+  },
+  "progres": {
+   "systems": 11,
+   "pct": 41,
+   "spelled": "Progress"
+  },
+  "badge": {
+   "systems": 10,
+   "pct": 37,
+   "spelled": "Badge"
+  },
+  "dropdown": {
+   "systems": 10,
+   "pct": 37,
+   "spelled": "Dropdown"
+  },
+  "form": {
+   "systems": 10,
+   "pct": 37,
+   "spelled": "Form"
+  },
+  "icon": {
+   "systems": 10,
+   "pct": 37,
+   "spelled": "Icon"
+  },
+  "modal": {
+   "systems": 10,
+   "pct": 37,
+   "spelled": "Modal"
+  },
+  "radio": {
+   "systems": 10,
+   "pct": 37,
+   "spelled": "Radio"
+  },
+  "switch": {
+   "systems": 10,
+   "pct": 37,
+   "spelled": "Switch"
+  },
+  "table": {
+   "systems": 10,
+   "pct": 37,
+   "spelled": "Table"
+  },
+  "pagination": {
+   "systems": 9,
+   "pct": 33,
+   "spelled": "Pagination"
+  },
+  "combobox": {
+   "systems": 9,
+   "pct": 33,
+   "spelled": "Combobox"
+  },
+  "avatar": {
+   "systems": 8,
+   "pct": 30,
+   "spelled": "Avatar"
+  },
+  "slider": {
+   "systems": 8,
+   "pct": 30,
+   "spelled": "Slider"
+  },
+  "label": {
+   "systems": 8,
+   "pct": 30,
+   "spelled": "Label"
+  },
+  "nav": {
+   "systems": 8,
+   "pct": 30,
+   "spelled": "Nav"
+  },
+  "carousel": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "Carousel"
+  },
+  "list": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "List"
+  },
+  "select.popup": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "Select.Popup"
+  },
+  "text": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "Text"
+  },
+  "textarea": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "Textarea"
+  },
+  "textfield": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "Textfield"
+  },
+  "toast": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "Toast"
+  },
+  "search": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "Search"
+  },
+  "meter": {
+   "systems": 7,
+   "pct": 26,
+   "spelled": "Meter"
+  },
+  "grid": {
+   "systems": 6,
+   "pct": 22,
+   "spelled": "Grid"
+  },
+  "image": {
+   "systems": 6,
+   "pct": 22,
+   "spelled": "Image"
+  },
+  "tag": {
+   "systems": 6,
+   "pct": 22,
+   "spelled": "Tag"
+  },
+  "range": {
+   "systems": 6,
+   "pct": 22,
+   "spelled": "Range"
+  },
+  "img": {
+   "systems": 6,
+   "pct": 22,
+   "spelled": "Img"
+  },
+  "link": {
+   "systems": 6,
+   "pct": 22,
+   "spelled": "Link"
+  },
+  "detail": {
+   "systems": 6,
+   "pct": 22,
+   "spelled": "Details"
+  },
+  "radiogroup": {
+   "systems": 6,
+   "pct": 22,
+   "spelled": "Radio Group"
+  },
+  "datepicker": {
+   "systems": 5,
+   "pct": 19,
+   "spelled": "DatePicker"
+  },
+  "divider": {
+   "systems": 5,
+   "pct": 19,
+   "spelled": "Divider"
+  },
+  "input": {
+   "systems": 5,
+   "pct": 19,
+   "spelled": "Input"
+  },
+  "popover": {
+   "systems": 5,
+   "pct": 19,
+   "spelled": "Popover"
+  },
+  "progressindicator": {
+   "systems": 5,
+   "pct": 19,
+   "spelled": "Progress indicator"
+  },
+  "spinner": {
+   "systems": 5,
+   "pct": 19,
+   "spelled": "Spinner"
+  },
+  "buttongroup": {
+   "systems": 5,
+   "pct": 19,
+   "spelled": "Button group"
+  },
+  "video": {
+   "systems": 5,
+   "pct": 19,
+   "spelled": "Video"
+  }
+ }
+}

@@ -31,7 +31,7 @@ you create or restyle. These are the binding rules — load them every session.
   row like \`[input] [Submit]\` sits on one baseline. Never mix \`.btn--sm\` with a default \`.in\`.
 - **Compose the kit's recipes — don't hand-roll.** ~80 classes cover most jobs:
   atoms (\`.btn\` \`.in\` \`.select-trigger\` \`.badge\` \`.chip\` \`.avatar\` \`.switch\`/\`.toggle\` \`.radio\`),
-  data (\`.tbl\` \`.datatable\` \`.list\` \`.dl\` \`.stat-tile\`/\`.stat-tile-grid\`), forms (\`.formpanel\` \`.field\`),
+  data (\`.table\` \`.datatable\` \`.list\` \`.dl\` \`.stat-tile\`/\`.stat-tile-grid\`), forms (\`.formpanel\` \`.field\`),
   nav/shell (\`.toolbar\` \`.navrow\` \`.navsuite\` \`.sidenav\` \`.scaffold\` \`.page-head\` \`.section\`),
   overlays (\`.menu\` \`.dialog\` \`.popover\` \`.toast\`), filters (\`.filterbar\` \`.searchinput\` \`.combobox\`).
   **The FULL catalog (every class + its modifiers) is in \`contract.json\` → \`components.classes\`;
@@ -63,7 +63,7 @@ Radix / Headless UI / cmdk):
   NATIVE \`<select class="select">\` (fully accessible, zero JS) when a native control fits.
 - **OTP / slider:** wire focus-advance+paste / keyboard + \`aria-valuenow\` yourself.
 - **Overlays** (popover · tooltip · hover-card) open ONE static side (placement modifiers
-  e.g. \`.tt__pop--bottom\` / \`--left\` / \`--right\`, \`.popover--top\` / \`--end\`); there's no
+  e.g. \`.tooltip__pop--bottom\` / \`--left\` / \`--right\`, \`.popover--top\` / \`--end\`); there's no
   JS collision-flip — pick the side that clears the viewport edge, and portal the overlay
   if a parent clips it.
 - **Scroll-area** styles the NATIVE scrollbar (Chromium + Firefox); Safari keeps the OS

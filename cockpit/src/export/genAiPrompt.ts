@@ -9,6 +9,7 @@ import { genCss } from './genCss'
 import { Z_INDEX, BREAKPOINTS } from '../tokens/extras'
 import { RECIPES } from '../kit'
 import { FOUNDATIONS, COMPONENT_USES, STANDALONE_ATOMS, idsByTier } from '../kit/segments'
+import STANDARD_NAMES from '../kit/standardNames.json'
 
 /** Per-component Do/Don't craft rules (LP1 doc-cards) — rendered from the recipes'
  * own `doc` blocks, so the export can never drift from the kit source. Encodes
@@ -45,7 +46,18 @@ export function componentModel(): string {
   const atoms = idsByTier('atom').map(label).join(', ')
   const foundations = FOUNDATIONS.map(label).join(', ')
   const standalone = STANDALONE_ATOMS.map(label).join(', ')
-  return `## The component model — the composition contract
+  return `## Naming — use the field's word, get our class
+
+You will know most of these by the name the industry converged on. That name is
+the key; the class is the value. Open UI's Component Name Matrix measured naming
+agreement across ${STANDARD_NAMES._systems} design systems (Ant, Carbon, Spectrum,
+USWDS, WAI-ARIA, the browser engines) — the percentage is how many use that word.
+Reach for the standard word and this tells you what to type. Do NOT invent
+\`.button\` or \`.dropdown\`; they do not exist in this kit.
+
+${STANDARD_NAMES.aliases.map((a) => `- **${a.standard}** (${a.pct}%) → \`.${a.className}\``).join('\n')}
+
+## The component model — the composition contract
 
 This kit is a **tier ladder** (Foundation → Atom → Component → Section → Page). Build
 UP it; never invent a parallel structure or re-implement what a component already
@@ -433,7 +445,7 @@ Phone input (country code + flag).
 **Auth screens (.auth):**
 Sign-in / sign-up / forgot-password — centered card with heading, SSO buttons
 (.auth__social), a labelled "or" divider (.divider-or), the form (reuse .in /
-.btn / .check), a remember+forgot meta row (.auth__meta) and a footer link
+.btn / .checkbox), a remember+forgot meta row (.auth__meta) and a footer link
 (.auth__foot). Lightbox (.lightbox) — fullscreen image viewer with prev/next.
 
 **Mobile shell:**
@@ -563,7 +575,7 @@ values, or the user's UI drifts back out of alignment.
 
 | Surface | Reach for |
 |---|---|
-| Contact list | \`.tbl\` (table) or \`.list\` rows |
+| Contact list | \`.table\` (table) or \`.list\` rows |
 | Pipeline / stages | \`.kanban\` board |
 | Deal detail (fields) | \`.dl\` (description list) |
 | Activity history | \`.timeline\` |
@@ -587,7 +599,7 @@ values, or the user's UI drifts back out of alignment.
 **Row collections = exactly TWO systems (lists are the #1 place UIs drift).**
 There is no third row vocabulary — settings rows and notification feeds are LIST
 variants, not their own components.
-1. **TABLE** (\`.tbl\`) — columns to scan / sort / compare / multi-select / paginate
+1. **TABLE** (\`.table\`) — columns to scan / sort / compare / multi-select / paginate
    many homogeneous records. Rows use a hairline \`border-b\` + hover (not zebra);
    sortable headers, and the \`.datatable\` chrome (bordered frame + toolbar/bulk-bar
    + sticky header + scroll).
@@ -662,13 +674,13 @@ headless lib sets them for you; if you hand-roll, this is the checklist):
 | Menu / dropdown / context (.menu) | trigger \`aria-haspopup="menu"\` + \`aria-expanded\`; \`role="menu"\` + items \`role="menuitem"\`; roving tabindex |
 | Combobox / command (.combobox/.cmdp) | input \`role="combobox"\` + \`aria-expanded\` + \`aria-controls\` + \`aria-activedescendant\`; list \`role="listbox"\`, options \`role="option"\` + \`aria-selected\` |
 | Select trigger (.select-trigger) | \`aria-haspopup="listbox"\` + \`aria-expanded\`; the panel is a listbox |
-| Tooltip (.tt) | trigger \`aria-describedby="\<tipId\>"\`; tip \`role="tooltip"\` |
+| Tooltip (.tooltip) | trigger \`aria-describedby="\<tipId\>"\`; tip \`role="tooltip"\` |
 | Popover / hover-card (.popover) | trigger \`aria-expanded\` + \`aria-controls\`; panel \`role="dialog"\` if interactive |
 | Switch / toggle (.toggle) | \`role="switch"\` + \`aria-checked\` + an accessible NAME (wrap in \`<label>\`, or \`aria-label\`/\`aria-labelledby\`) + \`tabindex="0"\` if not a \`<button>\` |
 | Slider (.slider) | \`role="slider"\` + \`aria-valuemin/max/now\` + \`aria-label\` |
 | Progress (.progress/.usage) | \`role="progressbar"\` + \`aria-valuenow/min/max\` + an accessible NAME (\`aria-label\`/\`aria-labelledby\`) |
 | OTP (.otp) | group \`role="group"\` + \`aria-label\`; each slot \`aria-label="Digit N of M"\` |
-| Sortable table header (.tbl th) | \`aria-sort="ascending"\|"descending"\|"none"\` |
+| Sortable table header (.table th) | \`aria-sort="ascending"\|"descending"\|"none"\` |
 | Toast / status (.toast-stack) | \`role="status"\` (polite) or \`role="alert"\` (assertive) + \`aria-live\` |
 | Resize handle (.resizable__handle) | \`role="separator"\` + \`tabindex="0"\` + \`aria-valuenow\` (a FOCUSABLE separator is a widget and needs a value) + \`aria-label\` |
 | Any scrollable box (\`overflow:auto\`) | \`tabindex="0"\` + \`role="region"\` + \`aria-label\` — without it a keyboard cannot scroll it at all (WCAG 2.1.1) |

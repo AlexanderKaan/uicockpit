@@ -20,7 +20,7 @@ export const CLASS_MAP: Array<[string, string]> = [
   // tier (the walk UP returns the deepest match).
   ['stat-tile', 'stat'],
   ['toggle', 'switch'],
-  ['tbl', 'table'],
+  ['table', 'table'],
   ['chip', 'chip'],
   ['badge', 'badge'],
   ['avatar', 'avatar'],

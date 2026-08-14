@@ -571,7 +571,7 @@ function FieldsetCard() {
         <legend className="fieldset__legend">How should we contact you?</legend>
         <p className="fieldset__hint">We will only use this for order updates.</p>
         {['Email', 'Text message', 'Phone call'].map((o) => (
-          <label key={o} className="check">
+          <label key={o} className="checkbox">
             <input type="radio" name="contact-pref" defaultChecked={o === 'Email'} />
             {o}
           </label>
@@ -812,10 +812,10 @@ function SelectionCard() {
         <input type="radio" name="repo-vis" /> Private — you choose who
       </label>
       <div style={{ borderTop: 'var(--k-divider)', margin: '4px 0 2px' }} />
-      <label className="check">
+      <label className="checkbox">
         <input type="checkbox" defaultChecked /> Add a README
       </label>
-      <label className="check">
+      <label className="checkbox">
         <input type="checkbox" /> Include .gitignore
       </label>
       <div className="card__foot">
@@ -933,21 +933,21 @@ function TableCard() {
   }
   return (
     <Card wide title="System health" desc="Status of your core services.">
-      <table className="tbl">
+      <table className="table">
         <thead>
           <tr>
             <th className={`is-sortable ${sortKey === 'name' ? 'is-active' : ''}`} onClick={() => toggle('name')}>
-              <span className="tbl__sort">
+              <span className="table__sort">
                 Name
-                <span className="tbl__sort-chevron" style={{ transform: sortKey === 'name' && sortDir === 'desc' ? 'rotate(180deg)' : 'none' }}>
+                <span className="table__sort-chevron" style={{ transform: sortKey === 'name' && sortDir === 'desc' ? 'rotate(180deg)' : 'none' }}>
                   <ChevronSvg size={12} />
                 </span>
               </span>
             </th>
             <th className={`is-sortable ${sortKey === 'status' ? 'is-active' : ''}`} onClick={() => toggle('status')}>
-              <span className="tbl__sort">
+              <span className="table__sort">
                 Status
-                <span className="tbl__sort-chevron" style={{ transform: sortKey === 'status' && sortDir === 'desc' ? 'rotate(180deg)' : 'none' }}>
+                <span className="table__sort-chevron" style={{ transform: sortKey === 'status' && sortDir === 'desc' ? 'rotate(180deg)' : 'none' }}>
                   <ChevronSvg size={12} />
                 </span>
               </span>
@@ -979,8 +979,8 @@ function TooltipCard() {
   return (
     <Card title="Last sync" desc="Hover the status — four static placements.">
       <div className="card__row" style={{ paddingTop: 20 }}>
-        <span className="tt">
-          <span className="tt__pop" role="tooltip" id="tt-lastsync">Saved 2 min ago</span>
+        <span className="tooltip">
+          <span className="tooltip__pop" role="tooltip" id="tt-lastsync">Saved 2 min ago</span>
           <button className="btn btn--ghost btn--sm" aria-describedby="tt-lastsync">
             <Icon name="info" /> Status
           </button>
@@ -990,8 +990,8 @@ function TooltipCard() {
           pick the side that clears the edge. */}
       <div className="card__row" style={{ justifyContent: 'center', gap: 'var(--k-s-16)', padding: 'var(--k-s-16) 0' }}>
         {([['', 'Top'], ['tt__pop--bottom', 'Bottom'], ['tt__pop--left', 'Left'], ['tt__pop--right', 'Right']] as const).map(([mod, lbl]) => (
-          <span className="tt" key={lbl}>
-            <span className={`tt__pop ${mod}`} role="tooltip">On the {lbl.toLowerCase()}</span>
+          <span className="tooltip" key={lbl}>
+            <span className={`tooltip__pop ${mod}`} role="tooltip">On the {lbl.toLowerCase()}</span>
             <button className="btn btn--ghost btn--sm" tabIndex={-1}>{lbl}</button>
           </span>
         ))}
@@ -1559,10 +1559,10 @@ function DataTableProCard() {
           )}
         </div>
         <div className="datatable__body">
-          <table className="tbl">
+          <table className="table">
             <thead>
               <tr>
-                <th className="datatable__check"><label className="check"><input type="checkbox" checked={allOn} ref={(el) => { if (el) el.indeterminate = sel.size > 0 && !allOn }} onChange={toggleAll} aria-label="Select all services" disabled={!hasRows} /></label></th>
+                <th className="datatable__check"><label className="checkbox"><input type="checkbox" checked={allOn} ref={(el) => { if (el) el.indeterminate = sel.size > 0 && !allOn }} onChange={toggleAll} aria-label="Select all services" disabled={!hasRows} /></label></th>
                 <th>Service</th>
                 <th>Owner</th>
                 <th className="num">Requests</th>
@@ -1601,7 +1601,7 @@ function DataTableProCard() {
               ) : (
                 rows.map((r) => (
                   <tr key={r.id} aria-selected={sel.has(r.id)}>
-                    <td className="datatable__check"><label className="check"><input type="checkbox" checked={sel.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`} /></label></td>
+                    <td className="datatable__check"><label className="checkbox"><input type="checkbox" checked={sel.has(r.id)} onChange={() => toggle(r.id)} aria-label={`Select ${r.name}`} /></label></td>
                     <td><span className="truncate" style={{ fontWeight: 500 }}>{r.name}</span></td>
                     <td style={{ color: 'var(--k-fg-muted)' }}>{r.owner}</td>
                     <td className="num">{r.req.toLocaleString()}</td>
@@ -2310,9 +2310,9 @@ function SheetCard() {
                 </button>
               </div>
               <div className="sheet__body">
-                <label className="check"><input type="checkbox" defaultChecked /> Open</label>
-                <label className="check"><input type="checkbox" /> In review</label>
-                <label className="check"><input type="checkbox" /> Closed</label>
+                <label className="checkbox"><input type="checkbox" defaultChecked /> Open</label>
+                <label className="checkbox"><input type="checkbox" /> In review</label>
+                <label className="checkbox"><input type="checkbox" /> Closed</label>
               </div>
               <div className="sheet__foot">
                 <button className="btn btn--ghost btn--sm" onClick={() => setOpen(false)}>Cancel</button>
@@ -2731,7 +2731,7 @@ function LoginCard() {
         <label className="lab" htmlFor="form-email"><span>Email</span><input id="form-email" className="in" type="email" defaultValue="ava@supadash.io" /></label>
         <label className="lab" htmlFor="form-password"><span>Password</span><input id="form-password" className="in" type="password" defaultValue="supersecret" /></label>
         <div className="auth__meta">
-          <label className="check" style={{ gap: 6 }}><input type="checkbox" defaultChecked /> Remember me</label>
+          <label className="checkbox" style={{ gap: 6 }}><input type="checkbox" defaultChecked /> Remember me</label>
           <button type="button" className="auth__link">Forgot password?</button>
         </div>
         <button className="btn btn--primary btn--block">Sign in</button>
@@ -2777,7 +2777,7 @@ function SignupCard() {
             <span className="pwinput__label">{strength <= 0 ? 'Too short' : strength === 1 ? 'Weak' : strength === 2 ? 'Fair' : 'Strong'}</span>
           </div>
         </div>
-        <label className="check" style={{ gap: 6, alignItems: 'flex-start' }}>
+        <label className="checkbox" style={{ gap: 6, alignItems: 'flex-start' }}>
           <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
           <span>I agree to the <button type="button" className="auth__link">Terms</button> &amp; <button type="button" className="auth__link">Privacy Policy</button></span>
         </label>
@@ -3232,9 +3232,9 @@ function CalendarRangeCard() {
 // === Table variants (Tailwind App-UI: grouped · summary · condensed · responsive) ===
 
 function GroupedTableCard() {
-  // Grouped rows + a summary footer + condensed density — three .tbl features at
-  // once. .tbl__group rows segment the body by team; <tfoot> totals the seats;
-  // .tbl--condensed tightens the rhythm.
+  // Grouped rows + a summary footer + condensed density — three .table features at
+  // once. .table__group rows segment the body by team; <tfoot> totals the seats;
+  // .table--condensed tightens the rhythm.
   const GROUPS = [
     { team: 'Design', rows: [['Mara Vidic', 'Lead', 3], ['Tom Healy', 'Product', 2]] },
     { team: 'Engineering', rows: [['Priya Rao', 'Staff', 5], ['Jonas Ek', 'Senior', 4], ['Lin Yu', 'Mid', 2]] },
@@ -3242,17 +3242,17 @@ function GroupedTableCard() {
   const total = GROUPS.flatMap((g) => g.rows).reduce((s, r) => s + (r[2] as number), 0)
   return (
     <Card title="Team roster" desc="Grouped rows, a summary total, condensed density.">
-      <table className="tbl tbl--condensed">
+      <table className="table table--condensed">
         <thead>
           <tr><th>Member</th><th>Role</th><th className="num">Seats</th></tr>
         </thead>
         <tbody>
           {GROUPS.map((g) => (
             <Fragment key={g.team}>
-              <tr className="tbl__group"><td colSpan={3}>{g.team}</td></tr>
+              <tr className="table__group"><td colSpan={3}>{g.team}</td></tr>
               {g.rows.map((r) => (
                 <tr key={r[0] as string}>
-                  <td className="tbl__name">{r[0]}</td>
+                  <td className="table__name">{r[0]}</td>
                   <td>{r[1]}</td>
                   <td className="num">{r[2]}</td>
                 </tr>
@@ -3269,9 +3269,9 @@ function GroupedTableCard() {
 }
 
 function ResponsiveTableCard() {
-  // Responsive table: .tbl-responsive (a size container) + .tbl--stack. Below the
+  // Responsive table: .table-responsive (a size container) + .table--stack. Below the
   // stack breakpoint each row reflows to a label/value card (cells read their
-  // header from data-label); the "Method" column is .tbl__col--optional and drops
+  // header from data-label); the "Method" column is .table__col--optional and drops
   // a step earlier. In the narrow gallery tile this shows the stacked form.
   const ROWS = [
     { id: 'INV-2043', amount: '$1,200.00', method: 'Card', status: 'Paid' },
@@ -3280,22 +3280,22 @@ function ResponsiveTableCard() {
   ]
   return (
     <Card title="Invoices" desc="Responsive — rows reflow to label/value cards when narrow.">
-      <div className="tbl-responsive">
-        <table className="tbl tbl--stack">
+      <div className="table-responsive">
+        <table className="table table--stack">
           <thead>
             <tr>
               <th>Invoice</th>
               <th className="num">Amount</th>
-              <th className="tbl__col--optional">Method</th>
+              <th className="table__col--optional">Method</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {ROWS.map((r) => (
               <tr key={r.id}>
-                <td data-label="Invoice" className="tbl__name">{r.id}</td>
+                <td data-label="Invoice" className="table__name">{r.id}</td>
                 <td data-label="Amount" className="num">{r.amount}</td>
-                <td data-label="Method" className="tbl__col--optional">{r.method}</td>
+                <td data-label="Method" className="table__col--optional">{r.method}</td>
                 <td data-label="Status">
                   <span className={`badge ${r.status === 'Paid' ? 'badge--success' : 'badge--warn'}`}>{r.status}</span>
                 </td>
@@ -3309,7 +3309,7 @@ function ResponsiveTableCard() {
 }
 
 function CardTableCard() {
-  // Card-framed table: .tbl--card flips the atom to separate borders with
+  // Card-framed table: .table--card flips the atom to separate borders with
   // inset-shadow dividers + a rounded bordered frame + a sticky opaque header,
   // so a STANDALONE table can be sticky/rounded without the borders vanishing on
   // scroll. Wrapped in a max-height scroll well to engage the sticky thead. The
@@ -3325,7 +3325,7 @@ function CardTableCard() {
   return (
     <Card title="Files" desc="Card-framed — rounded frame, sticky header, scrolls.">
       <div style={{ maxHeight: '12rem', overflow: 'auto' }} tabIndex={0} role="region" aria-label="Scrollable list">
-        <table className="tbl tbl--card">
+        <table className="table table--card">
           <thead>
             <tr>
               <th>File</th>
@@ -3349,9 +3349,9 @@ function CardTableCard() {
 }
 
 function FrozenColumnTableCard() {
-  // Frozen first column (.tbl__col--frozen) on a spreadsheet-shaped wide table:
+  // Frozen first column (.table__col--frozen) on a spreadsheet-shaped wide table:
   // the Metric column pins while the month columns scroll horizontally, so row
-  // identity never gets lost. Built on .tbl--card (separate borders) so the
+  // identity never gets lost. Built on .table--card (separate borders) so the
   // sticky cell keeps its background + divider; the reveal shadow shows there's
   // more to the right. Interactive rows clear the I4 hit-target floor.
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug']
@@ -3364,17 +3364,17 @@ function FrozenColumnTableCard() {
   return (
     <Card title="Metrics" desc="Frozen first column — the Metric pins while months scroll.">
       <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Scrollable table">
-        <table className="tbl tbl--card" style={{ minWidth: '32rem' }}>
+        <table className="table table--card" style={{ minWidth: '32rem' }}>
           <thead>
             <tr>
-              <th className="tbl__col--frozen">Metric</th>
+              <th className="table__col--frozen">Metric</th>
               {MONTHS.map((m) => (<th key={m} className="num">{m}</th>))}
             </tr>
           </thead>
           <tbody>
             {ROWS.map((r) => (
               <tr key={r.metric}>
-                <th className="tbl__col--frozen tbl__name" style={{ textAlign: 'left' }}>{r.metric}</th>
+                <th className="table__col--frozen table__name" style={{ textAlign: 'left' }}>{r.metric}</th>
                 {r.vals.map((v, i) => (<td key={i} className="num">{v}</td>))}
               </tr>
             ))}

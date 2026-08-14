@@ -164,7 +164,7 @@ function FilterTable<T extends { status: string }>({
         </div>
       </div>
       <div className="datatable__body">
-        <table className="tbl">
+        <table className="table">
           <thead>{head}</thead>
           <tbody>{visible.map(row)}</tbody>
         </table>
@@ -594,7 +594,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                       {s.toLines.map((l) => <span key={l} style={muted}>{l}</span>)}
                     </div>
                   </div>
-                  <table className="tbl">
+                  <table className="table">
                     <thead><tr><th>Project</th><th className="num">Hours</th><th className="num">Rate</th><th className="num">Price</th></tr></thead>
                     <tbody>
                       {s.items.map((it) => (
@@ -781,10 +781,10 @@ export function renderSection(spec: SectionSpec, key: number) {
           <FilterTable
             filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
             ariaLabel="Filter invoices" searchLabel="Search invoices"
-            head={<tr><th className="tbl__col--frozen">Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
+            head={<tr><th className="table__col--frozen">Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
             row={(r) => (
               <tr key={r.number}>
-                <td className="tbl__col--frozen"><div style={{ fontWeight: med }}>#{r.number}</div><div style={muted}>{r.project}</div></td>
+                <td className="table__col--frozen"><div style={{ fontWeight: med }}>#{r.number}</div><div style={muted}>{r.project}</div></td>
                 <td>
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
                     <BrandLogo id={r.clientLogo} size={28} />
@@ -828,10 +828,10 @@ export function renderSection(spec: SectionSpec, key: number) {
           <FilterTable
             filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
             ariaLabel="Filter clients" searchLabel="Search clients"
-            head={<tr><th className="tbl__col--frozen">Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th><th aria-label="Actions" /></tr>}
+            head={<tr><th className="table__col--frozen">Client</th><th>Contact</th><th className="num">Billed</th><th className="num">Outstanding</th><th>Status</th><th aria-label="Actions" /></tr>}
             row={(r) => (
               <tr key={r.company}>
-                <td className="tbl__col--frozen">
+                <td className="table__col--frozen">
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
                     <BrandLogo id={r.logo} size={28} />
                     <span style={{ fontWeight: med }}>{r.company}</span>
@@ -894,10 +894,10 @@ export function renderSection(spec: SectionSpec, key: number) {
           <FilterTable
             filters={s.filters} activeInit={s.activeFilter} rows={s.rows}
             ariaLabel="Filter expenses" searchLabel="Search expenses"
-            head={<tr><th className="tbl__col--frozen">Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
+            head={<tr><th className="table__col--frozen">Vendor</th><th>Category</th><th>Date</th><th className="num">Amount</th><th>Status</th><th aria-label="Actions" /></tr>}
             row={(r) => (
               <tr key={r.vendor + r.date}>
-                <td className="tbl__col--frozen">
+                <td className="table__col--frozen">
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}>
                     <BrandLogo id={r.logo} size={28} />
                     <span style={{ fontWeight: med }}>{r.vendor}</span>
@@ -940,7 +940,7 @@ export function renderSection(spec: SectionSpec, key: number) {
       return (
         <div className="card" key={key}>
           {spec.seed.title && <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>}
-          <table className="tbl">
+          <table className="table">
             <thead>
               <tr>{spec.seed.columns.map((c, j) => {
                 const cls = [spec.seed.numericCols?.includes(j) && 'num', spec.seed.sortableCols?.includes(j) && 'is-sortable'].filter(Boolean).join(' ')

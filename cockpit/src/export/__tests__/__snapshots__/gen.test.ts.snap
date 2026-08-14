@@ -1556,7 +1556,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "item"
         ]
       },
-      "check": {
+      "checkbox": {
         "modifiers": [],
         "parts": []
       },
@@ -2575,6 +2575,27 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "badge"
         ]
       },
+      "table": {
+        "modifiers": [
+          "card",
+          "condensed",
+          "frozen",
+          "optional",
+          "stack"
+        ],
+        "parts": [
+          "col",
+          "group",
+          "name",
+          "sort",
+          "sort-chevron",
+          "sub"
+        ]
+      },
+      "table-responsive": {
+        "modifiers": [],
+        "parts": []
+      },
       "tabs": {
         "modifiers": [],
         "parts": []
@@ -2598,27 +2619,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "name",
           "status"
         ]
-      },
-      "tbl": {
-        "modifiers": [
-          "card",
-          "condensed",
-          "frozen",
-          "optional",
-          "stack"
-        ],
-        "parts": [
-          "col",
-          "group",
-          "name",
-          "sort",
-          "sort-chevron",
-          "sub"
-        ]
-      },
-      "tbl-responsive": {
-        "modifiers": [],
-        "parts": []
       },
       "thread": {
         "modifiers": [],
@@ -2715,6 +2715,17 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "spacer"
         ]
       },
+      "tooltip": {
+        "modifiers": [
+          "always",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "parts": [
+          "pop"
+        ]
+      },
       "tree": {
         "modifiers": [
           "leaf",
@@ -2734,17 +2745,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "ts": {
         "modifiers": [],
         "parts": []
-      },
-      "tt": {
-        "modifiers": [
-          "always",
-          "bottom",
-          "left",
-          "right"
-        ],
-        "parts": [
-          "pop"
-        ]
       },
       "twocol": {
         "modifiers": [],
@@ -3961,7 +3961,7 @@ body {
 .segctrl__btn:focus-visible,
 .menu__item:focus-visible,
 .cmdp__item:focus-visible,
-.tbl__row:focus-visible,
+.table__row:focus-visible,
 .navrow:focus-visible,
 .accordion summary:focus-visible,
 .convo:focus-visible,
@@ -5068,7 +5068,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Error message — only render when the control is invalid; pairs with
  * aria-invalid="true" + aria-describedby on the control. */
 .field__error { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-danger-text); line-height: 1.4; }
-.check, .radio {
+.checkbox, .radio {
   display: inline-flex;
   align-items: center;
   gap: var(--k-s-10);
@@ -5079,7 +5079,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Custom checkbox + radio — appearance: none kills the platform UI, we draw
    our own 16px square/circle. Uses --k-input-border so it visually matches
    form inputs, and --k-primary for the checked state. */
-.check input[type="checkbox"], .radio input[type="radio"] {
+.checkbox input[type="checkbox"], .radio input[type="radio"] {
   appearance: none;
   -webkit-appearance: none;
   width: 16px;
@@ -5098,20 +5098,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* A checkbox is a slightly-rounded SQUARE, never a near-circle. Cap the corner
  * at 4px (≈ shadcn's 25% on a 16px box) so it still responds to Box radius
  * (0 at None) but never rounds off into radio-button territory at Soft/Round. */
-.check input[type="checkbox"] { border-radius: min(var(--k-radius-sm), 4px); }
+.checkbox input[type="checkbox"] { border-radius: min(var(--k-radius-sm), 4px); }
 .radio input[type="radio"]    { border-radius: 50%; }
-.check input[type="checkbox"]:hover,
+.checkbox input[type="checkbox"]:hover,
 .radio input[type="radio"]:hover { border-color: var(--k-fg-faint); }
-.check input[type="checkbox"]:focus-visible,
+.checkbox input[type="checkbox"]:focus-visible,
 .radio input[type="radio"]:focus-visible {
   outline: 2px solid var(--k-ring-soft);
   outline-offset: 1px;
 }
-.check input[type="checkbox"]:checked {
+.checkbox input[type="checkbox"]:checked {
   background: var(--k-primary);
   border-color: var(--k-primary);
 }
-.check input[type="checkbox"]:checked::after {
+.checkbox input[type="checkbox"]:checked::after {
   content: '';
   /* Absolute so the checkmark is OUT of flow — an in-flow grid item shifts the
      box's baseline by ~1.5px the moment it appears, making the checkbox visibly
@@ -5129,11 +5129,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Indeterminate — the "some-but-not-all selected" state (set via the .indeterminate
  * DOM property in JS; there is no HTML attribute). Filled like :checked but with a
  * horizontal dash instead of the tick — the standard table select-all glyph. */
-.check input[type="checkbox"]:indeterminate {
+.checkbox input[type="checkbox"]:indeterminate {
   background: var(--k-primary);
   border-color: var(--k-primary);
 }
-.check input[type="checkbox"]:indeterminate::after {
+.checkbox input[type="checkbox"]:indeterminate::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -5145,7 +5145,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 /* Disabled checkbox/radio — muted + not-allowed, the :checked tick still shows
  * (a disabled-but-checked row reads as "locked on", not empty). */
-.check input:disabled,
+.checkbox input:disabled,
 .radio input:disabled {
   opacity: var(--k-disabled-opacity, 0.55);
   cursor: not-allowed;
@@ -5413,94 +5413,94 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tab--on .tab__badge { background: var(--k-primary-soft); color: var(--k-primary-soft-fg); }
 
 /* === Table === */
-.tbl { width: 100%; border-collapse: collapse; font-size: var(--k-type-body); }
-.tbl th, .tbl td {
+.table { width: 100%; border-collapse: collapse; font-size: var(--k-type-body); }
+.table th, .table td {
   /* Cell padding scales with density — Compact / Default / Comfortable via --k-space */
   padding: calc(var(--k-space, 10px) * 0.55) calc(var(--k-space, 10px) * 0.65);
   text-align: left;
 }
-.tbl thead { color: var(--k-fg-muted); font-weight: var(--k-weight-semibold); font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
-.tbl tbody tr { border-top: var(--k-divider); }
-.tbl tbody tr:hover { background: var(--k-state-hover); }
+.table thead { color: var(--k-fg-muted); font-weight: var(--k-weight-semibold); font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
+.table tbody tr { border-top: var(--k-divider); }
+.table tbody tr:hover { background: var(--k-state-hover); }
 /* Press state (B1) — a clickable row gives a tactile "pressed" confirm on
  * :active (the stronger --k-state-press wash, a notch above hover). Harmless on
  * non-interactive tables: it only fires for the instant a row is held down. */
-.tbl tbody tr:active { background: var(--k-state-press); }
+.table tbody tr:active { background: var(--k-state-press); }
 /* Row selected (user checked a row / picked it) — follows the Selection
  * accent toggle: brand-soft when Brand, neutral surface when Neutral. */
-.tbl tbody tr.is-selected,
-.tbl tbody tr[aria-selected="true"] {
+.table tbody tr.is-selected,
+.table tbody tr[aria-selected="true"] {
   background: var(--k-state-selected-bg, var(--k-primary-soft));
 }
-.tbl tbody tr.is-selected:hover,
-.tbl tbody tr[aria-selected="true"]:hover {
+.table tbody tr.is-selected:hover,
+.table tbody tr[aria-selected="true"]:hover {
   background: var(--k-state-selected-bg, var(--k-primary-soft));
   filter: brightness(0.98);
 }
 
 /* Sortable column header — chevrons indicate sort state */
-.tbl th.is-sortable {
+.table th.is-sortable {
   cursor: pointer;
   user-select: none;
 }
-.tbl th.is-sortable:hover { color: var(--k-fg); }
-.tbl th.is-sortable:focus-visible {
+.table th.is-sortable:hover { color: var(--k-fg); }
+.table th.is-sortable:focus-visible {
   outline: var(--k-focus-ring-width) solid var(--k-ring);
   outline-offset: -2px;
 }
-.tbl__sort {
+.table__sort {
   display: inline-flex;
   align-items: center;
   gap: var(--k-s-4);
 }
-.tbl__sort-chevron {
+.table__sort-chevron {
   display: inline-flex;
   color: var(--k-fg-faint);
   transition: color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
-.is-sortable.is-active .tbl__sort-chevron { color: var(--k-primary-text); }
+.is-sortable.is-active .table__sort-chevron { color: var(--k-primary-text); }
 
 /* Two-line cell (B★5) — the canonical "primary name + secondary meta" stack
    inside a table cell (issue key · type · points, file · size, user · email).
    Was hand-rolled per-table with inline styles; now a kit pattern so the meta
    hierarchy is consistent: name = near-black --k-fg, meta = the FAINT tier (one
    step below muted) so the sub-line recedes cleanly behind the name. */
-.tbl__name { font-weight: var(--k-weight-medium); color: var(--k-fg); }
-.tbl__sub { font-size: var(--k-type-small); color: var(--k-fg-faint); margin-top: 1px; }
+.table__name { font-weight: var(--k-weight-medium); color: var(--k-fg); }
+.table__sub { font-size: var(--k-type-small); color: var(--k-fg-faint); margin-top: 1px; }
 /* Numeric column (CP3 — the Attio/Linear "dense but calm" data signature). Value
    columns (money, counts, %) right-align and use TABULAR figures so digits line
    up in a column and the eye scans magnitudes straight down the stack — the
-   pro-data-table move every left-aligned table misses. On the .tbl ATOM (was
+   pro-data-table move every left-aligned table misses. On the .table ATOM (was
    scoped to the .datatable block) so EVERY table earns it, not just the flagship.
    Apply the num class to BOTH the column's th and its td. */
-.tbl th.num, .tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
-/* Tables are restrained shadcn-style: per-row border-top (base .tbl) + hover,
+.table th.num, .table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+/* Tables are restrained shadcn-style: per-row border-top (base .table) + hover,
    no zebra striping. The zebra modifier was dropped — the base row treatment
    already reads cleanly and zebra added visual noise to dense data.
 
    The data-table BLOCK (bordered frame + toolbar + selection + footer +
    empty/loading/error states) is its own segment — see the "Data table" recipe,
-   which composes this .tbl atom. */
+   which composes this .table atom. */
 
 /* --- Grouped rows (Tailwind "with grouped rows") -------------------------
    A subheader <tr> that segments the body into labelled groups (by team, date,
-   status…). Drop a .tbl__group row before each run of member rows; give its one
+   status…). Drop a .table__group row before each run of member rows; give its one
    full-span <td> the colSpan. Reads as a quiet sunken band — eyebrow type, no
    hover lift — so the groups structure the table without competing with data. */
-.tbl tr.tbl__group > * {
+.table tr.table__group > * {
   background: var(--k-surface-sunken);
   font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow);
   font-weight: var(--k-weight-semibold); color: var(--k-fg-muted);
   padding-top: var(--k-s-6); padding-bottom: var(--k-s-6);
 }
-.tbl tr.tbl__group { border-top: var(--k-divider); }
-.tbl tr.tbl__group:hover > * { background: var(--k-surface-sunken); }
+.table tr.table__group { border-top: var(--k-divider); }
+.table tr.table__group:hover > * { background: var(--k-surface-sunken); }
 
 /* --- Summary / total row (Tailwind "with summary row") -------------------
    A <tfoot> totals line: a heavier top rule sets it off from the body and the
    figures go semibold. Pair the number cells with .num so the totals align under
    their columns. No hover (tfoot is outside tbody's hover rule). */
-.tbl tfoot td, .tbl tfoot th {
+.table tfoot td, .table tfoot th {
   border-top: 2px solid var(--k-border);
   font-weight: var(--k-weight-semibold); color: var(--k-fg);
 }
@@ -5509,8 +5509,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    A tighter row rhythm for data-dense tables (admin grids, financials). Still
    density-aware — the cell padding stays a fraction of --k-space, just a smaller
    one — and the type drops to the small tier. */
-.tbl--condensed { font-size: var(--k-type-small); }
-.tbl--condensed th, .tbl--condensed td { padding: calc(var(--k-space, 10px) * 0.32) calc(var(--k-space, 10px) * 0.5); }
+.table--condensed { font-size: var(--k-type-small); }
+.table--condensed th, .table--condensed td { padding: calc(var(--k-space, 10px) * 0.32) calc(var(--k-space, 10px) * 0.5); }
 
 /* --- Truncation utility (.truncate) — the TEXT-SLOT role's guarantee --------
    A GLOBAL single-line clamp for any long unbreakable value (name, path, title)
@@ -5519,71 +5519,71 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    with a title attr for the full value; --k-col-max overrides the per-slot cap. */
 .truncate { display: block; max-width: var(--k-col-max, 24ch); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* --- Card-framed table (.tbl--card) ---------------------------------------
-   The bare .tbl uses border-collapse:collapse + per-row border-top — right for
+/* --- Card-framed table (.table--card) ---------------------------------------
+   The bare .table uses border-collapse:collapse + per-row border-top — right for
    a flush list, but collapsed borders belong to the GRID, not the cell box, so
    they VANISH under sticky cells and bleed past a rounded clip (confirmed
-   FF/WebKit). .tbl--card is the primitive for a STANDALONE sticky/rounded
+   FF/WebKit). .table--card is the primitive for a STANDALONE sticky/rounded
    table: separate borders, dividers drawn as inset box-shadow (they paint on
    the cell box → travel with a sticky cell + clip to the radius), a rounded
    bordered frame, a sticky opaque header, and the last row dropping its divider
    so the grid meets the curve clean. (The .datatable BLOCK builds on the same
    idea; this is the atom-level version for a table used bare.) Wrap in a
    max-height + overflow:auto container to engage the sticky header on scroll. */
-.tbl--card { border-collapse: separate; border-spacing: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius-lg); overflow: hidden; }
-.tbl--card thead th { position: sticky; top: 0; z-index: 1; background: var(--k-surface); box-shadow: inset 0 -1px 0 var(--k-border); }
-.tbl--card tbody tr { border-top: 0; }
-.tbl--card tbody tr + tr td, .tbl--card tbody tr + tr th { box-shadow: inset 0 1px 0 var(--k-border); }
+.table--card { border-collapse: separate; border-spacing: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius-lg); overflow: hidden; }
+.table--card thead th { position: sticky; top: 0; z-index: 1; background: var(--k-surface); box-shadow: inset 0 -1px 0 var(--k-border); }
+.table--card tbody tr { border-top: 0; }
+.table--card tbody tr + tr td, .table--card tbody tr + tr th { box-shadow: inset 0 1px 0 var(--k-border); }
 
 /* --- Hit-target floor (Invariant I4) --------------------------------------
    An INTERACTIVE row (one holding a checkbox, button or link) must clear the
    WCAG-2.2 24px target even at Compact density. :has() floors ONLY those rows,
    so a dense read-only table stays tight — the guard never fights density where
    it isn't needed. */
-.tbl tbody tr:has(input, button, a, [role="button"]) td { min-block-size: var(--k-hit-min); }
+.table tbody tr:has(input, button, a, [role="button"]) td { min-block-size: var(--k-hit-min); }
 
-/* --- Frozen first column (.tbl__col--frozen) ------------------------------
+/* --- Frozen first column (.table__col--frozen) ------------------------------
    Spreadsheet-shaped wide tables: pin the first column so row identity (name /
    id) survives horizontal scroll. Mark the first th AND every first td with
-   .tbl__col--frozen and wrap the table in an overflow-x:auto container. Needs
-   .tbl--card (separate borders) so the sticky cell keeps its opaque background
+   .table__col--frozen and wrap the table in an overflow-x:auto container. Needs
+   .table--card (separate borders) so the sticky cell keeps its opaque background
    and dividers — collapsed borders vanish under a sticky cell. A one-sided
    shadow reveals that there's more to the right. */
-.tbl__col--frozen { position: sticky; left: 0; z-index: 1; background: var(--k-surface); }
-.tbl thead .tbl__col--frozen { z-index: 2; }
-.tbl--card .tbl__col--frozen::after {
+.table__col--frozen { position: sticky; left: 0; z-index: 1; background: var(--k-surface); }
+.table thead .table__col--frozen { z-index: 2; }
+.table--card .table__col--frozen::after {
   content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: var(--k-s-16);
   transform: translateX(100%); pointer-events: none;
   box-shadow: inset var(--k-s-12) 0 var(--k-s-8) calc(var(--k-s-10) * -1) rgb(0 0 0 / 0.12);
 }
 
 /* --- Responsive (Tailwind "hidden columns" + "stacked on mobile") --------
-   Wrap a table in .tbl-responsive (a size container, so it adapts to its own
+   Wrap a table in .table-responsive (a size container, so it adapts to its own
    width, not the viewport). Two levers:
-     .tbl__col--optional  drop non-essential columns under a narrow host (mark
+     .table__col--optional  drop non-essential columns under a narrow host (mark
                           BOTH the th and every matching td).
-     .tbl--stack          go further: below the stack breakpoint each row reflows
+     .table--stack          go further: below the stack breakpoint each row reflows
                           to a label/value card — the header is visually hidden and
                           each cell shows its column name from data-label. */
-.tbl-responsive { container-type: inline-size; width: 100%; overflow-x: auto; }
+.table-responsive { container-type: inline-size; width: 100%; overflow-x: auto; }
 @container (max-width: 34rem) {
-  .tbl-responsive .tbl__col--optional { display: none; }
+  .table-responsive .table__col--optional { display: none; }
 }
 @container (max-width: 26rem) {
-  .tbl-responsive .tbl--stack thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  .tbl-responsive .tbl--stack tbody tr { display: block; border: 1px solid var(--k-border); border-radius: var(--k-radius-md); padding: var(--k-s-4); margin-bottom: var(--k-s-8); }
-  .tbl-responsive .tbl--stack tbody tr:hover { background: transparent; }
-  .tbl-responsive .tbl--stack tbody td { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); padding: var(--k-s-4) var(--k-s-6); text-align: right; border: 0; }
-  .tbl-responsive .tbl--stack tbody td::before { content: attr(data-label); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); text-align: left; text-transform: none; letter-spacing: normal; }
+  .table-responsive .table--stack thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .table-responsive .table--stack tbody tr { display: block; border: 1px solid var(--k-border); border-radius: var(--k-radius-md); padding: var(--k-s-4); margin-bottom: var(--k-s-8); }
+  .table-responsive .table--stack tbody tr:hover { background: transparent; }
+  .table-responsive .table--stack tbody td { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); padding: var(--k-s-4) var(--k-s-6); text-align: right; border: 0; }
+  .table-responsive .table--stack tbody td::before { content: attr(data-label); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); text-align: left; text-transform: none; letter-spacing: normal; }
   /* optional columns stay dropped in the stacked form too (higher specificity
      than the stacked-td display rule above, so they don't reappear as rows). */
-  .tbl-responsive .tbl--stack .tbl__col--optional { display: none; }
+  .table-responsive .table--stack .table__col--optional { display: none; }
 }
 
 /* === Data table ===
-   The flagship BLOCK: a bordered frame that wraps the .tbl atom into a complete,
+   The flagship BLOCK: a bordered frame that wraps the .table atom into a complete,
    believable data surface — matrix-complete across every state real data hits.
-   It COMPOSES atoms (.toolbar · .tbl · .select / .select-trigger · .pagination),
+   It COMPOSES atoms (.toolbar · .table · .select / .select-trigger · .pagination),
    so the whole surface is rebuildable from the kit, not a one-off.
 
    Anatomy
@@ -5592,7 +5592,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
          .datatable__bar--active      filters / actions); swaps to the bulk-action
                                       bar when rows are selected
        .datatable__body               scroll well (sticky thead)
-         table.tbl                    the table atom
+         table.table                    the table atom
          .datatable__state            centered slot for EMPTY / LOADING / ERROR
        .datatable__foot               footer band — row count · rows-per-page
                                       .select · .pagination
@@ -5630,28 +5630,28 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    universal mobile-table affordance (the toolbar stacks separately below). */
 @container datatable (max-width: 40rem) {
   .datatable--page .datatable__body { overflow-x: auto; }
-  .datatable--page .tbl { min-width: 34rem; }
+  .datatable--page .table { min-width: 34rem; }
   /* When the body scrolls, a frozen first column keeps row identity in view.
      The seam is scoped HERE (not on the base) so a full-width desktop table
      doesn't grow a lone vertical divider on column one. */
-  .datatable--page .tbl__col--frozen { box-shadow: 1px 0 0 var(--k-border); }
+  .datatable--page .table__col--frozen { box-shadow: 1px 0 0 var(--k-border); }
   /* The header cell also pins; stack its bottom divider WITH the seam (the
      sticky-thead rule below would otherwise replace the seam with just the divider). */
-  .datatable--page .tbl thead .tbl__col--frozen { box-shadow: inset 0 -1px 0 var(--k-border), 1px 0 0 var(--k-border); }
+  .datatable--page .table thead .table__col--frozen { box-shadow: inset 0 -1px 0 var(--k-border), 1px 0 0 var(--k-border); }
 }
-.datatable .tbl thead th {
+.datatable .table thead th {
   position: sticky; top: 0; z-index: 1;
   background: var(--k-surface);
   box-shadow: inset 0 -1px 0 0 var(--k-border);
 }
-.datatable .tbl td:first-child, .datatable .tbl th:first-child { padding-left: var(--k-s-12); }
-.datatable .tbl td:last-child, .datatable .tbl th:last-child { padding-right: var(--k-s-12); }
+.datatable .table td:first-child, .datatable .table th:first-child { padding-left: var(--k-s-12); }
+.datatable .table td:last-child, .datatable .table th:last-child { padding-right: var(--k-s-12); }
 
 /* Selection cell — checkbox column, fixed narrow width. */
 .datatable__check { width: 36px; }
 
 /* Content-stress helper: .truncate (single-line ellipsis clamp) is now defined
-   on the .tbl ATOM above, so every table — bare or inside .datatable — gets it,
+   on the .table ATOM above, so every table — bare or inside .datatable — gets it,
    same as the th.num / td.num numeric treatment. */
 
 /* State slot — EMPTY / LOADING / ERROR share one centered well, so a row-less
@@ -5675,17 +5675,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .datatable__perpage .select { width: auto; min-height: var(--k-control-h-sm); }
 
 /* === Tooltip ===
-   Hidden by default; reveals on hover/focus of the parent .tt wrapper.
-   Add .tt--always for forced-open demos (gallery card uses this so users
+   Hidden by default; reveals on hover/focus of the parent .tooltip wrapper.
+   Add .tooltip--always for forced-open demos (gallery card uses this so users
    see the tooltip without needing to hover).
    Left-aligned to the trigger's edge so wide labels don't overflow the
    card's padding rail. */
-.tt {
+.tooltip {
   position: relative;
   display: inline-flex;
   align-items: center;
 }
-.tt__pop {
+.tooltip__pop {
   position: absolute;
   bottom: calc(100% + 6px);
   left: 0;
@@ -5711,12 +5711,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 /* Placement — static (no JS collision-flip; pick the side that clears the viewport
  * edge, or portal it in your framework). Default opens ABOVE, start-aligned. */
-.tt__pop--bottom { top: calc(100% + var(--k-s-6)); bottom: auto; }
-.tt__pop--right { left: calc(100% + var(--k-s-6)); right: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
-.tt__pop--left { right: calc(100% + var(--k-s-6)); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
-.tt:hover .tt__pop,
-.tt:focus-within .tt__pop,
-.tt--always .tt__pop {
+.tooltip__pop--bottom { top: calc(100% + var(--k-s-6)); bottom: auto; }
+.tooltip__pop--right { left: calc(100% + var(--k-s-6)); right: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
+.tooltip__pop--left { right: calc(100% + var(--k-s-6)); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
+.tooltip:hover .tooltip__pop,
+.tooltip:focus-within .tooltip__pop,
+.tooltip--always .tooltip__pop {
   opacity: 1;
 }
 
@@ -6376,7 +6376,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 
 /* === Auth — sign-in / sign-up screen scaffolding ===
  * Centered card flow: heading, SSO buttons, labelled "or" divider, the form
- * (reuses .in / .btn / .check), a meta row (remember + forgot) and a footer
+ * (reuses .in / .btn / .checkbox), a meta row (remember + forgot) and a footer
  * link. Every app starts here, so it's a first-class screen pattern. */
 .auth { display: flex; flex-direction: column; gap: var(--k-space, 16px); }
 .auth__head { text-align: center; }
@@ -7229,7 +7229,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 @keyframes bar-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 /* Hover/focus value tooltip — CSS-only so it survives the framework-neutral
-   export (no JS runtime); same dark-pill look as .tt__pop. Bars carry
+   export (no JS runtime); same dark-pill look as .tooltip__pop. Bars carry
    tabindex + aria-label, so the global :focus-visible ring plus this tip make
    the data keyboard-reachable, not just hover-only. */
 .barchart__bar:hover,
@@ -9290,7 +9290,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .list__item[aria-selected="true"]:hover, .list__item.is-selected:hover { filter: brightness(0.98); }
 /* Hit-target floor (Invariant I4) — an interactive row clears the WCAG-2.2 24px
-   target even at Compact density; generalises the .tbl guard so list rows stop
+   target even at Compact density; generalises the .table guard so list rows stop
    being a per-component afterthought. */
 button.list__item, a.list__item, .list__item:has(input, button, a, [role="button"]) { min-block-size: var(--k-hit-min); }
 .list__lead {
@@ -11666,7 +11666,7 @@ body {
 .segctrl__btn:focus-visible,
 .menu__item:focus-visible,
 .cmdp__item:focus-visible,
-.tbl__row:focus-visible,
+.table__row:focus-visible,
 .navrow:focus-visible,
 .accordion summary:focus-visible,
 .convo:focus-visible,
@@ -12773,7 +12773,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Error message — only render when the control is invalid; pairs with
  * aria-invalid="true" + aria-describedby on the control. */
 .field__error { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-danger-text); line-height: 1.4; }
-.check, .radio {
+.checkbox, .radio {
   display: inline-flex;
   align-items: center;
   gap: var(--k-s-10);
@@ -12784,7 +12784,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Custom checkbox + radio — appearance: none kills the platform UI, we draw
    our own 16px square/circle. Uses --k-input-border so it visually matches
    form inputs, and --k-primary for the checked state. */
-.check input[type="checkbox"], .radio input[type="radio"] {
+.checkbox input[type="checkbox"], .radio input[type="radio"] {
   appearance: none;
   -webkit-appearance: none;
   width: 16px;
@@ -12803,20 +12803,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* A checkbox is a slightly-rounded SQUARE, never a near-circle. Cap the corner
  * at 4px (≈ shadcn's 25% on a 16px box) so it still responds to Box radius
  * (0 at None) but never rounds off into radio-button territory at Soft/Round. */
-.check input[type="checkbox"] { border-radius: min(var(--k-radius-sm), 4px); }
+.checkbox input[type="checkbox"] { border-radius: min(var(--k-radius-sm), 4px); }
 .radio input[type="radio"]    { border-radius: 50%; }
-.check input[type="checkbox"]:hover,
+.checkbox input[type="checkbox"]:hover,
 .radio input[type="radio"]:hover { border-color: var(--k-fg-faint); }
-.check input[type="checkbox"]:focus-visible,
+.checkbox input[type="checkbox"]:focus-visible,
 .radio input[type="radio"]:focus-visible {
   outline: 2px solid var(--k-ring-soft);
   outline-offset: 1px;
 }
-.check input[type="checkbox"]:checked {
+.checkbox input[type="checkbox"]:checked {
   background: var(--k-primary);
   border-color: var(--k-primary);
 }
-.check input[type="checkbox"]:checked::after {
+.checkbox input[type="checkbox"]:checked::after {
   content: '';
   /* Absolute so the checkmark is OUT of flow — an in-flow grid item shifts the
      box's baseline by ~1.5px the moment it appears, making the checkbox visibly
@@ -12834,11 +12834,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 /* Indeterminate — the "some-but-not-all selected" state (set via the .indeterminate
  * DOM property in JS; there is no HTML attribute). Filled like :checked but with a
  * horizontal dash instead of the tick — the standard table select-all glyph. */
-.check input[type="checkbox"]:indeterminate {
+.checkbox input[type="checkbox"]:indeterminate {
   background: var(--k-primary);
   border-color: var(--k-primary);
 }
-.check input[type="checkbox"]:indeterminate::after {
+.checkbox input[type="checkbox"]:indeterminate::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -12850,7 +12850,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 /* Disabled checkbox/radio — muted + not-allowed, the :checked tick still shows
  * (a disabled-but-checked row reads as "locked on", not empty). */
-.check input:disabled,
+.checkbox input:disabled,
 .radio input:disabled {
   opacity: var(--k-disabled-opacity, 0.55);
   cursor: not-allowed;
@@ -13118,94 +13118,94 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tab--on .tab__badge { background: var(--k-primary-soft); color: var(--k-primary-soft-fg); }
 
 /* === Table === */
-.tbl { width: 100%; border-collapse: collapse; font-size: var(--k-type-body); }
-.tbl th, .tbl td {
+.table { width: 100%; border-collapse: collapse; font-size: var(--k-type-body); }
+.table th, .table td {
   /* Cell padding scales with density — Compact / Default / Comfortable via --k-space */
   padding: calc(var(--k-space, 10px) * 0.55) calc(var(--k-space, 10px) * 0.65);
   text-align: left;
 }
-.tbl thead { color: var(--k-fg-muted); font-weight: var(--k-weight-semibold); font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
-.tbl tbody tr { border-top: var(--k-divider); }
-.tbl tbody tr:hover { background: var(--k-state-hover); }
+.table thead { color: var(--k-fg-muted); font-weight: var(--k-weight-semibold); font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
+.table tbody tr { border-top: var(--k-divider); }
+.table tbody tr:hover { background: var(--k-state-hover); }
 /* Press state (B1) — a clickable row gives a tactile "pressed" confirm on
  * :active (the stronger --k-state-press wash, a notch above hover). Harmless on
  * non-interactive tables: it only fires for the instant a row is held down. */
-.tbl tbody tr:active { background: var(--k-state-press); }
+.table tbody tr:active { background: var(--k-state-press); }
 /* Row selected (user checked a row / picked it) — follows the Selection
  * accent toggle: brand-soft when Brand, neutral surface when Neutral. */
-.tbl tbody tr.is-selected,
-.tbl tbody tr[aria-selected="true"] {
+.table tbody tr.is-selected,
+.table tbody tr[aria-selected="true"] {
   background: var(--k-state-selected-bg, var(--k-primary-soft));
 }
-.tbl tbody tr.is-selected:hover,
-.tbl tbody tr[aria-selected="true"]:hover {
+.table tbody tr.is-selected:hover,
+.table tbody tr[aria-selected="true"]:hover {
   background: var(--k-state-selected-bg, var(--k-primary-soft));
   filter: brightness(0.98);
 }
 
 /* Sortable column header — chevrons indicate sort state */
-.tbl th.is-sortable {
+.table th.is-sortable {
   cursor: pointer;
   user-select: none;
 }
-.tbl th.is-sortable:hover { color: var(--k-fg); }
-.tbl th.is-sortable:focus-visible {
+.table th.is-sortable:hover { color: var(--k-fg); }
+.table th.is-sortable:focus-visible {
   outline: var(--k-focus-ring-width) solid var(--k-ring);
   outline-offset: -2px;
 }
-.tbl__sort {
+.table__sort {
   display: inline-flex;
   align-items: center;
   gap: var(--k-s-4);
 }
-.tbl__sort-chevron {
+.table__sort-chevron {
   display: inline-flex;
   color: var(--k-fg-faint);
   transition: color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
-.is-sortable.is-active .tbl__sort-chevron { color: var(--k-primary-text); }
+.is-sortable.is-active .table__sort-chevron { color: var(--k-primary-text); }
 
 /* Two-line cell (B★5) — the canonical "primary name + secondary meta" stack
    inside a table cell (issue key · type · points, file · size, user · email).
    Was hand-rolled per-table with inline styles; now a kit pattern so the meta
    hierarchy is consistent: name = near-black --k-fg, meta = the FAINT tier (one
    step below muted) so the sub-line recedes cleanly behind the name. */
-.tbl__name { font-weight: var(--k-weight-medium); color: var(--k-fg); }
-.tbl__sub { font-size: var(--k-type-small); color: var(--k-fg-faint); margin-top: 1px; }
+.table__name { font-weight: var(--k-weight-medium); color: var(--k-fg); }
+.table__sub { font-size: var(--k-type-small); color: var(--k-fg-faint); margin-top: 1px; }
 /* Numeric column (CP3 — the Attio/Linear "dense but calm" data signature). Value
    columns (money, counts, %) right-align and use TABULAR figures so digits line
    up in a column and the eye scans magnitudes straight down the stack — the
-   pro-data-table move every left-aligned table misses. On the .tbl ATOM (was
+   pro-data-table move every left-aligned table misses. On the .table ATOM (was
    scoped to the .datatable block) so EVERY table earns it, not just the flagship.
    Apply the num class to BOTH the column's th and its td. */
-.tbl th.num, .tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
-/* Tables are restrained shadcn-style: per-row border-top (base .tbl) + hover,
+.table th.num, .table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+/* Tables are restrained shadcn-style: per-row border-top (base .table) + hover,
    no zebra striping. The zebra modifier was dropped — the base row treatment
    already reads cleanly and zebra added visual noise to dense data.
 
    The data-table BLOCK (bordered frame + toolbar + selection + footer +
    empty/loading/error states) is its own segment — see the "Data table" recipe,
-   which composes this .tbl atom. */
+   which composes this .table atom. */
 
 /* --- Grouped rows (Tailwind "with grouped rows") -------------------------
    A subheader <tr> that segments the body into labelled groups (by team, date,
-   status…). Drop a .tbl__group row before each run of member rows; give its one
+   status…). Drop a .table__group row before each run of member rows; give its one
    full-span <td> the colSpan. Reads as a quiet sunken band — eyebrow type, no
    hover lift — so the groups structure the table without competing with data. */
-.tbl tr.tbl__group > * {
+.table tr.table__group > * {
   background: var(--k-surface-sunken);
   font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow);
   font-weight: var(--k-weight-semibold); color: var(--k-fg-muted);
   padding-top: var(--k-s-6); padding-bottom: var(--k-s-6);
 }
-.tbl tr.tbl__group { border-top: var(--k-divider); }
-.tbl tr.tbl__group:hover > * { background: var(--k-surface-sunken); }
+.table tr.table__group { border-top: var(--k-divider); }
+.table tr.table__group:hover > * { background: var(--k-surface-sunken); }
 
 /* --- Summary / total row (Tailwind "with summary row") -------------------
    A <tfoot> totals line: a heavier top rule sets it off from the body and the
    figures go semibold. Pair the number cells with .num so the totals align under
    their columns. No hover (tfoot is outside tbody's hover rule). */
-.tbl tfoot td, .tbl tfoot th {
+.table tfoot td, .table tfoot th {
   border-top: 2px solid var(--k-border);
   font-weight: var(--k-weight-semibold); color: var(--k-fg);
 }
@@ -13214,8 +13214,8 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    A tighter row rhythm for data-dense tables (admin grids, financials). Still
    density-aware — the cell padding stays a fraction of --k-space, just a smaller
    one — and the type drops to the small tier. */
-.tbl--condensed { font-size: var(--k-type-small); }
-.tbl--condensed th, .tbl--condensed td { padding: calc(var(--k-space, 10px) * 0.32) calc(var(--k-space, 10px) * 0.5); }
+.table--condensed { font-size: var(--k-type-small); }
+.table--condensed th, .table--condensed td { padding: calc(var(--k-space, 10px) * 0.32) calc(var(--k-space, 10px) * 0.5); }
 
 /* --- Truncation utility (.truncate) — the TEXT-SLOT role's guarantee --------
    A GLOBAL single-line clamp for any long unbreakable value (name, path, title)
@@ -13224,71 +13224,71 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    with a title attr for the full value; --k-col-max overrides the per-slot cap. */
 .truncate { display: block; max-width: var(--k-col-max, 24ch); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* --- Card-framed table (.tbl--card) ---------------------------------------
-   The bare .tbl uses border-collapse:collapse + per-row border-top — right for
+/* --- Card-framed table (.table--card) ---------------------------------------
+   The bare .table uses border-collapse:collapse + per-row border-top — right for
    a flush list, but collapsed borders belong to the GRID, not the cell box, so
    they VANISH under sticky cells and bleed past a rounded clip (confirmed
-   FF/WebKit). .tbl--card is the primitive for a STANDALONE sticky/rounded
+   FF/WebKit). .table--card is the primitive for a STANDALONE sticky/rounded
    table: separate borders, dividers drawn as inset box-shadow (they paint on
    the cell box → travel with a sticky cell + clip to the radius), a rounded
    bordered frame, a sticky opaque header, and the last row dropping its divider
    so the grid meets the curve clean. (The .datatable BLOCK builds on the same
    idea; this is the atom-level version for a table used bare.) Wrap in a
    max-height + overflow:auto container to engage the sticky header on scroll. */
-.tbl--card { border-collapse: separate; border-spacing: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius-lg); overflow: hidden; }
-.tbl--card thead th { position: sticky; top: 0; z-index: 1; background: var(--k-surface); box-shadow: inset 0 -1px 0 var(--k-border); }
-.tbl--card tbody tr { border-top: 0; }
-.tbl--card tbody tr + tr td, .tbl--card tbody tr + tr th { box-shadow: inset 0 1px 0 var(--k-border); }
+.table--card { border-collapse: separate; border-spacing: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius-lg); overflow: hidden; }
+.table--card thead th { position: sticky; top: 0; z-index: 1; background: var(--k-surface); box-shadow: inset 0 -1px 0 var(--k-border); }
+.table--card tbody tr { border-top: 0; }
+.table--card tbody tr + tr td, .table--card tbody tr + tr th { box-shadow: inset 0 1px 0 var(--k-border); }
 
 /* --- Hit-target floor (Invariant I4) --------------------------------------
    An INTERACTIVE row (one holding a checkbox, button or link) must clear the
    WCAG-2.2 24px target even at Compact density. :has() floors ONLY those rows,
    so a dense read-only table stays tight — the guard never fights density where
    it isn't needed. */
-.tbl tbody tr:has(input, button, a, [role="button"]) td { min-block-size: var(--k-hit-min); }
+.table tbody tr:has(input, button, a, [role="button"]) td { min-block-size: var(--k-hit-min); }
 
-/* --- Frozen first column (.tbl__col--frozen) ------------------------------
+/* --- Frozen first column (.table__col--frozen) ------------------------------
    Spreadsheet-shaped wide tables: pin the first column so row identity (name /
    id) survives horizontal scroll. Mark the first th AND every first td with
-   .tbl__col--frozen and wrap the table in an overflow-x:auto container. Needs
-   .tbl--card (separate borders) so the sticky cell keeps its opaque background
+   .table__col--frozen and wrap the table in an overflow-x:auto container. Needs
+   .table--card (separate borders) so the sticky cell keeps its opaque background
    and dividers — collapsed borders vanish under a sticky cell. A one-sided
    shadow reveals that there's more to the right. */
-.tbl__col--frozen { position: sticky; left: 0; z-index: 1; background: var(--k-surface); }
-.tbl thead .tbl__col--frozen { z-index: 2; }
-.tbl--card .tbl__col--frozen::after {
+.table__col--frozen { position: sticky; left: 0; z-index: 1; background: var(--k-surface); }
+.table thead .table__col--frozen { z-index: 2; }
+.table--card .table__col--frozen::after {
   content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: var(--k-s-16);
   transform: translateX(100%); pointer-events: none;
   box-shadow: inset var(--k-s-12) 0 var(--k-s-8) calc(var(--k-s-10) * -1) rgb(0 0 0 / 0.12);
 }
 
 /* --- Responsive (Tailwind "hidden columns" + "stacked on mobile") --------
-   Wrap a table in .tbl-responsive (a size container, so it adapts to its own
+   Wrap a table in .table-responsive (a size container, so it adapts to its own
    width, not the viewport). Two levers:
-     .tbl__col--optional  drop non-essential columns under a narrow host (mark
+     .table__col--optional  drop non-essential columns under a narrow host (mark
                           BOTH the th and every matching td).
-     .tbl--stack          go further: below the stack breakpoint each row reflows
+     .table--stack          go further: below the stack breakpoint each row reflows
                           to a label/value card — the header is visually hidden and
                           each cell shows its column name from data-label. */
-.tbl-responsive { container-type: inline-size; width: 100%; overflow-x: auto; }
+.table-responsive { container-type: inline-size; width: 100%; overflow-x: auto; }
 @container (max-width: 34rem) {
-  .tbl-responsive .tbl__col--optional { display: none; }
+  .table-responsive .table__col--optional { display: none; }
 }
 @container (max-width: 26rem) {
-  .tbl-responsive .tbl--stack thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  .tbl-responsive .tbl--stack tbody tr { display: block; border: 1px solid var(--k-border); border-radius: var(--k-radius-md); padding: var(--k-s-4); margin-bottom: var(--k-s-8); }
-  .tbl-responsive .tbl--stack tbody tr:hover { background: transparent; }
-  .tbl-responsive .tbl--stack tbody td { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); padding: var(--k-s-4) var(--k-s-6); text-align: right; border: 0; }
-  .tbl-responsive .tbl--stack tbody td::before { content: attr(data-label); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); text-align: left; text-transform: none; letter-spacing: normal; }
+  .table-responsive .table--stack thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .table-responsive .table--stack tbody tr { display: block; border: 1px solid var(--k-border); border-radius: var(--k-radius-md); padding: var(--k-s-4); margin-bottom: var(--k-s-8); }
+  .table-responsive .table--stack tbody tr:hover { background: transparent; }
+  .table-responsive .table--stack tbody td { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); padding: var(--k-s-4) var(--k-s-6); text-align: right; border: 0; }
+  .table-responsive .table--stack tbody td::before { content: attr(data-label); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); text-align: left; text-transform: none; letter-spacing: normal; }
   /* optional columns stay dropped in the stacked form too (higher specificity
      than the stacked-td display rule above, so they don't reappear as rows). */
-  .tbl-responsive .tbl--stack .tbl__col--optional { display: none; }
+  .table-responsive .table--stack .table__col--optional { display: none; }
 }
 
 /* === Data table ===
-   The flagship BLOCK: a bordered frame that wraps the .tbl atom into a complete,
+   The flagship BLOCK: a bordered frame that wraps the .table atom into a complete,
    believable data surface — matrix-complete across every state real data hits.
-   It COMPOSES atoms (.toolbar · .tbl · .select / .select-trigger · .pagination),
+   It COMPOSES atoms (.toolbar · .table · .select / .select-trigger · .pagination),
    so the whole surface is rebuildable from the kit, not a one-off.
 
    Anatomy
@@ -13297,7 +13297,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
          .datatable__bar--active      filters / actions); swaps to the bulk-action
                                       bar when rows are selected
        .datatable__body               scroll well (sticky thead)
-         table.tbl                    the table atom
+         table.table                    the table atom
          .datatable__state            centered slot for EMPTY / LOADING / ERROR
        .datatable__foot               footer band — row count · rows-per-page
                                       .select · .pagination
@@ -13335,28 +13335,28 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    universal mobile-table affordance (the toolbar stacks separately below). */
 @container datatable (max-width: 40rem) {
   .datatable--page .datatable__body { overflow-x: auto; }
-  .datatable--page .tbl { min-width: 34rem; }
+  .datatable--page .table { min-width: 34rem; }
   /* When the body scrolls, a frozen first column keeps row identity in view.
      The seam is scoped HERE (not on the base) so a full-width desktop table
      doesn't grow a lone vertical divider on column one. */
-  .datatable--page .tbl__col--frozen { box-shadow: 1px 0 0 var(--k-border); }
+  .datatable--page .table__col--frozen { box-shadow: 1px 0 0 var(--k-border); }
   /* The header cell also pins; stack its bottom divider WITH the seam (the
      sticky-thead rule below would otherwise replace the seam with just the divider). */
-  .datatable--page .tbl thead .tbl__col--frozen { box-shadow: inset 0 -1px 0 var(--k-border), 1px 0 0 var(--k-border); }
+  .datatable--page .table thead .table__col--frozen { box-shadow: inset 0 -1px 0 var(--k-border), 1px 0 0 var(--k-border); }
 }
-.datatable .tbl thead th {
+.datatable .table thead th {
   position: sticky; top: 0; z-index: 1;
   background: var(--k-surface);
   box-shadow: inset 0 -1px 0 0 var(--k-border);
 }
-.datatable .tbl td:first-child, .datatable .tbl th:first-child { padding-left: var(--k-s-12); }
-.datatable .tbl td:last-child, .datatable .tbl th:last-child { padding-right: var(--k-s-12); }
+.datatable .table td:first-child, .datatable .table th:first-child { padding-left: var(--k-s-12); }
+.datatable .table td:last-child, .datatable .table th:last-child { padding-right: var(--k-s-12); }
 
 /* Selection cell — checkbox column, fixed narrow width. */
 .datatable__check { width: 36px; }
 
 /* Content-stress helper: .truncate (single-line ellipsis clamp) is now defined
-   on the .tbl ATOM above, so every table — bare or inside .datatable — gets it,
+   on the .table ATOM above, so every table — bare or inside .datatable — gets it,
    same as the th.num / td.num numeric treatment. */
 
 /* State slot — EMPTY / LOADING / ERROR share one centered well, so a row-less
@@ -13380,17 +13380,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .datatable__perpage .select { width: auto; min-height: var(--k-control-h-sm); }
 
 /* === Tooltip ===
-   Hidden by default; reveals on hover/focus of the parent .tt wrapper.
-   Add .tt--always for forced-open demos (gallery card uses this so users
+   Hidden by default; reveals on hover/focus of the parent .tooltip wrapper.
+   Add .tooltip--always for forced-open demos (gallery card uses this so users
    see the tooltip without needing to hover).
    Left-aligned to the trigger's edge so wide labels don't overflow the
    card's padding rail. */
-.tt {
+.tooltip {
   position: relative;
   display: inline-flex;
   align-items: center;
 }
-.tt__pop {
+.tooltip__pop {
   position: absolute;
   bottom: calc(100% + 6px);
   left: 0;
@@ -13416,12 +13416,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 /* Placement — static (no JS collision-flip; pick the side that clears the viewport
  * edge, or portal it in your framework). Default opens ABOVE, start-aligned. */
-.tt__pop--bottom { top: calc(100% + var(--k-s-6)); bottom: auto; }
-.tt__pop--right { left: calc(100% + var(--k-s-6)); right: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
-.tt__pop--left { right: calc(100% + var(--k-s-6)); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
-.tt:hover .tt__pop,
-.tt:focus-within .tt__pop,
-.tt--always .tt__pop {
+.tooltip__pop--bottom { top: calc(100% + var(--k-s-6)); bottom: auto; }
+.tooltip__pop--right { left: calc(100% + var(--k-s-6)); right: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
+.tooltip__pop--left { right: calc(100% + var(--k-s-6)); left: auto; top: 50%; bottom: auto; transform: translateY(-50%); }
+.tooltip:hover .tooltip__pop,
+.tooltip:focus-within .tooltip__pop,
+.tooltip--always .tooltip__pop {
   opacity: 1;
 }
 
@@ -14081,7 +14081,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 
 /* === Auth — sign-in / sign-up screen scaffolding ===
  * Centered card flow: heading, SSO buttons, labelled "or" divider, the form
- * (reuses .in / .btn / .check), a meta row (remember + forgot) and a footer
+ * (reuses .in / .btn / .checkbox), a meta row (remember + forgot) and a footer
  * link. Every app starts here, so it's a first-class screen pattern. */
 .auth { display: flex; flex-direction: column; gap: var(--k-space, 16px); }
 .auth__head { text-align: center; }
@@ -14934,7 +14934,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 @keyframes bar-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 /* Hover/focus value tooltip — CSS-only so it survives the framework-neutral
-   export (no JS runtime); same dark-pill look as .tt__pop. Bars carry
+   export (no JS runtime); same dark-pill look as .tooltip__pop. Bars carry
    tabindex + aria-label, so the global :focus-visible ring plus this tip make
    the data keyboard-reachable, not just hover-only. */
 .barchart__bar:hover,
@@ -16995,7 +16995,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .list__item[aria-selected="true"]:hover, .list__item.is-selected:hover { filter: brightness(0.98); }
 /* Hit-target floor (Invariant I4) — an interactive row clears the WCAG-2.2 24px
-   target even at Compact density; generalises the .tbl guard so list rows stop
+   target even at Compact density; generalises the .table guard so list rows stop
    being a per-component afterthought. */
 button.list__item, a.list__item, .list__item:has(input, button, a, [role="button"]) { min-block-size: var(--k-hit-min); }
 .list__lead {
@@ -18811,6 +18811,41 @@ that element out of theming, and the user's UI drifts back out of alignment.
 Touch only look / layout / composition — never rewrite the app's logic to fit the
 kit.
 
+## Naming — use the field's word, get our class
+
+You will know most of these by the name the industry converged on. That name is
+the key; the class is the value. Open UI's Component Name Matrix measured naming
+agreement across 27 design systems (Ant, Carbon, Spectrum,
+USWDS, WAI-ARIA, the browser engines) — the percentage is how many use that word.
+Reach for the standard word and this tells you what to type. Do NOT invent
+\`.button\` or \`.dropdown\`; they do not exist in this kit.
+
+- **Button** (93%) → \`.btn\`
+- **Checkbox** (74%) → \`.checkbox\`
+- **Tooltip** (67%) → \`.tooltip\`
+- **Select** (59%) → \`.select\`
+- **Breadcrumb** (56%) → \`.breadcrumb\`
+- **Accordion** (52%) → \`.accordion\`
+- **Tabs** (48%) → \`.tabs\`
+- **Dialog** (44%) → \`.dialog\`
+- **Card** (44%) → \`.card\`
+- **Menu** (41%) → \`.menu\`
+- **Progress** (41%) → \`.progress\`
+- **Alert** (41%) → \`.alert\`
+- **Dropdown** (37%) → \`.menu\`
+- **Modal** (37%) → \`.dialog\`
+- **Form** (37%) → \`.field\`
+- **Badge** (37%) → \`.badge\`
+- **Radio** (37%) → \`.radio\`
+- **Switch** (37%) → \`.switch\`
+- **Table** (37%) → \`.table\`
+- **Combobox** (33%) → \`.combobox\`
+- **Pagination** (33%) → \`.pagination\`
+- **Label** (30%) → \`.lab\`
+- **Nav** (30%) → \`.navsuite\`
+- **Slider** (30%) → \`.slider\`
+- **Avatar** (30%) → \`.avatar\`
+
 ## The component model — the composition contract
 
 This kit is a **tier ladder** (Foundation → Atom → Component → Section → Page). Build
@@ -18904,7 +18939,7 @@ kit already guarantees.
 **Do**
 - Reach for .data-table for ANY data surface — it owns the toolbar, selection, sticky header, pagination and the empty/loading/error states.
 - Put numeric columns in .num cells (th + td) — right-aligned, tabular numerals, so totals line up.
-- On a narrow container let the container query reflow it; freeze the identity column with .tbl__col--frozen when it scrolls horizontally.
+- On a narrow container let the container query reflow it; freeze the identity column with .table__col--frozen when it scrolls horizontally.
 
 **Don't**
 - Don't hand-roll a table out of .card + flex rows — density, hover, selection and the states are already guaranteed here.
@@ -19889,7 +19924,7 @@ you create or restyle. These are the binding rules — load them every session.
   row like \`[input] [Submit]\` sits on one baseline. Never mix \`.btn--sm\` with a default \`.in\`.
 - **Compose the kit's recipes — don't hand-roll.** ~80 classes cover most jobs:
   atoms (\`.btn\` \`.in\` \`.select-trigger\` \`.badge\` \`.chip\` \`.avatar\` \`.switch\`/\`.toggle\` \`.radio\`),
-  data (\`.tbl\` \`.datatable\` \`.list\` \`.dl\` \`.stat-tile\`/\`.stat-tile-grid\`), forms (\`.formpanel\` \`.field\`),
+  data (\`.table\` \`.datatable\` \`.list\` \`.dl\` \`.stat-tile\`/\`.stat-tile-grid\`), forms (\`.formpanel\` \`.field\`),
   nav/shell (\`.toolbar\` \`.navrow\` \`.navsuite\` \`.sidenav\` \`.scaffold\` \`.page-head\` \`.section\`),
   overlays (\`.menu\` \`.dialog\` \`.popover\` \`.toast\`), filters (\`.filterbar\` \`.searchinput\` \`.combobox\`).
   **The FULL catalog (every class + its modifiers) is in \`contract.json\` → \`components.classes\`;
@@ -19921,7 +19956,7 @@ Radix / Headless UI / cmdk):
   NATIVE \`<select class="select">\` (fully accessible, zero JS) when a native control fits.
 - **OTP / slider:** wire focus-advance+paste / keyboard + \`aria-valuenow\` yourself.
 - **Overlays** (popover · tooltip · hover-card) open ONE static side (placement modifiers
-  e.g. \`.tt__pop--bottom\` / \`--left\` / \`--right\`, \`.popover--top\` / \`--end\`); there's no
+  e.g. \`.tooltip__pop--bottom\` / \`--left\` / \`--right\`, \`.popover--top\` / \`--end\`); there's no
   JS collision-flip — pick the side that clears the viewport edge, and portal the overlay
   if a parent clips it.
 - **Scroll-area** styles the NATIVE scrollbar (Chromium + Firefox); Safari keeps the OS
