@@ -222,6 +222,12 @@ export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
 
   return (
     <div className={`app ${menuOpen ? '' : 'app--menu-closed'} ${cfg.mode === 'dark' ? 'app--theme-dark' : ''}`} style={chromeTokens}>
+      {/* First tab stop, before our own chrome. The kit has shipped a skip-link
+        * recipe since P0 and our own product did not use it: the tree walk found
+        * the first Tab landing inside the gallery, twenty-odd controls deep. axe
+        * passes us on `bypass` because the landmarks are there, which is exactly
+        * why a rule checker was never going to raise this. */}
+      <a className="skiplink" href="#main">Skip to main content</a>
       <Topbar
         stageMode={stageMode}
         onStageMode={setStageMode}

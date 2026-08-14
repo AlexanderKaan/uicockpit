@@ -588,12 +588,29 @@ function FieldsetCard() {
 function ErrorSummaryCard() {
   return (
     <Card title="Error summary" desc="Every failed field, above the form, each one a link.">
-      <div className="errorsummary" role="alert" tabIndex={-1}>
-        <h3 className="errorsummary__title">There is a problem</h3>
+      {/* The fields below are not decoration. This card previously linked to
+        * #es-email and #es-post while no such elements existed anywhere on the
+        * page, so every link was a dead jump — and the component's entire reason
+        * to exist IS the jump. axe cannot see it (a link to a missing fragment
+        * breaks no rule) and neither can a screenshot; only walking the tree
+        * does. Since the demo is what people copy, it has to demonstrate the
+        * behaviour, not the appearance. */}
+      <div className="errorsummary" role="alert" tabIndex={-1} aria-labelledby="es-title">
+        <h3 className="errorsummary__title" id="es-title">There is a problem</h3>
         <ul className="errorsummary__list">
           <li><a className="errorsummary__link" href="#es-email">Enter an email address</a></li>
           <li><a className="errorsummary__link" href="#es-post">Enter a postcode in the right format</a></li>
         </ul>
+      </div>
+      <div className="field" style={{ marginTop: 14 }}>
+        <label className="field__label" htmlFor="es-email">Email address</label>
+        <input className="in in--invalid" id="es-email" type="email" aria-describedby="es-email-err" defaultValue="" />
+        <span className="field__error" id="es-email-err">Enter an email address</span>
+      </div>
+      <div className="field" style={{ marginTop: 10 }}>
+        <label className="field__label" htmlFor="es-post">Postcode</label>
+        <input className="in in--invalid" id="es-post" aria-describedby="es-post-err" defaultValue="12" />
+        <span className="field__error" id="es-post-err">Enter a postcode in the right format</span>
       </div>
       <p style={{ margin: '12px 0 0', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
         Move focus here on a failed submit. Per-field messages alone are only

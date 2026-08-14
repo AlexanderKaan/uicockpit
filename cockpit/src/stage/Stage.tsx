@@ -29,7 +29,7 @@ export function Stage({ cfg, tokens, audit, mode = 'catalogue', onSeeEvidence, o
   const previewStyle = tokens.vars as CSSProperties
 
   return (
-    <main className="stage">
+    <main className="stage" id="main" tabIndex={-1}>
       <div className="stage__row">
         <div className="stage__body">
           <div className="cockpit-preview" style={previewStyle}>
