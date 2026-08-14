@@ -60,6 +60,9 @@ const CARD_KEYWORDS: Record<string, string> = {
   NavMenuCard: 'Navigation menu navbar megamenu',
   BreadcrumbCard: 'Breadcrumb path trail',
   SkipLinkCard: 'Skip link bypass blocks keyboard accessibility',
+  TaskListCard: 'Task list sections progress service multi-step form',
+  ToggletipCard: 'Toggletip accessible tooltip help hint disclosure',
+  LanguageNavCard: 'Language navigation multilingual locale switcher',
   FieldsetCard: 'Fieldset legend group radio checkbox accessibility',
   ErrorSummaryCard: 'Error summary form validation accessibility',
   PaginationCard: 'Search results pagination pages',
@@ -237,7 +240,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
-    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
+    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
@@ -342,8 +345,8 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
   ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, ColorPickerCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
-  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, PaginationCard, StepperCard]],
-  ['Overlays & disclosure', [PopoverCard, TooltipCard, HoverCardCard, AccordionCard]],
+  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, LanguageNavCard, PaginationCard, StepperCard, TaskListCard]],
+  ['Overlays & disclosure', [PopoverCard, TooltipCard, ToggletipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
   ['AI thread', [ToolCallCard, ReasoningCard, CitationCard]],
@@ -439,6 +442,105 @@ function ChevronSvg({ size = 14 }: { size?: number }) {
  * Breadcrumb · Avatar · Accordion (standalone) · Carousel · Navigation menu ·
  * Context menu. The last three add new recipes (.carousel/.navmenu/.ctxmenu);
  * the first three compose existing primitives (.breadcrumb/.avatar/.accordion). */
+
+function TaskListCard() {
+  const TASKS = [
+    { name: 'Your details', status: 'Completed', tone: 'success' as const },
+    { name: 'Company information', status: 'Completed', tone: 'success' as const },
+    { name: 'Payment details', status: 'In progress', tone: 'warn' as const, hint: 'You saved a draft on 12 May' },
+    { name: 'Review and submit', status: 'Cannot start yet', tone: '' as const, locked: true },
+  ]
+  const done = TASKS.filter((t) => t.status === 'Completed').length
+  return (
+    <Card title="Task list" desc="A long form as a plan — complete the sections in any order.">
+      <p className="tasklist__count">{done} of {TASKS.length} sections complete</p>
+      <ol className="tasklist">
+        {TASKS.map((t) => (
+          <li className="tasklist__item" key={t.name}>
+            <span className="tasklist__name">
+              {/* A task that cannot start yet is deliberately NOT a link. */}
+              {t.locked
+                ? <span className="tasklist__name--locked">{t.name}</span>
+                : <a className="tasklist__link" href="#task">{t.name}</a>}
+              {t.hint && <span className="tasklist__hint">{t.hint}</span>}
+            </span>
+            <span className={`badge tasklist__status ${t.tone ? `badge--${t.tone}` : ''}`}>{t.status}</span>
+          </li>
+        ))}
+      </ol>
+    </Card>
+  )
+}
+
+function ToggletipCard() {
+  const [open, setOpen] = useState(false)
+  return (
+    <Card title="Toggletip" desc="A tooltip you can reach — opened by a button, not by hovering.">
+      <label className="lab" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+          VAT number
+          <span className="toggletip">
+            <button
+              type="button"
+              className="toggletip__trigger"
+              aria-expanded={open}
+              aria-label="What is a VAT number?"
+              onClick={() => setOpen((v) => !v)}
+            >
+              <Icon name="info" />
+            </button>
+            {/* A live region, so the text is ANNOUNCED on open rather than
+                silently appearing somewhere a screen reader has already passed. */}
+            <span role="status">
+              {open && (
+                <span className="toggletip__bubble">
+                  Found on your VAT registration certificate. Two letters followed by
+                  up to twelve digits.
+                </span>
+              )}
+            </span>
+          </span>
+        </span>
+        <input className="in" defaultValue="NL 8123 4567 B01" aria-label="VAT number" />
+      </label>
+      <p style={{ margin: '10px 0 0', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
+        Hover is not available on touch. Supplementary content behind a hover is
+        content some people never get.
+      </p>
+    </Card>
+  )
+}
+
+function LanguageNavCard() {
+  const [cur, setCur] = useState('nl')
+  // Each option names itself IN its own language and carries lang/hreflang, or
+  // a screen reader announces it in the wrong voice.
+  const LANGS = [
+    { code: 'nl', label: 'Nederlands' },
+    { code: 'en', label: 'English' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'fr', label: 'Français' },
+  ]
+  return (
+    <Card title="Language navigation" desc="Each language, named in itself. WCAG 3.1.1 / 3.1.2.">
+      <nav className="langnav" aria-label="Language">
+        {LANGS.map((l) => (
+          <a
+            key={l.code}
+            className="langnav__item"
+            href={`#${l.code}`}
+            lang={l.code}
+            hrefLang={l.code}
+            aria-current={cur === l.code ? 'true' : undefined}
+            onClick={(e) => { e.preventDefault(); setCur(l.code) }}
+          >
+            {l.label}
+          </a>
+        ))}
+      </nav>
+    </Card>
+  )
+}
 
 function SkipLinkCard() {
   return (

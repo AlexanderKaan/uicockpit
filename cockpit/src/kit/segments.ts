@@ -153,6 +153,10 @@ export const STANDALONE_ATOMS: readonly string[] = [
    * ERROR SUMMARY sits above any form at all. Giving them a fake host would be
    * exactly the dishonesty this list exists to avoid. */
   'skiplink', 'fieldset', 'errorsummary',
+  /* And the P5 additions. A TASK LIST organises any multi-step service and has
+   * no host; a TOGGLETIP attaches to any control, exactly like the tooltip
+   * above it; LANGUAGE NAVIGATION belongs to the page. */
+  'tasklist', 'toggletip', 'langnav',
 ]
 
 const FOUNDATION_SET: ReadonlySet<string> = new Set(FOUNDATIONS)

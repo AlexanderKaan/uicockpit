@@ -2743,6 +2743,100 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }`,
   },
   {
+    id: 'tasklist',
+    section: "Task list",
+    css: `/* === Task list ===========================================================
+ * The multi-step service pattern: "apply for X" broken into sections you can
+ * complete in any order, each carrying its own status. GOV.UK ships it as Task
+ * list, NL Design System as Task Navigation — it is how a long form stops being
+ * a wall and starts being a plan.
+ *
+ * NOT our .stepper, which is the reason this earns a place under the study's
+ * "unique" criterion: a stepper is LINEAR and tells you where you are in a
+ * sequence; a task list is NON-LINEAR and tells you what is left. Different
+ * question, different component.
+ *
+ * Markup is an ordered list of links with a status beside each. The status is a
+ * .badge, so it inherits the tones the kit already guarantees, and it must read
+ * as TEXT — never colour alone, which is WCAG 1.4.1. */
+.tasklist { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--k-border); }
+.tasklist__item {
+  display: flex; align-items: center; gap: var(--k-s-12);
+  padding: var(--k-s-12) var(--k-s-2);
+  border-bottom: 1px solid var(--k-border);
+}
+.tasklist__name { flex: 1; min-width: 0; }
+.tasklist__link { color: var(--k-fg); text-decoration: underline; text-underline-offset: 2px; font-weight: var(--k-weight-medium); }
+.tasklist__link:hover { color: var(--k-primary-soft-fg); }
+/* A task that cannot be started yet is not a link — a dead link is a worse
+ * answer than plain text, because it invites a click that goes nowhere. */
+.tasklist__name--locked { color: var(--k-fg-muted); font-weight: var(--k-weight-medium); }
+.tasklist__hint { display: block; margin-top: var(--k-s-2); font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.tasklist__status { flex: none; }
+/* The section counter above the list ("2 of 5 sections complete"). */
+.tasklist__count { margin: 0 0 var(--k-s-8); font-size: var(--k-type-body); color: var(--k-fg-muted); }`,
+  },
+  {
+    id: 'toggletip',
+    section: "Toggletip",
+    css: `/* === Toggletip ===========================================================
+ * A tooltip you can actually reach. The difference is the interaction model,
+ * not the look: a TOOLTIP appears on hover and describes the thing it is
+ * attached to; a TOGGLETIP is opened by a button, stays until dismissed, and
+ * carries information that is genuinely additional.
+ *
+ * That distinction matters because hover is not available to a touch user and
+ * is awkward for anyone using magnification, so supplementary content behind a
+ * hover is content some people simply never get. NL Design System steers to the
+ * toggletip for exactly this reason; the study filed tooltip-vs-toggletip as a
+ * judgement call between systems, but SHIPPING BOTH is not a judgement call —
+ * it is giving people the reachable option.
+ *
+ * Wiring: a real <button> with aria-expanded, and a live region for the bubble
+ * so the text is announced when it opens rather than silently appearing. */
+.toggletip { position: relative; display: inline-flex; }
+.toggletip__trigger {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--k-hit-min); height: var(--k-hit-min);
+  padding: 0; border: 0; border-radius: 999px;
+  background: transparent; color: var(--k-fg-muted); cursor: pointer;
+}
+.toggletip__trigger:hover { background: var(--k-state-hover); color: var(--k-fg); }
+.toggletip__bubble {
+  position: absolute; bottom: calc(100% + var(--k-s-6)); left: 50%; transform: translateX(-50%);
+  z-index: 40; width: max-content; max-width: 16rem;
+  padding: var(--k-s-8) var(--k-s-10);
+  border: 1px solid var(--k-border); border-radius: var(--k-radius-md);
+  background: var(--k-surface-overlay); color: var(--k-fg);
+  box-shadow: var(--k-shadow-md);
+  font-size: var(--k-type-small); line-height: 1.45; text-align: left;
+}`,
+  },
+  {
+    id: 'langnav',
+    section: "Language navigation",
+    css: `/* === Language navigation =================================================
+ * Choosing the language of the page. A named component rather than a menu with
+ * links in it, because the accessibility of this one lives entirely in
+ * attributes a generic menu will not carry: each option needs \`lang\` and
+ * \`hreflang\` set to the language it leads to, and its name written IN that
+ * language — "Nederlands", never "Dutch" — or a screen reader announces it in
+ * the wrong voice and the person who needs it most cannot find it.
+ * WCAG 3.1.1 / 3.1.2.
+ *
+ * The current language is marked with aria-current, not by removing it: a list
+ * that hides where you are makes you count. */
+.langnav { display: flex; align-items: center; gap: var(--k-s-2); }
+.langnav__item {
+  display: inline-flex; align-items: center;
+  min-height: var(--k-hit-min); padding: 0 var(--k-s-8);
+  border-radius: var(--k-radius-sm);
+  color: var(--k-fg-muted); font-size: var(--k-type-small); text-decoration: none;
+}
+.langnav__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
+.langnav__item[aria-current='true'] { color: var(--k-fg); font-weight: var(--k-weight-medium); background: var(--k-state-selected-bg); }`,
+  },
+  {
     id: 'skiplink',
     section: "Skip link",
     css: `/* === Skip link ===========================================================
