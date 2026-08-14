@@ -61,6 +61,8 @@ const CARD_KEYWORDS: Record<string, string> = {
   BreadcrumbCard: 'Breadcrumb path trail',
   SkipLinkCard: 'Skip link bypass blocks keyboard accessibility',
   TaskListCard: 'Task list sections progress service multi-step form',
+  CharacterCountCard: 'Character count remaining limit textarea live region announce',
+  MemorableDateCard: 'Memorable date of birth day month year three fields not a picker',
   ToggletipCard: 'Toggletip accessible tooltip help hint disclosure',
   LanguageNavCard: 'Language navigation multilingual locale switcher',
   FieldsetCard: 'Fieldset legend group radio checkbox accessibility',
@@ -240,7 +242,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
-    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
+    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
@@ -443,6 +445,58 @@ function ChevronSvg({ size = 14 }: { size?: number }) {
  * Context menu. The last three add new recipes (.carousel/.navmenu/.ctxmenu);
  * the first three compose existing primitives (.breadcrumb/.avatar/.accordion). */
 
+function CharacterCountCard() {
+  const LIMIT = 120
+  const [text, setText] = useState('We were told the form had been received, but the reference number in the letter does not match')
+  const left = LIMIT - text.length
+  const over = left < 0
+  return (
+    <Card title="Character count" desc="A live remaining-count that is actually announced.">
+      <div className="field">
+        <label className="field__label" htmlFor="cc-why">Why are you appealing?</label>
+        <textarea
+          className="in" id="cc-why" rows={3} value={text}
+          aria-describedby="cc-why-count"
+          onChange={(e) => setText(e.target.value)}
+        />
+        {/* The live region is the component. A count that only updates visually
+          * tells a sighted person they have 12 left and tells everyone else
+          * nothing. Polite, never assertive — interrupting someone mid-sentence
+          * to say "142 remaining" is worse than silence. */}
+        <span className={`charcount ${over ? 'charcount--over' : ''}`} id="cc-why-count" role="status" aria-live="polite">
+          {over ? `${-left} characters too many` : `${left} characters remaining`}
+        </span>
+      </div>
+      {/* No maxlength: a hard cap silently truncates a paste, which is how
+        * people lose a paragraph they already wrote. Let them go over and tell
+        * them so. */}
+    </Card>
+  )
+}
+
+function MemorableDateCard() {
+  return (
+    <Card title="Memorable date" desc="Three fields for a date someone already knows — not a picker.">
+      <fieldset className="fieldset">
+        <legend className="fieldset__legend">Date of birth</legend>
+        <p className="field__hint" id="dob-hint">For example, 27 3 1981</p>
+        <div className="memdate" aria-describedby="dob-hint">
+          {([['Day', 'dob-d', 2, ''], ['Month', 'dob-m', 2, ''], ['Year', 'dob-y', 4, 'memdate__part--year']] as const).map(
+            ([label, id, len, mod]) => (
+              <div className={`memdate__part ${mod}`} key={id}>
+                {/* Each part carries its OWN visible label. A placeholder is not
+                  * a label and disappears the moment someone types. */}
+                <label className="field__label" htmlFor={id}>{label}</label>
+                <input className="in" id={id} inputMode="numeric" maxLength={len} defaultValue={len === 4 ? '1981' : (id === 'dob-d' ? '27' : '3')} />
+              </div>
+            ),
+          )}
+        </div>
+      </fieldset>
+    </Card>
+  )
+}
+
 function TaskListCard() {
   const TASKS = [
     { name: 'Your details', status: 'Completed', tone: 'success' as const },
@@ -604,12 +658,12 @@ function ErrorSummaryCard() {
       </div>
       <div className="field" style={{ marginTop: 14 }}>
         <label className="field__label" htmlFor="es-email">Email address</label>
-        <input className="in in--invalid" id="es-email" type="email" aria-describedby="es-email-err" defaultValue="" />
+        <input className="in" id="es-email" type="email" aria-invalid="true" aria-describedby="es-email-err" defaultValue="" />
         <span className="field__error" id="es-email-err">Enter an email address</span>
       </div>
       <div className="field" style={{ marginTop: 10 }}>
         <label className="field__label" htmlFor="es-post">Postcode</label>
-        <input className="in in--invalid" id="es-post" aria-describedby="es-post-err" defaultValue="12" />
+        <input className="in" id="es-post" aria-invalid="true" aria-describedby="es-post-err" defaultValue="12" />
         <span className="field__error" id="es-post-err">Enter a postcode in the right format</span>
       </div>
       <p style={{ margin: '12px 0 0', fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
@@ -989,7 +1043,7 @@ function TooltipCard() {
       {/* Placement variants — top (default) · bottom · left · right. No JS flip;
           pick the side that clears the edge. */}
       <div className="card__row" style={{ justifyContent: 'center', gap: 'var(--k-s-16)', padding: 'var(--k-s-16) 0' }}>
-        {([['', 'Top'], ['tt__pop--bottom', 'Bottom'], ['tt__pop--left', 'Left'], ['tt__pop--right', 'Right']] as const).map(([mod, lbl]) => (
+        {([['', 'Top'], ['tooltip__pop--bottom', 'Bottom'], ['tooltip__pop--left', 'Left'], ['tooltip__pop--right', 'Right']] as const).map(([mod, lbl]) => (
           <span className="tooltip" key={lbl}>
             <span className={`tooltip__pop ${mod}`} role="tooltip">On the {lbl.toLowerCase()}</span>
             <button className="btn btn--ghost btn--sm" tabIndex={-1}>{lbl}</button>

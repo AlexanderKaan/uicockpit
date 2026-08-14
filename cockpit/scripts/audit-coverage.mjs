@@ -50,7 +50,7 @@ const HAYSTACK = FILES.map((f) => readFileSync(f, 'utf8')).join('\n')
 const MARKERS = {
   // Component tier — the 18 typed components (showcases/sections.tsx)
   StatTile: 'stat-tile', Chart: 'ChartFrame', List: 'list__item', Card: 'card"',
-  Thread: 'msg__', Composer: 'toolbar', Input: 'className="in"', Table: 'tbl',
+  Thread: 'msg__', Composer: 'toolbar', Input: 'className="in"', Table: 'table',
   Form: 'className="lab"', Pricing: 'pricing__', Prose: 'prose__',
   DescriptionList: 'className="dl"', Chip: 'chip ', Kanban: 'kanban__',
   TreeView: 'tree__row', Timeline: 'timeline__', SettingsRow: 'list--settings',

@@ -2750,6 +2750,67 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }`,
   },
   {
+    id: 'charcount',
+    section: 'Character count',
+    css: `/* === Character count =====================================================
+ * A live remaining-characters readout under a textarea. USWDS and GOV.UK both
+ * ship it and no commercial system in the Open UI matrix does — which is the
+ * tell that it belongs to the forms-people-must-complete surface rather than to
+ * the marketing-site surface most design systems are built for.
+ *
+ * The whole component is the ANNOUNCEMENT. A number that only updates visually
+ * tells a sighted user they have 12 characters left and tells everyone else
+ * nothing, so the readout is a live region — polite, never assertive, because
+ * interrupting someone mid-sentence to say "142 remaining" is worse than
+ * silence. GOV.UK debounces to roughly one announcement per second for the same
+ * reason; that is a behaviour the consumer implements, and the contract says so.
+ *
+ * Over the limit is a STATE, not a colour: .charcount--over swaps the wording to
+ * "N too many" and adds the danger ink, so the count still reads correctly in
+ * monochrome (WCAG 1.4.1). The field itself is not blocked — a hard maxlength
+ * silently truncates paste, which is how people lose a paragraph they wrote. */
+.charcount { display: block; margin-top: var(--k-s-6); font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.charcount--over { color: var(--k-danger-text); font-weight: var(--k-weight-medium); }
+`,
+  },
+  {
+    id: 'memorable-date',
+    section: 'Memorable date',
+    css: `/* === Memorable date ======================================================
+ * Three fields — day, month, year — for a date the person already knows.
+ *
+ * This is not a worse calendar; it is the right control for a different job, and
+ * that is why it passes the "unique" test next to .calendar. A date picker is for
+ * CHOOSING a date you are deciding on (a meeting, a delivery). A memorable date
+ * is for RECALLING one you already hold (born on, married on, expired on), and
+ * making someone navigate a grid to reach 1971 is an accessibility failure
+ * dressed as a feature. GOV.UK and USWDS both ship this instead of a picker for
+ * that case; it is one of the clearest places their guidance diverges from
+ * commercial systems, none of which have it.
+ *
+ * Structure carries the meaning: a fieldset with a legend is the date, the three
+ * inputs are its parts, and each part has its OWN visible label. Do not label
+ * them with placeholders — a placeholder is not a label and disappears on typing.
+ *
+ * inputmode="numeric" brings up the number pad without the spinner-and-clamping
+ * behaviour of type="number", which fights people who type a leading zero. Widths
+ * are in ch so day/month stay two characters and year four: the field's size is a
+ * legitimate affordance for how much to type. */
+.memdate { display: flex; gap: var(--k-s-12); align-items: flex-end; }
+.memdate__part { display: flex; flex-direction: column; gap: var(--k-s-6); }
+.memdate__part .in {
+  /* ch so day/month read as two characters and year as four — the field's size
+   * is a legitimate affordance for how much to type. Floored against
+   * --k-hit-min because a target is an AREA: 4ch is ~30px, which clears nothing
+   * on the width axis even when the height is fine. Our own matrix check missed
+   * this by measuring height only. */
+  width: max(4ch, var(--k-hit-min));
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.memdate__part--year .in { width: max(6ch, var(--k-hit-min)); }`,
+  },
+  {
     id: 'tasklist',
     section: "Task list",
     css: `/* === Task list ===========================================================
@@ -4313,6 +4374,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   align-items: center;
   justify-content: center;
   min-height: var(--k-row-h-default, 28px);
+  /* And the width, because a target is an area. A one-letter segment ("S" "M"
+   * "L") is tall enough and 26px wide, which fails 2.5.5 on the other axis —
+   * the case our own check missed while it measured height alone. */
+  min-width: var(--k-hit-min);
   padding: 0 var(--k-s-12);
   border: 0;
   background: transparent;

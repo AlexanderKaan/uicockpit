@@ -89,6 +89,12 @@ export const FOUNDATIONS: readonly string[] = [
  * no other catalog segment, e.g. toast-stack, resizable.)
  */
 export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
+  /* Three inputs inside a fieldset, and that IS the component: the grouping is
+   * what makes a day/month/year triple one date rather than three numbers.
+   * (Not a SECTION — a section is a full-width page slab with its own heading;
+   * this drops inside one. Registered under form-panel at first, which is a
+   * section, and the tier-count test caught it immediately.) */
+  'memorable-date': ['fieldset', 'form-primitives'],
   dialog: ['card', 'buttons'],
   'alert-dialog': ['card', 'buttons'],
   'sheet-drawer': ['card', 'buttons'],
@@ -157,6 +163,11 @@ export const STANDALONE_ATOMS: readonly string[] = [
    * no host; a TOGGLETIP attaches to any control, exactly like the tooltip
    * above it; LANGUAGE NAVIGATION belongs to the page. */
   'tasklist', 'toggletip', 'langnav',
+  /* CHARACTER COUNT is the same shape: it attaches to whatever field has a
+   * limit, so naming one host would be arbitrary. (MEMORABLE DATE is not here —
+   * it composes a fieldset and three inputs, so it is a component with real
+   * edges, listed in COMPONENT_USES.) */
+  'charcount',
 ]
 
 const FOUNDATION_SET: ReadonlySet<string> = new Set(FOUNDATIONS)

@@ -114,7 +114,13 @@ const targets = () => page.evaluate((sel) => {
     // explicit size opt-outs whose targets come from spacing (WCAG 2.5.8) instead.
     .filter((e) => e.offsetParent !== null && !e.closest('.calendar-year__month')
       && !e.matches('.btn--xs, .btn--sm, .btn--icon'))
-  const under = els.filter((e) => e.getBoundingClientRect().height < 43.5)
+  // BOTH axes. The first version measured height alone and reported "0 under 44"
+  // over a 30px-wide date field — a target is an area, and half a check is the
+  // kind of pass line that makes a claim feel verified when it is not.
+  const under = els.filter((e) => {
+    const r = e.getBoundingClientRect()
+    return r.height < 43.5 || r.width < 43.5
+  })
   const g = {}
   for (const e of under) { const k = e.className.split(' ')[0]; g[k] = (g[k] || 0) + 1 }
   return { total: els.length, under: under.length, groups: g }
@@ -129,7 +135,7 @@ const setConformance = (want) => page.evaluate((w) => {
 await setConformance('aaa')
 await page.waitForTimeout(900)
 const aaa = await targets()
-console.log(`  AAA  ${aaa.under === 0 ? '✓' : '✗'} ${aaa.under}/${aaa.total} interactive controls under 44px` +
+console.log(`  AAA  ${aaa.under === 0 ? '✓' : '✗'} ${aaa.under}/${aaa.total} interactive controls under 44px on EITHER axis` +
   (aaa.under ? `  ${JSON.stringify(aaa.groups)}` : ''))
 if (aaa.under > 0) results.push({ mode: 'aaa', scale: 'targets', rows: Array(aaa.under).fill({ id: 'target-size' }) })
 

@@ -433,6 +433,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "spinner",
         "navigation-row",
         "interactive-list-row",
+        "charcount",
         "tasklist",
         "toggletip",
         "langnav",
@@ -482,6 +483,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "lightbox",
         "calendar",
         "calendar-range",
+        "memorable-date",
         "dialog",
         "command-palette",
         "chart",
@@ -771,6 +773,19 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "uses": [
           "calendar",
           "buttons"
+        ]
+      },
+      "charcount": {
+        "tier": "atom",
+        "section": "Character count",
+        "uses": []
+      },
+      "memorable-date": {
+        "tier": "component",
+        "section": "Memorable date",
+        "uses": [
+          "fieldset",
+          "form-primitives"
         ]
       },
       "tasklist": {
@@ -1518,6 +1533,12 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "num"
         ]
       },
+      "charcount": {
+        "modifiers": [
+          "over"
+        ],
+        "parts": []
+      },
       "chart": {
         "modifiers": [
           "donut",
@@ -1993,6 +2014,14 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "sub",
           "title",
           "trail"
+        ]
+      },
+      "memdate": {
+        "modifiers": [
+          "year"
+        ],
+        "parts": [
+          "part"
         ]
       },
       "menu": {
@@ -2795,6 +2824,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "attachment-chip-family",
       "banner",
       "button-group",
+      "charcount",
       "citation",
       "combobox",
       "context-menu",
@@ -4127,14 +4157,14 @@ body {
  *   the catalog:
  *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (61): the reusable elements with real
+ * ATOMS — the bare vocabulary (62): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
+ *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
  *
- * COMPONENTS — stand-alone pieces of app (26), composed FROM the atoms — the
+ * COMPONENTS — stand-alone pieces of app (27), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
- *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Dialog, Command palette, Chart, Breakdown, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
+ *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Memorable date, Dialog, Command palette, Chart, Breakdown, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
  *
  * SECTIONS — the page-region tier (15): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
@@ -6713,6 +6743,60 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   .calendar-range__month + .calendar-range__month { padding-left: 0; border-left: 0; }
 }
 
+/* === Character count =====================================================
+ * A live remaining-characters readout under a textarea. USWDS and GOV.UK both
+ * ship it and no commercial system in the Open UI matrix does — which is the
+ * tell that it belongs to the forms-people-must-complete surface rather than to
+ * the marketing-site surface most design systems are built for.
+ *
+ * The whole component is the ANNOUNCEMENT. A number that only updates visually
+ * tells a sighted user they have 12 characters left and tells everyone else
+ * nothing, so the readout is a live region — polite, never assertive, because
+ * interrupting someone mid-sentence to say "142 remaining" is worse than
+ * silence. GOV.UK debounces to roughly one announcement per second for the same
+ * reason; that is a behaviour the consumer implements, and the contract says so.
+ *
+ * Over the limit is a STATE, not a colour: .charcount--over swaps the wording to
+ * "N too many" and adds the danger ink, so the count still reads correctly in
+ * monochrome (WCAG 1.4.1). The field itself is not blocked — a hard maxlength
+ * silently truncates paste, which is how people lose a paragraph they wrote. */
+.charcount { display: block; margin-top: var(--k-s-6); font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.charcount--over { color: var(--k-danger-text); font-weight: var(--k-weight-medium); }
+
+/* === Memorable date ======================================================
+ * Three fields — day, month, year — for a date the person already knows.
+ *
+ * This is not a worse calendar; it is the right control for a different job, and
+ * that is why it passes the "unique" test next to .calendar. A date picker is for
+ * CHOOSING a date you are deciding on (a meeting, a delivery). A memorable date
+ * is for RECALLING one you already hold (born on, married on, expired on), and
+ * making someone navigate a grid to reach 1971 is an accessibility failure
+ * dressed as a feature. GOV.UK and USWDS both ship this instead of a picker for
+ * that case; it is one of the clearest places their guidance diverges from
+ * commercial systems, none of which have it.
+ *
+ * Structure carries the meaning: a fieldset with a legend is the date, the three
+ * inputs are its parts, and each part has its OWN visible label. Do not label
+ * them with placeholders — a placeholder is not a label and disappears on typing.
+ *
+ * inputmode="numeric" brings up the number pad without the spinner-and-clamping
+ * behaviour of type="number", which fights people who type a leading zero. Widths
+ * are in ch so day/month stay two characters and year four: the field's size is a
+ * legitimate affordance for how much to type. */
+.memdate { display: flex; gap: var(--k-s-12); align-items: flex-end; }
+.memdate__part { display: flex; flex-direction: column; gap: var(--k-s-6); }
+.memdate__part .in {
+  /* ch so day/month read as two characters and year as four — the field's size
+   * is a legitimate affordance for how much to type. Floored against
+   * --k-hit-min because a target is an AREA: 4ch is ~30px, which clears nothing
+   * on the width axis even when the height is fine. Our own matrix check missed
+   * this by measuring height only. */
+  width: max(4ch, var(--k-hit-min));
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.memdate__part--year .in { width: max(6ch, var(--k-hit-min)); }
+
 /* === Task list ===========================================================
  * The multi-step service pattern: "apply for X" broken into sections you can
  * complete in any order, each carrying its own status. GOV.UK ships it as Task
@@ -8146,6 +8230,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   align-items: center;
   justify-content: center;
   min-height: var(--k-row-h-default, 28px);
+  /* And the width, because a target is an area. A one-letter segment ("S" "M"
+   * "L") is tall enough and 26px wide, which fails 2.5.5 on the other axis —
+   * the case our own check missed while it measured height alone. */
+  min-width: var(--k-hit-min);
   padding: 0 var(--k-s-12);
   border: 0;
   background: transparent;
@@ -11832,14 +11920,14 @@ body {
  *   the catalog:
  *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (61): the reusable elements with real
+ * ATOMS — the bare vocabulary (62): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
+ *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
  *
- * COMPONENTS — stand-alone pieces of app (26), composed FROM the atoms — the
+ * COMPONENTS — stand-alone pieces of app (27), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
- *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Dialog, Command palette, Chart, Breakdown, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
+ *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Memorable date, Dialog, Command palette, Chart, Breakdown, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
  *
  * SECTIONS — the page-region tier (15): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
@@ -14418,6 +14506,60 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   .calendar-range__month + .calendar-range__month { padding-left: 0; border-left: 0; }
 }
 
+/* === Character count =====================================================
+ * A live remaining-characters readout under a textarea. USWDS and GOV.UK both
+ * ship it and no commercial system in the Open UI matrix does — which is the
+ * tell that it belongs to the forms-people-must-complete surface rather than to
+ * the marketing-site surface most design systems are built for.
+ *
+ * The whole component is the ANNOUNCEMENT. A number that only updates visually
+ * tells a sighted user they have 12 characters left and tells everyone else
+ * nothing, so the readout is a live region — polite, never assertive, because
+ * interrupting someone mid-sentence to say "142 remaining" is worse than
+ * silence. GOV.UK debounces to roughly one announcement per second for the same
+ * reason; that is a behaviour the consumer implements, and the contract says so.
+ *
+ * Over the limit is a STATE, not a colour: .charcount--over swaps the wording to
+ * "N too many" and adds the danger ink, so the count still reads correctly in
+ * monochrome (WCAG 1.4.1). The field itself is not blocked — a hard maxlength
+ * silently truncates paste, which is how people lose a paragraph they wrote. */
+.charcount { display: block; margin-top: var(--k-s-6); font-size: var(--k-type-small); color: var(--k-fg-muted); }
+.charcount--over { color: var(--k-danger-text); font-weight: var(--k-weight-medium); }
+
+/* === Memorable date ======================================================
+ * Three fields — day, month, year — for a date the person already knows.
+ *
+ * This is not a worse calendar; it is the right control for a different job, and
+ * that is why it passes the "unique" test next to .calendar. A date picker is for
+ * CHOOSING a date you are deciding on (a meeting, a delivery). A memorable date
+ * is for RECALLING one you already hold (born on, married on, expired on), and
+ * making someone navigate a grid to reach 1971 is an accessibility failure
+ * dressed as a feature. GOV.UK and USWDS both ship this instead of a picker for
+ * that case; it is one of the clearest places their guidance diverges from
+ * commercial systems, none of which have it.
+ *
+ * Structure carries the meaning: a fieldset with a legend is the date, the three
+ * inputs are its parts, and each part has its OWN visible label. Do not label
+ * them with placeholders — a placeholder is not a label and disappears on typing.
+ *
+ * inputmode="numeric" brings up the number pad without the spinner-and-clamping
+ * behaviour of type="number", which fights people who type a leading zero. Widths
+ * are in ch so day/month stay two characters and year four: the field's size is a
+ * legitimate affordance for how much to type. */
+.memdate { display: flex; gap: var(--k-s-12); align-items: flex-end; }
+.memdate__part { display: flex; flex-direction: column; gap: var(--k-s-6); }
+.memdate__part .in {
+  /* ch so day/month read as two characters and year as four — the field's size
+   * is a legitimate affordance for how much to type. Floored against
+   * --k-hit-min because a target is an AREA: 4ch is ~30px, which clears nothing
+   * on the width axis even when the height is fine. Our own matrix check missed
+   * this by measuring height only. */
+  width: max(4ch, var(--k-hit-min));
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.memdate__part--year .in { width: max(6ch, var(--k-hit-min)); }
+
 /* === Task list ===========================================================
  * The multi-step service pattern: "apply for X" broken into sections you can
  * complete in any order, each carrying its own status. GOV.UK ships it as Task
@@ -15851,6 +15993,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   align-items: center;
   justify-content: center;
   min-height: var(--k-row-h-default, 28px);
+  /* And the width, because a target is an area. A one-letter segment ("S" "M"
+   * "L") is tall enough and 26px wide, which fails 2.5.5 on the other axis —
+   * the case our own check missed while it measured height alone. */
+  min-width: var(--k-hit-min);
   padding: 0 var(--k-s-12);
   border: 0;
   background: transparent;
@@ -18860,10 +19006,11 @@ layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
 \`max-width\`).
 
 **ATOMS** — the bare vocabulary; only meaningful inside something larger:
-Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose.
+Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose.
 
 **COMPONENTS** — stand-alone pieces of app. Each IS its surface; build it by COMPOSING
 the atoms listed, not by hand-rolling them inside a bare card:
+- **Memorable date** — composes: Fieldset · Form primitives
 - **Dialog** — composes: Card · Buttons
 - **Alert Dialog** — composes: Card · Buttons
 - **Sheet / Drawer** — composes: Card · Buttons
@@ -18895,7 +19042,7 @@ the atoms listed, not by hand-rolling them inside a bare card:
 components per container width; they own arrangement, never look, and assemble into PAGES.
 
 **STANDALONE atoms** — attach to anything; use directly, no host component needed:
-Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Tool call, Reasoning, Citation, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list, Rating, Skip link, Fieldset, Error summary, Task list, Toggletip, Language navigation.
+Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Tool call, Reasoning, Citation, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list, Rating, Skip link, Fieldset, Error summary, Task list, Toggletip, Language navigation, Character count.
 
 **The rule of reach:** need a data surface? → the **Data table** component (it owns
 toolbar + selection + pagination + empty/loading/error). Need a form? → **Form

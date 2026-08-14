@@ -50,12 +50,14 @@ describe('segment graph integrity', () => {
     expect(f + a + b + sh).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 5 · Component 25 · Section 13 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 5 · Component 27 · Section 15 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('component')).toHaveLength(Object.keys(COMPONENT_USES).length)
     expect(idsByTier('section')).toHaveLength(Object.keys(SECTION_USES).length)
     expect(idsByTier('foundation')).toHaveLength(5)
-    expect(idsByTier('component')).toHaveLength(26)
+    // 27 since the Open UI pass added `memorable-date` — a fieldset plus three
+    // inputs, which is a component because the GROUPING is the component.
+    expect(idsByTier('component')).toHaveLength(27)
     // The 2026-06-15 "slab vs widget" re-audit: a SECTION is a full-width page slab
     // (its own job + heading; stacked to build a page); a COMPONENT is a widget you
     // drop INSIDE one. 14 sections = 4 shell regions (scaffold/navsuite/pane + the
