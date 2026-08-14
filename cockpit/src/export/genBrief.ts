@@ -301,7 +301,9 @@ guarantee it *behaves* right.
 menu → \`aria-haspopup\` + \`aria-expanded\` + \`role="menu/menuitem"\`; combobox →
 \`role="combobox"\` + \`aria-expanded\` + \`aria-activedescendant\`; switch → \`role="switch"\`
 + \`aria-checked\` + an accessible name; slider → \`role="slider"\` + \`aria-valuenow\`; tooltip → \`aria-describedby\`
-+ \`role="tooltip"\`; invalid field → \`aria-invalid="true"\`. The full per-component
++ \`role="tooltip"\`; invalid field → \`aria-invalid="true"\`. And anything you make DRAGGABLE needs a
+single-pointer alternative that does not drag (WCAG 2.5.7) — a keyboard route
+does not count. The full per-component
 ARIA table is in the AI-prompt export. A headless lib (Radix / Base UI) sets these
 for you.
 

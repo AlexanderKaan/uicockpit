@@ -4778,7 +4778,17 @@ function ScrubberCard() {
     <Card title="Scrubber" desc="Media transport progress with a playhead — wire the seek yourself.">
       <div className="card__row" style={{ gap: 'var(--k-s-12)', alignItems: 'center', paddingTop: 8 }}>
         <span className="num" style={time}>1:48</span>
-        <div className="scrubber" style={{ flex: 1 }}>
+        <div
+          className="scrubber"
+          style={{ flex: 1 }}
+          role="slider"
+          aria-label="Playback position"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={45}
+          aria-valuetext="1:32 of 3:24"
+          tabIndex={0}
+        >
           <div className="scrubber__fill" style={{ width: '45%' }} />
           <div className="scrubber__knob" style={{ left: '45%' }} />
         </div>

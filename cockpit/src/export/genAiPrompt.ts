@@ -667,6 +667,7 @@ headless lib sets them for you; if you hand-roll, this is the checklist):
 | Toast / status (.toast-stack) | \`role="status"\` (polite) or \`role="alert"\` (assertive) + \`aria-live\` |
 | Resize handle (.resizable__handle) | \`role="separator"\` + \`tabindex="0"\` + \`aria-valuenow\` (a FOCUSABLE separator is a widget and needs a value) + \`aria-label\` |
 | Any scrollable box (\`overflow:auto\`) | \`tabindex="0"\` + \`role="region"\` + \`aria-label\` — without it a keyboard cannot scroll it at all (WCAG 2.1.1) |
+| ANYTHING YOU MAKE DRAGGABLE (slider · scrubber · kanban · resize · carousel) | WCAG **2.5.7 AA**: every dragging action needs a SINGLE-POINTER alternative — click the track, a move-to menu, prev/next buttons. A keyboard route does not satisfy this; it asks for a pointer that never drags. The CSS here cannot give you that, because the drag is yours: this row is the one thing in this table you must build rather than annotate |
 
 Disabled = native \`disabled\` (or \`aria-disabled="true"\` on non-form elements);
 invalid fields = \`aria-invalid="true"\` (pairs with \`.in.is-error\` / \`.select-trigger.is-error\`).
