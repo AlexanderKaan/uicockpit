@@ -923,22 +923,22 @@ export function countReadable(path, content, resolvedModuleElements = 0) {
  * accident — one busy file cannot outvote a whole codebase.
  */
 export const UI_KINDS = {
-  nav:        [/<nav\b/i, /role=["']navigation["']/, /<(Navbar|NavBar|Navigation|Sidebar|SideNav|TopBar|AppBar)\b/],
-  menu:       [/role=["']menu["']/, /<(DropdownMenu|Dropdown|Menu|Popover|ContextMenu|Select)\b/],
-  tabs:       [/role=["']tablist["']/, /<(Tabs|TabList|TabGroup)\b/],
-  table:      [/<table\b/i, /role=["']table["']/, /<(Table|DataTable|DataGrid)\b/],
-  dialog:     [/role=["'](dialog|alertdialog)["']/, /<(Dialog|Modal|Sheet|Drawer|AlertDialog)\b/],
-  toast:      [/<(Toast|Toaster|Snackbar)\b/, /from ["'](sonner|react-hot-toast|react-toastify)["']/],
-  badge:      [/<(Badge|Tag|Pill|Chip)\b/, /class(?:Name)?=["'][^"']*\bbadge\b/],
-  avatar:     [/<(Avatar|UserAvatar|ProfilePicture)\b/, /class(?:Name)?=["'][^"']*\bavatar\b/],
-  toggle:     [/role=["']switch["']/, /<(Switch|Toggle|ToggleGroup)\b/],
-  tooltip:    [/role=["']tooltip["']/, /<(Tooltip|HoverCard)\b/],
-  card:       [/<(Card|CardHeader|CardContent|CardBody)\b/, /class(?:Name)?=["'][^"']*\bcard\b/],
-  form:       [/<(Form|FormField|FormItem)\b/, /<label\b/i],
-  breadcrumb: [/<(Breadcrumb|Breadcrumbs)\b/, /aria-label=["']breadcrumb["']/i],
-  pagination: [/<(Pagination|Paginator)\b/, /aria-label=["']pagination["']/i],
-  chart:      [/<(LineChart|BarChart|AreaChart|PieChart|Chart|Sparkline)\b/, /from ["'](recharts|chart\.js|victory|nivo)/],
-  calendar:   [/<(Calendar|DatePicker|DayPicker)\b/, /from ["'](react-day-picker|@fullcalendar)/],
+  nav:        [/<nav[\s>]/, /role=["']navigation["']/],
+  menu:       [/role=["']menu["']/],
+  tabs:       [/role=["']tablist["']/],
+  table:      [/<table[\s>]/, /role=["']table["']/],
+  dialog:     [/role=["'](dialog|alertdialog)["']/],
+  toast:      [/from ["'](sonner|react-hot-toast|react-toastify)["']/],
+  badge:      [/class(?:Name)?=["'][^"']*\bbadge\b/],
+  avatar:     [/class(?:Name)?=["'][^"']*\bavatar\b/],
+  toggle:     [/role=["']switch["']/],
+  tooltip:    [/role=["']tooltip["']/],
+  card:       [/class(?:Name)?=["'][^"']*\bcard\b/],
+  form:       [/<label[\s>]/],
+  breadcrumb: [/aria-label=["']breadcrumb["']/i],
+  pagination: [/aria-label=["']pagination["']/i],
+  chart:      [/from ["'](recharts|chart\.js|victory|nivo)/],
+  calendar:   [/from ["'](react-day-picker|@fullcalendar)/],
 }
 
 /** Files that can carry markup. Stylesheets name no components. */
@@ -948,14 +948,90 @@ const MARKUP_FILE = /\.(tsx|jsx|vue|svelte|astro|html|ts|js|mts|cts)$/
  * Count, per kind, how many files show evidence of it — and keep one example
  * path per kind so a reader can check the claim instead of trusting it.
  */
+/**
+ * The COMPONENT NAMES that identify a kind, matched on PascalCase segments.
+ *
+ * Every component name lives here now, and `UI_KINDS` above keeps only the
+ * signals that are not names at all — an ARIA role, a real `<table>`, an import
+ * of recharts. Splitting them fixed two things at once.
+ *
+ * ① A codebase that namespaces its design system was invisible. The old
+ * patterns anchored on `<Tooltip`, and n8n writes `<N8nTooltip>`,
+ * `<N8nDataTableServer>`, `<N8nAlertDialog>` for everything: it reported 12 of
+ * 16 kinds while holding 15. Prefixes and suffixes are everywhere once you
+ * look — `LightIconButton`, `SettingsTextInput`, `TableCell`.
+ *
+ * ② The old patterns also matched TYPE POSITIONS. `Array<Dialog>` is not a
+ * dialog and `useState<TableState>` is not a table, but `/<(Dialog|…)\b/` reads
+ * both. Names now come from the JSX-guarded extractor, which knows that a
+ * generic opens directly after an identifier and JSX never does.
+ *
+ * Segment-wise, not substring: substring matching claims `FormattedMessage` for
+ * a form and `Navigate` for a nav. `Formatted` is one segment; `Form` is not
+ * part of it. A noun written `=Exactly` matches only as the WHOLE name.
+ */
+const KIND_NOUNS = {
+  nav: ['Nav', 'Navbar', 'NavBar', 'Navigation', 'Sidebar', 'SideNav', 'TopBar', 'AppBar'],
+  menu: ['Menu', 'Dropdown', 'ContextMenu', 'Select', 'Combobox', 'Listbox', 'Popover'],
+  tabs: ['Tabs', 'TabList', 'TabGroup', 'TabPanel'],
+  table: ['Table', 'DataTable', 'DataGrid'],
+  dialog: ['Dialog', 'Modal', 'Sheet', 'Drawer', 'AlertDialog'],
+  toast: ['Toast', 'Toaster', 'Snackbar'],
+  badge: ['Badge', 'Pill', 'Chip', '=Tag'],
+  avatar: ['Avatar', 'ProfilePicture'],
+  /* 'Switch' only, plus the bare `=Toggle`. As a SUFFIX, Toggle means "a thing
+   * that opens": n8n's `N8nActionToggle` is the "…" menu trigger, and matching
+   * it would draw a Switch specimen for an app that has none. */
+  toggle: ['Switch', '=Toggle', '=ToggleGroup'],
+  tooltip: ['Tooltip', 'HoverCard'],
+  card: ['Card'],
+  form: ['Form', 'FormField', 'FormItem', 'FormControl'],
+  breadcrumb: ['Breadcrumb', 'Breadcrumbs'],
+  pagination: ['Pagination', 'Paginator'],
+  chart: ['Chart', 'Sparkline'],
+  calendar: ['Calendar', 'DatePicker', 'DayPicker', 'DateRangePicker', 'DateTimePicker'],
+}
+
+/** `N8nTooltip` → ['N8n','Tooltip']; `OTPInput` → ['OTP','Input']. */
+export function pascalSegments(name) {
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .split(' ')
+    .filter(Boolean)
+}
+
+/** Does `name` contain `noun` as a contiguous run of whole segments?
+ *  A noun prefixed `=` must be the ENTIRE name. */
+export function hasNoun(name, noun) {
+  if (noun.startsWith('=')) return name === noun.slice(1)
+  const n = pascalSegments(name)
+  const q = pascalSegments(noun)
+  for (let i = 0; i + q.length <= n.length; i++) {
+    if (q.every((seg, j) => n[i + j] === seg)) return true
+  }
+  return false
+}
+
+/** PascalCase elements actually USED as JSX in a source. The leading group is
+ *  what keeps TypeScript generics out — `useState<HTMLDivElement>` opens
+ *  directly after an identifier, JSX never does. */
+const JSX_ELEMENT = /(^|[\s(){}[\],;=>&|?:!])<([A-Z][A-Za-z0-9]*)(?=[\s/>])/g
+
 export function detectKinds(files) {
   const out = {}
   for (const kind of Object.keys(UI_KINDS)) out[kind] = { files: 0, at: [] }
 
   for (const { path, content } of files) {
     if (!MARKUP_FILE.test(path)) continue
+    const names = new Set()
+    for (const m of content.matchAll(JSX_ELEMENT)) names.add(m[2])
+
     for (const [kind, patterns] of Object.entries(UI_KINDS)) {
-      if (!patterns.some((p) => p.test(content))) continue
+      const byPattern = patterns.some((p) => p.test(content))
+      const byNoun = !byPattern && KIND_NOUNS[kind]
+        && [...names].some((n) => KIND_NOUNS[kind].some((noun) => hasNoun(n, noun)))
+      if (!byPattern && !byNoun) continue
       const e = out[kind]
       e.files++
       if (e.at.length < 5) e.at.push(path)

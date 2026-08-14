@@ -7,7 +7,7 @@ import {
 import { renderReport } from '../src/report.mjs'
 import {
   extractCss, extractClasses, extractCssVars, extractClassStyles, resolveVar, expandBox,
-  cssModuleBindings, moduleClassAttrs, resolveRelative,
+  cssModuleBindings, moduleClassAttrs, resolveRelative, pascalSegments, hasNoun,
 } from '../src/patterns.mjs'
 
 const at = { file: 'x.tsx', line: 1, col: 1 }
@@ -1122,4 +1122,60 @@ test('a brand named at a ramp position is still a declaration', () => {
   const r = auditFiles([{ path: 'a.css', content: ':root { --brand-default: #3f76ff }' }])
   assert.equal(r.inferredConfig.values.brandHex, '#3f76ff')
   assert.equal(r.inferredConfig.confidence.colorTheme, 1)
+})
+
+/* ──────────────────── recognising a namespaced design system ─────────────────
+ * The literal patterns anchor on `<Tooltip`, which makes every codebase that
+ * prefixes its own components invisible to them. n8n writes `<N8nTooltip>` and
+ * `<N8nDataTableServer>` for everything and came back holding 12 of 16 kinds
+ * while actually holding 15. Prefixes and suffixes are everywhere once you look.
+ */
+
+test('a namespaced component is still the component', () => {
+  const r = auditFiles([{ path: 'a.vue', content: '<N8nTooltip><N8nDataTableServer /></N8nTooltip>' }])
+  assert.equal(r.kinds.tooltip.files, 1)
+  assert.equal(r.kinds.table.files, 1)
+})
+
+test('a qualified component is still the component', () => {
+  const r = auditFiles([{ path: 'a.tsx', content: '<AlertDialogContent /><DateRangePicker />' }])
+  assert.equal(r.kinds.dialog.files, 1)
+  assert.equal(r.kinds.calendar.files, 1)
+})
+
+test('matching is by SEGMENT, so a longer word is not the noun', () => {
+  // `FormattedMessage` is i18n and `Navigate` is a router. Substring matching
+  // claims both, and claiming a form an app does not have is how a specimen
+  // gets drawn for something nobody built.
+  const r = auditFiles([{ path: 'a.tsx', content: '<FormattedMessage id="x" /><Navigate to="/" />' }])
+  assert.equal(r.kinds.form.files, 0)
+  assert.equal(r.kinds.nav.files, 0)
+})
+
+test('a Toggle that opens something is not a switch — but a bare Toggle is', () => {
+  // n8n's `N8nActionToggle` is the "…" menu trigger. Read as a switch, we would
+  // draw a Switch specimen for an app that has none. The bare `<Toggle>` is
+  // unambiguous, so the exact-match marker has to keep working in BOTH
+  // directions — the negative half alone passes even with the marker removed.
+  assert.equal(auditFiles([{ path: 'a.vue', content: '<N8nActionToggle />' }]).kinds.toggle.files, 0)
+  assert.equal(auditFiles([{ path: 'b.tsx', content: '<Toggle />' }]).kinds.toggle.files, 1)
+  assert.equal(auditFiles([{ path: 'c.tsx', content: '<ToggleGroup />' }]).kinds.toggle.files, 1)
+  // …and a namespaced SWITCH still is one, since 'Switch' is unambiguous.
+  assert.equal(auditFiles([{ path: 'd.vue', content: '<N8nSwitch />' }]).kinds.toggle.files, 1)
+})
+
+test('a type parameter never creates a component', () => {
+  // `useState<TableState>` is not a table. The JSX guard is what separates them:
+  // a generic opens directly after an identifier, JSX never does.
+  const r = auditFiles([{ path: 'a.tsx', content: 'const [s] = useState<TableState>(null)\nconst d: Array<Dialog> = []' }])
+  assert.equal(r.kinds.table.files, 0)
+  assert.equal(r.kinds.dialog.files, 0)
+})
+
+test('pascalSegments splits namespaces and acronyms', () => {
+  assert.deepEqual(pascalSegments('N8nTooltip'), ['N8n', 'Tooltip'])
+  assert.deepEqual(pascalSegments('OTPInput'), ['OTP', 'Input'])
+  assert.deepEqual(pascalSegments('FormattedMessage'), ['Formatted', 'Message'])
+  assert.equal(hasNoun('LightIconButton', 'Button'), true)
+  assert.equal(hasNoun('FormattedMessage', 'Form'), false)
 })
