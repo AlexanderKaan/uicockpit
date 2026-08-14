@@ -38,6 +38,7 @@ const MODES = ['light', 'dark'] as const
  * knob to the panel and add it here — an unlisted control is an unmeasured one,
  * which is the state this whole file exists to end. */
 const KNOBS: Record<string, unknown[]> = {
+  conformance: ['aa', 'aaa'],
   radius: ['none', 'subtle', 'soft', 'round'],
   buttonShape: ['match', 'none', 'subtle', 'soft', 'round', 'pill'],
   scale: ['compact', 'default', 'comfortable'],
@@ -143,4 +144,48 @@ describe('the Border knob is a range above the floor, not through it', () => {
       }
     })
   }
+})
+
+describe('Conformance raises the floor without locking the knob', () => {
+  /* The design constraint that produced this control: a hit-expanding pseudo can
+   * only grow into EMPTY space. An isolated icon button has room around it; two
+   * stacked 32px list rows do not, and overlapping targets are worse than small
+   * ones. So a 44px target for rows means 44px rows — which is why AAA has to
+   * move the density ladder rather than decorate it, and why the answer was not
+   * "add rungs above comfortable" (that would impose one audience's floor on
+   * everyone) nor "lock compact" (already tried, read as an unclear arrow).
+   *
+   * AAA lifts every rung to the 44px floor; Scale keeps governing whitespace. */
+  const rem = (v: string | number) => {
+    const t = String(v)
+    return t.endsWith('rem') ? parseFloat(t) * 16 : parseFloat(t)
+  }
+  const SCALES = ['compact', 'default', 'comfortable'] as const
+
+  for (const scale of SCALES) {
+    it(`aaa floors every target at 44 — ${scale}`, () => {
+      const v = buildTokens({ ...DEFAULT_CONFIG, conformance: 'aaa', scale }).vars
+      for (const t of ['--k-btn-h-default', '--k-in-h-default', '--k-cal-cell', '--k-hit-min']) {
+        expect(rem(v[t]!), `${t} at ${scale}`).toBeGreaterThanOrEqual(44)
+      }
+    })
+  }
+
+  it('aa keeps the dense ladder, and still clears the AA floor', () => {
+    for (const scale of SCALES) {
+      const v = buildTokens({ ...DEFAULT_CONFIG, conformance: 'aa', scale }).vars
+      expect(rem(v['--k-hit-min']!), `hit-min at ${scale}`).toBeGreaterThanOrEqual(24)
+      expect(rem(v['--k-btn-h-default']!), `button at ${scale}`).toBeGreaterThanOrEqual(24)
+    }
+    // …and it is genuinely a different ladder, or the control would be theatre.
+    const a = rem(buildTokens({ ...DEFAULT_CONFIG, conformance: 'aa', scale: 'compact' }).vars['--k-btn-h-default']!)
+    const b = rem(buildTokens({ ...DEFAULT_CONFIG, conformance: 'aaa', scale: 'compact' }).vars['--k-btn-h-default']!)
+    expect(b).toBeGreaterThan(a)
+  })
+
+  it('Scale still governs whitespace under aaa — otherwise the knob died', () => {
+    const space = SCALES.map((scale) =>
+      rem(buildTokens({ ...DEFAULT_CONFIG, conformance: 'aaa', scale }).vars['--k-space']!))
+    expect(new Set(space).size, `distinct --k-space values: ${space.join('/')}`).toBe(3)
+  })
 })

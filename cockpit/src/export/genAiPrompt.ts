@@ -141,6 +141,11 @@ shadows or transitions.**
 - Surface: ${({ outlined: 'Outlined', filled: 'Filled', plain: 'Plain' } as const)[cfg.surface]} — the STRUCTURE of how contained surfaces (fields, menus, the sidebar seam) separate. ${cfg.surface === 'outlined' ? 'Outlined = a box drawn by a border (+ a light fill); the sidebar is flush with a hairline seam.' : cfg.surface === 'filled' ? 'Filled = a box drawn by the tonal fill, border transparent; the sidebar is a sunken recessed well (--k-chrome-bg = --k-surface-sunken).' : 'Plain = no box: fields get a bottom hairline (underline, radius 0), menus/sidebar go seamless and lean on the shadow.'} Fields read \`--k-field-bg / --k-field-border-color / --k-field-underline-color / --k-field-radius\`. (Border tunes the line strength; Elevation the lift — both separate.)
 - Border: ${cfg.borders} — a separate control for the 1px box-edge prominence (faint→strong), a tint on the neutral ladder. Independent of depth.
 - Motion: ${cfg.motion}
+- **Conformance: ${cfg.conformance === 'aaa' ? 'WCAG 2.2 AA + AAA target size' : 'WCAG 2.2 AA'}** — this is the bar the kit is built to, not a suggestion. ${
+    cfg.conformance === 'aaa'
+      ? 'Every interactive target is at least 44x44 CSS px (SC 2.5.5, the level NL Design System raises to mandatory). The density tokens already carry it — use `--k-btn-h-default` / `--k-in-h-default` / `--k-hit-min` and do not shrink a control below them. A small glyph control keeps its visual size and centres a transparent `::before` of `--k-hit-min` to reach the floor.'
+      : 'Every interactive target is at least 24x24 CSS px (SC 2.5.8). Use `--k-hit-min` for small glyph controls rather than a literal.'
+  }
 - Typeface: ${cfg.fontDisplay} (display) / ${cfg.fontBody} (body) / ${UI_MONO} (mono for code & Kbd)
 - UI text — applies to buttons, badges, tabs, nav rows, form labels: a fixed semibold weight (\`--k-ui-weight\`, constant — NOT changed by Scale or Text size), sentence case. Nav/tables/menus use the 14px body floor; uppercase only for the eyebrow role (--k-type-eyebrow: table heads, stat labels, group labels)
 - Icons: ${lib.label}

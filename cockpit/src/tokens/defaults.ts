@@ -10,6 +10,10 @@ export const DEFAULT_CONFIG: Config = {
   color: 'tone',               // chromatic mode (brand hue drives primary/links/focus + auto-tints neutrals)
   radius: 'soft',
   buttonShape: 'match',        // follow the box radius by default (unified look)
+  // AA, because AA is what the law actually requires — see the Conformance type.
+  // 'aaa' raises the target-size floor to 44 for the teams whose own baseline
+  // demands it (public services, NLDS), without inflating everyone else's kit.
+  conformance: 'aa',
   scale: 'default',            // size + presence macro (drives ui-weight too)
   typeScale: 'md',
   labelCase: 'sentence',       // UI labels as-authored; 'caps' = the industrial/terminal look

@@ -10,6 +10,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "color": "tone",
     "radius": "round",
     "buttonShape": "match",
+    "conformance": "aa",
     "scale": "comfortable",
     "typeScale": "md",
     "labelCase": "sentence",
@@ -92,8 +93,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
     "--k-chart-6": "oklch(80.6% 0.2079 150.0)",
     "--k-chrome-bg": "oklch(98.0% 0.0063 249.9)",
     "--k-control-h-lg": "calc(var(--k-in-h-default) + 0.5rem)",
-    "--k-control-h-md": "var(--k-in-h-default)",
-    "--k-control-h-sm": "calc(var(--k-in-h-default) - 0.25rem)",
+    "--k-control-h-md": "max(var(--k-hit-min), var(--k-in-h-default))",
+    "--k-control-h-sm": "max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem))",
     "--k-danger": "oklch(55.7% 0.1997 17.4)",
     "--k-danger-fg": "#ffffff",
     "--k-danger-soft": "oklch(94.8% 0.0101 2.0)",
@@ -3282,8 +3283,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-stroke-progress: 6px;
   --k-btn-h-default: 2.75rem;
   --k-in-h-default: 2.75rem;
-  --k-control-h-md: var(--k-in-h-default);
-  --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
+  --k-control-h-md: max(var(--k-hit-min), var(--k-in-h-default));
+  --k-control-h-sm: max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem));
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
@@ -3585,8 +3586,8 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-stroke-progress: 6px;
   --k-btn-h-default: 2.75rem;
   --k-in-h-default: 2.75rem;
-  --k-control-h-md: var(--k-in-h-default);
-  --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
+  --k-control-h-md: max(var(--k-hit-min), var(--k-in-h-default));
+  --k-control-h-sm: max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem));
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
@@ -5364,7 +5365,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tab {
   flex: 0 0 auto;
   white-space: nowrap;
-  padding: var(--k-s-8) var(--k-s-10);
+  /* A tab is a target and had no height of its own — only padding, so its size
+   * was whatever the font left behind (32px measured). It now sits on the row
+   * ladder like every other stacked control, which is also what makes it follow
+   * the target-size floor. */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--k-row-h-default, 32px);
+  padding: 0 var(--k-s-10);
   font-size: var(--k-type-body);
   color: var(--k-fg-muted);
   border-bottom: 2px solid transparent;
@@ -8130,7 +8138,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .segctrl__btn {
   flex: 0 0 auto;
   white-space: nowrap;
-  padding: var(--k-s-4) var(--k-s-12);
+  /* A segment is a target, and it had no height of its own — padding alone put
+   * it at 20px, the smallest interactive thing in the kit. Segments sit side by
+   * side in ONE row, so unlike stacked list rows there is vertical room: putting
+   * them on the row ladder lets the target-size floor reach them without
+   * changing how the control is laid out. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--k-row-h-default, 28px);
+  padding: 0 var(--k-s-12);
   border: 0;
   background: transparent;
   font-size: var(--k-type-small);
@@ -10971,8 +10988,8 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-stroke-progress: 6px;
   --k-btn-h-default: 2.75rem;
   --k-in-h-default: 2.75rem;
-  --k-control-h-md: var(--k-in-h-default);
-  --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
+  --k-control-h-md: max(var(--k-hit-min), var(--k-in-h-default));
+  --k-control-h-sm: max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem));
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
@@ -11274,8 +11291,8 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-stroke-progress: 6px;
   --k-btn-h-default: 2.75rem;
   --k-in-h-default: 2.75rem;
-  --k-control-h-md: var(--k-in-h-default);
-  --k-control-h-sm: calc(var(--k-in-h-default) - 0.25rem);
+  --k-control-h-md: max(var(--k-hit-min), var(--k-in-h-default));
+  --k-control-h-sm: max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem));
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
@@ -13053,7 +13070,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tab {
   flex: 0 0 auto;
   white-space: nowrap;
-  padding: var(--k-s-8) var(--k-s-10);
+  /* A tab is a target and had no height of its own — only padding, so its size
+   * was whatever the font left behind (32px measured). It now sits on the row
+   * ladder like every other stacked control, which is also what makes it follow
+   * the target-size floor. */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--k-row-h-default, 32px);
+  padding: 0 var(--k-s-10);
   font-size: var(--k-type-body);
   color: var(--k-fg-muted);
   border-bottom: 2px solid transparent;
@@ -15819,7 +15843,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .segctrl__btn {
   flex: 0 0 auto;
   white-space: nowrap;
-  padding: var(--k-s-4) var(--k-s-12);
+  /* A segment is a target, and it had no height of its own — padding alone put
+   * it at 20px, the smallest interactive thing in the kit. Segments sit side by
+   * side in ONE row, so unlike stacked list rows there is vertical room: putting
+   * them on the row ladder lets the target-size floor reach them without
+   * changing how the control is laid out. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--k-row-h-default, 28px);
+  padding: 0 var(--k-s-12);
   border: 0;
   background: transparent;
   font-size: var(--k-type-small);
@@ -19017,6 +19050,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
     "color": "mono",
     "radius": "soft",
     "buttonShape": "match",
+    "conformance": "aa",
     "scale": "default",
     "typeScale": "md",
     "labelCase": "sentence",

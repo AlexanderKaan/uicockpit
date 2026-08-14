@@ -52,6 +52,18 @@ export type ButtonShape = 'match' | 'none' | 'subtle' | 'soft' | 'round' | 'pill
  *    comfortable → Notion — calm, roomy, reading-friendly (40px)
  * (A 4th "spacious" tier was dropped: no premium-app ships controls beyond ~40px;
  * it inflated buttons/spacing and was the only tier with off-grid values.) */
+/** Which bar the kit must clear.
+ *
+ * The only control in the panel that is not about how the kit LOOKS. AA is the
+ * legal floor — EN 301 549 harmonises WCAG 2.1 AA and that is what the European
+ * Accessibility Act enforces. AAA is not "better compliance", it is a different
+ * bar that a few criteria can be raised to, and NL Design System raises exactly
+ * two: 2.4.13 focus appearance and 2.5.5 target size. Defaulting to AAA would
+ * claim a level the law does not ask for and inflate every kit to suit one
+ * audience; hiding it would leave that audience unable to reach their own
+ * baseline at any setting. So it is a choice, and it is the first one. */
+export type Conformance = 'aa' | 'aaa'
+
 export type Scale = 'compact' | 'default' | 'comfortable'
 /* Text size — S/M/L/XL scales the whole 6-tier type scale (h1/h2/h3/body/
  * small/eyebrow) proportionally. md is the sensible default (body 14, nav 14,
@@ -176,6 +188,7 @@ export interface Config {
   /* Scale — interface size + presence macro (drives sizing, spacing AND UI
    * weight; replaces Style + Density + the separate UI-weight control). */
   scale: Scale
+  conformance: Conformance
   typeScale: TypeScale
   labelCase: LabelCase
   displayWeight: DisplayWeight

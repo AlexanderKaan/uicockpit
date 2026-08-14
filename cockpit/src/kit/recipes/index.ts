@@ -1309,7 +1309,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tab {
   flex: 0 0 auto;
   white-space: nowrap;
-  padding: var(--k-s-8) var(--k-s-10);
+  /* A tab is a target and had no height of its own — only padding, so its size
+   * was whatever the font left behind (32px measured). It now sits on the row
+   * ladder like every other stacked control, which is also what makes it follow
+   * the target-size floor. */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--k-row-h-default, 32px);
+  padding: 0 var(--k-s-10);
   font-size: var(--k-type-body);
   color: var(--k-fg-muted);
   border-bottom: 2px solid transparent;
@@ -4297,7 +4304,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .segctrl__btn {
   flex: 0 0 auto;
   white-space: nowrap;
-  padding: var(--k-s-4) var(--k-s-12);
+  /* A segment is a target, and it had no height of its own — padding alone put
+   * it at 20px, the smallest interactive thing in the kit. Segments sit side by
+   * side in ONE row, so unlike stacked list rows there is vertical room: putting
+   * them on the row ladder lets the target-size floor reach them without
+   * changing how the control is laid out. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--k-row-h-default, 28px);
+  padding: 0 var(--k-s-12);
   border: 0;
   background: transparent;
   font-size: var(--k-type-small);

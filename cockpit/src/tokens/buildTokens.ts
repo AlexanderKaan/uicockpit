@@ -718,7 +718,32 @@ export function buildTokens(cfg: Config): Tokens {
   /* Scale is the size + presence macro — cascades to space, button/input/toggle
    * defaults, calendar cell size, row grammar default AND ui-weight. ONE knob,
    * whole kit follows. See SCALE table at the top. */
-  const st = SCALE[cfg.scale]
+  const aaa = cfg.conformance === 'aaa'
+  const stRaw = SCALE[cfg.scale]
+  /* AAA raises the FLOOR, it does not lock the knob.
+   *
+   * The per-option panel lock was already built once and deliberately removed —
+   * it "read as an unclear arrow" (see the note in Panel.tsx) and the conclusion
+   * was that the engine guarantee should stand on its own. So AAA does what
+   * every other floor in this file does: it lifts the minimum and leaves the
+   * control alone. All three rungs reach 44px targets, and Scale then governs
+   * exactly what it should govern — whitespace — instead of quietly deciding
+   * whether a target is legal.
+   *
+   * Stacked controls are why this cannot be solved with a hit-expanding pseudo:
+   * a list row's target IS its height, and two 32px rows cannot both carry a
+   * 44px target without overlapping, which is worse than being small. Isolated
+   * controls can expand (that is Invariant I4, already in the kit); rows cannot.
+   * On a coarse pointer this floor is already unconditional via globalLayer's
+   * `pointer: coarse` block — AAA is what brings it to the mouse. */
+  const st: ScaleRow = aaa
+    ? {
+        ...stRaw,
+        btnH: Math.max(44, stRaw.btnH),
+        inH: Math.max(44, stRaw.inH),
+        calCell: Math.max(44, stRaw.calCell),
+      }
+    : stRaw
   const space = rem(st.space)
   // Box padding is a SEPARATE token from --k-space (the gap/rhythm unit). Cards
   // and dialogs use it with a real floor (default 24px = shadcn `p-6`, the modern
@@ -1329,9 +1354,16 @@ export function buildTokens(cfg: Config): Tokens {
       //
       // Two-line rows (hover preview, attachment chip with meta) are NOT
       // part of this grammar — they're intrinsically taller.
-      '--k-row-h-sm': rem(28), // dense menu rows, table rows, dropdown options
-      '--k-row-h-md': rem(32), // default (search-result lists, command palette)
-      '--k-row-h-lg': rem(40), // sidebar nav, settings list, touch-friendly
+      /* The ROW ladder — a second height family, and the one the target-size
+       * floor actually turns on. Menu items, dropdown options and table rows
+       * read these, not `--k-btn-h-default`, so flooring the button family alone
+       * left every stacked control exactly where it was: measured on the wall,
+       * `.menu__item` stayed at 28px while the AAA token said 44. Stacked rows
+       * are precisely the case a hit-expanding pseudo cannot rescue — the row IS
+       * the target — which makes this ladder the one that matters most. */
+      '--k-row-h-sm': rem(aaa ? 44 : 28), // dense menu rows, table rows, dropdown options
+      '--k-row-h-md': rem(aaa ? 44 : 32), // default (search-result lists, command palette)
+      '--k-row-h-lg': rem(aaa ? 44 : 40), // sidebar nav, settings list, touch-friendly
       '--k-row-px': rem(10),
       '--k-row-gap': rem(10),
       '--k-row-icon': rem(14),
@@ -1370,14 +1402,27 @@ export function buildTokens(cfg: Config): Tokens {
       // which sizes LIST rows, not form controls) — mixing the two is exactly
       // what made the Board toolbar misalign. The .toolbar recipe forces its
       // children onto one of these so the bug class can't recur.
-      '--k-control-h-md': `var(--k-in-h-default)`,
-      '--k-control-h-sm': `calc(var(--k-in-h-default) - 0.25rem)`,
+      /* Floored against `--k-hit-min`, which already carries the Conformance
+       * choice (24px at AA, 44px at AAA). Stating it that way means the rule
+       * lives in ONE place and both levels follow automatically — the sm tier
+       * subtracts 4px, and under AAA that quietly produced a 40px control inside
+       * `.toolbar--sm`: the single element still under the bar after the row and
+       * button ladders were floored. A size modifier must not be able to opt out
+       * of the floor; that is the whole point of having one. */
+      '--k-control-h-md': `max(var(--k-hit-min), var(--k-in-h-default))`,
+      '--k-control-h-sm': `max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem))`,
       '--k-control-h-lg': `calc(var(--k-in-h-default) + 0.5rem)`,
-      // Min touch target (Invariant I4) — the WCAG-AA floor (24px). A small glyph
-      // control (a chip × / clear) keeps its visual size but centres a transparent
-      // ::before of this size to make the CLICK area reach the floor. Fixed (an
-      // accessibility constant), so it does NOT ride Scale/density.
-      '--k-hit-min': '1.5rem',
+      // Min touch target (Invariant I4) — a small glyph control (a chip × / clear)
+      // keeps its visual size but centres a transparent ::before of this size so
+      // the CLICK area reaches the floor. It does NOT ride Scale — density is not
+      // allowed to decide whether a target is legal — but it DOES ride the
+      // Conformance choice, because that is the bar itself: 24px is WCAG 2.5.8
+      // AA, 44px is 2.5.5 AAA. This is the isolated-control half of the floor;
+      // stacked rows get theirs from the ScaleRow heights above, since a row's
+      // target is its height and no pseudo-element can conjure space between two
+      // rows that are already touching.
+      // (NB there is a second, shadowed '--k-hit-min' in sVars — this one wins.)
+      '--k-hit-min': aaa ? '2.75rem' : '1.5rem',
       // One min-width for floating menus/popovers/hover-cards so they read as one
       // overlay family (was 180/200px literals). rem → scales with the root size.
       '--k-overlay-min': '12rem',

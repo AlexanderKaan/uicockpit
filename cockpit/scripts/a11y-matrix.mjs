@@ -97,6 +97,42 @@ for (const mode of ['light', 'dark']) {
   }
   if (mode === 'light') { await toggleMode(); await page.waitForTimeout(700) }
 }
+/* ── Target size, measured on the RENDERED page ────────────────────────────
+ *
+ * A unit test on the tokens is not enough and we proved it the hard way: the
+ * first version of the AAA floor set `--k-btn-h-default` to 44 and passed its
+ * own test while `.menu__item` still rendered at 28px, because menus read a
+ * different ladder (`--k-row-h-*`) and tabs and segments had no height at all.
+ * The token was right and the page was wrong. So the claim is checked where the
+ * claim lives. */
+console.log('\n── Target size (Conformance) ' + '─'.repeat(35))
+const SEL = ['.btn', '.in', '.list__row', '.menu__item', '.navsub__item', '.tab',
+  '.segctrl__btn', '.calendar__cell', '.select-trigger', '.navrow', '.opt']
+const targets = () => page.evaluate((sel) => {
+  const els = [...document.querySelectorAll(sel.map((s) => `.cockpit-preview ${s}`).join(', '))]
+    // year-view calendars deliberately shrink their cells; xs/sm/icon buttons are
+    // explicit size opt-outs whose targets come from spacing (WCAG 2.5.8) instead.
+    .filter((e) => e.offsetParent !== null && !e.closest('.calendar-year__month')
+      && !e.matches('.btn--xs, .btn--sm, .btn--icon'))
+  const under = els.filter((e) => e.getBoundingClientRect().height < 43.5)
+  const g = {}
+  for (const e of under) { const k = e.className.split(' ')[0]; g[k] = (g[k] || 0) + 1 }
+  return { total: els.length, under: under.length, groups: g }
+}, SEL)
+
+const setConformance = (want) => page.evaluate((w) => {
+  const row = [...document.querySelectorAll('.fmrow')].find((r) => r.textContent.includes('Conformance'))
+  const btn = [...(row?.querySelectorAll('button') || [])].find((b) => (w === 'aaa' ? /AAA/ : /AA$|WCAG AA/).test(b.textContent.trim()))
+  btn?.click(); return !!btn
+}, want)
+
+await setConformance('aaa')
+await page.waitForTimeout(900)
+const aaa = await targets()
+console.log(`  AAA  ${aaa.under === 0 ? '✓' : '✗'} ${aaa.under}/${aaa.total} interactive controls under 44px` +
+  (aaa.under ? `  ${JSON.stringify(aaa.groups)}` : ''))
+if (aaa.under > 0) results.push({ mode: 'aaa', scale: 'targets', rows: Array(aaa.under).fill({ id: 'target-size' }) })
+
 await browser.close()
 const total = results.reduce((a, r) => a + r.rows.length, 0)
 console.log(`\n${'═'.repeat(64)}\n${total} violation(s) across ${results.length} configurations`)

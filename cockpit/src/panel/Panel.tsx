@@ -141,6 +141,16 @@ const TYPESCALE_OPTS = [
 ]
 // Label case — the UI-chrome label tier (buttons, labels, badges, tabs, nav).
 // Default keeps them as authored; Caps = uppercase + tracking (the industrial look).
+/* Which bar the kit must clear — the one control here that is not about looks.
+ * AA is the legal floor (EN 301 549 harmonises WCAG 2.1 AA, and that is what the
+ * European Accessibility Act enforces). AAA is not "more compliant", it is a
+ * different bar that individual criteria can be raised to; NL Design System
+ * raises target size and focus appearance, which is why public-sector teams
+ * could not reach their own baseline at any setting until this existed. */
+const CONFORMANCE_OPTS = [
+  { id: 'aa' as const, cap: 'WCAG AA' },
+  { id: 'aaa' as const, cap: 'AAA targets' },
+]
 const LABEL_CASE_OPTS = [
   { id: 'sentence' as const, cap: 'Default' },
   { id: 'caps' as const, cap: 'Caps' },
@@ -275,6 +285,24 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
   const activeKit = activeKitId(cfg)
 
   const rows: RowDef[] = [
+    {
+      /* Conformance — deliberately the first row, above even Brand.
+       *
+       * Every control below it changes how the kit looks. This one changes what
+       * it must be true of, and it is the only place the product's actual claim
+       * is visible to the person using it. Choosing AAA raises the target-size
+       * floor to 44px on ALL three density rungs (the engine does it in
+       * buildTokens; nothing here dims or locks a rung — the per-option lock was
+       * tried once and read as an unclear arrow, see the note below). Scale then
+       * governs whitespace, which is what it should have governed all along. */
+      key: 'conformance',
+      label: 'Conformance',
+      value: cap(CONFORMANCE_OPTS, cfg.conformance),
+      kind: 'seg',
+      opts: optsFrom(CONFORMANCE_OPTS),
+      selected: cfg.conformance,
+      onPick: pick('conformance'),
+    },
     {
       // Style — the FRONT-DOOR anchor (top of FOUNDATION, above Brand). Pick a curated
       // named kit; it sets structure + type + colour-character but preserves the brand
