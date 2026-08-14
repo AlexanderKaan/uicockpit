@@ -36,6 +36,7 @@ import { genTailwind } from './genTailwind'
 import { genShadcn } from './genShadcn'
 import { genContract } from './genContract'
 import { genDesignMd } from './genDesignMd'
+import { genConformanceReport } from './genConformanceReport'
 import { genSkill } from './genSkill'
 import { zipSync } from './zip'
 import { ping } from '../analytics/beacon'
@@ -495,6 +496,17 @@ function ToolPane({ tool, cfg, onToast }: { tool: ToolDef; cfg: Config; onToast:
       }
     }
     if (!seen.has('design.md')) files.push({ name: 'design.md', text: genDesignMd(cfg) })
+    /* Always included, in every destination's zip. A conformance report you have
+     * to go and find is one nobody has when the procurement question arrives —
+     * and it is the artefact that makes the rest of the kit citable rather than
+     * merely good. Dated at generation, because a report without a date is not
+     * evidence of anything. */
+    if (!seen.has('conformance-report.md')) {
+      files.push({
+        name: 'conformance-report.md',
+        text: genConformanceReport(cfg, new Date().toISOString().slice(0, 10)),
+      })
+    }
     const blob = zipSync(files)
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -904,6 +916,36 @@ function OverviewPane({ cfg, onToast }: { cfg: Config; onToast: (m: string) => v
               <span className="export-ov__a11y-ratio">{p.ratio.toFixed(2)}:1</span>
             </div>
           ))}
+        </div>
+        {/* The pair table is the WEAKEST of the three things we measure — it is
+          * arithmetic on tokens, and it is the instrument that once scored a
+          * gradient as black and reported perfectly readable text as failing.
+          * The rendered scans are the strong evidence and they live in the
+          * report, together with what we did NOT test. Offered here because this
+          * panel is where someone checking conformance already is. */}
+        <div className="export-ov__a11y-foot">
+          <p className="export-ov__a11y-note">
+            These ratios are computed for this configuration. The report adds what was
+            measured on the rendered components, how, and what was not tested —
+            citable in your own accessibility statement.
+          </p>
+          <button
+            type="button"
+            className="export-ov__a11y-dl"
+            onClick={() => {
+              const text = genConformanceReport(cfg, new Date().toISOString().slice(0, 10))
+              const url = URL.createObjectURL(new Blob([text], { type: 'text/markdown' }))
+              const a = document.createElement('a')
+              a.href = url
+              a.download = 'conformance-report.md'
+              a.click()
+              URL.revokeObjectURL(url)
+              ping('download', 'conformance-report')
+            }}
+          >
+            <Download size={12} strokeWidth={2} />
+            Conformance report
+          </button>
         </div>
       </div>
     </div>

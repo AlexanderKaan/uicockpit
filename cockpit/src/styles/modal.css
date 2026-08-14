@@ -623,3 +623,39 @@
 .toolstep__inline::-webkit-scrollbar { display: none; }
 
 .tool__proof { margin-top: 22px; }
+
+/* Conformance-report offer, under the pair table. Deliberately quiet: the panel
+   above it already carries the numbers, and this is the sentence that says those
+   numbers are not the whole story. */
+.export-ov__a11y-foot {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--app-border);
+}
+.export-ov__a11y-note {
+  flex: 1 1 20rem;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--app-fg-muted);
+}
+.export-ov__a11y-dl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm, 6px);
+  background: var(--app-surface);
+  color: var(--app-fg);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.export-ov__a11y-dl:hover { background: var(--app-surface-2); }

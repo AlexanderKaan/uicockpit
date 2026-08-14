@@ -5,6 +5,7 @@ import { genTailwind } from '../genTailwind'
 import { genBrief } from '../genBrief'
 import { genRegistry } from '../genRegistry'
 import { genContract } from '../genContract'
+import { genConformanceReport } from '../genConformanceReport'
 import { genDesignMd } from '../genDesignMd'
 import { genSkill } from '../genSkill'
 import { DEFAULT_CONFIG } from '../../tokens/defaults'
@@ -210,5 +211,50 @@ describe('genSkill', () => {
 
   it('matches snapshot for soft + cobalt sample', () => {
     expect(genSkill(sampleCfg)).toMatchSnapshot()
+  })
+})
+
+/* The conformance report is the one export that makes a CLAIM about compliance,
+ * which is exactly why it is snapshotted: wording drift here is not cosmetic. The
+ * two things that must never quietly disappear are the disclaimer that this is
+ * not an accessibility statement, and the limitations section — a report whose
+ * caveats erode over a few edits is how an honest document becomes a misleading
+ * one without anyone deciding to mislead. */
+describe('genConformanceReport', () => {
+  const at = '2026-01-01'
+
+  it('matches snapshot at AA', () => {
+    expect(genConformanceReport(DEFAULT_CONFIG, at)).toMatchSnapshot()
+  })
+
+  it('matches snapshot at AAA', () => {
+    expect(genConformanceReport({ ...DEFAULT_CONFIG, conformance: 'aaa' }, at)).toMatchSnapshot()
+  })
+
+  it('refuses to present itself as an accessibility statement', () => {
+    const md = genConformanceReport(DEFAULT_CONFIG, at)
+    expect(md).toContain('It is not an accessibility statement')
+    expect(md).toContain('Using components that conform does not make a service conform')
+  })
+
+  it('states what was NOT tested, including the users', () => {
+    const md = genConformanceReport(DEFAULT_CONFIG, at)
+    expect(md).toContain('No testing with disabled users')
+    expect(md).toMatch(/EN 301 549 currently harmonises WCAG 2\.1 AA/)
+    // the suggested citation must carry the same admission, or a reader lifts
+    // the flattering half and leaves the honest one behind
+    expect(md).toContain('did not\n> include testing with disabled users')
+  })
+
+  it('separates what is measured live from what our CI measured', () => {
+    const md = genConformanceReport(DEFAULT_CONFIG, at)
+    expect(md).toContain('Measured live, for the configuration above')
+    expect(md).toContain('Measured on the kit itself, by our continuous checks')
+  })
+
+  it('reports the AAA target floor only when AAA is selected', () => {
+    expect(genConformanceReport({ ...DEFAULT_CONFIG, conformance: 'aaa' }, at))
+      .toContain('every interactive target is at least 44x44')
+    expect(genConformanceReport(DEFAULT_CONFIG, at)).toContain('24x24 minimum of SC 2.5.8')
   })
 })
