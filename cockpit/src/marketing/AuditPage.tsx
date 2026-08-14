@@ -92,6 +92,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       inferredConfig: { values?: Record<string, unknown>; confidence?: Record<string, unknown> }
       kinds?: Record<string, { files: number }>
       shell?: Record<string, { files: number }>
+      variants?: Record<string, number>
       spread?: AuditHandoff['spread']
       dimensions?: Record<string, { distinct: number }>
       sprawl?: { treatments: number; singletons: number }
@@ -106,6 +107,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       parsed: r.meta.parsed,
       kinds: Object.fromEntries(Object.entries(r.kinds || {}).map(([k, v]) => [k, v.files])),
       shell: Object.fromEntries(Object.entries(r.shell || {}).map(([k, v]) => [k, v.files])),
+      variants: r.variants || {},
       spread: r.spread || { radius: [], shadow: [], spacing: [], color: [], neutral: [], type: [], bg: null, fg: null, border: null, polarity: null },
       distinct: {
         radius: r.dimensions?.radius?.distinct ?? 0,

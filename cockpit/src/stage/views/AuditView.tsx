@@ -179,7 +179,7 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
                   <span className="audv__n">in {nf(n)} file{n === 1 ? '' : 's'}</span>
                 </figcaption>
                 <div className="audv__stage" style={drift ? driftStyle(audit, i) : undefined}>
-                  {spec.render()}
+                  {spec.render(audit.variants)}
                 </div>
               </figure>
             ))}
@@ -197,7 +197,7 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
                 <span className="audv__n">in {nf(n)} file{n === 1 ? '' : 's'}</span>
               </figcaption>
               <div className="audv__stage" style={drift ? driftStyle(audit, i + 3) : undefined}>
-                {spec.render()}
+                {spec.render(audit.variants)}
               </div>
             </figure>
           )

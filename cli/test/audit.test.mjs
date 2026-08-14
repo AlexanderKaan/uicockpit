@@ -946,3 +946,180 @@ test('stylesheets define no shell', () => {
   assert.equal(r.shell['side-nav'].files, 0)
   assert.equal(r.shell['top-bar'].files, 0)
 })
+
+/* ─────────────────────── the page, the ink and the edge ──────────────────────
+ * Every rule below was learned from a real repo reporting the wrong app back at
+ * its own authors, and each one drives the ENTIRE derived palette: get the page
+ * or the ink wrong and every surface, border and label mixed from them is wrong
+ * too. This is the most consequential inference the audit makes.
+ */
+
+test('the ink is the darkest text that is actually used, not the most frequent', () => {
+  // formbricks' busiest legible text colour is slate-500 (407 uses) and their
+  // body ink is slate-900 (257): every card carries one heading and three muted
+  // lines, so frequency elects the muted grey in any well-built app.
+  const css = `
+    .page { background: #ffffff }
+    ${Array.from({ length: 12 }, (_, i) => `.muted${i} { color: #64748b }`).join('\n')}
+    ${Array.from({ length: 6 }, (_, i) => `.head${i} { color: #0f172a }`).join('\n')}
+  `
+  const r = auditFiles([{ path: 'a.css', content: css }])
+  assert.equal(r.spread.bg, '#ffffff')
+  assert.equal(r.spread.fg, '#0f172a')
+})
+
+test('a single stray near-black does not become the ink', () => {
+  // The support floor: one #000000 in an icon must not outrank the colour the
+  // codebase actually writes its text in.
+  const css = `
+    .page { background: #ffffff }
+    ${Array.from({ length: 20 }, (_, i) => `.t${i} { color: #334155 }`).join('\n')}
+    .icon { color: #000000 }
+  `
+  assert.equal(auditFiles([{ path: 'a.css', content: css }]).spread.fg, '#334155')
+})
+
+test('what a codebase DECLARES outranks what it happens to use', () => {
+  // documenso has eleven literal text colours in total, because everything real
+  // lives in --foreground. Counting alone reads a tokenised repo by its scraps.
+  const css = `
+    :root { --background: #ffffff; --foreground: #0a0a0a; --border: #e5e5e5 }
+    ${Array.from({ length: 30 }, (_, i) => `.x${i} { color: #6b7280; background: #f3f4f6 }`).join('\n')}
+    .y { color: var(--foreground); background: var(--background); border-color: var(--border) }
+  `
+  const r = auditFiles([{ path: 'a.css', content: css }])
+  assert.equal(r.spread.bg, '#ffffff')
+  assert.equal(r.spread.fg, '#0a0a0a')
+  assert.equal(r.spread.border, '#e5e5e5')
+})
+
+test('a dark-theme block never overwrites the theme the app ships', () => {
+  // shadcn writes :root light then .dark dark, in that order. Last-wins read
+  // documenso's page as #262626 and its ink as near-white — their dark theme,
+  // reported as their app.
+  const css = `
+    :root { --background: #ffffff; --foreground: #111111 }
+    .dark { --background: #262626; --foreground: #f7f7f7 }
+  `
+  const r = auditFiles([{ path: 'a.css', content: css }])
+  assert.equal(r.spread.bg, '#ffffff')
+  assert.equal(r.spread.polarity, 'light')
+})
+
+test('a class that only CONTAINS the word dark is not a dark theme', () => {
+  // `.dark-mode-disabled` is the class documenso wraps its LIGHT theme in. A
+  // \b treats the hyphen as a boundary, so the opt-OUT read as the opt-in.
+  const css = `
+    .dark-mode-disabled { --background: #ffffff; --foreground: #111111 }
+    .dark:not(.dark-mode-disabled) { --background: #262626; --foreground: #f7f7f7 }
+  `
+  assert.equal(auditFiles([{ path: 'a.css', content: css }]).spread.bg, '#ffffff')
+})
+
+test('the ink that goes ON the brand is not the ink of the page', () => {
+  // --primary-foreground is documenso's lime darkened until it is legible on
+  // itself. Read as body text, it made their pages green — and it wins on reach
+  // when every button uses it, so the name-length tiebreak cannot save us here.
+  const css = `
+    :root { --background: #ffffff; --primary-foreground: #162c07; --foreground: #0f172a }
+    ${Array.from({ length: 9 }, (_, i) => `.btn${i} { color: var(--primary-foreground) }`).join('\n')}
+    .body { color: var(--foreground) }
+  `
+  assert.equal(auditFiles([{ path: 'a.css', content: css }]).spread.fg, '#0f172a')
+})
+
+test('a token defined through a fallback still resolves', () => {
+  // n8n's canvas is `var(--color-background-base, var(--color--neutral-125))`
+  // with the first name never declared. Unresolvable meant no declared page at
+  // all, and the audit fell through to a --bg inside a report-generating script.
+  const css = `
+    :root {
+      --color--neutral-125: #f5f5f5;
+      --color--background: var(--color-background-base, var(--color--neutral-125));
+      --color--text: #101010;
+    }
+    .app { background: var(--color--background); color: var(--color--text) }
+  `
+  const r = auditFiles([{ path: 'a.css', content: css }])
+  assert.equal(r.spread.bg, '#f5f5f5')
+  assert.equal(r.spread.polarity, 'light')
+})
+
+test('the most-READ token wins, not the shortest-named one', () => {
+  // n8n declares --bg in a script that generates evaluation reports, and
+  // --color-bg across the design system its editor is built from.
+  const css = `
+    :root { --bg: #0d1117; --color-bg: #ffffff }
+    ${Array.from({ length: 8 }, (_, i) => `.a${i} { background: var(--color-bg) }`).join('\n')}
+    .r { background: var(--bg) }
+  `
+  assert.equal(auditFiles([{ path: 'a.css', content: css }]).spread.bg, '#ffffff')
+})
+
+test('polarity follows the page we settled on, so the two cannot disagree', () => {
+  const css = ':root { --background: #0b0b0f; --foreground: #f2f2f5 }'
+  const r = auditFiles([{ path: 'a.css', content: css }])
+  assert.equal(r.spread.polarity, 'dark')
+  assert.equal(r.spread.bg, '#0b0b0f')
+})
+
+/* ───────────────────────────── which colour is theirs ───────────────────────
+ * The brand is the one value a visitor checks first, and a wrong one asserted
+ * confidently is worse than none: every other correct answer stops being
+ * believed. These are the three ways a declared name lied to us.
+ */
+
+test('the brand is the token the codebase actually reads, not the shortest name', () => {
+  // n8n declares --accent once in a corner and --color--primary in 347 places
+  // across the design system its editor is built from.
+  const css = `
+    :root { --accent: #7c8cff; --color--primary: #ff6900 }
+    ${Array.from({ length: 12 }, (_, i) => `.a${i} { color: var(--color--primary) }`).join('\n')}
+    .b { color: var(--accent) }
+  `
+  const r = auditFiles([{ path: 'a.css', content: css }])
+  assert.equal(r.inferredConfig.values.brandHex, '#ff6900')
+})
+
+test('a token named after the product outranks a generic default', () => {
+  // formbricks declares three brand-ish tokens that nothing references — two
+  // teals and an indigo — and the indigo is the overridable placeholder inside
+  // their embeddable survey widget. Only one of them claims to be anyone's.
+  const css = ':root { --brand-default: #1e40af; --formbricks-brand: #038178 }'
+  const r = auditFiles([{ path: 'a.css', content: css }], { pkg: { name: 'formbricks' } })
+  assert.equal(r.inferredConfig.values.brandHex, '#038178')
+})
+
+test('the product name only counts when the package says so', () => {
+  // Without a package.json there is nothing to match, and the rule must not
+  // silently reorder anything on its own.
+  const css = ':root { --brand-default: #1e40af; --formbricks-brand: #038178 }'
+  const r = auditFiles([{ path: 'a.css', content: css }])
+  assert.equal(r.inferredConfig.values.brandHex, '#1e40af')
+})
+
+test('a link colour is a use of the brand, not the brand', () => {
+  // plane aliases its identity onto --txt-link-primary. Read as a declaration,
+  // their brand became the colour of a hyperlink.
+  const css = `
+    :root { --brand-default: #3f76ff }
+    .l { color: var(--txt-link-primary) }
+    :root { --txt-link-primary: #006399 }
+  `
+  assert.equal(auditFiles([{ path: 'a.css', content: css }]).inferredConfig.values.brandHex, '#3f76ff')
+})
+
+test('nobody’s identity is their error state', () => {
+  // --bg-danger-primary ends in `primary` and is a red.
+  const css = `
+    :root { --bg-danger-primary: #e00714; --brand-default: #3f76ff }
+    ${Array.from({ length: 6 }, (_, i) => `.e${i} { background: var(--bg-danger-primary) }`).join('\n')}
+  `
+  assert.equal(auditFiles([{ path: 'a.css', content: css }]).inferredConfig.values.brandHex, '#3f76ff')
+})
+
+test('a brand named at a ramp position is still a declaration', () => {
+  const r = auditFiles([{ path: 'a.css', content: ':root { --brand-default: #3f76ff }' }])
+  assert.equal(r.inferredConfig.values.brandHex, '#3f76ff')
+  assert.equal(r.inferredConfig.confidence.colorTheme, 1)
+})

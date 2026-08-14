@@ -1,4 +1,4 @@
-import { AUDIT_SCAN_EXT, AUDIT_SKIP_FILE } from './engine'
+import { AUDIT_SCAN_EXT, AUDIT_SKIP_FILE, auditFilePriority } from './engine'
 
 /**
  * Turn a chosen directory into the `{path, content}[]` the engine reads.
@@ -57,10 +57,19 @@ export async function readPickedFiles(list: FileList | File[]): Promise<ScanResu
     try { pkg = JSON.parse(await pkgFile.text()) } catch { /* malformed → skip */ }
   }
 
-  for (const file of all) {
-    const path = relPath(file)
-    if (SKIP_DIR.test(path)) continue
-    if (!AUDIT_SCAN_EXT.test(path) || AUDIT_SKIP_FILE.test(path)) continue
+  /* Read the design system BEFORE the cap can bite. In walk order, n8n's 8,000
+   * files ran out inside their backend package and never reached the frontend
+   * at all — a cap spent on files that carry no styling is a cap that answers
+   * about the wrong half of a monorepo. Ordering is stable within a priority,
+   * so a repo small enough to fit is read exactly as before. */
+  const candidates = all
+    .map((file) => ({ file, path: relPath(file) }))
+    .filter(({ path }) => !SKIP_DIR.test(path) && AUDIT_SCAN_EXT.test(path) && !AUDIT_SKIP_FILE.test(path))
+  const ranked = candidates
+    .map((c, i) => ({ ...c, rank: auditFilePriority(c.path), i }))
+    .sort((a, b) => a.rank - b.rank || a.i - b.i)
+
+  for (const { file, path } of ranked) {
     if (file.size > MAX_FILE_BYTES) { skipped.tooBig++; continue }
     if (files.length >= MAX_FILES || total + file.size > MAX_TOTAL_BYTES) { skipped.overCap++; continue }
     total += file.size

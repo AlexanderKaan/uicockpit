@@ -42,6 +42,29 @@ export const AUDIT_SCAN_EXT = /\.(css|scss|less|html|jsx|tsx|vue|svelte|astro|ts
 export const AUDIT_SKIP_FILE =
   /(^|[/\\])(uicockpit\.tokens\.css|.*\.contract\.json|.*\.config\.(js|ts|mjs|cjs)|.*\.d\.ts|vite\.config\..*|next\.config\..*)$/
 
+/**
+ * How much a file is worth reading when the cap forces a choice — LOWER first.
+ *
+ * A cap has to be enforced somewhere (a 3GB monorepo cannot be read in a tab),
+ * but enforcing it in directory-walk order is enforcing it at random. n8n's
+ * walk reached 8,000 files inside `packages/cli` — their entire frontend, the
+ * design system included, was never opened, and the audit still answered with
+ * confidence: it described a backend as a dark app, because the only colours it
+ * ever saw were in a script that generates HTML reports.
+ *
+ * The ordering is not a guess about their layout. A stylesheet IS the design
+ * system; a component file renders it; a bare `.ts` is usually neither, and a
+ * test or a story is a copy of a decision rather than the decision.
+ */
+export function auditFilePriority(path) {
+  const p = path.toLowerCase()
+  if (/\.(test|spec|stories|story|bench)\.[jt]sx?$/.test(p) || /(^|\/)(tests?|__tests__|e2e|fixtures?|mocks?)\//.test(p)) return 4
+  if (/\.(css|scss|less)$/.test(p)) return 0
+  if (/\.(vue|svelte|astro|tsx|jsx|html)$/.test(p)) return 1
+  if (/(^|\/)(components?|ui|design-system|theme|styles?|views?|pages?|screens?|layouts?|frontend|web|app|client)(\/|$)/.test(p)) return 2
+  return 3
+}
+
 /* ───────────────────────── Tailwind default scales ─────────────────────────
  * Resolution with a fallback: no tailwind.config found → these defaults. That
  * is almost always right, because a drifting repo rarely has a carefully tuned
@@ -762,12 +785,32 @@ const PAINT_PROPS = new Set([
  *    up only every other variable.
  */
 export function extractCssVars(content) {
-  const vars = {}
-  for (const m of blankComments(content).matchAll(/(?:^|[{;])\s*(--[\w-]+)\s*:\s*([^;}]+)(?=[;}])/g)) {
-    vars[m[1]] = m[2].trim()
+  const base = {}
+  const alt = {}
+  const read = (bag, decls) => {
+    for (const m of decls.matchAll(/(?:^|[{;])\s*(--[\w-]+)\s*:\s*([^;}]+)(?=[;}])/g)) {
+      bag[m[1]] = m[2].trim()
+    }
   }
-  return vars
+  walkCss(content, (sel, decls, ancestors) => {
+    read(ALT_THEME.test([...ancestors, sel].join(' ')) ? alt : base, decls + ';')
+  })
+  /* A variable that ONLY ever appears under a theme scope is still the app's
+   * answer for that name — but it must never OVERWRITE the base one. The whole
+   * shadcn convention is `:root` light, `.dark` dark, in that order, so
+   * last-wins read documenso's page as #262626 and its ink as near-white:
+   * their dark theme reported as their app. Preferring the base scope is also
+   * right for dark-first apps, since there the dark values ARE the base. */
+  return { ...alt, ...base }
 }
+
+/** Selectors that scope a variable to an alternate theme rather than the app.
+ *
+ *  The lookahead is not a stylistic choice: `\b` counts a hyphen as a word
+ *  boundary, so `.dark-mode-disabled` — the class documenso wraps its LIGHT
+ *  theme in — read as a dark scope, and their whole light block was filed under
+ *  the theme they were opting out of. */
+const ALT_THEME = /(\.|\[data-)(dark|light)(?![\w-])|prefers-color-scheme|theme-(dark|light)(?![\w-])|="(dark|light)"/i
 
 /**
  * Map each class name to the paint-ish declarations of the rules it appears in.
@@ -826,17 +869,30 @@ export function resolveVar(value, vars) {
  * system would score WORSE than a pile of hex literals. Chains are followed to
  * the literal; a name that leads nowhere stays itself.
  */
-export function deepResolveVar(name, vars, depth = 0) {
-  if (depth > 8) return name // pathological or circular — stop, don't hang
-  const raw = vars[name]
-  if (!raw) return name
-  const inner = raw.match(/^var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)$/)
+export function deepResolveVar(input, vars, depth = 0) {
+  if (depth > 8) return input // pathological or circular — stop, don't hang
+  // Callers pass a NAME (resolve its declaration) or a VALUE (resolve what it
+  // points at). A value that is itself `var(--x)` used to stand for itself,
+  // which quietly dropped every token defined as an alias of another.
+  const raw = typeof input === 'string' && vars[input] !== undefined ? vars[input] : input
+  if (typeof raw !== 'string') return input
+  const s = raw.trim()
+  /* `[\s\S]+` where a naive `[^)]+` used to be: a fallback can itself be a
+   * var(), and n8n's canvas is exactly that —
+   * `var(--color-background-base, var(--color--neutral-125))`. The old pattern
+   * could not match it, so their light #f5f5f5 page never resolved, no declared
+   * candidate survived, and the audit fell back to a `--bg` in a report-
+   * generating script: n8n came back as a dark app. */
+  const inner = s.match(/^var\(\s*(--[\w-]+)\s*(?:,\s*([\s\S]+))?\)$/)
   if (inner) {
-    const next = deepResolveVar(inner[1], vars, depth + 1)
-    // Unresolvable alias with a fallback → use the fallback rather than a name.
-    return next === inner[1] && inner[2] ? inner[2].trim() : next
+    if (vars[inner[1]] !== undefined) {
+      const next = deepResolveVar(inner[1], vars, depth + 1)
+      if (next !== inner[1]) return next
+    }
+    // Unresolvable alias → the fallback is what a browser actually paints.
+    return inner[2] ? deepResolveVar(inner[2].trim(), vars, depth + 1) : s
   }
-  return raw.trim()
+  return s
 }
 
 /** Readable styling units in a file — the denominator half of `parsed`.
@@ -951,6 +1007,37 @@ export function detectShell(files) {
       const e = out[region]
       e.files++
       if (e.at.length < 5) e.at.push(path)
+    }
+  }
+  return out
+}
+
+/* ─────────────────────── not "a table", but WHICH table ─────────────────────
+ *
+ * Structural again, like the kinds and the shell — the signal we are reliably
+ * good at. A specimen that shows sorting because they sort, and a checkbox
+ * column because they select, is closer to their app than any label we could
+ * scrape, and it costs nothing extra to detect.
+ *
+ * Deliberately a SHORT list. The probe found fifteen detectable variants across
+ * four repos, but only the ones that visibly change a specimen earn their place
+ * here — a flag nobody can see on screen is a number nobody can check.
+ */
+export const UI_VARIANTS = {
+  'table.sortable':    [/aria-sort=/, /getSortedRowModel|<SortableHeader\b|onSort\b/],
+  'table.selectable':  [/rowSelection|getIsSelected/, /<Checkbox[^>]{0,80}row/i],
+  'dialog.destructive':[/<(AlertDialog|ConfirmDialog)\b/, /variant=["']destructive["']/],
+  'form.validation':   [/zodResolver|<FormMessage\b|aria-invalid=/],
+}
+
+/** Which of those an app shows, counted per file like everything else here. */
+export function detectVariants(files) {
+  const out = {}
+  for (const key of Object.keys(UI_VARIANTS)) out[key] = 0
+  for (const { path, content } of files) {
+    if (!MARKUP_FILE.test(path)) continue
+    for (const [key, patterns] of Object.entries(UI_VARIANTS)) {
+      if (patterns.some((p) => p.test(content))) out[key]++
     }
   }
   return out

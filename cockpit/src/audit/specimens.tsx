@@ -23,10 +23,14 @@ import { Icon } from '../icons/Icon'
  * the recognition exactly where it had to hold.
  */
 
+/** Which flavours of a kind this codebase shows — `table.sortable` and friends,
+ *  measured by the engine. A specimen reads only the ones it can show. */
+export type Variants = Record<string, number>
+
 export interface Specimen {
   /** What the visitor calls it, not what we call it internally. */
   label: string
-  render: () => ReactNode
+  render: (v?: Variants) => ReactNode
   /** Wide specimens take the full row — a nav bar in a 240px cell is a lie. */
   wide?: boolean
 }
@@ -81,32 +85,63 @@ export const SPECIMENS: Record<string, Specimen> = {
 
   form: {
     label: 'Form field',
-    render: () => (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 190 }}>
-        <label className="lab" style={{ fontSize: 'var(--k-type-small)' }}>Work email</label>
-        <input className="in" defaultValue="ada@example.com" />
-        <span className="field__hint">We never share this.</span>
-      </div>
-    ),
+    /* An app that validates gets shown the state it actually ships. */
+    render: (v) => {
+      const validates = (v?.['form.validation'] ?? 0) > 0
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 190 }}>
+          <label className="lab" style={{ fontSize: 'var(--k-type-small)' }}>Work email</label>
+          <input className="in" defaultValue={validates ? 'ada@' : 'ada@example.com'} aria-invalid={validates || undefined} />
+          {validates
+            ? <span className="field__error">Enter a complete email address.</span>
+            : <span className="field__hint">We never share this.</span>}
+        </div>
+      )
+    },
   },
 
   table: {
     label: 'Table',
-    render: () => (
-      <table className="tbl" style={{ minWidth: 248 }}>
-        <thead><tr><th>Name</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><div className="tbl__name">Northwind</div><div className="tbl__sub">12 items</div></td>
-            <td><span className="badge badge--success">Live</span></td>
-          </tr>
-          <tr>
-            <td><div className="tbl__name">Renewal</div><div className="tbl__sub">4 items</div></td>
-            <td><span className="badge badge--warn">Draft</span></td>
-          </tr>
-        </tbody>
-      </table>
-    ),
+    /* Sorting and selection appear only if they were measured. cal.com sorts
+       and documenso does not, and showing sort chevrons to a team that has none
+       is the same kind of invention as guessing their brand colour. */
+    render: (v) => {
+      const sorts = (v?.['table.sortable'] ?? 0) > 0
+      const selects = (v?.['table.selectable'] ?? 0) > 0
+      return (
+        <table className="tbl" style={{ minWidth: selects ? 268 : 248 }}>
+          <thead>
+            <tr>
+              {selects && (
+                <th className="datatable__check">
+                  <label className="check"><input type="checkbox" aria-label="Select all" /></label>
+                </th>
+              )}
+              <th className={sorts ? 'is-sortable is-active' : undefined} aria-sort={sorts ? 'ascending' : undefined}>
+                {sorts ? <span className="tbl__sort">Name<span className="tbl__sort-chevron"><Icon name="chevD" size={11} /></span></span> : 'Name'}
+              </th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {selects && (
+                <td><label className="check"><input type="checkbox" defaultChecked aria-label="Select row" /></label></td>
+              )}
+              <td><div className="tbl__name">Northwind</div><div className="tbl__sub">12 items</div></td>
+              <td><span className="badge badge--success">Live</span></td>
+            </tr>
+            <tr>
+              {selects && (
+                <td><label className="check"><input type="checkbox" aria-label="Select row" /></label></td>
+              )}
+              <td><div className="tbl__name">Renewal</div><div className="tbl__sub">4 items</div></td>
+              <td><span className="badge badge--warn">Draft</span></td>
+            </tr>
+          </tbody>
+        </table>
+      )
+    },
   },
 
   toast: {
@@ -202,6 +237,42 @@ export const SPECIMENS: Record<string, Specimen> = {
     ),
   },
 
+  chart: {
+    label: 'Chart',
+    render: () => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 190 }}>
+        <div className="barchart" style={{ height: 72 }}>
+          {[38, 62, 44, 81, 55, 70, 48].map((v, i) => (
+            <div key={i} className="barchart__bar" style={{ height: `${v}%` }} />
+          ))}
+        </div>
+        <div className="chart-legend">
+          <span className="chart-legend__item"><span className="chart-legend__dot" />Revenue</span>
+        </div>
+      </div>
+    ),
+  },
+
+  calendar: {
+    label: 'Calendar',
+    render: () => (
+      <div className="calendar" style={{ minWidth: 186 }}>
+        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+          <span key={i} className="calendar__head">{d}</span>
+        ))}
+        {Array.from({ length: 28 }, (_, i) => {
+          const d = i + 1
+          const cls = ['calendar__cell']
+          if (d === 12) cls.push('calendar__cell--today')
+          if (d === 19) cls.push('calendar__cell--disabled')
+          return (
+            <span key={d} className={cls.join(' ')} aria-current={d === 12 ? 'date' : undefined}>{d}</span>
+          )
+        })}
+      </div>
+    ),
+  },
+
   tooltip: {
     label: 'Tooltip',
     render: () => (
@@ -216,9 +287,11 @@ export const SPECIMENS: Record<string, Specimen> = {
   },
 }
 
-/** Kinds the engine detects but this screen has no specimen for yet. Named so
- *  the gap is visible in code rather than silently absent on screen. */
-export const NO_SPECIMEN = ['chart', 'calendar']
+/** Kinds the engine detects but this screen has no specimen for yet. Empty now
+ *  that chart and calendar are drawn — kept because the next kind added to the
+ *  engine will land here before it lands on screen, and a gap named in code is
+ *  a gap somebody fixes. */
+export const NO_SPECIMEN: string[] = []
 
 /**
  * The SHELL — the skeleton an app holds to, cut into kit pieces.

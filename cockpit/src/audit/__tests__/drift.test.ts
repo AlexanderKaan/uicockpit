@@ -17,7 +17,7 @@ const spread = (over: Partial<AuditHandoff['spread']> = {}): AuditHandoff['sprea
   bg: null, fg: null, border: null, polarity: null, ...over,
 })
 const audit = (s: Partial<AuditHandoff['spread']>): AuditHandoff => ({
-  hash: '', rootName: 'x', filesRead: 1, parsed: 1, kinds: {}, shell: {},
+  hash: '', rootName: 'x', filesRead: 1, parsed: 1, kinds: {}, shell: {}, variants: {},
   spread: spread(s), distinct: { radius: 0, shadow: 0, color: 0, spacing: 0 },
   treatments: 0, singletons: 0, score: 0, provenance: {}, derived: {},
 })

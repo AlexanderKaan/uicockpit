@@ -16,4 +16,4 @@ export { auditFiles, DIMENSIONS, MIN_PARSED, MIN_EVENTS } from '../../../cli/src
 // @ts-expect-error — same
 export { renderReport } from '../../../cli/src/report.mjs'
 // @ts-expect-error — same
-export { AUDIT_SCAN_EXT, AUDIT_SKIP_FILE } from '../../../cli/src/patterns.mjs'
+export { AUDIT_SCAN_EXT, AUDIT_SKIP_FILE, auditFilePriority } from '../../../cli/src/patterns.mjs'

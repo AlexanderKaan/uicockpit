@@ -232,7 +232,7 @@ export function ConformanceSheet({ audit, mode, style }: { audit: AuditHandoff; 
               background: 'var(--k-bg)', overflow: 'auto',
             }}
           >
-            {spec.render()}
+            {spec.render(audit.variants)}
           </div>
         </figure>
       ))}

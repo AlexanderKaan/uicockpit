@@ -38,6 +38,8 @@ export interface AuditHandoff {
   /** The skeleton: region → how many of their files build it. Regions only —
    *  never an arrangement, which a static read genuinely cannot recover. */
   shell: Record<string, number>
+  /** Which flavour of each kind — `table.sortable` and friends, per file. */
+  variants: Record<string, number>
   /** Their real values, resolved to CSS by the engine. This is what makes an
    *  honest "before" possible: we cannot reconstruct any single component of
    *  theirs, but we know their values exactly, and drift IS having nineteen
@@ -216,7 +218,7 @@ export function readHandoff(): AuditHandoff | null {
     const h = JSON.parse(raw) as Partial<AuditHandoff>
     const ok =
       h && typeof h.rootName === 'string' &&
-      !!h.kinds && !!h.shell && !!h.provenance && !!h.derived &&
+      !!h.kinds && !!h.shell && !!h.variants && !!h.provenance && !!h.derived &&
       // Check every field the view actually reads, not a representative one:
       // `spread` grew `neutral` and `type` after the first version, and testing
       // only `color` let a half-shaped object through — it rendered, silently

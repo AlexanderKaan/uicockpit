@@ -23,7 +23,7 @@ const EMPTY_SPREAD = {
 }
 const handoff = (over: Partial<AuditHandoff> = {}): AuditHandoff => ({
   hash: 'v2:abc', rootName: 'acme', filesRead: 10, parsed: 1,
-  kinds: {}, shell: {}, spread: EMPTY_SPREAD,
+  kinds: {}, shell: {}, variants: {}, spread: EMPTY_SPREAD,
   distinct: { radius: 0, shadow: 0, color: 0, spacing: 0 },
   treatments: 0, singletons: 0, score: 70,
   provenance: {}, derived: {}, ...over,

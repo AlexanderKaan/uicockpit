@@ -33,7 +33,7 @@
 import {
   GRID, AUDIT_SCAN_EXT, AUDIT_SKIP_FILE,
   extractCss, extractClasses, extractInline, classAttrs,
-  extractClassStyles, extractCssVars, resolveVar, detectKinds, detectShell,
+  extractClassStyles, extractCssVars, resolveVar, detectKinds, detectShell, detectVariants,
   cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar, styledClassNames, walkElements,
   countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX, cssInJsBlocks,
 } from './patterns.mjs'
@@ -755,7 +755,7 @@ const px = (v) => {
   return m[2] === 'rem' ? parseFloat(m[1]) * 16 : parseFloat(m[1])
 }
 
-function inferConfig(dims, palette, cssVars = {}) {
+function inferConfig(dims, palette, cssVars = {}, varRefs = new Map(), project = '') {
   const values = {}
   const confidence = {}
   const MIN_DOMINANCE = 0.4 // below this, nobody decided anything
@@ -804,7 +804,7 @@ function inferConfig(dims, palette, cssVars = {}) {
   // decision itself, so it needs no dominance share to be believed. Only when
   // nobody named one do we fall back to counting literals — and that fallback is
   // gated, because ungated it christened our own cobalt product "ember".
-  const named = pickNamedBrand(cssVars, palette)
+  const named = pickNamedBrand(cssVars, palette, varRefs, project)
   const brand = named || pickBrandColor(dims.color.values, palette)
   if (brand) {
     let best = null
@@ -843,7 +843,11 @@ function inferConfig(dims, palette, cssVars = {}) {
  *  and `--brand` are declarations, while `--primary-hover` or `--accent-border`
  *  are derivations OF one, and `--primary-foreground` (shadcn) is the ink that
  *  goes ON it — usually near-white, and never the brand. */
-const BRAND_VAR = /^--?(?:[\w-]*?-)?(?:brand|primary|accent)$/i
+/*  A trailing `-default` / `-base` / `-main` is a RAMP POSITION, not a scope:
+ *  plane's brand lives in `--brand-default`, and requiring the name to end in
+ *  the brand word left only `--txt-link-primary` — an alias of it — as the
+ *  candidate, so their identity came back as the colour of a hyperlink. */
+const BRAND_VAR = /^--?(?:[\w-]*?-)?(?:brand|primary|accent)(?:-(?:default|base|main))?$/i
 
 /* Component-SCOPED tokens that happen to end in a brand-ish word. shadcn ships
  * every one of these with a default, and most apps never touch them — so
@@ -855,6 +859,23 @@ const BRAND_VAR = /^--?(?:[\w-]*?-)?(?:brand|primary|accent)$/i
  * are the fixed set of shadcn component scopes. */
 const SCOPED_VAR = /^--?(?:sidebar|card|popover|muted|destructive|input|ring|chart|border|secondary)-/i
 
+/** A name that says WHERE a colour is painted rather than WHAT it is. plane
+ *  aliases its identity onto `--txt-link-primary`; read as a declaration, their
+ *  brand became the colour of a hyperlink. Applies to every picker: a link, an
+ *  icon or a hover state is a USE of a decision, never the decision. */
+const USAGE_VAR = /^--?(?:[\w-]*?-)?(?:txt|text|link|icon|fill|stroke|shadow|outline|hover|active|focus|disabled|selected|placeholder|caret|scrollbar|gradient)-/i
+
+/** And the ROLE scopes, which only the surface picker excludes:
+ *  `--primary-foreground` is the ink that goes ON the brand, and reading it as
+ *  the page's ink handed documenso a near-black GREEN for their body text —
+ *  their lime, darkened until it was legible on itself. The brand picker must
+ *  NOT exclude these, or `--brand-primary` stops being a brand declaration. */
+const ROLE_VAR = /^--?(?:primary|accent|brand|success|warning|error|danger|info)-/i
+
+/** A status colour anywhere in the name disqualifies it. `--bg-danger-primary`
+ *  ends in `primary` and is a red; nobody's identity is their error state. */
+const STATUS_VAR = /(?:^|-)(?:danger|success|warning|error|info|destructive|critical|positive|negative)(?:-|$)/i
+
 /**
  * A colour the codebase NAMED as its identity, which beats one it merely used
  * often. This matters more the better the codebase is: tokenise your brand
@@ -863,20 +884,35 @@ const SCOPED_VAR = /^--?(?:sidebar|card|popover|muted|destructive|input|ring|cha
  * exactly the repos that did the most things right. Asking "what did you call
  * your brand" is the question a human would ask first.
  */
-function pickNamedBrand(cssVars, palette) {
+function pickNamedBrand(cssVars, palette, varRefs = new Map(), project = '') {
   const hits = []
   for (const [name, raw] of Object.entries(cssVars)) {
-    if (!BRAND_VAR.test(name) || SCOPED_VAR.test(name)) continue
+    if (!BRAND_VAR.test(name) || SCOPED_VAR.test(name) || USAGE_VAR.test(name) || STATUS_VAR.test(name)) continue
     const value = deepResolveVar(raw, cssVars)
     const lab = toLab(value, palette)
     if (!lab) continue
     if (Math.hypot(lab[1], lab[2]) <= 25 || lab[0] <= 15 || lab[0] >= 92) continue
-    hits.push({ name, value })
+    hits.push({
+      name,
+      value,
+      refs: varRefs.get(name) || 0,
+      // A token that carries the product's own name is the product saying so.
+      mine: project.length > 2 && name.toLowerCase().includes(project) ? 1 : 0,
+    })
   }
   if (!hits.length) return null
-  // Shortest name wins: `--primary` is the declaration, `--color-ui-primary` is
-  // someone's scoped copy of it.
-  hits.sort((a, b) => a.name.length - b.name.length)
+  /* Reach, then self-naming, then length.
+   *
+   * Reach first: n8n's `--color--primary` is read in 347 places and `--accent`
+   * in nine, and shortest-name-wins handed their users a periwinkle identity
+   * for an orange product.
+   *
+   * Self-naming settles what reach cannot. formbricks declares three brand-ish
+   * tokens that nothing references — two tealsvand an indigo — and the indigo is
+   * the overridable placeholder inside their embeddable survey widget. Between
+   * `--brand-default` and `--formbricks-brand`, only one of them claims to be
+   * anyone's in particular. `--cal-*` and `--n8n-*` are the same convention. */
+  hits.sort((a, b) => b.refs - a.refs || b.mine - a.mine || a.name.length - b.name.length)
   return { value: hits[0].value, name: hits[0].name }
 }
 
@@ -937,29 +973,96 @@ function ratio(a, b) {
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)
 }
 
-/** The busiest text and border that are actually legible on the page. */
+/**
+ * The page's INK, and an edge that separates on it.
+ *
+ * Ink is not the busiest legible text colour — it is the FURTHEST one from the
+ * page that still has real usage. Frequency picks the muted grey every time,
+ * because every card carries one heading and three secondary lines: formbricks'
+ * busiest legible fg is slate-500 at 407 uses, and their actual body ink is
+ * slate-900 at 257. Taking the extreme is not a tiebreak dressed up as a rule —
+ * an app's muted greys are DERIVED from its ink by fading toward the page, so
+ * the far end of the legible ramp is the ink by construction, and it is exactly
+ * the input the palette then re-derives the muted steps from.
+ *
+ * The support floor is what keeps a single `#000000` in an SVG from winning.
+ */
 function inkAndEdge(fgs, borders, bg) {
-  if (!bg) return { fg: fgs[0] || null, border: borders[0] || null }
+  const hexes = fgs.map(([h]) => h)
+  if (!bg) return { fg: hexes[0] || null, border: borders[0] || null }
+  const legible = (bar) => fgs.filter(([h]) => ratio(h, bg) >= bar)
+  const pool = legible(4.5).length ? legible(4.5) : legible(3)
+  let fg = null
+  if (pool.length) {
+    const floor = Math.max(2, pool[0][1] * 0.1)
+    const supported = pool.filter(([, n]) => n >= floor)
+    fg = (supported.length ? supported : pool)
+      .reduce((a, c) => (ratio(c[0], bg) > ratio(a[0], bg) ? c : a))[0]
+  }
   return {
-    fg: fgs.find((h) => ratio(h, bg) >= 4.5) || fgs.find((h) => ratio(h, bg) >= 3) || null,
+    fg,
     // A border only has to separate, not to be read — a lower bar, but it still
     // has to be visible, and the busiest one often is not.
     border: borders.find((h) => ratio(h, bg) >= 1.2 && ratio(h, bg) <= 6) || borders[0] || null,
   }
 }
 
-/** Most-used colours for one measured ROLE, busiest first. */
-function roleHexes(events, role, palette, want) {
-  const tally = new Map()
+/**
+ * The page, ink and edge a codebase NAMED, which beats the ones it happened to
+ * use most — the same reason a declared brand beats a counted one, and it bites
+ * harder here: documenso's literal fg colours number eleven in total, because
+ * everything real lives in `--foreground`. Component-scoped names are excluded
+ * for the same reason as the brand (`--card-foreground` ships with shadcn), and
+ * a declared pair still has to be legible against itself before it is believed.
+ */
+const SURFACE_VAR = {
+  bg: /^--?(?:[\w-]*?-)?(?:background|bg|canvas|page|surface)$/i,
+  fg: /^--?(?:[\w-]*?-)?(?:foreground|fg|text|ink|body-color)$/i,
+  border: /^--?(?:[\w-]*?-)?(?:border|border-color|divider|outline)$/i,
+}
+function declaredSurface(cssVars, palette, varRefs) {
+  const out = { bg: null, fg: null, border: null }
+  for (const role of ['bg', 'fg', 'border']) {
+    const hits = []
+    for (const [name, raw] of Object.entries(cssVars)) {
+      if (!SURFACE_VAR[role].test(name) || SCOPED_VAR.test(name) || ROLE_VAR.test(name) || USAGE_VAR.test(name)) continue
+      const hex = toHex(deepResolveVar(raw, cssVars), palette, 'neutral')
+      if (hex) hits.push({ name, hex, refs: varRefs.get(name) || 0 })
+    }
+    /* Authority is how much of the codebase actually READS a token, not how
+     * short its name is. n8n declares `--bg: #0d1117` inside a script that
+     * generates HTML evaluation reports, and `--color-*` throughout the design
+     * system its editor is built from; name length crowned the report, and the
+     * app came back as a GitHub-dark canvas it has never rendered. Length still
+     * breaks ties, where `--background` beats `--color-app-background`. */
+    hits.sort((a, b) => b.refs - a.refs || a.name.length - b.name.length)
+    out[role] = hits.length ? hits[0].hex : null
+  }
+  // A declared page with unreadable declared ink is not a theme we understood —
+  // most likely two halves of different blocks. Keep neither.
+  if (out.bg && out.fg && ratio(out.bg, out.fg) < 3) { out.bg = null; out.fg = null }
+  return out
+}
+
+/** Most-used colours for one measured ROLE with their counts, busiest first. */
+function roleTally(events, role, palette, want) {
+  const raw = new Map()
   for (const e of events) {
     if (e.dim !== 'color' || e.role !== role) continue
-    tally.set(e.value, (tally.get(e.value) || 0) + 1)
+    raw.set(e.value, (raw.get(e.value) || 0) + 1)
   }
-  return [...tally.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([v]) => toHex(v, palette, want))
-    .filter(Boolean)
+  // Merge AFTER conversion: `#fff`, `white` and `rgb(255,255,255)` are one
+  // decision counted three ways, and splitting them understates the real one.
+  const byHex = new Map()
+  for (const [v, n] of raw) {
+    const hex = toHex(v, palette, want)
+    if (hex) byHex.set(hex, (byHex.get(hex) || 0) + n)
+  }
+  return [...byHex.entries()].sort((a, b) => b[1] - a[1])
 }
+
+/** Just the hexes, busiest first. */
+const roleHexes = (events, role, palette, want) => roleTally(events, role, palette, want).map(([h]) => h)
 
 /* ──────────────────────────────── the engine ───────────────────────────────── */
 
@@ -1143,6 +1246,40 @@ export function auditFiles(files, opts = {}) {
   const expressibleTotal = expressible.recipe + expressible.tokensOnly + expressible.layout + expressible.none
   const share = (n) => (expressibleTotal ? round(n / expressibleTotal, 3) : null)
 
+  /* What the product calls itself, from its own package.json — `@acme/web`
+   *  becomes `web`, and a scope-only name is ignored. Used for one thing: a
+   *  token named after the product is the product claiming it. */
+  const projectName = String(opts.pkg?.name || '').split('/').pop().replace(/[^a-z0-9]/gi, '').toLowerCase()
+
+  // How often each custom property is READ. A token's authority is its reach.
+  const varRefs = new Map()
+  for (const { content } of files) {
+    for (const m of content.matchAll(/var\(\s*(--[\w-]+)/g)) {
+      varRefs.set(m[1], (varRefs.get(m[1]) || 0) + 1)
+    }
+  }
+
+  /* The page, its ink and its edge — declared first, counted where nothing was
+   * declared. Per role rather than all-or-nothing: a repo can name its page and
+   * still leave its borders to literals, and taking the pair as a unit would
+   * throw away the half it did name. Polarity always follows whichever page we
+   * ended up believing, so the two can never disagree. */
+  const counted = {
+    ...pageSurface(roleHexes(events, 'bg', palette, 'neutral')),
+    ...inkAndEdge(
+      roleTally(events, 'fg', palette, 'neutral'),
+      roleHexes(events, 'border', palette, 'neutral'),
+      pageSurface(roleHexes(events, 'bg', palette, 'neutral')).bg,
+    ),
+  }
+  const named = declaredSurface(cssVars, palette, varRefs)
+  const surfaces = {
+    bg: named.bg || counted.bg,
+    fg: named.fg || counted.fg,
+    border: named.border || counted.border,
+  }
+  surfaces.polarity = surfaces.bg ? (hexLum(surfaces.bg) < 0.5 ? 'dark' : 'light') : null
+
   const result = {
     meta: {
       files: files.length,
@@ -1219,16 +1356,14 @@ export function auditFiles(files, opts = {}) {
        * A page is the EXTREME of the ramp: the lightest thing in a light app,
        * the darkest in a dark one. Which of those an app is gets decided by
        * where the mass of its backgrounds sits, rather than assumed. */
-      ...pageSurface(roleHexes(events, 'bg', palette, 'neutral')),
       /* Text and borders are chosen against the page we just settled, not by
        * frequency. cal.com's busiest fg-role neutral is #ffffff — the label on
        * their black buttons — which on their white page renders invisible. What
-       * makes something body text is that you can READ it on the canvas. */
-      ...inkAndEdge(
-        roleHexes(events, 'fg', palette, 'neutral'),
-        roleHexes(events, 'border', palette, 'neutral'),
-        pageSurface(roleHexes(events, 'bg', palette, 'neutral')).bg,
-      ),
+       * makes something body text is that you can READ it on the canvas.
+       *
+       * Whatever the app DECLARED outranks all of it, per role: a repo that
+       * tokenised its surfaces properly has almost no literals left to count. */
+      ...surfaces,
       neutral: dimensions.color.values
         .map((v) => toHex(v.value, palette, 'neutral'))
         .filter(Boolean)
@@ -1245,6 +1380,9 @@ export function auditFiles(files, opts = {}) {
      * arranged; see the note on SHELL_REGIONS for why that is unknowable from a
      * static read, and why anything rendering this must say so. */
     shell: detectShell(files),
+    /* Not which kinds, but which FLAVOUR of them — a table that sorts, a dialog
+     * with a destructive action. Same structural signal, one level finer. */
+    variants: detectVariants(files),
     // Not part of the measurement — purely so the report can render a real
     // swatch for a class-based component instead of quoting its class list.
     classStyles: resolvedStyles,
@@ -1261,7 +1399,7 @@ export function auditFiles(files, opts = {}) {
     flags: smokingGuns(files, opts.pkg, events),
     // Emitted but unused in PR 1 — it is the hinge to the configurator (PR 4),
     // and computing it now is cheaper than a second pass later.
-    inferredConfig: inferConfig(dimensions, palette, cssVars),
+    inferredConfig: inferConfig(dimensions, palette, cssVars, varRefs, projectName),
   }
 
   // The second headline, given equal billing rather than a footnote.
