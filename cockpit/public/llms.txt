@@ -1,6 +1,6 @@
 # UIcockpit
 
-> Open-source, browser-based design system generator for developers and designers building modern web apps — AI fluent and drift-proof. Pick a Style and a color theme or customize from scratch in the visual configurator — UIcockpit produces framework-neutral design tokens, component CSS recipes, and an agent pack (spec + skill rules + a checkable contract) that tells AI coding tools how to use them, plus a verifier (`uicockpit check`) that keeps generated code on-system. Not a design system (someone else's taste, themed) but the generator that ships your own; it sits a layer above component primitives like shadcn/ui, so AI-built apps don't all look generic.
+> Open-source, browser-based design system tool for developers and designers building modern web apps — AI fluent and drift-proof. TWO WAYS IN: **audit** a codebase you have already written, and UIcockpit derives the design system your code already implies; or **build** one from scratch in the visual configurator. Either way the output is the same: framework-neutral design tokens, component CSS recipes, and an agent pack (spec + skill rules + a checkable contract) that tells AI coding tools how to use them, plus a verifier (`uicockpit check`) that keeps generated code on-system. Not a design system (someone else's taste, themed) but the generator that ships your own; it sits a layer above component primitives like shadcn/ui, so AI-built apps don't all look generic.
 
 URL: https://uicockpit.com/
 License: MIT
@@ -10,11 +10,26 @@ Telemetry: None
 
 ## What it is
 
-UIcockpit is a design system generator: a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About nineteen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery as the user tweaks. Start from a curated Style or shuffle and refine — every kit is your own, not a preset picked from a shelf. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
+UIcockpit is a design system generator with two entrances.
+
+**Audit (`/audit`, or `npx uicockpit audit`)** — for a codebase that already exists. It reads the values the code actually uses, derives the design system those values imply, and measures how far the code has drifted from its own system. It returns a configuration you can then edit, not a grade. Everything runs in the browser tab: the source is never uploaded, and the only network request is the site handing over its kit vocabulary.
+
+**Configure (`/app`)** — for a system you are defining rather than recovering: a single-page web app that helps a developer or product designer build a coherent design system in under a minute. About nineteen visual controls (covering color, typography, radii, motion, density, icons, surface backgrounds, state layers) re-render a full component gallery as the user tweaks. Start from a curated Style or shuffle and refine — every kit is your own, not a preset picked from a shelf. The output is an install-ready kit: a hosted token link plus an agent pack that tells an AI coding tool exactly how to apply it.
 
 ## Who it's for
 
-The "vibe-coder" audience: developers who build with AI tools (Cursor, v0, Lovable, Claude Code, Bolt) using shadcn/ui and Tailwind v4 as their default stack. UIcockpit fills the "I need a design system before I start coding" gap that AI tools leave open — generated components otherwise default to plain shadcn defaults regardless of the project's brand identity.
+Developers who build with AI tools (Cursor, v0, Lovable, Claude Code, Bolt), usually on shadcn/ui and Tailwind v4. Two situations, which is why there are two doors:
+
+1. **Starting out** — generated components default to plain shadcn regardless of the project's brand, so the system has to exist before the AI reaches for it.
+2. **Already forty screens in** — the majority, and the sharper pain. Nothing here assumes an empty repo: `audit` starts from what has already been written.
+
+## What the audit can and cannot tell you
+
+Stated plainly, because an overstated claim is worse than a modest one. Measured across eight open-source products:
+
+- It reads **70–100%** of the styled elements in a typical repository, and **refuses to publish a score below 70%** rather than grade code it could not read.
+- It reliably recovers the **page, ink, border, brand, radii, shadows, spacing and type scale** a codebase declares, and detects **which KINDS of component** the app is built from (16 kinds) and **which shell regions** it uses (8).
+- It does **not** reconstruct your application. It shows the kinds of component you build, rendered in a kit derived from your own values — not your screens, your arrangement, or your full component inventory, which for a real app runs to hundreds of distinct components.
 
 ## What you get when you export
 

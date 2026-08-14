@@ -4,16 +4,24 @@
 
 ### The open-source design system generator — AI fluent, drift-proof.
 
-**Not another design system — the machine that makes yours.** Dial in your design
-language visually, export it framework-neutral, and keep it up to date behind one
-link — then hand it to your coding agent and `uicockpit check` makes sure it *stays*
-on it. `--k-*` tokens + 100+ accessible components (real recipes with state contracts)
-with a built-in WCAG audit of *your* kit, delivered as a hosted `<link>`, a download,
-or natively inside your agent (CLI + MCP).
+**Not another design system — the machine that makes yours.** And two ways in,
+because most people are not at the start of an app:
+
+**→ Already have a codebase?** `npx uicockpit audit` reads the values your code
+actually uses, derives the design system it already implies, and measures how far
+the code has drifted from its own. Runs entirely on your machine.
+
+**→ Starting fresh?** Dial in your design language visually instead.
+
+Either way you get the same thing: `--k-*` tokens + 100+ accessible components
+(real recipes with state contracts) with a built-in WCAG audit of *your* kit,
+framework-neutral, behind one link that stays up to date — then hand it to your
+coding agent and `uicockpit check` makes sure it *stays* on it. Delivered as a
+hosted `<link>`, a download, or natively inside your agent (CLI + MCP).
 
 **Free · no account · paste it anywhere.**
 
-[**Try it →** uicockpit.com](https://uicockpit.com) · [**Use a kit →** kit.uicockpit.com](https://kit.uicockpit.com) · [Docs](https://uicockpit.com/docs)
+[**Audit my code →** uicockpit.com/audit](https://uicockpit.com/audit) · [**Build a kit →** uicockpit.com](https://uicockpit.com) · [Docs](https://uicockpit.com/docs) · [What's new](https://uicockpit.com/changelog)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![npm: uicockpit](https://img.shields.io/badge/npm-uicockpit-cb3837?logo=npm&logoColor=white)](https://www.npmjs.com/package/uicockpit)

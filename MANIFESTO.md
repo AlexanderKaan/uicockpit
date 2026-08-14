@@ -1,4 +1,4 @@
-# Why I'm building UICockpit
+# Why I'm building UIcockpit
 
 *by Alexander Kaan*
 
@@ -67,14 +67,14 @@ only from your design language — not "does this match the catalog," but "does 
 belong." A coherence guarantee for things nobody has designed yet. As far as I know,
 nobody hands you that.
 
-## What UICockpit is *not*
+## What UIcockpit is *not*
 
 I want to be honest about the edges, because overpromising is how tools lose trust.
 
-UICockpit is a **look-and-structure** system: colour, type, shape, spacing,
+UIcockpit is a **look-and-structure** system: colour, type, shape, spacing,
 composition. It is deliberately *not* your behaviour layer. Hover, focus, keyboard
 navigation, error handling, accessibility wiring — that lives in the component,
-done by you or your framework, and done properly. UICockpit's job is to tell the
+done by you or your framework, and done properly. UIcockpit's job is to tell the
 agent exactly what it must wire and then get out of the way. That boundary isn't a
 missing feature. It's the line that keeps the grammar a single, human-authored
 source of truth — something agents *compile from* and never quietly turn into
@@ -83,7 +83,7 @@ something else.
 And to be clear about the neighbours: this isn't a competitor to shadcn or the
 component libraries I love and use. They give you the components; we give you the
 design language those components wear. We sit a layer above, and we're happy there.
-In a word: those are design systems — UICockpit is a design system *generator*. A
+In a word: those are design systems — UIcockpit is a design system *generator*. A
 design system ships someone else's taste, beautifully themed; a generator is the
 machine that makes yours, and then keeps it honest.
 
@@ -109,6 +109,24 @@ Here's the deal, plainly:
   in the edge cases — these are real open questions, and I'd rather argue them in
   public with the people using it than settle them alone and be quietly wrong.
 
+One thing I got wrong for a long time, and only fixed recently: all of this
+assumed you were at the *start* of an app. Every screenshot, every example, the
+whole first run. But almost nobody is at the start. They are forty screens in,
+the drift has already happened, and being told to define a design system first
+is useless advice delivered late.
+
+So there is a second door now — `audit`. Point UIcockpit at a codebase you have
+already written and it reads the values your code actually uses, derives the design
+system those values already imply, and shows you the distance between the two.
+It doesn't hand you a grade — it hands you a configuration, which is the thing
+you can actually act on. Your code never leaves your machine; the whole scan
+runs in the tab, and you can watch the network panel stay quiet while it does.
+
+I want to be straight about the limits, because an overstated claim is worse
+than a modest one. It recovers your values, your palette and the *kinds* of
+component you build. It does not rebuild your app. That gap is the work I am
+doing now, in the open.
+
 Some of what's above is shipped and working today, and some of it is the direction
 we're rowing toward — out loud, so you can row too. The world is moving from *people
 who smooth* to *agents that don't*, and that shift needs a layer that keeps the
@@ -116,7 +134,7 @@ result coherent without a human eyeballing every gap. I don't think any one pers
 should own the answer to that. I think it should be a grammar, plus a guarantee,
 plus a community that keeps both honest.
 
-That's UICockpit. If this itches for you the way it itched for me — grab it, use it,
+That's UIcockpit. If this itches for you the way it itched for me — grab it, use it,
 break it, and help build the rest. Let's do it together.
 
 — Alexander

@@ -11,6 +11,7 @@ interface DocsBodyProps {
 const SECTIONS = [
   { id: 'overview', label: 'Overview' },
   { id: 'quickstart', label: 'Quick start' },
+  { id: 'audit', label: 'Audit existing code' },
   { id: 'exports', label: 'The exports' },
   { id: 'livekit', label: 'Live kit (CDN)' },
   { id: 'adoption', label: 'Agent adoption' },
@@ -142,6 +143,58 @@ export function DocsBody({ onLaunch }: DocsBodyProps) {
                 automatically.
               </li>
             </ol>
+          </section>
+
+          <section id="audit">
+            <h2>Audit an existing codebase</h2>
+            <p>
+              Quick start above assumes an empty project. Most are not — they are
+              forty screens in, and the drift has already happened. <strong>Audit
+              is the other door:</strong> point it at code you have already
+              written and it reads the values that code actually uses, derives
+              the design system those values imply, and shows you how far the
+              code has drifted from its own system. You get a configuration to
+              edit, not a grade.
+            </p>
+            <pre className="docs__code"><code>npx uicockpit audit .</code></pre>
+            <p>
+              Or drop the folder — or a <code>.zip</code>, which is what a phone
+              can hand over — at <a href="/audit" className="docs__link">uicockpit.com/audit</a>.
+              <strong> Your code never leaves your machine either way.</strong> In
+              the browser the scan runs in the tab; the only request is us handing
+              over the kit vocabulary, and you can watch the network panel stay
+              quiet while it works.
+            </p>
+            <h3>What it can and cannot tell you</h3>
+            <p>
+              Worth stating plainly, because an overstated claim is worse than a
+              modest one. Measured across eight open-source products:
+            </p>
+            <ul className="docs__list">
+              <li>
+                It reads <strong>70–100%</strong> of the styled elements in a
+                typical repository, and <strong>refuses to publish a score below
+                70%</strong> rather than grade code it could not read.
+              </li>
+              <li>
+                It recovers the <strong>page, ink, border, brand, radii, shadows,
+                spacing and type scale</strong> your code declares — preferring
+                what you <em>named</em> over what you happened to use most, since
+                the most frequent grey in any well-built app is the muted one.
+              </li>
+              <li>
+                It detects <strong>which kinds of component</strong> your app is
+                built from (16) and <strong>which shell regions</strong> it uses (8),
+                and draws them wearing your derived kit.
+              </li>
+              <li>
+                It does <strong>not</strong> reconstruct your application. It shows
+                the kinds of thing you build, not your screens, your arrangement,
+                or your full component inventory — which for a real app runs to
+                hundreds of distinct components. Closing that gap is the current
+                work; see <a href="/changelog" className="docs__link">what&rsquo;s new</a>.
+              </li>
+            </ul>
           </section>
 
           <section id="exports">

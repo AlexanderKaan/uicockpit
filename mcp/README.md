@@ -5,6 +5,12 @@ AI agent (Claude, Cursor, Windsurf, Claude Code, …) the [UIcockpit](https://ui
 design-system wedge natively: **create or install a kit, read its design context, and
 verify the agent's output conforms** — generate → apply → **check**, without copy-paste.
 
+> **Working in a codebase that already exists?** Derive the design system it
+> already implies before creating a new one: `npx uicockpit audit .` reads the
+> values the code actually uses and reports the system behind them. That is a
+> CLI command today, not an MCP tool — an `audit_codebase` tool is on the
+> roadmap. Nothing is uploaded either way; the audit runs locally.
+
 ## Tools
 
 | Tool | What it does |

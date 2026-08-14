@@ -21,11 +21,12 @@ export function OgCard() {
           Free &amp; open source
         </div>
 
-        <h1 className="og-card__h1">Ship AI apps that look designed, not generated.</h1>
+        <h1 className="og-card__h1">Find the design system your code already has.</h1>
 
         <p className="og-card__sub">
-          The design system generator — dial yours in, export it anywhere, and keep
-          it coherent as you and your AI build on it.
+          Point it at a codebase you have already written — or build one from scratch.
+          Either way: framework-neutral tokens, real components, and a checker that
+          keeps your AI on them.
         </p>
 
         <div className="og-card__foot">

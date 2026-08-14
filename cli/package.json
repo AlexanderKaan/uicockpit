@@ -1,7 +1,7 @@
 {
   "name": "uicockpit",
   "version": "0.6.1",
-  "description": "The CLI of the UIcockpit design system generator - apply and ENFORCE your generated design system in any codebase: generate -> apply -> check. The verifier nobody else ships.",
+  "description": "The CLI of the UIcockpit design system generator. Two ways in: AUDIT a codebase you already wrote and derive the design system it implies, or apply a kit you configured \u2014 then ENFORCE it anywhere: audit -> apply -> check. The verifier nobody else ships.",
   "type": "module",
   "bin": {
     "uicockpit": "bin/uicockpit.mjs"

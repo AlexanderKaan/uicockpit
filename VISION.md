@@ -1,11 +1,11 @@
-# UICockpit — the coherence compiler
+# UIcockpit — the coherence compiler
 
 > A token names a decision. A component is a whole assembly. The value lives in
 > the gap between them — and that gap is where coherence is won or lost.
 
 ## The one line
 
-**UICockpit isn't a component library. It's a coherence compiler.**
+**UIcockpit isn't a component library. It's a coherence compiler.**
 
 Configure your design language once → and you get not 40 components, but the
 *grammar* that makes every component you'll ever assemble come out coherent —
@@ -22,6 +22,22 @@ is a drift away from your design language.
 You cannot win this by drawing more boxes. There are infinite screens a person
 might want, and you will never draw them all.
 
+## Two ways in, one grammar
+
+A grammar you can only adopt on day one is a grammar almost nobody can adopt.
+Most codebases are not empty — they are forty screens in, and the drift has
+already happened. So there are two entrances, and they meet in the same place:
+
+- **Configure** — name the decisions, get the grammar.
+- **Audit** — point at code that already exists, and the decisions it already
+  implies are read back out of it. The system was always there, unnamed and
+  inconsistently applied; the audit gives it a name so it can be enforced.
+
+The second one is the same thesis pointed backwards. If a design language is a
+grammar rather than a catalog, then a codebase written without one still has a
+grammar — a bad one, with 172 colours and 17 radii where it meant to have a
+handful. Deriving it is how you find out.
+
 ## The shift: from catalog to grammar
 
 - A **token** holds one decision (`--k-primary`, `--k-radius-lg`).
@@ -32,13 +48,13 @@ might want, and you will never draw them all.
 
 Most systems bake those bundles invisibly into each component. So an agent that
 needs a *new* component has nothing to recombine — it hand-rolls the bundle off
-your grammar, and drifts. UICockpit names that middle layer and hands it to the
+your grammar, and drifts. UIcockpit names that middle layer and hands it to the
 agent as building blocks. **The agent composes; the grammar guarantees the result
 belongs.**
 
 ## How it holds together (the moat)
 
-A grammar would be a nice idea without enforcement. UICockpit ships the
+A grammar would be a nice idea without enforcement. UIcockpit ships the
 enforcement: `npx uicockpit check`. Today it catches a hardcoded hex or an
 off-grid pixel. The trajectory: it verifies that *anything* an agent assembles —
 a component that has never existed — is built only from your grammar. That is a
@@ -50,7 +66,7 @@ A finite kit can, at best, be "complete." A grammar plus a verifier is
 ## The honest boundary
 
 A style grammar is look, layout, structure. Hover, focus, error, behaviour, and
-accessibility live in the component, wired by you or your agent. UICockpit is
+accessibility live in the component, wired by you or your agent. UIcockpit is
 deliberately a *look + structure* system and says so — its **behaviour contract**
 tells the agent exactly what it must wire (state via aria, keyboard for custom
 controls, overlay placement). That isn't a gap. It's the line that keeps the
