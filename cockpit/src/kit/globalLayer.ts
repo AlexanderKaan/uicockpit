@@ -410,6 +410,34 @@ ${s}.taginput[aria-disabled="true"] {
   pointer-events: none;
 }
 
+/* Visually hidden — text for assistive tech that takes no space on screen.
+ *
+ * A foundational primitive we did not have, which is how it ended up hand-rolled
+ * twice: .skiplink and the stacked-table thead each carry their own copy of
+ * the clip trick. Two implementations of one idea is exactly the drift this kit
+ * exists to stop, and the one place it hurts most is accessibility, where the
+ * copies quietly diverge and one of them stops working.
+ *
+ * .sr-only is a misnomer — it is visually hidden, not screen-reader-only, and
+ * Bootstrap 5 renamed it for that reason. We ship it under this name anyway
+ * because Tailwind made it the thing people type, and .visually-hidden is
+ * aliased onto it so the accurate name also resolves. Same reasoning as .btn.
+ *
+ * NOT display:none and NOT visibility:hidden — both remove it from the
+ * accessibility tree, which is the opposite of the point. */
+${s}.sr-only,
+${s}.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Touch-target floor (WCAG 2.5.5 / 2.5.8) — on a COARSE pointer (touch), tappable
  * controls grow to a 44px minimum so they're comfortably hit-able, WITHOUT
  * inflating dense desktop (fine-pointer) layouts where this never fires. Covers

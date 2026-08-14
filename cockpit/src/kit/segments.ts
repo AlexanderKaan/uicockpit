@@ -31,6 +31,10 @@ export type Tier = 'foundation' | 'atom' | 'component' | 'section'
  * (Future page-region recipes also live in this tier.)
  */
 export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
+  /* A footer IS a slab: full-width, its own job, stacked to build a page — the
+   * same test that keeps `memorable-date` a component. It hosts the identifier,
+   * which is why that edge is declared rather than left implicit. */
+  'sitefooter': ['identifier'],
   // Shell regions — the app frame.
   scaffold: ['navsuite', 'pane'],
   navsuite: [],
@@ -168,6 +172,11 @@ export const STANDALONE_ATOMS: readonly string[] = [
    * it composes a fieldset and three inputs, so it is a component with real
    * edges, listed in COMPONENT_USES.) */
   'charcount',
+  /* The Open UI / USWDS government pass. IN-PAGE NAVIGATION belongs to a page,
+   * like the skip link above it; PROCESS LIST and IDENTIFIER are editorial and
+   * institutional furniture with no host widget; REQUIREMENTS attaches to
+   * whichever field has rules, exactly like the character count. */
+  'inpagenav', 'processlist', 'identifier', 'requirements',
 ]
 
 const FOUNDATION_SET: ReadonlySet<string> = new Set(FOUNDATIONS)

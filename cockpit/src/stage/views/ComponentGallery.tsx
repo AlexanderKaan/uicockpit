@@ -62,6 +62,11 @@ const CARD_KEYWORDS: Record<string, string> = {
   SkipLinkCard: 'Skip link bypass blocks keyboard accessibility',
   TaskListCard: 'Task list sections progress service multi-step form',
   CharacterCountCard: 'Character count remaining limit textarea live region announce',
+  InPageNavCard: 'In-page navigation on this page anchors table of contents jump',
+  SiteFooterCard: 'Footer contentinfo landmark site links accessibility statement',
+  RequirementsCard: 'Requirements checklist password rules live as you type met unmet',
+  ProcessListCard: 'Process list numbered steps what happens next how it works',
+  IdentifierCard: 'Identifier agency official government masthead required links',
   MemorableDateCard: 'Memorable date of birth day month year three fields not a picker',
   ToggletipCard: 'Toggletip accessible tooltip help hint disclosure',
   LanguageNavCard: 'Language navigation multilingual locale switcher',
@@ -242,7 +247,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
-    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
+    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [InPageNavCard, 'component'], [SiteFooterCard, 'section'], [RequirementsCard, 'component'], [ProcessListCard, 'component'], [IdentifierCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
@@ -444,6 +449,145 @@ function ChevronSvg({ size = 14 }: { size?: number }) {
  * Breadcrumb · Avatar · Accordion (standalone) · Carousel · Navigation menu ·
  * Context menu. The last three add new recipes (.carousel/.navmenu/.ctxmenu);
  * the first three compose existing primitives (.breadcrumb/.avatar/.accordion). */
+
+function InPageNavCard() {
+  const SECTIONS = [
+    { id: 'ipn-a', label: 'Who can apply', nested: false },
+    { id: 'ipn-b', label: 'What you will need', nested: false },
+    { id: 'ipn-c', label: 'Proof of address', nested: true },
+    { id: 'ipn-d', label: 'After you apply', nested: false },
+  ]
+  const [active, setActive] = useState('ipn-b')
+  return (
+    <Card title="In-page navigation" desc="On this page — a NAMED nav landmark, current item announced.">
+      {/* Named, because a screen-reader user lands on a page with several navs
+        * and telling them apart is the entire value of a landmark. */}
+      <nav className="inpagenav" aria-labelledby="ipn-title" style={{ position: 'static' }}>
+        <h3 className="inpagenav__title" id="ipn-title">On this page</h3>
+        <ul className="inpagenav__list">
+          {SECTIONS.map((sec) => (
+            <li className={`inpagenav__item ${sec.nested ? 'inpagenav__item--nested' : ''}`} key={sec.id}>
+              {/* aria-current is the accessible half of the coloured bar. */}
+              <a
+                className="inpagenav__link" href={`#${sec.id}`}
+                aria-current={active === sec.id ? 'true' : undefined}
+                onClick={(e) => { e.preventDefault(); setActive(sec.id) }}
+              >{sec.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </Card>
+  )
+}
+
+function SiteFooterCard() {
+  const GROUPS = [
+    { title: 'Services', links: ['Apply', 'Check a claim', 'Report a change'] },
+    { title: 'About', links: ['Accessibility statement', 'Privacy', 'Cookies'] },
+    { title: 'Contact', links: ['Phone and post', 'Complaints'] },
+  ]
+  return (
+    <Card title="Footer" desc="The contentinfo landmark — obligation, not decoration.">
+      {/* <footer> gives the landmark for free; role="contentinfo" on a div says
+        * the same thing twice. */}
+      <footer className="footer">
+        <div className="footer__cols">
+          {GROUPS.map((g) => (
+            <div key={g.title}>
+              <h3 className="footer__group-title">{g.title}</h3>
+              <ul className="footer__list">
+                {g.links.map((l) => (
+                  <li key={l}><a className="footer__link" href="#footer">{l}</a></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="footer__bar">
+          <span>© 2026 Example Agency</span>
+          <span className="footer__bar-spacer" />
+          <a className="footer__link" href="#footer">Accessibility statement</a>
+        </div>
+      </footer>
+    </Card>
+  )
+}
+
+function RequirementsCard() {
+  const [pw, setPw] = useState('winter')
+  const RULES = [
+    { id: 'len', label: 'At least 12 characters', met: pw.length >= 12 },
+    { id: 'num', label: 'Contains a number', met: /\d/.test(pw) },
+    { id: 'sym', label: 'Contains a symbol', met: /[^\w\s]/.test(pw) },
+  ]
+  return (
+    <Card title="Requirements checklist" desc="Rules that tick off as you type — the as-you-go half.">
+      <div className="field">
+        <label className="field__label" htmlFor="val-pw">Create a password</label>
+        <input className="in" id="val-pw" type="text" value={pw} aria-describedby="val-rules" onChange={(e) => setPw(e.target.value)} />
+        {/* Polite, and updated when a rule FLIPS — announcing every rule on every
+          * keystroke is unusable. Met/unmet is a WORD, not only a mark, so 1.4.1
+          * holds and a screen reader hears "met" rather than an icon. */}
+        <ul className="requirements" id="val-rules" aria-live="polite">
+          {RULES.map((r) => (
+            <li className={`requirements__item ${r.met ? 'requirements__item--met' : ''}`} key={r.id}>
+              <span className="requirements__mark" aria-hidden="true">{r.met ? <Icon name="check" size={11} /> : null}</span>
+              {r.label}
+              <span className="sr-only">{r.met ? ' — met' : ' — not yet met'}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Card>
+  )
+}
+
+function ProcessListCard() {
+  const STEPS = [
+    { title: 'Send your application', body: 'We confirm by email within one working day.' },
+    { title: 'We check your documents', body: 'This usually takes 10 working days.' },
+    { title: 'You get a decision', body: 'By letter, and in your account.' },
+  ]
+  return (
+    <Card title="Process list" desc="What will happen, in order — editorial, not interactive.">
+      {/* An <ol> so the ORDER lives in the markup: the count gets announced and a
+        * re-order cannot silently lie. The visible numeral is generated and
+        * aria-hidden, or a screen reader says "one" twice. */}
+      <ol className="processlist">
+        {STEPS.map((st) => (
+          <li className="processlist__step" key={st.title}>
+            <h3 className="processlist__title">{st.title}</h3>
+            <p className="processlist__body">{st.body}</p>
+          </li>
+        ))}
+      </ol>
+    </Card>
+  )
+}
+
+function IdentifierCard() {
+  return (
+    <Card title="Identifier" desc="Who runs this service — the one component with no commercial analogue.">
+      <div className="identifier">
+        <div className="identifier__masthead">
+          <span className="identifier__logo" aria-hidden="true">EA</span>
+          <span>
+            <span className="identifier__name">Example Agency</span>{' '}
+            <span className="identifier__parent">part of the Ministry of Examples</span>
+          </span>
+        </div>
+        {/* Part of the component, not left to the footer — optional is how these
+          * go missing, and they are the ones a person is entitled to find. */}
+        <ul className="identifier__links">
+          {['Accessibility statement', 'Privacy', 'Freedom of information', 'Contact us'].map((l) => (
+            <li key={l}><a className="identifier__link" href="#identifier">{l}</a></li>
+          ))}
+        </ul>
+      </div>
+    </Card>
+  )
+}
 
 function CharacterCountCard() {
   const LIMIT = 120

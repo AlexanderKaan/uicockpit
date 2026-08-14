@@ -1518,7 +1518,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   .table-responsive .table__col--optional { display: none; }
 }
 @container (max-width: 26rem) {
-  .table-responsive .table--stack thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  /* Was a hand-rolled copy of the clip trick; the kit now ships .sr-only in
+     the global layer, so this composes it instead of re-deriving it. */
+  .table-responsive .table--stack thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
   .table-responsive .table--stack tbody tr { display: block; border: 1px solid var(--k-border); border-radius: var(--k-radius-md); padding: var(--k-s-4); margin-bottom: var(--k-s-8); }
   .table-responsive .table--stack tbody tr:hover { background: transparent; }
   .table-responsive .table--stack tbody td { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); padding: var(--k-s-4) var(--k-s-6); text-align: right; border: 0; }
@@ -2748,6 +2750,191 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 @container (max-width: 32rem) {
   .calendar-range__month + .calendar-range__month { padding-left: 0; border-left: 0; }
 }`,
+  },
+  {
+    id: 'inpagenav',
+    section: 'In-page navigation',
+    css: `/* === In-page navigation ==================================================
+ * "On this page" — anchors into the headings of a long document. USWDS ships it,
+ * no commercial system in the Open UI matrix does, and that is the tell: it
+ * belongs to the read-a-long-official-document surface.
+ *
+ * It is a NAV LANDMARK and it must be NAMED, because a screen-reader user lands
+ * on a page with several navs and needs to tell them apart — that is the whole
+ * value of a landmark. The current item carries aria-current="true", which is
+ * the accessible half of the visual bar; a bar alone says nothing.
+ *
+ * Sticky is the default because the point is to read and jump; the sticky offset
+ * uses the same top inset the scaffold uses so it never hides under a header. */
+.inpagenav { position: sticky; top: var(--k-s-16); align-self: start; }
+.inpagenav__title {
+  font-size: var(--k-type-eyebrow); letter-spacing: var(--k-tracking-eyebrow);
+  text-transform: uppercase; color: var(--k-fg-muted);
+  margin: 0 0 var(--k-s-8);
+}
+.inpagenav__list { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--k-border); }
+.inpagenav__link {
+  display: block; padding: var(--k-s-6) var(--k-s-12);
+  margin-left: -1px; border-left: 2px solid transparent;
+  color: var(--k-fg-muted); text-decoration: none;
+  font-size: var(--k-type-small);
+}
+.inpagenav__link:hover { color: var(--k-fg); background: var(--k-hover); }
+.inpagenav__link[aria-current='true'] {
+  color: var(--k-fg); border-left-color: var(--k-primary); font-weight: var(--k-weight-medium);
+}
+.inpagenav__item--nested .inpagenav__link { padding-left: var(--k-s-24); }
+`,
+  },
+  {
+    id: 'sitefooter',
+    section: 'Footer',
+    css: `/* === Footer ==============================================================
+ * The contentinfo landmark. Every public service has one and almost no
+ * commercial design system ships one (2 of 26 in the Open UI matrix), because a
+ * marketing site's footer is bespoke and a service's footer is obligation:
+ * accessibility statement, privacy, contact, the body responsible.
+ *
+ * Use <footer> so the landmark is free — role="contentinfo" on a div is the
+ * same thing said twice. Link groups get their own heading so the landmark has
+ * internal structure rather than being one long list of forty links. */
+.footer { border-top: 1px solid var(--k-border); background: var(--k-surface-sunken); padding: var(--k-s-32) 0 var(--k-s-20); }
+.footer__cols {
+  display: grid; gap: var(--k-s-24);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  padding: 0 var(--k-pad);
+}
+.footer__group-title {
+  font-size: var(--k-type-small); font-weight: var(--k-weight-semibold);
+  color: var(--k-fg); margin: 0 0 var(--k-s-10);
+}
+.footer__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-s-8); }
+.footer__link { color: var(--k-fg-muted); text-decoration: none; font-size: var(--k-type-small); }
+.footer__link:hover { color: var(--k-primary-text-hover); text-decoration: underline; }
+.footer__bar {
+  margin-top: var(--k-s-24); padding: var(--k-s-16) var(--k-pad) 0;
+  border-top: 1px solid var(--k-border);
+  display: flex; flex-wrap: wrap; gap: var(--k-s-12); align-items: center;
+  font-size: var(--k-type-small); color: var(--k-fg-muted);
+}
+.footer__bar-spacer { flex: 1; }
+`,
+  },
+  {
+    id: 'requirements',
+    section: 'Requirements checklist',
+    css: `/* === Requirements checklist ==============================================
+ * Requirements that tick off as the person types — the password-rules pattern.
+ * USWDS calls this "Validation"; we do not, because our ValidationCard already
+ * demonstrates FIELD STATES (is-error / is-success) and one word for two things
+ * helps nobody. The matrix has no converged name for this pattern, so we are
+ * free to pick the clearer one.
+ *
+ * Distinct from .errorsummary, which is the on-submit report; this is the
+ * as-you-go one, and shipping both is coverage rather than duplication.
+ *
+ * Two accessibility decisions carry the whole component. First, the list is a
+ * POLITE live region, never assertive: announcing every rule on every keystroke
+ * is unusable, so the consumer updates it when a rule actually FLIPS, not on
+ * each character. Second, met/unmet is TEXT, not a tick — the .requirements__item
+ * carries its state in a visually-hidden word so 1.4.1 holds and a screen reader
+ * hears "met" rather than an icon it cannot describe.
+ *
+ * The field itself keeps aria-describedby pointing here, so the rules are read
+ * when the field is focused rather than only when someone finds them. */
+.requirements { list-style: none; margin: var(--k-s-8) 0 0; padding: 0; display: grid; gap: var(--k-s-6); }
+.requirements__item {
+  display: flex; align-items: center; gap: var(--k-s-8);
+  font-size: var(--k-type-small); color: var(--k-fg-muted);
+}
+.requirements__mark {
+  inline-size: var(--k-icon-sm); block-size: var(--k-icon-sm);
+  display: grid; place-items: center; flex: 0 0 auto;
+  border-radius: var(--k-radius-full); border: 1px solid var(--k-border);
+}
+.requirements__item--met { color: var(--k-success-text); }
+.requirements__item--met .requirements__mark { border-color: currentColor; }
+`,
+  },
+  {
+    id: 'processlist',
+    section: 'Process list',
+    css: `/* === Process list ========================================================
+ * Numbered steps that each carry real content — "how this application works",
+ * "what happens next". USWDS ships it; no commercial system does.
+ *
+ * It earns its place under the study's "unique" test against two neighbours we
+ * already have, and the distinction is worth writing down because it is the sort
+ * of thing that gets re-litigated: .stepper is a PROGRESS INDICATOR (where am I
+ * in a sequence), .tasklist is a NON-LINEAR STATUS BOARD (what is left to do),
+ * and a process list is EDITORIAL (here is what will happen, in order). Nobody
+ * interacts with it.
+ *
+ * An <ol> so the order is in the markup rather than in the numbers, which means
+ * the count is announced and a re-order cannot silently lie.
+ *
+ * The visible numeral is generated content, and an <li> inside an <ol> is ALREADY
+ * announced with its position — so a plain counter makes a screen reader say
+ * "one" twice. A pseudo-element cannot carry aria-hidden, so the suppression uses
+ * the content alt-text syntax instead: counter(process) / "" renders the digit
+ * and hands assistive tech an empty string. Chrome and Safari honour it; Firefox
+ * ignores the alt and announces the digit, which is exactly today's behaviour, so
+ * this degrades to no worse than not doing it. */
+.processlist { list-style: none; margin: 0; padding: 0; counter-reset: process; }
+.processlist__step {
+  counter-increment: process;
+  position: relative;
+  padding: 0 0 var(--k-s-24) var(--k-s-40);
+  border-left: 2px solid var(--k-border);
+  margin-left: var(--k-s-16);
+}
+.processlist__step:last-child { border-left-color: transparent; padding-bottom: 0; }
+.processlist__step::before {
+  content: counter(process) / "";
+  position: absolute; left: calc(var(--k-s-16) * -1 - 1px); top: 0;
+  inline-size: var(--k-s-32); block-size: var(--k-s-32);
+  display: grid; place-items: center;
+  border-radius: var(--k-radius-full);
+  background: var(--k-primary); color: var(--k-primary-fg);
+  font-size: var(--k-type-small); font-weight: var(--k-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.processlist__title { margin: 0 0 var(--k-s-6); font-weight: var(--k-weight-semibold); }
+.processlist__body { margin: 0; color: var(--k-fg-muted); }
+`,
+  },
+  {
+    id: 'identifier',
+    section: 'Identifier',
+    css: `/* === Identifier ==========================================================
+ * Who runs this service. USWDS calls it the Identifier and it is the one
+ * component on the government list with no commercial analogue at all, because
+ * commercial software never has to prove it is the official one.
+ *
+ * It answers three questions a person is entitled to ask of a public service:
+ * which body operates it, where the required statements are (accessibility,
+ * privacy, FOI), and how to reach a human. That is why the required-links list
+ * is part of the component rather than left to the footer — leaving it optional
+ * is how it goes missing.
+ *
+ * Sits inside the footer landmark; it is not a second contentinfo. */
+.identifier { border-top: 1px solid var(--k-border); padding: var(--k-s-20) var(--k-pad); }
+.identifier__masthead { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; }
+.identifier__logo {
+  inline-size: var(--k-s-32); block-size: var(--k-s-32); flex: 0 0 auto;
+  border-radius: var(--k-radius-sm); background: var(--k-primary-soft);
+  display: grid; place-items: center; color: var(--k-primary-soft-fg);
+}
+.identifier__name { font-weight: var(--k-weight-semibold); }
+.identifier__parent { color: var(--k-fg-muted); font-size: var(--k-type-small); }
+.identifier__links {
+  list-style: none; margin: var(--k-s-12) 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: var(--k-s-8) var(--k-s-20);
+  font-size: var(--k-type-small);
+}
+.identifier__link { color: var(--k-fg-muted); }
+.identifier__link:hover { color: var(--k-primary-text-hover); }
+`,
   },
   {
     id: 'charcount',
