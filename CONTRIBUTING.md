@@ -59,6 +59,32 @@ full audit suite that keeps everything coherent. Keep it green before opening a 
 - Keep everything token-driven (`var(--k-*)`) — no hardcoded colours or sizes in recipes.
 - Match the existing voice and restraint; this kit aims for shadcn-level taste, not maximalism.
 
+## Versioning — two clocks, and what counts as a release
+
+There is no single "UIcockpit version", because there is no single thing to
+version. Four artifacts ship in two different ways, so a change lands on one
+clock, both, or neither.
+
+**The product clock — dated, in `CHANGELOG.md`.** The site, the audit and the
+kit are continuously deployed; nothing is installed, so semver would say
+nothing. **A release is anything that changes what someone can do.** A one-line
+fix that changes the answer we give about someone's codebase is a release; a
+thousand-line refactor is not. Add a dated entry under `Added` / `Changed` /
+`Removed` / `Fixed`, written for the person using it rather than the person who
+wrote it. The file is parsed, not rendered as markdown (`marketing/changelog.ts`)
+— only `**bold**` and `` `code` `` are understood inline, and a malformed entry
+is reported in the dev console rather than rendering as a blank section.
+
+**The package clock — semver.** `uicockpit` and `uicockpit-mcp` are installed
+artifacts. **A release is a publish**: bump the version, tag it (`cli-v0.7.0`,
+`mcp-v0.5.2`) and cut a GitHub release from the same changelog entry. New
+subcommand → minor. Both numbers are read from their own `package.json` at build
+time and shown side by side in the nav, so neither can drift from what npm has.
+
+**A kit is not versioned.** It lives at `/k/<hash>.css` and the hash IS the
+version — immutable and specific to that kit. Nothing to bump, and a link cannot
+change under the person you gave it to.
+
 ## Pull requests
 
 1. Branch from `main`.

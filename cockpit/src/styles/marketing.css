@@ -260,6 +260,61 @@
   .mkt__nav-tools .mkt__burger { display: inline-flex; }
 }
 
+/* === /changelog — the product clock ======================================= */
+.chg { padding-block: 40px 90px; max-width: 46rem; }
+.chg h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); letter-spacing: -0.02em; margin: 0 0 12px; }
+.chg__lede { margin: 0 0 28px; font-size: 1rem; line-height: 1.65; color: var(--mkt-fg-muted); }
+
+/* Three cards, because "which version am I on" has three different answers and
+   pretending otherwise is what made the old pill dishonest. */
+.chg__clocks {
+  display: grid; gap: 12px; margin-bottom: 48px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.chg__clock {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--mkt-border); border-radius: 12px;
+  background: color-mix(in srgb, var(--mkt-fg) 2%, transparent);
+}
+.chg__clock-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--mkt-fg-faint, #a1a1aa); }
+.chg__clock strong { font-size: 0.9375rem; font-weight: 600; }
+.chg__clock code { font-size: 0.875em; }
+.chg__clock-note { font-size: 0.75rem; line-height: 1.5; color: var(--mkt-fg-muted); }
+.chg__clock-note a { color: inherit; }
+
+.chg__list { list-style: none; margin: 0; padding: 0; }
+.chg__entry { display: grid; grid-template-columns: 9.5rem 1fr; gap: 24px; padding-block: 28px; }
+.chg__entry + .chg__entry { border-top: 1px solid var(--mkt-border); }
+.chg__date {
+  margin: 0; font-size: 0.8125rem; font-weight: 600;
+  color: var(--mkt-fg-muted); letter-spacing: 0;
+  /* The date IS the version number here, so it sits in the margin like one. */
+  position: sticky; top: 84px; align-self: start;
+}
+.chg__section + .chg__section { margin-top: 20px; }
+.chg__kind {
+  margin: 0 0 8px; font-size: 0.6875rem; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.chg__kind--added { color: #15803d; }
+.chg__kind--changed { color: #b45309; }
+.chg__kind--removed { color: #b91c1c; }
+.chg__kind--fixed { color: #1d4ed8; }
+.chg__section ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 10px; }
+.chg__section li { font-size: 0.9375rem; line-height: 1.65; }
+.chg__section code {
+  font-size: 0.875em; padding: 1px 5px; border-radius: 5px;
+  background: color-mix(in srgb, var(--mkt-fg) 6%, transparent);
+}
+
+@media (max-width: 620px) {
+  /* The date stops being a margin note and becomes a heading. */
+  .chg__entry { grid-template-columns: 1fr; gap: 12px; }
+  .chg__date { position: static; }
+}
+
 /* === The mobile sheet ===================================================== */
 .mkt__burger {
   display: none;

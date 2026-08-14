@@ -4,16 +4,31 @@ import babel from '@rolldown/plugin-babel'
 import { VitePWA } from 'vite-plugin-pwa'
 import { readFileSync } from 'node:fs'
 
-// The nav version chip tracks the PUBLISHED CLI — the concrete artifact users
-// install (`npx uicockpit`). Derive it from cli/package.json at build time so it
-// auto-syncs on every deploy after a version bump; no hand-edited string to drift.
-const cliVersion = JSON.parse(
-  readFileSync(new URL('../cli/package.json', import.meta.url), 'utf8'),
-).version as string
+// The version chips track the PUBLISHED packages — the concrete artifacts users
+// install. Derived from their package.json at build time so they auto-sync on
+// every deploy after a version bump; no hand-edited string to drift.
+//
+// BOTH of them, because there is no single "UIcockpit version": the site is
+// continuously deployed and a kit is addressed by its own hash. A chip that
+// showed one number for the whole product was claiming a thing that does not
+// exist — and claiming it with the CLI's number, which at the time did not even
+// contain the feature the site opened on.
+const pkgVersion = (rel: string) =>
+  JSON.parse(readFileSync(new URL(rel, import.meta.url), 'utf8')).version as string
+const cliVersion = pkgVersion('../cli/package.json')
+const mcpVersion = pkgVersion('../mcp/package.json')
+
+// The changelog lives at the repo root, where GitHub and npm expect it — which
+// is outside Vite's root, so it cannot be `?raw` imported. Inlined at build
+// time instead, the same way the versions are: one source file, no second copy
+// inside the app to drift away from the first.
+const changelog = readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf8')
 
 export default defineConfig({
   define: {
     __UICOCKPIT_VERSION__: JSON.stringify(`v${cliVersion}`),
+    __MCP_VERSION__: JSON.stringify(`v${mcpVersion}`),
+    __CHANGELOG_MD__: JSON.stringify(changelog),
   },
   plugins: [
     react(),

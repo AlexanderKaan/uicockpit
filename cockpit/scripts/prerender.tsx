@@ -20,6 +20,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MarketingPage } from '../src/marketing/MarketingPage'
+import { ChangelogPage } from '../src/marketing/ChangelogPage'
 import { MarketingManifesto } from '../src/marketing/MarketingManifesto'
 import { SeoPage } from '../src/marketing/SeoPage'
 import { ComponentsIndexPage, ComponentDetailPage } from '../src/marketing/ComponentDocs'
@@ -101,6 +102,13 @@ write('/manifesto', renderPage({
   description: "Why I'm building UIcockpit: a design system generator that makes taste decisions once and keeps AI-built UI coherent — a grammar plus a guarantee, built in the open.",
 }))
 
+write('/changelog', renderPage({
+  path: '/changelog',
+  markup: renderToStaticMarkup(<ChangelogPage navigate={noop} />),
+  title: "What's new — UIcockpit changelog",
+  description: 'What changed for people using UIcockpit. The site and the audit ship continuously and are dated here; the CLI and MCP packages carry semver; an exported kit is addressed by its own immutable hash.',
+}))
+
 // The component reference: the index + a detail page per slug (IA-2b).
 write('/components', renderPage({
   path: '/components',
@@ -135,6 +143,7 @@ const staticRoutes: Array<{ loc: string; freq: string; pri: string }> = [
   // spot for the CLI one-liner and shared reports.
   { loc: '/audit', freq: 'weekly', pri: '0.9' },
   { loc: '/components', freq: 'weekly', pri: '0.9' },
+  { loc: '/changelog', freq: 'weekly', pri: '0.6' },
   { loc: '/docs', freq: 'monthly', pri: '0.8' },
   { loc: '/manifesto', freq: 'monthly', pri: '0.6' },
 ]

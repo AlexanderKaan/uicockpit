@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ChevronDown, Menu, X } from 'lucide-react'
 import { Wordmark } from '../Wordmark'
 import { ping } from '../analytics/beacon'
+import { MCP_VERSION } from './versions'
 
 /** The published npm package version (`uicockpit` CLI) — the public number. */
 // Derived from cli/package.json at build time (see vite.config.ts) — auto-syncs
@@ -22,7 +23,7 @@ interface MktNavProps {
   /** Client-side navigate (App's pushState router). */
   navigate: (to: string) => void
   /** Which page we're on — drives aria-current on the matching destination. */
-  current?: 'manifesto' | 'docs' | 'audit' | 'components'
+  current?: 'manifesto' | 'docs' | 'audit' | 'components' | 'changelog'
 }
 
 /**
@@ -86,8 +87,12 @@ export function MktNav({ navigate, current }: MktNavProps) {
               <ChevronDown size={13} strokeWidth={2.5} className="mkt__ver-caret" aria-hidden="true" />
             </summary>
             <div className="mkt__ver-menu" role="menu">
-              <div className="mkt__ver-head">UIcockpit {UICOCKPIT_VERSION}</div>
-              <a href={`${REPO_URL}/releases`} className="mkt__ver-item" target="_blank" rel="noopener noreferrer" role="menuitem">Release notes</a>
+              {/* Names the ARTIFACT. It used to read "UIcockpit {version}",
+                  which claimed a product version that does not exist — and did
+                  it with the CLI's number, which lacked the feature the site
+                  led with. */}
+              <div className="mkt__ver-head">CLI {UICOCKPIT_VERSION} · MCP {MCP_VERSION}</div>
+              <a href="/changelog" className="mkt__ver-item" onClick={(e) => go(e, '/changelog')} role="menuitem">What&rsquo;s new</a>
               <a href={`${REPO_URL}/blob/main/CONTRIBUTING.md`} className="mkt__ver-item" target="_blank" rel="noopener noreferrer" role="menuitem">Contributing</a>
               <a href={`${REPO_URL}/blob/main/LICENSE`} className="mkt__ver-item" target="_blank" rel="noopener noreferrer" role="menuitem">License · MIT</a>
             </div>
@@ -147,6 +152,7 @@ export function MktNav({ navigate, current }: MktNavProps) {
               <a href="/components" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
               <a href="/docs" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
               <a href="/manifesto" {...ariaCurrent('manifesto')} onClick={(e) => go(e, '/manifesto')}>Manifesto</a>
+              <a href="/changelog" {...ariaCurrent('changelog')} onClick={(e) => go(e, '/changelog')}>What&rsquo;s new</a>
             </nav>
 
             <div className="mkt__sheet-meta">
