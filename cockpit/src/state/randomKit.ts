@@ -22,8 +22,6 @@ const SURFACE_DEPTHS = ['flat', 'soft', 'deep'] as const
 const SURFACES = ['outlined', 'filled', 'plain'] as const
 const BORDERS = ['faint', 'subtle', 'medium', 'strong'] as const
 const MOTIONS = ['snappy', 'smooth', 'playful'] as const // skip 'none' — a roll should feel alive
-const TEMPOS = ['snappy', 'normal', 'generous'] as const
-const CURVES = ['standard', 'emphasized', 'spring'] as const
 const PALETTES = ['pastel', 'vivid', 'bright'] as const
 const NEUTRALS = ['auto', 'cool', 'neutral', 'warm'] as const
 // Harmony rolls a vetted PRESET (never random raw slider values) — each preset
@@ -56,8 +54,6 @@ export function randomKit(current: Config, rnd: () => number = Math.random, lock
     surface: roll('surface', SURFACES),
     borders: roll('borders', BORDERS),
     motion: roll('motion', MOTIONS),
-    motionTempo: roll('motionTempo', TEMPOS),
-    motionCurve: roll('motionCurve', CURVES),
     palette: roll('palette', PALETTES),
     neutral: roll('neutral', NEUTRALS),
     mode: current.mode, // preserve light/dark — don't jar the user

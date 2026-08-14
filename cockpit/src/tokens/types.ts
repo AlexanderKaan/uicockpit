@@ -191,8 +191,6 @@ export interface Config {
   /* Border prominence — standalone (see Borders). */
   borders: Borders
   motion: Motion
-  motionTempo: MotionTempo
-  motionCurve: MotionCurve
   /* Single brand hue. Secondary + accent are DERIVED from this in buildTokens
    * — one color in, a harmonious family out (shadcn/Linear model). */
   cPrimary: Hex

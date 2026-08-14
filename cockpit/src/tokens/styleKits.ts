@@ -28,7 +28,7 @@ const TONAL = applyHarmonyPreset('tonal')
 const BASE: Partial<Config> = {
   scale: 'default', typeScale: 'md', buttonShape: 'match', labelCase: 'sentence',
   displayWeight: 'semibold', surface: 'outlined', surfaceDepth: 'soft', borders: 'subtle',
-  motion: 'smooth', motionTempo: 'normal', motionCurve: 'standard',
+  motion: 'smooth',
   palette: 'vivid', canvas: 'neutral', fill: 'brand', iconSet: 'line', ...TONAL,
 }
 
@@ -45,7 +45,7 @@ export const STYLE_KITS: StyleKit[] = [
   {
     id: 'precision', name: 'Precision', blurb: 'Dense, sharp, cool — Linear',
     // Signature = DENSITY. Compact + small type + defined borders + snappy motion.
-    config: { ...BASE, radius: 'subtle', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'cool', surfaceDepth: 'flat', scale: 'compact', typeScale: 'sm', borders: 'medium', motion: 'snappy', motionTempo: 'snappy' },
+    config: { ...BASE, radius: 'subtle', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'cool', surfaceDepth: 'flat', scale: 'compact', typeScale: 'sm', borders: 'medium', motion: 'snappy' },
   },
   {
     id: 'minimal', name: 'Minimal', blurb: 'Square, mono, stark — Vercel',
@@ -65,7 +65,7 @@ export const STYLE_KITS: StyleKit[] = [
   {
     id: 'soft', name: 'Soft', blurb: 'Rounded, bold, playful — friendly',
     // Signature = CHUNKY. Round radius, filled surface, bold headings, rounded icons, playful motion.
-    config: { ...BASE, radius: 'round', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'warm', surface: 'filled', displayWeight: 'bold', iconSet: 'rounded', motion: 'playful', motionCurve: 'spring' },
+    config: { ...BASE, radius: 'round', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'warm', surface: 'filled', displayWeight: 'bold', iconSet: 'rounded', motion: 'playful' },
   },
   {
     id: 'editorial', name: 'Editorial', blurb: 'Serif, spacious, literary',

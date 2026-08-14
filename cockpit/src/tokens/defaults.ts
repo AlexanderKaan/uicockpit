@@ -24,8 +24,6 @@ export const DEFAULT_CONFIG: Config = {
   surface: 'outlined',         // box-with-border fields + flush hairline-seam sidebar (= the previous default look)
   borders: 'subtle',
   motion: 'smooth',
-  motionTempo: 'normal',
-  motionCurve: 'standard',
   // Interaction (H2): the state wash is a fixed house formula — whisper alpha
   // (0.05) on a NEUTRAL source that follows the Neutrals ramp, 0.96 press squish.
   // The States/State-tint AND Springs(motionScheme) dials were removed (knob-cull):

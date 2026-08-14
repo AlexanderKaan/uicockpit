@@ -761,19 +761,24 @@ export function buildTokens(cfg: Config): Tokens {
   // borders toggled, which the depth macro no longer does — bw is always 1px.)
   const bw = '1px'
 
-  /* Motion resolution — base preset × tempo multiplier × curve family.
-   * The three dimensions stack so a Smooth+Generous+Spring combo feels
-   * deliberate and bouncy, while Snappy+Snappy+Standard reads as a
-   * dense pro-tool. */
+  /* Motion resolution — base preset × the house tempo × the house curve.
+   *
+   * Tempo and Curve used to be two more Config fields, and the panel had no
+   * control for either: only a hand-written URL hash or a Style preset could
+   * move them, while Shuffle rolled them freely. That combination is worse than
+   * dead surface — it meant Shuffle could hand you a kit the panel was unable to
+   * reproduce or adjust. Three stacked motion dimensions was also 36 ways to
+   * time an animation for a system whose promise is that the default is right.
+   * Base preset stays; the other two are the house formula now. */
   const base = MOT_BASE[cfg.motion]
-  const mul = TEMPO[cfg.motionTempo]
+  const mul = TEMPO.normal
   // Spring physics (H2) — fixed to the composed 'standard' sampling (the Springs
   // knob was culled). Pre-sample the spatial springs into linear() easings.
   const springSet = SPRINGS.standard
   const spFast = springLinear(...springSet.fast)
   const spDef = springLinear(...springSet.def)
   const spSlow = springLinear(...springSet.slow)
-  const curveSet = CURVE[cfg.motionCurve]
+  const curveSet = CURVE.standard
   const ms = (n: number) => `${Math.round(n * mul)}ms`
   const motion = {
     fast: ms(base.fast),
