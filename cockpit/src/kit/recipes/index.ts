@@ -315,7 +315,14 @@ export const RECIPES: readonly Recipe[] = [
  * quieter (secondary/ghost/outline/link) stays flat. */
 .btn--primary,
 .btn--danger {
-  box-shadow: var(--k-btn-shadow, var(--k-shadow-sm));
+  /* The inset layer is the 1.4.11 boundary: it only paints when the engine has
+     decided this brand does not separate from the page on its own, and is
+     transparent otherwise, so most kits carry a no-op. Inset rather than a
+     border so the box model never changes, and first in the chain so it reads as
+     the button's own edge rather than a glow underneath it. */
+  box-shadow:
+    inset 0 0 0 1px var(--k-primary-edge, transparent),
+    var(--k-btn-shadow, var(--k-shadow-sm));
   transition:
     background var(--k-dur, 200ms) var(--k-ease, ease),
     transform var(--k-dur-fast, 140ms) var(--k-ease-spring, cubic-bezier(.34,1.56,.64,1)),

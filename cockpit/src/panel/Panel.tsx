@@ -262,6 +262,10 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
   // is the user's OWN — show its colour name (e.g. "Burnt Orange") instead of
   // the stale preset name, and clear the grid checkmark. Pick a preset exactly
   // again and it snaps back.
+  // 'transparent' whenever the brand separates from the page on its own, which
+  // is most of the time — so the note below stays absent rather than nagging.
+  const brandEdge = String((tokens.vars as Record<string, string>)['--k-primary-edge'] ?? 'transparent')
+
   const themeHex = COLOR_THEMES[cfg.colorTheme]?.cPrimary
   const themeIsCustom = !!themeHex && cfg.cPrimary.toLowerCase() !== themeHex.toLowerCase()
 
@@ -342,20 +346,41 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
       // Brand colour lives at the foot of the theme flyout (emphasised row) —
       // it's the same decision ("what carries the UI"), no separate menu row.
       footer: (
-        <label className="fmbrand">
-          <span className="fmbrand__label">Brand color</span>
-          <span className="fmbrand__val">
-            <span className="fmrow__dot" style={{ background: tokens.primaryHex }} />
-            {nameColor(tokens.primaryHex)}
-          </span>
-          <input
-            type="color"
-            className="fmrow__colorinput"
-            value={cfg.cPrimary}
-            onChange={(e) => set('cPrimary', e.target.value)}
-            aria-label="Brand color"
-          />
-        </label>
+        <>
+          <label className="fmbrand">
+            <span className="fmbrand__label">Brand color</span>
+            <span className="fmbrand__val">
+              <span className="fmrow__dot" style={{ background: tokens.primaryHex }} />
+              {nameColor(tokens.primaryHex)}
+            </span>
+            <input
+              type="color"
+              className="fmrow__colorinput"
+              value={cfg.cPrimary}
+              onChange={(e) => set('cPrimary', e.target.value)}
+              aria-label="Brand color"
+            />
+          </label>
+          {/* Said out loud, because something was done on their behalf.
+            *
+            * Roughly a quarter of the reachable brand space sits too close to the
+            * page to satisfy WCAG 1.4.11 on its own. The usual fix is to shift the
+            * colour, and we measured what that costs: median dE00 10.8 — a visibly
+            * different colour. A public body's brand is often fixed by decision,
+            * so we keep it exactly and give the button a boundary instead.
+            *
+            * The note exists because a silent adjustment is the thing a design
+            * team discovers three months later. It reports what happened and why,
+            * and it appears only when it actually happened. */}
+          {brandEdge !== 'transparent' && (
+            <p className="fmbrand__note">
+              <span className="fmbrand__note-swatch" style={{ background: brandEdge }} aria-hidden="true" />
+              This colour sits close to the page background, so primary buttons get a
+              1px boundary to stay identifiable (WCAG&nbsp;1.4.11). Your brand colour
+              is unchanged.
+            </p>
+          )}
+        </>
       ),
     },
     {

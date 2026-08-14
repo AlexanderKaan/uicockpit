@@ -59,20 +59,17 @@ const KNOBS: Record<string, unknown[]> = {
   expression: [50, 100, 150],
 }
 
-/* The one open case, named so it cannot quietly become normal.
+/* Empty, and it took a measurement to get here.
  *
- * `--k-primary` is the brand SOLID, and on these two themes in dark mode it
- * measures 1.78:1 and 2.03:1 against the page — a primary button whose extent
- * is hard to see, even though its label is fine at 4.63:1. Unlike the two bugs
- * above this is not a broken guard, it is a real decision with three answers
- * (nudge the brand's lightness · give the button a boundary when its fill is
- * too close · drop the theme), and it changes how a kit LOOKS. So it is pinned
- * here rather than fixed quietly, and the test still fails if it spreads to a
- * third theme or a second rule. */
-const KNOWN_OPEN = new Set([
-  'indigo/dark/Primary against background',
-  'violet/dark/Primary against background',
-])
+ * This held indigo/dark and violet/dark: the brand SOLID at 1.78:1 and 2.03:1
+ * against the page. The tempting reading was "two unlucky presets, drop them".
+ * Sweeping the whole reachable brand space instead — 24 hues x 4 lightnesses x 2
+ * saturations x both modes — found 87 of 384 failing, in BOTH modes. Dropping
+ * two of sixteen presets would have removed the only two cases this file could
+ * SEE while leaving the failure one hex field away, and turned the gate green on
+ * a system that had not improved. Fixed properly instead: see `--k-primary-edge`
+ * in buildTokens for why the boundary moves and the brand colour does not. */
+const KNOWN_OPEN = new Set<string>([])
 
 const hx = (v: unknown) => (String(v).startsWith('#') ? String(v) : oklchStrToHex(String(v)))
 

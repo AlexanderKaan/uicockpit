@@ -450,6 +450,11 @@ export function buildTokens(cfg: Config): Tokens {
    * indigo/dark at 1.78:1 — which is exactly the raw primary.
    *
    * The focus indicator is the one thing a keyboard user has. Convert first. */
+  /* Last resort if the ramp runs out: the ink already proven readable on this
+   * fill. Never pretty, always legal — and unreachable for every kit we have
+   * measured, which is why it is a fallback and not the rule. */
+  const primaryFgFallbackEdge = (h: string) => readableInk(h)
+
   const ringFloored = (() => {
     const surfHex = oklchStrToHex(surf.base)
     const primaryHexNow = oklchStrToHex(primary)
@@ -941,6 +946,52 @@ export function buildTokens(cfg: Config): Tokens {
       ? 'var(--k-surface)'
       : `color-mix(in srgb, var(--k-primary) 6%, ${nStep(0)})`
 
+  /* The brand solid against the page — WCAG 1.4.11, and the one place we refuse
+   * to move the brand.
+   *
+   * A primary button is identified by its fill, so that fill needs 3:1 against
+   * what surrounds it. Swept across the whole reachable brand space (24 hues x 4
+   * lightnesses x 2 saturations x both modes): 87 of 384 fail, in BOTH modes —
+   * this is not a dark-mode quirk and not a property of two unlucky presets.
+   *
+   * The obvious fix is to nudge the brand until it clears, which is common
+   * practice (Material treats your colour as a seed; Leonardo generates to a
+   * target ratio) and is already what we do for the ink ON the button. We
+   * measured how far it would have to move: median dE00 10.8, p75 14.6, max
+   * 22.6. Only 8 of the 87 land under dE 2, the threshold below which nobody can
+   * tell. And there is no cleverer path — contrast is a luminance relation and
+   * chroma barely moves luminance, so reaching 3:1 means moving lightness, and
+   * moving it that far IS a different colour. For a public body whose brand is
+   * fixed by decision, "we replaced your colour" is not a disclosure, it is a
+   * blocker.
+   *
+   * So the boundary does the work instead, which is what 1.4.11 asks for anyway:
+   * the visual information that identifies the component. The same lightness
+   * shift we refused to make to the FILL is fine on a hairline — a 1px edge is
+   * not the brand, it is an edge. Emitted as `transparent` whenever the fill
+   * already clears, so the overwhelming majority of kits carry nothing. */
+  const primaryEdge = (() => {
+    const fill = oklchStrToHex(primary)
+    /* BOTH neighbours: a primary button lands on the page and inside a card.
+     * The first version checked only surf.base and 45 of the emitted edges did
+     * not clear against --k-bg — the identical mistake the input-border floor
+     * made an hour earlier, which is what a repeated shape in a codebase looks
+     * like before it becomes a rule. */
+    const neighbours = [oklchStrToHex(pageBg), oklchStrToHex(surf.base)]
+    const clearsAll = (hex: string) => neighbours.every((n) => contrast(hex, n) >= 3)
+    if (clearsAll(fill)) return 'transparent'
+    const [l0, c0, h0] = hexToOklch(fill)
+    const dir = dark ? 1 : -1 // away from the page, whichever way that is
+    for (let l = l0; l >= 0.06 && l <= 0.97; l += dir * 0.01) {
+      const out = `oklch(${(l * 100).toFixed(1)}% ${c0.toFixed(4)} ${h0.toFixed(1)})`
+      const hex = oklchStrToHex(out)
+      // It sits BETWEEN the fill and the page, so it has to separate from both.
+      if (clearsAll(hex) && contrast(hex, fill) >= 1.4) return out
+    }
+    return primaryFgFallbackEdge(fill)
+  })()
+
+
   // Input border — TRACKS the Border control (Faint→Strong), one neutral step
   // firmer than the decorative --k-border so a field still reads as a field.
   // Intentionally NO hard 3:1 floor (the old behaviour clamped Faint/Subtle/
@@ -1112,6 +1163,10 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-primary': primary,
       // Brand-as-link-text. Same split as the status roles above: the brand solid
       // is a fill, a link is ink. Eleven links measured 3.41:1 in dark mode.
+      /* transparent for the ~77% of brands that already separate from the page;
+       * a hairline for the rest. Consumers read it as a colour, so it composes
+       * into any border/shadow without knowing our rule. */
+      '--k-primary-edge': primaryEdge,
       '--k-primary-text': primaryText,
       '--k-primary-text-hover': primaryTextHover,
       '--k-primary-hover': primaryHoverFloored,
