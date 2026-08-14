@@ -39,6 +39,47 @@ function relPath(file: File): string {
   return cut === -1 ? raw : raw.slice(cut + 1)
 }
 
+/** Is this path worth opening at all? */
+export const isScannable = (path: string) =>
+  !SKIP_DIR.test(path) && AUDIT_SCAN_EXT.test(path) && !AUDIT_SKIP_FILE.test(path)
+
+/**
+ * Which files to read, and in which order — the one place the caps live.
+ *
+ * Both intakes route through this. A folder and a zip of that same folder must
+ * produce the same audit, and they will not if each enforces its own ceiling in
+ * its own order: the cap decides WHICH half of a monorepo gets described, which
+ * makes it a correctness rule rather than a memory setting.
+ */
+export function selectFiles<T extends { path: string; size: number }>(
+  candidates: T[],
+): { take: T[]; skipped: { tooBig: number; overCap: number } } {
+  const skipped = { tooBig: 0, overCap: 0 }
+  /* Ties break on the PATH, never on arrival order.
+   *
+   * The engine has order-sensitive tiebreaks — a custom property declared in two
+   * files resolves last-wins, so whichever file is read second decides. Reading
+   * documenso as a folder and as a zip of that same folder therefore returned
+   * two different brands from byte-identical inputs, because a directory walk
+   * and a zip's central directory enumerate in different orders. Sorting on the
+   * path makes the answer a property of the codebase rather than of how it
+   * happened to be handed over — across intakes, and across filesystems. */
+  const ranked = candidates
+    .filter((c) => isScannable(c.path))
+    .map((c) => ({ c, rank: auditFilePriority(c.path) }))
+    .sort((a, b) => a.rank - b.rank || (a.c.path < b.c.path ? -1 : a.c.path > b.c.path ? 1 : 0))
+
+  const take: T[] = []
+  let total = 0
+  for (const { c } of ranked) {
+    if (c.size > MAX_FILE_BYTES) { skipped.tooBig++; continue }
+    if (take.length >= MAX_FILES || total + c.size > MAX_TOTAL_BYTES) { skipped.overCap++; continue }
+    total += c.size
+    take.push(c)
+  }
+  return { take, skipped }
+}
+
 export async function readPickedFiles(list: FileList | File[]): Promise<ScanResult> {
   const all = Array.from(list)
   const rootName =
@@ -46,9 +87,7 @@ export async function readPickedFiles(list: FileList | File[]): Promise<ScanResu
     'your project'
 
   const files: ScanFile[] = []
-  const skipped = { tooBig: 0, overCap: 0 }
   let pkg: unknown | null = null
-  let total = 0
 
   // package.json is read even though it is not a scannable file: it is what
   // tells the report which framework and styling libraries are installed.
@@ -60,19 +99,10 @@ export async function readPickedFiles(list: FileList | File[]): Promise<ScanResu
   /* Read the design system BEFORE the cap can bite. In walk order, n8n's 8,000
    * files ran out inside their backend package and never reached the frontend
    * at all — a cap spent on files that carry no styling is a cap that answers
-   * about the wrong half of a monorepo. Ordering is stable within a priority,
-   * so a repo small enough to fit is read exactly as before. */
-  const candidates = all
-    .map((file) => ({ file, path: relPath(file) }))
-    .filter(({ path }) => !SKIP_DIR.test(path) && AUDIT_SCAN_EXT.test(path) && !AUDIT_SKIP_FILE.test(path))
-  const ranked = candidates
-    .map((c, i) => ({ ...c, rank: auditFilePriority(c.path), i }))
-    .sort((a, b) => a.rank - b.rank || a.i - b.i)
+   * about the wrong half of a monorepo. */
+  const { take, skipped } = selectFiles(all.map((file) => ({ file, path: relPath(file), size: file.size })))
 
-  for (const { file, path } of ranked) {
-    if (file.size > MAX_FILE_BYTES) { skipped.tooBig++; continue }
-    if (files.length >= MAX_FILES || total + file.size > MAX_TOTAL_BYTES) { skipped.overCap++; continue }
-    total += file.size
+  for (const { file, path } of take) {
     try {
       files.push({ path, content: await file.text() })
     } catch { /* unreadable → it carries no style either */ }

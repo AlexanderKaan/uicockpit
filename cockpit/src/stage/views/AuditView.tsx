@@ -152,14 +152,14 @@ export function AuditView({ audit, onSeeEvidence }: AuditViewProps) {
         {drift ? (
           <>Every value below is one your own code uses — dealt out one per component, which is what
           having <b>{audit.distinct.radius} radii</b> looks like when nothing decides between them.
-          The Foundation on the left is not applied yet.</>
+          The Foundation is not applied yet.</>
         ) : brandKnown ? (
           <>These are the components your codebase actually builds, on the kit your code implies. Change
-          anything on the left and this updates — it is the same live preview, pointed at your app.</>
+          anything in the Foundation and this updates — it is the same live preview, pointed at your app.</>
         ) : (
           <>These are the components your codebase actually builds. The <b>colour is ours, not yours</b> —
           nothing in your code declared a brand and no single colour dominated enough to infer one. Set
-          Brand on the left and this becomes your app rather than our guess.</>
+          Brand in the Foundation and this becomes your app rather than our guess.</>
         )}
       </p>
 

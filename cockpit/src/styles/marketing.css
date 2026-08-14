@@ -2302,7 +2302,10 @@
 /* ── /audit — the retroactive door ───────────────────────────────────────────
  * Same site shell as everything else: two doors, ONE product. The instrument
  * language stays inside the report itself.                                     */
-.aud { padding: 40px 0 90px; }
+/* Vertical only — the shorthand was overriding `.mkt__container`'s 24px side
+ * gutter, so on a phone the headline and every promise ran flush into the
+ * screen edge. */
+.aud { padding-block: 40px 90px; }
 .aud__local { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 30px;
   font-size: 12.5px; color: var(--mkt-fg-muted); padding: 7px 13px; border-radius: 999px;
   background: color-mix(in oklab, var(--mkt-fg) 5%, transparent); }
@@ -2486,3 +2489,16 @@
 }
 .audz--page .audz__promise svg { flex: none; }
 .audz--page .audz__error { color: #b91c1c; font-size: 0.8125rem; }
+.audz--page .audz__choices {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 8px; margin-top: 6px;
+}
+.audz--page .audz__zip { gap: 6px; }
+
+/* A phone cannot drag a folder and cannot open a directory picker, so the .zip
+ * route is not a secondary convenience there — it is the only one. Give the two
+ * buttons room to stack rather than squeezing them onto one line. */
+@media (max-width: 560px) {
+  .audz--page { padding: 30px 18px; margin-top: 18px; }
+  .audz--page h2 { font-size: 1rem; }
+}

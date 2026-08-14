@@ -6,6 +6,7 @@ import { auditFiles, renderReport } from '../audit/engine'
 import { readPickedFiles, loadVocabulary, type ScanResult } from '../audit/readFiles'
 import { ping } from '../analytics/beacon'
 import { FolderDrop } from '../audit/FolderDrop'
+import { readZipFile } from '../audit/readZip'
 import type { AuditHandoff } from '../audit/handoff'
 import { saveHandoff, saveReport, readReport, clearHandoff, configFromAudit, provenanceFromAudit, derivedFromAudit } from '../audit/handoff'
 import { encode } from '../state/hash'
@@ -49,13 +50,15 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
     return () => { document.title = prev }
   }, [])
 
-  const run = async (list: FileList | File[]) => {
+  /* One path for both intakes — see AuditEmpty. A folder and a zip of that
+   * folder must reach the engine as the same ScanResult. */
+  const run = async (read: () => Promise<ScanResult>) => {
     setError(null)
     setPhase('reading')
     try {
-      const scan = await readPickedFiles(list)
+      const scan = await read()
       if (!scan.files.length) {
-        setError('No stylable files in that folder — pick the app itself, not the repo root.')
+        setError('No stylable files in there — pick the app itself, not the repo root.')
         setPhase('door')
         return
       }
@@ -68,8 +71,12 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       // score, the stack or anything else derived from their code.
       ping('audit', result.refused ? 'refused' : 'scanned')
       setPhase('recognise')
-    } catch {
-      setError('That folder could not be read. Try a smaller one — a single app rather than a monorepo.')
+    } catch (e) {
+      // A zip that is not one has a specific, actionable reason; say that
+      // instead of blaming a folder the visitor did not choose.
+      setError(e instanceof Error && /\.zip/.test(e.message)
+        ? e.message
+        : 'That folder could not be read. Try a smaller one — a single app rather than a monorepo.')
       setPhase('door')
     }
   }
@@ -145,7 +152,13 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
           Runs in this tab · no upload, no account, no server
         </p>
 
-        {phase === 'door' && <Door onFiles={(f) => void run(f)} error={error} />}
+        {phase === 'door' && (
+          <Door
+            onFiles={(f) => void run(() => readPickedFiles(f))}
+            onZip={(f) => void run(() => readZipFile(f))}
+            error={error}
+          />
+        )}
         {phase === 'reading' && <Reading />}
         {phase === 'recognise' && state && (
           <Recognise
@@ -171,23 +184,28 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
 
 /* ─────────────────────────────── 1 · the door ─────────────────────────────── */
 
-function Door({ onFiles, error }: { onFiles: (f: FileList | File[]) => void; error: string | null }) {
+function Door({ onFiles, onZip, error }: {
+  onFiles: (f: FileList | File[]) => void
+  onZip: (f: File) => void
+  error: string | null
+}) {
   return (
     <section className="aud__door">
       <h1>Find the design system your code already has.</h1>
       <p className="aud__lede">
-        Point it at a folder. It reads the decisions your codebase already implies —
-        and measures how far the code has drifted from them.
+        Point it at a folder, or hand it a .zip. It reads the decisions your codebase
+        already implies — and measures how far the code has drifted from them.
       </p>
 
       {/* The SAME intake the configurator uses. Two doors into one product have
           to accept code the same way, or they stop being one product. */}
       <FolderDrop
         onFiles={onFiles}
+        onZip={onZip}
         error={error}
         tone="page"
         heading="Drop your app here"
-        lede="Or choose a folder. It never leaves this tab."
+        lede="Or choose a folder — or a .zip, which is the one a phone can give us. It never leaves this tab."
       />
 
       <ul className="aud__promises">

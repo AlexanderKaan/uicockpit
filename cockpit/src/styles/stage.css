@@ -800,7 +800,11 @@
 .audz__icon { color: var(--app-fg-faint); }
 .audz h2 { margin: 2px 0 0; font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
 .audz p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--app-fg-muted); }
-.audz .btn { margin-top: 6px; }
+.audz__choices {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 8px; margin-top: 6px;
+}
+.audz__zip { gap: 6px; }
 .audz__hint { font-size: 11px; color: var(--app-fg-faint); }
 .audz__error { color: #b91c1c; font-size: 12px; }
 .audz__promise {

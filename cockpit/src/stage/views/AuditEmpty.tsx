@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { readPickedFiles, loadVocabulary } from '../../audit/readFiles'
+import { readPickedFiles, loadVocabulary, type ScanResult } from '../../audit/readFiles'
+import { readZipFile } from '../../audit/readZip'
 import { FolderDrop } from '../../audit/FolderDrop'
 import { auditFiles } from '../../audit/engine'
 import {
@@ -30,11 +31,14 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const run = async (files: FileList | File[]) => {
+  /* One path for both intakes: a folder and a zip of that folder must reach the
+   * engine as the same ScanResult, or the two produce different audits of one
+   * codebase and neither can be believed. */
+  const run = async (read: () => Promise<ScanResult>) => {
     setError(null)
     setBusy(true)
     try {
-      const scan = await readPickedFiles(files)
+      const scan = await read()
       if (!scan.files.length) {
         setError('No stylable files in there — point at the app itself, not the repo root.')
         return
@@ -77,8 +81,10 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
       }
       saveHandoff(handoff)
       onScanned(handoff, hash)
-    } catch {
-      setError('That folder could not be read. Try a smaller one — a single app, not a monorepo.')
+    } catch (e) {
+      setError(e instanceof Error && /\.zip/.test(e.message)
+        ? e.message
+        : 'That folder could not be read. Try a smaller one — a single app, not a monorepo.')
     } finally {
       setBusy(false)
     }
@@ -86,7 +92,12 @@ export function AuditEmpty({ onScanned }: AuditEmptyProps) {
 
   return (
     <div className="audv audv--empty">
-      <FolderDrop onFiles={(f) => void run(f)} busy={busy} error={error} />
+      <FolderDrop
+        onFiles={(f) => void run(() => readPickedFiles(f))}
+        onZip={(f) => void run(() => readZipFile(f))}
+        busy={busy}
+        error={error}
+      />
     </div>
   )
 }

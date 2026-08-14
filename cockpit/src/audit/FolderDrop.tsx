@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react'
-import { FolderOpen, ShieldCheck } from 'lucide-react'
+import { FolderOpen, ShieldCheck, FileArchive } from 'lucide-react'
 import { filesFromDrop } from './readFiles'
 
 /**
@@ -13,10 +13,21 @@ import { filesFromDrop } from './readFiles'
  * Drop target AND file dialog, always. Dragging is what people reach for, and
  * the dialog stays because a drop zone is invisible to anyone on a keyboard —
  * and, on a phone, is not a thing at all.
+ *
+ * ── and the phone ──────────────────────────────────────────────────────────
+ * `webkitdirectory` is a desktop affordance. It does nothing on iOS and nothing
+ * on Android Chrome, and there is no feature test that says so: the property is
+ * present and settable on every browser that ignores it. So the choice is not
+ * "detect and adapt", it is what to OFFER — and the honest answer is both routes
+ * with the pointer-capable one shown first, since a zip is the only shape a
+ * phone can hand us and it costs a desktop visitor nothing to see it.
  */
 
 interface FolderDropProps {
+  /** A folder, as a flat file list with paths. */
   onFiles: (files: FileList | File[]) => void
+  /** A single .zip, read by readZipFile. */
+  onZip: (file: File) => void
   busy?: boolean
   error?: string | null
   /** The marketing door leads with its own headline, so it suppresses this one. */
@@ -28,10 +39,16 @@ interface FolderDropProps {
 }
 
 export function FolderDrop({
-  onFiles, busy = false, error = null, heading, lede, tone = 'stage',
+  onFiles, onZip, busy = false, error = null, heading, lede, tone = 'stage',
 }: FolderDropProps) {
+  /* The kit's `.btn` recipe is scoped to the app's preview root, so on the
+   * marketing page it resolved to nothing at all — the audit's primary call to
+   * action has been rendering as bare underlined-less text since the door
+   * shipped. Each surface gets the button class that exists on it. */
+  const btn = tone === 'page' ? 'mkt-btn' : 'btn'
   const [over, setOver] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const folderRef = useRef<HTMLInputElement>(null)
+  const zipRef = useRef<HTMLInputElement>(null)
 
   return (
     <div
@@ -41,6 +58,9 @@ export function FolderDrop({
       onDrop={async (e) => {
         e.preventDefault()
         setOver(false)
+        // A dropped .zip arrives as a plain file, not a directory entry.
+        const dropped = Array.from(e.dataTransfer.files || [])
+        if (dropped.length === 1 && /\.zip$/i.test(dropped[0]!.name)) { onZip(dropped[0]!); return }
         const files = await filesFromDrop(e.dataTransfer.items)
         if (files.length) onFiles(files)
       }}
@@ -54,9 +74,15 @@ export function FolderDrop({
       </p>
       {!busy && (
         <>
-          <button type="button" className="btn btn--primary" onClick={() => inputRef.current?.click()}>
-            Choose a folder
-          </button>
+          <div className="audz__choices">
+            <button type="button" className={`${btn} ${btn}--primary`} onClick={() => folderRef.current?.click()}>
+              Choose a folder
+            </button>
+            <button type="button" className={`${btn} ${btn}--ghost audz__zip`} onClick={() => zipRef.current?.click()}>
+              <FileArchive size={14} strokeWidth={1.9} />
+              or a .zip
+            </button>
+          </div>
           <span className="audz__hint">one app, not a monorepo root · node_modules is skipped</span>
         </>
       )}
@@ -67,7 +93,7 @@ export function FolderDrop({
       </p>
 
       <input
-        ref={inputRef}
+        ref={folderRef}
         type="file"
         hidden
         // @ts-expect-error — non-standard, but the only directory picker that
@@ -76,6 +102,13 @@ export function FolderDrop({
         directory=""
         multiple
         onChange={(e) => e.target.files && onFiles(e.target.files)}
+      />
+      <input
+        ref={zipRef}
+        type="file"
+        hidden
+        accept=".zip,application/zip"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) onZip(f) }}
       />
     </div>
   )
