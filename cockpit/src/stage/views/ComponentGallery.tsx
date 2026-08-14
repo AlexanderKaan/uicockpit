@@ -5519,6 +5519,13 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'select', name: 'Select', group: 'Inputs', recipeId: 'select-trigger', blurb: 'A themed select trigger + option menu — the native picker, restyled to the kit.', Preview: SelectCard },
   { slug: 'combobox', name: 'Combobox', group: 'Inputs', recipeId: 'combobox', blurb: 'Type-ahead select: filter a list as you type, keyboard-navigable.', Preview: ComboboxCard },
   { slug: 'checkbox-radio', name: 'Checkbox & Radio', group: 'Inputs', recipeId: 'radio-card', blurb: 'Multi- and single-select controls, including the richer selectable card variant.', Preview: SelectionCard },
+  /* The public-sector set (Open UI / USWDS pass, 2026-08). These are the
+   * components a service needs that a commercial system does not ship — they get
+   * pages because an undocumented component is one nobody can adopt, and because
+   * the Open UI submission publishes this exact list. */
+  { slug: 'character-count', name: 'Character Count', group: 'Inputs', recipeId: 'charcount', blurb: 'A live remaining-characters readout that is actually announced, and never truncates a paste.', Preview: CharacterCountCard },
+  { slug: 'memorable-date', name: 'Memorable Date', group: 'Inputs', recipeId: 'memorable-date', blurb: 'Three fields for a date someone already knows — the accessible answer to date entry, not a picker.', Preview: MemorableDateCard },
+  { slug: 'requirements', name: 'Requirements Checklist', group: 'Inputs', recipeId: 'requirements', blurb: 'Rules that tick off as you type, announced politely, with met/unmet carried in text.', Preview: RequirementsCard },
   { slug: 'switch', name: 'Switch', group: 'Inputs', recipeId: 'switch-toggle', blurb: 'A binary toggle with a shape-locked round knob and the kit’s motion.', Preview: SwitchCard },
   { slug: 'slider', name: 'Slider', group: 'Inputs', recipeId: 'slider', blurb: 'A drag-to-set value control on a stroke-3 track with a precise handle.', Preview: SliderCard },
   { slug: 'search-input', name: 'Search Input', group: 'Inputs', recipeId: 'searchinput', blurb: 'A search field with a lead icon, ghost clear button and optional kbd hint.', Preview: SearchInputCard },
@@ -5566,6 +5573,8 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'breadcrumb', name: 'Breadcrumb', group: 'Navigation', recipeId: 'pagination-breadcrumb', blurb: 'A path trail back up the hierarchy, with a truncating overflow.', Preview: BreadcrumbCard },
   { slug: 'pagination', name: 'Pagination', group: 'Navigation', recipeId: 'pagination-breadcrumb', blurb: 'Page controls with prev/next and a windowed page range.', Preview: PaginationCard },
   { slug: 'navigation-menu', name: 'Navigation Menu', group: 'Navigation', recipeId: 'navigation-menu', blurb: 'A top nav with dropdown mega-panels for sections.', Preview: NavMenuCard },
+  { slug: 'in-page-navigation', name: 'In-page Navigation', group: 'Navigation', recipeId: 'inpagenav', blurb: 'On this page — a named nav landmark whose current item is announced, not just underlined.', Preview: InPageNavCard },
+  { slug: 'process-list', name: 'Process List', group: 'Navigation', recipeId: 'processlist', blurb: 'Numbered steps that carry real content — editorial, not a progress indicator.', Preview: ProcessListCard },
   { slug: 'stepper', name: 'Stepper', group: 'Navigation', recipeId: 'stepper', blurb: 'A multi-step progress indicator — done, current and future states.', Preview: StepperCard },
 
   // Overlays & disclosure
@@ -5582,6 +5591,8 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'carousel', name: 'Carousel', group: 'Layout', recipeId: 'carousel', blurb: 'Sliding panels with prev/next and dot pagination.', Preview: CarouselCard },
   { slug: 'aspect-ratio', name: 'Aspect Ratio', group: 'Layout', recipeId: 'aspect-ratio', blurb: 'A box that holds a fixed ratio as it scales — media, embeds, thumbnails.', Preview: AspectRatioCard },
   { slug: 'scroll-area', name: 'Scroll Area', group: 'Layout', recipeId: 'scroll-area', blurb: 'A scoped scroll container with a themed, overlay scrollbar.', Preview: ScrollAreaCard },
+  { slug: 'footer', name: 'Footer', group: 'Layout', recipeId: 'sitefooter', blurb: 'The contentinfo landmark — accessibility statement, privacy, contact, the body responsible.', Preview: SiteFooterCard },
+  { slug: 'identifier', name: 'Identifier', group: 'Layout', recipeId: 'identifier', blurb: 'Who operates this service, and the statements a person is entitled to find.', Preview: IdentifierCard },
   { slug: 'resizable', name: 'Resizable', group: 'Layout', recipeId: 'resizable', blurb: 'Drag-to-resize split panes with a grabbable handle.', Preview: ResizableCard },
 
   // AI thread

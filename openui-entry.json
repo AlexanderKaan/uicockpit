@@ -1,0 +1,395 @@
+{
+  "$schema": "../schemas/design-system.schema.json",
+  "name": "UIcockpit",
+  "description": "A design system you configure once and can then prove: framework-neutral CSS tokens over semantic HTML, with a verifier that checks a codebase against the contract it was given. Built to WCAG 2.2 AA, with an AAA target-size mode for public-sector baselines.",
+  "url": "https://uicockpit.com",
+  "by": "Alexander Kaan",
+  "components": [
+    {
+      "name": "Accordion",
+      "url": "https://uicockpit.com/components/accordion",
+      "definition": "Stacked disclosure panels — one section open at a time or many."
+    },
+    {
+      "name": "Alert",
+      "url": "https://uicockpit.com/components/alert",
+      "definition": "An inline message in the toned status colours — info, success, warning, danger."
+    },
+    {
+      "name": "Alert Dialog",
+      "url": "https://uicockpit.com/components/alert-dialog",
+      "definition": "A confirmation modal that names the object and its destructive action."
+    },
+    {
+      "name": "Aspect Ratio",
+      "url": "https://uicockpit.com/components/aspect-ratio",
+      "definition": "A box that holds a fixed ratio as it scales — media, embeds, thumbnails."
+    },
+    {
+      "name": "Attachment",
+      "url": "https://uicockpit.com/components/attachment",
+      "definition": "A file chip with type icon, name and size — for messages and forms."
+    },
+    {
+      "name": "Avatar",
+      "url": "https://uicockpit.com/components/avatar",
+      "definition": "A user image or initials, with sizes and a status dot."
+    },
+    {
+      "name": "Badge & Chip",
+      "url": "https://uicockpit.com/components/badge",
+      "definition": "Compact status pills and removable chips in the toned status colours.",
+      "openUIName": "Badge"
+    },
+    {
+      "name": "Banner",
+      "url": "https://uicockpit.com/components/banner",
+      "definition": "A full-width page-level notice with an action and a dismiss."
+    },
+    {
+      "name": "Breadcrumb",
+      "url": "https://uicockpit.com/components/breadcrumb",
+      "definition": "A path trail back up the hierarchy, with a truncating overflow."
+    },
+    {
+      "name": "Breakdown",
+      "url": "https://uicockpit.com/components/breakdown",
+      "definition": "A share-bar category list — the analytical companion beside a chart."
+    },
+    {
+      "name": "Button",
+      "url": "https://uicockpit.com/components/button",
+      "definition": "The primary action control — one loud primary per region, quiet siblings, a locked height scale."
+    },
+    {
+      "name": "Button Group",
+      "url": "https://uicockpit.com/components/button-group",
+      "definition": "Segmented actions that share one seam — a split button or a related-action cluster."
+    },
+    {
+      "name": "Carousel",
+      "url": "https://uicockpit.com/components/carousel",
+      "definition": "Sliding panels with prev/next and dot pagination."
+    },
+    {
+      "name": "Character Count",
+      "url": "https://uicockpit.com/components/character-count",
+      "definition": "A live remaining-characters readout that is actually announced, and never truncates a paste."
+    },
+    {
+      "name": "Chart",
+      "url": "https://uicockpit.com/components/chart",
+      "definition": "Line / area / bar / stacked / donut on the kit’s derived 6-series palette."
+    },
+    {
+      "name": "Chat",
+      "url": "https://uicockpit.com/components/chat",
+      "definition": "A conversation thread — incoming vs your own message bubbles."
+    },
+    {
+      "name": "Checkbox & Radio",
+      "url": "https://uicockpit.com/components/checkbox-radio",
+      "definition": "Multi- and single-select controls, including the richer selectable card variant.",
+      "openUIName": "Checkbox"
+    },
+    {
+      "name": "Citation",
+      "url": "https://uicockpit.com/components/citation",
+      "definition": "The inline source chip a grounded answer hangs its claims on."
+    },
+    {
+      "name": "Code Block",
+      "url": "https://uicockpit.com/components/code-block",
+      "definition": "A mono code surface with a header, copy button and language tag."
+    },
+    {
+      "name": "Combobox",
+      "url": "https://uicockpit.com/components/combobox",
+      "definition": "Type-ahead select: filter a list as you type, keyboard-navigable."
+    },
+    {
+      "name": "Command Palette",
+      "url": "https://uicockpit.com/components/command-palette",
+      "definition": "The ⌘K launcher — searchable actions with sections, shortcuts and keyboard flow."
+    },
+    {
+      "name": "Context Menu",
+      "url": "https://uicockpit.com/components/context-menu",
+      "definition": "Right-click actions on a surface — the same menu vocabulary, summoned in place."
+    },
+    {
+      "name": "Data Table",
+      "url": "https://uicockpit.com/components/data-table",
+      "definition": "The flagship data surface — toolbar, selection, sticky header, pagination and every state.",
+      "openUIName": "Table"
+    },
+    {
+      "name": "Date Picker",
+      "url": "https://uicockpit.com/components/date-picker",
+      "definition": "A date field whose popover calendar is pure kit — themed, not OS chrome."
+    },
+    {
+      "name": "Description List",
+      "url": "https://uicockpit.com/components/description-list",
+      "definition": "Key–value pairs — account info, plan details, a spec sheet."
+    },
+    {
+      "name": "Dialog",
+      "url": "https://uicockpit.com/components/dialog",
+      "definition": "A focused modal — one screen of content, one primary action in a sunken foot.",
+      "openUIName": "Modal"
+    },
+    {
+      "name": "Dropdown Menu",
+      "url": "https://uicockpit.com/components/dropdown-menu",
+      "definition": "A trigger that opens a themed menu of actions, with sections, shortcuts and destructive items.",
+      "openUIName": "Dropdown"
+    },
+    {
+      "name": "Empty State",
+      "url": "https://uicockpit.com/components/empty-state",
+      "definition": "The zero-data screen — an icon, a line of guidance and one action."
+    },
+    {
+      "name": "Entity Card",
+      "url": "https://uicockpit.com/components/entity-card",
+      "definition": "An identity + a few key facts — mark, name, a kebab menu and meta rows."
+    },
+    {
+      "name": "File Upload",
+      "url": "https://uicockpit.com/components/file-upload",
+      "definition": "A drag-and-drop dropzone with browse fallback and file-type hints."
+    },
+    {
+      "name": "Filter Bar",
+      "url": "https://uicockpit.com/components/filter-bar",
+      "definition": "Search, facets and removable active-filter chips — the query surface for any list."
+    },
+    {
+      "name": "Footer",
+      "url": "https://uicockpit.com/components/footer",
+      "definition": "The contentinfo landmark — accessibility statement, privacy, contact, the body responsible."
+    },
+    {
+      "name": "Form Panel",
+      "url": "https://uicockpit.com/components/form-panel",
+      "definition": "The full form block — sectioned fields, inline validation and a sunken action bar.",
+      "openUIName": "Form"
+    },
+    {
+      "name": "Hover Card",
+      "url": "https://uicockpit.com/components/hover-card",
+      "definition": "A richer hover preview — a profile or link card summoned on dwell."
+    },
+    {
+      "name": "Identifier",
+      "url": "https://uicockpit.com/components/identifier",
+      "definition": "Who operates this service, and the statements a person is entitled to find."
+    },
+    {
+      "name": "In-page Navigation",
+      "url": "https://uicockpit.com/components/in-page-navigation",
+      "definition": "On this page — a named nav landmark whose current item is announced, not just underlined."
+    },
+    {
+      "name": "Input",
+      "url": "https://uicockpit.com/components/input",
+      "definition": "The text field and its label/hint/error anatomy — the base of every form."
+    },
+    {
+      "name": "Input OTP",
+      "url": "https://uicockpit.com/components/input-otp",
+      "definition": "A one-time-code field — separated single-character cells."
+    },
+    {
+      "name": "Lightbox",
+      "url": "https://uicockpit.com/components/lightbox",
+      "definition": "A full-screen media viewer with prev/next and a caption."
+    },
+    {
+      "name": "List",
+      "url": "https://uicockpit.com/components/list",
+      "definition": "Rows of items with lead media, meta and trailing actions or badges."
+    },
+    {
+      "name": "Memorable Date",
+      "url": "https://uicockpit.com/components/memorable-date",
+      "definition": "Three fields for a date someone already knows — the accessible answer to date entry, not a picker."
+    },
+    {
+      "name": "Menubar",
+      "url": "https://uicockpit.com/components/menubar",
+      "definition": "A desktop-style top menu bar with nested menus — File / Edit / View."
+    },
+    {
+      "name": "Navigation Menu",
+      "url": "https://uicockpit.com/components/navigation-menu",
+      "definition": "A top nav with dropdown mega-panels for sections."
+    },
+    {
+      "name": "Number Input",
+      "url": "https://uicockpit.com/components/number-input",
+      "definition": "A numeric field with stepper affordances and tabular alignment."
+    },
+    {
+      "name": "Pagination",
+      "url": "https://uicockpit.com/components/pagination",
+      "definition": "Page controls with prev/next and a windowed page range."
+    },
+    {
+      "name": "Password Input",
+      "url": "https://uicockpit.com/components/password-input",
+      "definition": "A password field with a reveal toggle and caps-lock warning."
+    },
+    {
+      "name": "Phone Input",
+      "url": "https://uicockpit.com/components/phone-input",
+      "definition": "A phone field with a country-code select add-on."
+    },
+    {
+      "name": "Plan Comparison",
+      "url": "https://uicockpit.com/components/plan-compare",
+      "definition": "A tier × feature matrix with one highlighted column — the upgrade-decision surface."
+    },
+    {
+      "name": "Popover",
+      "url": "https://uicockpit.com/components/popover",
+      "definition": "A small floating panel anchored to a trigger, for quick forms and pickers."
+    },
+    {
+      "name": "Pricing",
+      "url": "https://uicockpit.com/components/pricing",
+      "definition": "A pricing tier card — plan, price, feature list and one primary action."
+    },
+    {
+      "name": "Process List",
+      "url": "https://uicockpit.com/components/process-list",
+      "definition": "Numbered steps that carry real content — editorial, not a progress indicator."
+    },
+    {
+      "name": "Progress",
+      "url": "https://uicockpit.com/components/progress",
+      "definition": "A determinate progress bar, heavier than the slider to read as ongoing work."
+    },
+    {
+      "name": "Prose",
+      "url": "https://uicockpit.com/components/prose",
+      "definition": "A rich-text container that styles raw semantic tags to the kit’s type and rhythm."
+    },
+    {
+      "name": "Rating",
+      "url": "https://uicockpit.com/components/rating",
+      "definition": "A star scale for reviews and feedback, filled + empty + a count."
+    },
+    {
+      "name": "Reasoning",
+      "url": "https://uicockpit.com/components/reasoning",
+      "definition": "The model’s thinking disclosure — “Thought for 12s”, collapsed by default."
+    },
+    {
+      "name": "Requirements Checklist",
+      "url": "https://uicockpit.com/components/requirements",
+      "definition": "Rules that tick off as you type, announced politely, with met/unmet carried in text."
+    },
+    {
+      "name": "Resizable",
+      "url": "https://uicockpit.com/components/resizable",
+      "definition": "Drag-to-resize split panes with a grabbable handle."
+    },
+    {
+      "name": "Scroll Area",
+      "url": "https://uicockpit.com/components/scroll-area",
+      "definition": "A scoped scroll container with a themed, overlay scrollbar."
+    },
+    {
+      "name": "Search Input",
+      "url": "https://uicockpit.com/components/search-input",
+      "definition": "A search field with a lead icon, ghost clear button and optional kbd hint."
+    },
+    {
+      "name": "Select",
+      "url": "https://uicockpit.com/components/select",
+      "definition": "A themed select trigger + option menu — the native picker, restyled to the kit."
+    },
+    {
+      "name": "Sheet",
+      "url": "https://uicockpit.com/components/sheet",
+      "definition": "A slide-in panel from an edge — a longer flow than a dialog holds."
+    },
+    {
+      "name": "Skeleton",
+      "url": "https://uicockpit.com/components/skeleton",
+      "definition": "Loading placeholders that match the shape of what’s coming."
+    },
+    {
+      "name": "Slider",
+      "url": "https://uicockpit.com/components/slider",
+      "definition": "A drag-to-set value control on a stroke-3 track with a precise handle."
+    },
+    {
+      "name": "Spinner",
+      "url": "https://uicockpit.com/components/spinner",
+      "definition": "An indeterminate loading indicator at the control-height scale."
+    },
+    {
+      "name": "Stat Tile",
+      "url": "https://uicockpit.com/components/stat-tile",
+      "definition": "A KPI tile — big number, label, delta and an optional sparkline."
+    },
+    {
+      "name": "Stepper",
+      "url": "https://uicockpit.com/components/stepper",
+      "definition": "A multi-step progress indicator — done, current and future states."
+    },
+    {
+      "name": "Switch",
+      "url": "https://uicockpit.com/components/switch",
+      "definition": "A binary toggle with a shape-locked round knob and the kit’s motion."
+    },
+    {
+      "name": "Table",
+      "url": "https://uicockpit.com/components/table",
+      "definition": "The base data table — header, rows, numeric alignment, hover and zebra."
+    },
+    {
+      "name": "Tabs",
+      "url": "https://uicockpit.com/components/tabs",
+      "definition": "A tab strip that switches panels, with an active underline and keyboard flow."
+    },
+    {
+      "name": "Tag Input",
+      "url": "https://uicockpit.com/components/tag-input",
+      "definition": "Enter and remove tokens inline — labels, recipients, filters."
+    },
+    {
+      "name": "Timeline",
+      "url": "https://uicockpit.com/components/timeline",
+      "definition": "Vertical events with state dots — activity feeds, build history, version logs."
+    },
+    {
+      "name": "Toast",
+      "url": "https://uicockpit.com/components/toast",
+      "definition": "Transient confirmations — the toned variants and the actionable snackbar."
+    },
+    {
+      "name": "Tool Call",
+      "url": "https://uicockpit.com/components/tool-call",
+      "definition": "An AI agent’s tool receipt — mono name, args, a status dot and an expandable result."
+    },
+    {
+      "name": "Toolbar",
+      "url": "https://uicockpit.com/components/toolbar",
+      "definition": "A row of grouped controls at one locked height — the editor/table action bar."
+    },
+    {
+      "name": "Tooltip",
+      "url": "https://uicockpit.com/components/tooltip",
+      "definition": "A hover hint — one line of context, never interactive content."
+    },
+    {
+      "name": "Usage Meter",
+      "url": "https://uicockpit.com/components/usage-meter",
+      "definition": "A quota bar whose fill shifts to a warning tone past a threshold."
+    }
+  ]
+}
