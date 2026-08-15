@@ -198,9 +198,15 @@
   align-items: center;
   gap: 10px;
   padding: 9px 10px 9px 28px;
+  /* The row IS the target now that every setting is one, so it holds to the
+     floor we hold everyone else to — and it gets there for free, because a
+     full-width row is large by construction. The old inline segments measured
+     64x21 against a 24px floor and needed the panel to be redesigned to fix it;
+     this shape simply cannot fail. */
+  min-height: var(--k-hit-min, 24px);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--k-radius-md, 8px);
   cursor: pointer;
   font-family: inherit;
   text-align: left;

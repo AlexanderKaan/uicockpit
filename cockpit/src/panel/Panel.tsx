@@ -504,7 +504,15 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
             // 'seg'/'slider' render the control INLINE in the row (no flyout) —
             // the configurator-pass "everything visible" surface. 'opts'/'font'
             // keep the click-to-open flyout (dot-grids, font lists, dial knobs).
-            const inline = r.kind === 'seg' || r.kind === 'slider'
+            /* ONE ROW SHAPE (2026-08-15). The panel had three: inline segmented
+               strips, inline sliders, and rows that open a flyout. Three patterns
+               is three things to learn, and adding a knob used to add a fourth.
+               It was also what kept the panel below its own target floor —
+               a segment measured 64x21 where the floor is 24, while a full-width
+               row cannot fail it. Borrowed from shadcn's /create, which does ten
+               settings in one 52px shape and is shorter than our panel was.
+               Every row is now: label · current value · chevron → opens a list. */
+            const inline = false
             return (
             <Fragment key={r.key}>
               {r.sec && <div className="fmsec">{r.sec}</div>}
@@ -546,7 +554,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
                     </button>
                     {openKey === r.key && (
                       <div className={`fmrow__pop ${r.kind === 'font' ? 'fmrow__pop--font' : ''}`} role="menu">
-                        {r.kind === 'opts' ? (
+                        {r.kind !== 'font' ? (
                           <OptionList
                             opts={r.opts ?? []}
                             selected={r.selected}
