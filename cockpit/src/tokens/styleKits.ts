@@ -3,7 +3,7 @@ import { applyHarmonyPreset } from './harmony'
 
 /**
  * Named style kits — the FRONT-DOOR anchors (the "Style" picker, top of the panel).
- * Pick one; your brand colour rides through unchanged ("Clean + your purple"), then
+ * Pick one; your brand colour rides through unchanged ("Default + your purple"), then
  * the knobs perturb on top. SUBTLE BY DESIGN (the shadcn lesson): every kit shares
  * ONE coherent base and nudges only a few gentle levers — radius · font · the odd
  * flat · grey tint · heading weight. No kit changes density, goes pill, deepens
@@ -12,7 +12,12 @@ import { applyHarmonyPreset } from './harmony'
  * GROUNDED in the best-in-class coverage test (BEST-IN-CLASS-ANALYSIS.md). The two
  * type-depth knobs added after that test — mono fonts + display weight — are what let
  * the kits separate cleanly (Minimal's mono headings = Vercel; Refined's ultralight =
- * Stripe) instead of collapsing into grey variants. "Clean" mirrors DEFAULT_CONFIG.
+ * Stripe) instead of collapsing into grey variants.
+ *
+ * ONE OF THEM IS NOT LIKE THE OTHERS. "Default" is the base set, held identical
+ * to DEFAULT_CONFIG by test, and the six after it are departures FROM it. The
+ * panel should present it that way too — a base, then alternatives — rather than
+ * as seven equal tastes.
  */
 export interface StyleKit {
   id: string
@@ -37,9 +42,25 @@ export const STYLE_KITS: StyleKit[] = [
   // as genuinely different systems (not grey variants) at one glance — while the
   // brand colour rides through unchanged. Coupled pairs (dense↔small type,
   // airy↔large type) follow the foundation-coherence rules, so no combo clashes.
+  /* THE BASE SET — not one of seven tastes, and it used to read as one.
+   *
+   * It was called "Clean" and sat as the first of seven chips beside Precision,
+   * Minimal, Refined, Calm and Editorial, every one of them named after somebody
+   * else's aesthetic (Linear, Vercel, Stripe, Notion). That row asks "which vibe
+   * do you want?" when the thing it should say is "this is the base; the rest is
+   * your choice, and it stays safe either way".
+   *
+   * So it is named Default, it says what it IS rather than how it feels, and
+   * `styleKits.test.ts` holds it byte-identical to DEFAULT_CONFIG — the claim
+   * used to live in a comment, which is where claims go to drift.
+   *
+   * Every option in it is one we would defend in writing, and each has been
+   * measured rather than chosen: borders subtle because the input rim is floored
+   * to 3:1 at every rung, conformance aa because that is what EN 301 549
+   * harmonises (AAA is one click away and lifts every target to 44px), scale
+   * default because compact was measured too tight and removed. */
   {
-    id: 'clean', name: 'Clean', blurb: 'Balanced and neutral — the safe default',
-    // The anchor = DEFAULT_CONFIG. Everything else is a deliberate departure from this.
+    id: 'default', name: 'Default', blurb: 'The base set — every option here is one we defend',
     config: { ...BASE, radius: 'soft', fontDisplay: 'Inter', fontBody: 'Inter', neutral: 'auto' },
   },
   {
