@@ -91,6 +91,26 @@ const CRITERIA = [
   ['3.1.2 Language of Parts', 'AA', 'The language navigation names each option in its own language with lang and hreflang.'],
 ] as const
 
+/**
+ * Criteria we own and do NOT yet meet.
+ *
+ * These three are the ones a stylesheet decides on its own — page titles and
+ * media alternatives belong to the consumer, but whether a component survives a
+ * user's own text spacing, a 320px viewport or 200% zoom is settled entirely by
+ * the CSS. They were missing from the list above until a wider survey of
+ * government design systems made the category obvious, and once measured
+ * (`npm run a11y:css`) we fail all three in a small, specific way.
+ *
+ * They are listed because a conformance report that names only what passes is an
+ * advertisement. An accessibility statement asks for non-conforming content by
+ * name; this is ours.
+ */
+const NOT_YET_MET = [
+  ['1.4.12 Text Spacing', 'AA', 'Under the user overrides the SC specifies (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2em), two elements clip their text: the sticky table head and the document-cover tile in the file grid.'],
+  ['1.4.10 Reflow', 'AA', 'At 320 CSS px the calendar grid overflows its container rather than reflowing — six elements extend past the frame. The rest of the kit reflows; the month grid does not.'],
+  ['1.4.4 Resize Text', 'AA', 'At 200% root text size four elements clip: the sticky table head, the dialog and sheet demo frames, and the file-grid cover. Fixed heights are the cause in each case.'],
+] as const
+
 export function genConformanceReport(cfg: Config, assessedOn = '(fill in the date this was generated)'): string {
   const tk = buildTokens(cfg)
   const pairs = auditContrast(tk)
@@ -189,6 +209,16 @@ alternatives, page titles, journeys, timing, and the assembly of these parts.
 | Criterion | Level | How it is met |
 |---|---|---|
 ${CRITERIA.map(([c, l, how]) => `| ${c} | ${l} | ${how} |`).join('\n')}
+
+### Criteria we own and do not yet meet
+
+Listed by name, because a report that shows only what passes is an
+advertisement, and because an accessibility statement has to declare
+non-conforming content. Reproduce with: npm run a11y:css
+
+| Criterion | Level | What fails |
+|---|---|---|
+${NOT_YET_MET.map(([c, l, what]) => `| ${c} | ${l} | ${what} |`).join('\n')}
 
 ---
 

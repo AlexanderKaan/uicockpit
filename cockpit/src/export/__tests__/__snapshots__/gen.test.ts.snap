@@ -124,6 +124,18 @@ alternatives, page titles, journeys, timing, and the assembly of these parts.
 | 3.3.2 Labels or Instructions | A | Visible labels above the field. Placeholder-as-label is not available: the floating-label recipes were removed. |
 | 3.1.2 Language of Parts | AA | The language navigation names each option in its own language with lang and hreflang. |
 
+### Criteria we own and do not yet meet
+
+Listed by name, because a report that shows only what passes is an
+advertisement, and because an accessibility statement has to declare
+non-conforming content. Reproduce with: npm run a11y:css
+
+| Criterion | Level | What fails |
+|---|---|---|
+| 1.4.12 Text Spacing | AA | Under the user overrides the SC specifies (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2em), two elements clip their text: the sticky table head and the document-cover tile in the file grid. |
+| 1.4.10 Reflow | AA | At 320 CSS px the calendar grid overflows its container rather than reflowing — six elements extend past the frame. The rest of the kit reflows; the month grid does not. |
+| 1.4.4 Resize Text | AA | At 200% root text size four elements clip: the sticky table head, the dialog and sheet demo frames, and the file-grid cover. Fixed heights are the cause in each case. |
+
 ---
 
 ## Known limitations
@@ -277,6 +289,18 @@ alternatives, page titles, journeys, timing, and the assembly of these parts.
 | 3.3.1 Error Identification | A | Errors are named in text at the field and repeated in an error summary that moves focus to the control. |
 | 3.3.2 Labels or Instructions | A | Visible labels above the field. Placeholder-as-label is not available: the floating-label recipes were removed. |
 | 3.1.2 Language of Parts | AA | The language navigation names each option in its own language with lang and hreflang. |
+
+### Criteria we own and do not yet meet
+
+Listed by name, because a report that shows only what passes is an
+advertisement, and because an accessibility statement has to declare
+non-conforming content. Reproduce with: npm run a11y:css
+
+| Criterion | Level | What fails |
+|---|---|---|
+| 1.4.12 Text Spacing | AA | Under the user overrides the SC specifies (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2em), two elements clip their text: the sticky table head and the document-cover tile in the file grid. |
+| 1.4.10 Reflow | AA | At 320 CSS px the calendar grid overflows its container rather than reflowing — six elements extend past the frame. The rest of the kit reflows; the month grid does not. |
+| 1.4.4 Resize Text | AA | At 200% root text size four elements clip: the sticky table head, the dialog and sheet demo frames, and the file-grid cover. Fixed heights are the cause in each case. |
 
 ---
 

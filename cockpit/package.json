@@ -42,7 +42,8 @@
     "audit:naming": "node scripts/audit-naming.mjs",
     "gen:openui-entry": "node scripts/gen-openui-entry.mjs",
     "audit:backticks": "node scripts/audit-backticks.mjs",
-    "audit:apg": "node scripts/audit-apg.mjs"
+    "audit:apg": "node scripts/audit-apg.mjs",
+    "a11y:css": "node scripts/a11y-css-criteria.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
