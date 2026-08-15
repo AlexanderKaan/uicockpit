@@ -47,7 +47,8 @@
     "audit:fonts": "node scripts/audit-fonts.mjs",
     "check:components": "node scripts/check-components.mjs",
     "audit:uniformity": "node scripts/audit-uniformity.mjs",
-    "audit:promises": "node scripts/audit-promises.mjs"
+    "audit:promises": "node scripts/audit-promises.mjs",
+    "derive:provenance": "node scripts/derive-provenance.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
