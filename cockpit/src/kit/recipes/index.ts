@@ -2774,6 +2774,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: absolute;
   left: calc(var(--lane, 0) / var(--lanes, 1) * 100% + var(--k-s-2));
   width: calc(100% / var(--lanes, 1) - var(--k-s-4));
+  /* An event is a BUTTON, and dividing a column between lanes can divide it below
+     the size a finger can hit: measured at 14px wide when two appointments shared
+     a 37px column, which axe reports as the kit's only WCAG 2.5.8 breach. Lanes
+     may narrow an event; they may not make it untouchable. Past the floor the
+     events overlap instead — which is what every real calendar does with a clash,
+     and an overlap you can still tap beats a sliver you cannot.
+     min(): never wider than the column itself, or a narrow day would push its
+     events outside the grid and the grid clips them. */
+  min-width: min(var(--k-hit-min, 1.5rem), 100%);
   top: calc(var(--from, 0) * var(--k-cal-hour, 3rem));
   height: calc(var(--span, 1) * var(--k-cal-hour, 3rem) - var(--k-s-4));
   margin-top: var(--k-s-2);

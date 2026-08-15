@@ -133,8 +133,8 @@ non-conforming content. Reproduce with: npm run a11y:css
 
 | Criterion | Level | What fails |
 |---|---|---|
-| 2.5.8 Target Size (Minimum) | AA | 94 of 459 pointer targets are under 24 CSS px on at least one axis. The largest groups: checkbox and radio rows whose clickable label is 17px tall, disclosure summaries at 15px, footer and identifier links at 15-18px, chip and tag remove controls at 16x16, and a carousel dot at 6x6. Some may qualify under the SC’s spacing exception; that has not been measured, so they are declared as failing. Reproduce with: npm run a11y:matrix |
-| 2.5.5 Target Size (Enhanced) | AAA | 163 of 459 targets are under 44 CSS px on at least one axis at the AAA setting. The AAA control lifts the density ladder, which covers rows, buttons and fields; it does not reach controls that size themselves — a slider track 3px tall, a switch at 44x24, stepper chevrons at 24x44. |
+| 2.5.8 Target Size (Minimum) | AA | One element, in one situation: a week-calendar appointment that CLASHES with another. Two appointments sharing a column divide it between them, and at container widths around 1120-1200px and below 830px the result is a button with only ~18 CSS px of unobscured width. Every other target in the kit passes, including under the SC’s spacing exception (522 passing). Reproduce with: npm run a11y:matrix |
+| 2.5.5 Target Size (Enhanced) | AAA | Not claimed. The AAA conformance setting lifts the density ladder, which covers rows, buttons and fields, but it does not reach controls that size themselves — a slider track 3 px tall, a switch at 44x24, stepper chevrons at 24x44. Our own scan measures 163 of 459 targets under 44 px on an axis; that figure is a SIZE measurement and not a count of breaches, since it does not compute the spacing allowance. |
 
 ---
 
@@ -299,8 +299,8 @@ non-conforming content. Reproduce with: npm run a11y:css
 
 | Criterion | Level | What fails |
 |---|---|---|
-| 2.5.8 Target Size (Minimum) | AA | 94 of 459 pointer targets are under 24 CSS px on at least one axis. The largest groups: checkbox and radio rows whose clickable label is 17px tall, disclosure summaries at 15px, footer and identifier links at 15-18px, chip and tag remove controls at 16x16, and a carousel dot at 6x6. Some may qualify under the SC’s spacing exception; that has not been measured, so they are declared as failing. Reproduce with: npm run a11y:matrix |
-| 2.5.5 Target Size (Enhanced) | AAA | 163 of 459 targets are under 44 CSS px on at least one axis at the AAA setting. The AAA control lifts the density ladder, which covers rows, buttons and fields; it does not reach controls that size themselves — a slider track 3px tall, a switch at 44x24, stepper chevrons at 24x44. |
+| 2.5.8 Target Size (Minimum) | AA | One element, in one situation: a week-calendar appointment that CLASHES with another. Two appointments sharing a column divide it between them, and at container widths around 1120-1200px and below 830px the result is a button with only ~18 CSS px of unobscured width. Every other target in the kit passes, including under the SC’s spacing exception (522 passing). Reproduce with: npm run a11y:matrix |
+| 2.5.5 Target Size (Enhanced) | AAA | Not claimed. The AAA conformance setting lifts the density ladder, which covers rows, buttons and fields, but it does not reach controls that size themselves — a slider track 3 px tall, a switch at 44x24, stepper chevrons at 24x44. Our own scan measures 163 of 459 targets under 44 px on an axis; that figure is a SIZE measurement and not a count of breaches, since it does not compute the spacing allowance. |
 
 ---
 
@@ -7287,6 +7287,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: absolute;
   left: calc(var(--lane, 0) / var(--lanes, 1) * 100% + var(--k-s-2));
   width: calc(100% / var(--lanes, 1) - var(--k-s-4));
+  /* An event is a BUTTON, and dividing a column between lanes can divide it below
+     the size a finger can hit: measured at 14px wide when two appointments shared
+     a 37px column, which axe reports as the kit's only WCAG 2.5.8 breach. Lanes
+     may narrow an event; they may not make it untouchable. Past the floor the
+     events overlap instead — which is what every real calendar does with a clash,
+     and an overlap you can still tap beats a sliver you cannot.
+     min(): never wider than the column itself, or a narrow day would push its
+     events outside the grid and the grid clips them. */
+  min-width: min(var(--k-hit-min, 1.5rem), 100%);
   top: calc(var(--from, 0) * var(--k-cal-hour, 3rem));
   height: calc(var(--span, 1) * var(--k-cal-hour, 3rem) - var(--k-s-4));
   margin-top: var(--k-s-2);
@@ -15441,6 +15450,15 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: absolute;
   left: calc(var(--lane, 0) / var(--lanes, 1) * 100% + var(--k-s-2));
   width: calc(100% / var(--lanes, 1) - var(--k-s-4));
+  /* An event is a BUTTON, and dividing a column between lanes can divide it below
+     the size a finger can hit: measured at 14px wide when two appointments shared
+     a 37px column, which axe reports as the kit's only WCAG 2.5.8 breach. Lanes
+     may narrow an event; they may not make it untouchable. Past the floor the
+     events overlap instead — which is what every real calendar does with a clash,
+     and an overlap you can still tap beats a sliver you cannot.
+     min(): never wider than the column itself, or a narrow day would push its
+     events outside the grid and the grid clips them. */
+  min-width: min(var(--k-hit-min, 1.5rem), 100%);
   top: calc(var(--from, 0) * var(--k-cal-hour, 3rem));
   height: calc(var(--span, 1) * var(--k-cal-hour, 3rem) - var(--k-s-4));
   margin-top: var(--k-s-2);

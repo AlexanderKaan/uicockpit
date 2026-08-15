@@ -116,8 +116,8 @@ const CRITERIA = [
  * That is the whole argument for a report having a place to put a failure.
  */
 const NOT_YET_MET: ReadonlyArray<readonly [string, string, string]> = [
-  ['2.5.8 Target Size (Minimum)', 'AA', '94 of 459 pointer targets are under 24 CSS px on at least one axis. The largest groups: checkbox and radio rows whose clickable label is 17px tall, disclosure summaries at 15px, footer and identifier links at 15-18px, chip and tag remove controls at 16x16, and a carousel dot at 6x6. Some may qualify under the SC’s spacing exception; that has not been measured, so they are declared as failing. Reproduce with: npm run a11y:matrix'],
-  ['2.5.5 Target Size (Enhanced)', 'AAA', '163 of 459 targets are under 44 CSS px on at least one axis at the AAA setting. The AAA control lifts the density ladder, which covers rows, buttons and fields; it does not reach controls that size themselves — a slider track 3px tall, a switch at 44x24, stepper chevrons at 24x44.'],
+  ['2.5.8 Target Size (Minimum)', 'AA', 'One element, in one situation: a week-calendar appointment that CLASHES with another. Two appointments sharing a column divide it between them, and at container widths around 1120-1200px and below 830px the result is a button with only ~18 CSS px of unobscured width. Every other target in the kit passes, including under the SC’s spacing exception (522 passing). Reproduce with: npm run a11y:matrix'],
+  ['2.5.5 Target Size (Enhanced)', 'AAA', 'Not claimed. The AAA conformance setting lifts the density ladder, which covers rows, buttons and fields, but it does not reach controls that size themselves — a slider track 3 px tall, a switch at 44x24, stepper chevrons at 24x44. Our own scan measures 163 of 459 targets under 44 px on an axis; that figure is a SIZE measurement and not a count of breaches, since it does not compute the spacing allowance.'],
 ]
 
 export function genConformanceReport(cfg: Config, assessedOn = '(fill in the date this was generated)'): string {

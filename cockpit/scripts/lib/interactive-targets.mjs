@@ -25,6 +25,22 @@
  * and excluding them is legitimate — but a silent exclusion is indistinguishable
  * from a scan that missed something. So every exclusion is NAMED, carries its
  * reason, and the count is PRINTED next to the result.
+ *
+ * ⚠️ AND THE THIRD RULE, WHICH THIS FILE LEARNED BY BREAKING IT. What comes out
+ * of here is a SIZE, not a VERDICT. WCAG 2.5.8 permits an undersized target when
+ * there is enough clear space around it — a 24px circle centred on each target
+ * must not touch another's — and computing that is a different, harder job than
+ * measuring a box.
+ *
+ * The first version of this file did not know that and reported "94 targets
+ * under 24px" as if it were 94 breaches. axe-core, which does implement the
+ * spacing exception, finds TWO on the same page, with 519 passing. The 94 was
+ * true and meant almost nothing; it went into the conformance report as a
+ * failure and had to be taken back out.
+ *
+ * So: this scan owns the DENOMINATOR, which is the thing it was built to fix and
+ * which axe cannot give us per component. axe owns the VERDICT. Anything printed
+ * from here says "under Npx", never "fails".
  */
 
 /**
