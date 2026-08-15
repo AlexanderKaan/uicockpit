@@ -16,10 +16,16 @@
   --app-border:    #e3e5ea;
   --app-hover:     rgba(0, 0, 0, 0.04);
   --app-accent:    #1a1a1d;
-  /* Motion — Material standard, never inherited from user choice */
-  --app-dur:       120ms;
-  --app-dur-md:    200ms;
-  --app-ease:      cubic-bezier(.4, 0, .2, 1);
+  /* Motion — ALIASES of the kit's tokens, not a second opinion about them.
+     These were three hard-coded literals on Material's standard curve while the
+     kit ships an emphasized-decelerate one, so the chrome and the product it
+     configures moved differently — 120ms vs 110, and a different bezier. The
+     comment used to say "never inherited from user choice", which is still true
+     and is not a reason to invent the values: Motion is no longer a user choice
+     at all, so there is one curve and this is it. */
+  --app-dur:       var(--k-dur-fast, 110ms);
+  --app-dur-md:    var(--k-dur, 200ms);
+  --app-ease:      var(--k-ease-out, cubic-bezier(.05, .7, .1, 1));
   /* Elevation — chrome uses two consistent depths */
   --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --app-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.10);

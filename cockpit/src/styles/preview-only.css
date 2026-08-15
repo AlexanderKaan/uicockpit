@@ -11,43 +11,11 @@
  * thereafter. */
 
 
-/* === Sub-tile scrollbars for overlays ==================================
- * Browser-default scrollbars are an OS-shaped grey rail that visually
- * dominates a tasteful overlay (menu, command palette, combobox, sheet).
- * Replace with a 6px self-rounded thumb that uses the kit's fg-faint —
- * present when scrolling matters, invisible when it doesn't. WebKit + FF. */
-.cockpit-preview .menu,
-.cockpit-preview .combobox__pop,
-.cockpit-preview .cmdp__list,
-.cockpit-preview .sheet,
-.cockpit-preview .row-menu__pop {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(0 0% 50% / 0.35) transparent;
-}
-.cockpit-preview .menu::-webkit-scrollbar,
-.cockpit-preview .combobox__pop::-webkit-scrollbar,
-.cockpit-preview .cmdp__list::-webkit-scrollbar,
-.cockpit-preview .sheet::-webkit-scrollbar,
-.cockpit-preview .row-menu__pop::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-.cockpit-preview .menu::-webkit-scrollbar-thumb,
-.cockpit-preview .combobox__pop::-webkit-scrollbar-thumb,
-.cockpit-preview .cmdp__list::-webkit-scrollbar-thumb,
-.cockpit-preview .sheet::-webkit-scrollbar-thumb,
-.cockpit-preview .row-menu__pop::-webkit-scrollbar-thumb {
-  background: hsl(0 0% 50% / 0.35);
-  border-radius: 999px;
-  transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease);
-}
-.cockpit-preview .menu::-webkit-scrollbar-thumb:hover,
-.cockpit-preview .combobox__pop::-webkit-scrollbar-thumb:hover,
-.cockpit-preview .cmdp__list::-webkit-scrollbar-thumb:hover,
-.cockpit-preview .sheet::-webkit-scrollbar-thumb:hover,
-.cockpit-preview .row-menu__pop::-webkit-scrollbar-thumb:hover {
-  background: hsl(0 0% 50% / 0.6);
-}
+/* The overlay-scrollbar block that stood here is gone (2026-08-15): .menu now
+ * carries the treatment in the RECIPE, tinted from --k-border instead of the
+ * hard-coded hsl(0 0% 50% / .35) this copy used. It was the tell that someone
+ * had hit the problem before and fixed it beside the recipe rather than in it,
+ * which is why it reached the preview and neither the panel nor an export. */
 .cockpit-preview .menu::-webkit-scrollbar-track,
 .cockpit-preview .combobox__pop::-webkit-scrollbar-track,
 .cockpit-preview .cmdp__list::-webkit-scrollbar-track,

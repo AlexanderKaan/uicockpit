@@ -553,7 +553,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
                       <ChevronRight size={14} strokeWidth={2} className="fmrow__chev" />
                     </button>
                     {openKey === r.key && (
-                      <div className={`fmrow__pop ${r.kind === 'font' ? 'fmrow__pop--font' : ''}`} role="menu">
+                      <div className={`menu fmrow__pop ${r.kind === 'font' ? 'fmrow__pop--font' : ''}`} role="menu">
                         {r.kind !== 'font' ? (
                           <OptionList
                             opts={r.opts ?? []}

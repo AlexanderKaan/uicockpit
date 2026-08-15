@@ -306,20 +306,17 @@
 }
 
 /* === Flyout popover — floats over the canvas, to the right of the menu === */
-.fmrow__pop {
+/* .menu carries the surface, the border, the radius, the shadow, the padding,
+   the max-height, the scroll behaviour, the scrollbar and the enter animation.
+   Every one of those lines used to be restated here, including a 10px radius, a
+   5px padding, a z-index of 60 and a SECOND keyframe that duplicated the kit's.
+   What is left is where this particular menu opens: beside its row, not under
+   a trigger. */
+.panel .fmrow__pop {
   position: absolute;
   top: -6px;
-  left: calc(100% + 10px);
-  min-width: 184px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: 10px;
-  box-shadow: var(--app-shadow-md);
-  padding: 5px;
-  z-index: 60;
-  animation: app-menu-roll var(--app-dur-md) var(--app-ease) both;
+  left: calc(100% + var(--k-s-10));
+  z-index: var(--k-z-popover, 60);
 }
 .fmrow__pop--font {
   padding: 0;

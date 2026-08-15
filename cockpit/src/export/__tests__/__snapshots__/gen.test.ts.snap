@@ -8470,6 +8470,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   /* Constrain height + scroll the overflow — a long option list must not run
      off-screen (APG/Radix table-stakes). x stays clipped for the nested radius. */
   max-height: var(--k-overlay-max, 22rem); overflow: hidden auto;
+  /* AND IT STYLES THE RAIL IT JUST CREATED. A menu with a max-height scrolls by
+     design, so leaving the scrollbar to the OS puts a heavy platform-grey rail
+     down the side of a light overlay — which in dark mode is a black bar through
+     the middle of a white panel.
+     The kit already had the answer on .scroll-area and never applied it to the
+     overlays that scroll. The evidence it had been noticed before: our own
+     preview stylesheet carried a copy of this treatment, scoped to the preview
+     and hard-coding hsl(0 0% 50% / .35) where a token belongs. Patching beside
+     the recipe instead of in it is how a fix reaches one surface out of three. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--k-border) transparent;
   /* Nested radius — items pick this up via their border-radius rule.
    * Math: outer (radius-md) − padding (4px) = inner radius needed for
    * concentric curves. Without this, hover state of first/last item
@@ -8555,6 +8566,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    how a slot ends up serving neither, so the value gets its own.
    Found by rebuilding our own configurator panel out of this recipe: the kit had
    every other part of that row already. */
+.menu::-webkit-scrollbar { width: var(--k-s-6); height: var(--k-s-6); }
+.menu::-webkit-scrollbar-track { background: transparent; }
+.menu::-webkit-scrollbar-thumb { background: var(--k-border); border-radius: var(--k-radius-pill, 999px); }
+.menu::-webkit-scrollbar-thumb:hover { background: var(--k-fg-faint); }
 .menu__value { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); font-weight: var(--k-ui-weight, 500); }
 .menu__sep { height: var(--k-bw); background: var(--k-border); margin: var(--k-s-4) 0; }
 .menu__label { padding: var(--k-s-6) var(--k-s-10) var(--k-s-2); font-size: var(--k-type-caption); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-faint); font-weight: var(--k-weight-medium); }
@@ -16659,6 +16674,17 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   /* Constrain height + scroll the overflow — a long option list must not run
      off-screen (APG/Radix table-stakes). x stays clipped for the nested radius. */
   max-height: var(--k-overlay-max, 22rem); overflow: hidden auto;
+  /* AND IT STYLES THE RAIL IT JUST CREATED. A menu with a max-height scrolls by
+     design, so leaving the scrollbar to the OS puts a heavy platform-grey rail
+     down the side of a light overlay — which in dark mode is a black bar through
+     the middle of a white panel.
+     The kit already had the answer on .scroll-area and never applied it to the
+     overlays that scroll. The evidence it had been noticed before: our own
+     preview stylesheet carried a copy of this treatment, scoped to the preview
+     and hard-coding hsl(0 0% 50% / .35) where a token belongs. Patching beside
+     the recipe instead of in it is how a fix reaches one surface out of three. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--k-border) transparent;
   /* Nested radius — items pick this up via their border-radius rule.
    * Math: outer (radius-md) − padding (4px) = inner radius needed for
    * concentric curves. Without this, hover state of first/last item
@@ -16744,6 +16770,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    how a slot ends up serving neither, so the value gets its own.
    Found by rebuilding our own configurator panel out of this recipe: the kit had
    every other part of that row already. */
+.menu::-webkit-scrollbar { width: var(--k-s-6); height: var(--k-s-6); }
+.menu::-webkit-scrollbar-track { background: transparent; }
+.menu::-webkit-scrollbar-thumb { background: var(--k-border); border-radius: var(--k-radius-pill, 999px); }
+.menu::-webkit-scrollbar-thumb:hover { background: var(--k-fg-faint); }
 .menu__value { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); font-weight: var(--k-ui-weight, 500); }
 .menu__sep { height: var(--k-bw); background: var(--k-border); margin: var(--k-s-4) 0; }
 .menu__label { padding: var(--k-s-6) var(--k-s-10) var(--k-s-2); font-size: var(--k-type-caption); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-faint); font-weight: var(--k-weight-medium); }
