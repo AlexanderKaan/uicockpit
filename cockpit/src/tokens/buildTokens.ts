@@ -768,7 +768,7 @@ export function buildTokens(cfg: Config): Tokens {
    * number now lives in one place. It is deliberately NOT on the spacing scale:
    * a hit target is a guarantee about a person's finger, not a rhythm, and
    * re-scaling it with density is exactly the bug this prevents. */
-  const sVars: Record<string, string> = { '--k-s-0': '0', '--k-hit-min': '24px' }
+  const sVars: Record<string, string> = { '--k-s-0': '0' }
   for (const px of [2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32]) sVars[`--k-s-${px}`] = rem(px)
   // Measure — readable line-length caps (in ch, so they track the body font).
   // The layout grammar uses these instead of arbitrary px max-widths: a prose
@@ -1465,7 +1465,6 @@ export function buildTokens(cfg: Config): Tokens {
       // stacked rows get theirs from the ScaleRow heights above, since a row's
       // target is its height and no pseudo-element can conjure space between two
       // rows that are already touching.
-      // (NB there is a second, shadowed '--k-hit-min' in sVars — this one wins.)
       '--k-hit-min': aaa ? '2.75rem' : '1.5rem',
       // One min-width for floating menus/popovers/hover-cards so they read as one
       // overlay family (was 180/200px literals). rem → scales with the root size.

@@ -410,6 +410,28 @@ ${s}.taginput[aria-disabled="true"] {
   pointer-events: none;
 }
 
+/* [hidden] must actually hide. The one reset line every kit needs and ours did
+ * not have.
+ *
+ * The UA rule is [hidden] { display: none } and ANY author display declaration
+ * beats it — so .card, .list, .toolbar and every other component that sets
+ * its own display silently ignored the attribute. Measured against a no-CSS
+ * control: bare [hidden] hides correctly, [hidden] + display:flex does not, and
+ * all three of our components rendered visible.
+ *
+ * That matters more than the dialog case because [hidden] is everywhere — it is
+ * what Angular's [hidden], server-rendered toggles and half the conditional
+ * rendering in the wild come down to. A component that cannot be hidden by the
+ * platform's own attribute is a component that will be hidden with
+ * style="display:none" instead, and that is how inline styles get into a
+ * codebase we then audit for exactly that.
+ *
+ * !important is correct here and is what normalize.css has shipped for a decade:
+ * beating a component's own display is the entire job. */
+${s}[hidden] {
+  display: none !important;
+}
+
 /* The platform's closed state wins over our layout. Non-negotiable.
  *
  * A user agent hides a closed <dialog> and a closed [popover] with

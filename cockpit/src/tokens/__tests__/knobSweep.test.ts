@@ -4,6 +4,7 @@ import { auditContrast } from '../extras'
 import { contrast, oklchStrToHex } from '../color'
 import { DEFAULT_CONFIG } from '../defaults'
 import { COLOR_THEMES, applyColorTheme } from '../stylesAndThemes'
+import { STYLE_KITS } from '../styleKits'
 
 /**
  * No reachable configuration can break the floor.
@@ -184,4 +185,29 @@ describe('Conformance raises the floor without locking the knob', () => {
       rem(buildTokens({ ...DEFAULT_CONFIG, conformance: 'aaa', scale }).vars['--k-space']!))
     expect(new Set(space).size, `distinct --k-space values: ${space.join('/')}`).toBe(3)
   })
+})
+
+describe('the Style presets — the combinations, not the knobs', () => {
+  /* The sweep above varies ONE knob at a time from the default, and the file
+   * calls that "no reachable configuration can break the floor". A Style preset
+   * changes four to nine knobs at once and is exactly as reachable — one click
+   * at the top of the panel — so the claim was broader than the coverage.
+   *
+   * Found by re-reading the claim rather than the code, which is its own lesson:
+   * a gate can be correct about everything it tests and still be wrong about
+   * what it says. Measured clean the first time, and that is not a reason to
+   * leave it unmeasured. */
+  for (const kit of STYLE_KITS) {
+    it(`${kit.name} holds every floor`, () => {
+      const broken: string[] = []
+      for (const mode of MODES) {
+        for (const theme of THEMES) {
+          const base = applyColorTheme({ ...DEFAULT_CONFIG, mode }, theme)
+          const cfg = { ...base, ...kit.config, mode }
+          for (const label of violations(cfg)) broken.push(`${theme}/${mode}/${label}`)
+        }
+      }
+      expect([...new Set(broken)]).toEqual([])
+    })
+  }
 })

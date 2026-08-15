@@ -3560,7 +3560,6 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
 
 :root {
   --k-s-0: 0;
-  --k-hit-min: 1.5rem;
   --k-s-2: 0.125rem;
   --k-s-4: 0.25rem;
   --k-s-6: 0.375rem;
@@ -3743,6 +3742,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-control-h-md: max(var(--k-hit-min), var(--k-in-h-default));
   --k-control-h-sm: max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem));
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
+  --k-hit-min: 1.5rem;
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
   --k-cal-cell: 2.75rem;
@@ -3864,7 +3864,6 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
 
 .dark {
   --k-s-0: 0;
-  --k-hit-min: 1.5rem;
   --k-s-2: 0.125rem;
   --k-s-4: 0.25rem;
   --k-s-6: 0.375rem;
@@ -4047,6 +4046,7 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
   --k-control-h-md: max(var(--k-hit-min), var(--k-in-h-default));
   --k-control-h-sm: max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem));
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
+  --k-hit-min: 1.5rem;
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
   --k-cal-cell: 2.75rem;
@@ -4541,6 +4541,28 @@ body {
   opacity: var(--k-disabled-opacity, 0.55);
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* [hidden] must actually hide. The one reset line every kit needs and ours did
+ * not have.
+ *
+ * The UA rule is [hidden] { display: none } and ANY author display declaration
+ * beats it — so .card, .list, .toolbar and every other component that sets
+ * its own display silently ignored the attribute. Measured against a no-CSS
+ * control: bare [hidden] hides correctly, [hidden] + display:flex does not, and
+ * all three of our components rendered visible.
+ *
+ * That matters more than the dialog case because [hidden] is everywhere — it is
+ * what Angular's [hidden], server-rendered toggles and half the conditional
+ * rendering in the wild come down to. A component that cannot be hidden by the
+ * platform's own attribute is a component that will be hidden with
+ * style="display:none" instead, and that is how inline styles get into a
+ * codebase we then audit for exactly that.
+ *
+ * !important is correct here and is what normalize.css has shipped for a decade:
+ * beating a component's own display is the entire job. */
+[hidden] {
+  display: none !important;
 }
 
 /* The platform's closed state wins over our layout. Non-negotiable.
@@ -11578,7 +11600,6 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
 
 :root {
   --k-s-0: 0;
-  --k-hit-min: 1.5rem;
   --k-s-2: 0.125rem;
   --k-s-4: 0.25rem;
   --k-s-6: 0.375rem;
@@ -11761,6 +11782,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-control-h-md: max(var(--k-hit-min), var(--k-in-h-default));
   --k-control-h-sm: max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem));
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
+  --k-hit-min: 1.5rem;
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
   --k-cal-cell: 2.75rem;
@@ -11882,7 +11904,6 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
 
 .dark {
   --k-s-0: 0;
-  --k-hit-min: 1.5rem;
   --k-s-2: 0.125rem;
   --k-s-4: 0.25rem;
   --k-s-6: 0.375rem;
@@ -12065,6 +12086,7 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
   --k-control-h-md: max(var(--k-hit-min), var(--k-in-h-default));
   --k-control-h-sm: max(var(--k-hit-min), calc(var(--k-in-h-default) - 0.25rem));
   --k-control-h-lg: calc(var(--k-in-h-default) + 0.5rem);
+  --k-hit-min: 1.5rem;
   --k-overlay-min: 12rem;
   --k-touch-target: 44px;
   --k-cal-cell: 2.75rem;
@@ -12559,6 +12581,28 @@ body {
   opacity: var(--k-disabled-opacity, 0.55);
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* [hidden] must actually hide. The one reset line every kit needs and ours did
+ * not have.
+ *
+ * The UA rule is [hidden] { display: none } and ANY author display declaration
+ * beats it — so .card, .list, .toolbar and every other component that sets
+ * its own display silently ignored the attribute. Measured against a no-CSS
+ * control: bare [hidden] hides correctly, [hidden] + display:flex does not, and
+ * all three of our components rendered visible.
+ *
+ * That matters more than the dialog case because [hidden] is everywhere — it is
+ * what Angular's [hidden], server-rendered toggles and half the conditional
+ * rendering in the wild come down to. A component that cannot be hidden by the
+ * platform's own attribute is a component that will be hidden with
+ * style="display:none" instead, and that is how inline styles get into a
+ * codebase we then audit for exactly that.
+ *
+ * !important is correct here and is what normalize.css has shipped for a decade:
+ * beating a component's own display is the entire job. */
+[hidden] {
+  display: none !important;
 }
 
 /* The platform's closed state wins over our layout. Non-negotiable.

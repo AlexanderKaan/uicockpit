@@ -307,7 +307,28 @@ export function hslToHex(h: number, s: number, l: number): Hex {
   return `#${f(0)}${f(8)}${f(4)}`
 }
 
+/* Every hex-expecting entry point goes through here, which makes it the one
+ * place worth guarding.
+ *
+ * `Hex` is `string`, so TypeScript cannot tell a hex from an oklch string, a
+ * `var(--x)` or a `color-mix(...)`. Hand it one of those and `parseInt` yields
+ * NaN, `contrast()` returns NaN, and `NaN >= 3` is quietly false — a floor that
+ * never engages while every test stays green. That exact failure shipped three
+ * times: `ringFloored` never floored a ring for any kit, the primary-hover floor
+ * did nothing on its first version, and `toHex` scored a gradient as black.
+ *
+ * So the silent path is closed. In dev and in tests this throws with the value
+ * that reached it; in production it falls back to mid-grey rather than taking a
+ * page down over a colour. Loud where it can be fixed, safe where it cannot. */
+function assertHex(hex: string, fn: string): void {
+  if (typeof hex === 'string' && /^#[0-9a-f]{6}$/i.test(hex)) return
+  const msg = `${fn}() needs a 6-digit hex and got: ${String(hex).slice(0, 60)}`
+  if (import.meta.env?.DEV || import.meta.env?.MODE === 'test') throw new TypeError(msg)
+  else if (typeof console !== 'undefined') console.error(`[uicockpit] ${msg}`)
+}
+
 export function relLum(hex: Hex): number {
+  assertHex(hex, 'relLum')
   const c = [1, 3, 5].map((i) => {
     const v = parseInt(hex.slice(i, i + 2), 16) / 255
     return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
