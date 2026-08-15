@@ -2462,7 +2462,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
     id: 'lightbox',
     section: "Lightbox",
     css: `/* === Lightbox — fullscreen image viewer overlay === */
-.lightbox { position: fixed; inset: 0; z-index: var(--k-z-modal); background: var(--k-scrim-strong); display: grid; place-items: center; animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }
+.lightbox { position: fixed; inset: 0; z-index: var(--k-z-modal); background: var(--k-scrim-strong); display: grid; place-items: center; animation: var(--k-anim-fade-in, k-fade-in 160ms ease both); }
 .lightbox__stage { max-width: 78%; max-height: 76%; border-radius: var(--k-radius-md); box-shadow: var(--k-shadow-lg); }
 /* Loading: a light spinner on the scrim while the full-size image fetches (show it
  * until the <img> onLoad, then swap in .lightbox__stage). */
@@ -4415,7 +4415,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-radius: var(--k-radius-md);
   box-shadow: var(--k-shadow-md);
   font-size: var(--k-type-small);
-  animation: var(--k-anim-slide-up, k-slide-up 240ms ease) backwards;
+  animation: var(--k-anim-slide-up, k-slide-up 240ms ease backwards);
 }
 .toast--success { border-left: 3px solid var(--k-success); }
 .toast--info    { border-left: 3px solid var(--k-info); }
@@ -4556,7 +4556,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   z-index: var(--k-z-popover);
   /* shadcn/Radix enter — scale + fade anchored to trigger via transform-origin */
   transform-origin: top left;
-  animation: var(--k-anim-scale-in, k-scale-in 200ms cubic-bezier(.05,.7,.1,1)) backwards;
+  animation: var(--k-anim-scale-in, k-scale-in 200ms cubic-bezier(.05,.7,.1,1) backwards);
 }
 /* Arrow pointing back at the trigger — single rotated square, border-clipped */
 .popover__arrow {
@@ -5445,7 +5445,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    merely-hovered one (neutral) — not the same wash at the same intensity. */
 .navmenu__item--on { background: var(--k-state-selected-bg); color: var(--k-fg); font-weight: var(--k-weight-semibold); }
 .navmenu__group { position: relative; }
-.navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: var(--k-overlay-min, 12rem); z-index: var(--k-z-dropdown); animation: var(--k-anim-fade-in, k-fade-in 160ms ease) both; }`,
+.navmenu__panel { position: absolute; top: calc(100% + var(--k-s-4)); left: 0; min-width: var(--k-overlay-min, 12rem); z-index: var(--k-z-dropdown); animation: var(--k-anim-fade-in, k-fade-in 160ms ease both); }`,
   },
   {
     id: 'context-menu',

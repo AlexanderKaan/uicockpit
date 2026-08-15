@@ -170,7 +170,7 @@ export function FontPicker({ value, groups, onChange, sample, sampleSize = 'disp
         </div>
       )}
       {showMenu && (
-        <div className={`fp__menu ${inline ? 'fp__menu--inline' : ''}`} role="listbox">
+        <div className={`menu fp__menu ${inline ? 'fp__menu--inline' : ''}`} role="listbox">
           {/* Order: System → Custom (already-uploaded fonts) → Upload CTA →
               Google fonts. Custom sits HIGH so when a user opens a second
               font field they immediately see what they've already uploaded

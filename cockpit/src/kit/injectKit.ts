@@ -40,6 +40,39 @@ export function injectKit(): void {
   const vars = buildTokens(DEFAULT_CONFIG).vars as Record<string, string | number>
   const mktTokens = `.mkt {\n${Object.entries(vars).map(([k, v]) => `  ${k}: ${v};`).join('\n')}\n}`
 
-  style.textContent = `${globalLayer({ scope: '.cockpit-preview' })}\n\n${assembleKitCss()}\n\n${mktTokens}`
+  /* 🚨 THE KIT GOES IN A CASCADE LAYER, and this is the fix for a whole class of
+   * bug rather than a nicety.
+   *
+   * This <style> is appended to <head> AFTER the bundled stylesheets, so at equal
+   * specificity the kit won every tie against our own chrome. That made
+   * `.fmenu { gap: 0 }` on a composed `.card` silently INERT — and it is the same
+   * cascade that made an earlier fix to the panel's lock button do nothing at all
+   * while looking, in the source, exactly like a fix.
+   *
+   * The consequence was worse than the individual bugs: composing a kit recipe in
+   * the chrome meant hand-tuning a specificity hack for every local adjustment, so
+   * the cheaper move was always to re-implement the recipe instead. That is a
+   * mechanical explanation for "we built it twice" — the cascade was charging a
+   * toll on composition and paying a subsidy to duplication.
+   *
+   * An UNLAYERED rule beats a LAYERED one at any specificity. Putting the kit in
+   * `@layer kit` states the relationship we actually mean: the kit is the base,
+   * the chrome adjusts it. Compose the recipe, override locally, no arms race.
+   *
+   * Scope of the change, measured before making it rather than assumed:
+   *  - EXPORT UNTOUCHED. genCss calls assembleKitCss() itself; this wrapper is
+   *    preview-only, so no CDN consumer inherits a layer they did not ask for.
+   *  - Exactly two chrome selectors collide with a kit selector at all
+   *    (`.sheet`, `.sheet--left` in preview-only.css) and both carry !important,
+   *    which outranks layers in either direction.
+   *  - The chrome focus ring already re-asserts --k-ring inside the preview at
+   *    higher specificity (chrome.css `.app .cockpit-preview :focus-visible`),
+   *    so the a11y floor does not move.
+   *  - No other @layer exists in the codebase, so there is no layer-order
+   *    question to get wrong.
+   *
+   * The token block stays OUTSIDE the layer: it declares custom properties, not
+   * styles, and variables should resolve regardless of who is winning a cascade. */
+  style.textContent = `@layer kit {\n${globalLayer({ scope: '.cockpit-preview' })}\n\n${assembleKitCss()}\n}\n\n${mktTokens}`
   document.head.appendChild(style)
 }

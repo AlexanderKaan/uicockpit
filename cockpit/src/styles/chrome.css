@@ -55,26 +55,16 @@
   --app-shadow-lg: var(--k-shadow-lg, 0 18px 60px rgba(0, 0, 0, 0.25));
 }
 
-/* Chrome menu "roll-down" — mirrors the preview's --k-anim-menu signature so
- * UIcockpit's own dropdowns (Font/Theme picker) open with the same Material-3
- * roll. Chrome keeps its own --app-* timing (calm, never user-driven). */
-@keyframes app-menu-roll {
-  from { max-height: 0; opacity: 0.6; }
-  to   { max-height: 380px; opacity: 1; }
-}
+/* `app-menu-roll` and `fmenu-roll` used to live here. Their comments said they
+ * "mirror the preview's --k-anim-menu signature" — a second motion system whose
+ * stated purpose was to look like the first one. The chrome dropdowns now
+ * compose `.menu` / `.popover` and get that signature from the kit, so both
+ * keyframes dropped to zero users the moment the composition landed.
+ *
+ * `app-menu-item` still has one, and stays until that surface composes too. */
 @keyframes app-menu-item {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-/* Roll-down for the floating-menu accordion bodies. Same reveal as
- * app-menu-roll, but ENDS with overflow:visible so a leaf picker's own
- * dropdown (FontPicker) can escape the clipped container once the roll
- * settles. overflow is discrete: it stays hidden through 99%, flips at the
- * end, and animation-fill (both) keeps it visible afterwards. */
-@keyframes fmenu-roll {
-  0%   { max-height: 0; opacity: 0.5; overflow: hidden; }
-  99%  { overflow: hidden; }
-  100% { max-height: 760px; opacity: 1; overflow: visible; }
 }
 
 /* Dark chrome — colour + elevation now flow through the mode-correct --k-* that

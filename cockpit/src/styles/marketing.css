@@ -190,16 +190,21 @@
 .mkt__ver-caret { transition: transform 180ms ease; opacity: 0.7; }
 .mkt__ver[open] .mkt__ver-caret { transform: rotate(180deg); }
 
+/* COMPOSES `.menu` (role="menu", an option list — the recipe's exact case).
+ *
+ * This one was the most expensive of the four and the least visible: it did not
+ * merely re-derive the surface, it wrote its OWN SHADOW in raw rgba, twice, in a
+ * near-black that no theme can move. On a marketing page that ships a dark mode,
+ * a hard-coded shadow is a bug waiting for the switch to be flipped. The kit's
+ * --k-shadow-lg is mode-aware; this was not, and nothing would have told us.
+ *
+ * It works here because `.mkt` carries the default kit's --k-* (injectKit), so
+ * kit recipes have always been one class name away on marketing surfaces. */
 .mkt__ver-menu {
   position: absolute;
   right: 0;
-  top: calc(100% + 8px);
+  top: calc(100% + var(--k-s-8));
   min-width: 208px;
-  padding: 6px;
-  background: var(--mkt-surface);
-  border: 1px solid var(--mkt-border);
-  border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(10, 10, 11, 0.12), 0 2px 6px rgba(10, 10, 11, 0.06);
   z-index: 20;
 }
 .mkt__ver-head {

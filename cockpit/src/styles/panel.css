@@ -62,16 +62,24 @@
 .panel__reset:active:not(:disabled) { transform: scale(0.99); }
 .panel__reset svg { color: var(--app-fg-muted); }
 .panel__reset:disabled { opacity: 0.4; cursor: default; }
-/* === Floating control menu (.fmenu) ===
- * A nested accordion: category rows → setting recap-rows → the real visual
- * picker. Same engine as the old flat panel, compact floating shell. */
+/* === The control shell (.fmenu) === COMPOSES `.card`.
+ * It was four properties that `.card` already sets together — surface, border,
+ * radius, shadow — with a 14px radius answering to nothing. `.card` is the kit's
+ * surface; this is a surface; there was never a second one to write.
+ *
+ * NOT `.menu`, though the rows inside it are menu items and it should read as
+ * our menu component. `.menu` is a FLOATING overlay: it caps at
+ * --k-overlay-max (22rem) and scrolls. This shell is DOCKED and full-height —
+ * composing `.menu` here would push 645px of rows into a 352px scroller. The
+ * right decomposition is the one the markup already shows: a surface holding a
+ * menu, not a menu pretending to be a surface.
+ *
+ * The two overrides go through `.card`'s own documented comp-tier hooks rather
+ * than around them: this shell lays out its own padding (a flush bar over a
+ * 6px row list), so it zeroes the card's. */
 .fmenu {
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: 14px;
-  box-shadow: var(--app-shadow-md);
-  display: flex;
-  flex-direction: column;
+  --k-card-pad: 0;
+  gap: 0;
 }
 /* Slim header — an identity label + the collapse-to-full-width control. */
 .fmenu__bar {
@@ -563,21 +571,21 @@
   line-height: 1.5;
   letter-spacing: 0;
 }
+/* The font list — COMPOSES `.menu`. It is a floating option list, which is what
+ * `.menu` is; it kept only what is genuinely about WHERE it hangs.
+ *
+ * `.menu` brings the surface, the 22rem cap with its scroll, the roll-down, AND
+ * the scrollbar treatment — which this rule needed and never had. That is the
+ * tell that the duplicate was never free: the comment above pointed at
+ * --k-anim-menu for "chrome parity" while hand-copying one property out of a
+ * recipe that would have given all of them. Parity by transcription lasts until
+ * the recipe learns something new. */
 .fp__menu {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + var(--k-s-4));
   left: 0;
   right: 0;
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: 10px;
-  box-shadow: var(--app-shadow-md);
-  padding: 4px;
   z-index: 12;
-  max-height: 360px;
-  overflow-y: auto;
-  /* Roll-down signature (#210) — chrome parity with the preview's --k-anim-menu. */
-  animation: app-menu-roll var(--app-dur-md) var(--app-ease) both;
 }
 /* Inline mode — the font LIST drops its absolute positioning + own chrome and
  * fills a parent flyout (.fmrow__pop--font) directly. */

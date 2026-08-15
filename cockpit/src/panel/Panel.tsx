@@ -486,7 +486,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
       <div className="panel__grip" ref={gripRef} role="button" tabIndex={-1} aria-label="Drag to resize controls">
         <span className="panel__handle" />
       </div>
-      <div className="fmenu">
+      <div className="card fmenu">
         <div className="fmenu__bar">
           <span className="fmenu__bar-title">Foundation</span>
           <button

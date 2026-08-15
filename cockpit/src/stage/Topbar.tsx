@@ -130,7 +130,7 @@ export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, t
             {savedCount > 0 && <span className="kit-heart__count" aria-hidden="true">{savedCount}</span>}
           </button>
           {kitsOpen && (
-            <div className="kits-pop" role="dialog" aria-label="Saved kits" onMouseLeave={() => setKitsOpen(false)}>
+            <div className="popover popover--end kits-pop" role="dialog" aria-label="Saved kits" onMouseLeave={() => setKitsOpen(false)}>
               <div className="kits-pop__head">
                 <span className="kits-pop__title">My kits</span>
                 <span className="kits-pop__sub">{savedCount} of 3 slots saved in this browser</span>

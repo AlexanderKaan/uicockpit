@@ -244,20 +244,14 @@
 /* Saved-kits heart + dropdown (#216 — moved out of the panel). Wrapper keeps
  * the icon-button stretching to neighbour height; the pop anchors to it. */
 .kits-pop-wrap { position: relative; display: flex; align-self: stretch; }
+/* COMPOSES `.popover--end`, not `.menu` — it carries role="dialog" and holds
+ * arbitrary content (a head, three kit slots), which is the line the kit already
+ * draws between the two overlay recipes. `.popover` supplies the surface, the
+ * scale-in anchored to its trigger, and z-index; `--end` supplies the
+ * right-alignment this rule was spelling out by hand. */
 .kits-pop {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  z-index: 1100;
   min-width: 300px;
-  padding: 12px;
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: 12px;
-  box-shadow: var(--app-shadow-md);
-  /* Same roll-down signature as the other chrome dropdowns (#210). */
-  animation: app-menu-roll var(--app-dur-md) var(--app-ease) both;
-  transform-origin: top;
+  z-index: 1100;
   overflow: hidden;
 }
 .kits-pop__head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }

@@ -86,7 +86,7 @@ export function MktNav({ navigate, current }: MktNavProps) {
               <span className="mkt__ver-num">{UICOCKPIT_VERSION}</span>
               <ChevronDown size={13} strokeWidth={2.5} className="mkt__ver-caret" aria-hidden="true" />
             </summary>
-            <div className="mkt__ver-menu" role="menu">
+            <div className="menu mkt__ver-menu" role="menu">
               {/* Names the ARTIFACT. It used to read "UIcockpit {version}",
                   which claimed a product version that does not exist — and did
                   it with the CLI's number, which lacked the feature the site

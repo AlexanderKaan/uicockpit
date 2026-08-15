@@ -55,12 +55,12 @@ const REPORT_ONLY = process.argv.slice(2).includes('--report')
    Estimating and measuring disagreed by a factor of two, again. */
 const TARGETS = [
   { src: 'src/kit/recipes/index.ts', baseline: 170, what: 'the kit' },
-  { src: 'src/styles/panel.css',      baseline: 174,  what: 'the panel' },
-  { src: 'src/styles/stage.css',      baseline: 193,  what: 'the stage + topbar' },
-  { src: 'src/styles/chrome.css',     baseline: 55,  what: 'the app shell' },
+  { src: 'src/styles/panel.css',      baseline: 169,  what: 'the panel' },
+  { src: 'src/styles/stage.css',      baseline: 190,  what: 'the stage + topbar' },
+  { src: 'src/styles/chrome.css',     baseline: 53,  what: 'the app shell' },
   { src: 'src/styles/modal.css',      baseline: 164,  what: 'modals + toasts' },
   { src: 'src/styles/preview-only.css', baseline: 30, what: 'the gallery harness' },
-  { src: 'src/styles/marketing.css',  baseline: 703, what: 'the marketing site' },
+  { src: 'src/styles/marketing.css',  baseline: 697, what: 'the marketing site' },
 ]
 const HAIRLINE = new Set(['0.5', '1', '1.5', '2']) // borders + focus rings: device-tuned
 const isBreakpoint = (l) => /@(container|media)\b/.test(l)
