@@ -491,7 +491,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
           <span className="fmenu__bar-title">Foundation</span>
           <button
             type="button"
-            className="fmenu__collapse"
+            className="btn btn--ghost btn--icon fmenu__collapse"
             onClick={onCollapse}
             aria-label="Collapse menu"
             title="Collapse — full-width preview"
@@ -520,7 +520,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
                 {r.key !== 'style' && (
                   <button
                     type="button"
-                    className="fmrow__lock"
+                    className="btn btn--ghost btn--icon fmrow__lock"
                     onClick={() => onToggleLock(r.key)}
                     aria-pressed={lockedKeys.has(r.key)}
                     title={lockedKeys.has(r.key) ? 'Pinned — Shuffle keeps this. Click to unlock.' : 'Lock against Shuffle'}
@@ -584,13 +584,13 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
           to the curated default). Live here with the controls they act on, not in
           the top bar. ⌘K mirrors both; both flow through history so ⌘Z undoes them. */}
       <div className="panel__foot">
-        <button type="button" className="panel__shuffle" onClick={onRandomize} title="Shuffle — roll a fresh random kit">
+        <button type="button" className="btn btn--secondary panel__shuffle" onClick={onRandomize} title="Shuffle — roll a fresh random kit">
           <Shuffle size={15} strokeWidth={1.75} />
           <span>Shuffle</span>
         </button>
         <button
           type="button"
-          className="panel__reset"
+          className="btn btn--ghost panel__reset"
           onClick={onReset}
           disabled={atDefault}
           title={atDefault ? 'Already on the default kit' : 'Reset every knob to the default kit'}
