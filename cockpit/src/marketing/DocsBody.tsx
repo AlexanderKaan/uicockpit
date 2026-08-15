@@ -569,7 +569,7 @@ npx uicockpit check        # catch any drift from the contract`}</code></pre>
               design and code read from one source.
             </p>
             <div className="docs__cta">
-              <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={() => onLaunch?.()}>
+              <button className="btn btn--primary btn--lg" onClick={() => onLaunch?.()}>
                 Build my UI kit →
               </button>
             </div>

@@ -298,10 +298,10 @@ function Recognise({
           Not what you expected? Re-scan a narrower folder — one app, not the monorepo root.
         </p>
         <div className="aud__actions">
-          <button type="button" className="mkt-btn mkt-btn--ghost" onClick={onReset}>
+          <button type="button" className="btn btn--secondary" onClick={onReset}>
             <RotateCcw size={15} strokeWidth={1.9} /> Re-scan
           </button>
-          <button type="button" className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onContinue}>
+          <button type="button" className="btn btn--primary btn--lg" onClick={onContinue}>
             Show me what you found <ArrowRight size={17} strokeWidth={2} />
           </button>
         </div>
@@ -337,17 +337,17 @@ function Findings({
     <section className="aud__findings">
       <div className="aud__findings-bar">
         <div className="aud__actions">
-          <button type="button" className="mkt-btn mkt-btn--ghost" onClick={onReset}>
+          <button type="button" className="btn btn--secondary" onClick={onReset}>
             <RotateCcw size={15} strokeWidth={1.9} /> Scan another
           </button>
-          <button type="button" className="mkt-btn mkt-btn--ghost" onClick={onDownload}>
+          <button type="button" className="btn btn--secondary" onClick={onDownload}>
             <Download size={15} strokeWidth={1.9} /> Download the report
           </button>
         </div>
         {/* The bridge. If the audit is a wedge this is the number that says so;
             if it is a product in its own right, this stays near zero and that is
             an answer too. */}
-        <button type="button" className="mkt-btn mkt-btn--primary" onClick={onBridge}>
+        <button type="button" className="btn btn--primary" onClick={onBridge}>
           Open this as my kit <ArrowRight size={16} strokeWidth={2} />
         </button>
       </div>
@@ -374,11 +374,11 @@ function KeptFindings({ html, onReset, onBridge }: { html: string; onReset: () =
     <section className="aud__findings">
       <div className="aud__findings-bar">
         <div className="aud__actions">
-          <button type="button" className="mkt-btn mkt-btn--ghost" onClick={onReset}>
+          <button type="button" className="btn btn--secondary" onClick={onReset}>
             <RotateCcw size={15} strokeWidth={1.9} /> Scan another
           </button>
         </div>
-        <button type="button" className="mkt-btn mkt-btn--primary" onClick={onBridge}>
+        <button type="button" className="btn btn--primary" onClick={onBridge}>
           Back to my kit <ArrowRight size={16} strokeWidth={2} />
         </button>
       </div>

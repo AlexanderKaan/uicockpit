@@ -41,11 +41,12 @@ interface FolderDropProps {
 export function FolderDrop({
   onFiles, onZip, busy = false, error = null, heading, lede, tone = 'stage',
 }: FolderDropProps) {
-  /* The kit's `.btn` recipe is scoped to the app's preview root, so on the
-   * marketing page it resolved to nothing at all — the audit's primary call to
-   * action has been rendering as bare underlined-less text since the door
-   * shipped. Each surface gets the button class that exists on it. */
-  const btn = tone === 'page' ? 'mkt-btn' : 'btn'
+  /* One button recipe on every surface. This used to branch — .mkt-btn on the
+   * marketing page, .btn in the app — because the kit's tokens were scoped to
+   * the app root and .btn "resolved to nothing at all" out here. The tokens now
+   * ship with the recipes (see injectKit), so the workaround is gone and the
+   * audit's call to action is the same button as everywhere else. */
+  const btn = 'btn'
   const [over, setOver] = useState(false)
   const folderRef = useRef<HTMLInputElement>(null)
   const zipRef = useRef<HTMLInputElement>(null)

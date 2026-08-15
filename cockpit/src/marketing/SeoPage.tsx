@@ -85,10 +85,10 @@ export function SeoPage({ entry, navigate }: SeoPageProps) {
           <h1 className="seo__h1">{entry.h1}</h1>
           <p className="seo__sub">{entry.sub}</p>
           <div className="seo__ctas">
-            <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={() => navigate('/app')}>
+            <button className="btn btn--primary btn--lg" onClick={() => navigate('/app')}>
               Build my UI kit →
             </button>
-            <a href="/docs" className="mkt-btn mkt-btn--ghost mkt-btn--lg" onClick={(e) => go(e, '/docs')}>
+            <a href="/docs" className="btn btn--secondary btn--lg" onClick={(e) => go(e, '/docs')}>
               Read the docs
             </a>
           </div>
@@ -208,7 +208,7 @@ export function SeoPage({ entry, navigate }: SeoPageProps) {
             100% free, framework-neutral tokens — no account, no lock-in, your design language,
             your file.
           </p>
-          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={() => navigate('/app')}>
+          <button className="btn btn--primary btn--lg" onClick={() => navigate('/app')}>
             Build my UI kit →
           </button>
         </div>

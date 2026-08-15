@@ -112,10 +112,10 @@ export function MktNav({ navigate, current }: MktNavProps) {
 
           {/* Both entrances, on every page — the nav is where someone who
               arrived on the wrong side of the fork changes their mind. */}
-          <button className="mkt-btn mkt-btn--ghost mkt-btn--lg mkt__nav-door" onClick={door('/audit', 'audit')}>
+          <button className="btn btn--secondary btn--lg mkt__nav-door" onClick={door('/audit', 'audit')}>
             Audit my UI
           </button>
-          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={door('/app', 'configure')}>
+          <button className="btn btn--primary btn--lg" onClick={door('/app', 'configure')}>
             Build my UI kit
           </button>
 
@@ -141,10 +141,10 @@ export function MktNav({ navigate, current }: MktNavProps) {
             {/* The two doors first and EQUAL — the whole proposition is that
                 there are two ways in, and a menu that leads with one of them
                 is the one-door product wearing a hamburger. */}
-            <button className="mkt-btn mkt-btn--ghost mkt-btn--lg mkt__sheet-door" onClick={door('/audit', 'audit')}>
+            <button className="btn btn--secondary btn--lg mkt__sheet-door" onClick={door('/audit', 'audit')}>
               Audit my UI
             </button>
-            <button className="mkt-btn mkt-btn--primary mkt-btn--lg mkt__sheet-door" onClick={door('/app', 'configure')}>
+            <button className="btn btn--primary btn--lg mkt__sheet-door" onClick={door('/app', 'configure')}>
               Build my UI kit
             </button>
 

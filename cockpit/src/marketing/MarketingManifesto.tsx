@@ -180,10 +180,10 @@ export function MarketingManifesto({ onLaunch, onDocs, navigate }: MarketingMani
         <p className="mkt__manifesto-sign">— Alexander</p>
 
         <div className="mkt__manifesto-ctas">
-          <button className="mkt-btn mkt-btn--primary mkt-btn--lg" onClick={onLaunch}>
+          <button className="btn btn--primary btn--lg" onClick={onLaunch}>
             Build my UI kit →
           </button>
-          <a href="/docs" className="mkt-btn mkt-btn--ghost mkt-btn--lg" onClick={(e) => { e.preventDefault(); onDocs() }}>
+          <a href="/docs" className="btn btn--secondary btn--lg" onClick={(e) => { e.preventDefault(); onDocs() }}>
             Read the docs
           </a>
         </div>

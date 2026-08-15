@@ -72,6 +72,20 @@ function HeroDotGrid() {
  * the onLaunch prop (parent-managed client-side routing — no React Router).
  */
 export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
+  /* THE KIT'S OWN TOKENS, on the marketing page too.
+   *
+   * The kit stylesheet was already loaded here — .btn has been one class name
+   * away this whole time — but the --k-* variables were scoped to .app and
+   * .cockpit-preview, so a kit recipe used here would have fallen back to its
+   * hard-coded defaults and themed with nothing. That absence is why the page
+   * grew .mkt-btn, whose own comment gives the game away: it hard-codes
+   * 0.625rem "to match the kit's button radius", copies the value instead of
+   * reading the token, and then hand-tunes line-height to land on 32/36px while
+   * the kit's buttons are on the 44px floor we added today.
+   *
+   * Emitting the default kit here is the enabling move for the whole dogfood
+   * pass: 704 elements of our own interface, and not one of them used a kit
+   * class. */
   return (
     <div className="mkt">
       <MktNav navigate={navigate} />
@@ -207,7 +221,7 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               </div>
               <button
                 type="button"
-                className="mkt-btn mkt-btn--primary mkt-btn--lg"
+                className="btn btn--primary btn--lg"
                 onClick={() => { ping('door', 'audit'); navigate('/audit') }}
               >
                 Audit my UI <ArrowRight size={17} strokeWidth={2} />
@@ -651,13 +665,13 @@ npx uicockpit check --strict`}</code></pre>
           </p>
           <div className="mkt__final-doors">
             <button
-              className="mkt-btn mkt-btn--primary mkt-btn--lg"
+              className="btn btn--primary btn--lg"
               onClick={() => { ping('door', 'configure'); onLaunch() }}
             >
               Build my UI kit →
             </button>
             <button
-              className="mkt-btn mkt-btn--ghost mkt-btn--lg"
+              className="btn btn--secondary btn--lg"
               onClick={() => { ping('door', 'audit'); navigate('/audit') }}
             >
               Audit the app I already have
