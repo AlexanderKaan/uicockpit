@@ -183,9 +183,24 @@ const report = await page.evaluate(() => {
    * canonical set, and report the visual-only ones as their own finding: an
    * element that looks chosen but says nothing in ARIA is a screen-reader bug
    * wearing a styling bug's clothes. */
-  const ARIA_SELECTABLE = '[aria-selected="true"],[aria-checked="true"],[data-role="selectable"].is-selected,[role="option"],[role="tab"],[role="radio"],[role="menuitemradio"],[role="menuitemcheckbox"]'
-  const canonical = selectedEls.filter((el) => { try { return el.matches(ARIA_SELECTABLE) } catch { return false } })
-  const visualOnly = selectedEls.filter((el) => !canonical.includes(el) && /(--on|--selected|is-selected|is-active|--active)/.test(el.getAttribute('class') || ''))
+  /* aria-current is in here because it is the CORRECT answer for navigation:
+   * "this is the page you are on" is not aria-selected, and a nav row that says
+   * it properly must not be reported as saying nothing. */
+  const ARIA_SELECTABLE = '[aria-selected="true"],[aria-checked="true"],[aria-pressed="true"],[aria-current]:not([aria-current="false"]),[aria-sort]:not([aria-sort="none"]),[data-role="selectable"].is-selected,[role="option"],[role="tab"],[role="radio"],[role="menuitemradio"],[role="menuitemcheckbox"]'
+  /* Self OR DESCENDANT. `.radio-card--on` is a <label> wrapping a real
+   * <input type="radio" checked> — the semantics are already right, they just do
+   * not live on the element carrying the paint. Requiring the attribute on the
+   * styled element would have pushed a redundant role onto correct markup. */
+  const saysIt = (el) => { try { return el.matches(ARIA_SELECTABLE) || !!el.querySelector(ARIA_SELECTABLE) || !!el.querySelector(':checked') } catch { return false } }
+  const canonical = selectedEls.filter(saysIt)
+
+  /* ⚠️ A MODIFIER IS A WHOLE TOKEN, NOT A SUBSTRING. `--on` written as a plain
+   * substring matched `avatar__status--online`, so a presence dot was filed as an
+   * element that "looks chosen but says nothing in ARIA". It is a status, it is
+   * not chosen, and no amount of ARIA would have fixed it. Anchored to the end of
+   * the class token now. */
+  const MOD = /(?:--on|--selected|--active|\bis-selected|\bis-active)(?![\w-])/
+  const visualOnly = selectedEls.filter((el) => !canonical.includes(el) && MOD.test(el.getAttribute('class') || ''))
 
   const treatments = new Map()
   for (const el of canonical) {

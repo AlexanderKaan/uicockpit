@@ -180,3 +180,44 @@ describe('token substitution produces valid CSS', () => {
     }
   })
 })
+
+describe('every token the kit reads is a token the engine emits', () => {
+  /* THE SAME BLIND SPOT AS THE ANIMATION BUG, one level up. `.processlist__step`
+   * asked for `padding: 0 0 var(--k-s-24) var(--k-s-40)` and --k-s-40 does not
+   * exist. No fallback, so the WHOLE shorthand is invalid, so the step had no
+   * left padding, so the numbered badge sat on top of the heading — "Send your
+   * application" rendered as "end your application". Its sibling
+   * `--k-radius-full` does not exist either, which is why the badge was a square
+   * where the recipe asked for a circle.
+   *
+   * A ghost token is silent by design: CSS drops the declaration and says
+   * nothing. Only substitution finds it, and only against the REAL table —
+   * a regex over buildTokens.ts source reported --k-s-4 as undefined, because
+   * the spacing and tone scales are emitted in loops rather than as literal
+   * keys. That reading would have had the entire kit broken, which is the tell
+   * that the meter, not the kit, was wrong. */
+  const defined = new Set(Object.keys(vars))
+
+  it('the token table is real and large (guard against measuring nothing)', () => {
+    expect(defined.size).toBeGreaterThan(150)
+    for (const t of ['--k-s-4', '--k-s-24', '--k-danger', '--k-radius-md']) {
+      expect(defined.has(t), `${t} missing — the table is not what this test thinks it is`).toBe(true)
+    }
+  })
+
+  it('no recipe reads a --k-* token that does not exist, without a fallback', () => {
+    const ghosts: string[] = []
+    for (const r of RECIPES) {
+      for (const m of r.css.matchAll(/([a-z-]+)\s*:\s*([^;}]*var\([^;}]*)/g)) {
+        const [, prop, value] = m
+        for (const v of (value ?? '').matchAll(/var\(\s*(--k-[\w-]+)\s*([,)])/g)) {
+          const name = v[1]!
+          const hasFallback = v[2] === ','
+          if (defined.has(name) || hasFallback) continue
+          ghosts.push(`${r.id}: ${prop} reads ${name}, which the engine never emits and there is no fallback`)
+        }
+      }
+    }
+    expect([...new Set(ghosts)].join('\n')).toBe('')
+  })
+})

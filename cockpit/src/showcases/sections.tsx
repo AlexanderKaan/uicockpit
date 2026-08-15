@@ -524,7 +524,7 @@ export function renderSection(spec: SectionSpec, key: number) {
               if (d === today) cls.push('calendar__cell--today')
               const dot = events.includes(d) && d !== selected
               return (
-                <button type="button" key={i} className={cls.join(' ')} aria-current={d === today ? 'date' : undefined}>
+                <button type="button" key={i} className={cls.join(' ')} aria-selected={d === selected} aria-current={d === today ? 'date' : undefined}>
                   {d}
                   {dot && <span aria-hidden="true" style={{ position: 'absolute', bottom: 5, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, borderRadius: '50%', background: 'var(--k-primary)' }} />}
                 </button>

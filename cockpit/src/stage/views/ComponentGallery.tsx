@@ -943,7 +943,7 @@ function NavMenuCard() {
   return (
     <Card title="Navigation menu" desc="Horizontal top nav with a dropdown flyout." wide>
       <nav className="navmenu">
-        <button className="navmenu__item navmenu__item--on">Home</button>
+        <button className="navmenu__item navmenu__item--on" aria-current="page">Home</button>
         <div className="navmenu__group">
           <button className="navmenu__item" aria-expanded={open} onClick={() => setOpen((v) => !v)}>Products <ChevronSvg size={12} /></button>
           {open && (
@@ -1170,7 +1170,14 @@ function TableCard() {
       <table className="table">
         <thead>
           <tr>
-            <th className={`is-sortable ${sortKey === 'name' ? 'is-active' : ''}`} onClick={() => toggle('name')}>
+            <th
+              scope="col"
+              className={`is-sortable ${sortKey === 'name' ? 'is-active' : ''}`}
+              aria-sort={sortKey === 'name' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+              tabIndex={0}
+              onClick={() => toggle('name')}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle('name') } }}
+            >
               <span className="table__sort">
                 Name
                 <span className="table__sort-chevron" style={{ transform: sortKey === 'name' && sortDir === 'desc' ? 'rotate(180deg)' : 'none' }}>
@@ -1178,7 +1185,14 @@ function TableCard() {
                 </span>
               </span>
             </th>
-            <th className={`is-sortable ${sortKey === 'status' ? 'is-active' : ''}`} onClick={() => toggle('status')}>
+            <th
+              scope="col"
+              className={`is-sortable ${sortKey === 'status' ? 'is-active' : ''}`}
+              aria-sort={sortKey === 'status' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+              tabIndex={0}
+              onClick={() => toggle('status')}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle('status') } }}
+            >
               <span className="table__sort">
                 Status
                 <span className="table__sort-chevron" style={{ transform: sortKey === 'status' && sortDir === 'desc' ? 'rotate(180deg)' : 'none' }}>
@@ -1559,13 +1573,13 @@ function ChartCard() {
   const donutLabels = ['Direct', 'Search', 'Social', 'Referral']
   return (
     <Card wide docId="chart" title="Traffic by source" desc="One ChartFrame, six render modes — gridlines, axes, hover tooltips.">
-      <div className="segctrl" style={{ marginBottom: 10, flexWrap: 'wrap' }}>
+      <div className="segctrl" role="radiogroup" aria-label="Chart type" style={{ marginBottom: 10, flexWrap: 'wrap' }}>
         {([['line', 'Line'], ['area', 'Area'], ['bar', 'Bar'], ['stacked', 'Stacked'], ['stackedArea', 'Stacked area'], ['donut', 'Donut']] as const).map(([t, lbl]) => (
-          <button key={t} className={`segctrl__btn ${view === 'chart' && type === t ? 'segctrl__btn--on' : ''}`} onClick={() => { setType(t); setView('chart') }}>
+          <button key={t} role="radio" aria-checked={view === 'chart' && type === t} className={`segctrl__btn ${view === 'chart' && type === t ? 'segctrl__btn--on' : ''}`} onClick={() => { setType(t); setView('chart') }}>
             {lbl}
           </button>
         ))}
-        <button className={`segctrl__btn ${view === 'loading' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('loading')}>Loading</button>
+        <button role="radio" aria-checked={view === 'loading'} className={`segctrl__btn ${view === 'loading' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('loading')}>Loading</button>
         <button className={`segctrl__btn ${view === 'empty' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('empty')}>Empty</button>
       </div>
       <ChartFrame type={type} height={140} labels={type === 'donut' ? donutLabels : labels} series={series} empty={view === 'empty'} loading={view === 'loading'} />
@@ -3014,7 +3028,7 @@ function SignupCard() {
           </div>
           <div className="pwinput__strength">
             {[0, 1, 2].map((i) => (
-              <span key={i} className={'pwinput__bar' + (i < strength ? ' pwinput__bar--on' : '')} data-level={strength} />
+              <span key={i} className={'pwinput__bar' + (i < strength ? ' pwinput__bar--filled' : '')} data-level={strength} />
             ))}
             <span className="pwinput__label">{strength <= 0 ? 'Too short' : strength === 1 ? 'Weak' : strength === 2 ? 'Fair' : 'Strong'}</span>
           </div>
@@ -3229,6 +3243,7 @@ function DateCard() {
                     disabled={isBlocked(d)}
                     aria-label={`May ${d}${isBlocked(d) ? ' (unavailable)' : ''}`}
                     aria-current={d === today ? 'date' : undefined}
+                    aria-selected={cellClass(d).includes('calendar__cell--on') || cellClass(d).includes('--range')}
                     onClick={() => handleClick(d)}
                     onMouseEnter={() => setHover(d)}
                   >
@@ -3404,7 +3419,7 @@ function CalendarYearCard() {
                   const out = d < 1 || d > m.dim
                   const isToday = now && d === 15
                   return (
-                    <span key={i} className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${isToday ? 'calendar__cell--on' : ''}`} aria-hidden={out}>
+                    <span key={i} className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${isToday ? 'calendar__cell--today' : ''}`} aria-current={isToday ? 'date' : undefined} aria-hidden={out}>
                       {out ? '' : d}
                     </span>
                   )
@@ -4149,9 +4164,9 @@ function SlotPickerCard() {
   const off = new Set(['11:00', '13:00'])
   return (
     <Card title="Slot picker" desc="Time-slot grid for booking — available, selected, disabled.">
-      <div className="slotpicker">
+      <div className="slotpicker" role="radiogroup" aria-label="Available times">
         {slots.map((t) => (
-          <button key={t} type="button" disabled={off.has(t)} className={'slot' + (off.has(t) ? ' slot--off' : slot === t ? ' slot--on' : '')} onClick={() => !off.has(t) && setSlot(t)}>{t}</button>
+          <button key={t} type="button" role="radio" aria-checked={slot === t} disabled={off.has(t)} className={'slot' + (off.has(t) ? ' slot--off' : slot === t ? ' slot--on' : '')} onClick={() => !off.has(t) && setSlot(t)}>{t}</button>
         ))}
       </div>
     </Card>
@@ -4521,7 +4536,7 @@ function PasswordInputCard() {
       )}
       <div className="pwinput__strength">
         {[0, 1, 2].map((i) => (
-          <span key={i} className={'pwinput__bar' + (i < strength ? ' pwinput__bar--on' : '')} data-level={strength} />
+          <span key={i} className={'pwinput__bar' + (i < strength ? ' pwinput__bar--filled' : '')} data-level={strength} />
         ))}
         <span className="pwinput__label">
           {strength <= 0 ? 'Too short' : strength === 1 ? 'Weak' : strength === 2 ? 'Fair' : 'Strong'}
@@ -4559,10 +4574,10 @@ function SearchInputCard() {
         <kbd className="searchinput__kbd">⌘K</kbd>
       </div>
       {q && (
-        <div className="searchinput__sugg">
-          <div className="searchinput__group">Suggestions</div>
+        <div className="searchinput__sugg" role="listbox" aria-label="Suggestions">
+          <div className="searchinput__group" role="presentation">Suggestions</div>
           {matches.map((m, i) => (
-            <button key={m} className={'searchinput__item' + (i === 0 ? ' searchinput__item--on' : '')}>
+            <button key={m} role="option" aria-selected={i === 0} className={'searchinput__item' + (i === 0 ? ' searchinput__item--on' : '')}>
               <Icon name="search" />
               <span>{m}</span>
             </button>

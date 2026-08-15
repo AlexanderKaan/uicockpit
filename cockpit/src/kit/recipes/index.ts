@@ -2870,7 +2870,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * uses the same top inset the scaffold uses so it never hides under a header. */
 .inpagenav { position: sticky; top: var(--k-s-16); align-self: start; }
 .inpagenav__title {
-  font-size: var(--k-type-eyebrow); letter-spacing: var(--k-tracking-eyebrow);
+  font-size: var(--k-type-eyebrow); letter-spacing: var(--k-track-eyebrow);
   text-transform: uppercase; color: var(--k-fg-muted);
   margin: 0 0 var(--k-s-8);
 }
@@ -2881,7 +2881,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   color: var(--k-fg-muted); text-decoration: none;
   font-size: var(--k-type-small);
 }
-.inpagenav__link:hover { color: var(--k-fg); background: var(--k-hover); }
+.inpagenav__link:hover { color: var(--k-fg); background: var(--k-state-hover); }
 .inpagenav__link[aria-current='true'] {
   color: var(--k-fg); border-left-color: var(--k-primary); font-weight: var(--k-weight-medium);
 }
@@ -2952,7 +2952,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .requirements__mark {
   inline-size: var(--k-icon-sm); block-size: var(--k-icon-sm);
   display: grid; place-items: center; flex: 0 0 auto;
-  border-radius: var(--k-radius-full); border: 1px solid var(--k-border);
+  border-radius: var(--k-radius-pill); border: 1px solid var(--k-border);
 }
 .requirements__item--met { color: var(--k-success-text); }
 .requirements__item--met .requirements__mark { border-color: currentColor; }
@@ -2986,7 +2986,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .processlist__step {
   counter-increment: process;
   position: relative;
-  padding: 0 0 var(--k-s-24) var(--k-s-40);
+  padding: 0 0 var(--k-s-24) calc(var(--k-s-32) + var(--k-s-8));
   border-left: 2px solid var(--k-border);
   margin-left: var(--k-s-16);
 }
@@ -2996,7 +2996,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   position: absolute; left: calc(var(--k-s-16) * -1 - 1px); top: 0;
   inline-size: var(--k-s-32); block-size: var(--k-s-32);
   display: grid; place-items: center;
-  border-radius: var(--k-radius-full);
+  border-radius: var(--k-radius-pill);
   background: var(--k-primary); color: var(--k-primary-fg);
   font-size: var(--k-type-small); font-weight: var(--k-weight-semibold);
   font-variant-numeric: tabular-nums;
@@ -5705,14 +5705,20 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border: var(--k-hairline, 1px solid var(--k-border));
   transition: background var(--k-dur, 200ms) var(--k-ease), border-color var(--k-dur, 200ms) var(--k-ease);
 }
-/* A MODIFIER MUST NEVER BE INERT. The three rules below key on data-level, and
-   the meter also emits level 0 — for which there was no rule at all, so a bar
-   marked --on rendered exactly like an unfilled one. Anything that says it is on
-   now looks on; the levelled rules refine it, they do not enable it. */
-.pwinput__bar--on { background: var(--k-fg-faint); border-color: transparent; }
-.pwinput__bar--on[data-level="1"] { background: var(--k-danger); border-color: transparent; }
-.pwinput__bar--on[data-level="2"] { background: var(--k-warning); border-color: transparent; }
-.pwinput__bar--on[data-level="3"] { background: var(--k-success); border-color: transparent; }
+/* --filled, NOT --on. A strength meter measures; it does not select, and the
+   kit was using one modifier name for three unrelated ideas — selection (a
+   chosen menu row), state (a switch that is on) and measurement (this). Anything
+   auditing "what does selection look like here" had to read a password bar as a
+   selected thing. One name, one concept.
+
+   A MODIFIER MUST NEVER BE INERT, either. The levelled rules key on data-level
+   and the meter also emits level 0, for which there was no rule at all — so a
+   bar marked as filled rendered exactly like an empty one. The base rule below
+   makes it look filled; the levelled rules refine it, they no longer enable it. */
+.pwinput__bar--filled { background: var(--k-fg-faint); border-color: transparent; }
+.pwinput__bar--filled[data-level="1"] { background: var(--k-danger); border-color: transparent; }
+.pwinput__bar--filled[data-level="2"] { background: var(--k-warning); border-color: transparent; }
+.pwinput__bar--filled[data-level="3"] { background: var(--k-success); border-color: transparent; }
 .pwinput__label {
   font-size: var(--k-type-caption);
   color: var(--k-fg-muted);
