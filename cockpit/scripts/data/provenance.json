@@ -37,12 +37,6 @@
     ],
     "button-finish": [
       {
-        "layer": 1,
-        "source": "<button>",
-        "because": "The platform provides <button>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button"
-      },
-      {
         "layer": 3,
         "source": "Open UI · Button",
         "because": "25 of 27 surveyed design systems ship this independently (93%).",
@@ -74,8 +68,8 @@
       },
       {
         "layer": 3,
-        "source": "Open UI · Button",
-        "because": "25 of 27 surveyed design systems ship this independently (93%).",
+        "source": "Open UI · Button group",
+        "because": "5 of 27 surveyed design systems ship this independently (19%).",
         "url": "https://open-ui.org/research/component-matrix"
       }
     ],
@@ -211,6 +205,12 @@
         "source": "APG · Meter",
         "because": "WAI-ARIA APG names the Meter pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/meter/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Progress",
+        "because": "11 of 27 surveyed design systems ship this independently (41%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "select-trigger": [
@@ -224,6 +224,14 @@
         "layer": 3,
         "source": "Open UI · Select",
         "because": "16 of 27 surveyed design systems ship this independently (59%).",
+        "url": "https://open-ui.org/research/component-matrix"
+      }
+    ],
+    "spinner": [
+      {
+        "layer": 3,
+        "source": "Open UI · Spinner",
+        "because": "5 of 27 surveyed design systems ship this independently (19%).",
         "url": "https://open-ui.org/research/component-matrix"
       }
     ],
@@ -262,6 +270,12 @@
         "source": "APG · Grid (for interactive rows)",
         "because": "WAI-ARIA APG names the Grid (for interactive rows) pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · List",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "lightbox": [
@@ -302,6 +316,12 @@
         "source": "APG · Grid (date grid)",
         "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Range",
+        "because": "6 of 27 surveyed design systems ship this independently (22%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "inpagenav": [
@@ -333,6 +353,12 @@
       }
     ],
     "processlist": [
+      {
+        "layer": 3,
+        "source": "Open UI · List",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
+      },
       {
         "layer": 4,
         "source": "USWDS · Process list",
@@ -372,6 +398,12 @@
         "url": "https://www.w3.org/WAI/ARIA/apg/checkbox/"
       },
       {
+        "layer": 3,
+        "source": "Open UI · List",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
         "layer": 4,
         "source": "GOV.UK · Task list",
         "because": "GOV.UK ships it because a public service needs it.",
@@ -404,6 +436,12 @@
         "layer": 2,
         "source": "APG · Landmarks (bypass blocks)",
         "because": "WAI-ARIA APG names the Landmarks (bypass blocks) pattern and specifies its behaviour."
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Link",
+        "because": "6 of 27 surveyed design systems ship this independently (22%).",
+        "url": "https://open-ui.org/research/component-matrix"
       },
       {
         "layer": 4,
@@ -512,6 +550,12 @@
         "source": "APG · Meter",
         "because": "WAI-ARIA APG names the Meter pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/meter/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Meter",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "combobox": [
@@ -564,6 +608,12 @@
         "source": "APG · Alert",
         "because": "WAI-ARIA APG names the Alert pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/alert/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Toast",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "tag-input": [
@@ -572,6 +622,12 @@
         "source": "APG · Combobox",
         "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Tag",
+        "because": "6 of 27 surveyed design systems ship this independently (22%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "popover": [
@@ -580,6 +636,12 @@
         "source": "APG · Disclosure",
         "because": "WAI-ARIA APG names the Disclosure pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/disclosure/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Popover",
+        "because": "5 of 27 surveyed design systems ship this independently (19%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "hover-card": [
@@ -626,6 +688,12 @@
         "source": "<dl>",
         "because": "The platform provides <dl>; this recipe styles it rather than rebuilding it.",
         "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dl"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · List",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "banner": [
@@ -644,6 +712,12 @@
     ],
     "alert-dialog": [
       {
+        "layer": 1,
+        "source": "<dialog>",
+        "because": "The platform provides <dialog>; this recipe styles it rather than rebuilding it.",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog"
+      },
+      {
         "layer": 2,
         "source": "APG · Alert Dialog",
         "because": "WAI-ARIA APG names the Alert Dialog pattern and specifies its behaviour.",
@@ -656,12 +730,26 @@
         "url": "https://open-ui.org/research/component-matrix"
       }
     ],
+    "input-otp": [
+      {
+        "layer": 3,
+        "source": "Open UI · Input",
+        "because": "5 of 27 surveyed design systems ship this independently (19%).",
+        "url": "https://open-ui.org/research/component-matrix"
+      }
+    ],
     "carousel": [
       {
         "layer": 2,
         "source": "APG · Carousel",
         "because": "WAI-ARIA APG names the Carousel pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/carousel/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Carousel",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "navigation-menu": [
@@ -708,18 +796,62 @@
     ],
     "numberinput": [
       {
+        "layer": 1,
+        "source": "<input type=\"number\">",
+        "because": "The platform provides <input type=\"number\">; this recipe styles it rather than rebuilding it.",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+      },
+      {
         "layer": 2,
         "source": "APG · Spinbutton",
         "because": "WAI-ARIA APG names the Spinbutton pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/spinbutton/"
       }
     ],
+    "passwordinput": [
+      {
+        "layer": 1,
+        "source": "<input type=\"password\">",
+        "because": "The platform provides <input type=\"password\">; this recipe styles it rather than rebuilding it.",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+      }
+    ],
     "searchinput": [
+      {
+        "layer": 1,
+        "source": "<input type=\"search\">",
+        "because": "The platform provides <input type=\"search\">; this recipe styles it rather than rebuilding it.",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+      },
       {
         "layer": 2,
         "source": "APG · Combobox",
         "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
+      }
+    ],
+    "phoneinput": [
+      {
+        "layer": 1,
+        "source": "<input type=\"tel\">",
+        "because": "The platform provides <input type=\"tel\">; this recipe styles it rather than rebuilding it.",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+      }
+    ],
+    "list": [
+      {
+        "layer": 3,
+        "source": "Open UI · List",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
+      }
+    ],
+    "file-grid": [
+      {
+        "layer": 3,
+        "source": "Open UI · Grid",
+        "because": "6 of 27 surveyed design systems ship this independently (22%).",
+        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "radio-card": [
@@ -808,7 +940,6 @@
     "badges-pills",
     "skeleton",
     "empty-state",
-    "spinner",
     "danger-zone",
     "auth",
     "chart",
@@ -817,19 +948,14 @@
     "roll-down-item-stagger",
     "stepper",
     "file-upload-dropzone",
-    "input-otp",
     "stat-tile",
     "attachment-chip-family",
     "inline-status-meta-micro-components",
-    "passwordinput",
-    "phoneinput",
     "infocard",
-    "list",
     "timeline",
     "codeblock",
     "twocolumnlayout",
     "wizardstepper",
-    "file-grid",
     "layout-primitives",
     "pane",
     "prose"

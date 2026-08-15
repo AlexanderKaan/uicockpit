@@ -1936,7 +1936,7 @@ function FormPanelCard() {
             <div className="lab formpanel__full"><span>Phone (billing alerts)</span>
               <div className="phoneinput">
                 <button className="phoneinput__country" aria-label="Country"><span className="phoneinput__flag" aria-hidden>🇳🇱</span><span className="phoneinput__code">+31</span></button>
-                <input className="phoneinput__field" defaultValue="6 1234 5678" aria-label="Phone number" />
+                <input className="phoneinput__field" type="tel" inputMode="tel" autoComplete="tel" defaultValue="6 1234 5678" aria-label="Phone number" />
               </div>
             </div>
           </div>
@@ -4680,8 +4680,15 @@ function PhoneInputCard() {
           <span className="phoneinput__code">+31</span>
           <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden><path d="M1 1 L5 5 L9 1" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
         </button>
+        {/* type="tel" — the platform's phone field. It is what puts the phone
+            keypad on a mobile keyboard, and this rendered as plain text (no type
+            at all) in a component literally named phoneinput. autocomplete="tel"
+            is the other half: the browser can fill it. */}
         <input
           className="phoneinput__field"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
           value={num}
           onChange={(e) => setNum(e.target.value)}
           placeholder="6 12 34 56 78"
@@ -4696,6 +4703,8 @@ function PhoneInputCard() {
         </button>
         <input
           className="phoneinput__field"
+          type="tel"
+          inputMode="tel"
           value="555-013"
           readOnly
           aria-invalid="true"

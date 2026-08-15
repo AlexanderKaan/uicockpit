@@ -55,7 +55,23 @@ for (const m of recipeSrc.matchAll(/^    id: '([\w-]+)',\n    section: ['"`]([^'
   const at = recipeSrc.indexOf(`    id: '${id}',`)
   const end = recipeSrc.indexOf('\n  },', at)
   const block = recipeSrc.slice(at, end === -1 ? at + 8000 : end)
-  const cls = block.match(/^\.([a-z][\w-]*)/m)?.[1] ?? null
+  /* ⚠️ THE FIRST SELECTOR IS NOT ALWAYS THE COMPONENT. `passwordinput`'s recipe
+   * opens with `.pwinput__eye` — the reveal BUTTON — so the component was judged
+   * on its own decoration and came back sourceless while it is literally
+   * <input type="password">. Prefer the class that reads like the id, then a
+   * root-looking one, and only then the first. */
+  const all = [...block.matchAll(/^\.([a-z][\w-]*)/gm)].map((m) => m[1])
+  const key = id.replace(/[-_]/g, '')
+  const roots = all.filter((c) => !c.includes('__') && !c.includes('--'))
+  /* And if the recipe defines NO root class at all — `passwordinput` styles only
+   * .pwinput__eye, .pwinput__field, .pwinput__bar — the BEM base of the first
+   * one is the root by construction. That is a fact about the class name, not a
+   * guess: `.pwinput__eye` belongs to `.pwinput` and nothing else. */
+  const bemBase = all[0] ? all[0].split('__')[0].split('--')[0] : null
+  const cls = all.find((c) => c.replace(/[-_]/g, '') === key)
+    ?? roots.find((c) => key.includes(c.replace(/[-_]/g, '')))
+    ?? roots.sort((a, b) => a.length - b.length)[0]
+    ?? bemBase ?? all[0] ?? null
   RECIPES.push({ id, section, cls })
 }
 
@@ -72,8 +88,15 @@ for (const m of apgSrc.matchAll(/^  '?([\w-]+)'?: \{\n([\s\S]*?)\n  \},$/gm)) {
  * the two agree by construction rather than by coincidence. */
 const norm = (s) => s.toLowerCase().replace(/[\s-_]/g, '').replace(/(\w+?)(e|er)?(s|ing)$/, '$1')
 const OPENUI = {}
+/* ⚠️ NO 30% BAR HERE. That threshold belongs to the NAMING gate, which asks "is
+ * this the word the field uses" — below it the field genuinely disagrees and the
+ * name is ours. Provenance asks something else: does the field ship this concept
+ * at all. "7 of 27 systems" is weaker evidence than "25 of 27" and it is still
+ * evidence, so every surveyed concept counts and the number is printed. */
 for (const [concept, v] of Object.entries(openui.names)) {
-  if (v.pct >= 30) OPENUI[norm(concept)] = { ...v, concept }
+  for (const k of [norm(concept), concept.toLowerCase().replace(/[\s-_]/g, '')]) {
+    if (!OPENUI[k] || OPENUI[k].pct < v.pct) OPENUI[k] = { ...v, concept }
+  }
 }
 
 /* ---- layer 4 · the service systems --------------------------------------- *
@@ -148,7 +171,12 @@ const measured = await page.evaluate((classes) => {
     if (!cls) continue
     const el = document.querySelector('.' + cls)
     if (!el) { out[cls] = null; continue }
-    out[cls] = { tag: el.tagName, type: el.getAttribute('type') ?? null }
+    /* A field component's primary class is its WRAPPER — .numinput, .pwinput —
+     * and a wrapper being a <div> is correct. The type claim is about the input
+     * INSIDE it, so both are recorded and the check below asks the right one. */
+    const inner = el.matches('input') ? el : el.querySelector('input')
+    out[cls] = { tag: el.tagName, type: el.getAttribute('type') ?? null,
+                 innerTag: inner ? inner.tagName : null, innerType: inner ? inner.getAttribute('type') : null }
   }
   return out
 }, RECIPES.map((r) => r.cls))
@@ -175,8 +203,15 @@ for (const r of RECIPES) {
    * platform element is the provenance (why this exists at all); RENDERING it is
    * conformance to the layer-1 rule. `kbd` has <kbd> as its source and does not
    * use it — it belongs in layer 1 AND in the violations, not in the cut list. */
-  const namesPlatform = Object.entries(PLATFORM).find(([tag, v]) =>
-    norm(r.id) === v.concept || norm(r.section) === v.concept || norm(r.id) === norm(tag))
+  /* The TYPE is part of the element's identity: a phone field is
+   * <input type="tel"> and nothing else, so a component named for one is checked
+   * against the type as well as the tag. */
+  const INPUT_TYPE = { passwordinput: 'password', phoneinput: 'tel', searchinput: 'search', numberinput: 'number' }
+  const wantType = INPUT_TYPE[r.id]
+  const namesPlatform = wantType
+    ? ['INPUT', { el: `<input type="${wantType}">`, concept: 'input', type: wantType }]
+    : Object.entries(PLATFORM).find(([tag, v]) =>
+        norm(r.id) === v.concept || norm(r.section) === v.concept || norm(r.id) === norm(tag))
   const plat = dom && PLATFORM[dom.tag]
   const rendersItsOwn = plat && (norm(r.id).includes(plat.concept) || norm(r.section).includes(plat.concept)
       || plat.concept.includes(norm(r.id)) || plat.concept.includes(norm(r.section)))
@@ -220,8 +255,17 @@ for (const r of RECIPES) {
    * defect. This is the class `.numinput` belonged to: a spinbutton built on a
    * text field. Reported separately because it is the most actionable thing the
    * derivation produces. */
-  if (namesPlatform && dom && dom.tag !== namesPlatform[0]) {
-    violations.push({ ...r, wants: namesPlatform[1].el, renders: dom.tag })
+  if (namesPlatform && dom) {
+    const want = namesPlatform[1]
+    if (want.type) {
+      // A typed field: judge the input, wherever it sits.
+      if (dom.innerTag !== 'INPUT' || dom.innerType !== want.type) {
+        violations.push({ ...r, wants: want.el,
+          renders: dom.innerTag ? `<${dom.innerTag.toLowerCase()} type="${dom.innerType ?? '(none)'}">` : 'no input at all' })
+      }
+    } else if (dom.tag !== namesPlatform[0]) {
+      violations.push({ ...r, wants: want.el, renders: `<${dom.tag.toLowerCase()}>` })
+    }
   }
 }
 
