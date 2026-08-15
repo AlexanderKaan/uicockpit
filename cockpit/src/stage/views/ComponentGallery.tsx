@@ -1910,9 +1910,9 @@ function FormPanelCard() {
             </label>
             <div className="lab"><span>Seats</span>
               <div className="numinput">
-                <button className="numinput__step" onClick={() => setQty((n) => Math.max(1, n - 1))} aria-label="Decrement">−</button>
-                <input className="numinput__field" value={qty} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setQty(n) }} aria-label="Seats" />
-                <button className="numinput__step" onClick={() => setQty((n) => n + 1)} aria-label="Increment">+</button>
+                <button className="numinput__step" onClick={() => setQty((n) => Math.max(1, n - 1))} disabled={qty <= 1} aria-label="Decrease seats">−</button>
+                <input className="numinput__field" type="number" inputMode="numeric" min={1} max={99} step={1} value={qty} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setQty(Math.min(99, Math.max(1, n))) }} aria-label="Seats" />
+                <button className="numinput__step" onClick={() => setQty((n) => Math.min(99, n + 1))} disabled={qty >= 99} aria-label="Increase seats">+</button>
               </div>
             </div>
             <div className="lab formpanel__full"><span>Phone (billing alerts)</span>
@@ -4462,25 +4462,83 @@ function FileGridCard() {
  * 3-5 tabs onderaan met icon+label, active tab krijgt primary color.
  * Anders dan onze sidebar nav: mobiel-formaat, equal-width grid, label
  * onder icon (Netflix/IMDb pattern). */
+/* The bounds live in ONE place and both the input and the buttons read them, so
+   the platform's clamp and our disabled state can never disagree. They used to:
+   Math.max(0, n-1) in the handler with nothing on the input and nothing on the
+   button, so at zero the minus stayed lit and did nothing. */
+const QTY = { min: 1, max: 99, step: 1 }
+const PX = { min: 8, max: 96, step: 1 }
+
 function NumberInputCard() {
   const [v, setV] = useState(12)
   const [px, setPx] = useState(16)
+  const clamp = (n: number, b: { min: number; max: number }) => Math.min(b.max, Math.max(b.min, n))
+  /* type="number" gives Up/Down for free but NOT Page Up/Page Down or Home/End,
+     and our APG anchor declares all three. Rather than quietly drop the two the
+     platform withholds, add them — it is six lines, and the alternative is a
+     documentation page that promises keys nobody implemented. That gap is
+     exactly what audit:promises exists to refuse. */
+  const spin = (b: { min: number; max: number; step: number }, set: (f: (n: number) => number) => void) =>
+    (e: ReactKeyboardEvent<HTMLInputElement>) => {
+      const jump = b.step * 10
+      if (e.key === 'PageUp') { e.preventDefault(); set((n) => clamp(n + jump, b)) }
+      else if (e.key === 'PageDown') { e.preventDefault(); set((n) => clamp(n - jump, b)) }
+      else if (e.key === 'Home') { e.preventDefault(); set(() => b.min) }
+      else if (e.key === 'End') { e.preventDefault(); set(() => b.max) }
+    }
   return (
     <Card title="Quantity" desc="Adjust amounts with steppers.">
+      <label className="lab" htmlFor="ni-qty">Seats</label>
       <div className="numinput">
-        <button className="numinput__step" onClick={() => setV((n) => Math.max(0, n - 1))} aria-label="Decrement">−</button>
-        <input className="numinput__field" value={v} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setV(n) }} aria-label="Quantity" />
-        <button className="numinput__step" onClick={() => setV((n) => n + 1)} aria-label="Increment">+</button>
+        <button
+          className="numinput__step"
+          onClick={() => setV((n) => clamp(n - QTY.step, QTY))}
+          disabled={v <= QTY.min}
+          aria-label="Decrease seats"
+        >−</button>
+        {/* type="number" IS the spinbutton — Up/Down, the numeric keyboard and the
+            announced range come from the browser. The recipe's APG anchor claims
+            that pattern; before this it was a bare text input and claimed it falsely. */}
+        <input
+          id="ni-qty"
+          className="numinput__field"
+          type="number"
+          inputMode="numeric"
+          min={QTY.min}
+          max={QTY.max}
+          step={QTY.step}
+          value={v}
+          onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setV(clamp(n, QTY)) }}
+          onKeyDown={spin(QTY, setV)}
+        />
+        <button
+          className="numinput__step"
+          onClick={() => setV((n) => clamp(n + QTY.step, QTY))}
+          disabled={v >= QTY.max}
+          aria-label="Increase seats"
+        >+</button>
       </div>
+      <label className="lab" htmlFor="ni-px">Font size</label>
       <div className="numinput numinput--with-suffix">
-        <input className="numinput__field" value={px} onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setPx(n) }} aria-label="Size in pixels" />
-        <span className="numinput__suffix">px</span>
+        <input
+          id="ni-px"
+          className="numinput__field"
+          type="number"
+          inputMode="numeric"
+          min={PX.min}
+          max={PX.max}
+          step={PX.step}
+          value={px}
+          onChange={(e) => { const n = parseInt(e.target.value, 10); if (!isNaN(n)) setPx(clamp(n, PX)) }}
+          onKeyDown={spin(PX, setPx)}
+        />
+        <span className="numinput__suffix" aria-hidden="true">px</span>
         <div className="numinput__steps">
-          <button className="numinput__chev" onClick={() => setPx((n) => n + 1)} aria-label="Increment">
-            <svg width="9" height="6" viewBox="0 0 10 6"><path d="M1 5 L5 1.5 L9 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <button className="numinput__chev" onClick={() => setPx((n) => clamp(n + PX.step, PX))} disabled={px >= PX.max} aria-label="Increase font size">
+            <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 5 L5 1.5 L9 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
-          <button className="numinput__chev" onClick={() => setPx((n) => Math.max(0, n - 1))} aria-label="Decrement">
-            <svg width="9" height="6" viewBox="0 0 10 6"><path d="M1 1.5 L5 5 L9 1.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <button className="numinput__chev" onClick={() => setPx((n) => clamp(n - PX.step, PX))} disabled={px <= PX.min} aria-label="Decrease font size">
+            <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1.5 L5 5 L9 1.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
         </div>
       </div>

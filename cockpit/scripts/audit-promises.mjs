@@ -1,0 +1,308 @@
+#!/usr/bin/env node
+/**
+ * audit:promises — the claims the kit makes about itself, executed.
+ *
+ *   npm run dev  &&  npm run audit:promises
+ *
+ * 🚨 READ THE SCOPE BEFORE READING THE OUTPUT. The first version of this file
+ * got its own premise wrong and it is worth keeping the correction, because the
+ * mistake is the kind a confident gate makes.
+ *
+ * It was built to assert that every key listed in src/kit/apg.ts works — and
+ * reported 58 of 59 components as publishing "a behaviour contract they do not
+ * keep". apg.ts says, in its own header: "We ship CSS over semantic HTML — the
+ * keyboard behaviour below is what the CONSUMER owes, not what our stylesheet
+ * performs." The kit never promised those keys. A gate that reports 58 of 59
+ * failures is reporting on itself; the file it was auditing had stated the scope
+ * in writing the whole time and the gate had not read it.
+ *
+ * WHAT IS ACTUALLY OURS, and what this checks now:
+ *
+ *  1. THE `free:` CLAIM. Where an anchor says the platform gives the behaviour
+ *     for free — `<input type="number"> gives the keys` — our own demo had
+ *     better be using that platform element. `.numinput` was an <input> with no
+ *     type at all: a text field, so not one of the Spinbutton keys worked, in a
+ *     component whose anchor said they came free. THAT is a real broken promise,
+ *     and it is the defect this file was worth writing for.
+ *
+ *  2. THE DECLARED ARIA. Roles and states are markup, and markup is what we
+ *     ship examples of. A demo that omits them teaches the omission.
+ *
+ *  3. THE KEYS, reported as INFORMATION, not failure: "the demo does not
+ *     show this behaviour." Useful for deciding which demos to wire up. Not a
+ *     conformance claim, because the kit makes none.
+ *
+ * ⚠️ AND THE ORACLE IS WEAK ON PURPOSE. It presses the key and asks whether
+ * anything observable moved. It cannot tell whether the key did the RIGHT thing.
+ * It also cannot tell "not implemented" from "the component is not in the state
+ * this key applies to" — Escape on a dialog that is not open correctly does
+ * nothing. Both are reported together and neither fails the build.
+ *
+ * Getting here took four corrections to the meter, all the same shape: a proxy
+ * measured instead of the concept. An implicit role read as a missing attribute.
+ * A native checkbox's `checked` PROPERTY read as an attribute. <summary> and
+ * <a href> left out of "focusable" because they carry no tabindex. And a
+ * 6000-character window that ran past the end of one recipe into the next, so
+ * the Checkbox pattern was being pressed at a number field.
+ */
+import { chromium } from '@playwright/test'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+
+const HERE = dirname(fileURLToPath(import.meta.url))
+const JSON_OUT = process.argv.includes('--json')
+const ONLY = process.argv.find((a) => a.startsWith('--only='))?.slice(7)
+
+/* ---- The declarations, parsed from the source that renders them ------------
+ * apg.ts is TypeScript, so it is read as text rather than imported — the same
+ * shape the doc page consumes, so a drift between them is impossible. */
+const apgSrc = readFileSync(join(HERE, '../src/kit/apg.ts'), 'utf8')
+
+function parseAnchors(src) {
+  const out = {}
+  // Each entry: `  id: {` … `  },` at two-space indent.
+  const re = /^  '?([\w-]+)'?: \{\n([\s\S]*?)\n  \},$/gm
+  for (const m of src.matchAll(re)) {
+    const [, id, body] = m
+    const pattern = body.match(/pattern: '([^']*)'/)?.[1]
+    if (!pattern) continue
+    const keysBlock = body.match(/keys: \[([\s\S]*?)\],\n    (?:aria|free|note):/)?.[1]
+      ?? body.match(/keys: \[([\s\S]*?)\],?\s*$/m)?.[1] ?? ''
+    const keys = [...keysBlock.matchAll(/\['([^']+)',\s*'([^']*)'\]/g)].map((k) => ({ combo: k[1], effect: k[2] }))
+    const ariaBlock = body.match(/aria: \[([\s\S]*?)\],\n/)?.[1] ?? ''
+    const aria = [...ariaBlock.matchAll(/'([^']*)'/g)].map((a) => a[1])
+    out[id] = { pattern, keys, aria }
+  }
+  return out
+}
+const ANCHORS = parseAnchors(apgSrc)
+
+/* The element that stands for a recipe: its FIRST class selector. Derived, so a
+ * new recipe needs no registration here — the moment it declares an APG anchor
+ * it is checked. */
+const recipeSrc = readFileSync(join(HERE, '../src/kit/recipes/index.ts'), 'utf8')
+function primaryClass(id) {
+  const at = recipeSrc.indexOf(`    id: '${id}',`)
+  if (at === -1) return null
+  /* Bounded by the recipe's OWN block. A fixed 6000-char window ran past the end
+   * of `form-primitives` into the next recipe and returned `.numinput` — so the
+   * Checkbox pattern was being pressed at a number field, and reported dead. A
+   * derivation that can silently read the neighbour is not a derivation. */
+  const end = recipeSrc.indexOf("\n  },", at)
+  const block = recipeSrc.slice(at, end === -1 ? at + 6000 : end)
+  return block.match(/^\.([a-z][\w-]*)/m)?.[1] ?? null
+}
+
+/* Declared ARIA, reduced to the tokens a DOM can be asked about. The prose
+ * around them ("or a native number input") is guidance for a human and is
+ * deliberately not parsed as a requirement. */
+function ariaTokens(list) {
+  const roles = new Set()
+  const attrs = new Set()
+  for (const line of list) {
+    for (const m of line.matchAll(/role="([\w-]+)"/g)) roles.add(m[1])
+    for (const m of line.matchAll(/\b(aria-[a-z]+)/g)) attrs.add(m[1])
+  }
+  return { roles: [...roles], attrs: [...attrs] }
+}
+
+/* Key names APG writes as prose → what Playwright presses. */
+const KEYMAP = {
+  up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
+  'page up': 'PageUp', 'page down': 'PageDown', home: 'Home', end: 'End',
+  enter: 'Enter', space: ' ', escape: 'Escape', esc: 'Escape', tab: 'Tab',
+  backspace: 'Backspace', delete: 'Delete',
+}
+function pressable(combo) {
+  return combo.split('/').map((s) => s.trim().toLowerCase())
+    .map((s) => KEYMAP[s]).filter(Boolean)
+}
+
+const targets = Object.entries(ANCHORS)
+  .filter(([id]) => !ONLY || id === ONLY)
+  .map(([id, a]) => ({ id, ...a, cls: primaryClass(id) }))
+  .filter((t) => t.cls)
+
+const browser = await chromium.launch()
+const page = await browser.newPage({ viewport: { width: 1440, height: 1400 } })
+await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+await page.waitForTimeout(800)
+await page.evaluate(() => {
+  for (const el of document.querySelectorAll('[aria-expanded="false"], details:not([open])')) {
+    try { el.tagName === 'DETAILS' ? (el.open = true) : el.click() } catch { /* a trigger that refuses is not a finding */ }
+  }
+})
+await page.waitForTimeout(400)
+
+const findings = []
+const checked = { aria: 0, keys: 0, absent: 0 }
+
+for (const t of targets) {
+  const present = await page.locator(`.${t.cls}`).first().count().catch(() => 0)
+  if (!present) { checked.absent++; findings.push({ id: t.id, kind: 'not-rendered', detail: `.${t.cls} is not on the wall — the promise cannot be checked` }); continue }
+
+  /* ---- 1 · the declared ARIA ---------------------------------------------- */
+  const want = ariaTokens(t.aria)
+  if (want.roles.length || want.attrs.length) {
+    checked.aria++
+    /* AN IMPLICIT ROLE IS A REAL ROLE. The first version looked for
+     * role="spinbutton" as an ATTRIBUTE and reported the number input as
+     * missing it, while <input type="number"> carries that role natively —
+     * which is the entire reason to prefer the platform element. Asking the DOM
+     * for an attribute answers a question about markup; asking for the COMPUTED
+     * role answers the question about accessibility. Playwright's getByRole uses
+     * the browser's own computation, so no implicit-role table lives here to
+     * fall out of date. */
+    const missingRoles = []
+    for (const r of want.roles) {
+      const scope = page.locator('.' + t.cls).first()
+      const inside = await scope.getByRole(r, { includeHidden: true }).count().catch(() => 0)
+      const isSelf = await scope.and(page.getByRole(r, { includeHidden: true })).count().catch(() => 0)
+      if (!inside && !isSelf) missingRoles.push(r)
+    }
+    /* Same correction, one family further: aria-valuenow / -valuemin / -valuemax
+     * are EXPOSED, not written, when the element is <input type="number" min
+     * max>. Checking for the attribute reported the platform element as missing
+     * the very properties it publishes. So the value family is read from the
+     * accessibility tree; the rest stay an attribute question, because
+     * aria-controls and friends have no computed equivalent. */
+    const AX_VALUE = { 'aria-valuenow': 'valuenow', 'aria-valuemin': 'valuemin', 'aria-valuemax': 'valuemax', 'aria-valuetext': 'valuetext' }
+    const axAttrs = want.attrs.filter((a) => AX_VALUE[a])
+    const domAttrs = want.attrs.filter((a) => !AX_VALUE[a])
+    let axMissing = []
+    if (axAttrs.length) {
+      /* page.accessibility is gone from modern Playwright; ariaSnapshot is the
+       * supported route and yields the same answer for the value family, because
+       * a spinbutton renders as `spinbutton "name": <value>` only when the
+       * browser has a value to expose. Ask the CDP-free way instead: the element
+       * either has the DOM attributes OR is a native control whose min/max/value
+       * are set, which is precisely what the browser turns into valuemin/max/now. */
+      axMissing = await page.evaluate(({ cls, attrs }) => {
+        const el = document.querySelector('.' + cls)
+        if (!el) return attrs
+        const NATIVE = { 'aria-valuenow': 'value', 'aria-valuemin': 'min', 'aria-valuemax': 'max' }
+        const candidates = [el, ...el.querySelectorAll('*')]
+        return attrs.filter((a) => !candidates.some((n) => {
+          if (n.hasAttribute(a)) return true
+          const native = NATIVE[a]
+          if (!native) return false
+          // A native range-ish control publishes these from its own attributes.
+          const isRangeish = n.matches('input[type="number"],input[type="range"],progress,meter')
+          return isRangeish && n.hasAttribute(native)
+        }))
+      }, { cls: t.cls, attrs: axAttrs })
+    }
+    const missing = await page.evaluate(({ cls, attrs }) => {
+      const el = document.querySelector('.' + cls)
+      if (!el) return null
+      const has = (sel) => el.matches(sel) || !!el.querySelector(sel) || !!el.closest(sel)
+      return { attrs: attrs.filter((a) => !has('[' + a + ']')).concat([]) }
+    }, { cls: t.cls, attrs: domAttrs })
+    if (missing) missing.attrs = missing.attrs.concat(axMissing)
+    if (missing) missing.roles = missingRoles
+    if (missing && (missing.roles.length || missing.attrs.length)) {
+      findings.push({
+        id: t.id, kind: 'aria-missing', pattern: t.pattern,
+        detail: [...missing.roles.map((r) => `role="${r}"`), ...missing.attrs].join(' · '),
+      })
+    }
+  }
+
+  /* ---- 2 · the declared KEYS ---------------------------------------------- */
+  for (const k of t.keys) {
+    const presses = pressable(k.combo)
+    if (!presses.length) continue
+    checked.keys++
+    const dead = []
+    for (const key of presses) {
+      const changed = await page.evaluate(async ({ cls, role }) => {
+        const root = document.querySelector('.' + cls)
+        if (!root) return null
+        /* FOCUS THE CONTROL THE PATTERN IS ABOUT. Taking the first focusable
+         * descendant put focus on the stepper's MINUS BUTTON and pressed
+         * ArrowUp at it — which correctly does nothing, and was reported as a
+         * dead key on a component that had just been fixed. The spinbutton is
+         * the field, the tablist's keys belong to the tab. Prefer a native form
+         * control or the element carrying the declared role; fall back after. */
+        /* ⚠️ FOCUSABLE IS NOT "HAS A TABINDEX". <summary>, <a href> and <select>
+         * are focusable natively with no attribute at all, and leaving them out
+         * meant every <details>-based component — accordion, disclosure,
+         * tool-call, reasoning — reported "nothing focusable" and was filed as a
+         * dead key. The platform's own focusable set is the list; ours was a
+         * guess at it. */
+        const FOCUSABLE = 'input:not([type="hidden"]),select,textarea,button,a[href],summary,[contenteditable],[tabindex]:not([tabindex="-1"])'
+        const byRole = role ? root.querySelector('[role="' + role + '"]') : null
+        const focusable = (root.matches('input,select,textarea,summary') ? root : null)
+          || byRole
+          || root.querySelector('input:not([type="hidden"]),select,textarea,summary')
+          || (root.matches(FOCUSABLE) ? root : null)
+          || root.querySelector(FOCUSABLE)
+        if (!focusable) return 'no-focusable'
+        focusable.focus()
+        /* ⚠️ THE SNAPSHOT DECIDES WHAT COUNTS AS "SOMETHING HAPPENED", and the
+         * first one was far too narrow: it read the aria-checked ATTRIBUTE and
+         * the value ATTRIBUTE. A native checkbox toggled with Space changes
+         * neither — it changes the `checked` PROPERTY — so every checkbox in the
+         * kit came back as a dead key. 58 of 59 components "failed", which is
+         * impossible data and therefore a statement about the meter.
+         *
+         * It now reads what a person would notice: properties as well as
+         * attributes, <details> open state, the text, how many elements exist
+         * (a menu opening ADDS nodes), scroll position, and where focus went. */
+        const snap = () => {
+          const a = document.activeElement
+          const parts = [a?.tagName + '#' + (a?.id || '') + '.' + (a?.className || ''),
+            String(document.querySelectorAll('*').length), String(root.scrollTop), String(root.scrollLeft)]
+          for (const n of [root, ...root.querySelectorAll('*')]) {
+            parts.push(
+              n.getAttribute('value') ?? '', String(n.value ?? ''),
+              String(n.checked ?? ''), String(n.open ?? ''), String(n.selected ?? ''),
+              n.getAttribute('aria-valuenow') ?? '', n.getAttribute('aria-selected') ?? '',
+              n.getAttribute('aria-expanded') ?? '', n.getAttribute('aria-checked') ?? '',
+              n.getAttribute('aria-pressed') ?? '', n.getAttribute('hidden') ?? '',
+              n.className ?? '',
+            )
+          }
+          parts.push((root.textContent ?? '').replace(/\s+/g, ' ').trim())
+          return parts.join('|')
+        }
+        window.__before = snap()
+        window.__snap = snap
+        return 'ready'
+      }, { cls: t.cls, role: want.roles[0] ?? null })
+      if (changed !== 'ready') { if (changed === 'no-focusable') dead.push(`${key} (nothing focusable)`); continue }
+      await page.keyboard.press(key)
+      await page.waitForTimeout(60)
+      const after = await page.evaluate(() => (window.__snap ? window.__snap() : ''))
+      const before = await page.evaluate(() => window.__before)
+      if (after === before) dead.push(key)
+    }
+    if (dead.length === presses.length) {
+      findings.push({ id: t.id, kind: 'key-dead', pattern: t.pattern, detail: `"${k.combo}" — declared to ${k.effect.toLowerCase()}, changes nothing` })
+    }
+  }
+}
+
+await browser.close()
+
+if (JSON_OUT) { console.log(JSON.stringify({ checked, findings }, null, 2)); process.exit(0) }
+
+console.log(`audit:promises — ${targets.length} recipes declare an APG pattern; ${checked.aria} ARIA claims and ${checked.keys} key claims executed`)
+console.log('Not a review of the components. An execution of the claims they publish.\n')
+
+const byKind = (k) => findings.filter((f) => f.kind === k)
+const show = (title, rows, fmt) => {
+  if (!rows.length) return console.log(`  ✓ ${title} — clean\n`)
+  console.log(`  ✗ ${title} — ${rows.length}`)
+  for (const r of rows) console.log(`      ${fmt(r)}`)
+  console.log()
+}
+show('the demo does not show this declared behaviour (information — the kit ships CSS, the consumer owes the keys)', byKind('key-dead'), (r) => `${r.id} (${r.pattern}): ${r.detail}`)
+show('declared ARIA that is not in the DOM', byKind('aria-missing'), (r) => `${r.id} (${r.pattern}): ${r.detail}`)
+show('declared but not on the wall — unverifiable, not passing', byKind('not-rendered'), (r) => `${r.id}: ${r.detail}`)
+
+const real = byKind('aria-missing').length
+console.log(real
+  ? `audit:promises — ${real} declared-ARIA gap(s). The keys above are information, not failures: the kit ships CSS and says so.`
+  : 'audit:promises — every declared attribute is present. The keys above are demo coverage, not conformance.')

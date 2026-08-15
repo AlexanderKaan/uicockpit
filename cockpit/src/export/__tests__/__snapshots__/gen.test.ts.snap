@@ -2379,6 +2379,10 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "part"
         ]
       },
+      "memorable-date": {
+        "modifiers": [],
+        "parts": []
+      },
       "menu": {
         "modifiers": [
           "check",
@@ -9829,9 +9833,31 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   min-width: 0;
 }
 
-/* === NumberInput (#5) === */
+/* === NumberInput (#5) === THE SPINBUTTON, DONE BY THE PLATFORM.
+ *
+ * This recipe's APG anchor claims the Spinbutton pattern and lists Up/Down,
+ * Page Up/Page Down and Home/End. For a long time the markup was an <input> with
+ * NO type at all — a text field — so not one of those keys did anything. The kit
+ * documented a behaviour contract it did not keep, and the doc page said so in
+ * print on a public URL.
+ *
+ * The fix is not to implement the pattern in JavaScript. type="number" IS the
+ * spinbutton: the browser gives Up/Down, the numeric keyboard, min/max clamping
+ * and the range announced to assistive tech, for free and better than we would.
+ * We supply only what the platform does not: the visual stepper.
+ *
+ * (Which is the opposite call from .memorable-date, deliberately. GOV.UK's
+ * research is that type="number" is WRONG for a date or an account number —
+ * scroll-wheel mutation, leading zeros eaten, no maxlength — so that recipe uses
+ * inputmode="numeric" on a text field. A quantity is the case type="number" was
+ * designed for. Same question, opposite answers, both from the same source.)
+ *
+ * The browser's own spinner is suppressed, because we draw the stepper. */
 .numinput { padding: 0; }
 .numinput__field { font-variant-numeric: tabular-nums; text-align: center; }
+.numinput__field::-webkit-outer-spin-button,
+.numinput__field::-webkit-inner-spin-button { appearance: none; margin: 0; }
+.numinput__field[type='number'] { appearance: textfield; -moz-appearance: textfield; }
 .numinput__step {
   width: var(--k-in-h-default, 40px);
   align-self: stretch;     /* fill the wrapper height so the hover fill reaches the edges */
@@ -9855,8 +9881,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-top-right-radius: calc(var(--k-radius-md) - var(--k-bw, 1px));
   border-bottom-right-radius: calc(var(--k-radius-md) - var(--k-bw, 1px));
 }
-.numinput__step:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.numinput__step:active { color: var(--k-primary-text); }
+.numinput__step:hover:not(:disabled) { background: var(--k-state-hover); color: var(--k-fg); }
+/* PRESS. The old rule recoloured the glyph and nothing else, which on a filled
+   field is close to invisible — the reason the control felt unresponsive. A
+   press now moves the surface, which is what every other control in the kit
+   does. */
+.numinput__step:active:not(:disabled) { background: var(--k-state-press); color: var(--k-primary-text); }
+/* AT THE BOUND, SAY SO. A button that stays lit and does nothing is worse than
+   no button: the person presses it, nothing happens, and there is no way to know
+   whether the control is broken or the value is already at its limit. */
+.numinput__step:disabled { color: var(--k-fg-faint); cursor: not-allowed; background: transparent; }
 .numinput--with-suffix .numinput__field { text-align: left; padding-right: var(--k-s-4); }
 .numinput__suffix {
   padding-right: var(--k-s-8);
@@ -9901,16 +9935,25 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .numinput__steps .numinput__chev:last-child {
   border-bottom-right-radius: calc(var(--k-radius-md) - var(--k-bw, 1px));
 }
-.numinput__chev:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.numinput__chev:active { color: var(--k-primary-text); }  /* press feedback */
+.numinput__chev:hover:not(:disabled) { background: var(--k-state-hover); color: var(--k-fg); }
+.numinput__chev:active:not(:disabled) { background: var(--k-state-press); color: var(--k-primary-text); }
+.numinput__chev:disabled { color: var(--k-fg-faint); cursor: not-allowed; background: transparent; }
 .numinput__chev + .numinput__chev { border-top: var(--k-divider); }
-/* Suppress per-button focus outline — parent .numinput already shows
- * :focus-within ring, so a second outline on chev/step is visual noise.
- * Accessibility: container-level focus indicator covers keyboard users. */
-.numinput__chev:focus,
+/* ⚠️ THESE FOUR SELECTORS USED TO SET outline: none, and the comment justifying
+ * it said the wrapper's :focus-within ring "covers keyboard users". It does not.
+ * The wrapper holds THREE tab stops — minus, field, plus — and the wrapper ring
+ * looks identical for all three, so a keyboard user tabbing through had no way
+ * to tell which control they were on. That is 2.4.7 failing while a comment
+ * claims it passes, which is the worst kind of both.
+ *
+ * The buttons carry their own indicator, drawn INSIDE so it cannot be clipped by
+ * the wrapper and does not fight the wrapper's own ring. */
 .numinput__chev:focus-visible,
-.numinput__step:focus,
-.numinput__step:focus-visible { outline: none; }
+.numinput__step:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 var(--k-ring-w, 2px) var(--k-ring);
+  color: var(--k-fg);
+}
 
 /* === PasswordInput (#6) === */
 .pwinput__eye {
@@ -17807,9 +17850,31 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   min-width: 0;
 }
 
-/* === NumberInput (#5) === */
+/* === NumberInput (#5) === THE SPINBUTTON, DONE BY THE PLATFORM.
+ *
+ * This recipe's APG anchor claims the Spinbutton pattern and lists Up/Down,
+ * Page Up/Page Down and Home/End. For a long time the markup was an <input> with
+ * NO type at all — a text field — so not one of those keys did anything. The kit
+ * documented a behaviour contract it did not keep, and the doc page said so in
+ * print on a public URL.
+ *
+ * The fix is not to implement the pattern in JavaScript. type="number" IS the
+ * spinbutton: the browser gives Up/Down, the numeric keyboard, min/max clamping
+ * and the range announced to assistive tech, for free and better than we would.
+ * We supply only what the platform does not: the visual stepper.
+ *
+ * (Which is the opposite call from .memorable-date, deliberately. GOV.UK's
+ * research is that type="number" is WRONG for a date or an account number —
+ * scroll-wheel mutation, leading zeros eaten, no maxlength — so that recipe uses
+ * inputmode="numeric" on a text field. A quantity is the case type="number" was
+ * designed for. Same question, opposite answers, both from the same source.)
+ *
+ * The browser's own spinner is suppressed, because we draw the stepper. */
 .numinput { padding: 0; }
 .numinput__field { font-variant-numeric: tabular-nums; text-align: center; }
+.numinput__field::-webkit-outer-spin-button,
+.numinput__field::-webkit-inner-spin-button { appearance: none; margin: 0; }
+.numinput__field[type='number'] { appearance: textfield; -moz-appearance: textfield; }
 .numinput__step {
   width: var(--k-in-h-default, 40px);
   align-self: stretch;     /* fill the wrapper height so the hover fill reaches the edges */
@@ -17833,8 +17898,16 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-top-right-radius: calc(var(--k-radius-md) - var(--k-bw, 1px));
   border-bottom-right-radius: calc(var(--k-radius-md) - var(--k-bw, 1px));
 }
-.numinput__step:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.numinput__step:active { color: var(--k-primary-text); }
+.numinput__step:hover:not(:disabled) { background: var(--k-state-hover); color: var(--k-fg); }
+/* PRESS. The old rule recoloured the glyph and nothing else, which on a filled
+   field is close to invisible — the reason the control felt unresponsive. A
+   press now moves the surface, which is what every other control in the kit
+   does. */
+.numinput__step:active:not(:disabled) { background: var(--k-state-press); color: var(--k-primary-text); }
+/* AT THE BOUND, SAY SO. A button that stays lit and does nothing is worse than
+   no button: the person presses it, nothing happens, and there is no way to know
+   whether the control is broken or the value is already at its limit. */
+.numinput__step:disabled { color: var(--k-fg-faint); cursor: not-allowed; background: transparent; }
 .numinput--with-suffix .numinput__field { text-align: left; padding-right: var(--k-s-4); }
 .numinput__suffix {
   padding-right: var(--k-s-8);
@@ -17879,16 +17952,25 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .numinput__steps .numinput__chev:last-child {
   border-bottom-right-radius: calc(var(--k-radius-md) - var(--k-bw, 1px));
 }
-.numinput__chev:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.numinput__chev:active { color: var(--k-primary-text); }  /* press feedback */
+.numinput__chev:hover:not(:disabled) { background: var(--k-state-hover); color: var(--k-fg); }
+.numinput__chev:active:not(:disabled) { background: var(--k-state-press); color: var(--k-primary-text); }
+.numinput__chev:disabled { color: var(--k-fg-faint); cursor: not-allowed; background: transparent; }
 .numinput__chev + .numinput__chev { border-top: var(--k-divider); }
-/* Suppress per-button focus outline — parent .numinput already shows
- * :focus-within ring, so a second outline on chev/step is visual noise.
- * Accessibility: container-level focus indicator covers keyboard users. */
-.numinput__chev:focus,
+/* ⚠️ THESE FOUR SELECTORS USED TO SET outline: none, and the comment justifying
+ * it said the wrapper's :focus-within ring "covers keyboard users". It does not.
+ * The wrapper holds THREE tab stops — minus, field, plus — and the wrapper ring
+ * looks identical for all three, so a keyboard user tabbing through had no way
+ * to tell which control they were on. That is 2.4.7 failing while a comment
+ * claims it passes, which is the worst kind of both.
+ *
+ * The buttons carry their own indicator, drawn INSIDE so it cannot be clipped by
+ * the wrapper and does not fight the wrapper's own ring. */
 .numinput__chev:focus-visible,
-.numinput__step:focus,
-.numinput__step:focus-visible { outline: none; }
+.numinput__step:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 var(--k-ring-w, 2px) var(--k-ring);
+  color: var(--k-fg);
+}
 
 /* === PasswordInput (#6) === */
 .pwinput__eye {
