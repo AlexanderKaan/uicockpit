@@ -620,7 +620,7 @@ function OptionList({
         <button
           key={o.id}
           type="button"
-          className={`fmopt ${o.id === selected ? 'fmopt--on' : ''}`}
+          className={`menu__item fmopt ${o.id === selected ? 'menu__item--on' : ''}`}
           aria-pressed={o.id === selected}
           onClick={() => onPick(o.id)}
           // Sub-blurb (Style kits) is a hover tooltip, not a visible line — keeps the

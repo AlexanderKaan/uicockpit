@@ -54,6 +54,33 @@ body {
 
   return `/* Selected-text gets the brand soft-tint */
 ${s}::selection { background: var(--k-selection, var(--k-primary-soft)); }
+
+/* === The scroll rail, declared ONCE for everything =========================
+   A scrollbar is a property of the THEME, not of a component — the same kind of
+   thing as ::selection directly above. It was being treated as a component
+   detail instead, so .scroll-area carried the treatment, .menu got a copy of
+   it this morning, and every other scrolling surface in the product fell through
+   to the OS default: a heavy platform-grey bar down a light panel, and a black
+   bar through a white one in dark mode.
+
+   Measured rather than assumed — audit:uniformity derives every element that
+   ACTUALLY scrolls and found 8 of 11 untreated, including the week calendar,
+   the data table body, the dialog body and the sheet body. Fixing them one at a
+   time is how you get an eleventh next month.
+
+   The two properties behave differently and the difference matters: per the CSS
+   Scrollbars module, scrollbar-color IS inherited and scrollbar-width is NOT.
+   (This comment claimed both were, the calendar came back themed-but-not-thin,
+   and the measurement corrected the text.) So the colour — the actual complaint,
+   a black bar through a white panel — rides inheritance from the scope root and
+   reaches every descendant that will ever exist; the width needs the same
+   universal reach the reduced-motion guard below already uses.
+
+   Either way there is no list to maintain and nothing for a new component to
+   forget. The ::-webkit- pseudos are neither inherited nor universal and stay
+   per-surface (.scroll-area / .menu) where a thicker, bordered thumb is wanted. */
+${s ? s.trim() : ':root'} { scrollbar-color: var(--k-border) transparent; }
+${s || ':root '}* { scrollbar-width: thin; }
 ${body}
 /* Motion system — three-tier duration scale + direction-aware easings.
    --k-dur-fast (microinteractions)  · --k-dur (standard)  · --k-dur-slow (large surfaces)

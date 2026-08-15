@@ -337,6 +337,26 @@
   gap: 2px;
   width: 232px;
 }
+/* A flyout option === COMPOSES `.menu__item`.
+ *
+ * It used to be a 15-line copy of that recipe — flex, gap, padding, radius,
+ * transparent background, hover tint — and I deleted it as dead code in the same
+ * sweep that removed the unreachable slider, because my regex matched the group
+ * `fmsld|fmslider|fmseg|fmrow__inline|fmopt` and I verified the GROUP rather than
+ * each member. Ten live options in every flyout rendered as unstyled 17px blocks
+ * with the checkmark floating loose. Checking that one member of a batch is dead
+ * is not checking the batch.
+ *
+ * Restoring the copy would have been the easy repair and the wrong one. The
+ * recipe brings more than the deleted rule had: the SM row rhythm
+ * (--k-row-h-sm), the nested radius the parent `.menu` computes so hover corners
+ * curve concentrically, icon sizing, and the roll-down stagger. What stays below
+ * is only the selected state, which the kit expresses as a token pair rather
+ * than as `.fmopt--on { background: var(--app-hover) }` reaching for a chrome
+ * variable — and the kit turned out not to HAVE one, which is the third gap this
+ * dogfooding pass has found. `.menu__item` had only :hover, so a menu of ten
+ * choices could not show which was in force. That now lives in the recipe as
+ * `.menu__item--on` (class or ARIA), and this file carries nothing. */
 .fmopt__viz {
   flex: none;
   display: inline-flex;
@@ -669,7 +689,17 @@
   line-height: 1.2;
 }
 .fp__item:hover { background: var(--app-hover); }
-.fp__item--on { background: var(--app-hover); font-weight: 600; }
+/* The font list's chosen row. It used to be `background: var(--app-hover)` —
+   the HOVER colour used as the SELECTED colour, so the current font was
+   indistinguishable from whatever the mouse happened to be over. Two rows, same
+   paint, no way to tell which one is in force. Now the kit's one selected
+   treatment, the same as every other option list. */
+.fp__item--on {
+  background: var(--k-state-selected-bg);
+  color: var(--k-fg);
+  font-weight: var(--k-weight-semibold);
+  box-shadow: var(--k-selected-edge);
+}
 /* "Custom" tag — sibling of .fp__name (not nested) so it doesn't pick up
    the custom font that .fp__name renders in. Stays in the chrome's own
    neutral type + muted system color so it reads as meta-info, not content. */

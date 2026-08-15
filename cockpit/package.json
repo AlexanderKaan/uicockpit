@@ -45,7 +45,8 @@
     "audit:apg": "node scripts/audit-apg.mjs",
     "a11y:css": "node scripts/a11y-css-criteria.mjs",
     "audit:fonts": "node scripts/audit-fonts.mjs",
-    "check:components": "node scripts/check-components.mjs"
+    "check:components": "node scripts/check-components.mjs",
+    "audit:uniformity": "node scripts/audit-uniformity.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

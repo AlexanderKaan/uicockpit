@@ -53,6 +53,14 @@
   --app-shadow-sm: var(--k-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
   --app-shadow-md: var(--k-shadow-md, 0 8px 24px rgba(0, 0, 0, 0.10));
   --app-shadow-lg: var(--k-shadow-lg, 0 18px 60px rgba(0, 0, 0, 0.25));
+  /* The scroll rail, once, for the whole shell — the chrome is a second consumer
+     of the kit and declares this the same way the preview scope does (see
+     globalLayer). Inherited properties, so every panel, flyout, modal and list
+     inside .app is covered without any of them knowing about it. Before this,
+     the treatment lived on .scroll-area and .menu and nowhere else, which is why
+     a dark OS bar kept turning up in surfaces nobody had thought about. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--k-border, #e3e5ea) transparent;
 }
 
 /* `app-menu-roll` and `fmenu-roll` used to live here. Their comments said they

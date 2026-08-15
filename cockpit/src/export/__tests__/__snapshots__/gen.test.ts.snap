@@ -2423,6 +2423,7 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "modifiers": [
           "check",
           "danger",
+          "on",
           "uncheck"
         ],
         "parts": [
@@ -4167,6 +4168,33 @@ exports[`genCss > matches snapshot for soft + cobalt sample 1`] = `
 
 /* Selected-text gets the brand soft-tint */
 ::selection { background: var(--k-selection, var(--k-primary-soft)); }
+
+/* === The scroll rail, declared ONCE for everything =========================
+   A scrollbar is a property of the THEME, not of a component — the same kind of
+   thing as ::selection directly above. It was being treated as a component
+   detail instead, so .scroll-area carried the treatment, .menu got a copy of
+   it this morning, and every other scrolling surface in the product fell through
+   to the OS default: a heavy platform-grey bar down a light panel, and a black
+   bar through a white one in dark mode.
+
+   Measured rather than assumed — audit:uniformity derives every element that
+   ACTUALLY scrolls and found 8 of 11 untreated, including the week calendar,
+   the data table body, the dialog body and the sheet body. Fixing them one at a
+   time is how you get an eleventh next month.
+
+   The two properties behave differently and the difference matters: per the CSS
+   Scrollbars module, scrollbar-color IS inherited and scrollbar-width is NOT.
+   (This comment claimed both were, the calendar came back themed-but-not-thin,
+   and the measurement corrected the text.) So the colour — the actual complaint,
+   a black bar through a white panel — rides inheritance from the scope root and
+   reaches every descendant that will ever exist; the width needs the same
+   universal reach the reduced-motion guard below already uses.
+
+   Either way there is no list to maintain and nothing for a new component to
+   forget. The ::-webkit- pseudos are neither inherited nor universal and stay
+   per-surface (.scroll-area / .menu) where a thicker, bordered thumb is wanted. */
+:root { scrollbar-color: var(--k-border) transparent; }
+:root * { scrollbar-width: thin; }
 
 /* Body baseline — keeps the system consistent when this file is dropped
    into a fresh project. Override per your reset preference. */
@@ -8548,6 +8576,24 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * earlier \`--k-danger-fg\` value was the FOREGROUND used ON a danger fill
  * (white text on a red button), which rendered invisible white-on-white
  * when applied as \`color:\` on a transparent menu row. */
+/* Selected — THE MENU COULD NOT SAY WHICH OPTION IS THE CURRENT ONE.
+ * Every other selectable in the kit could: .table tbody tr[aria-selected],
+ * .list__item[aria-selected], .segctrl__btn[aria-checked], .toggle[aria-pressed],
+ * .navmenu__item--on. The dropdown — the most-used of all of them — had only
+ * :hover, so a menu of ten choices gave no cue which one was in force. Found by
+ * putting the configurator's own flyouts on this recipe.
+ * Class OR aria, the shape .segctrl__btn already uses, so markup that states the
+ * truth in ARIA gets the visual for free. --k-selected-edge is the depth-
+ * independent cue invariant I2 requires (audit:state-edge). */
+.menu__item--on,
+.menu__item[aria-checked="true"],
+.menu__item[aria-selected="true"],
+.menu__item[aria-pressed="true"] {
+  background: var(--k-state-selected-bg);
+  color: var(--k-fg);
+  font-weight: var(--k-weight-semibold);
+  box-shadow: var(--k-selected-edge);
+}
 .menu__item--danger { color: var(--k-danger-text); }
 .menu__item--danger:hover { background: var(--k-danger-soft); color: var(--k-danger-text); }
 .menu__item--check::before {
@@ -12375,6 +12421,33 @@ buttons/inputs/selects to \`--k-touch-target\` (44px) for WCAG-sized tap areas.
 /* Selected-text gets the brand soft-tint */
 ::selection { background: var(--k-selection, var(--k-primary-soft)); }
 
+/* === The scroll rail, declared ONCE for everything =========================
+   A scrollbar is a property of the THEME, not of a component — the same kind of
+   thing as ::selection directly above. It was being treated as a component
+   detail instead, so .scroll-area carried the treatment, .menu got a copy of
+   it this morning, and every other scrolling surface in the product fell through
+   to the OS default: a heavy platform-grey bar down a light panel, and a black
+   bar through a white one in dark mode.
+
+   Measured rather than assumed — audit:uniformity derives every element that
+   ACTUALLY scrolls and found 8 of 11 untreated, including the week calendar,
+   the data table body, the dialog body and the sheet body. Fixing them one at a
+   time is how you get an eleventh next month.
+
+   The two properties behave differently and the difference matters: per the CSS
+   Scrollbars module, scrollbar-color IS inherited and scrollbar-width is NOT.
+   (This comment claimed both were, the calendar came back themed-but-not-thin,
+   and the measurement corrected the text.) So the colour — the actual complaint,
+   a black bar through a white panel — rides inheritance from the scope root and
+   reaches every descendant that will ever exist; the width needs the same
+   universal reach the reduced-motion guard below already uses.
+
+   Either way there is no list to maintain and nothing for a new component to
+   forget. The ::-webkit- pseudos are neither inherited nor universal and stay
+   per-surface (.scroll-area / .menu) where a thicker, bordered thumb is wanted. */
+:root { scrollbar-color: var(--k-border) transparent; }
+:root * { scrollbar-width: thin; }
+
 /* Body baseline — keeps the system consistent when this file is dropped
    into a fresh project. Override per your reset preference. */
 body {
@@ -16755,6 +16828,24 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * earlier \`--k-danger-fg\` value was the FOREGROUND used ON a danger fill
  * (white text on a red button), which rendered invisible white-on-white
  * when applied as \`color:\` on a transparent menu row. */
+/* Selected — THE MENU COULD NOT SAY WHICH OPTION IS THE CURRENT ONE.
+ * Every other selectable in the kit could: .table tbody tr[aria-selected],
+ * .list__item[aria-selected], .segctrl__btn[aria-checked], .toggle[aria-pressed],
+ * .navmenu__item--on. The dropdown — the most-used of all of them — had only
+ * :hover, so a menu of ten choices gave no cue which one was in force. Found by
+ * putting the configurator's own flyouts on this recipe.
+ * Class OR aria, the shape .segctrl__btn already uses, so markup that states the
+ * truth in ARIA gets the visual for free. --k-selected-edge is the depth-
+ * independent cue invariant I2 requires (audit:state-edge). */
+.menu__item--on,
+.menu__item[aria-checked="true"],
+.menu__item[aria-selected="true"],
+.menu__item[aria-pressed="true"] {
+  background: var(--k-state-selected-bg);
+  color: var(--k-fg);
+  font-weight: var(--k-weight-semibold);
+  box-shadow: var(--k-selected-edge);
+}
 .menu__item--danger { color: var(--k-danger-text); }
 .menu__item--danger:hover { background: var(--k-danger-soft); color: var(--k-danger-text); }
 .menu__item--check::before {

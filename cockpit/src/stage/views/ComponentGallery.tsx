@@ -948,7 +948,7 @@ function NavMenuCard() {
           <button className="navmenu__item" aria-expanded={open} onClick={() => setOpen((v) => !v)}>Products <ChevronSvg size={12} /></button>
           {open && (
             <div className="navmenu__panel menu" role="menu">
-              <button className="menu__item" role="menuitem"><Icon name="grid" /> Overview</button>
+              <button className="menu__item menu__item--on" role="menuitem" aria-current="page"><Icon name="grid" /> Overview</button>
               <button className="menu__item" role="menuitem"><Icon name="chart" /> Analytics</button>
               <button className="menu__item" role="menuitem"><Icon name="cog" /> Settings</button>
             </div>

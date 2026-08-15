@@ -4160,6 +4160,24 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * earlier \`--k-danger-fg\` value was the FOREGROUND used ON a danger fill
  * (white text on a red button), which rendered invisible white-on-white
  * when applied as \`color:\` on a transparent menu row. */
+/* Selected — THE MENU COULD NOT SAY WHICH OPTION IS THE CURRENT ONE.
+ * Every other selectable in the kit could: .table tbody tr[aria-selected],
+ * .list__item[aria-selected], .segctrl__btn[aria-checked], .toggle[aria-pressed],
+ * .navmenu__item--on. The dropdown — the most-used of all of them — had only
+ * :hover, so a menu of ten choices gave no cue which one was in force. Found by
+ * putting the configurator's own flyouts on this recipe.
+ * Class OR aria, the shape .segctrl__btn already uses, so markup that states the
+ * truth in ARIA gets the visual for free. --k-selected-edge is the depth-
+ * independent cue invariant I2 requires (audit:state-edge). */
+.menu__item--on,
+.menu__item[aria-checked="true"],
+.menu__item[aria-selected="true"],
+.menu__item[aria-pressed="true"] {
+  background: var(--k-state-selected-bg);
+  color: var(--k-fg);
+  font-weight: var(--k-weight-semibold);
+  box-shadow: var(--k-selected-edge);
+}
 .menu__item--danger { color: var(--k-danger-text); }
 .menu__item--danger:hover { background: var(--k-danger-soft); color: var(--k-danger-text); }
 .menu__item--check::before {
