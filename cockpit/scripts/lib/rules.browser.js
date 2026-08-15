@@ -307,6 +307,118 @@
       },
     },
 
+    'F-heading-equidistant': {
+      dimension: 'F',
+      title: 'a heading that belongs to neither side',
+      wcag: '—',
+      /* THE ONE FOUNDED PRINCIPLE IN SPACING: proximity. What belongs together
+       * sits closer than what follows. So the check never needs to know whether
+       * a gap should be 24 or 32 — it needs the BINDING to be unambiguous. A
+       * title with 16 above and 16 below joins what precedes exactly as much as
+       * what follows, and the grouping then says nothing at all.
+       *
+       * ⚠️ Not "above must exceed below", which was the first version and is
+       * backwards for a title under an eyebrow: page-head__title measures 2
+       * above and 6 below because the eyebrow BELONGS to it. Direction depends
+       * on what is above; only the ambiguity is universally wrong.
+       *
+       * ⚠️ And measured across wrappers, not within them. Comparing siblings
+       * found six headings in the entire wall, because most titles live inside
+       * a __head box and are therefore not siblings of the content they head. */
+      run: function (root) {
+        const out = []
+        const isHeading = (e) => /^H[1-6]$/.test(e.tagName) ||
+          /(__title|__section-title|__group-title|__legend)$/.test(String(e.className).trim().split(/\s+/)[0] || '')
+        const blocks = [...root.querySelectorAll('*')].filter((e) => {
+          const r = e.getBoundingClientRect()
+          return r.width > 8 && r.height > 4 && !/inline$/.test(getComputedStyle(e).display)
+        })
+        for (const h of root.querySelectorAll('*')) {
+          if (!isHeading(h)) continue
+          const hr = h.getBoundingClientRect()
+          if (hr.height < 4) continue
+          const card = h.closest('[data-card],[data-recipe]')
+          if (!card) continue
+          let above = null
+          let below = null
+          for (const b of blocks) {
+            if (b === h || h.contains(b) || b.contains(h) || !card.contains(b)) continue
+            const r = b.getBoundingClientRect()
+            /* Same column, in EITHER direction. Comparing left edges only put
+             * three headings on the list in the rtl condition and nowhere else,
+             * because right-to-left aligns to the other side — the artefact was
+             * mine, not the kit's. */
+            if (Math.abs(r.left - hr.left) > 40 && Math.abs(r.right - hr.right) > 40) continue
+            if (r.bottom <= hr.top + 1) { if (above === null || r.bottom > above) above = r.bottom }
+            if (r.top >= hr.bottom - 1) { if (below === null || r.top < below) below = r.top }
+          }
+          if (above === null || below === null) continue
+          const gapAbove = Math.round(hr.top - above)
+          const gapBelow = Math.round(below - hr.bottom)
+          if (gapAbove < 4 || gapBelow < 4) continue               // touching: no grouping claim
+          const ratio = Math.max(gapAbove, gapBelow) / Math.min(gapAbove, gapBelow)
+          if (ratio >= 1.25) continue                              // the binding is clear
+          out.push({ component: componentOf(h), kit: inKit(h), el: label(h),
+            detail: gapAbove + 'px above and ' + gapBelow + 'px below — it binds to both sides equally, so it groups nothing' })
+        }
+        return out
+      },
+    },
+
+    'F-companion-out-of-band': {
+      dimension: 'F',
+      title: 'an avatar or icon that belongs to neither ladder',
+      wcag: '—',
+      /* Alexander's case: an avatar beside a button that is visibly too small
+       * for it. The threshold is DERIVED rather than chosen, which is what makes
+       * this a check instead of an opinion — the kit has two ladders, icons and
+       * control heights, and a companion whose size falls in the gap BETWEEN
+       * them is neither an icon nor a control-height element. It has no band.
+       *
+       * Measured: the kit has NO --k-avatar-* token at all, and avatars render
+       * at 22, 30, 32, 36 and 44. Five sizes, nothing governing them — which is
+       * the root cause rather than a symptom, and why this keeps happening. */
+      run: function (root) {
+        const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+        const cs0 = getComputedStyle(root)
+        const read = (n) => { const raw = cs0.getPropertyValue(n).trim(); const v = parseFloat(raw); return isNaN(v) ? null : Math.round(/rem/.test(raw) ? v * rootPx : v) }
+        const icons = ['--k-icon-xs', '--k-icon-sm', '--k-icon-md', '--k-icon-lg'].map(read).filter((v) => v !== null)
+        const controls = ['--k-btn-h-default', '--k-in-h-default', '--k-row-h-md', '--k-control-h-md'].map(read).filter((v) => v !== null)
+        if (!icons.length || !controls.length) return []
+        const iconMax = Math.max.apply(null, icons)
+        const controlMin = Math.min.apply(null, controls)
+        if (controlMin - iconMax < 8) return []                    // no gap to fall into
+
+        /* ⚠️ The first version required the companion to sit in the SAME ROW as
+         * a control, and found nothing — because in the case that prompted this
+         * the avatars are stacked ABOVE the button, not beside it. The band gap
+         * is the finding on its own; a neighbouring control is evidence, not a
+         * precondition. */
+        const out = []
+        const seen = new Set()
+        for (const k of root.querySelectorAll('.avatar, [class*="avatar"], [class*="thumb"]')) {
+          const h = Math.round(k.getBoundingClientRect().height)
+          if (h <= iconMax || h >= controlMin) continue            // it has a band
+          const card = k.closest('[data-card],[data-recipe]')
+          const near = card && card.querySelector('button, input, .btn, .in, .select-trigger')
+          const ch = near ? Math.round(near.getBoundingClientRect().height) : null
+          const key = componentOf(k) + '|' + label(k) + '|' + h
+          if (seen.has(key)) continue
+          seen.add(key)
+          out.push({ component: componentOf(k), kit: inKit(k), el: label(k),
+            detail: h + 'px — no --k-avatar-* ladder exists, so this size is ad hoc; it falls between the icon ladder (max ' +
+              iconMax + ') and the control ladder (min ' + controlMin + '), belonging to neither' +
+              (ch ? ', beside a ' + ch + 'px control' : '') })
+        }
+        /* ⚠️ READ THIS AS ONE FINDING, not as one per avatar. Every instance has
+         * the same cause: the kit ships --k-icon-* and --k-btn-h-* but nothing
+         * for avatars, so each usage picks its own number and they land at 22,
+         * 30, 32, 36 and 44. The fix is a ladder, after which this rule becomes
+         * what it should be — a check that an avatar is ON it. */
+        return out
+      },
+    },
+
     /* ── C · perception, where it is OUR floor rather than the law's ──────── */
 
     'C-target-under-floor': {
