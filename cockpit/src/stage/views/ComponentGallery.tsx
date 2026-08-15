@@ -4927,7 +4927,12 @@ function CodeBlockCard() {
             <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
           </button>
         </div>
-        <pre className="codeblock__pre">
+        {/* tabindex + a role and a name, because this box scrolls sideways when the
+            code is wider than it is. A scroll container with no focusable content
+            cannot be reached by keyboard at all — WCAG 2.1.1, Level A — and it only
+            shows up at widths where the code actually overflows, which is why a
+            scan pinned at 1440px never saw it. */}
+        <pre className="codeblock__pre" tabIndex={0} role="region" aria-label="Code sample, scrollable">
           {lines.map((line, i) => (
             <code key={i} className="codeblock__line">
               <span className="codeblock__gutter">{i + 1}</span>

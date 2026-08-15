@@ -573,7 +573,7 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   sparkline: 'A trend glyph. It needs the trend in words beside it ("up 12% this week"); on its own it is decoration and takes aria-hidden.',
   kbd: 'A key name. <kbd>. The trap is symbols — "⌘K" needs to be readable, not a glyph a screen reader spells out or skips.',
   code: 'An inline code span. <code>.',
-  codeblock: 'A code block. <pre><code>, with a language label as text. The copy button is a plain button that must confirm what it did in a live region.',
+  codeblock: 'A code block. <pre><code>, with a language label as text. The copy button is a plain button that must confirm what it did in a live region. And the <pre> itself needs tabindex="0" with a role and a name: it scrolls sideways whenever the code is wider than the box, and a scroll container with no focusable content cannot be reached by keyboard at all (WCAG 2.1.1, Level A). Found here for real — and only at widths where the code overflows, which a scan pinned at one viewport never reaches.',
   citation: 'A source reference. A link with a name that identifies the source, not "[1]" — a citation list read as bracketed numbers is a list of nothing.',
   message: 'A chat turn. Who is speaking must be in text, not conveyed by which side of the screen it sits on.',
   'inline-status-meta-micro-components': 'Small pieces of meta text. Each carries its meaning in words; that is the whole contract.',
