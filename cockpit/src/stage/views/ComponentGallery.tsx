@@ -125,15 +125,11 @@ const CARD_KEYWORDS: Record<string, string> = {
   InfoCardCard: 'Hosting details info card definition',
   // — Blocks / composed —
   FormPanelCard: 'Form panel labeled fields validation action bar',
-  ThreadCard: 'Conversation chat message thread bubble comments',
   ToolCallCard: 'Tool call AI agent function receipt status running done error mcp',
   ReasoningCard: 'Reasoning thinking chain of thought AI disclosure thought for',
-  CitationCard: 'Citation source chip footnote reference grounded AI answer',
   ProseCard: 'Article prose rich text body copy changelog docs',
   FilterBarCard: 'Filter bar toolbar facets',
   InboxFilterCard: 'Inbox filter mail messages',
-  PricingCardCard: 'Plans pricing tiers subscription',
-  PlanCompareCard: 'Plan comparison compare tiers feature matrix upgrade table',
   CodeBlockCard: 'Quick start code block snippet syntax',
   LoginCard: 'Log in sign in auth credentials',
   SignupCard: 'Sign up register create account auth',
@@ -240,10 +236,10 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [FrozenColumnTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
-    [PricingCardCard, 'section'], [PlanCompareCard, 'section'], [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
+    [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'component'], [SheetCard, 'component'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'component'],
-    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ThreadCard, 'component'], [ToolCallCard, 'atom'], [ReasoningCard, 'atom'], [CitationCard, 'atom'], [ProseCard, 'component'],
+    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ToolCallCard, 'atom'], [ReasoningCard, 'atom'], [ProseCard, 'component'],
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
@@ -356,7 +352,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Overlays & disclosure', [PopoverCard, TooltipCard, ToggletipCard, HoverCardCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
-  ['AI thread', [ToolCallCard, ReasoningCard, CitationCard]],
+  ['AI thread', [ToolCallCard, ReasoningCard]],
   ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
   ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
 ]
@@ -4778,33 +4774,6 @@ function ListCard() {
   )
 }
 
-/* === Chat message (Fase J-8) =========================================
- * A conversation thread — incoming bubbles on the surface, the sender's
- * own (.msg--me) on the right in the brand-soft fill. Comment feeds,
- * support chats, AI assistants. */
-function ThreadCard() {
-  return (
-    <Card docId="message" title="Conversation" desc="A chat thread — the three voices: incoming, you, and the assistant.">
-      <div className="thread">
-        <div className="msg msg--me">
-          <div className="msg__head"><span className="msg__name">You</span><span className="msg__time">09:24</span></div>
-          <p className="msg__body">Is the draft contract ready to sign off today?</p>
-        </div>
-        <div className="msg msg--ai">
-          <div className="msg__head"><span className="avatar avatar--sm avatar--a2" aria-hidden="true">L</span><span className="msg__name">Ledger AI</span><span className="msg__time">09:24</span></div>
-          <p className="msg__body">Yes — the redline is clean and both parties initialled every change. You’re clear to sign.</p>
-          <div className="msg__actions">
-            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Copy"><Icon name="copy" /></button>
-            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Regenerate"><Icon name="refresh" /></button>
-            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Good response"><Icon name="thumbUp" /></button>
-            <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Bad response"><Icon name="thumbDown" /></button>
-          </div>
-        </div>
-      </div>
-    </Card>
-  )
-}
-
 /* === Tool call (LP6) =================================================
  * The "assistant used a tool" receipt in an AI thread — a native <details>
  * with mono tool name, args summary and a status dot; open for the raw
@@ -4865,24 +4834,6 @@ function ReasoningCard() {
             <span className="reasoning__chevron"><ChevronSvg size={11} /></span>
           </summary>
         </details>
-      </div>
-    </Card>
-  )
-}
-
-/* === Citation (LP6) ==================================================
- * The inline [n] source chip a grounded answer hangs its claims on — in
- * running text at baseline, or grouped in a .cite-row under the message. */
-function CitationCard() {
-  return (
-    <Card title="Citation" desc="Numbered source chips — inline at baseline, or a source row under the answer.">
-      <p style={{ margin: 0, fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', lineHeight: 1.6 }}>
-        Q2 revenue grew 18% quarter-over-quarter <a className="cite" href="#src-1"><span className="cite__n">1</span></a>,
-        driven mostly by the Scale plan <a className="cite" href="#src-2"><span className="cite__n">2</span></a>.
-      </p>
-      <div className="cite-row">
-        <a className="cite" href="#src-1"><span className="cite__n">1</span> Q2 board deck</a>
-        <a className="cite" href="#src-2"><span className="cite__n">2</span> plans.csv</a>
       </div>
     </Card>
   )
@@ -5016,112 +4967,6 @@ function CodeBlockCard() {
     </Card>
   )
 }
-/* === Pricing (Tier 4 #12) — composed demo, no new CSS ===
- * 3 tiers met featured middle highlighted. Bouwt op .card + .btn + .badge.
- * Layout via flex column; no inline plan-specific CSS. */
-// Plan comparison — a tier × feature matrix (distinct from .pricing's
-// standalone cards): plans across the top, features down the side, one
-// highlighted column drawn behind the recommended tier.
-function PlanCompareCard() {
-  const tiers = [
-    { name: 'Starter', price: '$0', per: '/mo', cta: 'Get started' },
-    { name: 'Pro', price: '$19', per: '/mo', cta: 'Start trial', featured: true },
-    { name: 'Scale', price: '$96', per: '/mo', cta: 'Contact sales' },
-  ]
-  const features: Array<{ label: string; cells: Array<boolean | string> }> = [
-    { label: 'Projects', cells: ['3', 'Unlimited', 'Unlimited'] },
-    { label: 'Monthly tokens', cells: ['10K', '500K', 'Unlimited'] },
-    { label: 'Advanced exports', cells: [false, true, true] },
-    { label: 'Audit log & SSO', cells: [false, false, true] },
-    { label: 'Priority support', cells: [false, true, true] },
-    { label: 'Dedicated CSM', cells: [false, false, true] },
-  ]
-  const hl = tiers.findIndex((t) => t.featured)
-  return (
-    <Card xwide docId="plan-compare" title="Compare plans" desc="A tier × feature matrix with the recommended plan highlighted.">
-      <div className="plan-compare-scroll">
-      <div className="plan-compare" style={{ '--pc-cols': tiers.length, '--pc-rows': features.length, '--pc-hl': hl + 2 } as CSSProperties}>
-        {hl >= 0 && <div className="plan-compare__hl" />}
-        <div className="plan-compare__corner"><span className="plan-compare__eyebrow">Compare</span></div>
-        {tiers.map((t) => (
-          <div className="plan-compare__head" key={t.name}>
-            <span className="plan-compare__name">{t.name}</span>
-            <span className="plan-compare__price"><span className="plan-compare__amount">{t.price}</span><span className="plan-compare__per">{t.per}</span></span>
-            <button className={`btn btn--sm ${t.featured ? 'btn--primary' : 'btn--ghost'}`}>{t.cta}</button>
-          </div>
-        ))}
-        {features.map((f) => (
-          <Fragment key={f.label}>
-            <div className="plan-compare__feat">{f.label}</div>
-            {f.cells.map((c, i) => (
-              <div className="plan-compare__cell" key={i}>
-                {c === true ? <span className="plan-compare__yes"><Icon name="check" /></span>
-                  : c === false ? <span className="plan-compare__no">—</span>
-                  : c}
-              </div>
-            ))}
-          </Fragment>
-        ))}
-      </div>
-      </div>
-    </Card>
-  )
-}
-
-function PricingCardCard() {
-  const [cycle, setCycle] = useState<'monthly' | 'yearly'>('monthly')
-  const yearly = cycle === 'yearly'
-  // Annual = ~2 months free (20% off) — the conventional SaaS discount.
-  const amt = (mo: number) => (mo === 0 ? '$0' : yearly ? `$${Math.round(mo * 12 * 0.8)}` : `$${mo}`)
-  const per = yearly ? '/yr' : '/mo'
-  return (
-    <Card xwide title="Plans" desc="Pick what fits your team.">
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginBottom: 16 }}>
-        <div className="segctrl" role="radiogroup" aria-label="Billing cycle" style={{ width: 'fit-content' }}>
-          <button className={`segctrl__btn ${!yearly ? 'segctrl__btn--on' : ''}`} role="radio" aria-checked={!yearly} onClick={() => setCycle('monthly')}>Monthly</button>
-          <button className={`segctrl__btn ${yearly ? 'segctrl__btn--on' : ''}`} role="radio" aria-checked={yearly} onClick={() => setCycle('yearly')}>Yearly</button>
-        </div>
-        <span style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }}>Save 20% with annual billing</span>
-      </div>
-      <div className="pricing">
-        <div className="pricing__tier">
-          <div className="pricing__name">Starter</div>
-          <div className="pricing__price"><span className="pricing__amount">{amt(0)}</span><span className="pricing__period">{per}</span></div>
-          <ul className="pricing__feats">
-            <li>3 projects</li>
-            <li>10K monthly tokens</li>
-            <li>Community support</li>
-          </ul>
-          <button className="btn btn--ghost" style={{ width: '100%' }}>Get started</button>
-        </div>
-        <div className="pricing__tier pricing__tier--featured">
-          <span className="pricing__badge">Popular</span>
-          <div className="pricing__name">Pro</div>
-          <div className="pricing__price"><span className="pricing__amount">{amt(19)}</span><span className="pricing__period">{per}</span></div>
-          <ul className="pricing__feats">
-            <li>Unlimited projects</li>
-            <li>500K monthly tokens</li>
-            <li>Priority support</li>
-            <li>Advanced exports</li>
-          </ul>
-          <button className="btn btn--primary" style={{ width: '100%' }}>Start free trial</button>
-        </div>
-        <div className="pricing__tier">
-          <div className="pricing__name">Team</div>
-          <div className="pricing__price"><span className="pricing__amount">{amt(49)}</span><span className="pricing__period">{per}</span></div>
-          <ul className="pricing__feats">
-            <li>Everything in Pro</li>
-            <li>Collaboration</li>
-            <li>SSO</li>
-            <li>SLA</li>
-          </ul>
-          <button className="btn btn--ghost" style={{ width: '100%' }}>Contact sales</button>
-        </div>
-      </div>
-    </Card>
-  )
-}
-
 /* === SECTION tier — page-region wrappers (KIT-COVERAGE-AUDIT) =============
  * The header/wrapper grammar you stack to lay out a screen: page-head (screen
  * header), section (titled region), entity-card (identity + key facts). These
@@ -5627,8 +5472,6 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'entity-card', name: 'Entity Card', group: 'Data display', recipeId: 'entity-card', blurb: 'An identity + a few key facts — mark, name, a kebab menu and meta rows.', Preview: EntityCardCard },
   { slug: 'usage-meter', name: 'Usage Meter', group: 'Data display', recipeId: 'usage-meter', blurb: 'A quota bar whose fill shifts to a warning tone past a threshold.', Preview: UsageMeterCard },
   { slug: 'code-block', name: 'Code Block', group: 'Data display', recipeId: 'codeblock', blurb: 'A mono code surface with a header, copy button and language tag.', Preview: CodeBlockCard },
-  { slug: 'pricing', name: 'Pricing', group: 'Data display', recipeId: 'pricing', blurb: 'A pricing tier card — plan, price, feature list and one primary action.', Preview: PricingCardCard },
-  { slug: 'plan-compare', name: 'Plan Comparison', group: 'Data display', recipeId: 'plan-compare', blurb: 'A tier × feature matrix with one highlighted column — the upgrade-decision surface.', Preview: PlanCompareCard },
 
   // Feedback & status
   { slug: 'alert', name: 'Alert', group: 'Feedback', recipeId: 'alert', blurb: 'An inline message in the toned status colours — info, success, warning, danger.', Preview: AlertsCard },
@@ -5667,10 +5510,8 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'resizable', name: 'Resizable', group: 'Layout', recipeId: 'resizable', blurb: 'Drag-to-resize split panes with a grabbable handle.', Preview: ResizableCard },
 
   // AI thread
-  { slug: 'chat', name: 'Chat', group: 'AI', recipeId: 'message', blurb: 'A conversation thread — incoming vs your own message bubbles.', Preview: ThreadCard },
   { slug: 'tool-call', name: 'Tool Call', group: 'AI', recipeId: 'tool-call', blurb: 'An AI agent’s tool receipt — mono name, args, a status dot and an expandable result.', Preview: ToolCallCard },
   { slug: 'reasoning', name: 'Reasoning', group: 'AI', recipeId: 'reasoning', blurb: 'The model’s thinking disclosure — “Thought for 12s”, collapsed by default.', Preview: ReasoningCard },
-  { slug: 'citation', name: 'Citation', group: 'AI', recipeId: 'citation', blurb: 'The inline source chip a grounded answer hangs its claims on.', Preview: CitationCard },
   { slug: 'prose', name: 'Prose', group: 'Content', recipeId: 'prose', blurb: 'A rich-text container that styles raw semantic tags to the kit’s type and rhythm.', Preview: ProseCard },
   { slug: 'attachment', name: 'Attachment', group: 'Content', recipeId: 'attachment-chip-family', blurb: 'A file chip with type icon, name and size — for messages and forms.', Preview: AttachmentChipCard },
 ]

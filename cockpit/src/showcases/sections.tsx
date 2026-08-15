@@ -1,4 +1,4 @@
-import { Fragment, useState, type CSSProperties, type ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../icons/Icon'
 import { ChartFrame } from '../stage/views/ChartFrame'
 import { useModal, useDropdown, Toggle, MenuButton } from '../stage/views/apps/AppHelpers'
@@ -210,42 +210,6 @@ function ChartTabs({ tabs }: { tabs: Array<{ label: string; type: 'bar' | 'area'
 
 /** Plan comparison — the real `.plan-compare` tier × feature matrix. One column
  *  (the featured/current plan) is highlighted by a band behind its cells. */
-function PlanCompareSection({ eyebrow, tiers, features }: { eyebrow?: string; tiers: Array<{ name: string; price: string; per?: string; cta: string; featured?: boolean }>; features: Array<{ label: string; cells: Array<boolean | string> }> }) {
-  const hl = tiers.findIndex((t) => t.featured)
-  return (
-    <div className="card">
-      <div className="plan-compare-scroll">
-      <div className="plan-compare" style={{ '--pc-cols': tiers.length, '--pc-rows': features.length, '--pc-hl': hl + 2 } as CSSProperties}>
-        {hl >= 0 && <div className="plan-compare__hl" />}
-        <div className="plan-compare__corner">{eyebrow && <span className="plan-compare__eyebrow">{eyebrow}</span>}</div>
-        {tiers.map((t) => (
-          <div className="plan-compare__head" key={t.name}>
-            <span className="plan-compare__name">{t.name}</span>
-            <span className="plan-compare__price"><span className="plan-compare__amount">{t.price}</span>{t.per && <span className="plan-compare__per">{t.per}</span>}</span>
-            <button type="button" className={`btn btn--sm ${t.featured ? 'btn--primary' : 'btn--ghost'}`}>{t.cta}</button>
-          </div>
-        ))}
-        {features.map((f) => (
-          <Fragment key={f.label}>
-            <div className="plan-compare__feat">{f.label}</div>
-            {f.cells.map((c, i) => (
-              <div className="plan-compare__cell" key={i}>
-                {c === true ? <span className="plan-compare__yes"><Icon name="check" /></span>
-                  : c === false ? <span className="plan-compare__no">—</span>
-                  : c}
-              </div>
-            ))}
-          </Fragment>
-        ))}
-      </div>
-      </div>
-    </div>
-  )
-}
-
-/** Breakdown — the real `.breakdown` share-bar list. Rows are sorted biggest-
- *  first and each bar's colour comes from the derived --k-chart-1..6 palette,
- *  so a breakdown beside a chart shares its legend ("made of what?"). */
 function BreakdownSection({ title, unit, rows }: { title: string; unit?: string; rows: Array<{ name: string; value: number }> }) {
   const sorted = [...rows].sort((a, b) => b.value - a.value)
   const total = sorted.reduce((s, r) => s + r.value, 0) || 1
@@ -366,8 +330,6 @@ export function renderSection(spec: SectionSpec, key: number) {
       return <ChartTabs key={key} tabs={spec.seed.tabs} />
     case 'breakdown':
       return <BreakdownSection key={key} title={spec.seed.title} unit={spec.seed.unit} rows={spec.seed.rows} />
-    case 'planCompare':
-      return <PlanCompareSection key={key} eyebrow={spec.seed.eyebrow} tiers={spec.seed.tiers} features={spec.seed.features} />
     case 'pageHead': {
       const a = spec.seed.actions
       return (
@@ -401,66 +363,6 @@ export function renderSection(spec: SectionSpec, key: number) {
               </button>
             ))}
           </div>
-        </div>
-      )
-    case 'thread':
-      return (
-        <div className="thread" key={key}>
-          {spec.seed.messages.map((m, i) => (
-            <div className={`msg ${m.me ? 'msg--me' : m.ai ? 'msg--ai' : ''}`} key={i}>
-              <div className="msg__head">
-                {m.avatar && <span className={`avatar avatar--sm avatar--a${(i % 6) + 1}`} aria-hidden="true">{m.avatar}</span>}
-                <span className="msg__name">{m.name}</span>
-                <span className="msg__time">{m.time}</span>
-              </div>
-              {/* LP6 — the AI-furniture tier: the thinking line above the reply… */}
-              {m.reasoning && (
-                <details className="reasoning" style={{ marginBottom: 'var(--k-s-6)' }}>
-                  <summary>
-                    {m.reasoning.label} {m.reasoning.time && <span className="reasoning__time">{m.reasoning.time}</span>}
-                    <span className="reasoning__chevron"><Icon name="chevD" /></span>
-                  </summary>
-                  {m.reasoning.body && <p className="reasoning__body">{m.reasoning.body}</p>}
-                </details>
-              )}
-              {/* …the tool receipts between question and answer… */}
-              {m.tools && m.tools.length > 0 && (
-                <div style={{ display: 'grid', gap: 'var(--k-s-4)', marginBottom: 'var(--k-s-6)' }}>
-                  {m.tools.map((t) => (
-                    <details className={`tool-call tool-call--${t.status}`} key={t.name}>
-                      <summary>
-                        <span className="tool-call__name">{t.name}</span>
-                        <span className="tool-call__meta">{t.meta}</span>
-                        <span className="tool-call__status">{t.status === 'running' ? 'Running' : t.status === 'done' ? 'Done' : 'Failed'}</span>
-                        <span className="tool-call__chevron"><Icon name="chevD" /></span>
-                      </summary>
-                      {t.result && <pre className="tool-call__body">{t.result}</pre>}
-                    </details>
-                  ))}
-                </div>
-              )}
-              <p className="msg__body">{m.body}</p>
-              {/* …and the source chips the answer is grounded on. */}
-              {m.sources && m.sources.length > 0 && (
-                <div className="cite-row">
-                  {m.sources.map((s) => (
-                    <a className="cite" href="#sources" key={s.n} onClick={(e) => e.preventDefault()}>
-                      <span className="cite__n">{s.n}</span> {s.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-              {/* Assistant reply gets the hover action row — copy · regenerate · rate. */}
-              {m.ai && (
-                <div className="msg__actions">
-                  <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Copy"><Icon name="copy" /></button>
-                  <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Regenerate"><Icon name="refresh" /></button>
-                  <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Good response"><Icon name="thumbUp" /></button>
-                  <button type="button" className="btn btn--ghost btn--icon btn--xs" aria-label="Bad response"><Icon name="thumbDown" /></button>
-                </div>
-              )}
-            </div>
-          ))}
         </div>
       )
     case 'composer':
@@ -998,22 +900,6 @@ export function renderSection(spec: SectionSpec, key: number) {
             <button type="button" className="btn btn--ghost">Cancel</button>
             <button type="button" className="btn btn--primary">{spec.seed.submit}</button>
           </div>
-        </div>
-      )
-    case 'pricing':
-      return (
-        <div className="pricing" key={key}>
-          {spec.seed.tiers.map((t) => (
-            <div className={`pricing__tier ${t.featured ? 'pricing__tier--featured' : ''}`} key={t.name}>
-              {t.featured && <span className="pricing__badge">Popular</span>}
-              <div className="pricing__name">{t.name}</div>
-              <div className="pricing__price"><span className="pricing__amount">{t.price}</span><span className="pricing__period">{t.period}</span></div>
-              <ul className="pricing__feats">
-                {t.feats.map((f) => <li key={f}>{f}</li>)}
-              </ul>
-              <button type="button" className={`btn ${t.featured ? 'btn--primary' : 'btn--outline'} btn--block`}>{t.cta}</button>
-            </div>
-          ))}
         </div>
       )
     case 'prose': {

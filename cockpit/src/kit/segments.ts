@@ -59,8 +59,6 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'phoneinput', 'switch-toggle', 'radio-card'],
   // Pricing table, file gallery, the empty-content region, the nav rail — each a
   // full-width slab you stack into a page.
-  pricing: ['card', 'buttons', 'badges-pills'],
-  'plan-compare': ['buttons'],
   sidebar: ['navigation-row', 'avatar', 'badges-pills'],
   'empty-state': ['buttons'],
   'file-grid': ['card', 'badges-pills'],
@@ -147,10 +145,9 @@ export const STANDALONE_ATOMS: readonly string[] = [
   // inline messaging / status — drop in anywhere
   'alert', 'banner', 'inline-status-meta-micro-components', 'attachment-chip-family',
   // a chat/comment bubble — self-contained, stacks into a .thread (Fase J-8)
-  'message',
   // AI-thread furniture (LP6) — self-contained receipts/disclosures that drop
   // into any .msg or feed: the tool receipt, the thinking line, the source chip
-  'tool-call', 'reasoning', 'citation',
+  'tool-call', 'reasoning',
   // a rich-text container — styles raw semantic tags; no single host (Fase J-8)
   'prose',
   // loading & layout utilities

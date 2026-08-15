@@ -802,10 +802,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "list",
         "radio-card",
         "chip",
-        "message",
         "tool-call",
         "reasoning",
-        "citation",
         "prose"
       ],
       "component": [
@@ -847,8 +845,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "calendar-week",
         "calendar-year",
         "sitefooter",
-        "pricing",
-        "plan-compare",
         "file-grid",
         "form-panel",
         "scaffold",
@@ -1432,22 +1428,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "buttons"
         ]
       },
-      "pricing": {
-        "tier": "section",
-        "section": "Pricing",
-        "uses": [
-          "card",
-          "buttons",
-          "badges-pills"
-        ]
-      },
-      "plan-compare": {
-        "tier": "section",
-        "section": "Plan comparison",
-        "uses": [
-          "buttons"
-        ]
-      },
       "twocolumnlayout": {
         "tier": "foundation",
         "section": "TwoColumnLayout",
@@ -1530,11 +1510,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "section": "Pane",
         "uses": []
       },
-      "message": {
-        "tier": "atom",
-        "section": "Chat message",
-        "uses": []
-      },
       "tool-call": {
         "tier": "atom",
         "section": "Tool call",
@@ -1543,11 +1518,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "reasoning": {
         "tier": "atom",
         "section": "Reasoning",
-        "uses": []
-      },
-      "citation": {
-        "tier": "atom",
-        "section": "Citation",
         "uses": []
       },
       "prose": {
@@ -1953,16 +1923,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         "parts": [
           "remove"
         ]
-      },
-      "cite": {
-        "modifiers": [],
-        "parts": [
-          "n"
-        ]
-      },
-      "cite-row": {
-        "modifiers": [],
-        "parts": []
       },
       "cmdp": {
         "modifiers": [
@@ -2494,17 +2454,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
         ]
       },
       "msg": {
-        "modifiers": [
-          "ai",
-          "me"
-        ],
-        "parts": [
-          "actions",
-          "body",
-          "head",
-          "name",
-          "time"
-        ]
+        "modifiers": [],
+        "parts": []
       },
       "nav-group": {
         "modifiers": [],
@@ -2641,27 +2592,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "flag"
         ]
       },
-      "plan-compare": {
-        "modifiers": [],
-        "parts": [
-          "amount",
-          "cell",
-          "corner",
-          "eyebrow",
-          "feat",
-          "head",
-          "hl",
-          "name",
-          "no",
-          "per",
-          "price",
-          "yes"
-        ]
-      },
-      "plan-compare-scroll": {
-        "modifiers": [],
-        "parts": []
-      },
       "popover": {
         "modifiers": [
           "end",
@@ -2675,22 +2605,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "popover-wrap": {
         "modifiers": [],
         "parts": []
-      },
-      "pricing": {
-        "modifiers": [
-          "featured"
-        ],
-        "parts": [
-          "amount",
-          "badge",
-          "cta",
-          "feats",
-          "name",
-          "period",
-          "price",
-          "tagline",
-          "tier"
-        ]
       },
       "processlist": {
         "modifiers": [],
@@ -3071,10 +2985,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "status"
         ]
       },
-      "thread": {
-        "modifiers": [],
-        "parts": []
-      },
       "timefield": {
         "modifiers": [],
         "parts": [
@@ -3247,7 +3157,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "banner",
       "button-group",
       "charcount",
-      "citation",
       "combobox",
       "context-menu",
       "description-list",
@@ -3260,7 +3169,6 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
       "input-otp",
       "interactive-list-row",
       "langnav",
-      "message",
       "navigation-menu",
       "popover",
       "processlist",
@@ -4696,20 +4604,20 @@ dialog::backdrop {
  *   the catalog:
  *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (66): the reusable elements with real
+ * ATOMS — the bare vocabulary (64): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, In-page navigation, Requirements checklist, Process list, Identifier, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
+ *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, In-page navigation, Requirements checklist, Process list, Identifier, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Tool call, Reasoning, Prose
  *
  * COMPONENTS — stand-alone pieces of app (27), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
  *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Memorable date, Dialog, Command palette, Chart, Breakdown, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
  *
- * SECTIONS — the page-region tier (16): adaptive app frames that ARRANGE
+ * SECTIONS — the page-region tier (14): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
  *   arrangement, never look; components slot into panes; panes assemble into PAGES
  *   (your screens).
- *     Page header, Section, Data table, Empty state, Sidebar, App bar, Calendar week, Calendar year, Footer, Pricing, Plan comparison, File grid, Form panel, Adaptive scaffold, Nav suite, Pane
+ *     Page header, Section, Data table, Empty state, Sidebar, App bar, Calendar week, Calendar year, Footer, File grid, Form panel, Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
 
 /* === Composition utilities — the mid-tier "phrase book" =================
@@ -10536,184 +10444,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 }
 .codeblock__text { flex: 1; }
 
-/* === Pricing (#12) === */
-.pricing {
-  /* Self-responsive tier row: auto-fit lays the tiers side-by-side (3-up, the
-     canonical pricing layout) whenever the card is wide enough, and falls back
-     to stacked 1-up in a narrow card — no media query, adapts to the card span. */
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  align-items: start;
-  gap: var(--k-s-8);
-  margin: calc(var(--k-s-4) * -1) 0;
-}
-.pricing__tier {
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-  padding: var(--k-s-12);
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-8);
-  position: relative;
-}
-.pricing__tier--featured {
-  background: var(--k-surface);
-  border: 2px solid var(--k-primary);
-  box-shadow: var(--k-shadow-md);
-}
-.pricing__badge {
-  position: absolute;
-  top: -8px;
-  right: 12px;
-  padding: var(--k-s-2) var(--k-s-8);
-  background: var(--k-primary);
-  color: var(--k-primary-fg);
-  font-size: var(--k-type-caption);
-  font-weight: var(--k-weight-bold);
-  letter-spacing: var(--k-track-eyebrow);
-  /* Marketing tag — follows box radius like .badge (text chip, not a count). */
-  border-radius: var(--k-radius-md);
-}
-.pricing__name {
-  font-size: var(--k-type-eyebrow);
-  font-weight: var(--k-weight-semibold);
-  letter-spacing: var(--k-track-eyebrow);
-  text-transform: uppercase;
-  color: var(--k-fg-muted);
-}
-.pricing__price {
-  display: flex;
-  align-items: baseline;
-  gap: var(--k-s-4);
-}
-.pricing__amount {
-  font-size: var(--k-type-h2);
-  font-weight: var(--k-weight-semibold);
-  font-family: var(--k-font-display);
-  font-variant-numeric: tabular-nums;
-  color: var(--k-fg);
-  letter-spacing: -0.02em;
-}
-.pricing__period {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-}
-.pricing__feats {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-4);
-}
-.pricing__feats li {
-  font-size: var(--k-type-small);
-  color: var(--k-fg);
-  padding-left: var(--k-s-16);
-  position: relative;
-}
-.pricing__feats li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--k-success-text);
-  font-weight: var(--k-weight-semibold);
-}
-/* Tagline + CTA — the parts the a2ui test wanted. The CTA pins to the bottom of
-   the (flex-column) tier so every plan's button aligns across the row, and goes
-   full-width. */
-.pricing__tagline { font-size: var(--k-type-small); color: var(--k-fg-muted); }
-.pricing__cta { margin-top: auto; }
-.pricing__cta .btn { width: 100%; }
-
-/* StatGroup metric strip → unified into the .stat-tile family as
- * .stat-tile-strip / .stat-tile-strip__cell (defined with the stat-tile
- * block above; cells reuse .stat-tile__value / .stat-tile__label). */
-
-/* === Plan comparison (.plan-compare) — a tier × feature matrix ==========
- * The upgrade-decision surface: plans across the top, features down the
- * side, a check / dash / value in each cell, and ONE highlighted column
- * (the current or recommended plan) drawn as a continuous band behind its
- * cells. A CSS grid (not a table) so the highlight can span every row while
- * the columns stay perfectly aligned. On the root set --pc-cols (tier count)
- * and --pc-hl (the 1-based grid column of the highlighted tier = its
- * index + 2, since column 1 is the feature-label rail). */
-/* Scroll wrapper — on a narrow container the matrix scrolls horizontally
-   instead of squishing its columns below readability (the same convention as
-   the data table). Wrap the grid in this on any width-constrained surface. */
-.plan-compare-scroll { overflow-x: auto; }
-.plan-compare {
-  display: grid;
-  /* Keeps the columns readable; below this the wrapper scrolls. */
-  min-width: 30rem;
-  grid-template-columns: 1.3fr repeat(var(--pc-cols, 3), minmax(0, 1fr));
-  /* Rows are made EXPLICIT (header + --pc-rows feature rows) so the highlight
-     band's grid-row: 1 / -1 resolves to the full height — an absolutely-placed
-     item only sees explicit line numbers, and implicit auto-rows wouldn't count. */
-  grid-template-rows: auto repeat(var(--pc-rows, 6), auto);
-  position: relative;
-  align-items: stretch;
-}
-/* The highlight band — sits behind the featured column's cells, top to bottom.
- * position:absolute so it's placed INTO its grid area (the featured column,
- * all rows) without occupying a track for auto-placement — otherwise it would
- * block the featured tier's own header + cells from landing in that column. */
-.plan-compare__hl {
-  position: absolute;
-  inset: 0;
-  grid-row: 1 / -1;
-  grid-column: var(--pc-hl, 2) / span 1;
-  background: var(--k-surface-raised, var(--k-surface));
-  border: 2px solid var(--k-primary);
-  border-radius: var(--k-radius-md);
-  z-index: 0;
-}
-.plan-compare__corner,
-.plan-compare__head,
-.plan-compare__feat,
-.plan-compare__cell { position: relative; z-index: 1; }
-/* Header row — one cell per tier: name, price, CTA. */
-.plan-compare__corner { padding: var(--k-s-12) var(--k-s-10); display: flex; align-items: flex-end; }
-.plan-compare__eyebrow {
-  font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold);
-  letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted);
-}
-.plan-compare__head {
-  display: flex; flex-direction: column; align-items: center; gap: var(--k-s-6);
-  padding: var(--k-s-12) var(--k-s-10); text-align: center;
-}
-.plan-compare__name {
-  font-size: var(--k-type-small); font-weight: var(--k-weight-semibold);
-  letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted);
-}
-.plan-compare__price { display: flex; align-items: baseline; gap: var(--k-s-2); }
-.plan-compare__amount {
-  font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold);
-  font-family: var(--k-font-display); font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em; color: var(--k-fg);
-}
-.plan-compare__per { font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
-.plan-compare__head .btn { width: 100%; margin-top: var(--k-s-2); }
-/* Feature rows — label in the rail, a value under each tier; hairline between. */
-.plan-compare__feat {
-  display: flex; align-items: center;
-  padding: var(--k-s-10);
-  font-size: var(--k-type-small); color: var(--k-fg);
-  border-top: var(--k-hairline, 1px solid var(--k-border));
-}
-.plan-compare__cell {
-  display: flex; align-items: center; justify-content: center;
-  padding: var(--k-s-10);
-  font-size: var(--k-type-small); font-variant-numeric: tabular-nums; color: var(--k-fg);
-  border-top: var(--k-hairline, 1px solid var(--k-border));
-  text-align: center;
-}
-/* Cell marks — a success check for "included", a quiet dash for "not". */
-.plan-compare__yes { color: var(--k-success-text); display: inline-flex; }
-.plan-compare__yes svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
-.plan-compare__no { color: var(--k-fg-faint); }
-
 /* === TwoColumnLayout (#11) — composed demo === */
 .twocol {
   display: grid;
@@ -11442,78 +11172,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   gap: var(--k-gap, var(--k-s-8));
 }
 
-/* === Chat message ===
-   A conversation bubble — a name/time header over the body, on the surface.
-   Stack them in a .thread (a plain vertical-rhythm container) for a chat or
-   comment feed. The modifier flips ONE axis: who is speaking.
-     .msg          → an incoming message (left, neutral surface)
-     .msg--me      → the sender's own message (right, brand-soft fill)
-     .msg--ai      → the assistant's turn (a wider, raised answer-card that
-                     groups its reasoning, tool receipts, reply + actions)
-   The bubble caps its width so a thread reads as a conversation, not full-bleed
-   paragraphs. Everything derives — fill, border and text all from tokens. */
-.thread {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-space, var(--k-s-8));
-}
-.msg {
-  align-self: flex-start;
-  max-width: 85%;
-  border: var(--k-bw) solid var(--k-border);
-  border-radius: var(--k-radius-lg);
-  background: var(--k-surface);
-  padding: var(--k-s-10) var(--k-s-12);
-}
-.msg--me {
-  align-self: flex-end;
-  border-color: var(--k-primary-soft);
-  background: var(--k-primary-soft);
-  color: var(--k-primary-soft-fg);
-}
-.msg__head {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-8);
-  margin-bottom: var(--k-s-4);
-}
-.msg__name { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); }
-/* CP6 — time pushes to the trailing edge so an optional leading .avatar groups
-   with the name (avatar + name left, time right). Was justify-content:space-between
-   on the head; an avatar there would have spread away from the name. */
-.msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); margin-left: auto; }
-/* No opacity on text — it composites the ink toward the bubble and dropped this
- * to 2.81:1. The quieter tier comes from a token that is derived to stay
- * legible on the fill it sits on. */
-.msg--me .msg__time { color: var(--k-primary-soft-fg); }
-.msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
-.msg--me .msg__body { color: inherit; }
-/* The assistant's turn — a distinct THIRD voice. It's not a narrow bubble: an
-   AI answer earns room, so it stretches and sits on a faintly raised surface
-   that groups its reasoning, tool receipts, reply and actions as one card
-   (the Claude/ChatGPT layout: compact user bubbles, full-width AI answers). */
-.msg--ai {
-  align-self: stretch;
-  max-width: 100%;
-  background: var(--k-surface-raised, var(--k-surface));
-  /* An accent left-edge marks the assistant's turn so the answer-card reads as
-     distinct even where surface-raised collapses to the surface (flat Style). */
-  border-inline-start: 2px solid var(--k-primary);
-}
-/* Action row — copy / regenerate / rate an AI reply. Real ghost icon buttons
-   inside; quiet by default (muted), brightening on hover / keyboard focus. */
-.msg__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-2);
-  margin-top: var(--k-s-6);
-  opacity: 0.65;
-  transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease);
-}
-.msg:hover .msg__actions,
-.msg:focus-within .msg__actions { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .msg__actions { transition: none; } }
-
 /* === Tool call ===
    The "assistant used a tool" card in an AI thread — the receipt of an action,
    not a message. A native <details> (zero-JS disclosure): a mono tool name, a
@@ -11633,41 +11291,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   border-left: var(--k-stroke-3, 3px) solid var(--k-border);
   color: var(--k-fg-faint);
   line-height: 1.6;
-}
-
-/* === Citation ===
-   The inline source chip a grounded AI answer hangs its claims on — a numbered
-   pill at text baseline. Anchor or span; the number carries the accent, the
-   label stays quiet. Group under a message with .cite-row.
-     .cite       → the [n] chip: number + optional source label
-     .cite-row   → a wrapping row of sources under the answer */
-.cite {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-4);
-  padding: 0 var(--k-s-6);
-  border: var(--k-bw) solid var(--k-border);
-  border-radius: 999px;
-  background: var(--k-surface);
-  font-size: var(--k-type-caption);
-  line-height: 1.5;
-  color: var(--k-fg-muted);
-  text-decoration: none;
-  vertical-align: baseline;
-  transition: border-color var(--k-dur-fast, 120ms) var(--k-ease, ease),
-              color var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-.cite:hover { border-color: var(--k-primary); color: var(--k-fg); }
-.cite__n {
-  font-variant-numeric: tabular-nums;
-  color: var(--k-primary-text);
-  font-weight: var(--k-weight-semibold);
-}
-.cite-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--k-s-4);
-  margin-top: var(--k-s-6);
 }
 
 /* === Prose ===
@@ -12959,20 +12582,20 @@ dialog::backdrop {
  *   the catalog:
  *     Composition utilities, Button finish, Roll-down item stagger, TwoColumnLayout, Layout primitives
  *
- * ATOMS — the bare vocabulary (66): the reusable elements with real
+ * ATOMS — the bare vocabulary (64): the reusable elements with real
  *   state contracts. Only meaningful inside something larger; these + the tokens
  *   are what guarantee a consumer's UI looks like the preview.
- *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, In-page navigation, Requirements checklist, Process list, Identifier, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose
+ *     Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, In-page navigation, Requirements checklist, Process list, Identifier, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Tool call, Reasoning, Prose
  *
  * COMPONENTS — stand-alone pieces of app (27), composed FROM the atoms — the
  *   surface IS the component (dialog, sidebar, data tiles, auth, …).
  *     Entity card, Action panel, Activity feed, Danger zone, Auth, Lightbox, Calendar, Calendar range, Memorable date, Dialog, Command palette, Chart, Breakdown, Usage meter, Menubar, Resizable, File upload dropzone, Toast stack, Sheet / Drawer, Alert Dialog, Stat tile, Carousel, InfoCard, Timeline, CodeBlock, WizardStepper, Filter bar
  *
- * SECTIONS — the page-region tier (16): adaptive app frames that ARRANGE
+ * SECTIONS — the page-region tier (14): adaptive app frames that ARRANGE
  *   components per container width (scaffold · nav suite · pane). Sections own
  *   arrangement, never look; components slot into panes; panes assemble into PAGES
  *   (your screens).
- *     Page header, Section, Data table, Empty state, Sidebar, App bar, Calendar week, Calendar year, Footer, Pricing, Plan comparison, File grid, Form panel, Adaptive scaffold, Nav suite, Pane
+ *     Page header, Section, Data table, Empty state, Sidebar, App bar, Calendar week, Calendar year, Footer, File grid, Form panel, Adaptive scaffold, Nav suite, Pane
  * ======================================================================== */
 
 /* === Composition utilities — the mid-tier "phrase book" =================
@@ -18799,184 +18422,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 }
 .codeblock__text { flex: 1; }
 
-/* === Pricing (#12) === */
-.pricing {
-  /* Self-responsive tier row: auto-fit lays the tiers side-by-side (3-up, the
-     canonical pricing layout) whenever the card is wide enough, and falls back
-     to stacked 1-up in a narrow card — no media query, adapts to the card span. */
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  align-items: start;
-  gap: var(--k-s-8);
-  margin: calc(var(--k-s-4) * -1) 0;
-}
-.pricing__tier {
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-  padding: var(--k-s-12);
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-8);
-  position: relative;
-}
-.pricing__tier--featured {
-  background: var(--k-surface);
-  border: 2px solid var(--k-primary);
-  box-shadow: var(--k-shadow-md);
-}
-.pricing__badge {
-  position: absolute;
-  top: -8px;
-  right: 12px;
-  padding: var(--k-s-2) var(--k-s-8);
-  background: var(--k-primary);
-  color: var(--k-primary-fg);
-  font-size: var(--k-type-caption);
-  font-weight: var(--k-weight-bold);
-  letter-spacing: var(--k-track-eyebrow);
-  /* Marketing tag — follows box radius like .badge (text chip, not a count). */
-  border-radius: var(--k-radius-md);
-}
-.pricing__name {
-  font-size: var(--k-type-eyebrow);
-  font-weight: var(--k-weight-semibold);
-  letter-spacing: var(--k-track-eyebrow);
-  text-transform: uppercase;
-  color: var(--k-fg-muted);
-}
-.pricing__price {
-  display: flex;
-  align-items: baseline;
-  gap: var(--k-s-4);
-}
-.pricing__amount {
-  font-size: var(--k-type-h2);
-  font-weight: var(--k-weight-semibold);
-  font-family: var(--k-font-display);
-  font-variant-numeric: tabular-nums;
-  color: var(--k-fg);
-  letter-spacing: -0.02em;
-}
-.pricing__period {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-}
-.pricing__feats {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-4);
-}
-.pricing__feats li {
-  font-size: var(--k-type-small);
-  color: var(--k-fg);
-  padding-left: var(--k-s-16);
-  position: relative;
-}
-.pricing__feats li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--k-success-text);
-  font-weight: var(--k-weight-semibold);
-}
-/* Tagline + CTA — the parts the a2ui test wanted. The CTA pins to the bottom of
-   the (flex-column) tier so every plan's button aligns across the row, and goes
-   full-width. */
-.pricing__tagline { font-size: var(--k-type-small); color: var(--k-fg-muted); }
-.pricing__cta { margin-top: auto; }
-.pricing__cta .btn { width: 100%; }
-
-/* StatGroup metric strip → unified into the .stat-tile family as
- * .stat-tile-strip / .stat-tile-strip__cell (defined with the stat-tile
- * block above; cells reuse .stat-tile__value / .stat-tile__label). */
-
-/* === Plan comparison (.plan-compare) — a tier × feature matrix ==========
- * The upgrade-decision surface: plans across the top, features down the
- * side, a check / dash / value in each cell, and ONE highlighted column
- * (the current or recommended plan) drawn as a continuous band behind its
- * cells. A CSS grid (not a table) so the highlight can span every row while
- * the columns stay perfectly aligned. On the root set --pc-cols (tier count)
- * and --pc-hl (the 1-based grid column of the highlighted tier = its
- * index + 2, since column 1 is the feature-label rail). */
-/* Scroll wrapper — on a narrow container the matrix scrolls horizontally
-   instead of squishing its columns below readability (the same convention as
-   the data table). Wrap the grid in this on any width-constrained surface. */
-.plan-compare-scroll { overflow-x: auto; }
-.plan-compare {
-  display: grid;
-  /* Keeps the columns readable; below this the wrapper scrolls. */
-  min-width: 30rem;
-  grid-template-columns: 1.3fr repeat(var(--pc-cols, 3), minmax(0, 1fr));
-  /* Rows are made EXPLICIT (header + --pc-rows feature rows) so the highlight
-     band's grid-row: 1 / -1 resolves to the full height — an absolutely-placed
-     item only sees explicit line numbers, and implicit auto-rows wouldn't count. */
-  grid-template-rows: auto repeat(var(--pc-rows, 6), auto);
-  position: relative;
-  align-items: stretch;
-}
-/* The highlight band — sits behind the featured column's cells, top to bottom.
- * position:absolute so it's placed INTO its grid area (the featured column,
- * all rows) without occupying a track for auto-placement — otherwise it would
- * block the featured tier's own header + cells from landing in that column. */
-.plan-compare__hl {
-  position: absolute;
-  inset: 0;
-  grid-row: 1 / -1;
-  grid-column: var(--pc-hl, 2) / span 1;
-  background: var(--k-surface-raised, var(--k-surface));
-  border: 2px solid var(--k-primary);
-  border-radius: var(--k-radius-md);
-  z-index: 0;
-}
-.plan-compare__corner,
-.plan-compare__head,
-.plan-compare__feat,
-.plan-compare__cell { position: relative; z-index: 1; }
-/* Header row — one cell per tier: name, price, CTA. */
-.plan-compare__corner { padding: var(--k-s-12) var(--k-s-10); display: flex; align-items: flex-end; }
-.plan-compare__eyebrow {
-  font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold);
-  letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted);
-}
-.plan-compare__head {
-  display: flex; flex-direction: column; align-items: center; gap: var(--k-s-6);
-  padding: var(--k-s-12) var(--k-s-10); text-align: center;
-}
-.plan-compare__name {
-  font-size: var(--k-type-small); font-weight: var(--k-weight-semibold);
-  letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-muted);
-}
-.plan-compare__price { display: flex; align-items: baseline; gap: var(--k-s-2); }
-.plan-compare__amount {
-  font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold);
-  font-family: var(--k-font-display); font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em; color: var(--k-fg);
-}
-.plan-compare__per { font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
-.plan-compare__head .btn { width: 100%; margin-top: var(--k-s-2); }
-/* Feature rows — label in the rail, a value under each tier; hairline between. */
-.plan-compare__feat {
-  display: flex; align-items: center;
-  padding: var(--k-s-10);
-  font-size: var(--k-type-small); color: var(--k-fg);
-  border-top: var(--k-hairline, 1px solid var(--k-border));
-}
-.plan-compare__cell {
-  display: flex; align-items: center; justify-content: center;
-  padding: var(--k-s-10);
-  font-size: var(--k-type-small); font-variant-numeric: tabular-nums; color: var(--k-fg);
-  border-top: var(--k-hairline, 1px solid var(--k-border));
-  text-align: center;
-}
-/* Cell marks — a success check for "included", a quiet dash for "not". */
-.plan-compare__yes { color: var(--k-success-text); display: inline-flex; }
-.plan-compare__yes svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
-.plan-compare__no { color: var(--k-fg-faint); }
-
 /* === TwoColumnLayout (#11) — composed demo === */
 .twocol {
   display: grid;
@@ -19705,78 +19150,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   gap: var(--k-gap, var(--k-s-8));
 }
 
-/* === Chat message ===
-   A conversation bubble — a name/time header over the body, on the surface.
-   Stack them in a .thread (a plain vertical-rhythm container) for a chat or
-   comment feed. The modifier flips ONE axis: who is speaking.
-     .msg          → an incoming message (left, neutral surface)
-     .msg--me      → the sender's own message (right, brand-soft fill)
-     .msg--ai      → the assistant's turn (a wider, raised answer-card that
-                     groups its reasoning, tool receipts, reply + actions)
-   The bubble caps its width so a thread reads as a conversation, not full-bleed
-   paragraphs. Everything derives — fill, border and text all from tokens. */
-.thread {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-space, var(--k-s-8));
-}
-.msg {
-  align-self: flex-start;
-  max-width: 85%;
-  border: var(--k-bw) solid var(--k-border);
-  border-radius: var(--k-radius-lg);
-  background: var(--k-surface);
-  padding: var(--k-s-10) var(--k-s-12);
-}
-.msg--me {
-  align-self: flex-end;
-  border-color: var(--k-primary-soft);
-  background: var(--k-primary-soft);
-  color: var(--k-primary-soft-fg);
-}
-.msg__head {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-8);
-  margin-bottom: var(--k-s-4);
-}
-.msg__name { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); }
-/* CP6 — time pushes to the trailing edge so an optional leading .avatar groups
-   with the name (avatar + name left, time right). Was justify-content:space-between
-   on the head; an avatar there would have spread away from the name. */
-.msg__time { font-size: var(--k-type-caption); color: var(--k-fg-muted); margin-left: auto; }
-/* No opacity on text — it composites the ink toward the bubble and dropped this
- * to 2.81:1. The quieter tier comes from a token that is derived to stay
- * legible on the fill it sits on. */
-.msg--me .msg__time { color: var(--k-primary-soft-fg); }
-.msg__body { margin: 0; font-size: var(--k-type-small); line-height: 1.55; color: var(--k-fg-muted); }
-.msg--me .msg__body { color: inherit; }
-/* The assistant's turn — a distinct THIRD voice. It's not a narrow bubble: an
-   AI answer earns room, so it stretches and sits on a faintly raised surface
-   that groups its reasoning, tool receipts, reply and actions as one card
-   (the Claude/ChatGPT layout: compact user bubbles, full-width AI answers). */
-.msg--ai {
-  align-self: stretch;
-  max-width: 100%;
-  background: var(--k-surface-raised, var(--k-surface));
-  /* An accent left-edge marks the assistant's turn so the answer-card reads as
-     distinct even where surface-raised collapses to the surface (flat Style). */
-  border-inline-start: 2px solid var(--k-primary);
-}
-/* Action row — copy / regenerate / rate an AI reply. Real ghost icon buttons
-   inside; quiet by default (muted), brightening on hover / keyboard focus. */
-.msg__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-2);
-  margin-top: var(--k-s-6);
-  opacity: 0.65;
-  transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease);
-}
-.msg:hover .msg__actions,
-.msg:focus-within .msg__actions { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .msg__actions { transition: none; } }
-
 /* === Tool call ===
    The "assistant used a tool" card in an AI thread — the receipt of an action,
    not a message. A native <details> (zero-JS disclosure): a mono tool name, a
@@ -19896,41 +19269,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   border-left: var(--k-stroke-3, 3px) solid var(--k-border);
   color: var(--k-fg-faint);
   line-height: 1.6;
-}
-
-/* === Citation ===
-   The inline source chip a grounded AI answer hangs its claims on — a numbered
-   pill at text baseline. Anchor or span; the number carries the accent, the
-   label stays quiet. Group under a message with .cite-row.
-     .cite       → the [n] chip: number + optional source label
-     .cite-row   → a wrapping row of sources under the answer */
-.cite {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-4);
-  padding: 0 var(--k-s-6);
-  border: var(--k-bw) solid var(--k-border);
-  border-radius: 999px;
-  background: var(--k-surface);
-  font-size: var(--k-type-caption);
-  line-height: 1.5;
-  color: var(--k-fg-muted);
-  text-decoration: none;
-  vertical-align: baseline;
-  transition: border-color var(--k-dur-fast, 120ms) var(--k-ease, ease),
-              color var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-.cite:hover { border-color: var(--k-primary); color: var(--k-fg); }
-.cite__n {
-  font-variant-numeric: tabular-nums;
-  color: var(--k-primary-text);
-  font-weight: var(--k-weight-semibold);
-}
-.cite-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--k-s-4);
-  margin-top: var(--k-s-6);
 }
 
 /* === Prose ===
@@ -20432,7 +19770,7 @@ layout utilities INSTEAD of ad-hoc flex/grid and magic px widths:
 \`max-width\`).
 
 **ATOMS** — the bare vocabulary; only meaningful inside something larger:
-Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, In-page navigation, Requirements checklist, Process list, Identifier, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Chat message, Tool call, Reasoning, Citation, Prose.
+Rating, Toolbar, Buttons, Card, Button group, Aspect ratio, Scroll area, Form, Badges & pills, Alert, Tabs, Table, Tooltip, Avatar, Switch / toggle, Slider, Progress, Skeleton, Select trigger, Spinner, Navigation row, Interactive list row, In-page navigation, Requirements checklist, Process list, Identifier, Character count, Task list, Toggletip, Language navigation, Skip link, Fieldset, Error summary, KBD, Code, Accordion, Pagination & breadcrumb, Sparkline, Combobox, Dropdown menu, Stepper, Tag input, Popover, Hover Card, Segmented control / Toggle group, Separator, Description list, Banner, Input OTP, Attachment chip family, Inline status & meta micro-components, Navigation menu, Context menu, Form primitives, NumberInput, PasswordInput, SearchInput, PhoneInput, List, Radio card, Chip, Tool call, Reasoning, Prose.
 
 **COMPONENTS** — stand-alone pieces of app. Each IS its surface; build it by COMPOSING
 the atoms listed, not by hand-rolling them inside a bare card:
@@ -20468,7 +19806,7 @@ the atoms listed, not by hand-rolling them inside a bare card:
 components per container width; they own arrangement, never look, and assemble into PAGES.
 
 **STANDALONE atoms** — attach to anything; use directly, no host component needed:
-Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Chat message, Tool call, Reasoning, Citation, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list, Rating, Skip link, Fieldset, Error summary, Task list, Toggletip, Language navigation, Character count, In-page navigation, Process list, Identifier, Requirements checklist.
+Tooltip, Popover, Hover Card, Context menu, Tabs, Accordion, Segmented control / Toggle group, Navigation menu, Button group, Input OTP, Interactive list row, Combobox, Alert, Banner, Inline status & meta micro-components, Attachment chip family, Tool call, Reasoning, Prose, Skeleton, Spinner, Separator, Aspect ratio, Scroll area, Description list, Rating, Skip link, Fieldset, Error summary, Task list, Toggletip, Language navigation, Character count, In-page navigation, Process list, Identifier, Requirements checklist.
 
 **The rule of reach:** need a data surface? → the **Data table** component (it owns
 toolbar + selection + pagination + empty/loading/error). Need a form? → **Form
@@ -20568,16 +19906,6 @@ kit already guarantees.
 - Don't use a toast for anything that needs a decision — that is a .dialog.
 - Don't auto-dismiss a toast that carries an action.
 
-### Plan comparison
-**Do**
-- Reach for a comparison when the choice is “which tier?” — plans across the top, features down the side, one value per cell.
-- Highlight exactly one column (the current or recommended plan) — the band draws behind that tier so the eye lands on it.
-- Keep cells to a check, a dash, or a short value (“Unlimited”, “5”); a comparison is scanned, not read.
-
-**Don't**
-- Don't use .pricing (standalone tier cards) when the job is comparing feature-by-feature — that’s this recipe.
-- Don't highlight two columns; the whole point is to aim the decision at one.
-
 ### File grid
 **Do**
 - Give every cover a type variant (--doc / --img / --sheet) so a populated vault reads as real files, not an empty grey grid.
@@ -20617,16 +19945,6 @@ kit already guarantees.
 **Don't**
 - Don't hide primary navigation behind a hamburger on a wide container.
 - Don't rebuild a sidebar from .card + links — the suite owns nav spacing, states and the morph.
-
-### Chat message
-**Do**
-- Pick the voice with the modifier: plain .msg for an incoming person, .msg--me for you, .msg--ai for the assistant’s turn.
-- Let the AI turn (.msg--ai) hold its reasoning, tool receipts, answer and .msg__actions as one grouped answer-card.
-- Keep .msg__actions as ghost icon buttons (copy · regenerate · rate) — they reveal on hover and stay visible on touch.
-
-**Don't**
-- Don't give an incoming person’s message the brand fill — that reads as “you.”
-- Don't stack more than one primary action in the bubble; message actions are all quiet ghosts.
 
 ## Verify your work
 

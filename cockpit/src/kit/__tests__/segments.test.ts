@@ -50,7 +50,7 @@ describe('segment graph integrity', () => {
     expect(f + a + b + sh).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 5 · Component 27 · Section 16 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 5 · Component 27 · Section 14 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('component')).toHaveLength(Object.keys(COMPONENT_USES).length)
     expect(idsByTier('section')).toHaveLength(Object.keys(SECTION_USES).length)
@@ -66,9 +66,12 @@ describe('segment graph integrity', () => {
     // calendar-week/calendar-year VIEWS). The ~11 widgets we'd over-promoted (calendar
     // picker/range, chart, timeline, activity-feed, stat-tile, action-panel,
     // danger-zone, entity-card, filter-bar, auth) moved back to COMPONENT_USES.
-    // 16 since the government pass added the site footer — full-width, its own
+    // 14 since the V1 prune: pricing and plan-compare left the kit. A foundation
+    // for public services that also ships a pricing table is arguing against
+    // itself, and both cost conformance evidence they were never going to repay.
+    // Was 16 when the government pass added the site footer — full-width, its own
     // job, stacked to build a page, which is the slab test.
-    expect(idsByTier('section')).toHaveLength(16)
+    expect(idsByTier('section')).toHaveLength(14)
   })
 
   it('every standalone-blessed id is a real ATOM (not a component/foundation)', () => {

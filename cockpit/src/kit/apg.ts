@@ -560,8 +560,6 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   processlist: 'Numbered steps that carry content. An <ol>, where the number is the list, not a painted circle.',
   stepper: 'A read-only progress indicator through a wizard. Not a widget — an <ol> with aria-current="step". The current step must be in TEXT ("Step 2 of 4"), because a filled dot is not available to a screen reader.',
   wizardstepper: 'Same as the stepper: an indicator, not a control. aria-current="step" and the position said in words.',
-  'plan-compare': 'A comparison of plans. It is a table when it compares features across plans, and marking it up as anything else loses the row/column relationship that makes it readable.',
-  pricing: 'Priced cards. The price must be in the accessible name of whatever chooses it — "Choose Pro, 29 euro per month", not "Choose".',
   breakdown: 'A labelled distribution. Each row states its own share in text; the bar is the illustration, not the information.',
 
   // — Media, text and status: the alternative IS the obligation —
@@ -574,8 +572,6 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   kbd: 'A key name. <kbd>. The trap is symbols — "⌘K" needs to be readable, not a glyph a screen reader spells out or skips.',
   code: 'An inline code span. <code>.',
   codeblock: 'A code block. <pre><code>, with a language label as text. The copy button is a plain button that must confirm what it did in a live region. And the <pre> itself needs tabindex="0" with a role and a name: it scrolls sideways whenever the code is wider than the box, and a scroll container with no focusable content cannot be reached by keyboard at all (WCAG 2.1.1, Level A). Found here for real — and only at widths where the code overflows, which a scan pinned at one viewport never reaches.',
-  citation: 'A source reference. A link with a name that identifies the source, not "[1]" — a citation list read as bracketed numbers is a list of nothing.',
-  message: 'A chat turn. Who is speaking must be in text, not conveyed by which side of the screen it sits on.',
   'inline-status-meta-micro-components': 'Small pieces of meta text. Each carries its meaning in words; that is the whole contract.',
   'attachment-chip-family': 'File chips. The name, the type and the size belong in the accessible name; the remove control names what it removes.',
   'roll-down-item-stagger': 'An entrance animation. It must respect prefers-reduced-motion, which is WCAG 2.3.3 and a media query, not a role.',

@@ -82,20 +82,10 @@
       "definition": "Line / area / bar / stacked / donut on the kit’s derived 6-series palette."
     },
     {
-      "name": "Chat",
-      "url": "https://uicockpit.com/components/chat",
-      "definition": "A conversation thread — incoming vs your own message bubbles."
-    },
-    {
       "name": "Checkbox & Radio",
       "url": "https://uicockpit.com/components/checkbox-radio",
       "definition": "Multi- and single-select controls, including the richer selectable card variant.",
       "openUIName": "Checkbox"
-    },
-    {
-      "name": "Citation",
-      "url": "https://uicockpit.com/components/citation",
-      "definition": "The inline source chip a grounded answer hangs its claims on."
     },
     {
       "name": "Code Block",
@@ -247,19 +237,9 @@
       "definition": "A phone field with a country-code select add-on."
     },
     {
-      "name": "Plan Comparison",
-      "url": "https://uicockpit.com/components/plan-compare",
-      "definition": "A tier × feature matrix with one highlighted column — the upgrade-decision surface."
-    },
-    {
       "name": "Popover",
       "url": "https://uicockpit.com/components/popover",
       "definition": "A small floating panel anchored to a trigger, for quick forms and pickers."
-    },
-    {
-      "name": "Pricing",
-      "url": "https://uicockpit.com/components/pricing",
-      "definition": "A pricing tier card — plan, price, feature list and one primary action."
     },
     {
       "name": "Process List",
