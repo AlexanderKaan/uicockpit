@@ -43,7 +43,8 @@
     "gen:openui-entry": "node scripts/gen-openui-entry.mjs",
     "audit:backticks": "node scripts/audit-backticks.mjs",
     "audit:apg": "node scripts/audit-apg.mjs",
-    "a11y:css": "node scripts/a11y-css-criteria.mjs"
+    "a11y:css": "node scripts/a11y-css-criteria.mjs",
+    "audit:fonts": "node scripts/audit-fonts.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

@@ -22,17 +22,27 @@ export const customFontFamily = (name: string): string =>
 /** All Google Fonts in alphabetical order — one combined group keeps the
  *  picker scannable. Categorical sub-grouping (grotesk/humanist/geometric)
  *  was nice meta-info but most users don't need that distinction. */
+/* Two faces were removed after `npm run audit:fonts` measured glyph confusion
+ * and a side-by-side render confirmed it:
+ *
+ *   Manrope  — I/l at 98%. Capital i and lowercase L are the same vertical
+ *              stroke; "Il1" renders as "ll1". For a system whose content is
+ *              names, postcodes and case numbers that is disqualifying.
+ *   DM Sans  — I/l at 90% and 0/O at 50%, same failure one notch less extreme.
+ *
+ * The rest of the list holds, and the metric calibrates itself on two faces it
+ * had no way to know about: Lexend, designed for reading proficiency, scores
+ * best of every sans (49%), and Public Sans, the US government's own face, sits
+ * solidly in the clear band (68%). */
 const GOOGLE_SANS = [
   'Albert Sans',
   'Archivo',
-  'DM Sans',
   'Figtree',
   'Geist',
   'Hanken Grotesk',
   'IBM Plex Sans',
   'Inter',
   'Lexend',
-  'Manrope',
   'Outfit',
   'Plus Jakarta Sans',
   'Public Sans',
