@@ -1379,16 +1379,26 @@ function ProgressCard() {
         <span style={{ fontSize: 'var(--k-type-small)', fontWeight: 500 }}>Media library</span>
         <span style={{ fontSize: 11, color: 'var(--k-fg-muted)', fontVariantNumeric: 'tabular-nums' }}>7.4 of 10 GB</span>
       </div>
-      <div className="progress" role="progressbar" aria-valuenow={74} aria-valuemin={0} aria-valuemax={100} aria-label="Storage used">
-        <div className="progress__fill" style={{ width: '74%' }} />
-      </div>
+      {/* <progress>, not a div. role="progressbar" and three aria-value* were
+          written by hand here and duplicated the width beside them — two places
+          to state one number, which is two places for it to disagree. value and
+          max carry both now. */}
+      <progress className="progress" value={74} max={100} aria-label="Storage used" />
       <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>74% used — upgrade for more space.</span>
+      {/* Indeterminate keeps the div, for the same measured reason as wavy below:
+          a valueless <progress> IS natively indeterminate, but once you set
+          appearance:none to style it there is no value box left to animate, so
+          it renders as an empty track. Seen on screen, not reasoned about. The
+          platform gives the STATE for free and the custom motion not at all. */}
       <div className="progress progress--indeterminate" role="progressbar" aria-label="Syncing media" style={{ marginTop: 10 }}>
         <div className="progress__fill" />
       </div>
       <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Syncing… (indeterminate — no ETA)</span>
-      {/* Wavy (H4 flourish) — value rides on --progress so the root can paint
-          the remaining track; reserve it for the one hero progress moment. */}
+      {/* Wavy (H4 flourish) — the ONE that stays a div, and it is a measured
+          platform limit rather than a preference: the wave is a -webkit-mask on
+          the fill, and a mask does not apply to ::-webkit-progress-value, so a
+          native <progress> cannot draw it. Hence the explicit role here that the
+          two above no longer need. Reserve it for the one hero moment. */}
       <div className="progress progress--wavy" role="progressbar" aria-valuenow={62} aria-valuemin={0} aria-valuemax={100} aria-label="Generating preview" style={{ '--progress': '62%', marginTop: 10 } as CSSProperties}>
         <div className="progress__fill" />
       </div>
@@ -1433,7 +1443,15 @@ function DialogCard() {
         {open ? (
           <>
             <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} aria-hidden="true" />
-            <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" style={{ maxBlockSize: 188 }}>
+            {/* <dialog open>, not a div with role="dialog". The recipe has said "use the
+                platform element" in print for months while its own demo did not, which is
+                the gap the provenance derivation is for.
+                aria-modal is GONE and that is the real fix: this demo is docked so the
+                card can measure it, so it is NOT modal — and telling a screen reader the
+                rest of the page is inert, on a wall of seventy cards, is a lie the div
+                version was telling. A consumer gets modality from showModal(), which the
+                recipe documents; the demo cannot call it and now stops pretending. */}
+            <dialog open className="dialog" aria-labelledby="dialog-title" style={{ maxBlockSize: 188 }}>
               <h3 id="dialog-title" className="dialog__title">Delete project?</h3>
               <div className="dialog__body" tabIndex={0} role="region" aria-label="Dialog content">
                 <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>
@@ -1449,7 +1467,7 @@ function DialogCard() {
                   <Icon name="trash" /> Delete
                 </button>
               </div>
-            </div>
+            </dialog>
           </>
         ) : (
           <span style={{ color: 'var(--k-fg-faint)', fontSize: 'var(--k-type-small)' }}>Dialog is closed</span>
@@ -1494,7 +1512,7 @@ function CmdPaletteCard() {
             aria-controls="cmdp-list"
             aria-activedescendant={matches.length ? `cmdp-opt-${clamped}` : undefined}
           />
-          <span className="kbd">⌘K</span>
+          <kbd className="kbd">⌘K</kbd>
         </div>
         {matches.length === 0 ? (
           <div className="cmdp__empty">No commands match “{q}”.</div>
@@ -1516,7 +1534,7 @@ function CmdPaletteCard() {
                       >
                         <span className="cmdp__item-icon"><Icon name={c.icon} /></span>
                         {c.label}
-                        <span className="cmdp__shortcut">{c.keys.map((k, ki) => <span key={ki} className="kbd">{k}</span>)}</span>
+                        <span className="cmdp__shortcut">{c.keys.map((k, ki) => <kbd key={ki} className="kbd">{k}</kbd>)}</span>
                       </li>
                     ) : null,
                   )}
@@ -2760,7 +2778,7 @@ function NavCard() {
         <div className="sidenav__foot">
           <NavRow icon="cog" label="Settings" />
           <button type="button" className="navrow" data-tip="Quick actions" aria-label="Quick actions">
-            <span className="kbd">⌘K</span>
+            <kbd className="kbd">⌘K</kbd>
             <span className="navrow__label">Quick actions</span>
           </button>
         </div>

@@ -1971,6 +1971,22 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * Heavier than the slider — stroke-progress (6px) signals "ongoing work"
  * rather than "controllable value". The 2:1 thickness ratio (6 vs 3) is
  * intentional: a glance distinguishes them without reading the label. */
+/* USE THE PLATFORM ELEMENT: <progress value max>. The role, the value and the
+   range all come from the attributes, so they cannot drift from what is drawn —
+   the div version carried role="progressbar" plus three aria-value* by hand, and
+   a hand-written value is a value that can disagree with the bar beside it.
+   TWO VARIANTS CANNOT BE ONE, both measured rather than assumed:
+     · --wavy   the wave is a -webkit-mask on the fill, and a mask does NOT apply
+                to ::-webkit-progress-value (background does; mask does not).
+     · --indeterminate  a valueless <progress> IS natively indeterminate, but the
+                moment appearance:none is set there is no value box left to
+                animate and it renders as an empty track.
+   Both keep their div and their explicit role. The platform gives the STATE for
+   free and the custom motion not at all, which is a limit worth writing down
+   rather than a preference worth arguing.
+
+   The two vendor pseudos are separate rules on purpose: one invalid selector in
+   a list invalidates the WHOLE rule, and neither engine knows the other's. */
 .progress {
   width: 100%;
   height: var(--k-stroke-progress, 6px);
@@ -1978,6 +1994,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border-radius: 999px;
   overflow: hidden;
 }
+/* The native element, styled to match the div version exactly. */
+progress.progress { appearance: none; -webkit-appearance: none; border: 0; display: block; }
+progress.progress::-webkit-progress-bar { background: var(--k-surface-2); border-radius: 999px; }
+progress.progress::-webkit-progress-value { background: var(--k-fill, var(--k-primary)); border-radius: 999px; }
+progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary)); border-radius: 999px; }
 .progress__fill {
   height: 100%;
   background: var(--k-fill, var(--k-primary));
