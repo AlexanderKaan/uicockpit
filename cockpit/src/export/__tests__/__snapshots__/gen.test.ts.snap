@@ -5177,7 +5177,10 @@ dialog::backdrop {
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--k-space, 16px);
+  /* --k-card-gap completes the lazy hook set below: a scope that lays out its
+     own internal rhythm (the configurator's control shell) needs to zero this,
+     and doing it from outside meant out-specifying the recipe. */
+  gap: var(--k-card-gap, var(--k-space, 16px));
   box-sizing: border-box;
   margin: 0;
   /* --k-card-* = lazy comp-tier hooks (H2): undefined by default, override
@@ -13381,7 +13384,10 @@ dialog::backdrop {
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--k-space, 16px);
+  /* --k-card-gap completes the lazy hook set below: a scope that lays out its
+     own internal rhythm (the configurator's control shell) needs to zero this,
+     and doing it from outside meant out-specifying the recipe. */
+  gap: var(--k-card-gap, var(--k-space, 16px));
   box-sizing: border-box;
   margin: 0;
   /* --k-card-* = lazy comp-tier hooks (H2): undefined by default, override

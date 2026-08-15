@@ -79,7 +79,7 @@
  * 6px row list), so it zeroes the card's. */
 .fmenu {
   --k-card-pad: 0;
-  gap: 0;
+  --k-card-gap: 0;
 }
 /* Slim header — an identity label + the collapse-to-full-width control. */
 .fmenu__bar {

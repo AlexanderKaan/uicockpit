@@ -40,39 +40,39 @@ export function injectKit(): void {
   const vars = buildTokens(DEFAULT_CONFIG).vars as Record<string, string | number>
   const mktTokens = `.mkt {\n${Object.entries(vars).map(([k, v]) => `  ${k}: ${v};`).join('\n')}\n}`
 
-  /* 🚨 THE KIT GOES IN A CASCADE LAYER, and this is the fix for a whole class of
-   * bug rather than a nicety.
+  /* ⚠️ THE KIT IS DELIBERATELY NOT IN A CASCADE LAYER, and the reason is worth
+   * keeping because the opposite looks obviously right until you measure it.
    *
-   * This <style> is appended to <head> AFTER the bundled stylesheets, so at equal
-   * specificity the kit won every tie against our own chrome. That made
-   * `.fmenu { gap: 0 }` on a composed `.card` silently INERT — and it is the same
-   * cascade that made an earlier fix to the panel's lock button do nothing at all
-   * while looking, in the source, exactly like a fix.
+   * This <style> is appended AFTER the bundled stylesheets, so at equal
+   * specificity the kit wins every tie against our own chrome. That reads like a
+   * bug: it makes a local adjustment on a composed recipe — `.fmenu { gap: 0 }`
+   * over `.card` — silently inert, so composing costs a specificity hack while
+   * re-implementing the recipe costs nothing. A tempting story followed: the
+   * cascade was charging a toll on composition and subsidising duplication, and
+   * `@layer kit` would settle it, since an unlayered rule beats a layered one at
+   * any specificity.
    *
-   * The consequence was worse than the individual bugs: composing a kit recipe in
-   * the chrome meant hand-tuning a specificity hack for every local adjustment, so
-   * the cheaper move was always to re-implement the recipe instead. That is a
-   * mechanical explanation for "we built it twice" — the cascade was charging a
-   * toll on composition and paying a subsidy to duplication.
+   * It was tried, and measured by toggling the layer on the live page and
+   * diffing computed styles: 1709 of 5390 elements moved. Reading them made the
+   * mistake obvious. `.topbar__icon-btn` composes `btn btn--ghost btn--icon`, and
+   * under the layer the chrome class's leftover background and border beat
+   * `--ghost` — the element stopped being a ghost button. THE LAYER MAKES
+   * COMPOSITION WORSE, not better: modifiers stop working wherever a chrome class
+   * still declares what the recipe owns.
    *
-   * An UNLAYERED rule beats a LAYERED one at any specificity. Putting the kit in
-   * `@layer kit` states the relationship we actually mean: the kit is the base,
-   * the chrome adjusts it. Compose the recipe, override locally, no arms race.
+   * Which is the actual lesson. The cascade is not the mechanism behind "we built
+   * it twice" — the duplicate declarations are. Flipping the cascade removes no
+   * duplication; it only hands the win to the UNREVIEWED copy over the reviewed
+   * one, which for a design system is backwards. While a duplicate exists, the
+   * kit winning the tie is the safer default, because it keeps the modifiers
+   * honest.
    *
-   * Scope of the change, measured before making it rather than assumed:
-   *  - EXPORT UNTOUCHED. genCss calls assembleKitCss() itself; this wrapper is
-   *    preview-only, so no CDN consumer inherits a layer they did not ask for.
-   *  - Exactly two chrome selectors collide with a kit selector at all
-   *    (`.sheet`, `.sheet--left` in preview-only.css) and both carry !important,
-   *    which outranks layers in either direction.
-   *  - The chrome focus ring already re-asserts --k-ring inside the preview at
-   *    higher specificity (chrome.css `.app .cockpit-preview :focus-visible`),
-   *    so the a11y floor does not move.
-   *  - No other @layer exists in the codebase, so there is no layer-order
-   *    question to get wrong.
-   *
-   * The token block stays OUTSIDE the layer: it declares custom properties, not
-   * styles, and variables should resolve regardless of who is winning a cascade. */
-  style.textContent = `@layer kit {\n${globalLayer({ scope: '.cockpit-preview' })}\n\n${assembleKitCss()}\n}\n\n${mktTokens}`
+   * So the toll on composition is real, and the answer is to stop paying it at
+   * the source: a chrome rule must not re-declare what the recipe owns. Where the
+   * chrome genuinely needs a different value, it goes through a token the recipe
+   * already reads (--k-card-pad, --k-overlay-min, …) rather than out-specifying
+   * it. That is composition working as designed — see .fmenu, .kits-pop and
+   * .mkt__ver-menu for the shape. */
+  style.textContent = `${globalLayer({ scope: '.cockpit-preview' })}\n\n${assembleKitCss()}\n\n${mktTokens}`
   document.head.appendChild(style)
 }

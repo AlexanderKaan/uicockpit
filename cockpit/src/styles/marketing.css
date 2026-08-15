@@ -204,7 +204,7 @@
   position: absolute;
   right: 0;
   top: calc(100% + var(--k-s-8));
-  min-width: 208px;
+  --k-overlay-min: 208px;
   z-index: 20;
 }
 .mkt__ver-head {
