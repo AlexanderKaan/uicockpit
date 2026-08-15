@@ -187,6 +187,126 @@
       },
     },
 
+    /* ── F · coherence — the only dimension with no external yardstick ─────
+     *
+     * A, B, C and E all measure against something somebody else defends: WCAG,
+     * APG, axe. Nothing in any law says the buttons in a row must be the same
+     * height, so F needs a different kind of rule — and the trick that makes it
+     * work is that you do not have to know what a value SHOULD be. You only have
+     * to notice that things which are peers disagree, and that a distance came
+     * from somewhere other than the scale.
+     *
+     * The scale already exists. So F is a check, not a design decision, and what
+     * it produces is a short worklist rather than a rewrite. */
+
+    'F-peers-disagree': {
+      dimension: 'F',
+      title: 'same kind, same row, different size',
+      wcag: '—',
+      /* NOT ALL SIBLINGS ARE PEERS, and the first version forgot it: an icon
+       * beside a paragraph beside a button is a composition, not a row of
+       * equals, and requiring them to match called three legitimate banners
+       * broken. Peer-hood is same KIND — .btn and .btn--primary are one kind —
+       * which is also what makes the rule answer the real question: six buttons
+       * split into two clusters are still six buttons, and they must agree. */
+      run: function (root) {
+        const out = []
+        const kindOf = (e) => {
+          const c = String(e.className || '').trim().split(/\s+/)[0]
+          return c ? c.split('--')[0] : e.tagName.toLowerCase()
+        }
+        for (const el of root.querySelectorAll('*')) {
+          const cs = getComputedStyle(el)
+          if (!/flex|grid/.test(cs.display)) continue
+          const kids = [...el.children].filter((k) => k.getBoundingClientRect().width > 0 && k.getBoundingClientRect().height > 0)
+          if (kids.length < 2) continue
+          if (new Set(kids.map((k) => Math.round(k.getBoundingClientRect().top))).size !== 1) continue
+          const byKind = {}
+          for (const k of kids) (byKind[kindOf(k)] ??= []).push(k)
+          for (const [kind, group] of Object.entries(byKind)) {
+            if (group.length < 2) continue
+            const hs = [...new Set(group.map((g) => Math.round(g.getBoundingClientRect().height)))]
+            const cy = [...new Set(group.map((g) => Math.round(g.getBoundingClientRect().top + g.getBoundingClientRect().height / 2)))]
+            if (hs.length === 1 && cy.length === 1) continue
+            out.push({ component: componentOf(group[0]), kit: inKit(group[0]), el: kind,
+              detail: group.length + ' side by side, heights ' + hs.join('/') + (cy.length > 1 ? ', not on one centre line' : '') })
+          }
+        }
+        return out
+      },
+    },
+
+    'F-off-scale-gap': {
+      dimension: 'F',
+      title: 'a distance that did not come from the scale',
+      wcag: '—',
+      /* Three things are NOT off-scale spacing and the rule has to know all of
+       * them, or its output is noise nobody reads:
+       *   · a HAIRLINE (<=1px) — the seam where joined buttons share a border;
+       *   · a DISTRIBUTION — space-between/around/evenly leaves whatever is
+       *     left over, so 121px is not a spacing decision, it is arithmetic;
+       *   · sub-pixel drift from a tokenised gap, hence the 1px tolerance. */
+      run: function (root) {
+        const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+        const cs0 = getComputedStyle(root)
+        const scale = [0]
+        const NAMES = ['--k-s-1', '--k-s-2', '--k-s-4', '--k-s-6', '--k-s-8', '--k-s-10', '--k-s-12',
+          '--k-s-16', '--k-s-20', '--k-s-24', '--k-s-32', '--k-s-40', '--k-s-48', '--k-s-56', '--k-s-64',
+          '--k-space', '--k-gap', '--k-pad', '--k-stack-gap', '--k-row-gap', '--k-card-pad']
+        for (const n of NAMES) {
+          const raw = cs0.getPropertyValue(n).trim()
+          const v = parseFloat(raw)
+          if (!isNaN(v)) scale.push(Math.round(/rem/.test(raw) ? v * rootPx : v))
+        }
+        // ⚠️ rem. Reading these with a bare parseFloat gave 0.25 for --k-s-4 and
+        // called the entire kit off-scale — an impossible answer that changed the
+        // whole conclusion until it was converted.
+        const onScale = (px) => scale.some((s) => Math.abs(s - px) <= 1)
+        /* Anything bigger than the LARGEST step was not taken from the scale —
+         * it is left-over room. A menu item puts its shortcut on the right with
+         * margin-left:auto and a toolbar pushes a group to the far end; the
+         * computed style reports those as plain pixels, so the auto cannot be
+         * seen, but the size gives it away. 136px and 142px are not spacing
+         * decisions, they are whatever was left. */
+        const biggest = Math.max.apply(null, scale)
+
+        const out = []
+        for (const el of root.querySelectorAll('*')) {
+          const cs = getComputedStyle(el)
+          if (!/flex|grid/.test(cs.display)) continue
+          if (/space-between|space-around|space-evenly/.test(cs.justifyContent)) continue
+          const kids = [...el.children].filter((k) => k.getBoundingClientRect().width > 0 && k.getBoundingClientRect().height > 0)
+          if (kids.length < 2) continue
+          /* HORIZONTAL ONLY, and that limit is the finding rather than a
+           * shortcut. A vertical distance between stacked children COMPOSES —
+           * the container's gap, plus each child's margins, plus the leading —
+           * so 26px is very often 16 + 10, both of them on the scale, and
+           * flagging it produced 439 findings that were mostly arithmetic.
+           * Almost any number is a sum of scale steps, so per-instance
+           * verification of a composed distance cannot be made honest.
+           * The vertical axis is reported as a VOCABULARY instead (how many
+           * distinct rhythms the kit uses), which is a coherence metric and not
+           * a defect list. Sideways, distances do not compose, and the rule
+           * holds. */
+          const oneLine = new Set(kids.map((k) => Math.round(k.getBoundingClientRect().top))).size === 1
+          if (!oneLine) continue
+          const seen = new Set()
+          for (let i = 1; i < kids.length; i++) {
+            const a = kids[i - 1].getBoundingClientRect()
+            const b = kids[i].getBoundingClientRect()
+            const d = Math.round(b.left - a.right)
+            if (d <= 1 || d > biggest) continue     // hairline seam, or left-over room
+            if (onScale(d)) continue
+            if (seen.has(d)) continue
+            seen.add(d)
+            out.push({ component: componentOf(el), kit: inKit(el), el: label(el),
+              detail: d + 'px between its children — not on the scale' })
+          }
+        }
+        return out
+      },
+    },
+
     /* ── C · perception, where it is OUR floor rather than the law's ──────── */
 
     'C-target-under-floor': {
