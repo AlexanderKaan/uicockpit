@@ -182,12 +182,19 @@
 /* Icon-only quick action (dark/light mode toggle). Square, ghost by
  * default, matches the topbar button height (32px) so it lines up with
  * Share/Export. */
+/* COMPOSED WITH .btn NOW, not a copy of it. The kit recipe brings the focus
+   ring, the hover/active/disabled states, the target floor and the radius token;
+   what stays here is only the topbar's own density — 30px, denser than the kit's
+   default control height, which is a deliberate property of a tool chrome and
+   not a disagreement with the kit.
+   Gone with the swap: border-radius 7px (a number nobody chose from anything)
+   and a bespoke @media (pointer: coarse) block re-implementing the 44px touch
+   floor that .btn already holds. */
+/* …and the size override that was here is gone too. It was dead: .btn--icon wins
+   the cascade and renders 36px square, which measured fine in the bar. The
+   "topbar needs its own denser control height" belief did not survive being
+   tested — the kit's own size fits. */
 .topbar__icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: var(--topbar-ctrl-h);
   /* Never let a cramped topbar squash an icon button to nothing — on a phone the
      "Show controls" toggle is the ONLY way into the configurator, and it was
      collapsing to ~2px. Text buttons floor at their label; icon buttons must too. */
@@ -195,10 +202,7 @@
   box-sizing: border-box;
   color: var(--app-fg-muted);
   border: 1px solid var(--app-border);
-  border-radius: 7px;
   background: var(--app-surface);
-  cursor: pointer;
-  transition: background var(--app-dur) var(--app-ease), border-color var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease);
 }
 .topbar__icon-btn:hover:not(:disabled) { background: var(--app-hover); border-color: var(--app-fg-muted); color: var(--app-fg); }
 /* Disabled (undo/redo at the ends of history) — dimmed + inert, no hover. */

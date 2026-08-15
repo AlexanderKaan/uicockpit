@@ -68,7 +68,7 @@ export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, t
         {/* Toggle the floating control menu. */}
         <button
           type="button"
-          className={`topbar__icon-btn topbar__icon-btn--menu ${menuOpen ? 'topbar__icon-btn--on' : ''}`}
+          className={`btn btn--ghost btn--icon topbar__icon-btn topbar__icon-btn--menu ${menuOpen ? 'topbar__icon-btn--on' : ''}`}
           onClick={onToggleMenu}
           aria-pressed={menuOpen}
           aria-label={menuOpen ? 'Hide controls' : 'Show controls'}
@@ -98,7 +98,7 @@ export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, t
         {/* Undo / redo (C2) — config history; mirrors ⌘Z / ⇧⌘Z. */}
         <button
           type="button"
-          className="topbar__icon-btn topbar__icon-btn--hist"
+          className="btn btn--ghost btn--icon topbar__icon-btn topbar__icon-btn--hist"
           onClick={onUndo}
           disabled={!canUndo}
           aria-label="Undo"
@@ -108,7 +108,7 @@ export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, t
         </button>
         <button
           type="button"
-          className="topbar__icon-btn topbar__icon-btn--hist"
+          className="btn btn--ghost btn--icon topbar__icon-btn topbar__icon-btn--hist"
           onClick={onRedo}
           disabled={!canRedo}
           aria-label="Redo"
@@ -120,7 +120,7 @@ export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, t
         <div className="kits-pop-wrap">
           <button
             type="button"
-            className={`topbar__icon-btn kit-heart ${savedCount > 0 ? 'kit-heart--saved' : ''}`}
+            className={`btn btn--ghost btn--icon topbar__icon-btn kit-heart ${savedCount > 0 ? 'kit-heart--saved' : ''}`}
             onClick={() => setKitsOpen((v) => !v)}
             aria-expanded={kitsOpen}
             aria-label={savedCount > 0 ? `Saved kits (${savedCount} of 3)` : 'Saved kits'}
@@ -141,7 +141,7 @@ export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, t
         </div>
         <button
           type="button"
-          className="topbar__icon-btn"
+          className="btn btn--ghost btn--icon topbar__icon-btn"
           onClick={onToggleMode}
           aria-pressed={mode === 'dark'}
           aria-label={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
