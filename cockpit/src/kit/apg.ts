@@ -42,6 +42,7 @@ export interface ApgPattern {
 }
 
 const APG = 'https://www.w3.org/WAI/ARIA/apg/patterns'
+const LANDMARKS = 'https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/'
 
 /** Recipe id → the pattern it must implement.
  *
@@ -236,14 +237,295 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
   },
   scaffold: {
     pattern: 'Landmarks',
-    url: 'https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/',
+    url: LANDMARKS,
     keys: [],
     aria: ['<header>/<nav>/<main>/<footer> rather than divs with roles', 'aria-label on each nav when more than one is present', 'Exactly one <main>'],
     free: 'The elements are the landmarks. role="banner" on a <header> is the same thing said twice.',
   },
+
+  /* ── The second pass ──────────────────────────────────────────────────────
+   * Everything above was mapped when the anchor was introduced; everything
+   * below closes the 85-recipe gap the ratchet was carrying. Two things worth
+   * saying about doing it in bulk:
+   *
+   * The interesting answer was often "no pattern, and here is why" — a rating
+   * that only DISPLAYS a score is text, not a widget, and dressing it in radio
+   * semantics would announce a control nobody can operate. Those live in
+   * APG_NOT_APPLICABLE, and there are more of them than there are patterns.
+   *
+   * And several recipes turn out to be the same pattern wearing different
+   * clothes: four calendars are one Grid, three collapsibles are one Disclosure,
+   * eight pieces of navigation furniture are Landmarks. That convergence is the
+   * point of anchoring to a standard rather than inventing per-component
+   * contracts — it is also how we find out our own set is smaller than it looks.
+   */
+
+  // — Disclosure: one pattern, three recipes —
+  popover: {
+    pattern: 'Disclosure',
+    url: `${APG}/disclosure/`,
+    keys: [['Enter / Space', 'Toggle the panel'], ['Escape', 'Close it and return focus to the trigger']],
+    aria: ['A <button> trigger with aria-expanded', 'aria-controls pointing at the panel'],
+    free: 'The Popover API ([popover] + popovertarget) gives light-dismiss, Escape and top-layer stacking; aria-expanded is still yours.',
+  },
+  'tool-call': {
+    pattern: 'Disclosure',
+    url: `${APG}/disclosure/`,
+    keys: [['Enter / Space', 'Toggle the payload']],
+    aria: ['aria-expanded on the trigger', 'The status is text, not colour alone (WCAG 1.4.1)'],
+    free: '<details>/<summary> gives the toggle, the state and the keys.',
+  },
+  reasoning: {
+    pattern: 'Disclosure',
+    url: `${APG}/disclosure/`,
+    keys: [['Enter / Space', 'Toggle the reasoning block']],
+    aria: ['aria-expanded on the trigger', 'While streaming, the region needs aria-live="polite" or the text arrives silently'],
+    free: '<details>/<summary>, as above.',
+  },
+
+  // — Dialog: the modal family —
+  lightbox: {
+    pattern: 'Dialog (Modal)',
+    url: `${APG}/dialog-modal/`,
+    keys: [['Escape', 'Close'], ['Tab / Shift+Tab', 'Cycle within the lightbox only'], ['Left / Right', 'Previous / next image, if the set is navigable']],
+    aria: ['aria-modal="true" and a name', 'Each image needs its alt text — a lightbox of undescribed images is a gallery of nothing', 'Focus returns to the thumbnail that opened it'],
+    free: '<dialog> + showModal() gives the trap, Escape and the inert background.',
+  },
+  'sheet-drawer': {
+    pattern: 'Dialog (Modal)',
+    url: `${APG}/dialog-modal/`,
+    keys: [['Escape', 'Close'], ['Tab / Shift+Tab', 'Cycle within the sheet while it is modal']],
+    aria: ['aria-modal="true" only when it really is modal — a non-modal drawer that claims it lies to a screen reader', 'A name from its heading', 'Focus returns to the trigger'],
+    free: '<dialog> + showModal() for the modal case; a non-modal drawer owes its own focus handling.',
+  },
+
+  // — Alert / live regions —
+  'toast-stack': {
+    pattern: 'Alert',
+    url: `${APG}/alert/`,
+    keys: [['Tab', 'Reach the toast’s own action or dismiss control']],
+    aria: ['role="status" for the ordinary case, role="alert" only when it is genuinely urgent', 'The container must EXIST before the toast is inserted or nothing is announced', 'Never move focus to a toast', 'Auto-dismiss fights WCAG 2.2.1 — give a way to keep it'],
+  },
+  banner: {
+    pattern: 'Alert',
+    url: `${APG}/alert/`,
+    keys: [['Tab', 'Reach the dismiss control']],
+    aria: ['role="status" for informational tones, role="alert" for errors', 'The tone is named in the text, never carried by colour alone'],
+  },
+  errorsummary: {
+    pattern: 'Alert',
+    url: `${APG}/alert/`,
+    keys: [['Enter', 'Follow a link to the field it names']],
+    aria: ['A heading plus a list of links, each pointing at the control that failed', 'Focus MOVES to the summary after a failed submit — this is the one live region you do focus', 'aria-invalid and aria-describedby on each named field'],
+  },
+
+  // — Combobox: three recipes, one pattern —
+  'command-palette': {
+    pattern: 'Combobox',
+    url: `${APG}/combobox/`,
+    keys: [['Down / Up', 'Move through results'], ['Enter', 'Run the focused command'], ['Escape', 'Close and return focus to where it came from']],
+    aria: ['role="combobox" on the input with aria-expanded and aria-controls', 'aria-activedescendant — DOM focus stays in the input', 'The result count belongs in a live region, or a blind user cannot tell an empty search from a slow one'],
+  },
+  'tag-input': {
+    pattern: 'Combobox',
+    url: `${APG}/combobox/`,
+    keys: [['Enter', 'Commit the typed token'], ['Backspace', 'Remove the last token when the input is empty'], ['Down / Up', 'Move through suggestions'], ['Escape', 'Close the suggestions']],
+    aria: ['Each token carries its own remove button with a name that includes the token ("Remove Design")', 'The token count belongs in a live region', 'aria-describedby telling the person how to commit a token'],
+  },
+  searchinput: {
+    pattern: 'Combobox',
+    url: `${APG}/combobox/`,
+    keys: [['Down / Up', 'Move through suggestions, when there are any'], ['Escape', 'Clear the suggestions, then the field']],
+    aria: ['<input type="search"> inside <form role="search">', 'Combobox roles ONLY when it actually suggests — a plain search field that claims aria-expanded is announcing a listbox that does not exist'],
+    free: 'type="search" gives the clear affordance and the platform’s own search idiom.',
+  },
+
+  // — Grid: four calendars, one pattern —
+  calendar: {
+    pattern: 'Grid (date grid)',
+    url: `${APG}/grid/`,
+    keys: [
+      ['Left / Right', 'Previous / next day'],
+      ['Up / Down', 'Same weekday, previous / next week'],
+      ['Home / End', 'First / last day of the week'],
+      ['Page Up / Page Down', 'Previous / next month'],
+      ['Tab', 'Leave the grid — the whole month is ONE tab stop'],
+    ],
+    aria: ['role="grid" with role="gridcell" days', 'aria-selected on the chosen day', 'The month and year are announced when they change', 'Each day needs its full date as its name — "14" alone is not a date'],
+    free: '<input type="date"> gives the entire pattern in the platform’s idiom, including on mobile. Reach for the grid when the date IS the content.',
+  },
+  'calendar-week': {
+    pattern: 'Grid (date grid)',
+    url: `${APG}/grid/`,
+    keys: [['Arrow keys', 'Move between time slots'], ['Tab', 'Leave the grid']],
+    aria: ['Events are buttons with a name carrying title AND time — position in the grid is not available to a screen reader', 'The grid needs a name saying which week it shows'],
+  },
+  'calendar-year': {
+    pattern: 'Grid (date grid)',
+    url: `${APG}/grid/`,
+    keys: [['Arrow keys', 'Move between days across month boundaries'], ['Tab', 'Leave the grid']],
+    aria: ['Each month grid carries its own name', 'Twelve grids is twelve tab stops unless they are one composite widget — decide which, and say so'],
+  },
+  'calendar-range': {
+    pattern: 'Grid (date grid)',
+    url: `${APG}/grid/`,
+    keys: [['Arrow keys', 'Move within and between the two month grids'], ['Enter', 'Set the start, then the end'], ['Escape', 'Abandon a half-made range']],
+    aria: ['The forming range must be announced, not only shaded — aria-live carrying "12 May to 18 May"', 'Start and end days say which they are in their names'],
+  },
+
+  // — Menus, toolbars, groups —
+  'context-menu': {
+    pattern: 'Menu Button',
+    url: `${APG}/menu-button/`,
+    keys: [['Shift+F10 / Context key', 'Open the menu from the keyboard — right-click alone excludes anyone not using a mouse'], ['Up / Down', 'Move between items'], ['Escape', 'Close and return focus']],
+    aria: ['role="menu" · role="menuitem"', 'aria-expanded on whatever opens it', 'A context menu with no keyboard opener is a feature only mouse users have'],
+  },
+  'navigation-menu': {
+    pattern: 'Disclosure Navigation',
+    url: `${APG}/disclosure/`,
+    keys: [['Enter / Space', 'Open the submenu'], ['Escape', 'Close it, focus stays on its trigger'], ['Tab', 'Move through the links — this is navigation, not a menu widget']],
+    aria: ['aria-expanded on each top-level trigger', 'role="menu" is for application menus; site navigation is a <nav> with lists and links'],
+  },
+  'button-group': {
+    pattern: 'Toolbar',
+    url: `${APG}/toolbar/`,
+    keys: [['Left / Right', 'Move between the buttons'], ['Tab', 'Leave the group — it is one tab stop']],
+    aria: ['role="toolbar" with a name, or plain buttons if they are unrelated', 'aria-pressed when a button is a toggle'],
+  },
+  'filter-bar': {
+    pattern: 'Toolbar',
+    url: `${APG}/toolbar/`,
+    keys: [['Left / Right', 'Move between filters'], ['Tab', 'Leave the bar']],
+    aria: ['role="toolbar" with a name', 'The number of results after filtering belongs in a live region — the change is invisible otherwise', 'Each active filter is removable and says what it removes'],
+  },
+  'segmented-control-toggle-group': {
+    pattern: 'Radio Group',
+    url: `${APG}/radio/`,
+    keys: [['Arrow keys', 'Move to and SELECT the next segment'], ['Tab', 'Enter or leave the group']],
+    aria: ['role="radiogroup" with a name when exactly one may be chosen', 'Multi-select instead: a toolbar of aria-pressed toggle buttons — the two must not be mixed'],
+    free: 'Native radios with a shared name give the whole pattern, including the one-tab-stop behaviour.',
+  },
+  tasklist: {
+    pattern: 'Checkbox',
+    url: `${APG}/checkbox/`,
+    keys: [['Space', 'Toggle the focused task']],
+    aria: ['A real <input type="checkbox"> per row, labelled by the task text', 'Completion is carried in the checked state, not by a line through the text'],
+    free: 'Native checkboxes give the key, the state and the label association.',
+  },
+  chip: {
+    pattern: 'Button',
+    url: `${APG}/button/`,
+    keys: [['Enter / Space', 'Activate'], ['Backspace / Delete', 'Remove, on a removable chip']],
+    aria: ['aria-pressed on a filter chip — it is a toggle, and a toggle that does not say so reads as a plain button', 'A removable chip needs a remove control naming what it removes'],
+    free: 'A <button> gives activation and focus; the pressed state is yours.',
+  },
+
+  // — Meters —
+  progress: {
+    pattern: 'Meter',
+    url: `${APG}/meter/`,
+    keys: [],
+    aria: ['role="progressbar" for a task that completes, role="meter" for a level that fluctuates', 'aria-valuenow · aria-valuemin · aria-valuemax, or omit valuenow for indeterminate', 'A name saying WHAT is progressing'],
+    free: '<progress> gives the role and the value semantics.',
+  },
+  'usage-meter': {
+    pattern: 'Meter',
+    url: `${APG}/meter/`,
+    keys: [],
+    aria: ['role="meter" — a quota is a level, not a task', 'aria-valuetext where the raw number is not the meaning ("8.2 GB of 10 GB")', 'Approaching the limit is said in text, not shown only as a colour change'],
+    free: '<meter> gives the role, the value and the low/high/optimum semantics.',
+  },
+
+  // — The rest —
+  'data-table': {
+    pattern: 'Table (sortable)',
+    url: `${APG}/table/`,
+    keys: [['Enter / Space', 'Sort by the focused column header'], ['Tab', 'Move between the interactive cells']],
+    aria: ['aria-sort on the sorted header, and on ONE header only', 'Sort controls are buttons inside <th>, not click handlers on the cell', 'Row selection announces how many rows are selected'],
+    free: 'A real <table> with <th scope> gives the structure a screen reader reads rows and columns with.',
+  },
+  'activity-feed': {
+    pattern: 'Feed',
+    url: `${APG}/feed/`,
+    keys: [['Page Down / Page Up', 'Move to the next / previous article'], ['Ctrl+Home / Ctrl+End', 'First / last article']],
+    aria: ['role="feed" with role="article" children', 'aria-posinset and aria-setsize on each article', 'aria-busy on the feed while new items are being loaded in'],
+  },
+  resizable: {
+    pattern: 'Window Splitter',
+    url: `${APG}/windowsplitter/`,
+    keys: [['Left / Right (or Up / Down)', 'Move the splitter by a step'], ['Home / End', 'Minimum / maximum'], ['Enter', 'Collapse or restore the pane']],
+    aria: ['role="separator" with tabindex="0" — a splitter that cannot be focused can only be dragged, which fails WCAG 2.5.7', 'aria-valuenow · aria-valuemin · aria-valuemax', 'aria-controls naming the pane it sizes'],
+  },
+  'hover-card': {
+    pattern: 'Tooltip',
+    url: `${APG}/tooltip/`,
+    keys: [['Escape', 'Dismiss while the trigger keeps focus']],
+    aria: ['Opens on FOCUS as well as hover, or it does not exist for a keyboard', 'Stays open while the pointer travels onto it (WCAG 1.4.13)', 'Rich content belongs in a disclosure instead — anything interactive inside a tooltip is unreachable'],
+  },
+
+  // — Navigation furniture: eight recipes, one practice —
+  appbar: {
+    pattern: 'Landmarks',
+    url: LANDMARKS,
+    keys: [],
+    aria: ['<header> is the banner landmark', 'Its nav needs a name when the page has more than one'],
+    free: 'The element is the landmark.',
+  },
+  sidebar: {
+    pattern: 'Landmarks',
+    url: LANDMARKS,
+    keys: [['Tab', 'Move through the links — site navigation is not arrow-navigated']],
+    aria: ['<nav> with a name distinguishing it from the other navs', 'aria-current="page" on the current item — the highlight is not available to a screen reader'],
+  },
+  navsuite: {
+    pattern: 'Landmarks',
+    url: LANDMARKS,
+    keys: [['Tab', 'Move through the links']],
+    aria: ['aria-current="page" on the active item', 'A collapsed rail still needs names — an icon with no label is an unnamed link'],
+  },
+  'navigation-row': {
+    pattern: 'Landmarks',
+    url: LANDMARKS,
+    keys: [['Tab', 'Move through the rows']],
+    aria: ['aria-current="page" on the active row', 'The whole row is one control, not a link wrapped around a button'],
+  },
+  inpagenav: {
+    pattern: 'Landmarks',
+    url: LANDMARKS,
+    keys: [['Tab', 'Move through the anchors']],
+    aria: ['<nav aria-label="On this page">', 'aria-current="true" on the section being read', 'The anchors must point at real headings, in document order'],
+  },
+  langnav: {
+    pattern: 'Landmarks',
+    url: LANDMARKS,
+    keys: [['Tab', 'Move through the languages']],
+    aria: ['Each option named IN ITS OWN LANGUAGE with a matching lang attribute (WCAG 3.1.2)', 'hreflang on each link', '"Nederlands", never a flag — a flag is a country, not a language'],
+  },
+  sitefooter: {
+    pattern: 'Landmarks',
+    url: LANDMARKS,
+    keys: [],
+    aria: ['<footer> is the contentinfo landmark', 'Its link groups are headed lists, not a wall of anchors'],
+    free: 'The element is the landmark.',
+  },
+  skiplink: {
+    pattern: 'Landmarks (bypass blocks)',
+    url: LANDMARKS,
+    keys: [['Tab', 'It is the FIRST tab stop, and becomes visible on focus']],
+    aria: ['Points at the <main> id', 'The target takes focus, not merely the scroll position — otherwise the next Tab returns to the top of the page'],
+  },
 }
 
-/** Recipe ids that deliberately have no APG pattern, and why. */
+/** Recipe ids that deliberately have no APG pattern, and why.
+ *
+ * This half is longer than the pattern half, and that is the honest shape of a
+ * component library: most of what we ship is structure and surface, and only a
+ * minority is behaviour that a standard specifies. The reason has to be a real
+ * one. "No pattern applies" as a stock phrase would make this table a way of
+ * clearing the gate rather than a way of answering the question — so each entry
+ * says what the recipe owes INSTEAD, and several of those obligations
+ * (a name, a live region, a text alternative) are stricter than a key map.
+ */
 export const APG_NOT_APPLICABLE: Record<string, string> = {
   card: 'A card is a visual container, not an interaction pattern. APG has none, and inventing roles for it is how a div ends up announced as a widget.',
   'badges-pills': 'Static text with a tone. Its meaning must be in the words, which is WCAG 1.4.1, not an APG pattern.',
@@ -251,4 +533,59 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   prose: 'Long-form content — HTML semantics, not a widget.',
   identifier: 'Institutional furniture. Landmarks apply; there is no interaction pattern.',
   charcount: 'A live region attached to a field. The pattern is the live region, covered under the field, not a widget of its own.',
+
+  // — Layout and composition: no behaviour to specify —
+  composition: 'Utilities that arrange other components. They have no semantics of their own, which is the point — a layout that announces itself is a layout in the way.',
+  'layout-primitives': 'Stack, cluster, grid. Structure only. Whatever they contain carries the semantics.',
+  twocolumnlayout: 'A two-column arrangement. The reading order it produces is the accessibility question, and that is source order, not a role.',
+  pane: 'A region of a shell. It needs a name if it is a landmark and nothing at all if it is not — see Window Splitter for the resizable case.',
+  section: 'A titled block of content. Its heading is the semantics; a role would be a second, weaker copy of it.',
+  'page-head': 'A title block. The <h1> does the work.',
+  separator: 'A visual rule. role="separator" only when it divides groups meaningfully — a decorative line takes aria-hidden, or a screen reader announces furniture.',
+  'aspect-ratio': 'A sizing box. It constrains its child and says nothing.',
+  'scroll-area': 'No APG pattern, but a real obligation: a scrollable region needs tabindex="0" and a name, or its content can be reached by mouse and not by keyboard. That is WCAG 2.1.1, and it is the failure this recipe is most likely to be part of.',
+  'form-panel': 'A form in a panel. The fields carry the semantics; the panel is a surface.',
+  'danger-zone': 'A framed action panel. Its danger is carried by the words and the confirmation step, not by a role — and never by the red alone (WCAG 1.4.1).',
+  'action-panel': 'A row of copy beside a control. Both halves already have semantics; the arrangement has none.',
+  auth: 'A page composition of fields and buttons. Every part is covered by its own recipe.',
+  form: 'A <form> is HTML, not a widget. What matters lives in the fields, the labels and the error handling — and in a submit button that says what it submits.',
+  fieldset: '<fieldset>/<legend> IS the grouping mechanism; APG has no pattern because HTML already has the element. The failure mode is not using it: a set of radios without a legend has options with no question.',
+  'entity-card': 'A card describing a thing. If the whole card is clickable it is one link with one name, not a card full of separate targets — that is the only real decision here.',
+  infocard: 'A compact information tile. Label/value pairs; a description list if the pairs are data.',
+  'stat-tile': 'A number with a label. The label must be part of the accessible name — a screen reader reading "1,284" alone has been told nothing.',
+  'file-grid': 'A grid of file tiles. Visually a grid, semantically a list — role="grid" here would promise arrow-key navigation between cells that no file browser actually wants.',
+  list: 'A list. <ul>/<li>, and the row semantics come from what is in the row.',
+  'description-list': 'Term and definition pairs. <dl>/<dt>/<dd> is the pattern, and it is HTML.',
+  timeline: 'An ordered list of events with times. <ol> plus <time> — a role would add nothing a screen reader does not already get.',
+  processlist: 'Numbered steps that carry content. An <ol>, where the number is the list, not a painted circle.',
+  stepper: 'A read-only progress indicator through a wizard. Not a widget — an <ol> with aria-current="step". The current step must be in TEXT ("Step 2 of 4"), because a filled dot is not available to a screen reader.',
+  wizardstepper: 'Same as the stepper: an indicator, not a control. aria-current="step" and the position said in words.',
+  'plan-compare': 'A comparison of plans. It is a table when it compares features across plans, and marking it up as anything else loses the row/column relationship that makes it readable.',
+  pricing: 'Priced cards. The price must be in the accessible name of whatever chooses it — "Choose Pro, 29 euro per month", not "Choose".',
+  breakdown: 'A labelled distribution. Each row states its own share in text; the bar is the illustration, not the information.',
+
+  // — Media, text and status: the alternative IS the obligation —
+  avatar: 'An image or initials. Decorative beside a name (aria-hidden), and named when it stands alone — a photo whose alt text is the file name is the classic failure.',
+  spinner: 'A busy indicator. aria-busy on the region it belongs to, and a live region announcing the outcome. Never a spinner that announces itself forever.',
+  'empty-state': 'A message and usually one action. The message is text; there is nothing to specify.',
+  rating: 'READ-ONLY display, and that is exactly why it has no pattern: five painted stars are an image of a score. It needs its value in text ("4 out of 5"). An INTERACTIVE rating would be a Radio Group instead, and dressing this one in radio semantics would announce a control nobody can operate.',
+  chart: 'No APG pattern, and the largest text-alternative obligation in the kit: a chart is unreadable to a screen reader unless the same information exists as text or a table. Colour alone cannot carry a series (WCAG 1.4.1), which is why the legend uses markers as well.',
+  sparkline: 'A trend glyph. It needs the trend in words beside it ("up 12% this week"); on its own it is decoration and takes aria-hidden.',
+  kbd: 'A key name. <kbd>. The trap is symbols — "⌘K" needs to be readable, not a glyph a screen reader spells out or skips.',
+  code: 'An inline code span. <code>.',
+  codeblock: 'A code block. <pre><code>, with a language label as text. The copy button is a plain button that must confirm what it did in a live region.',
+  citation: 'A source reference. A link with a name that identifies the source, not "[1]" — a citation list read as bracketed numbers is a list of nothing.',
+  message: 'A chat turn. Who is speaking must be in text, not conveyed by which side of the screen it sits on.',
+  'inline-status-meta-micro-components': 'Small pieces of meta text. Each carries its meaning in words; that is the whole contract.',
+  'attachment-chip-family': 'File chips. The name, the type and the size belong in the accessible name; the remove control names what it removes.',
+  'roll-down-item-stagger': 'An entrance animation. It must respect prefers-reduced-motion, which is WCAG 2.3.3 and a media query, not a role.',
+  'button-finish': 'A surface treatment for buttons. The Button pattern covers the behaviour; this changes only how it looks.',
+
+  // — Fields whose obligations are HTML, not ARIA —
+  'memorable-date': 'Three text inputs in a fieldset — the GOV.UK pattern, chosen BECAUSE it has no widget behaviour to get wrong. Day/month/year as separate labelled inputs, legend as the question, and no date picker between the person and the answer.',
+  'input-otp': 'A row of single-character inputs. autocomplete="one-time-code" and inputmode="numeric" are the whole accessibility story; the slots need one name for the group, not six unrelated fields.',
+  passwordinput: 'A password field. The reveal control is a toggle button that must say which state it is in ("Show password" / "Hide password"), and the field must permit paste — blocking it breaks password managers, which is an accessibility failure with a security costume.',
+  phoneinput: 'A country select beside a tel input. Both halves are ordinary form controls; the pairing needs one label that covers both.',
+  requirements: 'A checklist that updates as the person types. The pattern is the live region, not a widget: each rule states met/unmet in text, and the region must be polite or every keystroke interrupts.',
+  'file-upload-dropzone': 'No APG pattern, and one hard requirement: the drop target must be paired with a real <input type="file">. A drag-only upload fails WCAG 2.5.7, and drag is also the interaction most likely to be impossible for the person using this.',
 }

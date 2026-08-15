@@ -8,13 +8,17 @@
  * check and a second implementer can match — which is the entire difference
  * between a library and a standard.
  *
- * A RATCHET, not a pass line. 23 of 114 recipes carry a pattern and 6 record why
- * they have none; 85 are undeclared, and pretending otherwise by only checking
- * the mapped ones would be a gate that cannot fail. The number below is the
- * current debt, it may only go down, and a NEW recipe must declare either a
- * pattern or a reason. That is the same shape as the structural-inline ratchet
- * and for the same reason: the honest way to carry a backlog is to make it
- * visible and monotonic.
+ * IT WAS A RATCHET; IT IS NOW A PASS LINE. It opened at 85 undeclared of 114 —
+ * carried as a monotonic debt, because pretending otherwise by only checking the
+ * mapped ones would have been a gate that could not fail. The debt is now zero:
+ * 59 recipes carry a pattern, 55 record why they have none, and BASELINE 0 means
+ * a new recipe cannot be added without answering the question.
+ *
+ * The answer that mattered most was often "no pattern, and here is what it owes
+ * instead" — a read-only rating is an image of a score and needs its value in
+ * text; a chart needs a text alternative; a scroll area needs tabindex="0" or it
+ * is mouse-only. Those obligations are stricter than a key map, and they would
+ * not exist in the file if the reason field accepted a stock phrase.
  */
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -23,8 +27,8 @@ import { dirname, join } from 'node:path'
 const here = dirname(fileURLToPath(import.meta.url))
 const read = (p) => readFileSync(join(here, p), 'utf8')
 
-/** The debt as it stood when the anchor was introduced. Lower it, never raise it. */
-const BASELINE = 85
+/** Zero, and it may never rise. Every recipe declares a pattern or a reason. */
+const BASELINE = 0
 
 const recipeIds = [...read('../src/kit/recipes/index.ts').matchAll(/^ {4}id: '([a-z0-9-]+)',/gm)].map((m) => m[1])
 const apgSrc = read('../src/kit/apg.ts')
@@ -54,9 +58,11 @@ const problems = []
 
 if (undeclared.length > BASELINE) {
   problems.push(
-    `The undeclared count went UP: ${undeclared.length} vs a baseline of ${BASELINE}.\n` +
-    `  New recipes must say which APG pattern they implement, or record in APG_NOT_APPLICABLE\n` +
-    `  why they have none. Undeclared: ${undeclared.slice(-6).join(', ')}`,
+    `${undeclared.length} recipe(s) declare neither a pattern nor a reason.\n` +
+    `  Say which APG pattern it implements in APG_PATTERNS, or record in APG_NOT_APPLICABLE\n` +
+    `  what it owes instead — a name, a live region, a text alternative. A stock phrase here\n` +
+    `  turns the table into a way of clearing this gate rather than answering it.\n` +
+    `  Undeclared: ${undeclared.join(', ')}`,
   )
 }
 
