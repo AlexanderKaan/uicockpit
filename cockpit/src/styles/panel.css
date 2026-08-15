@@ -123,8 +123,9 @@
    line that used to be here was a copy of it, including a hard-coded 10px where
    the recipe reads --k-type-caption. What stays is the 28px indent, which is the
    panel's own gutter for the lock affordance and belongs to nobody else. */
-.fmsec {
-  padding-left: 28px;
+.panel .fmsec {
+  /* Aligned with the row labels, from the same expression rather than a copy. */
+  padding-left: calc(var(--k-in-h-default, 36px) + var(--k-s-8));
 }
 /* A section header that twins a Foundations stage section — clicking jumps there.
  * Resets button chrome to match the .fmsec label; a → appears on hover as the cue. */
@@ -167,7 +168,14 @@
   /* 24, not 19. WCAG 2.5.8 AA, and the spacing exception does not rescue it —
    * the row's controls sit right beside it. The GLYPH stays small; only the
    * target grows, which is the same trick the kit uses on close buttons. */
-  width: 24px; height: 24px; padding: 0; border: 0; border-radius: 5px;
+  /* NO SIZE HERE ANY MORE. .btn--icon sizes itself from --k-in-h-default, which
+     is the control ladder the whole kit sits on, and the 24px written here was
+     our own number fighting it — the button rendered at 36 and lay 30px across
+     the label. The answer was not to shrink the kit's button back down: it is
+     that size on purpose, because that is where the target floor is. The GUTTER
+     grows to fit it, below. Same lesson the topbar taught an hour ago, where
+     "this chrome needs its own denser control" also turned out to be untrue. */
+  padding: 0; border: 0;
   background: transparent; color: var(--app-fg-faint); cursor: pointer;
   /* Locking is a secondary affordance — it protects a row from Shuffle, which
    * most visits never touch. At 0.85 it sat level with the control labels and
@@ -191,18 +199,31 @@
  * dropped: the ticks read as noise (especially in dark mode) and a single, calm
  * title weight is cleaner than a per-row emphasis split. The .fmrow--key class
  * stays inert in the markup — group order + section headers carry the structure. */
-.fmrow__head {
+/* .panel-scoped ON PURPOSE. injectKit appends the recipes to <head> AFTER the
+   bundled stylesheets, so at equal specificity .menu__item wins — which is why
+   the first version of this override silently did nothing and the lock ended up
+   lying across the label. A panel adjusting a recipe for its own surface should
+   say so in the selector rather than hope about order. */
+.panel .fmrow__head {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 10px 9px 28px;
+  /* The left gutter holds the lock, so it is sized from the same token the lock
+     is: control height + a little air. It used to be a hard-coded 28, which was
+     narrower than the button it had to contain. */
+  padding: 9px 10px;
+  padding-left: calc(var(--k-in-h-default, 36px) + var(--k-s-8));
   /* The row IS the target now that every setting is one, so it holds to the
      floor we hold everyone else to — and it gets there for free, because a
      full-width row is large by construction. The old inline segments measured
      64x21 against a 24px floor and needed the panel to be redesigned to fix it;
      this shape simply cannot fail. */
-  min-height: var(--k-hit-min, 24px);
+  /* --k-row-h-md, not the sm rung .menu__item defaults to. A dropdown is
+     transient and wants to be dense; a settings panel is a surface you sit in,
+     and at the sm rung the rows read as one block of text with no air between
+     them. Same ladder, the rung that fits the context. */
+  min-height: var(--k-row-h-md, 32px);
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--k-radius-md, 8px);
@@ -213,7 +234,12 @@
               border-color var(--app-dur) var(--app-ease);
 }
 .fmrow__head:hover { background: var(--app-hover); }
-.fmrow--open > .fmrow__head {
+.fmrow--open > /* .panel-scoped ON PURPOSE. injectKit appends the recipes to <head> AFTER the
+   bundled stylesheets, so at equal specificity .menu__item wins — which is why
+   the first version of this override silently did nothing and the lock ended up
+   lying across the label. A panel adjusting a recipe for its own surface should
+   say so in the selector rather than hope about order. */
+.panel .fmrow__head {
   background: var(--app-bg);
   border-color: var(--app-border);
 }
