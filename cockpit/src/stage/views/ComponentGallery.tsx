@@ -1009,15 +1009,30 @@ function FormCard() {
 function SelectionCard() {
   return (
     <Card title="Create repository">
-      <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: '0 0 4px' }}>
-        Who can access this repository?
-      </p>
-      <label className="radio">
-        <input type="radio" name="repo-vis" defaultChecked /> Public — anyone can see it
-      </label>
-      <label className="radio">
-        <input type="radio" name="repo-vis" /> Private — you choose who
-      </label>
+      {/* <fieldset> + <legend>, NOT a div with role="radiogroup".
+          The question was in a paragraph — visible, but attached to nothing, so
+          the options were announced as two loose choices. The platform already
+          has the element for this, and reaching for the ARIA role instead was
+          the wrong instinct twice over: it is more to get right, and axe then
+          measured the radios themselves as 16px targets rather than crediting
+          their labels. The element does what the role only describes. */}
+      {/* …and the fieldset has to carry the gap the card used to give these rows.
+          Wrapping them took them out of the card's flow, the labels closed up,
+          and axe went from silent to flagging both radios — because WCAG 2.5.8's
+          spacing allowance is what a 16px radio passes on, and that allowance is
+          exactly the space that disappeared. Grouping for one criterion broke
+          another, which is the sort of trade only a rendered check catches. */}
+      <fieldset style={{ border: 0, padding: 0, margin: 0, minInlineSize: 0, display: 'flex', flexDirection: 'column', gap: 'var(--k-stack-gap, 8px)' }}>
+        <legend style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', padding: 0, margin: '0 0 4px' }}>
+          Who can access this repository?
+        </legend>
+        <label className="radio">
+          <input type="radio" name="repo-vis" defaultChecked /> Public — anyone can see it
+        </label>
+        <label className="radio">
+          <input type="radio" name="repo-vis" /> Private — you choose who
+        </label>
+      </fieldset>
       <div style={{ borderTop: 'var(--k-divider)', margin: '4px 0 2px' }} />
       <label className="checkbox">
         <input type="checkbox" defaultChecked /> Add a README
@@ -1886,8 +1901,12 @@ function FormPanelCard() {
             </div>
           </div>
           <div className="formpanel__section">
-            <div className="formpanel__section-title">Plan</div>
-            <div className="radio-cards">
+            {/* role="radiogroup" + a name, because a set of radios with nothing
+                grouping them announces three choices and no question. The visible
+                section title is the question, so it labels the group rather than
+                being repeated as invisible text. */}
+            <div className="formpanel__section-title" id="fp-plan-label">Plan</div>
+            <div className="radio-cards" role="radiogroup" aria-labelledby="fp-plan-label">
               {([['team', 'Team', '$8 / seat · unlimited projects'], ['biz', 'Business', '$16 / seat · SSO + audit log']] as [string, string, string][]).map(([k, t, d]) => (
                 <label key={k} className={'radio-card' + (plan === k ? ' radio-card--on' : '')}>
                   <span className="radio"><input type="radio" name="fp-plan" checked={plan === k} onChange={() => setPlan(k)} /></span>
@@ -4095,7 +4114,9 @@ function RadioCardCard() {
   ]
   return (
     <Card title="Radio card" desc="Selectable option cards — delivery, plans, payment.">
-      <div className="radio-cards">
+      {/* A radiogroup with a name. Without one these are three options with no
+          question attached, which is exactly what a screen reader announces. */}
+      <div className="radio-cards" role="radiogroup" aria-label="Delivery method">
         {opts.map((o) => (
           <label key={o.id} className={'radio-card' + (val === o.id ? ' radio-card--on' : '')}>
             <span className="radio"><input type="radio" name="rc-demo" checked={val === o.id} onChange={() => setVal(o.id)} /></span>

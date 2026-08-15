@@ -13,15 +13,24 @@
  * a gate that fails for reasons nobody has triaged is a gate people learn to
  * skip. It prints; the ratchet comes once the list has been worked through.
  */
-import { runHarness, byComponent } from './lib/harness.mjs'
+import { runHarness, driveTabWalk, byComponent } from './lib/harness.mjs'
 
 const { findings, variations } = await runHarness()
+
+/* Dimension B needs the page DRIVEN rather than rendered, so it is its own pass
+ * with its own browser. One tab walk, four checks — reachable, no trap, focus
+ * visible, focus not obscured. */
+const drive = await driveTabWalk()
+findings.push(...drive.findings.map((f) => ({ ...f, variation: 'tab-walk' })))
+console.log(`tab walk: ${drive.stops} stops over ${drive.marked} interactive elements` +
+  `${drive.leftTheRegion ? ', focus left the region cleanly' : ', FOCUS NEVER LEFT THE REGION'}\n`)
 
 /* SEVERITY, or the loudest component is loud for the least serious reason.
  * Sorting by count put Footer on top with 71 size measurements while a Level A
  * keyboard trap sat 40 lines below it. A breach and a measurement are not the
  * same kind of thing and must not share a ranking. */
 const SEVERITY = (f) => {
+  if (f.sevHint !== undefined) return f.sevHint              // the drive rules rank themselves
   if (f.rule.startsWith('axe:')) return 0                    // a real WCAG violation, independently found
   if (f.rule === 'E-scroll-region-unreachable') return 0     // 2.1.1, Level A
   if (f.rule === 'E-clipped-text' || f.rule === 'E-overflows-its-box') return 1  // content actually lost

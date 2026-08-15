@@ -222,6 +222,185 @@
     },
   }
 
+  /* ── DRIVE · the substrate the other rules cannot reach ─────────────────
+   *
+   * Everything above judges a render. Keyboard behaviour only exists while the
+   * component is being OPERATED, so it needs the page driven from Node — and
+   * one walk answers four questions at once, which is why it is worth the cost:
+   *
+   *   B1 reachable      · every interactive element receives focus at some point
+   *   B2 no trap        · the walk always progresses and eventually leaves
+   *   B4 focus visible  · every stop shows an indicator
+   *   B5 not obscured   · the focused element is actually on top at its centre
+   *
+   * Elements are tagged before the walk so a stop can be matched back to a
+   * specific control; a selector built after the fact drifts the moment the DOM
+   * re-renders, which it does at every stop.
+   */
+  const INTERACTIVE = 'a[href], button, input, select, textarea, summary, [contenteditable="true"], ' +
+    '[tabindex]:not([tabindex="-1"]), [role="button"], [role="link"], [role="checkbox"], [role="radio"], ' +
+    '[role="switch"], [role="slider"], [role="spinbutton"], [role="tab"], [role="menuitem"], [role="option"], [role="separator"]'
+
+  window.__uicMarkInteractive = function (rootSel) {
+    const root = document.querySelector(rootSel)
+    if (!root) return { total: 0 }
+    let n = 0
+    const els = root.querySelectorAll(INTERACTIVE)
+    for (const e of els) {
+      if (e.offsetParent === null && getComputedStyle(e).position !== 'fixed') continue
+      if (e.matches('[disabled], [aria-disabled="true"], [aria-hidden="true"]')) continue
+      /* The platform has its own ways of putting things out of tab order, and
+       * they are all CORRECT: a closed <details>, a dialog that is not open, a
+       * popover that is not showing, [hidden], [inert]. Marking those and then
+       * reporting them as unreachable would be the checker complaining that
+       * hidden things are hidden. */
+      if (e.closest('details:not([open]) > *:not(summary), dialog:not([open]), [popover]:not(:popover-open), [hidden], [inert]')) continue
+      /* tabindex="-1" is ROVING TABINDEX, and it is the pattern working. A
+       * toolbar is one tab stop: one control is tabbable and the rest are
+       * reached with arrow keys. Our "Last sync" toolbar has exactly that —
+       * Status tabbable, Top/Bottom/Left/Right at -1 — and reporting those four
+       * as Level A failures would have had us "fix" a correct toolbar into five
+       * separate tab stops, which is what APG's toolbar pattern exists to
+       * prevent. The bare `button` in the selector above matched them; this
+       * puts them back. */
+      if (e.getAttribute('tabindex') === '-1') continue
+      const det = e.closest('details')
+      if (det && !det.open && !e.closest('summary')) continue
+      e.setAttribute('data-uic-id', String(n++))
+    }
+    return { total: n }
+  }
+
+  /** Read everything worth knowing about wherever focus currently sits. */
+  window.__uicFocusState = function (rootSel) {
+    const root = document.querySelector(rootSel)
+    const el = document.activeElement
+    if (!el || el === document.body) return { outside: true }
+    if (!root || !root.contains(el)) return { outside: true }
+
+    const cs = getComputedStyle(el)
+    const r = el.getBoundingClientRect()
+
+    /* An indicator is an outline, a ring drawn with box-shadow, or a border the
+     * focus state changed. Checking only outline-width would call our own kit
+     * broken, since the ring is a box-shadow. */
+    const hasRing = (parseFloat(cs.outlineWidth) > 0 && cs.outlineStyle !== 'none') ||
+      (cs.boxShadow && cs.boxShadow !== 'none')
+
+    /* Obscured: something else is painted over the point a person would click.
+     * Sample the centre, and the corners too, because a sticky header usually
+     * covers an edge rather than the middle. */
+    let obscuredAt = null
+    if (r.width > 0 && r.height > 0) {
+      /* ENTIRELY hidden, which is what the SC actually says: 2.4.11 Focus Not
+       * Obscured (Minimum) asks that the focused component is "not entirely
+       * hidden due to author-created content". Reporting a partially covered
+       * element flagged .sheet-frame__backdrop — a full-area click-to-close
+       * target whose centre is covered by the sheet BY DESIGN, while its whole
+       * border, and therefore its focus ring, is plainly visible. Sample the
+       * centre and the corners; only a point that is covered EVERYWHERE counts. */
+      const pts = [
+        [r.left + r.width / 2, r.top + r.height / 2],
+        [r.left + 3, r.top + 3], [r.right - 3, r.top + 3],
+        [r.left + 3, r.bottom - 3], [r.right - 3, r.bottom - 3],
+      ]
+      let covered = 0
+      let sampled = 0
+      let coveredBy = null
+      for (const [x, y] of pts) {
+        if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue
+        sampled++
+        const top = document.elementFromPoint(x, y)
+        if (top && top !== el && !el.contains(top) && !top.contains(el)) {
+          covered++
+          coveredBy = String(top.className || top.tagName).slice(0, 30)
+        }
+      }
+      if (sampled > 0 && covered === sampled) obscuredAt = coveredBy
+    }
+
+    return {
+      outside: false,
+      id: el.getAttribute('data-uic-id'),
+      el: label(el),
+      component: componentOf(el),
+      kit: inKit(el),
+      hasRing,
+      obscuredAt,
+      x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height),
+    }
+  }
+
+  window.__uicUnfocused = function (rootSel) {
+    const root = document.querySelector(rootSel)
+    const out = []
+    /* COMPOSITE WIDGETS ARE ONE TAB STOP, and that is the pattern working, not a
+     * defect. A radio group, a tablist, a listbox and a menu each take a single
+     * stop and move internally with arrow keys — so every unchecked radio and
+     * every unselected tab is *correctly* unreachable by Tab. The first version
+     * of this rule did not know that and reported them as Level A failures,
+     * which would have had us "fix" a group into the keyboard trap of eleven
+     * separate tab stops that APG exists to prevent. */
+    const COMPOSITE = '[role="radiogroup"], [role="tablist"], [role="listbox"], [role="menu"], [role="menubar"], [role="tree"], [role="grid"], fieldset'
+    for (const e of root.querySelectorAll('[data-uic-id]')) {
+      if (e.hasAttribute('data-uic-seen')) continue
+      const group = e.closest(COMPOSITE)
+      const radioLike = e.matches('input[type="radio"]') || /^(radio|tab|option|menuitem|menuitemradio|menuitemcheckbox|treeitem)$/.test(e.getAttribute('role') || '')
+      if (group && radioLike) continue
+      if (radioLike && !group) {
+        /* An unchecked radio is never in the tab order — that is the platform
+         * working. But radios with no fieldset or radiogroup around them are a
+         * REAL defect wearing that pattern's clothes: nothing names the question
+         * the options answer, so a screen reader announces three choices and no
+         * question. Reported as what it is, not as "unreachable", which would
+         * have been an accurate observation of the wrong thing. */
+        out.push({ component: componentOf(e), kit: inKit(e), el: label(e),
+          detail: 'radio with no <fieldset> or role="radiogroup" around it — the options have no question' })
+        continue
+      }
+      out.push({ component: componentOf(e), kit: inKit(e), el: label(e),
+        detail: 'never received focus while tabbing' + (group ? ' (inside a composite widget, but not one of its item roles)' : '') })
+    }
+    return out
+  }
+
+  /**
+   * The CONTROL for the focus-indicator check, and it needs one.
+   *
+   * Reading the focused element's own outline and box-shadow called half our
+   * form controls unringed — because the kit draws the ring on the WRAPPER with
+   * :focus-within (.in, .taginput), so the inner input genuinely has none of its
+   * own while a ring is plainly visible on screen. Measuring the wrong element.
+   *
+   * So: focus it, record the element and its ancestors, blur, record again, and
+   * compare. Anything that changes is an indicator, wherever it is drawn and
+   * however it is drawn — no assumption about outline versus shadow versus
+   * border, which is what makes it work on somebody else's component too.
+   */
+  window.__uicProbeIndicator = function (id) {
+    const el = document.querySelector('[data-uic-id="' + id + '"]')
+    if (!el) return { missing: true }
+    /* Up AND down. The ring is not always on the focused element: our own
+     * .in draws it on the wrapper (:focus-within, an ancestor) and .slider
+     * draws it on the knob (:focus, a descendant). Looking only upward called
+     * the slider unringed, which is the third time this one rule has been wrong
+     * about which element to measure. */
+    const chain = []
+    for (let e = el, n = 0; e && n < 4; e = e.parentElement, n++) chain.push(e)
+    for (const d of el.querySelectorAll('*')) { if (chain.length > 12) break; chain.push(d) }
+    const snap = () => chain.map((e) => {
+      const cs = getComputedStyle(e)
+      return cs.outline + '|' + cs.boxShadow + '|' + cs.borderColor + '|' + cs.backgroundColor
+    })
+    el.focus()
+    const focused = snap()
+    el.blur()
+    const blurred = snap()
+    el.focus()
+    for (let i = 0; i < focused.length; i++) if (focused[i] !== blurred[i]) return { hasIndicator: true, at: i }
+    return { hasIndicator: false }
+  }
+
   window.__uicRules = rules
   window.__uicRun = function (rootSel, ctx) {
     var root = document.querySelector(rootSel)

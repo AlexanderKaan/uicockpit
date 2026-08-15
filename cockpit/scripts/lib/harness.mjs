@@ -233,6 +233,124 @@ export async function runHarness({
   return { findings, meta, variations }
 }
 
+/**
+ * DRIVE — walk the whole preview with the Tab key and read what happens.
+ *
+ * Dimension B, and the reason it was scheduled last: it is the only substrate
+ * that needs the component OPERATED rather than rendered, so it costs a real
+ * interaction per step. One walk pays for four checks, which is what makes it
+ * worth the cost:
+ *
+ *   B1 · every interactive element receives focus at some point
+ *   B2 · the walk always progresses and eventually leaves — no trap
+ *   B4 · every stop shows a focus indicator
+ *   B5 · the focused element is not covered by something else
+ *
+ * A trap is the failure that matters most here and the hardest to notice by
+ * hand: a person who tabs into a component and cannot tab out is stuck on the
+ * page, and nothing in a static render can tell you that.
+ */
+export async function driveTabWalk({
+  url = 'http://localhost:5173/app',
+  rootSel = '.cockpit-preview',
+  maxSteps = 600,
+} = {}) {
+  const browser = await chromium.launch()
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
+  await page.goto(url, { waitUntil: 'networkidle' })
+  await page.waitForSelector(rootSel, { timeout: 25000 })
+  await page.waitForTimeout(1500)
+  await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
+  await page.addScriptTag({ path: RULES_PATH })
+  const kitClasses = [...parseKit().classes.keys()]
+  await page.evaluate((classes) => { window.__uicKitClasses = new Set(classes) }, kitClasses)
+
+  const { total } = await page.evaluate((sel) => window.__uicMarkInteractive(sel), rootSel)
+
+  // Start just before the preview so the first Tab lands inside it.
+  await page.evaluate((sel) => {
+    const root = document.querySelector(sel)
+    const first = root.querySelector('[data-uic-id]')
+    if (first) first.focus()
+  }, rootSel)
+
+  const trace = []
+  let steps = 0
+  let leftTheRegion = false
+  for (; steps < maxSteps; steps++) {
+    const state = await page.evaluate((sel) => {
+      const s = window.__uicFocusState(sel)
+      if (!s.outside) {
+        const el = document.activeElement
+        if (el && el.setAttribute) el.setAttribute('data-uic-seen', '1')
+      }
+      return s
+    }, rootSel)
+    if (state.outside) { leftTheRegion = true; break }
+    trace.push(state)
+    await page.keyboard.press('Tab')
+  }
+
+  const unreached = await page.evaluate((sel) => window.__uicUnfocused(sel), rootSel)
+
+  const findings = []
+
+  /* B2 — a trap. Two shapes: focus that stops moving, and a walk that never
+   * ends. Both leave a keyboard user stranded, and neither is visible in a
+   * screenshot. */
+  let repeats = 0
+  for (let i = 1; i < trace.length; i++) {
+    if (trace[i].id && trace[i].id === trace[i - 1].id) repeats++
+    else repeats = 0
+    if (repeats >= 3) {
+      findings.push({ rule: 'B-keyboard-trap', wcag: '2.1.2 (Level A)', sevHint: 0,
+        component: trace[i].component, kit: trace[i].kit, el: trace[i].el,
+        detail: 'focus stops moving here — Tab does not advance' })
+      break
+    }
+  }
+  if (!leftTheRegion && steps >= maxSteps) {
+    findings.push({ rule: 'B-keyboard-trap', wcag: '2.1.2 (Level A)', sevHint: 0,
+      component: '(the wall)', kit: true, el: rootSel,
+      detail: `${maxSteps} tab presses and focus never left the region` })
+  }
+
+  // B1 — reachable.
+  for (const u of unreached) {
+    findings.push({ ...u, rule: 'B-unreachable-by-keyboard', wcag: '2.1.1 (Level A)', sevHint: 0 })
+  }
+
+  /* B4 — a focus indicator at every stop, VERIFIED before it is reported.
+   *
+   * The cheap reading (does the focused element have an outline or a shadow?)
+   * flagged half our form controls, because the kit draws the ring on the
+   * wrapper with :focus-within and the inner input has none of its own. So the
+   * suspects go through a control — focus, snapshot, blur, snapshot, compare —
+   * which needs no assumption about how a ring is drawn or which element draws
+   * it, and therefore also works on somebody else's component. */
+  const suspects = new Map()
+  for (const t of trace) if (!t.hasRing && t.id != null) suspects.set(`${t.component}|${t.el}`, t)
+  if (suspects.size) {
+    for (const t of suspects.values()) {
+      const probe = await page.evaluate((id) => window.__uicProbeIndicator(id), t.id)
+      if (probe.hasIndicator || probe.missing) continue
+      findings.push({ component: t.component, kit: t.kit, el: t.el, rule: 'B-no-focus-indicator',
+        wcag: '2.4.7 (AA)', sevHint: 0, detail: 'nothing changes visually when it takes focus' })
+    }
+  }
+
+  // B5 — focus not obscured.
+  const covered = new Map()
+  for (const t of trace) if (t.obscuredAt) covered.set(`${t.component}|${t.el}`, t)
+  for (const t of covered.values()) {
+    findings.push({ component: t.component, kit: t.kit, el: t.el, rule: 'B-focus-obscured',
+      wcag: '2.4.11 (AA)', sevHint: 1, detail: `covered by ${t.obscuredAt} when focused` })
+  }
+
+  await browser.close()
+  return { findings, stops: trace.length, marked: total, leftTheRegion }
+}
+
 /** Group findings by component — the axis a review needs, not the one a gate uses. */
 export function byComponent(findings) {
   const map = new Map()
