@@ -86,6 +86,9 @@ const CRITERIA = [
   ['2.5.7 Dragging Movements', 'AA', 'Every drag affordance has a single-pointer alternative.'],
   ['2.5.8 Target Size (Minimum)', 'AA', '24x24 CSS px floor via --k-hit-min; small glyph controls keep their visual size and centre a transparent hit area.'],
   ['2.5.5 Target Size (Enhanced)', 'AAA', 'Reached only at the AAA conformance setting, where every density rung lifts to 44x44 and Scale governs whitespace instead.'],
+  ['1.4.12 Text Spacing', 'AA', 'Under the four overrides the SC specifies (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2em) nothing clips. Scroll regions carry a two-line floor so a panel squeezed by grown chrome cannot collapse the part that holds the content.'],
+  ['1.4.10 Reflow', 'AA', 'At 320 CSS px no component is wider than the box it is given. Grid tracks use minmax(0, …) so one unbreakable cell cannot drag a column past its share, and the month-with-events calendar falls back to day markers where an event title no longer fits.'],
+  ['1.4.4 Resize Text', 'AA', 'At 200% root text size nothing clips and nothing is lost. Dialog and sheet scroll as a whole once their own title and footer no longer leave room for the body.'],
   ['3.3.1 Error Identification', 'A', 'Errors are named in text at the field and repeated in an error summary that moves focus to the control.'],
   ['3.3.2 Labels or Instructions', 'A', 'Visible labels above the field. Placeholder-as-label is not available: the floating-label recipes were removed.'],
   ['3.1.2 Language of Parts', 'AA', 'The language navigation names each option in its own language with lang and hreflang.'],
@@ -94,22 +97,21 @@ const CRITERIA = [
 /**
  * Criteria we own and do NOT yet meet.
  *
- * These three are the ones a stylesheet decides on its own — page titles and
- * media alternatives belong to the consumer, but whether a component survives a
- * user's own text spacing, a 320px viewport or 200% zoom is settled entirely by
- * the CSS. They were missing from the list above until a wider survey of
- * government design systems made the category obvious, and once measured
- * (`npm run a11y:css`) we fail all three in a small, specific way.
+ * Empty, and the section disappears from the report while it stays that way —
+ * but the list stays in the source, because the value of this report is that it
+ * HAS somewhere to put a failure. A report with no such place is an
+ * advertisement, and the next criterion we fail should land here rather than
+ * quietly nowhere.
  *
- * They are listed because a conformance report that names only what passes is an
- * advertisement. An accessibility statement asks for non-conforming content by
- * name; this is ours.
+ * It held three: 1.4.12, 1.4.10 and 1.4.4 — the criteria a stylesheet decides on
+ * its own, since page titles and media alternatives belong to the consumer but
+ * surviving a user's text spacing, a 320px viewport or 200% zoom is settled
+ * entirely by the CSS. Two of the three turned out to be smaller than declared
+ * (the instrument was reporting its own visually-hidden mechanism as the bug)
+ * and one considerably larger: nineteen recipes, not the calendar alone.
+ * Reproduce with: npm run a11y:css
  */
-const NOT_YET_MET = [
-  ['1.4.12 Text Spacing', 'AA', 'Under the user overrides the SC specifies (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2em), two elements clip their text: the sticky table head and the document-cover tile in the file grid.'],
-  ['1.4.10 Reflow', 'AA', 'At 320 CSS px the calendar grid overflows its container rather than reflowing — six elements extend past the frame. The rest of the kit reflows; the month grid does not.'],
-  ['1.4.4 Resize Text', 'AA', 'At 200% root text size four elements clip: the sticky table head, the dialog and sheet demo frames, and the file-grid cover. Fixed heights are the cause in each case.'],
-] as const
+const NOT_YET_MET: ReadonlyArray<readonly [string, string, string]> = []
 
 export function genConformanceReport(cfg: Config, assessedOn = '(fill in the date this was generated)'): string {
   const tk = buildTokens(cfg)
@@ -210,7 +212,7 @@ alternatives, page titles, journeys, timing, and the assembly of these parts.
 |---|---|---|
 ${CRITERIA.map(([c, l, how]) => `| ${c} | ${l} | ${how} |`).join('\n')}
 
-### Criteria we own and do not yet meet
+${NOT_YET_MET.length === 0 ? '' : `### Criteria we own and do not yet meet
 
 Listed by name, because a report that shows only what passes is an
 advertisement, and because an accessibility statement has to declare
@@ -220,7 +222,7 @@ non-conforming content. Reproduce with: npm run a11y:css
 |---|---|---|
 ${NOT_YET_MET.map(([c, l, what]) => `| ${c} | ${l} | ${what} |`).join('\n')}
 
----
+`}---
 
 ## Known limitations
 

@@ -676,7 +676,10 @@ export const RECIPES: readonly Recipe[] = [
 .page-head__crumb { margin-bottom: var(--k-s-4); }
 /* tabs: a sub-nav tab row below the header — wraps to its own full-width line
  *   (.page-head is already flex-wrap). Pair with the .tabs atom. */
-.page-head__tabs { flex-basis: 100%; margin-top: var(--k-s-12); }
+/* min-width:0 or the tab strip inside never scrolls: .tabs already declares
+   overflow-x:auto, but a wrapper sized to its content never gets narrow enough
+   to trigger it, so the strip left the card instead (the .in law). */
+.page-head__tabs { flex-basis: 100%; margin-top: var(--k-s-12); min-width: 0; }
 /* --banner: a cover-image header — a banner strip with the title block + actions
  *   overlapping its lower edge (the profile / project / workspace header).
  *   Anatomy: .page-head.page-head--banner > .page-head__banner (set the image via
@@ -743,7 +746,12 @@ export const RECIPES: readonly Recipe[] = [
 .action-panel__body { display: flex; flex-direction: column; gap: var(--k-s-4); flex: 1 1 22rem; min-width: 0; }
 .action-panel__title { font-size: var(--k-type-h3); font-weight: var(--k-weight-display); font-family: var(--k-font-display); letter-spacing: -0.01em; color: var(--k-fg); margin: 0; }
 .action-panel__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.45; }
-.action-panel__action { display: flex; align-items: center; gap: var(--k-s-8); flex: none; }
+/* 0 1 auto, not flex:none. Refusing to shrink is right while the action sits
+   BESIDE the copy — it should not be squeezed by a long description. But the
+   panel wraps, and once the action is alone on its own line it was still sized
+   to its widest content, so a panel holding a field plus a button left the card
+   by 47px at phone width. It may shrink; the field inside it truncates. */
+.action-panel__action { display: flex; align-items: center; gap: var(--k-s-8); flex: 0 1 auto; min-width: 0; flex-wrap: wrap; }
 /* --danger: the destructive variant (the "Delete account" panel) — a danger
  * hairline frames the card and the title takes the danger role. Pair the action
  * with a .btn--danger. */
@@ -850,6 +858,19 @@ export const RECIPES: readonly Recipe[] = [
  * opposite depth. */
 .in {
   background: var(--k-field-bg);
+  /* THE PHONE-WIDTH LAW, and this is the canonical instance of it.
+   *
+   * An <input> carries a default intrinsic width of about twenty characters, and
+   * a flex or grid child is never laid out narrower than its own content unless
+   * it is told it may be. Put those together and a field in a row refuses to go
+   * below ~170px, so the row bursts its card instead of the field getting
+   * smaller — measured at a 320px viewport across the gallery, where it produced
+   * most of a WCAG 1.4.10 Reflow failure spread over a dozen recipes that each
+   * looked individually fine.
+   *
+   * The same one-line remedy appears on every composed field, tab strip and
+   * scroll region below; it is one law, not a dozen patches. */
+  min-width: 0;
   /* Inputs sit flat on the surface — no inset pressed shadow. shadcn
    * pattern: emphasis lives in the focus halo, not in a default inner
    * shadow that competes with body text. */
@@ -1128,7 +1149,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  * Three accessibility-led systems and the literature on one side, one brand-
  * expression system on the other. By this project's own rule that is law rather
  * than taste, so these do not become a knob — they are gone. */
-.in-group { display: flex; align-items: stretch; width: 100%; }
+/* min-width:0 + wrap — the phone-width law (see .in). An addon like "https://"
+   or a currency symbol cannot shrink, so at phone width the group has to be
+   allowed to take a second line rather than push its addon out of the card. */
+.in-group { display: flex; align-items: stretch; width: 100%; min-width: 0; flex-wrap: wrap; }
 .in-group > * { border-radius: 0; }
 .in-group > *:not(:first-child) { margin-left: -1px; }
 .in-group > *:first-child { border-top-left-radius: var(--k-in-radius, var(--k-radius-md)); border-bottom-left-radius: var(--k-in-radius, var(--k-radius-md)); }
@@ -1311,6 +1335,10 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    * horizontally instead. Scrollbar hidden — the cut-off edge is the cue. */
   overflow-x: auto;
   scrollbar-width: none;
+  /* …which was the intent, and it had never once happened. As a flex/grid child
+     the strip was sized to its own content, so it was never narrow enough to
+     scroll — it just grew. Measured at 320px: 59px outside the card. */
+  min-width: 0;
 }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
@@ -2454,9 +2482,18 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
    sides so the highlight reads as continuous. */
 .calendar {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  /* minmax(0, …), not a bare 1fr. A 1fr track carries an automatic min-content
+     floor, so ONE cell whose content will not break — an event chip, a long
+     locale weekday — drags its whole column past its share and the seven tracks
+     stop being equal. Measured at 320px (WCAG 1.4.10): the seven columns came
+     out 26 · 107 · 53 · 26 · 26 · 26 · 129, a 393px grid inside a 212px box,
+     with 192 elements hanging outside the frame. */
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: var(--k-s-2) 0;
   font-size: var(--k-type-eyebrow);
+  /* Its own query context: how much room a DAY has is a property of the grid,
+     not of the viewport — the same calendar is a full-page planner and a popover. */
+  container-type: inline-size;
 }
 .calendar__head {
   text-align: center;
@@ -2586,6 +2623,39 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   cursor: pointer; padding: var(--k-s-2) var(--k-s-4); background: transparent; border: 0; text-align: left;
 }
 .calendar__more:hover { color: var(--k-fg); }
+/* Narrow host — the month-with-events grid stops pretending. Seven columns in
+ * 212px give each day 30px, which fits the SC but leaves an event chip 22px
+ * wide: reflow satisfied to the letter, content destroyed. So below the width
+ * where a title can be read, the variant falls back to the plain month grid and
+ * a day that has events carries a DOT — the iOS/Android month pattern, and the
+ * same information at the resolution the space affords. The events themselves
+ * stay one tap away, which is where .calendar__more already sends them.
+ * Queried against the calendar, not the viewport: a popover picker on a desktop
+ * is just as narrow as a phone, and it is the day's width that decides. */
+@container (max-width: 22rem) {
+  .calendar--events .calendar__cell {
+    aspect-ratio: 1;
+    min-height: var(--k-cal-cell, 32px);
+    align-items: center;
+    justify-content: center;
+  }
+  .calendar--events .calendar__event,
+  .calendar--events .calendar__more { display: none; }
+  .calendar--events .calendar__daynum { align-self: center; }
+  .calendar--events .calendar__cell:has(.calendar__event)::after {
+    content: "";
+    position: absolute;
+    bottom: var(--k-s-2);
+    left: 50%;
+    transform: translateX(-50%);
+    inline-size: var(--k-marker, 4px);
+    block-size: var(--k-marker, 4px);
+    border-radius: var(--k-radius-pill);
+    background: var(--k-primary);
+  }
+  /* The selected day inverts, so the dot has to invert with it or it vanishes. */
+  .calendar--events .calendar__cell--on:has(.calendar__event)::after { background: var(--k-primary-fg); }
+}
 /* range hover-preview — while picking a range (start set, end not yet), the cells
    between start and the hovered day get a LOWER-emphasis band so the forming
    range is visible before commit. Consumer paints --range-preview on mouseover. */
@@ -3088,7 +3158,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
  *
  * The current language is marked with aria-current, not by removing it: a list
  * that hides where you are makes you count. */
-.langnav { display: flex; align-items: center; gap: var(--k-s-2); }
+/* Wraps at phone width (the .in law): a language switcher is exactly the row
+   that grows with the number of languages, and a public body ships several. */
+.langnav { display: flex; align-items: center; gap: var(--k-s-2); min-width: 0; flex-wrap: wrap; }
 .langnav__item {
   display: inline-flex; align-items: center;
   min-height: var(--k-hit-min); padding: 0 var(--k-s-8);
@@ -3337,7 +3409,21 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .dialog__body {
   min-height: 0; overflow: auto; overscroll-behavior: contain;
   margin-inline: calc(-1 * var(--k-pad, 24px)); padding-inline: var(--k-pad, 24px);
+  /* …but "shrink" must not mean "vanish". A flex child that scrolls resolves its
+     automatic minimum size to ZERO, so the body is precisely the part that gives
+     when the box runs out of room — and a zero-height scroll port cannot be
+     scrolled, so its content is not hidden, it is unreachable.
+     Measured at 200% text (WCAG 1.4.4): title visible, buttons visible, and the
+     body rendered at 0px with 520px of content sealed inside it. The floor keeps
+     the port scrollable; the escape hatch below covers the case where even two
+     lines do not fit. */
+  min-block-size: 2lh;
 }
+/* Escape hatch — when the title and the footer alone exceed the cap (200% text
+   on a short viewport), the dialog scrolls as one rather than overflowing a box
+   that clips. Silent in every case where the body still fits: the footer stays
+   pinned exactly as before. */
+.dialog { overflow: auto; }
 /* Frame for modal demo — overlay backdrop, dialog centered inside */
 .dialog-frame {
   position: relative;
@@ -4519,6 +4605,12 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   box-shadow: var(--k-shadow-lg);
   display: flex;
   flex-direction: column;
+  /* Escape hatch, same as .dialog. The sheet's height is its container's, so a
+     head and a foot that both grow with text size can between them exceed it —
+     measured at 200%: head 121 + body 64 + foot 121 in a 218px panel, with the
+     ACTION BUTTONS pushed out of the box and clipped away. Scrolling the panel
+     keeps them reachable. */
+  overflow: auto;
   /* Slow + emphasized-decelerate — large surface, expressive enter */
   animation: sheet-in var(--k-dur-slow, 320ms) var(--k-ease-out, cubic-bezier(.05,.7,.1,1));
 }
@@ -4537,6 +4629,9 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   font-size: var(--k-type-small);
   color: var(--k-fg);
   overflow: auto;
+  /* Same floor as .dialog__body, same reason — a scrolling flex child may shrink
+     to zero, and the sheet's head + foot both grow with the user's text size. */
+  min-block-size: 2lh;
   /* Stack form rows vertically so checkboxes don't run together as inline labels */
   display: flex;
   flex-direction: column;
@@ -5334,6 +5429,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   display: flex;
   align-items: center;
   min-height: var(--k-in-h-default, 40px);
+  min-width: 0; /* the .in law — the country select cannot shrink, the field must */
   /* Same filled-field signature as .in / .select-trigger / .taginput / .otp:
      the brand-tinted --k-input-bg, so EVERY field type reads as one family
      (was --k-surface-2 → these composed inputs sat lighter than plain .in). */
@@ -5379,6 +5475,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border: 0;
   outline: 0;
   flex: 1;
+  min-width: 0; /* flex:1 grows it; only this lets it also shrink (the .in law) */
   /* Fill the wrapper height so the caret isn't clipped by overflow:clip at a
    * line-height-tight box (see .in--inline input). */
   align-self: stretch;
@@ -5571,6 +5668,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   padding-left: var(--k-s-12);
   padding-right: var(--k-s-6);
   gap: var(--k-s-8);
+  min-width: 0; /* the .in law */
 }
 .searchinput > svg,
 .in--inline > svg {
@@ -5727,6 +5825,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   display: flex;
   flex-direction: column;
   margin: calc(var(--k-s-4) * -1) 0;
+  min-width: 0; /* the .in law */
 }
 .list__section {
   padding: var(--k-s-12) 0 var(--k-s-4);
@@ -5870,7 +5969,11 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    flow into two columns on a wide container, one when narrow; section headings
    span the full width. Reset the row's negative inline margin so the hover bg
    doesn't bleed into the column gutter. */
-.list--cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); column-gap: var(--k-s-24); margin: 0; }
+/* min(15rem, 100%), not a bare 15rem: auto-fit cannot fit even one column when
+   the container is narrower than the minimum, so the track stays 15rem and the
+   rows hang out of the card. Clamping the minimum to the container is the whole
+   fix and it costs nothing at any width where 15rem does fit. */
+.list--cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); column-gap: var(--k-s-24); margin: 0; }
 .list--cols .list__item { margin-inline: 0; }
 .list--cols .list__section { grid-column: 1 / -1; }
 /* --sticky: section headings pin to the top while their group scrolls past
@@ -6823,6 +6926,12 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   min-width: 0;
   min-height: 0;
   overflow: auto;
+  /* Third instance of the same defect, found by sweeping for the shape rather
+     than waiting for a scan to name it: a scrolling child with its automatic
+     minimum removed is the part that gives. Here the 1fr row sits between a bar
+     and a nav that BOTH grow with the user's text size, so at 200% the app's
+     entire content area is what collapses. Never below two lines. */
+  min-block-size: 2lh;
 }
 @container scaffold (min-width: 600px) {
   .scaffold__frame {
@@ -7135,6 +7244,11 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   border-radius: var(--k-radius-md);
   background: var(--k-surface-2);
   font-size: var(--k-type-caption);
+  /* The .in law, and the worst case in the kit: the body is monospace payload
+     with no break opportunities, so the whole <details> was sized to the longest
+     line inside it — 336px in a 212px card. The body already scrolls; it just
+     needed the box to be allowed to be smaller than its contents. */
+  min-width: 0;
 }
 .tool-call + .tool-call { margin-top: var(--k-s-4); }
 .tool-call summary {
