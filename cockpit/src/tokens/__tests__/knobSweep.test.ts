@@ -4,7 +4,6 @@ import { auditContrast } from '../extras'
 import { contrast, oklchStrToHex } from '../color'
 import { DEFAULT_CONFIG } from '../defaults'
 import { COLOR_THEMES, applyColorTheme } from '../stylesAndThemes'
-import { STYLE_KITS } from '../styleKits'
 
 /**
  * No reachable configuration can break the floor.
@@ -49,7 +48,6 @@ const KNOBS: Record<string, unknown[]> = {
   surfaceDepth: ['flat', 'soft', 'deep'],
   surface: ['outlined', 'filled', 'plain'],
   borders: ['faint', 'subtle', 'medium', 'strong'],
-  motion: ['none', 'snappy', 'smooth', 'playful'],
   canvas: ['white', 'brand', 'neutral'],
   neutral: ['auto', 'cool', 'neutral', 'warm'],
   harmony: ['mono', 'tonal', 'complement', 'expressive'],
@@ -187,27 +185,10 @@ describe('Conformance raises the floor without locking the knob', () => {
   })
 })
 
-describe('the Style presets — the combinations, not the knobs', () => {
-  /* The sweep above varies ONE knob at a time from the default, and the file
-   * calls that "no reachable configuration can break the floor". A Style preset
-   * changes four to nine knobs at once and is exactly as reachable — one click
-   * at the top of the panel — so the claim was broader than the coverage.
-   *
-   * Found by re-reading the claim rather than the code, which is its own lesson:
-   * a gate can be correct about everything it tests and still be wrong about
-   * what it says. Measured clean the first time, and that is not a reason to
-   * leave it unmeasured. */
-  for (const kit of STYLE_KITS) {
-    it(`${kit.name} holds every floor`, () => {
-      const broken: string[] = []
-      for (const mode of MODES) {
-        for (const theme of THEMES) {
-          const base = applyColorTheme({ ...DEFAULT_CONFIG, mode }, theme)
-          const cfg = { ...base, ...kit.config, mode }
-          for (const label of violations(cfg)) broken.push(`${theme}/${mode}/${label}`)
-        }
-      }
-      expect([...new Set(broken)]).toEqual([])
-    })
-  }
-})
+/* The Style-presets block that stood here is gone with the presets themselves
+ * (2026-08-15). It swept every kit x 16 themes x 2 modes and was clean — worth
+ * recording, because the cut was not made for safety. Six of the seven kits were
+ * named after other companies' aesthetics, and a shelf of vibes is the wrong
+ * answer to "what should a public body start from". DEFAULT_CONFIG is the
+ * starting point now, and the knobs that remain are the ones that make a system
+ * YOURS rather than merely different. */

@@ -197,7 +197,6 @@ export interface Config {
   conformance: Conformance
   typeScale: TypeScale
   labelCase: LabelCase
-  displayWeight: DisplayWeight
   fontDisplay: string
   fontBody: string
   iconSet: IconSet
@@ -209,7 +208,6 @@ export interface Config {
   surface: Surface
   /* Border prominence — standalone (see Borders). */
   borders: Borders
-  motion: Motion
   /* Single brand hue. Secondary + accent are DERIVED from this in buildTokens
    * — one color in, a harmonious family out (shadcn/Linear model). */
   cPrimary: Hex

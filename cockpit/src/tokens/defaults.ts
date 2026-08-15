@@ -16,9 +16,16 @@ export const DEFAULT_CONFIG: Config = {
   scale: 'default',            // size + presence macro (drives ui-weight too)
   typeScale: 'md',
   labelCase: 'sentence',       // UI labels as-authored; 'caps' = the industrial/terminal look
-  displayWeight: 'semibold',   // headings 600 / hero 700 (the house default); 'light' = ultralight
   fontDisplay: 'Inter',
   fontBody: 'Inter',
+  /* LUCIDE, and no longer a panel knob (2026-08-15).
+     Five icon libraries was five ways to feel different, and one of them was
+     literally called "hairline" — the same shape of offer as the two typefaces
+     the glyph measurement removed, except we had never measured icons at all.
+     An icon set is not a setting a buyer can defend; it is a property of the
+     primitive, with a documented way to swap it (the adapter in kit/icons).
+     'line' IS Lucide: ISC-licensed, a 24px/2px grid, and what the ecosystem
+     already reaches for. */
   iconSet: 'line',
   // 'soft' = the shadcn/Stripe subtle two-layer shadow on a balanced ramp — the
   // former default combo, unchanged. (Elevation is now shadow-only; 'raised' was
@@ -26,7 +33,6 @@ export const DEFAULT_CONFIG: Config = {
   surfaceDepth: 'soft',
   surface: 'outlined',         // box-with-border fields + flush hairline-seam sidebar (= the previous default look)
   borders: 'subtle',
-  motion: 'smooth',
   // Interaction (H2): the state wash is a fixed house formula — whisper alpha
   // (0.05) on a NEUTRAL source that follows the Neutrals ramp, 0.96 press squish.
   // The States/State-tint AND Springs(motionScheme) dials were removed (knob-cull):

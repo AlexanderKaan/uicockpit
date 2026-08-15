@@ -365,7 +365,7 @@ interface ToolStep {
 /* A one-line, human-readable recap of the kit — used inside the web-builder prompt. */
 function kitSummary(cfg: Config, tk: ReturnType<typeof buildTokens>): string {
   const cap = (k: string, v: string) => CHOICE_CAP[k]?.[v] ?? v
-  return `${tk.primaryHex.toUpperCase()} brand · ${cap('radius', cfg.radius)} corners · ${cfg.fontDisplay}/${cfg.fontBody} type · ${cap('scale', cfg.scale)} density · ${cap('motion', cfg.motion)} motion`
+  return `${tk.primaryHex.toUpperCase()} brand · ${cap('radius', cfg.radius)} corners · ${cfg.fontDisplay}/${cfg.fontBody} type · ${cap('scale', cfg.scale)} density · ${cap('motion', 'smooth')} motion`
 }
 
 /* The prompt prefix for chat-based builders — they can't run `check`, so consistency
@@ -838,7 +838,7 @@ function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ 
     { icon: ic(ShieldCheck), label: 'Conformance', value: cfg.conformance === 'aaa' ? 'AA + AAA targets' : 'WCAG AA' },
     { icon: ic(Ruler), label: 'Scale', value: cap('scale', cfg.scale) },
     { icon: ic(Square), label: 'Corner radius', value: cap('radius', cfg.radius) },
-    { icon: ic(Zap), label: 'Motion', value: cap('motion', cfg.motion) },
+    { icon: ic(Zap), label: 'Motion', value: cap('motion', 'smooth') },
     { icon: ic(Sparkles), label: 'Icons', value: cap('iconSet', cfg.iconSet) },
     { icon: ic(Layers), label: 'Elevation', value: cap('surfaceDepth', cfg.surfaceDepth) },
     { icon: ic(Sidebar), label: 'Surface', value: cap('surface', cfg.surface) },

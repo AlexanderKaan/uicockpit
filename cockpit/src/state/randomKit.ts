@@ -16,11 +16,9 @@ const CHROMATIC_THEMES: readonly ColorTheme[] = ['cobalt', 'sky', 'teal', 'jade'
 const SCALES = ['compact', 'default', 'comfortable'] as const
 const RADII = ['none', 'subtle', 'soft', 'round'] as const
 const TYPE_SCALES = ['sm', 'md', 'lg', 'xl'] as const
-const ICON_SETS = ['hairline', 'line', 'rounded', 'bold', 'solid'] as const
 const SURFACE_DEPTHS = ['flat', 'soft', 'deep'] as const
 const SURFACES = ['outlined', 'filled', 'plain'] as const
 const BORDERS = ['faint', 'subtle', 'medium', 'strong'] as const
-const MOTIONS = ['snappy', 'smooth', 'playful'] as const // skip 'none' — a roll should feel alive
 const PALETTES = ['pastel', 'vivid', 'bright'] as const
 const NEUTRALS = ['auto', 'cool', 'neutral', 'warm'] as const
 // Harmony rolls a vetted PRESET (never random raw slider values) — each preset
@@ -47,11 +45,9 @@ export function randomKit(current: Config, rnd: () => number = Math.random, lock
     typeScale: roll('typeScale', TYPE_SCALES),
     fontDisplay: keep('fontDisplay') ? current.fontDisplay : pick(displayFonts, rnd),
     fontBody: keep('fontBody') ? current.fontBody : pick(bodyFonts, rnd),
-    iconSet: roll('iconSet', ICON_SETS),
     surfaceDepth: roll('surfaceDepth', SURFACE_DEPTHS),
     surface: roll('surface', SURFACES),
     borders: roll('borders', BORDERS),
-    motion: roll('motion', MOTIONS),
     palette: roll('palette', PALETTES),
     neutral: roll('neutral', NEUTRALS),
     mode: current.mode, // preserve light/dark — don't jar the user

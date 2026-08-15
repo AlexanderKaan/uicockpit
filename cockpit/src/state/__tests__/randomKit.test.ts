@@ -33,7 +33,7 @@ describe('randomKit', () => {
     const a = randomKit(DEFAULT_CONFIG, mulberry32(2))
     const b = randomKit(DEFAULT_CONFIG, mulberry32(99))
     // Some facet must differ — astronomically unlikely to be identical.
-    const differs = (['colorTheme', 'scale', 'radius', 'fontDisplay', 'surface', 'motion'] as const)
+    const differs = (['colorTheme', 'scale', 'radius', 'fontDisplay', 'surface', 'typeScale'] as const)
       .some((k) => a[k] !== b[k])
     expect(differs).toBe(true)
   })

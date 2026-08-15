@@ -29,7 +29,6 @@ import { applyHarmonyPreset } from '../harmony'
 const KNOBS: Record<string, string[]> = {
   scale: ['compact', 'default', 'comfortable'],
   typeScale: ['sm', 'md', 'lg', 'xl'],
-  displayWeight: ['light', 'regular', 'medium', 'semibold', 'bold'],
   labelCase: ['sentence', 'caps'],
   radius: ['none', 'subtle', 'soft', 'round'],
   surfaceDepth: ['flat', 'soft', 'deep'],
@@ -38,7 +37,6 @@ const KNOBS: Record<string, string[]> = {
   borders: ['faint', 'subtle', 'medium', 'strong'],
   neutral: ['auto', 'cool', 'neutral', 'warm'],
   palette: ['pastel', 'vivid', 'bright'],
-  motion: ['none', 'snappy', 'smooth', 'playful'],
   conformance: ['aa', 'aaa'],
 }
 

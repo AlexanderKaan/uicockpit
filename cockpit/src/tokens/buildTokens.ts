@@ -800,7 +800,12 @@ export function buildTokens(cfg: Config): Tokens {
    * reproduce or adjust. Three stacked motion dimensions was also 36 ways to
    * time an animation for a system whose promise is that the default is right.
    * Base preset stays; the other two are the house formula now. */
-  const base = MOT_BASE[cfg.motion]
+  /* ONE CURVE (2026-08-15). The axis offered none/snappy/smooth/playful, and
+     "playful" is not a need a public service has. Smooth is the house default
+     and now the only one; the honest escape was never the knob anyway — every
+     motion token still collapses under prefers-reduced-motion, which is the
+     setting that actually belongs to the reader rather than to the buyer. */
+  const base = MOT_BASE.smooth
   const mul = TEMPO.normal
   // Spring physics (H2) — fixed to the composed 'standard' sampling (the Springs
   // knob was culled). Pre-sample the spatial springs into linear() easings.
@@ -814,9 +819,9 @@ export function buildTokens(cfg: Config): Tokens {
     fast: ms(base.fast),
     normal: ms(base.normal),
     slow: ms(base.slow),
-    ease: cfg.motion === 'none' ? 'linear' : curveSet.ease,
-    easeOut: cfg.motion === 'none' ? 'linear' : curveSet.easeOut,
-    easeIn: cfg.motion === 'none' ? 'linear' : curveSet.easeIn,
+    ease: curveSet.ease,
+    easeOut: curveSet.easeOut,
+    easeIn: curveSet.easeIn,
   }
   const sla = STATE_BASE_ALPHA
   // Hover / selected wash — a NEUTRAL overlay scaling with Emphasis. NOT pure
@@ -900,7 +905,11 @@ export function buildTokens(cfg: Config): Tokens {
   const DISPLAY_WEIGHT: Record<DisplayWeight, [number, number]> = {
     light: [300, 400], regular: [400, 500], medium: [500, 600], semibold: [600, 700], bold: [700, 800],
   }
-  const [wDisplay, wDisplayHero] = DISPLAY_WEIGHT[cfg.displayWeight] ?? DISPLAY_WEIGHT.semibold
+  /* ONE HEADING WEIGHT (2026-08-15). The knob offered light → bold, and light
+     at display sizes costs legibility for exactly the readers this system is
+     built for — the same reason two typefaces were dropped after the glyph
+     measurement. Semibold is the house default and now the only answer. */
+  const [wDisplay, wDisplayHero] = DISPLAY_WEIGHT.semibold
 
   // Generic CSS fallback for a font: monospace > serif > sans-serif, derived from
   // the family so a mono display (Vercel headings) keeps a mono fallback.
@@ -1612,9 +1621,7 @@ export function buildTokens(cfg: Config): Tokens {
       // rises + fades + settles on a gentle spring-decel. Slower than slide-up so
       // it reads as a deliberate entrance, not a micro-transition. Pair with
       // animation-delay for a staggered reveal. Collapses to instant at Motion=None.
-      '--k-anim-rise': cfg.motion === 'none'
-        ? 'none'
-        : `k-rise ${motion.slow} ${EMPHASIZED.decel} both`,
+      '--k-anim-rise': `k-rise ${motion.slow} ${EMPHASIZED.decel} both`,
       // Scale-in is the shadcn/Radix popover/menu enter — small zoom anchored
       // to the trigger. Origin is set per-component via transform-origin.
       '--k-anim-scale-in':  `k-scale-in ${motion.normal} ${motion.easeOut} both`,
@@ -1626,7 +1633,7 @@ export function buildTokens(cfg: Config): Tokens {
       '--k-anim-menu-item': `k-menu-item ${motion.normal} ${EMPHASIZED.decel} both`,
       // Per-item stagger step — scales with Motion+Tempo, '0ms' when Motion=None
       // so the whole cascade collapses to an instant reveal.
-      '--k-menu-stagger':   cfg.motion === 'none' ? '0ms' : `${Math.round((base.normal * mul) / 10)}ms`,
+      '--k-menu-stagger':   `${Math.round((base.normal * mul) / 10)}ms`,
       '--k-anim-spin': `k-spin 800ms linear infinite`,
       // === System additions (#127) — premium 2026 motion + surface tokens
       // --k-anim-pulse: gentle scale + opacity, infinite. Use for "live" dots

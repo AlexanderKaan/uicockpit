@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useState, type Dispatch, type ReactNode, type Ref } from 'react'
 import { Check, ChevronRight, Lock, LockOpen, PanelLeftClose, RotateCcw, Shuffle } from 'lucide-react'
-import { STYLE_KITS, activeKitId } from '../tokens/styleKits'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 import { BODY_FONTS, DISPLAY_GROUPS, customFontFamily, isCustomFont, type FontGroup } from '../tokens/fonts'
 import { nameColor } from '../tokens/color'
@@ -12,8 +11,6 @@ import type { ConfigAction } from '../state/configReducer'
 import { FontPicker } from './FontPicker'
 import {
   VIZ_COLOR_THEME,
-  VIZ_ICONS,
-  VIZ_MOTION,
   VIZ_RADIUS,
 } from './vizFactories'
 
@@ -72,13 +69,12 @@ const NEUTRAL_OPTS = [
   { id: 'neutral' as const, cap: 'Neutral' },
   { id: 'warm' as const, cap: 'Warm' },
 ]
-const MOTION_OPTS = [
-  { id: 'none' as const, cap: 'None' },
-  { id: 'snappy' as const, cap: 'Snappy' },
-  { id: 'smooth' as const, cap: 'Smooth' },
-  { id: 'playful' as const, cap: 'Playful' },
-]
 // Scale — interface size + density (one tighter, default, one roomier).
+const CANVAS_OPTS = [
+  { id: 'white' as const, cap: 'White' },
+  { id: 'neutral' as const, cap: 'Neutral' },
+  { id: 'brand' as const, cap: 'Brand' },
+]
 const SCALE_OPTS = [
   { id: 'compact' as const, cap: 'Compact' },
   { id: 'default' as const, cap: 'Default' },
@@ -110,19 +106,6 @@ const BORDER_OPTS = [
 ]
 // Canvas — the page background (--k-bg), exported + usable behind key blocks.
 // White (flat) · Neutral (the muted near-white default) · Brand (a whisper tint)
-// · Gradient (the brand mesh). Outcome-named so the look is predictable.
-const CANVAS_OPTS = [
-  { id: 'white' as const, cap: 'White' },
-  { id: 'neutral' as const, cap: 'Neutral' },
-  { id: 'brand' as const, cap: 'Brand' },
-]
-const ICON_OPTS = [
-  { id: 'hairline' as const, cap: 'Iconoir' },
-  { id: 'line' as const, cap: 'Lucide' },
-  { id: 'rounded' as const, cap: 'Phosphor' },
-  { id: 'bold' as const, cap: 'Phosphor Bold' },
-  { id: 'solid' as const, cap: 'Heroicons' },
-]
 const TYPESCALE_OPTS = [
   { id: 'sm' as const, cap: 'S' },
   { id: 'md' as const, cap: 'M' },
@@ -144,14 +127,6 @@ const CONFORMANCE_OPTS = [
 const LABEL_CASE_OPTS = [
   { id: 'sentence' as const, cap: 'Default' },
   { id: 'caps' as const, cap: 'Caps' },
-]
-// Heading weight — the display tier's font-weight, light → bold (ordered slider).
-const DISPLAY_WEIGHT_OPTS = [
-  { id: 'light' as const, cap: 'Light' },
-  { id: 'regular' as const, cap: 'Regular' },
-  { id: 'medium' as const, cap: 'Medium' },
-  { id: 'semibold' as const, cap: 'Semibold' },
-  { id: 'bold' as const, cap: 'Bold' },
 ]
 const PALETTE_OPTS = [
   { id: 'pastel' as const, cap: 'Pastel' },
@@ -276,7 +251,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
   // stands on its own.
 
   // Which named kit (if any) the current config matches — the front-door anchor.
-  const activeKit = activeKitId(cfg)
 
   const rows: RowDef[] = [
     {
@@ -297,22 +271,14 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
       selected: cfg.conformance,
       onPick: pick('conformance'),
     },
-    {
-      // Style — the FRONT-DOOR anchor (top of FOUNDATION, above Brand). Pick a curated
-      // named kit; it sets structure + type + colour-character but preserves the brand
-      // hue, then the knobs below perturb on top. 'Custom' once a knob diverges.
-      key: 'style',
-      label: 'Style',
-      value: STYLE_KITS.find((k) => k.id === activeKit)?.name ?? 'Custom',
-      kind: 'opts',
-      opts: STYLE_KITS.map((k) => ({ id: k.id, label: k.name, sub: k.blurb })),
-      selected: activeKit ?? undefined,
-      onPick: (id) => {
-        const kit = STYLE_KITS.find((k) => k.id === id)
-        if (kit) dispatch({ type: 'SET', patch: kit.config })
-        close()
-      },
-    },
+    /* STYLE PRESETS REMOVED (2026-08-15). Seven named kits — Clean, Precision,
+       Minimal, Refined, Calm, Soft, Editorial — six of them named after somebody
+       else's aesthetic. Under the new proposition that row asked the wrong
+       question: a public body does not need to look like Linear, and a shelf of
+       vibes contradicts the idea of a base set you build on.
+       DEFAULT_CONFIG is now simply where you start; the remaining knobs are the
+       ones that make it YOURS (brand, fonts, radius) rather than merely
+       different. See ROADMAP "the cull". */
     {
       // Brand — the HERO decision and the highest-leverage knob: one hex feeds
       // the whole OKLCH system (primary + derived secondary/accent + the auto
@@ -464,15 +430,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
       onPick: pick('typeScale'),
     },
     {
-      key: 'displayWeight',
-      label: 'Heading weight',
-      value: cap(DISPLAY_WEIGHT_OPTS, cfg.displayWeight),
-      kind: 'slider',
-      opts: optsFrom(DISPLAY_WEIGHT_OPTS),
-      selected: cfg.displayWeight,
-      onPick: pick('displayWeight'),
-    },
-    {
       key: 'labelCase',
       label: 'Label case',
       value: cap(LABEL_CASE_OPTS, cfg.labelCase),
@@ -536,29 +493,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
       opts: optsFrom(BORDER_OPTS),
       selected: cfg.borders,
       onPick: pick('borders'),
-    },
-    {
-      // Interaction state wash (H2) is now a fixed house formula (whisper alpha
-      // on a neutral source that follows the Neutrals ramp) — the former States
-      // + State-tint dials were removed, so this section folds away. Springs
-      // moved under Motion & icons.
-      sec: 'Motion & icons',
-      key: 'motion',
-      label: 'Motion',
-      value: cap(MOTION_OPTS, cfg.motion),
-      kind: 'slider',
-      opts: optsFrom(MOTION_OPTS, VIZ_MOTION),
-      selected: cfg.motion,
-      onPick: pick('motion'),
-    },
-    {
-      key: 'iconSet',
-      label: 'Icons',
-      value: cap(ICON_OPTS, cfg.iconSet),
-      kind: 'seg',
-      opts: optsFrom(ICON_OPTS, VIZ_ICONS),
-      selected: cfg.iconSet,
-      onPick: pick('iconSet'),
     },
   ]
 
