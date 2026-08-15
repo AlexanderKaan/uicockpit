@@ -512,11 +512,10 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
                row cannot fail it. Borrowed from shadcn's /create, which does ten
                settings in one 52px shape and is shorter than our panel was.
                Every row is now: label · current value · chevron → opens a list. */
-            const inline = false
             return (
             <Fragment key={r.key}>
               {r.sec && <div className="menu__label fmsec">{r.sec}</div>}
-              <div className={`fmrow ${inline ? 'fmrow--inline' : ''} ${openKey === r.key ? 'fmrow--open' : ''} ${lockedKeys.has(r.key) ? 'fmrow--locked' : ''}`}>
+              <div className={`fmrow ${openKey === r.key ? 'fmrow--open' : ''} ${lockedKeys.has(r.key) ? 'fmrow--locked' : ''}`}>
                 {r.key !== 'style' && (
                   <button
                     type="button"
@@ -528,16 +527,12 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
                     {lockedKeys.has(r.key) ? <Lock size={11} strokeWidth={2.25} /> : <LockOpen size={11} strokeWidth={2} />}
                   </button>
                 )}
-                {inline ? (
-                  <div className={`fmrow__inline ${r.stack ? 'fmrow__inline--stack' : ''}`}>
-                    <span className="fmrow__label">{r.label}<Provenance state={provenance?.[r.label]} /></span>
-                    {r.kind === 'slider' ? (
-                      <Slider opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
-                    ) : (
-                      <Segmented opts={r.opts ?? []} selected={r.selected} onPick={r.onPick ?? (() => {})} ariaLabel={r.label} />
-                    )}
-                  </div>
-                ) : (
+                {/* The inline branch that stood here is gone with the components it
+                    rendered. Putting every row on one shape made <Slider> and
+                    <Segmented> unreachable, and unreachable code is not
+                    simplification until it is actually removed — it just sits
+                    there looking like a choice somebody still has. */}
+                {(
                   <>
                     <button
                       type="button"
@@ -603,73 +598,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
   )
 }
 
-/** Inline SEGMENTED control — a strip of equal pills, the active one lifted.
- *  Replaces a flyout for nominal settings (≤4 short options, or icon glyphs):
- *  the choice is always visible, one click to change — the shadcn "all-open"
- *  feel the configurator-pass is after. */
-function Segmented({
-  opts,
-  selected,
-  onPick,
-  ariaLabel,
-}: {
-  opts: Opt[]
-  selected?: string
-  onPick: (id: string) => void
-  ariaLabel: string
-}) {
-  return (
-    <div className="fmseg" role="radiogroup" aria-label={ariaLabel}>
-      {opts.map((o) => (
-        <button
-          key={o.id}
-          type="button"
-          role="radio"
-          aria-checked={o.id === selected}
-          className={`fmseg__opt ${o.id === selected ? 'fmseg__opt--on' : ''} ${o.viz ? 'fmseg__opt--viz' : ''}`}
-          onClick={() => onPick(o.id)}
-          title={o.label}
-        >
-          {o.viz ? <span className="fmseg__viz">{o.viz}</span> : o.label}
-        </button>
-      ))}
-    </div>
-  )
-}
 
-/** Inline discrete SLIDER — an ordered axis (Scale, Box radius, Elevation…)
- *  as a track the user drags between named steps, with the current step read
- *  out at the right. The options array IS the scale, in order; the slider maps
- *  index↔option so the named steps and the export stay identical. */
-function Slider({
-  opts,
-  selected,
-  onPick,
-  ariaLabel,
-}: {
-  opts: Opt[]
-  selected?: string
-  onPick: (id: string) => void
-  ariaLabel: string
-}) {
-  const idx = Math.max(0, opts.findIndex((o) => o.id === selected))
-  const cur = opts[idx]
-  return (
-    <div className="fmsld">
-      <input
-        type="range"
-        min={0}
-        max={Math.max(0, opts.length - 1)}
-        step={1}
-        value={idx}
-        onChange={(e) => { const o = opts[+e.target.value]; if (o) onPick(o.id) }}
-        aria-label={ariaLabel}
-        aria-valuetext={cur?.label}
-      />
-      <span className="fmsld__val">{cur?.label}</span>
-    </div>
-  )
-}
 
 /** The flyout option list — vertical (or a grid for the 10 colour themes).
  *  Each option: optional viz (radius/motion hint or theme dot) + label +

@@ -19,7 +19,6 @@
    * card. The accordion is short (one category open), so it stays on-screen. */
   overflow: visible;
 }
-
 /* Shuffle — a full-width footer action below the menu card (roll a fresh kit).
  * Lives with the controls it acts on; separated from the card by a small gap so
  * it reads as an action, not a setting. Matches the card chrome (surface +
@@ -54,7 +53,6 @@
 .panel__shuffle:hover { background: var(--app-hover); box-shadow: var(--app-shadow-md); }
 .panel__shuffle:active { transform: scale(0.99); }
 .panel__shuffle svg { color: var(--app-fg-muted); }
-
 /* Reset — quieter (ghost) than Shuffle; dims when already on the default kit. */
 .panel__reset {
   background: transparent;
@@ -64,7 +62,6 @@
 .panel__reset:active:not(:disabled) { transform: scale(0.99); }
 .panel__reset svg { color: var(--app-fg-muted); }
 .panel__reset:disabled { opacity: 0.4; cursor: default; }
-
 /* === Floating control menu (.fmenu) ===
  * A nested accordion: category rows → setting recap-rows → the real visual
  * picker. Same engine as the old flat panel, compact floating shell. */
@@ -76,7 +73,6 @@
   display: flex;
   flex-direction: column;
 }
-
 /* Slim header — an identity label + the collapse-to-full-width control. */
 .fmenu__bar {
   display: flex;
@@ -107,7 +103,6 @@
   transition: background var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease);
 }
 .fmenu__collapse:hover { background: var(--app-hover); color: var(--app-fg); }
-
 /* === Flat menu — one row per control (shadcn-create style) ===
  * No category accordion: every control's current value is visible at rest.
  * Click a row → its options float over the canvas (.fmrow__pop). Thin
@@ -117,7 +112,6 @@
   flex-direction: column;
   padding: 6px;
 }
-
 /* Section divider — quiet uppercase label, not interactive. */
 /* .menu__label carries the type, the tracking, the case and the colour — every
    line that used to be here was a copy of it, including a hard-coded 10px where
@@ -154,7 +148,6 @@
   transition: opacity 0.14s ease;
 }
 .fmsec--link:hover::after { opacity: 0.55; }
-
 /* A control row: label (left) + current value (right) + chevron. */
 .fmrow { position: relative; }
 .fmrow--open { z-index: 50; }
@@ -190,9 +183,6 @@
 /* Pinned = FILLED, so it clearly reads as "on" (the outline alone was too subtle). */
 .fmrow--locked .fmrow__lock { opacity: 1; background: var(--app-fg); color: var(--app-surface); }
 .fmrow--locked .fmrow__lock:hover { background: var(--app-fg); color: var(--app-surface); }
-/* Stacked rows (Neutrals · Surface · Background) put the label above the options strip;
-   centre the lock on the OPTIONS box, not the title. */
-.fmrow:has(.fmrow__inline--stack) .fmrow__lock { top: 43px; }
 /* Row labels read as one consistent tier — every control title is the same
  * semibold (see .fmrow__label below). The old "essential rows" treatment (a
  * heavier 680 label + a left tick on Brand/Scale/Display font/Box radius) was
@@ -304,7 +294,6 @@
   padding: 0;
   cursor: pointer;
 }
-
 /* === Flyout popover — floats over the canvas, to the right of the menu === */
 /* .menu carries the surface, the border, the radius, the shadow, the padding,
    the max-height, the scroll behaviour, the scrollbar and the enter animation.
@@ -327,7 +316,6 @@
   flex-direction: column;
   overflow: hidden;
 }
-
 .fmpop__list { display: flex; flex-direction: column; gap: 1px; }
 /* Colour-theme: a 2-column grid of dot + name, filled COLUMN-major so the
    spectrum reads as a clean fan — down column 1 (neutral → red → orange → green →
@@ -341,24 +329,6 @@
   gap: 2px;
   width: 232px;
 }
-.fmopt {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 7px 9px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 12.5px;
-  color: var(--app-fg);
-  text-align: left;
-  width: 100%;
-  transition: background var(--app-dur) var(--app-ease);
-}
-.fmopt:hover { background: var(--app-hover); }
-.fmopt--on { background: var(--app-hover); font-weight: 600; }
 .fmopt__viz {
   flex: none;
   display: inline-flex;
@@ -372,7 +342,6 @@
 .fmopt__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; align-items: flex-start; }
 .fmopt__text .fmopt__label { flex: none; }
 .fmopt__sub { font-size: 11px; font-weight: 400; line-height: 1.3; color: var(--app-fg-muted); white-space: normal; }
-
 /* Brand-colour footer — the emphasised row at the foot of the theme flyout.
  * Breaks out of the popover padding for a full-width divider; the whole row
  * is the native colour-picker trigger. */
@@ -404,7 +373,6 @@
   font-weight: 600;
   color: var(--app-fg);
 }
-
 /* === Harmony dials (H1) — the Spread/Expression sliders at the foot of the
  * Harmony flyout. Same footer treatment as .fmbrand (divider + recessed band). */
 .fmharmony {
@@ -416,12 +384,6 @@
   background: var(--app-bg);
   border-radius: 0 0 9px 9px;
 }
-.fmslider {
-  display: grid;
-  grid-template-columns: 72px 1fr 42px;
-  align-items: center;
-  gap: 8px;
-}
 .fmslider__label {
   font-size: 12px;
   font-weight: 500;
@@ -432,72 +394,6 @@
   font-variant-numeric: tabular-nums;
   text-align: right;
   color: var(--app-fg);
-}
-.fmslider input[type='range'] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 14px;
-  background: transparent;
-  cursor: pointer;
-}
-.fmslider input[type='range']::-webkit-slider-runnable-track {
-  height: 3px;
-  border-radius: 999px;
-  background: var(--app-border);
-}
-.fmslider input[type='range']::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  margin-top: -4.5px;
-  border-radius: 999px;
-  background: #fff;
-  border: 1.5px solid var(--app-fg-muted);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-}
-.fmslider input[type='range']::-moz-range-track {
-  height: 3px;
-  border-radius: 999px;
-  background: var(--app-border);
-}
-.fmslider input[type='range']::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: #fff;
-  border: 1.5px solid var(--app-fg-muted);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-}
-
-/* === Inline controls (configurator-pass) — the control lives IN the row,
- * no flyout. 'seg' = a segmented strip (nominal), 'slider' = a discrete track
- * (ordinal). Label sits left at its natural width; the control takes the rest,
- * so the choice is always visible (the shadcn "everything open" feel). === */
-.fmrow__inline {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 10px 5px 28px;
-  min-height: 36px;
-}
-.fmrow__inline > .fmrow__label { flex: none; }
-.fmrow__inline > .fmseg,
-.fmrow__inline > .fmsld { flex: 1; min-width: 0; }
-/* Stacked variant — label above a full-width strip, for segmented sets whose
- * options are too wide to share a line with the label (Neutrals · Surface · Press). */
-.fmrow__inline--stack { flex-direction: column; align-items: stretch; gap: 5px; padding-top: 6px; padding-bottom: 6px; }
-.fmrow__inline--stack > .fmrow__label { font-size: 12px; }
-
-/* Segmented strip — a recessed track of equal pills; the active pill lifts to
- * the surface colour (matches the panel's recessed-active language). */
-.fmseg {
-  display: flex;
-  gap: 2px;
-  padding: 2px;
-  background: var(--app-bg);
-  border: 1px solid var(--app-border);
-  border-radius: 8px;
 }
 .fmseg__opt {
   flex: 1 1 0;
@@ -531,7 +427,6 @@
 /* Icon-glyph segment (Icons row) — center the family glyph, no text. */
 .fmseg__opt--viz { display: inline-flex; align-items: center; justify-content: center; padding: 3px; }
 .fmseg__viz { display: inline-flex; }
-
 /* Foundation-coherence lock (surface-separation guard) — the option that would
    dissolve the block is disabled and wears a padlock, instead of being silently
    floored. Honest: the user sees WHY they can't pick it. */
@@ -542,48 +437,6 @@
 }
 .fmseg__opt--locked:hover { color: var(--app-fg-muted); }
 .fmseg__lock { flex: none; opacity: 0.85; }
-.fmsld--locked .fmsld__lock { flex: none; color: var(--app-fg-muted); opacity: 0.9; }
-
-/* Discrete slider — track + the current step's name read out at the right.
- * Same thumb/track language as the Harmony/Signature dials (.fmslider). */
-.fmsld { display: flex; align-items: center; gap: 9px; }
-.fmsld input[type='range'] {
-  -webkit-appearance: none;
-  appearance: none;
-  flex: 1;
-  min-width: 0;
-  height: 16px;
-  background: transparent;
-  cursor: pointer;
-}
-.fmsld input[type='range']::-webkit-slider-runnable-track {
-  height: 4px;
-  border-radius: 999px;
-  background: var(--app-border);
-}
-.fmsld input[type='range']::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  margin-top: -5px;
-  border-radius: 999px;
-  background: var(--app-surface);
-  border: 1.5px solid var(--app-fg-muted);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-}
-.fmsld input[type='range']::-moz-range-track {
-  height: 4px;
-  border-radius: 999px;
-  background: var(--app-border);
-}
-.fmsld input[type='range']::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  background: var(--app-surface);
-  border: 1.5px solid var(--app-fg-muted);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-}
 .fmsld__val {
   flex: none;
   min-width: 58px;
@@ -593,7 +446,6 @@
   color: var(--app-fg);
   white-space: nowrap;
 }
-
 /* Reduced-motion: the chrome guard at the file end already covers fmrow__pop. */
 
 /* === Ctrl: one labelled control row === */
@@ -621,7 +473,6 @@
   font-size: 11px;
   color: var(--app-fg-faint);
 }
-
 /* === Seg: segmented toggle ===
  *
  * Depth pattern (no color accent — Cockpit's chrome stays monochrome):
@@ -659,7 +510,6 @@
   font-weight: 600;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
 }
-
 /* Touch — floor the panel's own tap targets to the 44px WCAG 2.5.5 / Apple-HIG
    target on a coarse pointer (mirrors the kit's globalLayer floor, for app chrome).
    The 19px per-row Shuffle padlock is a deliberate exception — a tiny absolute
@@ -671,7 +521,6 @@
   .panel__reset { min-height: 44px; }
   .seg__opt { display: flex; align-items: center; justify-content: center; }
 }
-
 /* === FontPicker — custom dropdown where each option is rendered in its
    own typeface (Google Fonts eager-loaded in index.html). Replaces the
    native <select> which could only show font names in the chrome font. */
@@ -694,7 +543,6 @@
 .fp__btn:hover { border-color: var(--app-fg-muted); }
 .fp__name { flex: 1; color: var(--app-fg); }
 .fp__chev { color: var(--app-fg-faint); display: inline-flex; }
-
 /* Real preview, not a hint — full text color, sized to mirror the font's
    actual role: display picker shows headline-sized, body picker shows
    body-reading-sized. Makes the type hierarchy visible in the picker
@@ -715,7 +563,6 @@
   line-height: 1.5;
   letter-spacing: 0;
 }
-
 .fp__menu {
   position: absolute;
   top: calc(100% + 4px);
@@ -754,7 +601,6 @@
   max-height: none;
   animation: none;
 }
-
 /* Upload-your-own-font footer — grey, pinned, mirrors the Brand-colour
  * footer in the theme flyout. */
 .fp__foot {
@@ -816,7 +662,6 @@
 }
 .fp__item:hover { background: var(--app-hover); }
 .fp__item--on { background: var(--app-hover); font-weight: 600; }
-
 /* "Custom" tag — sibling of .fp__name (not nested) so it doesn't pick up
    the custom font that .fp__name renders in. Stays in the chrome's own
    neutral type + muted system color so it reads as meta-info, not content. */
@@ -833,7 +678,6 @@
   letter-spacing: 0;
   text-transform: none;
 }
-
 /* Warning shown when the user reloaded and their custom font is gone */
 .fp__warn {
   display: flex;
@@ -846,7 +690,6 @@
   border-radius: 6px;
   font-size: 11px;
 }
-
 /* Upload section — inline variant sits between System and Google fonts
    groups (so the action is high in the dropdown, not buried). */
 .fp__upload {
@@ -908,7 +751,6 @@
   font-size: 11px;
   color: #c53030;
 }
-
 /* === Select === */
 .select {
   width: 100%;
@@ -925,7 +767,6 @@
   background-position: right 10px center;
   padding-right: 28px;
 }
-
 /* === Saved kits — 3 fixed slots in localStorage === */
 .kits {
   display: grid;
@@ -997,7 +838,6 @@
   outline: none;
   box-shadow: 0 0 0 3px var(--k-focus-ring, rgba(59, 130, 246, 0.6));
 }
-
 /* Respect OS reduced-motion for chrome menus (preview side is covered by the
  * global guard in preview.css; chrome --app-* CSS needs its own). */
 @media (prefers-reduced-motion: reduce) {
@@ -1005,7 +845,6 @@
     animation-duration: 0.01ms !important;
   }
 }
-
 /* === Mobile — the panel is a bottom SHEET (chrome.css) =========================
  * Two things break the desktop panel model on a phone:
  *  1. Knob flyouts float to the RIGHT of the column (`left: calc(100% + 10px)`),
@@ -1037,7 +876,6 @@
      instead of stretching the segmented strips across the whole width. */
   .fmenu { max-width: 620px; margin-inline: auto; }
 }
-
 /* === Provenance — where a control's value came from ========================
  * Only present when the visitor arrived from an audit. Sits UNDER the label,
  * not beside it: the value column is already tight and a badge next to the
@@ -1060,7 +898,6 @@
 .fmrow__prov--default { color: #a16207; }
 /* Neutral once they take over: no longer evidence, just history. */
 .fmrow__prov--changed { color: var(--app-fg-faint); font-weight: 500; }
-
 /* Brand-colour note — shown only when the engine had to add a button boundary
    because the chosen brand does not separate from the page. Quiet by design: it
    reports, it does not warn. Nothing is wrong with their colour. */

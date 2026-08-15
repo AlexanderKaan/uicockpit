@@ -55,7 +55,7 @@ const REPORT_ONLY = process.argv.slice(2).includes('--report')
    Estimating and measuring disagreed by a factor of two, again. */
 const TARGETS = [
   { src: 'src/kit/recipes/index.ts', baseline: 170, what: 'the kit' },
-  { src: 'src/styles/panel.css',      baseline: 211,  what: 'the panel' },
+  { src: 'src/styles/panel.css',      baseline: 174,  what: 'the panel' },
   { src: 'src/styles/stage.css',      baseline: 193,  what: 'the stage + topbar' },
   { src: 'src/styles/chrome.css',     baseline: 55,  what: 'the app shell' },
   { src: 'src/styles/modal.css',      baseline: 164,  what: 'modals + toasts' },
