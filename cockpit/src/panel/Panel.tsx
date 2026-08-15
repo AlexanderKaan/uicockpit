@@ -515,7 +515,7 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
             const inline = false
             return (
             <Fragment key={r.key}>
-              {r.sec && <div className="fmsec">{r.sec}</div>}
+              {r.sec && <div className="menu__label fmsec">{r.sec}</div>}
               <div className={`fmrow ${inline ? 'fmrow--inline' : ''} ${openKey === r.key ? 'fmrow--open' : ''} ${lockedKeys.has(r.key) ? 'fmrow--locked' : ''}`}>
                 {r.key !== 'style' && (
                   <button
@@ -541,12 +541,12 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
                   <>
                     <button
                       type="button"
-                      className="fmrow__head"
+                      className="menu__item fmrow__head"
                       onClick={() => setOpenKey((k) => (k === r.key ? null : r.key))}
                       aria-expanded={openKey === r.key}
                     >
                       <span className="fmrow__label">{r.label}<Provenance state={provenance?.[r.label]} /></span>
-                      <span className="fmrow__val" title={r.value}>
+                      <span className="menu__value fmrow__val" title={r.value}>
                         {r.dot && <span className="fmrow__dot fmrow__dot--viz">{r.dot}</span>}
                         <span className="fmrow__val-text">{r.value}</span>
                       </span>

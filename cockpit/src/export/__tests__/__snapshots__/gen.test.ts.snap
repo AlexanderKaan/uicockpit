@@ -2429,7 +2429,8 @@ exports[`genContract (Fase D1 — the machine-readable contract) > matches snaps
           "item",
           "label",
           "sep",
-          "shortcut"
+          "shortcut",
+          "value"
         ]
       },
       "menubar": {
@@ -8547,6 +8548,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .menu__item--uncheck::before { content: ''; display: inline-block; width: 12px; margin-right: var(--k-s-4); }
 .menu__shortcut { margin-left: auto; font-family: var(--k-font-mono); font-size: var(--k-type-caption); color: var(--k-fg-faint); }
+/* The TRAILING VALUE slot, and it exists because dogfooding asked for it.
+   __shortcut is monospace on purpose — it holds a key hint. A settings menu puts
+   the CURRENT VALUE in the same position, and those are proper nouns (Cobalt,
+   Inter, Tonal) that read wrong in mono. Two different jobs sharing one slot is
+   how a slot ends up serving neither, so the value gets its own.
+   Found by rebuilding our own configurator panel out of this recipe: the kit had
+   every other part of that row already. */
+.menu__value { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); font-weight: var(--k-ui-weight, 500); }
 .menu__sep { height: var(--k-bw); background: var(--k-border); margin: var(--k-s-4) 0; }
 .menu__label { padding: var(--k-s-6) var(--k-s-10) var(--k-s-2); font-size: var(--k-type-caption); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-faint); font-weight: var(--k-weight-medium); }
 
@@ -16728,6 +16737,14 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 }
 .menu__item--uncheck::before { content: ''; display: inline-block; width: 12px; margin-right: var(--k-s-4); }
 .menu__shortcut { margin-left: auto; font-family: var(--k-font-mono); font-size: var(--k-type-caption); color: var(--k-fg-faint); }
+/* The TRAILING VALUE slot, and it exists because dogfooding asked for it.
+   __shortcut is monospace on purpose — it holds a key hint. A settings menu puts
+   the CURRENT VALUE in the same position, and those are proper nouns (Cobalt,
+   Inter, Tonal) that read wrong in mono. Two different jobs sharing one slot is
+   how a slot ends up serving neither, so the value gets its own.
+   Found by rebuilding our own configurator panel out of this recipe: the kit had
+   every other part of that row already. */
+.menu__value { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); font-weight: var(--k-ui-weight, 500); }
 .menu__sep { height: var(--k-bw); background: var(--k-border); margin: var(--k-s-4) 0; }
 .menu__label { padding: var(--k-s-6) var(--k-s-10) var(--k-s-2); font-size: var(--k-type-caption); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-faint); font-weight: var(--k-weight-medium); }
 

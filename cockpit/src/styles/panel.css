@@ -119,13 +119,12 @@
 }
 
 /* Section divider — quiet uppercase label, not interactive. */
+/* .menu__label carries the type, the tracking, the case and the colour — every
+   line that used to be here was a copy of it, including a hard-coded 10px where
+   the recipe reads --k-type-caption. What stays is the 28px indent, which is the
+   panel's own gutter for the lock affordance and belongs to nobody else. */
 .fmsec {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--app-fg-faint);
-  padding: 12px 10px 4px 28px;
+  padding-left: 28px;
 }
 /* A section header that twins a Foundations stage section — clicking jumps there.
  * Resets button chrome to match the .fmsec label; a → appears on hover as the cue. */
@@ -228,14 +227,15 @@
   letter-spacing: -0.01em;
 }
 .fmrow__val {
-  /* Takes the remaining width and right-aligns; the TEXT ellipsises when long
-   * so only the value shortens — the label stays put. */
+  /* .menu__value gives the position, the type and the colour. What stays is the
+     ellipsis behaviour: the VALUE shortens when it runs long so the label never
+     moves — a property of this panel, not of a menu item. */
   flex: 1;
   min-width: 0;
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 7px;
+  gap: var(--k-s-6);
   font-size: 12.5px;
   font-weight: 600;
   color: var(--app-fg);
