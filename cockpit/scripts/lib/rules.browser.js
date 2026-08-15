@@ -35,6 +35,32 @@
     return (cls || el.tagName.toLowerCase()).slice(0, 44)
   }
 
+  /* Kit, or the gallery's own wrapper? A review that cannot tell them apart
+   * reports the demo's disclosure widget as a defect in the design system. The
+   * class set is handed in from the kit model — the same single parser the
+   * static gates read, so the two halves of the checker finally agree on what
+   * "a kit class" is. Chrome findings are kept and marked, never dropped: a demo
+   * that breaks under a condition is worth knowing, it is just not a component
+   * defect, and silently discarding it is how a scan starts lying. */
+  function inKit(el) {
+    const set = window.__uicKitClasses
+    if (!set) return true
+    /* ⚠️ The first version walked UP the tree and returned true if any ancestor
+     * carried a kit class. Everything in the gallery sits inside .card, which is
+     * a kit class, so it reported 0 chrome findings — over a list that visibly
+     * contained the demo's own disclosure widget. An impossible number, which is
+     * the tell that the meter is broken rather than the subject.
+     * The element's OWN classes decide; an unclassed node inherits from the
+     * nearest classed ancestor, because a bare <li> belongs to whatever wraps it. */
+    for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
+      const classes = String(e.className || '').trim().split(/\s+/).filter(Boolean)
+      if (classes.length === 0) continue // unclassed: ask the parent
+      for (let i = 0; i < classes.length; i++) if (set.has(classes[i])) return true
+      return false // it has classes, none of them ours: chrome
+    }
+    return false
+  }
+
   /** Visually-hidden is a MECHANISM, detected by shape — never by class name. */
   function isVisuallyHidden(el) {
     const cs = getComputedStyle(el)
@@ -65,7 +91,7 @@
           if (!/hidden|clip/.test(cs.overflowY)) continue
           if (isVisuallyHidden(e)) continue
           if (e.scrollHeight <= e.clientHeight + 2) continue
-          out.push({ component: componentOf(e), el: label(e), detail: e.scrollHeight - e.clientHeight + 'px of text hidden' })
+          out.push({ component: componentOf(e), kit: inKit(e), el: label(e), detail: e.scrollHeight - e.clientHeight + 'px of text hidden' })
         }
         return out
       },
@@ -104,7 +130,7 @@
           var e = els[i]
           var over = e.getBoundingClientRect().right - boxOf(e).right
           if (over <= 2 || excluded(e) || reachableByScroll(e)) continue
-          out.push({ component: componentOf(e), el: label(e), detail: Math.round(over) + 'px outside its card' })
+          out.push({ component: componentOf(e), kit: inKit(e), el: label(e), detail: Math.round(over) + 'px outside its card' })
         }
         return out
       },
@@ -129,7 +155,7 @@
           if (!scrolls) continue
           var FOCUSABLE = 'a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])'
           if (e.matches(FOCUSABLE) || e.querySelector(FOCUSABLE)) continue
-          out.push({ component: componentOf(e), el: label(e), detail: 'no tabindex and nothing focusable inside' })
+          out.push({ component: componentOf(e), kit: inKit(e), el: label(e), detail: 'no tabindex and nothing focusable inside' })
         }
         return out
       },
@@ -163,7 +189,7 @@
           if (seen[key]) continue
           seen[key] = 1
           if (r.width >= floor - 0.5 && r.height >= floor - 0.5) continue
-          out.push({ component: componentOf(e), el: label(e), detail: Math.round(r.width) + 'x' + Math.round(r.height) + ' (floor ' + floor + ')' })
+          out.push({ component: componentOf(e), kit: inKit(e), el: label(e), detail: Math.round(r.width) + 'x' + Math.round(r.height) + ' (floor ' + floor + ')' })
         }
         return out
       },

@@ -31,6 +31,7 @@
 import { chromium } from '@playwright/test'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { parseKit } from './kit-model.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const RULES_PATH = join(HERE, 'rules.browser.js')
@@ -64,6 +65,77 @@ export const VARIATIONS = [
       line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important;
     } .cockpit-preview p { margin-block-end: 2em !important }`,
   },
+
+  /* ── D · robustness under CONTENT ──────────────────────────────────────
+   *
+   * The dimension NL Design System requires ("handles varying content: short
+   * text, long text, missing content") and the one we had nothing for. It is
+   * cheap now only because VARY exists: a content condition is a DOM edit, not
+   * new infrastructure — which is exactly why it was worth building the harness
+   * before writing any of these.
+   *
+   * Every mutation is reversible; the harness snapshots the subtree and puts it
+   * back, or the next condition would measure the previous one's damage. */
+  {
+    id: 'longtext',
+    label: 'pseudo-localised, ~40% longer',
+    width: 1440,
+    /* PSEUDO-LOCALISATION, the standard technique rather than something invented
+     * here: expand every string by roughly 40% and accent it. German and Dutch
+     * run that much longer than English, and the accents make it obvious at a
+     * glance which strings came from the UI and which are hard-coded. */
+    mutate: () => {
+      const MAP = { a: 'á', e: 'é', i: 'í', o: 'ó', u: 'ú', c: 'ç', n: 'ñ', s: 'š', y: 'ý' }
+      const walker = document.createTreeWalker(document.querySelector('.cockpit-preview'), NodeFilter.SHOW_TEXT)
+      const nodes = []
+      while (walker.nextNode()) nodes.push(walker.currentNode)
+      for (const n of nodes) {
+        const t = n.nodeValue
+        if (!t || t.trim().length < 2) continue
+        const accented = t.replace(/[aeioucnsy]/g, (ch) => MAP[ch] || ch)
+        // 40% longer, in whole words so wrapping still behaves like language.
+        const pad = ' ' + 'wörd'.repeat(Math.max(1, Math.round(t.trim().length * 0.4 / 5)))
+        n.nodeValue = accented + pad
+      }
+    },
+  },
+  {
+    id: 'unbreakable',
+    label: 'an unbreakable string (IBAN, reference, URL)',
+    width: 1440,
+    /* The failure that broke nineteen recipes at 320px was exactly this: content
+     * with no break opportunity setting a min-content floor nobody expected.
+     * Public services are made of these — case numbers, IBANs, BSNs, long URLs. */
+    mutate: () => {
+      const root = document.querySelector('.cockpit-preview')
+      const els = [...root.querySelectorAll('p, span, td, li, div, h1, h2, h3, h4')]
+        .filter((e) => e.children.length === 0 && e.textContent && e.textContent.trim().length > 3)
+      for (const e of els.slice(0, 400)) e.textContent = 'NL91ABNA0417164300-REF20260815-0042'
+    },
+  },
+  {
+    id: 'minimal',
+    label: 'content reduced to almost nothing',
+    width: 1440,
+    /* The other half of "varying content", and the one people forget: a layout
+     * held apart by its text collapses when the text is a single word, and an
+     * optional slot that is empty in production was never empty in the demo. */
+    mutate: () => {
+      const root = document.querySelector('.cockpit-preview')
+      const els = [...root.querySelectorAll('p, span, td, li, h1, h2, h3, h4')]
+        .filter((e) => e.children.length === 0 && e.textContent && e.textContent.trim().length > 1)
+      for (const e of els.slice(0, 400)) e.textContent = 'x'
+    },
+  },
+  {
+    id: 'rtl',
+    label: 'right-to-left',
+    width: 1440,
+    mutate: () => {
+      const root = document.querySelector('.cockpit-preview')
+      root.setAttribute('dir', 'rtl')
+    },
+  },
 ]
 
 /** Run every rule under every variation. Returns findings grouped by component. */
@@ -83,6 +155,18 @@ export async function runHarness({
   await page.addScriptTag({ path: RULES_PATH })
   const meta = await page.evaluate(() => window.__uicMeta())
 
+  /* Is this element part of the SHIPPED KIT, or the gallery's own wrapper?
+   *
+   * The preview contains both, and a review that cannot tell them apart reports
+   * "the Best practices disclosure overflows" as a defect in the design system.
+   * The kit model — the single parser built for the gates — already knows every
+   * class the kit ships, so the two halves finally meet: parse once in Node,
+   * hand the set to the page, and every finding says which side it is on.
+   * Chrome findings are still PRINTED, just marked; a demo that breaks under a
+   * condition is worth knowing about, it just is not a component defect. */
+  const kitClasses = [...parseKit().classes.keys()]
+  await page.evaluate((classes) => { window.__uicKitClasses = new Set(classes) }, kitClasses)
+
   const findings = []
   let baseline = null
 
@@ -90,6 +174,21 @@ export async function runHarness({
     await page.setViewportSize({ width: v.width, height: 1000 })
     let styleHandle = null
     if (v.css) styleHandle = await page.addStyleTag({ content: v.css })
+
+    /* A content mutation must not leak into the next condition, and the cheap
+     * trick — snapshot the subtree and put it back — is the wrong one twice
+     * over: it re-inserts markup by hand, and it leaves React holding a tree it
+     * no longer rendered. Reloading is two seconds and gives a genuinely clean
+     * DOM with fresh component state, which is what a content test should
+     * start from anyway. */
+    if (v.mutate) {
+      await page.reload({ waitUntil: 'networkidle' })
+      await page.waitForSelector(rootSel, { timeout: 25000 })
+      await page.waitForTimeout(1200)
+      await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
+      await page.addScriptTag({ path: RULES_PATH })
+      await page.evaluate(v.mutate)
+    }
     await page.waitForTimeout(550)
 
     const raw = await page.evaluate((sel) => window.__uicRun(sel, {}), rootSel)

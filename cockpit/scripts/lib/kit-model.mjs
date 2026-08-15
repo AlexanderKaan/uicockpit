@@ -128,10 +128,28 @@ export function parseKit(source = readFileSync(RECIPES_PATH, 'utf8')) {
     const block = source.slice(start, end)
     const section = block.match(/^ {4}section: ["'](.+?)["'],/m)?.[1] ?? null
 
-    // The css: template literal. Backticks inside it are a build error the
-    // audit:backticks gate already prevents, so a plain span is safe here.
+    /* The css: template literal, ending at the first UNESCAPED backtick.
+     *
+     * "Backticks inside are a build error the gate prevents" was almost true and
+     * cost an hour: audit:backticks bans BARE backticks, and an ESCAPED one is
+     * legal JS. The calendar recipe has exactly one, in a comment reading "the
+     * native \`disabled\` + this class" — and a plain indexOf stopped there,
+     * truncating that recipe's CSS at 4433 characters and silently dropping
+     * everything after it, .calendar__more included.
+     *
+     * The tell was the same one as always: an impossible number. The classifier
+     * built on this model called .calendar__more "not part of the kit", which is
+     * not a surprising answer, it is a wrong one. */
     const cssStart = block.indexOf('css: `')
-    const css = cssStart < 0 ? '' : block.slice(cssStart + 6, block.indexOf('`', cssStart + 6))
+    let css = ''
+    if (cssStart >= 0) {
+      let i = cssStart + 6
+      for (; i < block.length; i++) {
+        if (block[i] === '\\') { i++; continue }
+        if (block[i] === '`') break
+      }
+      css = block.slice(cssStart + 6, i)
+    }
 
     recipes.push({
       id: m[1],

@@ -67,16 +67,20 @@ for (const [component, rows] of groups) {
     const d = [...f.details]
     // One example plus a count reads better than a wall of near-identical strings.
     const detail = d.length === 1 ? d[0] : `${d[0]}  (+${d.length - 1} more, e.g. ${d[d.length - 1]})`
-    console.log(`   ${BAND[f.sev].padEnd(12)} ${String(f.n).padStart(3)}x  ${f.el.padEnd(24)} ${detail}`)
+    // Kit or the gallery's own wrapper — printed, never dropped.
+    const where = f.kit === false ? ' ·chrome' : ''
+    console.log(`   ${(BAND[f.sev] + where).padEnd(20)} ${String(f.n).padStart(3)}x  ${f.el.padEnd(24)} ${detail}`)
     console.log(`                     ${f.rule}${wcag}   at: ${[...f.where].join(', ')}`)
   }
 }
 
 const tally = [0, 0, 0]
 for (const f of findings) tally[f.sev]++
+const chrome = findings.filter((f) => f.kit === false).length
 const comps = groups.length
 console.log(`\n${'═'.repeat(70)}`)
 console.log(`${tally[0]} breach · ${tally[1]} content-lost · ${tally[2]} measurement` +
   `   across ${comps} component(s), over ${variations.length} conditions`)
+console.log(`${chrome} of those are marked ·chrome — the gallery's own wrappers, not the kit.`)
 console.log('A measurement is not a verdict: WCAG 2.5.8 permits a small target with enough')
 console.log('space around it, and axe owns that call. Not a gate yet — triage first.')
