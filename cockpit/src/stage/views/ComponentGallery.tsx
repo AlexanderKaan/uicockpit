@@ -418,13 +418,25 @@ function Card({ title, desc, children, wide, xwide, docId }: { title?: string; d
       data-recipe={docId || undefined}
       data-card={title || undefined}
     >
-      {(title || desc) && (
-        <div className="card__head">
-          {title && <div className="card__title">{title}</div>}
-          {desc && <div className="card__desc">{desc}</div>}
-          {doc && (
-            <details className="gdoc">
-              <summary>Best practices<span className="gdoc__chev"><ChevronSvg size={11} /></span></summary>
+      {/* THE CARD SHOWS THE COMPONENT, NOTHING ELSE.
+          The name and the description used to sit inside the frame, so every
+          card opened with two lines of our prose and you were judging a heading
+          before you reached the thing itself. Behind an ⓘ instead — and as
+          <details>, not a hover overlay: hover has no keyboard and no touch, and
+          reaching for one in an accessibility-first kit would be the product
+          contradicting itself. The wall's search still finds cards by name, so
+          nothing is lost but the noise.
+          A side effect worth noting: this head was also what F-heading-equidistant
+          flagged, card__title sitting 16px above and 16px below its own content. */}
+      {(title || desc || doc) && (
+        <details className="cardinfo">
+          <summary className="cardinfo__btn" aria-label={title ? `About ${title}` : 'About this component'}>
+            <span aria-hidden="true">i</span>
+          </summary>
+          <div className="cardinfo__panel">
+            {title && <div className="card__title">{title}</div>}
+            {desc && <div className="card__desc">{desc}</div>}
+            {doc && (
               <div className="gdoc__cols">
                 <div>
                   <div className="gdoc__h gdoc__h--do">Do</div>
@@ -435,9 +447,9 @@ function Card({ title, desc, children, wide, xwide, docId }: { title?: string; d
                   <ul>{doc.donts.map((x) => <li key={x}>{x}</li>)}</ul>
                 </div>
               </div>
-            </details>
-          )}
-        </div>
+            )}
+          </div>
+        </details>
       )}
       {children}
     </div>
