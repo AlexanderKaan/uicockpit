@@ -2598,9 +2598,13 @@ function ResizableCard() {
       {/* Vertical (row) split — .resizable--vertical stacks the panes + turns the
           grip horizontal. Visual orientation; wire the row-drag like the column one. */}
       <div className="resizable resizable--vertical" style={{ height: 132, marginTop: 'var(--k-s-12)' }}>
-        <div className="resizable__pane" style={{ padding: 'var(--k-s-12)', fontSize: 'var(--k-type-small)', fontWeight: 600 }}>Preview</div>
+        {/* Panes scroll once their content outgrows them, and a scroll container
+            with nothing focusable inside cannot be reached by keyboard at all
+            (2.1.1, Level A). Named regions, so the pane is both reachable and
+            announced as something rather than an anonymous box. */}
+        <div className="resizable__pane" tabIndex={0} role="region" aria-label="Preview pane" style={{ padding: 'var(--k-s-12)', fontSize: 'var(--k-type-small)', fontWeight: 600 }}>Preview</div>
         <div className="resizable__handle" role="separator" aria-orientation="horizontal" aria-label="Resize rows" aria-valuenow={50} aria-valuemin={0} aria-valuemax={100} tabIndex={0} />
-        <div className="resizable__pane" style={{ padding: 'var(--k-s-12)', fontSize: 11.5, fontFamily: 'var(--k-font-mono)', color: 'var(--k-fg-muted)' }}>$ build — done in 4.1s</div>
+        <div className="resizable__pane" tabIndex={0} role="region" aria-label="Terminal output" style={{ padding: 'var(--k-s-12)', fontSize: 11.5, fontFamily: 'var(--k-font-mono)', color: 'var(--k-fg-muted)' }}>$ build — done in 4.1s</div>
       </div>
     </Card>
   )
@@ -3487,7 +3491,12 @@ function ResponsiveTableCard() {
   ]
   return (
     <Card title="Invoices" desc="Responsive — rows reflow to label/value cards when narrow.">
-      <div className="table-responsive">
+      {/* A table wrapper that scrolls sideways with nothing focusable inside is
+          unreachable by keyboard — WCAG 2.1.1, Level A. The canonical fix, and the
+          one every scrollable-table guide gives: make the wrapper itself the
+          target, name it, and give it a role so it is announced as a region
+          rather than an anonymous box. */}
+      <div className="table-responsive" tabIndex={0} role="region" aria-label="Invoices, scrollable">
         <table className="table table--stack">
           <thead>
             <tr>

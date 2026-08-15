@@ -571,7 +571,9 @@ export function Resizable({
   const clamp = (v: number) => Math.max(min, Math.min(max, v))
   return (
     <div ref={ref} className="resizable" style={{ minHeight }}>
-      <div className="resizable__pane" style={{ flex: `0 0 ${pct}%` }}>{left}</div>
+      {/* Reachable by keyboard: a pane scrolls once its content outgrows it, and a
+          scroll container with nothing focusable inside is mouse-only (2.1.1, A). */}
+      <div className="resizable__pane" tabIndex={0} role="region" aria-label="Left pane" style={{ flex: `0 0 ${pct}%` }}>{left}</div>
       <div
         className="resizable__handle"
         role="separator"
@@ -595,7 +597,7 @@ export function Resizable({
           else if (e.key === 'End') { e.preventDefault(); setPct(max) }
         }}
       />
-      <div className="resizable__pane" style={{ flex: '1 1 0' }}>{right}</div>
+      <div className="resizable__pane" tabIndex={0} role="region" aria-label="Right pane" style={{ flex: '1 1 0' }}>{right}</div>
     </div>
   )
 }

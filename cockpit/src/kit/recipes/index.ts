@@ -1548,6 +1548,19 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
      .table--stack          go further: below the stack breakpoint each row reflows
                           to a label/value card — the header is visually hidden and
                           each cell shows its column name from data-label. */
+/* ⚠️ THE WRAPPER OWES ATTRIBUTES, and the CSS cannot supply them.
+   overflow-x:auto makes this a scroll container, and a scroll container with
+   nothing focusable inside cannot be reached by keyboard at all — WCAG 2.1.1,
+   Level A. A display-only table has nothing focusable inside. So the consumer
+   must write:
+
+     <div class="table-responsive" tabindex="0" role="region"
+          aria-label="Invoices, scrollable">
+
+   Found in our own gallery by measuring at 200% text, where the table starts to
+   overflow; at 1440px it never does, which is why one viewport had never seen
+   it. The same obligation applies to .scroll-area and any other box here that
+   scrolls. */
 .table-responsive { container-type: inline-size; width: 100%; overflow-x: auto; }
 @container (max-width: 34rem) {
   .table-responsive .table__col--optional { display: none; }
@@ -4198,6 +4211,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   overflow: hidden;
   background: var(--k-surface);
 }
+/* ⚠️ A pane scrolls the moment its content outgrows it — which is the whole
+   point of a resizable pane — and a scroll container with nothing focusable
+   inside is mouse-only (WCAG 2.1.1, Level A). The pane needs
+   tabindex="0" role="region" aria-label="…" from the consumer; CSS cannot
+   supply an attribute. Same obligation as .table-responsive and .scroll-area. */
 .resizable__pane { overflow: auto; min-width: 0; }
 .resizable__handle {
   flex: none;

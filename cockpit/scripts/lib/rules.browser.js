@@ -61,6 +61,23 @@
     return false
   }
 
+  /**
+   * Is this region operated by a control somewhere else on the page?
+   *
+   * The combobox contract: focus stays in the input, arrow keys move a visual
+   * pointer through the options, and the wiring is aria-controls plus
+   * aria-activedescendant. The region genuinely is reachable, just not by
+   * tabbing to it — which is the one thing a DOM scan naturally checks.
+   */
+  function controlledElsewhere(el) {
+    for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
+      if (!e.id) continue
+      const controller = document.querySelector(`[aria-controls="${CSS.escape(e.id)}"]`)
+      if (controller && (controller.hasAttribute('aria-activedescendant') || controller.getAttribute('role') === 'combobox')) return true
+    }
+    return false
+  }
+
   /** Visually-hidden is a MECHANISM, detected by shape — never by class name. */
   function isVisuallyHidden(el) {
     const cs = getComputedStyle(el)
@@ -155,6 +172,15 @@
           if (!scrolls) continue
           var FOCUSABLE = 'a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])'
           if (e.matches(FOCUSABLE) || e.querySelector(FOCUSABLE)) continue
+          /* CONTROLLED FROM ELSEWHERE is reachable, and axe cannot see it.
+           * A combobox listbox is the standard case: DOM focus stays in the
+           * input on purpose, arrow keys move a visual pointer, and the
+           * relationship lives in aria-controls + aria-activedescendant. Our
+           * own APG entry for the command palette specifies exactly that, so
+           * flagging it would be the checker contradicting the contract it
+           * publishes. Verified before excluding: the palette really does wire
+           * role="combobox", aria-controls and aria-activedescendant. */
+          if (controlledElsewhere(e)) continue
           out.push({ component: componentOf(e), kit: inKit(e), el: label(e), detail: 'no tabindex and nothing focusable inside' })
         }
         return out
