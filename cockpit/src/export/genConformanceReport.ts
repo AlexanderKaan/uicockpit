@@ -84,8 +84,6 @@ const CRITERIA = [
   ['2.4.7 Focus Visible', 'AA', 'A single focus treatment in the global layer, never removed by a component.'],
   ['2.4.11 Focus Not Obscured', 'AA', 'Sticky surfaces leave the focused element visible.'],
   ['2.5.7 Dragging Movements', 'AA', 'Every drag affordance has a single-pointer alternative.'],
-  ['2.5.8 Target Size (Minimum)', 'AA', '24x24 CSS px floor via --k-hit-min; small glyph controls keep their visual size and centre a transparent hit area.'],
-  ['2.5.5 Target Size (Enhanced)', 'AAA', 'Reached only at the AAA conformance setting, where every density rung lifts to 44x44 and Scale governs whitespace instead.'],
   ['1.4.12 Text Spacing', 'AA', 'Under the four overrides the SC specifies (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2em) nothing clips. Scroll regions carry a two-line floor so a panel squeezed by grown chrome cannot collapse the part that holds the content.'],
   ['1.4.10 Reflow', 'AA', 'At 320 CSS px no component is wider than the box it is given. Grid tracks use minmax(0, …) so one unbreakable cell cannot drag a column past its share, and the month-with-events calendar falls back to day markers where an event title no longer fits.'],
   ['1.4.4 Resize Text', 'AA', 'At 200% root text size nothing clips and nothing is lost. Dialog and sheet scroll as a whole once their own title and footer no longer leave room for the body.'],
@@ -110,8 +108,17 @@ const CRITERIA = [
  * (the instrument was reporting its own visually-hidden mechanism as the bug)
  * and one considerably larger: nineteen recipes, not the calendar alone.
  * Reproduce with: npm run a11y:css
+ *
+ * It was empty for about an hour. Then the target-size scan was rebuilt to
+ * derive its own denominator instead of carrying a list of eleven selectors, and
+ * the two target-size criteria moved OUT of the met table and into this one —
+ * not because the kit got worse, but because the measurement finally covered it.
+ * That is the whole argument for a report having a place to put a failure.
  */
-const NOT_YET_MET: ReadonlyArray<readonly [string, string, string]> = []
+const NOT_YET_MET: ReadonlyArray<readonly [string, string, string]> = [
+  ['2.5.8 Target Size (Minimum)', 'AA', '94 of 459 pointer targets are under 24 CSS px on at least one axis. The largest groups: checkbox and radio rows whose clickable label is 17px tall, disclosure summaries at 15px, footer and identifier links at 15-18px, chip and tag remove controls at 16x16, and a carousel dot at 6x6. Some may qualify under the SC’s spacing exception; that has not been measured, so they are declared as failing. Reproduce with: npm run a11y:matrix'],
+  ['2.5.5 Target Size (Enhanced)', 'AAA', '163 of 459 targets are under 44 CSS px on at least one axis at the AAA setting. The AAA control lifts the density ladder, which covers rows, buttons and fields; it does not reach controls that size themselves — a slider track 3px tall, a switch at 44x24, stepper chevrons at 24x44.'],
+]
 
 export function genConformanceReport(cfg: Config, assessedOn = '(fill in the date this was generated)'): string {
   const tk = buildTokens(cfg)

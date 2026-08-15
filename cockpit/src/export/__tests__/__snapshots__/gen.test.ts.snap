@@ -118,14 +118,23 @@ alternatives, page titles, journeys, timing, and the assembly of these parts.
 | 2.4.7 Focus Visible | AA | A single focus treatment in the global layer, never removed by a component. |
 | 2.4.11 Focus Not Obscured | AA | Sticky surfaces leave the focused element visible. |
 | 2.5.7 Dragging Movements | AA | Every drag affordance has a single-pointer alternative. |
-| 2.5.8 Target Size (Minimum) | AA | 24x24 CSS px floor via --k-hit-min; small glyph controls keep their visual size and centre a transparent hit area. |
-| 2.5.5 Target Size (Enhanced) | AAA | Reached only at the AAA conformance setting, where every density rung lifts to 44x44 and Scale governs whitespace instead. |
 | 1.4.12 Text Spacing | AA | Under the four overrides the SC specifies (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2em) nothing clips. Scroll regions carry a two-line floor so a panel squeezed by grown chrome cannot collapse the part that holds the content. |
 | 1.4.10 Reflow | AA | At 320 CSS px no component is wider than the box it is given. Grid tracks use minmax(0, …) so one unbreakable cell cannot drag a column past its share, and the month-with-events calendar falls back to day markers where an event title no longer fits. |
 | 1.4.4 Resize Text | AA | At 200% root text size nothing clips and nothing is lost. Dialog and sheet scroll as a whole once their own title and footer no longer leave room for the body. |
 | 3.3.1 Error Identification | A | Errors are named in text at the field and repeated in an error summary that moves focus to the control. |
 | 3.3.2 Labels or Instructions | A | Visible labels above the field. Placeholder-as-label is not available: the floating-label recipes were removed. |
 | 3.1.2 Language of Parts | AA | The language navigation names each option in its own language with lang and hreflang. |
+
+### Criteria we own and do not yet meet
+
+Listed by name, because a report that shows only what passes is an
+advertisement, and because an accessibility statement has to declare
+non-conforming content. Reproduce with: npm run a11y:css
+
+| Criterion | Level | What fails |
+|---|---|---|
+| 2.5.8 Target Size (Minimum) | AA | 94 of 459 pointer targets are under 24 CSS px on at least one axis. The largest groups: checkbox and radio rows whose clickable label is 17px tall, disclosure summaries at 15px, footer and identifier links at 15-18px, chip and tag remove controls at 16x16, and a carousel dot at 6x6. Some may qualify under the SC’s spacing exception; that has not been measured, so they are declared as failing. Reproduce with: npm run a11y:matrix |
+| 2.5.5 Target Size (Enhanced) | AAA | 163 of 459 targets are under 44 CSS px on at least one axis at the AAA setting. The AAA control lifts the density ladder, which covers rows, buttons and fields; it does not reach controls that size themselves — a slider track 3px tall, a switch at 44x24, stepper chevrons at 24x44. |
 
 ---
 
@@ -275,14 +284,23 @@ alternatives, page titles, journeys, timing, and the assembly of these parts.
 | 2.4.7 Focus Visible | AA | A single focus treatment in the global layer, never removed by a component. |
 | 2.4.11 Focus Not Obscured | AA | Sticky surfaces leave the focused element visible. |
 | 2.5.7 Dragging Movements | AA | Every drag affordance has a single-pointer alternative. |
-| 2.5.8 Target Size (Minimum) | AA | 24x24 CSS px floor via --k-hit-min; small glyph controls keep their visual size and centre a transparent hit area. |
-| 2.5.5 Target Size (Enhanced) | AAA | Reached only at the AAA conformance setting, where every density rung lifts to 44x44 and Scale governs whitespace instead. |
 | 1.4.12 Text Spacing | AA | Under the four overrides the SC specifies (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2em) nothing clips. Scroll regions carry a two-line floor so a panel squeezed by grown chrome cannot collapse the part that holds the content. |
 | 1.4.10 Reflow | AA | At 320 CSS px no component is wider than the box it is given. Grid tracks use minmax(0, …) so one unbreakable cell cannot drag a column past its share, and the month-with-events calendar falls back to day markers where an event title no longer fits. |
 | 1.4.4 Resize Text | AA | At 200% root text size nothing clips and nothing is lost. Dialog and sheet scroll as a whole once their own title and footer no longer leave room for the body. |
 | 3.3.1 Error Identification | A | Errors are named in text at the field and repeated in an error summary that moves focus to the control. |
 | 3.3.2 Labels or Instructions | A | Visible labels above the field. Placeholder-as-label is not available: the floating-label recipes were removed. |
 | 3.1.2 Language of Parts | AA | The language navigation names each option in its own language with lang and hreflang. |
+
+### Criteria we own and do not yet meet
+
+Listed by name, because a report that shows only what passes is an
+advertisement, and because an accessibility statement has to declare
+non-conforming content. Reproduce with: npm run a11y:css
+
+| Criterion | Level | What fails |
+|---|---|---|
+| 2.5.8 Target Size (Minimum) | AA | 94 of 459 pointer targets are under 24 CSS px on at least one axis. The largest groups: checkbox and radio rows whose clickable label is 17px tall, disclosure summaries at 15px, footer and identifier links at 15-18px, chip and tag remove controls at 16x16, and a carousel dot at 6x6. Some may qualify under the SC’s spacing exception; that has not been measured, so they are declared as failing. Reproduce with: npm run a11y:matrix |
+| 2.5.5 Target Size (Enhanced) | AAA | 163 of 459 targets are under 44 CSS px on at least one axis at the AAA setting. The AAA control lifts the density ladder, which covers rows, buttons and fields; it does not reach controls that size themselves — a slider track 3px tall, a switch at 44x24, stepper chevrons at 24x44. |
 
 ---
 

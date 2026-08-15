@@ -13,6 +13,7 @@
  * proves the paths a person would take.
  */
 import { chromium } from '@playwright/test'
+import { deriveTargets, NOT_A_TARGET } from './lib/interactive-targets.mjs'
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 const SCALES = ['compact', 'default', 'comfortable']
@@ -106,25 +107,12 @@ for (const mode of ['light', 'dark']) {
  * The token was right and the page was wrong. So the claim is checked where the
  * claim lives. */
 console.log('\n── Target size (Conformance) ' + '─'.repeat(35))
-const SEL = ['.btn', '.in', '.list__row', '.menu__item', '.navsub__item', '.tab',
-  '.segctrl__btn', '.calendar__cell', '.select-trigger', '.navrow', '.opt']
-const targets = () => page.evaluate((sel) => {
-  const els = [...document.querySelectorAll(sel.map((s) => `.cockpit-preview ${s}`).join(', '))]
-    // year-view calendars deliberately shrink their cells; xs/sm/icon buttons are
-    // explicit size opt-outs whose targets come from spacing (WCAG 2.5.8) instead.
-    .filter((e) => e.offsetParent !== null && !e.closest('.calendar-year__month')
-      && !e.matches('.btn--xs, .btn--sm, .btn--icon'))
-  // BOTH axes. The first version measured height alone and reported "0 under 44"
-  // over a 30px-wide date field — a target is an area, and half a check is the
-  // kind of pass line that makes a claim feel verified when it is not.
-  const under = els.filter((e) => {
-    const r = e.getBoundingClientRect()
-    return r.height < 43.5 || r.width < 43.5
-  })
-  const g = {}
-  for (const e of under) { const k = e.className.split(' ')[0]; g[k] = (g[k] || 0) + 1 }
-  return { total: els.length, under: under.length, groups: g }
-}, SEL)
+/* The denominator is DERIVED, not listed — see scripts/lib/interactive-targets.mjs
+ * for why, in short: this scan used to carry eleven selectors and printed a zero
+ * over everything nobody had remembered to add to them. */
+const targets = () => page.evaluate(deriveTargets, {
+  rootSel: '.cockpit-preview', exclude: NOT_A_TARGET, floor: 44,
+})
 
 const setConformance = (want) => page.evaluate((w) => {
   const row = [...document.querySelectorAll('.fmrow')].find((r) => r.textContent.includes('Conformance'))
@@ -134,9 +122,26 @@ const setConformance = (want) => page.evaluate((w) => {
 
 await setConformance('aaa')
 await page.waitForTimeout(900)
+/* BOTH floors, because they are different promises. 2.5.8 (AA, 24px) is what the
+ * kit claims in every configuration; 2.5.5 (AAA, 44px) only at the AAA setting.
+ * Reporting the AAA number alone made a long list that is mostly not a breach of
+ * anything we claim, which is its own way of being useless. */
+const aa24 = await page.evaluate(deriveTargets, { rootSel: '.cockpit-preview', exclude: NOT_A_TARGET, floor: 24 })
+console.log(`  2.5.8 AA  (24px) ${aa24.under === 0 ? '✓' : '✗'} ${aa24.under}/${aa24.total} derived targets under 24px on EITHER axis`)
+for (const [name, g] of Object.entries(aa24.groups ?? {}).sort((a, b) => b[1].n - a[1].n).slice(0, 14)) {
+  console.log(`       ${String(g.size).padStart(14)}  x${String(g.n).padStart(3)}  ${name}`)
+}
+
 const aaa = await targets()
-console.log(`  AAA  ${aaa.under === 0 ? '✓' : '✗'} ${aaa.under}/${aaa.total} interactive controls under 44px on EITHER axis` +
-  (aaa.under ? `  ${JSON.stringify(aaa.groups)}` : ''))
+console.log(`\n  2.5.5 AAA (44px) ${aaa.under === 0 ? '✓' : '✗'} ${aaa.under}/${aaa.total} derived targets under 44px on EITHER axis`)
+for (const [name, g] of Object.entries(aaa.groups ?? {}).sort((a, b) => b[1].n - a[1].n).slice(0, 8)) {
+  console.log(`       ${String(g.size).padStart(14)}  x${String(g.n).padStart(3)}  ${name}`)
+}
+// Exclusions are printed, never silent: a scan that quietly drops things is
+// indistinguishable from one that missed them.
+for (const [sel, n] of Object.entries(aaa.skipped ?? {})) {
+  console.log(`       excluded x${String(n).padStart(3)}  ${sel}`)
+}
 if (aaa.under > 0) results.push({ mode: 'aaa', scale: 'targets', rows: Array(aaa.under).fill({ id: 'target-size' }) })
 
 await browser.close()
