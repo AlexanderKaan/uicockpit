@@ -97,3 +97,9 @@ bench/kit/
 # dev-only /__conformance route. Regenerate rather than commit; they are large
 # and they change whenever the engine's spread changes.
 /cockpit/public/fixtures/
+
+# The archive of superseded internal briefings + studies. Moved out of the root
+# rather than deleted, because none of these are in git and a delete would be
+# permanent. Ignored as a folder so a new file dropped in there does not have to
+# be added to the list above one at a time.
+/_archive/
