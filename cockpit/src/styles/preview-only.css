@@ -625,17 +625,23 @@
 .cardinfo > summary::-webkit-details-marker { display: none; }
 .cardinfo > summary:hover,
 .cardinfo[open] > summary { opacity: 1; color: var(--k-fg-muted); background: var(--k-state-hover); }
+/* The panel IS .popover — the kit's own recipe, not a second version of it.
+ * The first cut hand-rolled the whole surface here, which is the exact rule this
+ * repo records me breaking once before with the KPI band. audit:provenance
+ * cannot catch it either, because gallery chrome is allowed anything: the
+ * judgement is mine and I missed it. Only POSITION belongs here; everything
+ * else — padding, radius, shadow, z-index, the enter animation — comes from the
+ * recipe, and stays right when the recipe changes.
+ *
+ * The remaining honest gap: <details name> makes these mutually exclusive, so
+ * opening one closes the others, but the platform gives no light-dismiss and no
+ * Escape here. That wants the Popover API, which needs anchor positioning to sit
+ * beside its trigger — Chrome-only for now. Noted rather than papered over. */
 .cardinfo__panel {
   position: absolute;
   top: calc(100% + var(--k-s-4));
   right: 0;
-  inline-size: min(20rem, 70vw);
-  padding: var(--k-s-12);
-  border-radius: var(--k-radius-md);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  background: var(--k-surface-overlay, var(--k-surface-raised));
-  box-shadow: var(--k-shadow-lg);
-  font-size: var(--k-type-caption);
+  left: auto;
   text-align: left;
 }
 .cardinfo__panel .card__title { margin-bottom: var(--k-s-4); }

@@ -429,11 +429,11 @@ function Card({ title, desc, children, wide, xwide, docId }: { title?: string; d
           A side effect worth noting: this head was also what F-heading-equidistant
           flagged, card__title sitting 16px above and 16px below its own content. */}
       {(title || desc || doc) && (
-        <details className="cardinfo">
+        <details className="cardinfo" name="cardinfo">
           <summary className="cardinfo__btn" aria-label={title ? `About ${title}` : 'About this component'}>
             <span aria-hidden="true">i</span>
           </summary>
-          <div className="cardinfo__panel">
+          <div className="popover cardinfo__panel" role="dialog">
             {title && <div className="card__title">{title}</div>}
             {desc && <div className="card__desc">{desc}</div>}
             {doc && (
