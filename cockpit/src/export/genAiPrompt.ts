@@ -283,7 +283,7 @@ equivalent package (most of these ship for Vue / Svelte / Solid as well).
     Mobile-first: \`@media (min-width: var(--k-bp-md)) { ... }\`. Tailwind-compatible.
 14. Decorative palette — ONE six-swatch set drives avatars, category tiles,
     cover art, preload placeholders AND charts, so decoration + dataviz stay
-    on-brand. Character: \`${cfg.palette}\` — all three MULTI-HUE, derived from
+    on-brand. Character: \`${'vivid'}\` — all three MULTI-HUE, derived from
     the brand hue (pastel = soft & light, bright = Material-style clear/modern,
     vivid = saturated & punchy). Every swatch is a distinct colour (avatars /
     chart series / categories — never six tints of one hue). Use:

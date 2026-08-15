@@ -829,7 +829,7 @@ function buildChoices(cfg: Config, tk: ReturnType<typeof buildTokens>): Array<{ 
   return [
     { icon: ic(Palette), label: 'Color theme', value: cap('colorTheme', cfg.colorTheme) },
     { icon: sw(tk.primaryHex), label: 'Brand color', value: tk.primaryHex.toUpperCase() },
-    { icon: ic(Blend), label: 'Palette', value: cap('palette', cfg.palette) },
+    { icon: ic(Blend), label: 'Palette', value: cap('palette', 'vivid') },
     { icon: ic(Contrast), label: 'Neutrals', value: cap('neutral', cfg.neutral) },
     { icon: cfg.mode === 'dark' ? ic(Moon) : ic(Sun), label: 'Mode', value: cfg.mode === 'dark' ? 'Dark' : 'Light' },
     { icon: ic(Type), label: 'Display font', value: cfg.fontDisplay },

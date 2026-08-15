@@ -61,17 +61,16 @@ describe('relLum', () => {
 })
 
 describe('paletteSet soft/softFg contrast (icon chips, WCAG non-text ≥ 3:1)', () => {
-  const strategies = ['pastel', 'bright', 'vivid'] as const
   // A spread of brand hues so we catch the worst hue (yellow/green are the
   // historical danger zone for light containers).
   const hues = [221, 0, 50, 96, 140, 200, 270, 320]
   it('every soft/softFg pair clears 3:1 across characters, hues and modes', () => {
     let worst = Infinity
     let worstWhere = ''
-    for (const strat of strategies) {
+    for (const strat of [0.3, 0.7, 1.0, 1.4]) {   // expression, not three named palettes
       for (const dark of [false, true]) {
         for (const h of hues) {
-          const p = paletteSet(strat, h, 70, false, dark)
+          const p = paletteSet(h, 70, false, dark, { exprMul: strat })
           for (let i = 0; i < 6; i++) {
             const ratio = contrast(okStrToHex(p.soft[i]!), okStrToHex(p.softFg[i]!))
             if (ratio < worst) { worst = ratio; worstWhere = `${strat} ${dark ? 'dark' : 'light'} h${h} #${i}` }

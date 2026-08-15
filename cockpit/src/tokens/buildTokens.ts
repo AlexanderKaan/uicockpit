@@ -280,7 +280,7 @@ export function buildTokens(cfg: Config): Tokens {
   // old "Floating" sidebar is now an Elevation expression (a .sidenav--floating
   // utility), so it's no longer a chrome-bg branch.
   const surfaceFilled = cfg.surface === 'filled'
-  const surfacePlain = cfg.surface === 'plain'
+  const surfacePlain = false
   const chromeSunkenNav = surfaceFilled
   const spread = 1 // balanced ramp (Elevation decoupled from contrast)
 
@@ -594,7 +594,7 @@ export function buildTokens(cfg: Config): Tokens {
   // strategy. Mono → greyscale ramp. The harmony dials carry through: Spread
   // scales the hue offsets (60° = the calibrated full set, 0 = a sequential
   // single-hue family), Expression multiplies the saturation.
-  const pal = paletteSet(cfg.palette, ph, mono ? 0 : psat, mono, dark, { spreadFactor: spreadDeg / 60, exprMul })
+  const pal = paletteSet(ph, mono ? 0 : psat, mono, dark, { spreadFactor: spreadDeg / 60, exprMul })
   const chartCols = pal.base
 
   // --k-fill: solid brand fill for decorative directional fills (progress,

@@ -44,7 +44,6 @@ export const DEFAULT_CONFIG: Config = {
   harmony: 'tonal',
   spread: 60,
   expression: 100,
-  palette: 'vivid',
   neutral: 'auto',          // greys auto-tint toward the brand hue (Linear/Vercel)
   canvas: 'neutral',        // muted near-white page bg (= the prior --k-bg = nStep(1))
   fill: 'brand',            // subtle brand wash on the summary band (KPI strip etc.)

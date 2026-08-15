@@ -65,9 +65,7 @@ const NEUTRAL_OPTS = [
   // 'Auto' tints the grey ramp toward the brand hue; it sits first as the default,
   // so the bare word reads clearly beside Cool/Neutral/Warm in the segmented strip.
   { id: 'auto' as const, cap: 'Auto' },
-  { id: 'cool' as const, cap: 'Cool' },
   { id: 'neutral' as const, cap: 'Neutral' },
-  { id: 'warm' as const, cap: 'Warm' },
 ]
 // Scale — interface size + density (one tighter, default, one roomier).
 const CANVAS_OPTS = [
@@ -95,7 +93,6 @@ const SURFACE_DEPTH_OPTS = [
 const SURFACE_OPTS = [
   { id: 'outlined' as const, cap: 'Outlined' },
   { id: 'filled' as const, cap: 'Filled' },
-  { id: 'plain' as const, cap: 'Plain' },
 ]
 // Border prominence — its own control (tint of the box edge), 4 steps.
 const BORDER_OPTS = [
@@ -127,11 +124,6 @@ const CONFORMANCE_OPTS = [
 const LABEL_CASE_OPTS = [
   { id: 'sentence' as const, cap: 'Default' },
   { id: 'caps' as const, cap: 'Caps' },
-]
-const PALETTE_OPTS = [
-  { id: 'pastel' as const, cap: 'Pastel' },
-  { id: 'bright' as const, cap: 'Bright' },
-  { id: 'vivid' as const, cap: 'Vivid' },
 ]
 /* Harmony (H1) — presets of the two dials underneath (Spread °, Expression %).
  * Picking a preset snaps both sliders; moving a slider flips the row to Custom.
@@ -391,15 +383,6 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
         dispatch({ type: 'SET', patch: applyHarmonyPreset(id as Exclude<Harmony, 'custom'>) })
         close()
       },
-    },
-    {
-      key: 'palette',
-      label: 'Palette',
-      value: cap(PALETTE_OPTS, cfg.palette),
-      kind: 'seg',
-      opts: optsFrom(PALETTE_OPTS),
-      selected: cfg.palette,
-      onPick: pick('palette'),
     },
     {
       sec: 'Typography',

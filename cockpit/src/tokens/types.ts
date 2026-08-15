@@ -129,7 +129,11 @@ export type Canvas = 'white' | 'brand' | 'neutral'
 /* Neutral temperature. 'auto' (default) tints the grey ladder toward the BRAND
  * hue — the Linear/Vercel "the greys carry a whisper of the brand" trick, pure
  * OKLCH. cool/neutral/warm are explicit overrides; mono falls back to pure grey. */
-export type Neutral = 'auto' | 'cool' | 'neutral' | 'warm'
+/* TWO, not four (2026-08-15). The real question a house style asks is "do my
+   greys carry my brand, or stay neutral" — one line, and defensible to a buyer.
+   Cool and warm were taste on top of taste: anyone who genuinely needs a warm
+   grey sets a warm brand hue and 'auto' derives it. */
+export type Neutral = 'auto' | 'neutral'
 /* Harmony — how the DERIVED color family (secondary · accent · decoratives ·
  * the neutral tint) relates to the brand hue. Two continuous dials (H1):
  *   spread     0–180  — hue rotation of the derived family, in degrees.
@@ -152,7 +156,6 @@ export type Harmony = 'mono' | 'tonal' | 'complement' | 'expressive' | 'custom'
  * avatars / chart series get distinct colours:
  *   pastel = soft & light · bright = Material-style clear/legible/modern ·
  *   vivid = saturated & punchy. All three rotate with the brand colour. */
-export type Palette = 'pastel' | 'vivid' | 'bright'
 /* Surface — the STRUCTURE of how every contained/separated surface (fields,
  * menus, popovers, the sidebar seam) distinguishes itself from its background.
  * One axis, three archetypes (= shadcn's three field states, generalised). It
@@ -167,7 +170,12 @@ export type Palette = 'pastel' | 'vivid' | 'bright'
  *  plain    → no box: a single bottom hairline (underline) on fields, radius 0;
  *             seamless menus/sidebar that lean on the shadow. Linear/Vercel-clean.
  * Drives --k-field-* + --k-menu-* tokens + --k-chrome-bg. */
-export type Surface = 'outlined' | 'filled' | 'plain'
+/* 'plain' removed (2026-08-15). It took the boundary off a field, which is the
+   thing WCAG 1.4.11 is about. The floor kept it legal, so this is a positioning
+   argument rather than a compliance one — but it was the one setting in the
+   panel that let a reader of our conformance report then take the edge off their
+   own inputs. Outlined vs filled is a real style choice; "no boundary" is not. */
+export type Surface = 'outlined' | 'filled'
 
 /* Elevation — purely the SHADOW LADDER: how much surfaces lift off the page.
  * Decoupled (June 2026) from the neutral-ramp contrast (now owned by Borders +
@@ -217,7 +225,6 @@ export interface Config {
   harmony: Harmony
   spread: number
   expression: number
-  palette: Palette
   neutral: Neutral
   /* Page canvas / background — see Canvas. Drives --k-bg (exported). */
   canvas: Canvas

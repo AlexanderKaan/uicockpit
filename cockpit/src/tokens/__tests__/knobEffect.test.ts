@@ -32,11 +32,10 @@ const KNOBS: Record<string, string[]> = {
   labelCase: ['sentence', 'caps'],
   radius: ['none', 'subtle', 'soft', 'round'],
   surfaceDepth: ['flat', 'soft', 'deep'],
-  surface: ['outlined', 'filled', 'plain'],
+  surface: ['outlined', 'filled'],
   canvas: ['white', 'neutral', 'brand'],
   borders: ['faint', 'subtle', 'medium', 'strong'],
-  neutral: ['auto', 'cool', 'neutral', 'warm'],
-  palette: ['pastel', 'vivid', 'bright'],
+  neutral: ['auto', 'neutral'],
   conformance: ['aa', 'aaa'],
 }
 

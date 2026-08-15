@@ -343,7 +343,7 @@ ${Object.entries(CONTAINER_WIDTHS).map(([k, v]) => `--k-container-${k}: ${v};`).
 
 ## Decorative palette — avatars, tiles, cover art + charts
 
-One six-swatch set, auto-derived from the brand hue (character: \`${cfg.palette}\`
+One six-swatch set, auto-derived from the brand hue (character: \`${'vivid'}\`
 — pastel / bright / vivid, all multi-hue). It drives the decorative layer (avatar
 backgrounds, category tiles, cover-art & preload placeholders) AND the chart
 series, so dataviz and decoration stay on-brand together. Each \`accent-N\` has

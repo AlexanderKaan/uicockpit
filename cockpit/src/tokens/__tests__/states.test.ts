@@ -30,8 +30,8 @@ describe('H2 — state-layer algebra (fixed house formula)', () => {
   })
 
   it('the wash source is neutral and tracks the Neutrals ramp (cool ≠ warm hue)', () => {
-    const cool = buildTokens(at({ neutral: 'cool' })).vars
-    const warm = buildTokens(at({ neutral: 'warm' })).vars
+    const cool = buildTokens(at({ neutral: 'auto' })).vars
+    const warm = buildTokens(at({ neutral: 'neutral' })).vars
     // A neutral wash carries only a whisper of chroma — never a brand-strength fill.
     expect(chromaOf(String(cool['--k-state-hover']))).toBeLessThan(0.03)
     // But its hue follows the Neutral temperature control: cool and warm differ.

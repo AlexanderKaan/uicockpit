@@ -196,8 +196,18 @@ export function okAccentScale(solidHex: Hex, dark: boolean): string[] {
  * Anchored on the brand hue so the whole set rotates when the brand colour
  * changes — no more disconnected magic-hex gradients.
  */
+/* ONE STRATEGY (2026-08-15). The Palette knob offered pastel/vivid/bright, and
+ * measuring it settled the question: pastel and vivid differ only in saturation
+ * and lightness — which is what `expression` already scales — so they were two
+ * controls on one axis. `bright` was the odd one out for a different reason: its
+ * distinction was evenly-spaced 60-degree hues, and hue GEOMETRY belongs to
+ * Harmony, which already owns it.
+ *
+ * So the geometry is the organic set, and expression now carries the full range:
+ * at 1 it is the old vivid, and as it falls the family lightens toward what
+ * pastel used to be. Folding saturation alone would have lost that lightness,
+ * which is most of what made pastel feel different. */
 export function paletteSet(
-  strategy: 'pastel' | 'vivid' | 'bright',
   h: number,
   s: number,
   mono: boolean,
@@ -210,24 +220,23 @@ export function paletteSet(
    * exprMul multiplies every saturation. */
   const factor = Math.max(0, Math.min(1.5, harmony?.spreadFactor ?? 1))
   const xm = Math.max(0, Math.min(2, harmony?.exprMul ?? 1))
+  const soften = 1 - Math.min(1, xm)   // 0 at full colour, 1 at none
   const xs = (v: number): number => Math.min(96, Math.round(v * xm))
   let hsls: Array<[number, number, number]>
   if (mono || s === 0 || xm === 0) {
     const ls = dark ? [78, 68, 58, 49, 40, 32] : [30, 42, 52, 61, 70, 78]
     hsls = ls.map((l) => [h, 0, l])
-  } else if (strategy === 'pastel') {
-    // soft, light, low-mid chroma — 6 hues spread around the wheel from brand
-    const dh = [0, 42, 96, 168, 220, 292]
-    hsls = dh.map((d, i) => [(h + d * factor) % 360, xs(dark ? 40 : 56), dark ? 56 : 80 - (i % 2 ? 3 : 0)])
-  } else if (strategy === 'bright') {
-    // Material-inspired: evenly spaced hues (60° steps) at one consistent
-    // tone + moderate chroma → clear, legible, modern. Anchored on brand hue.
-    const dh = [0, 60, 120, 180, 240, 300]
-    hsls = dh.map((d) => [(h + d * factor) % 360, xs(dark ? 58 : 64), dark ? 64 : 60])
   } else {
-    // vivid: saturated multi-hue, deeper tone — bold/punchy
+    /* Saturated multi-hue at full expression; lightening toward the old pastel
+       tone as expression falls, so ONE dial spans what two knobs used to. */
     const dh = [0, 42, 96, 168, 220, 292]
-    hsls = dh.map((d) => [(h + d * factor) % 360, xs(dark ? 74 : 76), dark ? 56 : 54])
+    const baseL = dark ? 56 : 54
+    const softL = dark ? 56 : 80                     // where pastel used to sit
+    hsls = dh.map((d, i) => [
+      (h + d * factor) % 360,
+      xs(dark ? 74 : 76),
+      baseL + (softL - baseL) * soften - (soften > 0.5 && !dark && i % 2 ? 3 : 0),
+    ])
   }
   if (!(mono || s === 0 || xm === 0)) {
     // Low Spread collapses the hues together — restore CATEGORICAL distinction
@@ -273,16 +282,18 @@ export function paletteSet(
   // quick-action chips, avatars, badges — ignored the palette character.)
   // softFg stays a contrast-safe L30 ink (light mode) / L82 (dark); the
   // deepest light chip is Vivid at L87, which still clears 4.5:1 against L30.
-  const softL = dark
-    ? (strategy === 'pastel' ? 20 : strategy === 'bright' ? 23 : 26)
-    : (strategy === 'pastel' ? 94 : strategy === 'bright' ? 90 : 87)
-  const softSCap = strategy === 'vivid' ? 80 : strategy === 'bright' ? 66 : 58
+  /* The soft-chip tier follows expression the same way the base family does:
+     at full colour it is the old Vivid chip, and it lightens as expression falls.
+     softFg stays a contrast-safe ink, and the sweep proves the pair holds at
+     every point on the dial rather than at three named stops. */
+  const softL = dark ? 26 + 6 * soften : 87 + 7 * soften
+  const softSCap = 80 - 22 * soften
   const soft = hsls.map(([H, S]) =>
     hsl(H, mono || s === 0 ? 0 : Math.min(S, softSCap), softL))
   // on-container INK deepens in step with the container so text/icons stay
   // legible as the chip gets richer (Vivid's deeper chip → darker ink). Keeps
   // badge/pill TEXT — not just graphical glyphs — comfortably above AA.
-  const softFgL = dark ? 82 : strategy === 'pastel' ? 28 : strategy === 'bright' ? 25 : 22
+  const softFgL = dark ? 82 : 22 + 6 * soften   // ink lightens with its chip
   const softFg = hsls.map(([H, S]) =>
     hsl(H, mono || s === 0 ? 0 : Math.min(S + 10, 84), softFgL))
   const grad = hsls.map(([H, S, L]) => {
@@ -406,9 +417,7 @@ export function clampToAA(hue: number, sat: number, requestedL: number): number 
 // in buildTokens (not a fixed entry here), so this table only carries the manual
 // cool/neutral/warm anchors.
 export const TEMP: Record<Exclude<Neutral, 'auto'>, { h: number; s: number }> = {
-  cool: { h: 230, s: 9 },
   neutral: { h: 255, s: 3 },
-  warm: { h: 32, s: 11 },
 }
 
 const HUE_FAMILIES: Array<{ max: number; name: string }> = [
