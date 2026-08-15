@@ -408,7 +408,16 @@ function Card({ title, desc, children, wide, xwide, docId }: { title?: string; d
   // (the same single source design.md + the MCP serve) behind a quiet disclosure.
   const doc = docId ? RECIPES.find((r) => r.id === docId)?.doc : undefined
   return (
-    <div className={`card${wide ? ' card--wide' : ''}${xwide ? ' card--xwide' : ''}`}>
+    /* data-recipe / data-card make the wall MACHINE-ATTRIBUTABLE. Every check we
+       run reports per script — "audit:craft found 170 magic px" — when the thing
+       a review needs is per COMPONENT: "Slider: four findings". Nothing in the
+       DOM connected a rendered element back to the recipe it came from, so no
+       harness could group by component even though the gallery knows. */
+    <div
+      className={`card${wide ? ' card--wide' : ''}${xwide ? ' card--xwide' : ''}`}
+      data-recipe={docId || undefined}
+      data-card={title || undefined}
+    >
       {(title || desc) && (
         <div className="card__head">
           {title && <div className="card__title">{title}</div>}
