@@ -94,11 +94,39 @@ const report = await page.evaluate(() => {
    * it the concept is the house trap; the delta has to span every channel the
    * kit is allowed to use for a state. */
   const CHANNELS = ['backgroundColor', 'color', 'borderColor', 'borderWidth', 'boxShadow', 'fontWeight', 'outlineColor', 'textDecorationLine']
-  const look = (el) => CHANNELS.map((p) => cs(el)[p]).join('|')
+
+  /* AND THE CUE IS ALLOWED TO LIVE IN A CHILD. A sorted table header marks
+   * itself by colouring its chevron, not the <th> — comparing only the element
+   * reported it as indistinguishable while it is perfectly clear on screen. So
+   * the signature spans the rendered SUBTREE, plus the element's own transform
+   * (a rotated chevron is a cue too) and content of ::before/::after (that is
+   * how .menu__item--check draws its tick). */
+  const sig = (el) => {
+    const parts = []
+    const one = (n) => {
+      const c = cs(n)
+      parts.push(CHANNELS.map((p) => c[p]).join('|') + '|' + c.transform + '|' + c.opacity)
+      for (const pseudo of ['::before', '::after']) {
+        const pc = getComputedStyle(n, pseudo)
+        parts.push(pseudo + pc.content + pc.backgroundColor + pc.color + pc.width + pc.height)
+      }
+    }
+    one(el)
+    for (const d of el.querySelectorAll('*')) one(d)
+    return parts.join('#')
+  }
+  const look = sig
 
   const c1 = []
   for (const el of selectedEls) {
-    const sib = [...(el.parentElement?.children ?? [])].find((s) => s !== el && s.tagName === el.tagName && vis(s))
+    /* The control has to be an UNSELECTED sibling, which is not the same as "any
+     * sibling". Taking the first one compared two lit segments of a strength
+     * meter against each other and reported them as indistinguishable — they are
+     * identical, and correctly so. A comparison is only evidence when the thing
+     * compared against is actually the other state. */
+    const sib = [...(el.parentElement?.children ?? [])].find(
+      (s) => s !== el && s.tagName === el.tagName && vis(s) && !selectedEls.includes(s),
+    )
     if (!sib) continue
     const rest = look(sib)
     const mine = look(el)
@@ -128,9 +156,12 @@ const report = await page.evaluate(() => {
       const resolved = cs(probe).backgroundColor
       probe.remove()
       // Only a finding when the FILL is the whole difference — a row that also
-      // carries an edge or a weight change stays readable under the cursor.
-      const restCh = rest.split('|'), mineCh = mine.split('|')
-      const onlyFillDiffers = CHANNELS.every((_, i) => i === 0 || restCh[i] === mineCh[i])
+      // carries an edge, a weight change or a marked-up child stays readable
+      // under the cursor. Compared on the ELEMENT's own channels (the subtree
+      // signature above answers a different question and cannot be indexed).
+      const own = (n) => CHANNELS.map((p) => cs(n)[p])
+      const a = own(el), b = own(sib)
+      const onlyFillDiffers = a.every((v, i) => i === 0 || v === b[i]) && sig(el).replace(a[0], '') === sig(sib).replace(b[0], '')
       if (resolved === cs(el).backgroundColor && onlyFillDiffers) {
         problems.push(`its only cue is a fill that equals :hover (${resolved}) — indistinguishable under the cursor`)
       }
@@ -212,6 +243,13 @@ const report = await page.evaluate(() => {
   const c3 = []
   for (const [cls, count] of rendered) {
     if (styled.has(cls)) continue
+
+    /* AN ANCHOR IS NOT AN ORPHAN. `.inpagenav__item` has no rule of its own and
+     * does not need one: it exists so `.inpagenav__item--nested` has something to
+     * hang on, and that modifier IS styled. A class carrying a styled modifier is
+     * doing its job. Derived from the class name, so still no allow-list. */
+    if ([...styled].some((s) => s.startsWith(cls + '--'))) continue
+
     const base = cls.split('--')[0].split('__')[0]
     const familyStyled = [...styled].some((s) => s !== cls && (s.startsWith(base + '__') || s.startsWith(base + '--') || s === base))
     if (familyStyled) c3.push({ concept: 'orphan-class', el: '.' + cls, count, note: `its BEM family (${base}) is styled — this member is not` })

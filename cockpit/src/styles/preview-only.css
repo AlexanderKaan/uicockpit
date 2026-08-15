@@ -573,7 +573,11 @@
  * inside sits exactly where it would with no chrome. */
 .cockpit-preview .gallery .card { position: relative; }
 .cardinfo { position: absolute; top: var(--k-s-8); right: var(--k-s-8); z-index: 3; }
-.cardinfo > summary {
+/* Addressed BY ITS NAME, not by `> summary`. The markup has carried
+   .cardinfo__btn on 127 elements the whole time while every rule here
+   selected the element structurally, so the class did nothing and a rename of
+   the tag would have silently unstyled all of them. */
+.cardinfo__btn {
   list-style: none;
   display: grid;
   place-items: center;
@@ -590,9 +594,9 @@
   opacity: 0.5;
   transition: opacity var(--k-dur-fast, 120ms) var(--k-ease, ease), color var(--k-dur-fast, 120ms) var(--k-ease, ease);
 }
-.cardinfo > summary::-webkit-details-marker { display: none; }
-.cardinfo > summary:hover,
-.cardinfo[open] > summary { opacity: 1; color: var(--k-fg-muted); background: var(--k-state-hover); }
+.cardinfo__btn::-webkit-details-marker { display: none; }
+.cardinfo__btn:hover,
+.cardinfo[open] .cardinfo__btn { opacity: 1; color: var(--k-fg-muted); background: var(--k-state-hover); }
 /* The panel IS .popover — the kit's own recipe, not a second version of it.
  * The first cut hand-rolled the whole surface here, which is the exact rule this
  * repo records me breaking once before with the KPI band. audit:provenance

@@ -2733,9 +2733,9 @@ function NavCard() {
         </button>
         <div className="nav-group">Commerce</div>
         <div>
-          <button type="button" className="navrow navrow--parent" aria-expanded={open} data-tip="Shop" aria-label="Shop" onClick={() => setOpen((o) => !o)}>
+          <button type="button" className="navrow" aria-expanded={open} data-tip="Shop" aria-label="Shop" onClick={() => setOpen((o) => !o)}>
             <Icon name="store" />
-            <span className="navrow__label" style={{ flex: 1 }}>Shop</span>
+            <span className="navrow__label">Shop</span>
             <span className="navrow__chev"><Icon name="chevR" /></span>
           </button>
           {open && (
@@ -3014,7 +3014,7 @@ function SignupCard() {
           </div>
           <div className="pwinput__strength">
             {[0, 1, 2].map((i) => (
-              <span key={i} className={'pwinput__bar' + (i <= strength ? ' pwinput__bar--on' : '')} data-level={strength} />
+              <span key={i} className={'pwinput__bar' + (i < strength ? ' pwinput__bar--on' : '')} data-level={strength} />
             ))}
             <span className="pwinput__label">{strength <= 0 ? 'Too short' : strength === 1 ? 'Weak' : strength === 2 ? 'Fair' : 'Strong'}</span>
           </div>
@@ -4521,7 +4521,7 @@ function PasswordInputCard() {
       )}
       <div className="pwinput__strength">
         {[0, 1, 2].map((i) => (
-          <span key={i} className={'pwinput__bar' + (i <= strength ? ' pwinput__bar--on' : '')} data-level={strength} />
+          <span key={i} className={'pwinput__bar' + (i < strength ? ' pwinput__bar--on' : '')} data-level={strength} />
         ))}
         <span className="pwinput__label">
           {strength <= 0 ? 'Too short' : strength === 1 ? 'Weak' : strength === 2 ? 'Fair' : 'Strong'}

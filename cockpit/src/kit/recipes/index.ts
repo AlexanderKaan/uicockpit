@@ -5705,6 +5705,11 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
   border: var(--k-hairline, 1px solid var(--k-border));
   transition: background var(--k-dur, 200ms) var(--k-ease), border-color var(--k-dur, 200ms) var(--k-ease);
 }
+/* A MODIFIER MUST NEVER BE INERT. The three rules below key on data-level, and
+   the meter also emits level 0 — for which there was no rule at all, so a bar
+   marked --on rendered exactly like an unfilled one. Anything that says it is on
+   now looks on; the levelled rules refine it, they do not enable it. */
+.pwinput__bar--on { background: var(--k-fg-faint); border-color: transparent; }
 .pwinput__bar--on[data-level="1"] { background: var(--k-danger); border-color: transparent; }
 .pwinput__bar--on[data-level="2"] { background: var(--k-warning); border-color: transparent; }
 .pwinput__bar--on[data-level="3"] { background: var(--k-success); border-color: transparent; }
