@@ -36,15 +36,37 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(HERE, '..')
 const REPORT_ONLY = process.argv.slice(2).includes('--report')
 
-// The pinned count of magic-px literals in the kit. Lower this (never raise it)
-// as the C2/C6 sweep tokenizes dimensions. See RATCHET CONTRACT above.
-const BASELINE = 170
-
-const SRC = 'src/kit/recipes/index.ts'
+/* TARGETS, each with its own ratchet.
+ *
+ * This gate read ONE file for its whole life — the kit — which is why the kit
+ * holds and the chrome does not. All 26 gates in this repo did the same, so the
+ * 6177 lines and 1047 classes that dress the product had never been looked at by
+ * anything. Every re-implementation found in the dogfood pass — a second motion
+ * system, a hand-rolled menu, a copied scrollbar, a 24px lock fighting the
+ * control ladder — survived on that blind spot rather than on anyone's decision.
+ *
+ * Separate baselines on purpose: mixing them would let the chrome's debt hide
+ * behind the kit's progress, and the two are worked by different passes. */
+/* The chrome's baselines are the TRUE measured counts, pinned on the day the
+   gate first looked at these files. 1356 against the kit's 170 — eight times the
+   debt in the code that dresses the product, which is what happens when nothing
+   has ever counted. My own quick estimate beforehand said ~550, because I only
+   counted values that sit on the spacing scale; the gate counts every literal.
+   Estimating and measuring disagreed by a factor of two, again. */
+const TARGETS = [
+  { src: 'src/kit/recipes/index.ts', baseline: 170, what: 'the kit' },
+  { src: 'src/styles/panel.css',      baseline: 211,  what: 'the panel' },
+  { src: 'src/styles/stage.css',      baseline: 193,  what: 'the stage + topbar' },
+  { src: 'src/styles/chrome.css',     baseline: 55,  what: 'the app shell' },
+  { src: 'src/styles/modal.css',      baseline: 164,  what: 'modals + toasts' },
+  { src: 'src/styles/preview-only.css', baseline: 30, what: 'the gallery harness' },
+  { src: 'src/styles/marketing.css',  baseline: 703, what: 'the marketing site' },
+]
 const HAIRLINE = new Set(['0.5', '1', '1.5', '2']) // borders + focus rings: device-tuned
 const isBreakpoint = (l) => /@(container|media)\b/.test(l)
 const isSvgCoord = (l) => /(mask|viewBox|data:image|url\()/i.test(l)
 
+function scan(SRC) {
 let raw = readFileSync(resolve(ROOT, SRC), 'utf8')
 raw = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '') // strip comments
 
@@ -61,32 +83,43 @@ raw.split('\n').forEach((line, i) => {
     offenders.push({ line: i + 1, v, text: line.trim().slice(0, 100) })
   }
 })
+return offenders
+}
 
-const count = offenders.length
+/* One pass per target, and the verdict is the WORST of them: a chrome regression
+ * must not pass because the kit improved on the same day. */
+const results = TARGETS.map((t) => ({ ...t, offenders: scan(t.src) }))
+let failed = false
 
 if (REPORT_ONLY) {
-  console.log(`=== audit:craft — magic-px report (${count} literals) ===`)
-  const byVal = {}
-  for (const o of offenders) byVal[o.v] = (byVal[o.v] || 0) + 1
-  console.log('by value:', Object.entries(byVal).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k}px:${n}`).join('  '))
-  for (const o of offenders) console.log(`  ${SRC}:${o.line}\t${o.v}px\t${o.text}`)
+  for (const r of results) {
+    console.log(`\n=== ${r.src} — ${r.offenders.length} magic-px literals (baseline ${r.baseline}) ===`)
+    const byVal = {}
+    for (const o of r.offenders) byVal[o.v] = (byVal[o.v] || 0) + 1
+    console.log('by value:', Object.entries(byVal).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k}px:${n}`).join('  '))
+    for (const o of r.offenders.slice(0, 40)) console.log(`  ${r.src}:${o.line}\t${o.v}px\t${o.text}`)
+  }
   process.exit(0)
 }
 
-if (count === BASELINE) {
-  console.log(`audit:craft — magic-px ratchet holds (${count} === baseline). Tokenize to ratchet down.`)
+for (const r of results) {
+  const count = r.offenders.length
+  if (count === r.baseline) {
+    console.log(`  ✓ ${r.what.padEnd(22)} ${String(count).padStart(4)} === baseline`)
+    continue
+  }
+  failed = true
+  if (count > r.baseline) {
+    console.error(`  ✗ ${r.what.padEnd(22)} ${String(count).padStart(4)} magic-px literals — baseline ${r.baseline}, +${count - r.baseline}  (${r.src})`)
+    console.error('      A raw Npx desyncs the moment Scale re-scales the kit. Use a --k-* token or a calc.')
+  } else {
+    console.error(`  ↓ ${r.what.padEnd(22)} ${String(count).padStart(4)} — you removed ${r.baseline - count}. Lock it in: set baseline ${count} in scripts/audit-craft.mjs`)
+  }
+}
+
+if (!failed) {
+  console.log('audit:craft — every ratchet holds. Tokenize to ratchet down.')
   process.exit(0)
 }
-
-if (count > BASELINE) {
-  console.error(`audit:craft — REGRESSION: ${count} magic-px literals (baseline ${BASELINE}, +${count - BASELINE}).`)
-  console.error('A raw Npx dimension desyncs when Scale/density re-scales the kit. Derive it from a')
-  console.error('--k-* token (--k-icon-sm / --k-s-* / a calc), or run `npm run audit:craft -- --report`')
-  console.error('to see the full list. Do NOT raise BASELINE to make this pass.')
-  process.exit(1)
-}
-
-// count < BASELINE — improvement; force the win to be locked in.
-console.error(`audit:craft — you removed ${BASELINE - count} magic-px literal(s) (now ${count}). Lock it in:`)
-console.error(`set BASELINE = ${count} in scripts/audit-craft.mjs so the ratchet can't slip back.`)
+console.error('\nDo NOT raise a baseline to make this pass. `npm run audit:craft -- --report` lists them.')
 process.exit(1)
