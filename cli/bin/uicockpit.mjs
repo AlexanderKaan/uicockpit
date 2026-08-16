@@ -82,7 +82,11 @@ async function main() {
   }
 }
 
-main().then((code) => process.exit(code ?? 0)).catch((err) => {
+/* exitCode, never process.exit(): a `--json` report is larger than the 64KB a
+ * pipe takes synchronously, and process.exit() after console.log truncated it
+ * at exactly 65536 bytes for anyone reading us through execFile — the bench,
+ * the MCP server. Let the loop drain; nothing keeps it alive. */
+main().then((code) => { process.exitCode = code ?? 0 }).catch((err) => {
   console.error(`✗ ${err?.stack || err}`)
-  process.exit(2)
+  process.exitCode = 2
 })

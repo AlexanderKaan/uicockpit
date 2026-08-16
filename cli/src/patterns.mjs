@@ -328,17 +328,98 @@ function pushColors(events, value, loc, role, tokenized) {
  * (`check.mjs:106` bails on non-CSS), so nothing here can be reused from it. */
 
 /** Every `class`/`className="…"` string literal, with its line. */
+/**
+ * Every `className=` / `class=` site in a file, classified ONCE for the reader
+ * and both counters — so "readable" and "unreadable" cannot disagree about the
+ * same element.
+ *
+ *   kind      'string'   className="p-4"
+ *             'template' className={`p-4 ${x}`}     static parts read; the rest dynamic
+ *             'expr'     className={cn('p-4', open && 'bg-x', className)}
+ *   literals  every class token that is literally in the source: quoted strings
+ *             and the static parts of templates, at any depth of the expression
+ *   dynamic   something in the site is computed (an interpolation, a variable)
+ *
+ * The expression form is what Tailwind codebases actually write — cn(), clsx(),
+ * twMerge(), a ternary between two strings — and reading only the two quoted
+ * forms called 719 of openstatus's 3,950 elements a blind spot when the
+ * classes were sitting right there in the call. Brace-aware and multi-line: a
+ * cn() call rarely fits on one line.
+ */
+export function classNameSites(content) {
+  const out = []
+  // `class=` · `className=` · Vue's `:class=` / `v-bind:class=` (a bound
+  // expression in quotes) — one regex, the prefix tells the kind.
+  const re = /(:|v-bind:)?class(?:Name)?\s*=\s*/g
+  let m
+  while ((m = re.exec(content))) {
+    const start = m.index + m[0].length
+    const ch = content[start]
+    const bound = !!m[1]
+    let raw = '', end = start, kind = null
+    if (ch === '"' || ch === "'") {
+      end = content.indexOf(ch, start + 1)
+      if (end < 0) continue
+      raw = content.slice(start + 1, end)
+      /* Vue: `:class="{ 'is-active': open, foo: bar }"` — the KEYS are the
+       * classes; `:class="[$style.wrap, cond ? 'a' : 'b']"` — `$style.x` is a
+       * class in this file's own <style module>, the strings are literal. An
+       * expression, read as one. */
+      kind = bound ? 'expr' : 'string'
+    } else if (ch === '{') {
+      let depth = 0, i = start
+      for (; i < content.length; i++) {
+        const c = content[i]
+        if (c === '{') depth++
+        else if (c === '}') { depth--; if (!depth) break }
+        else if (c === '`' || c === '"' || c === "'") {
+          // skip a string/template so a brace inside it does not count
+          const q = c; i++
+          while (i < content.length && content[i] !== q) { if (content[i] === '\\') i++; i++ }
+        }
+      }
+      end = i
+      const inner = content.slice(start + 1, end).trim()
+      // `className={className}` / `{props.className}` / `{rest.className}` is a
+      // PASSTHROUGH: no styling decision is made here, the parent's site holds
+      // the classes and is counted there. Neither readable nor a blind spot.
+      if (/^(?:[\w$]+\.)?class(?:Name)?$/.test(inner)) { re.lastIndex = end + 1; continue }
+      const tpl = inner.match(/^`([\s\S]*)`$/)
+      if (tpl) { raw = tpl[1]; kind = 'template' } else { raw = inner; kind = 'expr' }
+    } else continue
+    re.lastIndex = end + 1
+
+    let literals = [], dynamic = false
+    const takeStatic = (text) => { for (const t of text.replace(/\$\{[\s\S]*?\}/g, ' ').split(/\s+/)) if (t) literals.push(t) }
+    if (kind === 'string') takeStatic(raw)
+    else if (kind === 'template') { takeStatic(raw); dynamic = /\$\{/.test(raw) }
+    else {
+      // every quoted string and every template's static parts, at any depth
+      for (const q of raw.matchAll(/"([^"]*)"|'([^']*)'|`([^`]*)`/g)) takeStatic(q[1] ?? q[2] ?? q[3] ?? '')
+      // object-syntax keys: `{ 'is-active': x, foo: y }` → is-active, foo
+      for (const k of raw.matchAll(/[{,]\s*([A-Za-z_][\w-]*)\s*:/g)) literals.push(k[1])
+      // `$style.foo` / `styles.foo`: a class of a CSS module — the name is right there
+      for (const k of raw.matchAll(/\$?styles?\.([A-Za-z_][\w-]*)/g)) literals.push(k[1])
+      // anything that is not a string literal, a call name, punctuation or a
+      // boolean is a computed part
+      const stripped = raw.replace(/"[^"]*"|'[^']*'|`[^`]*`/g, '').replace(/\$?styles?\.[\w-]+/g, '').replace(/\b(cn|clsx|classnames|classNames|twMerge|cva|cx|true|false|null|undefined)\b/g, '')
+      dynamic = /[A-Za-z_$][\w$.]*/.test(stripped)
+    }
+    // Only tokens that look like classes (identifiers were stripped above; belt and braces).
+    literals = literals.filter((t) => /^[A-Za-z_-][\w:./\[\]#%!()-]*$/.test(t))
+    out.push({ index: m.index, kind, literals, dynamic })
+  }
+  return out
+}
+
 export function classAttrs(path, content) {
   const out = []
-  const lines = content.split('\n')
-  for (let i = 0; i < lines.length; i++) {
-    for (const m of lines[i].matchAll(/class(?:Name)?\s*=\s*(?:"([^"]*)"|'([^']*)'|\{`([^`]*)`\})/g)) {
-      const raw = m[1] ?? m[2] ?? m[3] ?? ''
-      // A template literal with an interpolation is only partly readable; we
-      // take the static classes and count the file as partly-unreadable
-      // elsewhere (countUnreadable).
-      out.push({ classes: raw.split(/\s+/).filter(Boolean), at: { file: path, line: i + 1, col: m.index + 1 } })
-    }
+  // line numbers from the index, once, so a multi-line cn() reports its start
+  let line = 1, cursor = 0
+  const lineAt = (i) => { for (; cursor < i; cursor++) if (content.charCodeAt(cursor) === 10) line++; return line }
+  for (const site of classNameSites(content)) {
+    if (!site.literals.length) continue
+    out.push({ classes: site.literals, at: { file: path, line: lineAt(site.index), col: 1 } })
   }
   return out
 }
@@ -667,15 +748,68 @@ function readTemplate(src, from) {
  * DROPPED so `theme.x.y` and `themeCssVariables.x.y` resolve to one token
  * rather than two.
  */
-const THEME_BASE = /^(theme|tokens?|palette|vars|styles?)/i
-function themePath(expr) {
-  const m = expr.match(/\b([A-Za-z_$][\w$]*)((?:\s*\.\s*[\w$]+|\s*\[\s*['"]?[\w-]+['"]?\s*\])+)/)
-  if (!m) return null
-  const base = m[1].replace(/^props\./, '')
-  if (!THEME_BASE.test(base)) return null
-  // `.spacing[2]` and `.spacing.2` are the same token.
-  const path = m[2].replace(/\s+/g, '').replace(/\[['"]?([\w-]+)['"]?\]/g, '.$1').replace(/^\./, '')
-  return path || null
+/* The accessor is theme-ish, or it is one of the token FAMILIES a design
+ * system exports as objects: `colors.nodeIconSurface`, `spacing.md`,
+ * `shadows.card`, `zIndex.modal`. A family object is the theme, split up. */
+const THEME_BASE = /^(theme|tokens?|palette|vars|styles?|colou?rs?|spacings?|radii|radius|fonts?|typography|shadows?|elevations?|sizes?|breakpoints?|z(?:-?index|indices)?|motion|durations?|easings?)$|^(theme|tokens?|palette|vars|styles?)/i
+/* A named constant — RECORD_TABLE_ROW_HEIGHT, NAVIGATION_DRAWER_CONSTRAINTS.default,
+ * MOBILE_VIEWPORT — is a value the codebase chose to name once and reuse: that
+ * IS token discipline, in a different notation. Read it as one. */
+const CONSTANT = /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$|^[A-Z]{3,}$/
+export function themePath(expr) {
+  const e = expr.trim()
+  // theme.spacing(5) · theme.color('white') · theme.fontSize(5.5) · theme.spacing(GUTTER.md):
+  // a theme FUNCTION with a literal (or named) argument is a scale lookup — a
+  // token reference. twentyhq/twenty writes 1,300 of them per checkout.
+  // The theme may sit one hop in: `p.theme.spacing(5)`, `props.theme.x.y` —
+  // the arrow's parameter is the base, its first property is the theme.
+  const hop = (base, path) => {
+    const segs = path.replace(/\s+/g, '').replace(/^\./, '').split('.')
+    if (!THEME_BASE.test(base) && segs.length > 1 && THEME_BASE.test(segs[0])) return { base: segs[0], path: segs.slice(1).join('.') }
+    return { base, path: segs.join('.') }
+  }
+  const call = e.match(/\b([A-Za-z_$][\w$]*)((?:\s*\.\s*[\w$]+)+)\s*\(\s*([^()]*)\)\s*$/)
+  if (call) {
+    const h = hop(call[1], call[2])
+    if (THEME_BASE.test(h.base)) {
+      const args = call[3].split(',').map((a) => a.trim().replace(/^['"]|['"]$/g, '').replace(/[^\w.-]/g, '')).filter(Boolean)
+      if (args.length && args.every((a) => /^[\w.-]+$/.test(a))) return `${h.path}.${args.join('.')}`.replace(/\./g, '-').replace(/-+/g, '-')
+    }
+  }
+  // A BARE scale function — spacing(5), color('white'), fontSize(5.5), radius(2)
+  // imported from a tokens module — is the same lookup without the theme
+  // prefix (twentyhq/twenty-website writes it so). All arguments literal or
+  // named, and the call is the whole value: deterministic, named — a token.
+  const bareCall = e.match(/^([a-z][\w$]*)\s*\(\s*([^()]*)\)$/)
+  if (bareCall) {
+    const args = bareCall[2].split(',').map((a) => a.trim().replace(/^['"]|['"]$/g, '')).filter(Boolean)
+    if (args.length && args.every((a) => /^-?[\w.-]+$/.test(a))) return `${bareCall[1]}-${args.join('-')}`.replace(/\./g, '-').replace(/-+/g, '-')
+  }
+  const m = e.match(/\b([A-Za-z_$][\w$]*)((?:\s*\.\s*[\w$]+|\s*\[\s*['"]?[\w-]+['"]?\s*\])+)/)
+  if (m) {
+    // `.spacing[2]` and `.spacing.2` are the same token.
+    const h = hop(m[1], m[2].replace(/\[['"]?([\w-]+)['"]?\]/g, '.$1'))
+    const base = h.base
+    if (THEME_BASE.test(base)) return h.path || null
+    // SCREAMING_CASE, or a PascalCase constant object with a property path
+    // (RootStackingContextZIndices.SidePanel — a z-index scale by another name).
+    if (CONSTANT.test(m[1]) || /^[A-Z][A-Za-z0-9]+$/.test(m[1])) return `const-${m[1]}${m[2].replace(/\s+/g, '').replace(/\[['"]?([\w-]+)['"]?\]/g, '.$1')}`.replace(/\./g, '-').toLowerCase()
+    /* Any other `object.property` used as the whole value is a NAMED reference
+     * — `inks.userMessageBackground`, `scene.layout.surface` — a value looked
+     * up by name, which is what a token is, under a local name. What is NOT: a
+     * prop of the component (`props.width`, `p.$size`, `({ width }) => width`)
+     * — that value arrives per instance and is dynamic for real. */
+    const propsish = /^(props?|p|rest|attrs|attributes|\$props)$/.test(base)
+    const arrowParam = e.match(/^\(?\s*\{?\s*([\w$]+)/)   // `(p) => p.x` / `({ theme }) => …`
+    const isArrowOverBase = /=>/.test(e) && arrowParam && arrowParam[1] === m[1]
+    if (!propsish && !isArrowOverBase && !/=>/.test(e)) {
+      return `ref-${m[1]}${m[2].replace(/\s+/g, '').replace(/\[['"]?([\w-]+)['"]?\]/g, '.$1')}`.replace(/\./g, '-')
+    }
+  }
+  // a bare constant, possibly with a unit suffix: `${MOBILE_VIEWPORT}px`
+  const bare = e.match(/^([A-Za-z_$][\w$]*)$/)
+  if (bare && CONSTANT.test(bare[1])) return `const-${bare[1]}`.toLowerCase()
+  return null
 }
 
 /**
@@ -747,13 +881,12 @@ export function countUnreadable(path, content, resolvedModuleElements = 0) {
   // CSS-in-JS is READ now (see cssInJsBlocks) — only the declarations whose value
   // is an interpolation we cannot name are still lost.
   bump('css-in-js-interpolation', cssInJsUnreadable(content))
-  // className={expr} that is NOT a plain string or a plain template literal —
-  // minus the ones a CSS-module binding resolved, which ARE readable (their
-  // values sit in the .module.css we scanned).
-  bump('dynamic-classname',
-    (content.match(/class(?:Name)?\s*=\s*\{(?!\s*`)[^}]*\}/g) || []).length - resolvedModuleElements)
-  // template-literal classNames WITH interpolation (partly readable)
-  bump('dynamic-classname', (content.match(/class(?:Name)?\s*=\s*\{`[^`]*\$\{/g) || []).length)
+  // A className site with NO literal class in it — `className={cls}`,
+  // `className={props.className}` — minus the ones a CSS-module binding
+  // resolved, which ARE readable (their values sit in the .module.css we
+  // scanned). A site with literals is read (see countReadable), even when it
+  // also computes something.
+  bump('dynamic-classname', classNameSites(content).filter((s) => s.literals.length === 0).length - resolvedModuleElements)
   // CSS modules composition
   bump('css-modules-composes', (content.match(/^\s*composes\s*:/gm) || []).length)
 
@@ -900,7 +1033,10 @@ export function deepResolveVar(input, vars, depth = 0) {
 export function countReadable(path, content, resolvedModuleElements = 0) {
   const isCss = /\.(css|scss|less)$/.test(path)
   if (isCss) return (blankComments(content).match(/\{[^{}]*\}/g) || []).length
-  return (content.match(/class(?:Name)?\s*=\s*(?:"|'|\{`)/g) || []).length
+  // A site is READ when at least one class is literally there — a cn() with
+  // its strings, a template with its static half. What it also computes is
+  // noted (dynamic) but does not make the element a blind spot.
+  return classNameSites(content).filter((s) => s.literals.length > 0).length
     + (content.match(/style\s*=\s*\{\{/g) || []).length
     + resolvedModuleElements
 }

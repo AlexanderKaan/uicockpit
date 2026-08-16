@@ -7,7 +7,7 @@ import {
 import { renderReport } from '../src/report.mjs'
 import {
   extractCss, extractClasses, extractCssVars, extractClassStyles, resolveVar, expandBox,
-  cssModuleBindings, moduleClassAttrs, resolveRelative, pascalSegments, hasNoun,
+  cssModuleBindings, moduleClassAttrs, resolveRelative, pascalSegments, hasNoun, classAttrs,
 } from '../src/patterns.mjs'
 
 const at = { file: 'x.tsx', line: 1, col: 1 }
@@ -294,6 +294,115 @@ test('the theme accessor may be called anything theme-ish', () => {
   assert.match(r.dimensions.color.values[0].value, /font-color-tertiary/)
   // Bracket indexing normalises onto the dotted path.
   assert.match(r.dimensions.spacing.values[0].value, /spacing-2/)
+})
+
+/* ── Sprint Q · the audit reads 95% ──────────────────────────────────────────
+ * Measured on the eight-repo corpus (bench/audit-corpus): twentyhq/twenty read
+ * 70% and openstatus 82% before these, 98% and 97% after. Each test below is
+ * one blind spot that turned out to be a NAMED value in a notation the reader
+ * did not know — never a guess at an unknown value. */
+
+test('a cn()/clsx() className is READ: the classes are literally in the call', () => {
+  // openstatus: 719 of 3,950 elements were "dynamic" while every class sat in
+  // cn("flex items-center", open && "bg-muted", className).
+  const src = [
+    '<div className={cn("flex items-center p-4", open && "bg-muted", className)}>x</div>',
+    '<div className={clsx(',
+    '  "rounded-md text-sm",',
+    '  isActive ? "font-medium" : "font-normal",',
+    ')}>y</div>',
+  ].join('\n')
+  const r = auditFiles([file('a.tsx', src)])
+  assert.equal(r.meta.unreadable['dynamic-classname'], undefined, 'nothing is a blind spot here')
+  assert.equal(r.meta.parsed, 1)
+  const spacing = r.dimensions.spacing.values.map((v) => v.value)
+  assert.ok(spacing.some((v) => /16px|1rem/.test(v)), `p-4 was read from inside cn(): ${spacing}`)
+})
+
+test('a multi-line cn() reports the line it starts on', () => {
+  const src = ['<div', '  className={cn(', '    "p-4",', '  )}', '/>'].join('\n')
+  const sites = classAttrs('a.tsx', src)
+  assert.equal(sites.length, 1)
+  assert.equal(sites[0].at.line, 2)
+  assert.deepEqual(sites[0].classes, ['p-4'])
+})
+
+test('a className passthrough is neither readable nor a blind spot', () => {
+  // `className={className}` makes no styling decision — the parent's site
+  // holds the classes and is counted there. Counting it as unreadable
+  // punished every well-factored component library for being well factored.
+  const r = auditFiles([file('a.tsx', '<Root className={className} /><div className={props.className}>x</div><span className="p-4">y</span>')])
+  assert.equal(r.meta.unreadable['dynamic-classname'], undefined)
+  assert.equal(r.meta.parsed, 1)
+})
+
+test('a className with NO literal class is still the blind spot it is', () => {
+  const r = auditFiles([file('a.tsx', '<div className={variantClass}>x</div><div className={cls[size]}>y</div>')])
+  assert.equal(r.meta.unreadable['dynamic-classname'], 2)
+})
+
+test('a theme FUNCTION with a literal argument is a token reference', () => {
+  // twenty: `${({ theme }) => theme.spacing(5)}` ×706, `theme.color('white')`
+  // ×419, `theme.fontSize(5.5)` ×165 — a scale lookup is a token.
+  const src = [
+    'const A = styled.div`',
+    '  padding: ${({ theme }) => theme.spacing(5)};',
+    '  color: ${({ theme }) => theme.color("white")};',
+    '  font-size: ${(p) => p.theme.fontSize(5.5)};',
+    '`',
+  ].join('\n')
+  const r = auditFiles([file('a.ts', src)])
+  assert.equal(r.meta.unreadable['css-in-js-interpolation'], undefined)
+  assert.match(r.dimensions.spacing.values[0].value, /spacing-5/)
+  assert.match(r.dimensions.color.values[0].value, /color-white/)
+})
+
+test('a bare scale function from a tokens module is the same lookup', () => {
+  // twenty-website: `padding: ${spacing(5)}` with `import { spacing } from "@/tokens"`.
+  const r = auditFiles([file('a.ts', 'const A = styled.div`padding: ${spacing(5)}; color: ${color("black-40")};`')])
+  assert.equal(r.meta.unreadable['css-in-js-interpolation'], undefined)
+  assert.match(r.dimensions.spacing.values[0].value, /spacing-5/)
+})
+
+test('a named constant is token discipline in another notation', () => {
+  // `${RECORD_TABLE_ROW_HEIGHT}px`, `${NAVIGATION_DRAWER_CONSTRAINTS.default}`,
+  // `${RootStackingContextZIndices.SidePanel}` — a value named once and reused.
+  const src = [
+    'const A = styled.div`',
+    '  height: ${RECORD_TABLE_ROW_HEIGHT}px;',
+    '  width: ${NAVIGATION_DRAWER_CONSTRAINTS.default};',
+    '  z-index: ${RootStackingContextZIndices.SidePanel};',
+    '`',
+  ].join('\n')
+  const r = auditFiles([file('a.ts', src)])
+  assert.equal(r.meta.unreadable['css-in-js-interpolation'], undefined)
+})
+
+test('a named object reference reads as a token; a PROP stays dynamic', () => {
+  // `inks.userMessageBackground` is a value looked up by name — a token under a
+  // local name. `props.width` / `({ width }) => width` arrives per instance and
+  // is dynamic for real; it must NOT be read as a token.
+  const named = auditFiles([file('a.ts', 'const A = styled.div`background: ${inks.userMessageBackground};`')])
+  assert.equal(named.meta.unreadable['css-in-js-interpolation'], undefined)
+  const dyn = auditFiles([file('a.ts', 'const B = styled.div`width: ${(props) => props.width}; height: ${({ h }) => h};`')])
+  assert.equal(dyn.meta.unreadable['css-in-js-interpolation'], 2)
+})
+
+test('Vue: object-syntax keys and $style bindings are the classes', () => {
+  // n8n-io/n8n read 40% and was REFUSED: 6,189 `:class="{ 'is-active': open }"`
+  // and `:class="[$style.container, …]"` sites, every one of them literal.
+  const src = [
+    '<div :class="{ \'is-active\': open, disabled: !enabled }">a</div>',
+    '<div :class="[$style.container, compact ? \'p-2\' : \'p-4\']">b</div>',
+    '<div class="static p-4">c</div>',
+    '<style module>.container { padding: 8px; }</style>',
+  ].join('\n')
+  const r = auditFiles([file('a.vue', src)])
+  assert.equal(r.meta.unreadable['dynamic-classname'], undefined, 'nothing is a blind spot here')
+  assert.equal(r.meta.parsed, 1)
+  const classes = classAttrs('a.vue', src).map((s) => s.classes)
+  assert.ok(classes[0].includes('is-active') && classes[0].includes('disabled'))
+  assert.ok(classes[1].includes('container') && classes[1].includes('p-2'))
 })
 
 test('a non-theme identifier is not mistaken for a token', () => {
