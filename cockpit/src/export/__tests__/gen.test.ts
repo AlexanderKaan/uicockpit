@@ -36,9 +36,12 @@ describe('genCss', () => {
     expect(out).toContain('--k-font-display')
   })
 
-  it('matches snapshot for soft + cobalt sample', () => {
-    expect(genCss(sampleCfg)).toMatchSnapshot()
-  })
+  /* The full-text snapshot that stood here is gone, replaced by derived
+   * assertions in exportShape.test.ts. It was 7985 lines, and a one-property
+   * recipe edit made it a diff nobody reads — an unread diff is an unheld
+   * assertion. What it really guarded (nothing dropped, nothing invented,
+   * order preserved) is now stated directly and each statement has been
+   * observed failing under the mutation it exists to catch. */
 })
 
 describe('genJson', () => {
@@ -168,9 +171,12 @@ describe('genContract (Fase D1 — the machine-readable contract)', () => {
     expect(c.rules.find((r: { id: string }) => r.id === 'tokens-exist').severity).toBe('error')
   })
 
-  it('matches snapshot for soft + cobalt sample', () => {
-    expect(genContract(sampleCfg)).toMatchSnapshot()
-  })
+  /* The full-text snapshot that stood here is gone, replaced by derived
+   * assertions in exportShape.test.ts. It was 3120 lines, and a one-property
+   * recipe edit made it a diff nobody reads — an unread diff is an unheld
+   * assertion. What it really guarded (nothing dropped, nothing invented,
+   * order preserved) is now stated directly and each statement has been
+   * observed failing under the mutation it exists to catch. */
 })
 
 describe('genDesignMd', () => {
@@ -189,9 +195,12 @@ describe('genDesignMd', () => {
     expect(out.split('## Design tokens (light + dark)').length).toBe(2)
   })
 
-  it('matches snapshot for soft + cobalt sample', () => {
-    expect(genDesignMd(sampleCfg)).toMatchSnapshot()
-  })
+  /* The full-text snapshot that stood here is gone, replaced by derived
+   * assertions in exportShape.test.ts. It was 8698 lines, and a one-property
+   * recipe edit made it a diff nobody reads — an unread diff is an unheld
+   * assertion. What it really guarded (nothing dropped, nothing invented,
+   * order preserved) is now stated directly and each statement has been
+   * observed failing under the mutation it exists to catch. */
 })
 
 describe('genSkill', () => {

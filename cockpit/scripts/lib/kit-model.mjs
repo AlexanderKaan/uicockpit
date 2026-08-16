@@ -31,7 +31,7 @@ export const RECIPES_PATH = join(HERE, '../../src/kit/recipes/index.ts')
  * Character-stream, not regex: a `/*` inside a url() or a data: URI is not a
  * comment, and a regex cannot tell the difference.
  */
-function stripComments(css) {
+export function stripComments(css) {
   let out = ''
   let i = 0
   while (i < css.length) {
