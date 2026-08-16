@@ -50,7 +50,19 @@
         "Confirmation pages": "/patterns/confirmation-pages/",
         "Question pages": "/patterns/question-pages/",
         "Addresses": "/patterns/addresses/",
-        "Payment card details": "/patterns/payment-card-details/"
+        "Payment card details": "/patterns/payment-card-details/",
+        "Bank details": "/patterns/bank-details/",
+        "Cookies page": "/patterns/cookies-page/",
+        "Create accounts": "/patterns/create-accounts/",
+        "Dates": "/patterns/dates/",
+        "Email addresses": "/patterns/email-addresses/",
+        "Exit a page quickly": "/patterns/exit-a-page-quickly/",
+        "Names": "/patterns/names/",
+        "National Insurance numbers": "/patterns/national-insurance-numbers/",
+        "Start pages": "/patterns/start-using-a-service/",
+        "Task list pages": "/patterns/task-list-pages/",
+        "Telephone numbers": "/patterns/telephone-numbers/",
+        "Validation": "/patterns/validation/"
       }
     },
     "USWDS": {
@@ -147,5 +159,6 @@
         "Unordered list": "/unordered-list"
       }
     }
-  }
+  },
+  "_captured_note": "GOV.UK patterns extended 2026-08-16 from 8 to 20 — the first capture was the ones already aliased, which made the reverse reading flatter itself."
 }

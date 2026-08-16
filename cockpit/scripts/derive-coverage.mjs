@@ -122,23 +122,15 @@ for (const m of floorSrc.matchAll(/\bw\(\s*'([^']+)'/g)) {
     if (t[2]) FLOORED.add(t[1] + t[2])
   }
 }
-const l1 = { covered: [], missing: [] }
+const NO_RENDER = new Set(Object.keys(platform.html._no_render ?? {}).filter((k) => !k.startsWith('_')))
+const l1 = { covered: [], missing: [], notApplicable: [] }
 for (const group of ['controls', 'structure', 'content']) {
   for (const [el, path] of Object.entries(platform.html[group])) {
     const tag = el.replace(/\[.*/, '')
+    if (NO_RENDER.has(tag)) { l1.notApplicable.push({ name: el, why: platform.html._no_render[tag] }); continue }
     const ok = FLOORED.has(el) || FLOORED.has(tag) || claims(1, `<${tag}>`) || claims(1, tag)
     ;(ok ? l1.covered : l1.missing).push({ name: el, group, url: platform.html.url + path })
   }
-}
-
-/* ── layer 2 · APG ─────────────────────────────────────────────────────────── */
-const l2 = { covered: [], missing: [] }
-for (const [name, path] of Object.entries(platform.apg.patterns)) {
-  // "Grid (date grid)" claims "Grid"; match on the head of the name too.
-  const head = name.replace(/\s*\(.*/, '')
-  const ok = claims(2, name) || claims(2, head) ||
-    [...CLAIMED[2]].some((c) => forms(String(c).replace(/\s*\(.*/, '')).includes(forms(head)[0]))
-  ;(ok ? l2.covered : l2.missing).push({ name, url: platform.apg.url + path.replace(/^\//, '') })
 }
 
 /* ⚠️ THE LAYERS OVERLAP, and not accounting for it invents gaps that are our
@@ -156,7 +148,14 @@ const PLATFORM_NAMES = { textarea: 'textarea', textfield: 'input', textinput: 'i
   radiogroup: 'input[type=radio]', radiobutton: 'input[type=radio]', select: 'select', label: 'label',
   detail: 'details', image: 'img', img: 'img', video: 'video', link: 'a', divider: 'hr',
   rangeslider: 'input[type=range]', range: 'input[type=range]', datepicker: 'input[type=date]',
-  search: 'input[type=search]', meter: 'meter', progressindicator: 'progress', progres: 'progress' }
+  search: 'input[type=search]', meter: 'meter', progressindicator: 'progress', progres: 'progress',
+  // GOV.UK's field-level patterns prescribe the PLAIN element — a single text
+  // input for names, emails, phone numbers, bank details, NI numbers. That is
+  // the floor. (Telephone numbers explicitly says: no country-code picker.)
+  telephonenumber: 'input[type=tel]', emailaddresse: 'input[type=email]', emailaddress: 'input[type=email]',
+  name: 'input', bankdetail: 'input', nationalinsurancenumber: 'input', heading: 'h1',
+  ordered: 'ol', orderedlist: 'ol', unorderedlist: 'ul', paragraph: 'p', blockquote: 'blockquote',
+  figure: 'figure', separator: 'hr', article: 'article', logo: 'img' }
 const onTheFloor = (name) => {
   for (const f of forms(name)) {
     const el = PLATFORM_NAMES[f]
@@ -165,23 +164,62 @@ const onTheFloor = (name) => {
   return null
 }
 
+/* ── layer 2 · APG ─────────────────────────────────────────────────────────── */
+/* APG's page titles vs our anchor names, and the patterns the platform gives
+ * outright. "Menu" is APG's "Menu and Menubar" page; our menus anchor to Menu
+ * Button and Menubar, which are that page. Link is <a>. */
+const APG_ALIAS = { Menu: ['Menubar', 'Menu Button', 'Menu and Menubar'] }
+/* Decided, with the reason written down rather than left as a hole. */
+const DECIDED = {
+  Treegrid: 'a tree crossed with a grid — rows that expand AND cells that navigate. No service system publishes one; a tax form needs a table or a tree, not both at once. Not shipped, on purpose.',
+  Logo: 'a brand asset, not a component. The header has a slot for it; there is nothing to style.',
+}
+const l2 = { covered: [], missing: [], decided: [] }
+for (const [name, path] of Object.entries(platform.apg.patterns)) {
+  const head = name.replace(/\s*\(.*/, '')
+  const url = platform.apg.url + path.replace(/^\//, '')
+  const ok = claims(2, name) || claims(2, head) ||
+    (APG_ALIAS[head] ?? []).some((a) => claims(2, a)) ||
+    [...CLAIMED[2]].some((c) => forms(String(c).replace(/\s*\(.*/, '')).includes(forms(head)[0]))
+  if (ok) { l2.covered.push({ name, url }); continue }
+  const floor = onTheFloor(head)
+  if (floor) { l2.covered.push({ name, url, floor }); continue }
+  if (DECIDED[head]) { l2.decided.push({ name, url, why: DECIDED[head] }); continue }
+  l2.missing.push({ name, url })
+}
+
 /* ── layer 3 · Open UI ─────────────────────────────────────────────────────── */
+/* Covered by TOKENS rather than a recipe. An icon "component" in a CSS kit is a
+ * size ladder — --k-icon-xs/sm/md/chip — plus whatever glyph set the consumer
+ * wires in; there is no .icon class to ship and no reason to invent one. */
+const TOKEN_COVERED = { Icon: '--k-icon-xs · --k-icon-sm · --k-icon-md · --k-icon-chip' }
 const l3 = { covered: [], missing: [] }
 for (const [concept, v] of Object.entries(openui.names)) {
   const label = v.spelled ?? concept
-  const floor = (!claims(3, label) && !claims(3, concept)) ? onTheFloor(label) : null
-  const row = { name: label, pct: v.pct, floor }
-  ;(claims(3, label) || claims(3, concept) || floor ? l3.covered : l3.missing).push(row)
+  const hit = claims(3, label) || claims(3, concept)
+  const floor = hit ? null : onTheFloor(label)
+  const tokens = hit || floor ? null : (TOKEN_COVERED[label] ?? null)
+  const row = { name: label, pct: v.pct, floor, tokens }
+  ;(hit || floor || tokens ? l3.covered : l3.missing).push(row)
 }
 
 /* ── layer 4 · the service systems ─────────────────────────────────────────── */
-const l4 = { covered: [], missing: [] }
+const l4 = { covered: [], missing: [], pagePatterns: [], decided: [] }
 for (const [system, sv] of Object.entries(services.systems)) {
   for (const kind of ['components', 'patterns']) {
     for (const [name, path] of Object.entries(sv[kind] ?? {})) {
-      const floor = claims(4, name) ? null : onTheFloor(name)
-      const row = { name, system, kind, floor, url: sv.url.replace(/\/[^/]*\/?$/, '') + path }
-      ;(claims(4, name) || floor ? l4.covered : l4.missing).push(row)
+      const url = sv.url.replace(/\/[^/]*\/?$/, '') + path
+      const hit = claims(4, name)
+      const floor = hit ? null : onTheFloor(name)
+      const tokens = hit || floor ? null : (TOKEN_COVERED[name] ?? null)
+      const row = { name, system, kind, floor, tokens, url }
+      if (hit || floor || tokens) { l4.covered.push(row); continue }
+      if (DECIDED[name]) { l4.decided.push({ ...row, why: DECIDED[name] }); continue }
+      /* A PATTERN that no component resolves is a page composition — check
+       * answers, confirmation page, question page. If it belongs anywhere it is
+       * the section tier; it is not a missing component and is not listed as one. */
+      if (kind === 'patterns') { l4.pagePatterns.push(row); continue }
+      l4.missing.push(row)
     }
   }
 }
@@ -199,41 +237,89 @@ const wrap = (items, indent = '      ') => {
   out.push(row.replace(/ · $/, ''))
   return out.join('\n')
 }
+const tierOfIdRaw = (id) => (prov.tiers ?? {})[id] ?? 'component'
 
 line()
-line('  derive-coverage — the four layers as DENOMINATORS')
-line('  ' + '─'.repeat(70))
-line('  derive-provenance asks whether every recipe has a source, and the answer is')
-line('  yes. That proves nothing was invented. THIS asks whether every source has a')
-line('  recipe — the only direction that can prove nothing was missed, which is what')
-line('  turns a justified set into a derived one.')
+line('  derive-coverage — THE MEASURE. Both directions of the four-layer derivation,')
+line('  read together, so the set can be exact on paper before anything is built or cut.')
+line('  ' + '─'.repeat(74))
+line('  CORE = layer 2 ∪ layer 4 (normative behaviour, or a public service needs it).')
+line('  FLOOR = layer 1 (the platform\'s elements). CHECK = layer 3 (recorded, never a')
+line('  justification — Open UI is a census of what shadcn and its relatives ship, and')
+line('  copying that census is the shortcut this derivation exists to undo).')
 line()
 
-const layers = [
-  ['1 · MDN / HTML — the platform has it, we style it', l1, (r) => r.name],
-  ['2 · WAI-ARIA APG — a named pattern with a spec', l2, (r) => r.name],
-  ['3 · Open UI — the field converged on it', l3, (r) => `${r.name} (${r.pct}%)`],
-  ['4 · GOV.UK · NL · USWDS — a public service needs it', l4, (r) => `${r.name} [${r.system}]`],
-]
-for (const [title, layer, fmt] of layers) {
-  const total = layer.covered.length + layer.missing.length
-  line(`  Layer ${title}`)
-  line(`    ${layer.covered.length} of ${total} covered — ${pct(layer.covered.length, total)}`)
-  if (layer.missing.length) {
-    line(`    ⛔ ${layer.missing.length} in the catalogue with nothing in the kit:`)
-    line(wrap(layer.missing.map(fmt)))
-  }
+/* ── forward: STAYS / LEAVES ────────────────────────────────────────────────── */
+const stays = prov.stays ?? []
+const leaves = prov.leaves ?? []
+line(`  ══ STAYS — ${stays.length} component-tier recipes with a core line ══`)
+line(wrap(stays))
+line()
+/* ⚠️ THE WEAK EDGE OF "L2 ∪ L4", made visible rather than averaged in. An APG
+ * anchor can name the pattern of the PART rather than of the component: a card
+ * with an expand button is not a Disclosure, it CONTAINS one; a chip is a Button
+ * the way everything clickable is. Where the only core line is one of the
+ * primitive patterns and no service system ships the component, "core" is doing
+ * a lot of work. Listed so the criterion can be tightened by decision — "L2
+ * counts when the pattern IS the component; when the pattern is a part, the
+ * component needs L4 too" — not by me. */
+const PRIMITIVE = new Set(['Disclosure', 'Button', 'Landmarks', 'Grid (for interactive rows)', 'Tooltip', 'Alert', 'Link'])
+const byId = Object.fromEntries(prov.assigned.map((a) => [a.id, a]))
+const primitiveOnly = stays.filter((id) => {
+  const core = byId[id].sources.filter((x) => x.layer === 2 || x.layer === 4)
+  return core.length > 0 && core.every((x) => x.layer === 2 && PRIMITIVE.has(x.source.replace(/^APG · /, '')))
+})
+if (primitiveOnly.length) {
+  line(`     ⚠️ ${primitiveOnly.length} of them are core ONLY through a primitive APG pattern — the part, not the`)
+  line('     component — and no service system ships them. Core under the current criterion;')
+  line('     the criterion is the decision:')
+  for (const id of primitiveOnly) line(`      ${id.padEnd(24)} ${byId[id].sources.filter((x) => x.layer === 2).map((x) => x.source).join(' · ')}`)
   line()
 }
-
-const totalCov = layers.reduce((a, [, l]) => a + l.covered.length, 0)
-const totalAll = layers.reduce((a, [, l]) => a + l.covered.length + l.missing.length, 0)
-line('  ' + '─'.repeat(70))
-line(`  ${totalCov} of ${totalAll} catalogue entries covered — ${pct(totalCov, totalAll)}`)
+line(`  ══ LEAVES — ${leaves.length} component-tier recipes with NO core line ══`)
+for (const l of leaves) line(`      ${l.id.padEnd(24)} ${l.why}`)
 line()
-line('  ⚠️ Read the layers separately, never averaged. A missing layer-1 element is')
-line('     a rule for the platform floor; a missing layer-2 pattern is a component')
-line('     with a behaviour spec attached; a missing layer-3 concept is only')
-line('     evidence that other design systems ship it, and design systems copy each')
-line('     other. They are not the same kind of debt and one number hides that.')
+
+/* ── reverse: MISSING ───────────────────────────────────────────────────────── */
+line(`  ══ MISSING — core catalogue entries with nothing in the kit ══`)
+const l2m = l2.missing, l4m = l4.missing
+line(`     layer 2 · APG          ${l2.covered.length} of ${l2.covered.length + l2m.length + l2.decided.length} covered · ${l2m.length} missing · ${l2.decided.length} decided`)
+if (l2m.length) line(wrap(l2m.map((r) => r.name)))
+for (const d of l2.decided) line(`      decided  ${d.name} — ${d.why}`)
+line(`     layer 4 · services     ${l4.covered.length} of ${l4.covered.length + l4m.length} components covered · ${l4m.length} missing`)
+if (l4m.length) line(wrap(l4m.map((r) => `${r.name} [${r.system}]`)))
+for (const d of l4.decided) line(`      decided  ${d.name} — ${d.why}`)
+line()
+line(`  ── page patterns — ${l4.pagePatterns.length}: compositions, not components. If they belong`)
+line('     anywhere it is the section tier; they are listed, not counted as gaps:')
+line(wrap(l4.pagePatterns.map((r) => `${r.name} [${r.system}]`)))
+line()
+
+/* ── the floor and the check ────────────────────────────────────────────────── */
+line(`  ── FLOOR · layer 1        ${l1.covered.length} of ${l1.covered.length + l1.missing.length} rendering elements styled` +
+  ` · ${l1.notApplicable.length} wrappers not applicable`)
+if (l1.missing.length) {
+  line('     the platform has an opinion the floor does not override yet (one rule each):')
+  line(wrap(l1.missing.map((r) => `<${r.name}>`)))
+}
+line(`  ── CHECK · layer 3        ${l3.covered.length} of ${l3.covered.length + l3.missing.length} Open UI concepts present` +
+  ` (${l3.covered.filter((r) => r.floor).length} on the floor, ${l3.covered.filter((r) => r.tokens).length} as tokens)`)
+if (l3.missing.length) line(wrap(l3.missing.map((r) => `${r.name} (${r.pct}%)`)))
+line()
+
+/* ── granularity ────────────────────────────────────────────────────────────── */
+line('  ── GRANULARITY — one concept split across recipes (a decision, not a default):')
+const FAMILIES = { calendar: /^calendar(-|$)/, 'input variants': /^(number|password|search|phone)input$|^form-primitives$/, form: /^form(-|$)/ }
+const everyone = [...stays, ...(prov.coreSections ?? []), ...leaves.map((l) => l.id)]
+for (const [stem, re] of Object.entries(FAMILIES)) {
+  const ids = everyone.filter((id) => re.test(id))
+  if (ids.length > 1) line(`      ${stem.padEnd(16)} ${ids.length} recipes  ${ids.join(' · ')}`)
+}
+line()
+
+const coreTotal = l2.covered.length + l2m.length + l2.decided.length + l4.covered.length + l4m.length
+const coreCov = l2.covered.length + l4.covered.length + l2.decided.length
+line('  ' + '─'.repeat(74))
+line(`  core coverage: ${coreCov} of ${coreTotal} — ${pct(coreCov, coreTotal)}  (decided gaps count as answered)`)
+line(`  the set on paper: ${stays.length} stay · ${leaves.length} leave · ${l2m.length + l4m.length} to add · ${l4.pagePatterns.length} page patterns for the section tier`)
 process.exit(0)

@@ -126,6 +126,14 @@
       "q": "/q",
       "del": "/del",
       "ins": "/ins"
+    },
+    "_no_render": {
+      "_why": "Wrappers and groupers that paint nothing of their own. They are in the element catalogue because they exist; they are not styling work, and counting them as gaps would put <form> next to <combobox> in the same list.",
+      "form": "groups controls; the controls are what render",
+      "thead": "groups rows; <th> is what renders",
+      "search": "a landmark; the input inside it renders",
+      "picture": "selects a source; the <img> renders",
+      "optgroup": "styled by the UA inside a native <select> popup and largely unstylable by page CSS"
     }
   }
 }

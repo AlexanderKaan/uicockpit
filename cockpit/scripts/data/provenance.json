@@ -1,5 +1,5 @@
 {
-  "_derived": "scripts/derive-provenance.mjs — layer 1 measured off the rendered DOM, 2/3 from apg.ts + openui-names.json, 4 hand-written and named",
+  "_derived": "scripts/derive-provenance.mjs — layer 1 measured off the rendered DOM, 2 from apg.ts, 3 from openui-names.json (a CHECK, not a source since 2026-08-16), 4 matched against service-systems.json",
   "_layers": {
     "1": "MDN / HTML",
     "2": "WAI-ARIA APG",
@@ -113,6 +113,12 @@
         "source": "Open UI · Form",
         "because": "10 of 27 surveyed design systems ship this independently (37%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "NL Design System · Form field",
+        "because": "NL Design System ships this as a component because a public service needs it.",
+        "url": "https://nldesignsystem.nl/form-field"
       }
     ],
     "badges-pills": [
@@ -121,6 +127,12 @@
         "source": "Open UI · Badge",
         "because": "10 of 27 surveyed design systems ship this independently (37%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "NL Design System · Badge",
+        "because": "NL Design System ships this as a component because a public service needs it.",
+        "url": "https://nldesignsystem.nl/badge"
       }
     ],
     "alert": [
@@ -257,6 +269,12 @@
         "source": "Open UI · Slider",
         "because": "8 of 27 surveyed design systems ship this independently (30%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Range slider",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/range-slider/"
       }
     ],
     "progress": [
@@ -291,6 +309,12 @@
         "source": "Open UI · Select",
         "because": "16 of 27 surveyed design systems ship this independently (59%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Select",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/select/"
       }
     ],
     "spinner": [
@@ -326,6 +350,12 @@
         "layer": 2,
         "source": "APG · Landmarks",
         "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+      },
+      {
+        "layer": 4,
+        "source": "NL Design System · Navigation bar",
+        "because": "NL Design System ships this as a component because a public service needs it.",
+        "url": "https://nldesignsystem.nl/navigation-bar"
       }
     ],
     "activity-feed": [
@@ -372,6 +402,12 @@
         "source": "APG · Grid (date grid)",
         "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Date picker",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/date-picker/"
       }
     ],
     "calendar-week": [
@@ -402,6 +438,12 @@
         "source": "Open UI · Range",
         "because": "6 of 27 surveyed design systems ship this independently (22%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Date range picker",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/date-range-picker/"
       }
     ],
     "inpagenav": [
@@ -590,6 +632,12 @@
         "source": "Open UI · Dialog",
         "because": "12 of 27 surveyed design systems ship this independently (44%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Modal",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/modal/"
       }
     ],
     "command-palette": [
@@ -632,6 +680,12 @@
         "source": "Open UI · Pagination",
         "because": "9 of 27 surveyed design systems ship this independently (33%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Breadcrumbs",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/breadcrumbs/"
       }
     ],
     "treeview": [
@@ -784,6 +838,12 @@
         "source": "APG · Dialog (Modal)",
         "because": "WAI-ARIA APG names the Dialog (Modal) pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/dialog-modal/"
+      },
+      {
+        "layer": 4,
+        "source": "NL Design System · Drawer",
+        "because": "NL Design System ships this as a component because a public service needs it.",
+        "url": "https://nldesignsystem.nl/drawer"
       }
     ],
     "segmented-control-toggle-group": [
@@ -904,6 +964,12 @@
         "source": "Open UI · Form",
         "because": "10 of 27 surveyed design systems ship this independently (37%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Password input",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/password-input/"
       }
     ],
     "numberinput": [
@@ -946,6 +1012,12 @@
         "source": "APG · Combobox",
         "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Search",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/search/"
       }
     ],
     "phoneinput": [

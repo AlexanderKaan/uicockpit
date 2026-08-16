@@ -12,9 +12,23 @@
  *   3 · Open UI      what the field converged on independently
  *   4 · GOV.UK · NL Design System · USWDS   what a public service needs
  *
- * A component that needs a fifth line — "because we liked it" — leaves. This
- * script's real output is not the assignments; it is THAT LIST, printed rather
- * than hidden, because it is the V1 cut list and nobody can argue with it.
+ * ⚠️ LAYER 3 IS A CHECK, NOT A SOURCE (decided 2026-08-16, Sprint I). Open UI's
+ * matrix is a census of what 27 design systems ship — shadcn, Material, Radix and
+ * their relatives. "The field ships it" therefore means "shadcn has it", laundered
+ * through a survey; and the components this kit started with were copied from
+ * shadcn and Tailwind UI. As a reason for a component to EXIST that is circular
+ * with the exact problem being fixed. As a check — do we call it what the field
+ * calls it, does the field ship it too — it stays useful, and it is still looked
+ * up and still recorded. It just no longer counts toward CORE.
+ *
+ *   CORE  = layer 2 ∪ layer 4  (normative behaviour, or a public service needs it)
+ *   FLOOR = layer 1            (the platform's own elements — the floor's job)
+ *   CHECK = layer 3            (recorded, never a justification)
+ *
+ * A component with no line from 2 or 4 is reported by name — census-only, or
+ * platform-only where the floor already styles the element — because that is
+ * the list somebody will act on. Nothing here is a fifth line; "because we liked
+ * it" is what layer 3 turns out to have been.
  *
  * 🔑 THREE OF THE FOUR SOURCES ARE ALREADY IN THIS REPO, machine-readable, and
  * were being used for something narrower:
@@ -118,6 +132,19 @@ for (const m of apgSrc.matchAll(/^  '?([\w-]+)'?: \{\n([\s\S]*?)\n  \},$/gm)) {
 /* Matched on the CONCEPT WORD, normalised the same way the naming gate does, so
  * the two agree by construction rather than by coincidence. */
 const norm = (s) => s.toLowerCase().replace(/[\s-_]/g, '').replace(/(\w+?)(e|er)?(s|ing)$/, '$1')
+/* Open UI's names for things we ship under another word. Same rule as
+ * SERVICE_ALIAS: a translation, checkable against their page, never a decision. */
+const OPENUI_ALIAS = {
+  dialog: ['Modal', 'Dialog'],
+  'select-trigger': ['Select.Popup', 'Select'],
+  'dropdown-menu': ['Dropdown', 'Menu'],
+  'pagination-breadcrumb': ['Breadcrumb', 'Pagination'],
+  form: ['Textfield', 'Input', 'Text', 'Label', 'Textarea', 'Checkbox', 'Radio', 'Radio Group'],
+  'switch-toggle': ['Switch', 'Toggle'],
+  'sheet-drawer': ['Drawer'],
+  'badges-pills': ['Badge', 'Tag'],
+  'file-upload-dropzone': ['File'],
+}
 const OPENUI = {}
 /* ⚠️ NO 30% BAR HERE. That threshold belongs to the NAMING gate, which asks "is
  * this the word the field uses" — below it the field genuinely disagrees and the
@@ -162,29 +189,53 @@ for (const [concept, v] of Object.entries(openui.names)) {
  * their component, and their page settles it in one click. */
 const SERVICE_ALIAS = {
   'file-upload-dropzone': ['File upload', 'File input'],
-  requirements: ['Passwords'],
+  requirements: ['Passwords', 'Validation'],
   langnav: ['Language selector'],
-  'memorable-date': ['Date input', 'Memorable date'],
-  errorsummary: ['Error summary'],
+  'memorable-date': ['Date input', 'Memorable date', 'Dates'],
+  errorsummary: ['Error summary', 'Recover from validation errors'],
   sitefooter: ['Footer', 'Page footer'],
   charcount: ['Character count'],
   processlist: ['Process list'],
-  tasklist: ['Task list'],
+  tasklist: ['Task list', 'Task list pages'],
   stepper: ['Step indicator', 'Step by step navigation'],
   wizardstepper: ['Step indicator', 'Step by step navigation'],
   'page-head': ['Page header'],
   codeblock: ['Code block'],
-  prose: ['Prose'],
+  prose: ['Prose', 'Article'],
   infocard: ['Inset text', 'Summary box'],
   'action-panel': ['Spotlight section', 'Summary box'],
-  auth: ['Sign in'],
+  auth: ['Sign in', 'Create accounts'],
   'description-list': ['Summary list', 'Data list'],
-  banner: ['Banner', 'Phase banner'],
+  /* .banner is "page-level alert, persistent until dismissed, at the top of the
+   * content" — verified in the recipe, not assumed — which is what GOV.UK calls a
+   * Notification banner and USWDS a Site alert. */
+  banner: ['Banner', 'Phase banner', 'Notification banner', 'Site alert'],
   identifier: ['Identifier'],
   skiplink: ['Skip link'],
   inpagenav: ['In-page navigation'],
   fieldset: ['Fieldset'],
   sidebar: ['Side navigation', 'Sidenav'],
+  dialog: ['Modal'],
+  'pagination-breadcrumb': ['Breadcrumbs', 'Breadcrumb', 'Breadcrumb navigation', 'Pagination'],
+  appbar: ['Navigation bar', 'Service navigation', 'Header'],
+  /* ⚠️ THE ALIASES GO WHERE THE CLASSES ARE. The first version hung "Text input",
+   * "Form field", "Textbox" on form-primitives — five rules, the number/password/
+   * search/phone variants — while `form` (42 rules: .in .lab .field .checkbox
+   * .radio .tx .field__error) sat on the census-only list as if the most core
+   * recipe in the kit were a shadcn-ism. Verified against the class list, not the
+   * recipe name. */
+  form: ['Form field', 'Text input', 'Textbox', 'Textarea', 'Error message', 'Checkboxes', 'Checkbox', 'Radios', 'Radio buttons', 'Radio button', 'Validation'],
+  'form-primitives': ['Password input', 'Search'],
+  list: ['List', 'Collection', 'Link list', 'Icon list'],
+  'calendar-range': ['Date range picker'],
+  calendar: ['Date picker', 'Time picker'], // .timefield lives inside the calendar recipe
+  'badges-pills': ['Badge', 'Status badge', 'Tag'],
+  card: ['Card', 'Surface'],
+  'select-trigger': ['Select'],
+  combobox: ['Combo box'],
+  slider: ['Range slider'],
+  searchinput: ['Search'],
+  'sheet-drawer': ['Drawer'],
 }
 
 /* One index over all three catalogues, keyed by every form of the component's
@@ -199,6 +250,18 @@ for (const [system, sv] of Object.entries(services.systems)) {
         SERVICE_INDEX[k] = { system, name, url: sv.url.replace(/\/[^/]*\/?$/, '') + path, kind }
       }
     }
+  }
+}
+/* ⚠️ AN ALIAS KEYED ON A NON-RECIPE IS A SILENT MISS. Two were: 'checkbox-radio'
+ * (a gallery slug, not a recipe id) and 'headings' (no such recipe). They would
+ * have sat in the map forever, matching nothing, while the entries they were
+ * meant to resolve stayed on the gap list. So the maps are checked against the
+ * recipe list on load and a stray key throws — the whole point of Sprint I is
+ * that a miss here is a phantom worklist. */
+{
+  const ids = new Set(RECIPES.map((r) => r.id))
+  for (const k of [...Object.keys(SERVICE_ALIAS), ...Object.keys(OPENUI_ALIAS)]) {
+    if (!ids.has(k)) throw new Error(`alias map names "${k}", which is not a recipe id — the alias would never fire`)
   }
 }
 const serviceFor = (r) => {
@@ -328,7 +391,8 @@ for (const r of RECIPES) {
    * the two never met and a concept 37% of the field ships read as sourceless. */
   const words = [...forms(r.id), ...forms(r.section),
     ...String(r.section).split(/[^A-Za-z]+/).filter(Boolean).flatMap(forms),
-    ...String(r.id).split('-').flatMap(forms)]
+    ...String(r.id).split('-').flatMap(forms),
+    ...(OPENUI_ALIAS[r.id] ?? []).flatMap(forms)]
   /* ⚠️ ALL the matches, not just the first — and the difference only shows up
    * when the derivation is read BACKWARDS. Forward, one source is enough to
    * justify a recipe, so `find` was fine. Backwards, derive-coverage asks which
@@ -382,7 +446,31 @@ for (const r of RECIPES) {
   }
 }
 
-if (JSON_OUT) { console.log(JSON.stringify({ assigned, unassigned }, null, 2)); process.exit(0) }
+if (JSON_OUT) {
+  const isCoreJ = (a) => a.sources.some((x) => x.layer === 2 || x.layer === 4)
+  const compJ = (id) => tierOfId(id) === 'component'
+  const why = (a) => a.sources.some((x) => x.layer === 1)
+    ? `platform-only — ${a.sources.find((x) => x.layer === 1).source}; the floor styles the element`
+    : `census-only — ${a.sources.map((x) => x.source).join(', ')}`
+  const payload = JSON.stringify({
+    assigned, unassigned,
+    stays: assigned.filter((a) => compJ(a.id) && isCoreJ(a)).map((a) => a.id),
+    coreSections: assigned.filter((a) => !compJ(a.id) && isCoreJ(a)).map((a) => a.id),
+    leaves: [
+      ...assigned.filter((a) => compJ(a.id) && !isCoreJ(a)).map((a) => ({ id: a.id, why: why(a) })),
+      ...unassigned.filter((u) => compJ(u.id)).map((u) => ({ id: u.id, why: 'no source at all' })),
+    ],
+    tiers: Object.fromEntries(RECIPES.map((r) => [r.id, tierOfId(r.id)])),
+  }, null, 2)
+  /* ⚠️ NOT process.exit() after a big console.log: on a pipe, exit does not wait
+   * for stdout to drain and the JSON was cut at 64KB — derive-coverage then
+   * failed to parse it at "position 65242". Write, and leave on the callback. */
+  process.stdout.write(payload + '\n', () => process.exit(0))
+  /* And STOP here — the write callback fires later, and without this the report
+   * below prints after the JSON, which is what "unexpected character after JSON"
+   * means. An await that never resolves is the plain way to say "we are done". */
+  await new Promise(() => {})
+}
 
 const inLayer = (n) => assigned.filter((a) => a.sources.some((x) => x.layer === n))
 console.log(`derive-provenance — ${RECIPES.length} recipes against four sources; every source that applies, not the first that hits\n`)
@@ -404,34 +492,54 @@ if (violations.length) {
   for (const v of violations) console.log(`      ${v.id.padEnd(24)} wants ${v.wants.padEnd(12)} renders <${v.renders.toLowerCase()}>`)
 }
 
-/* ⚠️ THE CUT LIST IS THE COMPONENT-TIER HALF, and separating it is the difference
- * between a list somebody can act on and a list that gets argued about. The
- * substrate and the page shells are printed too — silently dropping them would be
- * the "quiet exclusion" this repo has been bitten by — but they are printed as
- * what they are, not as candidates for deletion. */
-const notComponents = unassigned.filter((u) => tierOfId(u.id) !== 'component')
-const cutList = unassigned.filter((u) => tierOfId(u.id) === 'component')
+/* ── THE THREE LISTS ──────────────────────────────────────────────────────────
+ * STAYS · LEAVES · (and derive-coverage prints MISSING, the other direction).
+ * Component-tier only — the substrate and the page shells are printed as what
+ * they are, never as candidates. Silently dropping them would be the "quiet
+ * exclusion" this repo has been bitten by. */
+const isCore = (a) => a.sources.some((x) => x.layer === 2 || x.layer === 4)
+const compTier = (id) => tierOfId(id) === 'component'
+const stays = assigned.filter((a) => compTier(a.id) && isCore(a))
+const censusOnly = assigned.filter((a) => compTier(a.id) && !isCore(a) && a.sources.some((x) => x.layer === 3) && !a.sources.some((x) => x.layer === 1))
+const platformOnly = assigned.filter((a) => compTier(a.id) && !isCore(a) && a.sources.some((x) => x.layer === 1))
+const noSource = unassigned.filter((u) => compTier(u.id))
+const notComponents = [...unassigned.filter((u) => !compTier(u.id)), ...assigned.filter((a) => !compTier(a.id) && !isCore(a))]
 
-console.log(`\n  ⛔ NO SOURCE — ${unassigned.length} of ${RECIPES.length}.\n`)
+const coreSections = assigned.filter((a) => !compTier(a.id) && isCore(a))
+console.log(`\n  ══ STAYS — core, component tier: ${stays.length} ══`)
+console.log('     A line from layer 2 (APG) or layer 4 (a public service). The set is these.')
+console.log(`     (+ ${coreSections.length} core recipes on the section/foundation tier, which stay as shells:`)
+console.log('      ' + coreSections.map((a) => a.id).join(' · ') + ')\n')
 
-if (notComponents.length) {
-  console.log(`     ${notComponents.length} of them are NOT COMPONENTS — the substrate and the page shells,`)
-  console.log('     read from the tier ladder in segments.ts. "Which design system ships this')
-  console.log('     component" is the wrong question about a grid, and they do not leave for')
-  console.log('     want of an answer:\n')
-  for (const u of notComponents) console.log(`      ${tierOfId(u.id).padEnd(11)} ${u.id.padEnd(28)} .${u.cls ?? '—'}`)
+console.log(`  ══ LEAVES — component tier with no core line: ${censusOnly.length + platformOnly.length + noSource.length} ══`)
+if (censusOnly.length) {
+  console.log(`     ${censusOnly.length} census-only — the field ships it, nothing normative, no service needs it.`)
+  console.log('     Layer 3 is a check, not a source; "shadcn has it" was the shortcut:\n')
+  for (const a of censusOnly) console.log(`      ${a.id.padEnd(28)} ${a.sources.map((x) => x.source).join('  ·  ')}`)
   console.log()
 }
-
-console.log(`     ⛔ THE V1 CUT LIST IS THE REMAINING ${cutList.length}. These are component-tier and`)
-console.log('     the only line left for them is "because we liked it", which is not a')
-console.log('     provenance:\n')
-for (const u of cutList) console.log(`      ${u.id.padEnd(28)} .${u.cls ?? '—'}  renders ${u.renders}`)
+if (platformOnly.length) {
+  console.log(`     ${platformOnly.length} platform-only — the element is the component. By the layer-1 rule the`)
+  console.log('     FLOOR styles the element and a recipe on top is a second version of it:\n')
+  for (const a of platformOnly) console.log(`      ${a.id.padEnd(28)} ${a.sources.map((x) => x.source).join('  ·  ')}`)
+  console.log()
+}
+if (noSource.length) {
+  console.log(`     ${noSource.length} with NO source at all:\n`)
+  for (const u of noSource) console.log(`      ${u.id.padEnd(28)} .${u.cls ?? '—'}  renders ${u.renders}`)
+  console.log()
+}
+if (notComponents.length) {
+  console.log(`  ── not components — ${notComponents.length}: the substrate and the page shells (tier read from`)
+  console.log('     segments.ts). "Which design system ships this component" is the wrong question')
+  console.log('     about a grid; they are listed, not judged:')
+  console.log('      ' + notComponents.map((u) => `${u.id} (${tierOfId(u.id)})`).join(' · ') + '\n')
+}
 
 if (WRITE) {
   const path = join(HERE, 'data/provenance.json')
   writeFileSync(path, JSON.stringify({
-    _derived: 'scripts/derive-provenance.mjs — layer 1 measured off the rendered DOM, 2/3 from apg.ts + openui-names.json, 4 hand-written and named',
+    _derived: 'scripts/derive-provenance.mjs — layer 1 measured off the rendered DOM, 2 from apg.ts, 3 from openui-names.json (a CHECK, not a source since 2026-08-16), 4 matched against service-systems.json',
     _layers: { 1: 'MDN / HTML', 2: 'WAI-ARIA APG', 3: 'Open UI', 4: 'GOV.UK · NL Design System · USWDS' },
     assigned: Object.fromEntries(assigned.map((a) => [a.id, a.sources])),
     unassigned: unassigned.map((u) => u.id),
