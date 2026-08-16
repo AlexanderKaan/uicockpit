@@ -355,15 +355,23 @@ for (const t of targets) {
        * either has the DOM attributes OR is a native control whose min/max/value
        * are set, which is precisely what the browser turns into valuemin/max/now. */
       axMissing = await page.evaluate(({ cls, attrs }) => {
-        const el = document.querySelector('.' + cls)
-        if (!el) return attrs
+        /* ⚠️ ALL instances, not the first. A recipe can render several times on
+         * the wall in different states — .calendar is a picker (aria-selected,
+         * aria-disabled) AND a read-only year overview AND a scheduler, and since
+         * Sprint G the display ones are plain tables that correctly carry no
+         * selection ARIA. querySelector landed on one of those and reported the
+         * picker's declared attributes missing. The claim is about the RECIPE:
+         * an attribute is present if some instance carries it. */
+        const els = [...document.querySelectorAll('.' + cls)]
+        if (!els.length) return attrs
+        const el = { querySelectorAll: (q) => els.flatMap((e) => [e, ...e.querySelectorAll(q)]) }
         /* ⚠️ SOME OF THESE HAVE NO ATTRIBUTE AND NEED NONE. <progress> and <meter>
          * have a minimum of 0 BY SPEC — there is no `min` attribute to look for,
          * and demanding one would ask an author to write a value the platform
          * already guarantees. `null` here means "implied by being this element
          * at all". */
         const NATIVE = { 'aria-valuenow': 'value', 'aria-valuemin': null, 'aria-valuemax': 'max' }
-        const candidates = [el, ...el.querySelectorAll('*')]
+        const candidates = el.querySelectorAll('*')
         return attrs.filter((a) => !candidates.some((n) => {
           if (n.hasAttribute(a)) return true
           const native = NATIVE[a]
@@ -374,6 +382,7 @@ for (const t of targets) {
           return native === null ? true : n.hasAttribute(native)
         }))
       }, { cls: t.cls, attrs: axAttrs })
+
     }
     /* ⚠️ AND A NATIVE ELEMENT SUPPLIES THE STATE WITHOUT WRITING IT. The same
      * correction as the implicit ROLE above, one level down: a checkbox has
@@ -381,7 +390,12 @@ for (const t of targets) {
      * has the whole value family. Demanding the attribute on markup that already
      * carries the state is demanding redundancy — and redundant ARIA on a native
      * control is a defect in its own right, not a fix. */
-    const missing = await page.evaluate(({ cls, attrs }) => {
+    /* The DOM-attribute check as a page-side function, registered once, because it
+     * is called TWICE: plainly, and again under each opened trigger when the plain
+     * pass finds something missing (see the reach below). */
+    await page.evaluate(() => {
+      if (window.__uicHasAttrs) return
+      window.__uicHasAttrs = ({ cls, attrs }) => {
       const el = document.querySelector('.' + cls)
       if (!el) return null
       const IMPLIED = {
@@ -438,7 +452,34 @@ for (const t of targets) {
         try { return n.matches(native) } catch { return false }
       })
       return { attrs: attrs.filter((a) => !has(a)).concat([]) }
-    }, { cls: t.cls, attrs: domAttrs })
+      }
+    })
+    let missing = await page.evaluate((arg) => window.__uicHasAttrs(arg), { cls: t.cls, attrs: domAttrs })
+
+    /* ⚠️ THE STATE THE ARIA LIVES IN MAY BE CLOSED. The drive opens everything and
+     * then keeps clicking; a popover that closes on any outside click — the date
+     * picker — is shut again by the time this check runs, and its cells are the
+     * only .calendar that carries aria-selected. So a miss earns ONE targeted
+     * attempt to reach the state: click each closed trigger, re-run the same
+     * check, restore. Generic (any recipe whose ARIA lives in a popover) and
+     * honest: found-after-opening is FOUND, still-missing is missing. */
+    if (missing && missing.attrs.length) {
+      const reached = await page.evaluate(async ({ cls, attrs }) => {
+        const triggers = [...document.querySelectorAll('[aria-haspopup][aria-expanded="false"], [aria-expanded="false"]')]
+        let still = attrs
+        for (const trig of triggers) {
+          try { trig.click() } catch { continue }
+          await new Promise((r) => setTimeout(r, 120))
+          const res = window.__uicHasAttrs({ cls, attrs: still })
+          if (res) still = res.attrs
+          try { trig.click() } catch { /* restore */ }
+          await new Promise((r) => setTimeout(r, 60))
+          if (!still.length) break
+        }
+        return still
+      }, { cls: t.cls, attrs: missing.attrs })
+      missing = { ...missing, attrs: reached }
+    }
     if (missing) missing.attrs = missing.attrs.concat(axMissing)
     if (missing) missing.roles = missingRoles
     if (missing && (missing.roles.length || missing.attrs.length)) {

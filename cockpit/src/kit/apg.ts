@@ -224,13 +224,6 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
     aria: ['role="radiogroup" with a name', 'role="radio" with aria-checked', 'Roving tabindex'],
     free: 'Native <input type="radio"> with a shared name gives all of it, including the one-tab-stop behaviour.',
   },
-  'form-primitives': {
-    pattern: 'Checkbox',
-    url: `${APG}/checkbox/`,
-    keys: [['Space', 'Toggle']],
-    aria: ['role="checkbox" with aria-checked, or a native input', 'aria-checked="mixed" for a tri-state parent'],
-    free: 'Native <input type="checkbox"> gives the key, the state and the mixed value.',
-  },
   buttons: {
     pattern: 'Button',
     url: `${APG}/button/`,
@@ -524,6 +517,15 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
  * (a name, a live region, a text alternative) are stricter than a key map.
  */
 export const APG_NOT_APPLICABLE: Record<string, string> = {
+  /* The FIELD PRIMITIVES — .in, .lab, .field, .checkbox, .radio, .tx — not the
+   * <form> element (an earlier note here said "a <form> is HTML, not a widget",
+   * which is true of the element and was never what this recipe is). Every
+   * control in it is the platform's own — input, checkbox, radio, textarea — and
+   * every pattern APG names for them (Checkbox, Radio Group) the platform supplies
+   * with the element. Anchoring the whole recipe to one of those patterns was
+   * tried and was a stretch: the recipe has no single root to check it against. */
+  form: 'The field primitives, and each control is a platform element carrying its own pattern: <input type=checkbox> IS APG Checkbox, <input type=radio> in a named group IS Radio Group. Style them; do not re-declare their roles. What the recipe owes is the label, the hint and the error wired by id.',
+
   /* GOV.UK Warning text — a paragraph, not a widget: an aria-hidden "!" glyph and
    * a <strong> whose text carries the word "Warning". Nothing to operate, no role
    * to claim; the meaning is in the words, which is the point (WCAG 1.4.1). */
@@ -549,7 +551,7 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   'form-panel': 'A form in a panel. The fields carry the semantics; the panel is a surface.',
   'action-panel': 'A row of copy beside a control. Both halves already have semantics; the arrangement has none.',
   auth: 'A page composition of fields and buttons. Every part is covered by its own recipe.',
-  form: 'A <form> is HTML, not a widget. What matters lives in the fields, the labels and the error handling — and in a submit button that says what it submits.',
+  'form-primitives': 'The shared chrome of the typed-input wrappers (.numinput, .pwinput, .searchinput). No pattern of its own: each variant carries its own on its own recipe — Spinbutton on numberinput, Combobox on searchinput, GOV.UK Password input on passwordinput — and the platform\'s <input type> is what each of them wraps.',
   fieldset: '<fieldset>/<legend> IS the grouping mechanism; APG has no pattern because HTML already has the element. The failure mode is not using it: a set of radios without a legend has options with no question.',
   infocard: 'A compact information tile. Label/value pairs; a description list if the pairs are data.',
   'file-grid': 'A grid of file tiles. Visually a grid, semantically a list — role="grid" here would promise arrow-key navigation between cells that no file browser actually wants.',

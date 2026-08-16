@@ -907,12 +907,6 @@
     ],
     "form-primitives": [
       {
-        "layer": 2,
-        "source": "APG · Checkbox",
-        "because": "WAI-ARIA APG names the Checkbox pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/checkbox/"
-      },
-      {
         "layer": 3,
         "source": "Open UI · Form",
         "because": "10 of 27 surveyed design systems ship this independently (37%).",

@@ -842,10 +842,13 @@ function ExitPageCard() {
   // GOV.UK Exit this page — for services where being seen using them is a risk.
   // A button-shaped link to a neutral site that REPLACES the current history
   // entry; the visible hint promises the Shift ×3 shortcut the consumer wires.
+  // The DEMO points at a fragment: audit:promises presses Enter on it, and the
+  // first version pointed at bbc.co.uk/weather and left the wall — the claim
+  // executed exactly as written, which is the gate working and the demo wrong.
   return (
     <Card docId="exitpage" title="Get help" desc="A way out that stays on screen and leaves no trace in the back button.">
       <div className="exitpage">
-        <a className="btn btn--danger btn--lg" role="button" href="https://www.bbc.co.uk/weather" rel="nofollow noopener">Exit this page</a>
+        <a className="btn btn--danger btn--lg" role="button" href="#exit-this-page">Exit this page</a>
         <span className="exitpage__hint">or press <kbd>Shift</kbd> 3 times</span>
       </div>
       <p className="card__desc" style={{ marginTop: 'var(--k-s-16)' }}>

@@ -811,7 +811,7 @@ export function renderSection(spec: SectionSpec, key: number) {
               a billing form is a stand-in, and the recipe does not know the
               difference: sticky, always visible, a link that replaces history. */}
           <div className="exitpage">
-            <a className="btn btn--danger btn--lg" role="button" href="https://www.bbc.co.uk/weather" rel="nofollow noopener">Exit this page</a>
+            <a className="btn btn--danger btn--lg" role="button" href="#exit-this-page">Exit this page</a>
             <span className="exitpage__hint">or press <kbd>Shift</kbd> 3 times</span>
           </div>
           <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>
