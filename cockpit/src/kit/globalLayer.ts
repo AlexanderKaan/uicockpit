@@ -699,7 +699,7 @@ ${w('legend')} { padding: 0; font-size: var(--k-type-h3); font-weight: var(--k-w
 /* The field. Same tokens the .in recipe reads, so a bare <input> and an
    <input class="in"> are the same field — one of them just does not need to
    be told. */
-${w('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]), textarea, select')} {
+${w('input:not([role]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]), textarea:not([role]), select:not([role])')} {
   display: block;
   inline-size: 100%;
   min-block-size: var(--k-in-h-default, 40px);
@@ -718,8 +718,23 @@ ${w('input::placeholder, textarea::placeholder')} { color: var(--k-fg-faint); }
 
 /* A neutral button, NOT a primary one. The floor gives the shape and the hit
    target; .btn--primary adds the fill. A floor that painted every button
-   brand-coloured would be an opinion, not a floor. */
-${w('button, input[type="submit"], input[type="button"], input[type="reset"]')} {
+   brand-coloured would be an opinion, not a floor.
+
+   🚨 AND NOT WHEN THE ELEMENT HAS BEEN REPURPOSED. Zero specificity only loses
+   to what a component DECLARES — what a component OMITS, the floor silently
+   fills in. .toggle is a <button role="switch"> that never sets a height, so
+   the floor's min-block-size: 40px squashed a 36x20 switch into 32x36, and with
+   border-radius: 999px on top it rendered as a circle with a bite out of it.
+   Found by eye, on a screenshot, which is exactly the loop this work exists to
+   end.
+
+   The rule that generalises: AN EXPLICIT role ATTRIBUTE MEANS THE ELEMENT IS NO LONGER
+   DOING ITS DEFAULT JOB, so the floor has no opinion about it. A switch, a tab,
+   a menuitem and an option are all <button> in markup and none of them wants a
+   button's box. Same reasoning as the platform floor itself — style what the
+   element IS, and an element with a role attribute has told you it is something
+   else. */
+${w('button:not([role]), button[role="button"], input[type="submit"], input[type="button"], input[type="reset"]')} {
   display: inline-flex; align-items: center; justify-content: center;
   gap: var(--k-s-6);
   min-block-size: var(--k-in-h-default, 40px);
@@ -734,9 +749,9 @@ ${w('button, input[type="submit"], input[type="button"], input[type="reset"]')} 
   font-weight: var(--k-ui-weight, 500);
   cursor: pointer;
 }
-${w('button:hover:not(:disabled)')} { background: var(--k-state-hover); }
+${w('button:not([role]):hover:not(:disabled), button[role="button"]:hover:not(:disabled)')} { background: var(--k-state-hover); }
 
-${w('input[type="checkbox"], input[type="radio"]')} {
+${w('input[type="checkbox"]:not([role]), input[type="radio"]:not([role])')} {
   inline-size: var(--k-s-16); block-size: var(--k-s-16);
   accent-color: var(--k-primary);
   margin: 0;
