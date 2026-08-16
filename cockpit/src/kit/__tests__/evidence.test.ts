@@ -5,7 +5,7 @@ import { RECIPES } from '../recipes'
 /**
  * The evidence file is GENERATED and COMMITTED, which is the only arrangement
  * that lets a static page publish a measurement — and it is also the arrangement
- * that rots. `scripts/gen-evidence.mjs` needs a dev server, so it cannot run in
+ * that rots. `scripts/a11y-matrix.mjs --evidence` needs a dev server, so it cannot run in
  * the build; nothing forces anyone to re-run it; and a stale file looks exactly
  * like a fresh one.
  *

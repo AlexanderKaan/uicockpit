@@ -44,7 +44,7 @@
     "derive:provenance": "node scripts/derive-provenance.mjs",
     "audit:platform-floor": "node scripts/audit-platform-floor.mjs",
     "audit:shape": "node scripts/audit-shape.mjs",
-    "gen:evidence": "node scripts/gen-evidence.mjs",
+    "gen:evidence": "node scripts/a11y-matrix.mjs --evidence",
     "derive:coverage": "node scripts/derive-coverage.mjs",
     "audit:values": "node scripts/audit-values.mjs"
   },
