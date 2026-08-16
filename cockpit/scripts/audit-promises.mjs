@@ -157,7 +157,15 @@ function ariaTokens(list) {
      * than one toolbar is present". Reading those as hard requirements is the
      * gate over-reporting, and an over-reporting gate gets ignored, which is
      * worse than not having it. They are collected and printed as advisory. */
-    const conditional = /\b(when|if|only|optional|unless)\b/i.test(line)
+    /* ⚠️ THE ANCHORS ALREADY CARRY THE NUANCE AND THE REGEX THREW IT AWAY.
+     * `chip` says "aria-pressed ON A FILTER CHIP", `segmented-control` says
+     * "Multi-select INSTEAD: a toolbar of aria-pressed toggle buttons",
+     * `reasoning` says "WHILE STREAMING, the region needs aria-live". Every one
+     * of those is a condition or an alternative, and stripping the prose to
+     * harvest attribute names turned three qualified statements into three hard
+     * requirements. The bug was mine, not the source's — which is why fixing
+     * this is gate work rather than anchor work. */
+    const conditional = /\b(when|if|only|optional|unless|while|instead|either|otherwise)\b/i.test(line)
     for (const m of line.matchAll(/role="([\w-]+)"/g)) (conditional ? advisory : roles).add(m[1])
     for (const m of line.matchAll(/\b(aria-[a-z]+)/g)) (conditional ? advisory : attrs).add(m[1])
   }
@@ -249,15 +257,21 @@ for (const t of targets) {
       axMissing = await page.evaluate(({ cls, attrs }) => {
         const el = document.querySelector('.' + cls)
         if (!el) return attrs
-        const NATIVE = { 'aria-valuenow': 'value', 'aria-valuemin': 'min', 'aria-valuemax': 'max' }
+        /* ⚠️ SOME OF THESE HAVE NO ATTRIBUTE AND NEED NONE. <progress> and <meter>
+         * have a minimum of 0 BY SPEC — there is no `min` attribute to look for,
+         * and demanding one would ask an author to write a value the platform
+         * already guarantees. `null` here means "implied by being this element
+         * at all". */
+        const NATIVE = { 'aria-valuenow': 'value', 'aria-valuemin': null, 'aria-valuemax': 'max' }
         const candidates = [el, ...el.querySelectorAll('*')]
         return attrs.filter((a) => !candidates.some((n) => {
           if (n.hasAttribute(a)) return true
           const native = NATIVE[a]
-          if (!native) return false
+          if (native === undefined) return false
           // A native range-ish control publishes these from its own attributes.
           const isRangeish = n.matches('input[type="number"],input[type="range"],progress,meter')
-          return isRangeish && n.hasAttribute(native)
+          if (!isRangeish) return false
+          return native === null ? true : n.hasAttribute(native)
         }))
       }, { cls: t.cls, attrs: axAttrs })
     }
@@ -281,7 +295,15 @@ for (const t of targets) {
       }
       /* Ancestors too: aria-activedescendant sits on the input that OWNS a
        * listbox, not on the listbox. */
-      const scope = [el, ...el.querySelectorAll('*'), ...(function () { const up = []; let n = el.parentElement; while (n && up.length < 4) { up.push(n); n = n.parentElement } return up })()]
+      /* ⚠️ ANY INSTANCE DEMONSTRATES THE PATTERN. Checking only the FIRST match
+       * put `.chip` on `.chip--input` — a static <span> tag, where aria-pressed
+       * would be wrong — while the interactive filter chips a few cards away
+       * carry it correctly. The gallery is a demonstration surface: one correct
+       * example IS the demonstration, and demanding it of every instance would
+       * demand aria-pressed on a label. */
+      const roots = [...document.querySelectorAll('.' + cls)]
+      const scope = roots.flatMap((r) => [r, ...r.querySelectorAll('*'),
+        ...(function () { const up = []; let n = r.parentElement; while (n && up.length < 4) { up.push(n); n = n.parentElement } return up })()])
       const has = (a) => scope.some((n) => {
         if (n.hasAttribute(a)) return true
         const native = IMPLIED[a]

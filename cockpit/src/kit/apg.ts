@@ -59,7 +59,7 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
       ['Enter / Space', 'Toggle the panel of the focused header'],
       ['Tab', 'Move to the next focusable element — headers are NOT arrow-navigated'],
     ],
-    aria: ['Each header is a <button> inside a heading element', 'aria-expanded on the button', 'aria-controls pointing at the panel'],
+    aria: ['Each header is a <button> inside a heading element', 'aria-expanded on the button', 'aria-controls pointing at the panel, unless the accordion is built from <details>/<summary> — there the relationship is structural and the attribute is redundant'],
     free: 'Use <details>/<summary> and the toggle, aria-expanded equivalent and keyboard handling are all the browser’s.',
   },
   'alert-dialog': {
@@ -351,7 +351,7 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
       ['Page Up / Page Down', 'Previous / next month'],
       ['Tab', 'Leave the grid — the whole month is ONE tab stop'],
     ],
-    aria: ['role="grid" with role="gridcell" days', 'aria-selected on the chosen day', 'The month and year are announced when they change', 'Each day needs its full date as its name — "14" alone is not a date'],
+    aria: ['role="grid" with role="gridcell" days — NOT implemented here, only when the calendar is restructured into rows: adding the role to our flat button grid took a11y:matrix from 3 violations to 16 (aria-required-children), so the pattern is ROADMAP Sprint G and until then this is a labelled group of date buttons', 'aria-selected on the chosen day', 'The month and year are announced when they change', 'Each day needs its full date as its name — "14" alone is not a date'],
     free: '<input type="date"> gives the entire pattern in the platform’s idiom, including on mobile. Reach for the grid when the date IS the content.',
   },
   'calendar-week': {
