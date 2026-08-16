@@ -51,10 +51,30 @@ const REPOS = [
   ['makeplane/plane', 'plane'],
 ]
 
+/* THE HOLD-OUT — repos the reader was NOT tuned on, each with a KNOWN ANSWER
+ * taken from its own source: the brand colour its theme declares. Coverage says
+ * how much was read; this says whether what was read is RIGHT, which is the
+ * claim that matters and the one coverage cannot make. Alexander's question
+ * ("heb je verse repo's erin gegooid?") — the answer was no, and the first run
+ * (2026-08-17) read the four at 0.89–0.98 and got ONE brand right, one
+ * confidently wrong (immich: a docs-site theme, dark-mode line, taken for the
+ * app's), two missed (SCSS $vars, a JS theme object). Kept apart from the
+ * training corpus on purpose; a repo moves from here to REPOS only when a new
+ * hold-out replaces it. */
+const HOLDOUT = [
+  ['outline/outline', 'outline', { brand: '#0366d6', where: 'shared/styles/theme.ts accent — a JS theme object read through s("accent")' }],
+  ['directus/directus', 'directus', { brand: '#6644ff', where: 'app/src/styles/_colors.scss $purple → primary — an SCSS variable' }],
+  ['immich-app/immich', 'immich', { brand: '#4250af', where: 'web/src/app.css --immich-primary: 66 80 175 — an rgb triplet; docs/ carries a Docusaurus --ifm-color-primary that must NOT win' }],
+  ['excalidraw/excalidraw', 'excalidraw', { brand: '#6965db', where: 'packages/excalidraw/css/theme.scss --color-primary' }],
+]
+const HOLDOUT_DIR = join(ROOT, 'bench/audit-fresh')
+
 mkdirSync(CORPUS, { recursive: true })
+mkdirSync(HOLDOUT_DIR, { recursive: true })
 const rows = []
-for (const [gh, dir] of REPOS) {
-  const path = join(CORPUS, dir)
+const all = [...REPOS.map(([gh, dir]) => [gh, dir, null, CORPUS]), ...HOLDOUT.map(([gh, dir, truth]) => [gh, dir, truth, HOLDOUT_DIR])]
+for (const [gh, dir, truth, base] of all) {
+  const path = join(base, dir)
   if (!existsSync(path)) {
     if (!FETCH) { rows.push({ dir, missing: true }); continue }
     console.log(`  fetching ${gh} (shallow)…`)
@@ -68,24 +88,48 @@ for (const [gh, dir] of REPOS) {
     continue
   }
   const m = out.meta
-  rows.push({ dir, parsed: m.parsed, files: m.files, elements: m.elements, unreadable: m.unreadable, refused: out.refused, score: out.score, grade: out.grade })
+  const ic = out.inferredConfig || {}
+  rows.push({ dir, truth, parsed: m.parsed, files: m.files, elements: m.elements, unreadable: m.unreadable, refused: out.refused, score: out.score, grade: out.grade,
+    brand: ic.values?.brandHex ?? null, brandConfidence: ic.confidence?.colorTheme ?? null, brandSource: ic.confidence?.colorThemeSource ?? null })
 }
 
-console.log('=== audit:bench — how much of a real codebase the audit reads ===')
-console.log(`  floor ${FLOOR} · corpus bench/audit-corpus (${rows.filter((r) => !r.missing).length} of ${REPOS.length} present${rows.some((r) => r.missing) ? ' — run with --fetch' : ''})\n`)
-let below = 0
-for (const r of rows) {
-  if (r.missing) { console.log(`  ·  ${r.dir.padEnd(12)} not fetched`); continue }
-  if (r.error) { console.log(`  ✗  ${r.dir.padEnd(12)} error: ${r.error}`); below++; continue }
+/* Known answers: is the inferred brand the declared one? Compared as sRGB
+ * distance (a couple of steps of rounding are not a wrong colour). */
+const hexToRgb = (h) => { const x = h.replace('#', ''); const f = x.length === 3 ? x.split('').map((c) => c + c).join('') : x; return [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16)) }
+const near = (a, b) => { const [r1, g1, b1] = hexToRgb(a), [r2, g2, b2] = hexToRgb(b); return Math.max(Math.abs(r1 - r2), Math.abs(g1 - g2), Math.abs(b1 - b2)) <= 12 }
+
+console.log('=== audit:bench — how much of a real codebase the audit reads, and whether it reads it RIGHT ===')
+console.log(`  floor ${FLOOR} · corpus bench/audit-corpus (${rows.filter((r) => !r.missing && !r.truth).length} of ${REPOS.length}) · hold-out bench/audit-fresh (${rows.filter((r) => !r.missing && r.truth).length} of ${HOLDOUT.length})${rows.some((r) => r.missing) ? ' — run with --fetch' : ''}\n`)
+let below = 0, wrong = 0
+const line = (r) => {
   const ok = r.parsed >= FLOOR
   if (!ok) below++
   const blind = Object.entries(r.unreadable ?? {}).map(([k, n]) => `${k} ${n}`).join(' · ') || '—'
   console.log(`  ${ok ? '✓' : '✗'}  ${r.dir.padEnd(12)} parsed ${r.parsed.toFixed(3)}   ${String(r.elements).padStart(6)} elements   ${r.refused ? 'REFUSED' : `score ${String(r.score).padStart(3)} ${r.grade}`}   blind: ${blind}`)
 }
+console.log('  ── coverage · the eight the reader was tuned on')
+for (const r of rows.filter((r) => !r.truth)) {
+  if (r.missing) { console.log(`  ·  ${r.dir.padEnd(12)} not fetched`); continue }
+  if (r.error) { console.log(`  ✗  ${r.dir.padEnd(12)} error: ${r.error}`); below++; continue }
+  line(r)
+}
+console.log('\n  ── hold-out · fresh repos, with the brand colour their own source declares')
+for (const r of rows.filter((r) => r.truth)) {
+  if (r.missing) { console.log(`  ·  ${r.dir.padEnd(12)} not fetched`); continue }
+  if (r.error) { console.log(`  ✗  ${r.dir.padEnd(12)} error: ${r.error}`); below++; continue }
+  line(r)
+  const conf = r.brandConfidence == null ? '—' : r.brandConfidence.toFixed(2)
+  let verdict
+  if (!r.brand) verdict = `MISS  (no brand inferred, confidence ${conf})`
+  else if (near(r.brand, r.truth.brand)) verdict = `RIGHT (${r.brand}, confidence ${conf})`
+  else { verdict = `WRONG (${r.brand} for ${r.truth.brand}, confidence ${conf}, from "${r.brandSource}")`; if ((r.brandConfidence ?? 0) >= 0.9) wrong++ }
+  console.log(`         brand ${r.truth.brand}  →  ${verdict}`)
+  console.log(`         truth: ${r.truth.where}`)
+}
 console.log()
-if (below) {
-  console.log(`${GATE ? 'FAIL' : 'would FAIL under --gate'}: ${below} repo(s) below the ${FLOOR} floor. Teach the reader the notation, or say why it cannot be read.`)
+if (below || wrong) {
+  console.log(`${GATE ? 'FAIL' : 'would FAIL under --gate'}: ${below} repo(s) below the ${FLOOR} floor · ${wrong} confidently WRONG brand(s). Teach the reader the notation, or say why it cannot be read — and never be sure of a value read from the wrong place.`)
   if (GATE) process.exit(1)
 } else {
-  console.log(`OK: every corpus repo reads at or above ${FLOOR}.`)
+  console.log(`OK: every repo reads at or above ${FLOOR}, and no known answer is confidently wrong.`)
 }
