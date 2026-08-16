@@ -265,10 +265,13 @@ for (const mode of ['light', 'dark']) {
  * separately and never merged: THE KIT is the number that may be published;
  * the chrome is ours to fix but not the product. It is measured here on every
  * run because it used to be measured nowhere the build looked — the enforcement
- * gap in one sentence — and it is printed rather than gated, exactly as the
- * scan it came from held it. Light, default density, 1440: one configuration,
- * because the chrome does not re-theme with the kit's controls the way the
- * preview does. */
+ * gap in one sentence. Since Sprint N (2026-08-16) it is GATED as well: a chrome
+ * violation fails this run like a kit violation does. The two numbers stay
+ * separate in the report (the kit's is the one that may be published), but a
+ * tool that measures accessibility cannot ship an inaccessible frame around
+ * it. Light, default density, 1440: one configuration, because the chrome does
+ * not re-theme with the kit's controls the way the preview does. */
+let chromeViolations = 0
 {
   await toggleMode() // back to light for the chrome pass
   await page.waitForTimeout(600)
@@ -276,7 +279,8 @@ for (const mode of ['light', 'dark']) {
   await page.waitForTimeout(400)
   await page.addScriptTag({ url: 'https://cdn.jsdelivr.net/npm/axe-core@4.10.2/axe.min.js' }).catch(() => {})
   const chrome = await scan('body', '.cockpit-preview')
-  console.log(`\n── Our chrome (the configurator around the preview) — reported, not gated`)
+  chromeViolations = chrome.rows.length
+  console.log(`\n── Our chrome (the configurator around the preview) — gated, reported apart from the kit`)
   console.log(`  ${chrome.rows.length === 0 ? '✓ 0 violation(s)' : `✗ ${chrome.rows.length} violation(s)`}` +
     (chrome.artifacts.length ? `  (${chrome.artifacts.length} contrast artifact(s) discounted)` : ''))
   const g = new Map()
@@ -425,5 +429,5 @@ if (EVIDENCE) {
 }
 
 const total = results.reduce((a, r) => a + r.rows.length, 0)
-console.log(`\n${'═'.repeat(64)}\n${total} violation(s) across ${results.length} configurations`)
-process.exit(total ? 1 : 0)
+console.log(`\n${'═'.repeat(64)}\n${total} violation(s) across ${results.length} configurations · chrome ${chromeViolations}`)
+process.exit(total || chromeViolations ? 1 : 0)

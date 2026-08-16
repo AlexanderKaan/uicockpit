@@ -75,6 +75,23 @@ Radix / Headless UI / cmdk):
 - Type: ${cfg.fontDisplay} display / ${cfg.fontBody} body · Icons ${lib.label}
 - Full values + rationale live in **design.md**; the live \`tokens.css\` link is the source of truth.
 
+## Before you invent a component — ask the forge
+The kit's component list is DERIVED (HTML · WAI-ARIA APG · GOV.UK/USWDS/NL Design System),
+so most things you are about to build either exist already, or are the platform's, or must
+not become a component. Before hand-rolling anything the kit does not obviously have,
+describe it in a sentence:
+
+\`\`\`bash
+npx uicockpit forge "a toast that confirms the save"   # or, over MCP: call resolve_component
+\`\`\`
+
+Act on the answer, not around it: **EXISTS** → use that recipe (it comes with its usage,
+APG keys and page) · **PLATFORM** → use the element, the floor styles it, do not build a
+component · **MAY EXIST** → start from the returned scaffold (tokens only, data-role for
+the look) · **NO** → build it outside the system as a local extension and mark it so —
+never as a new \`.something\` that pretends to be kit. Every answer is a citation you can
+click, not an opinion.
+
 ## Verify — run this after EVERY change, not once (the loop that actually binds)
 The rules above are a nudge; a fresh session — or a later you — drifts anyway (a wrong
 blue, an off-scale radius, a magic \`20px\`). Nothing catches that by eye. So after **every**

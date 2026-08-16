@@ -789,22 +789,10 @@
   font-size: 11px;
   color: #c53030;
 }
-/* === Select === */
-.select {
-  width: 100%;
-  padding: 7px 10px;
-  background: var(--app-bg);
-  border: 1px solid var(--app-border);
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--app-fg);
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6b73' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 28px;
-}
+/* (The panel's own .select rule lived here until 2026-08-16. Nothing in the
+ * chrome rendered class="select" any more, and its existence was the reason
+ * the kit's select.select recipe was scoped to .cockpit-preview — dead in the
+ * export. Both gone; the kit's rule ships.) */
 /* === Saved kits — 3 fixed slots in localStorage === */
 .kits {
   display: grid;

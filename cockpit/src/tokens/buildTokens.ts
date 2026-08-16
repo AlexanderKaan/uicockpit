@@ -1025,13 +1025,17 @@ export function buildTokens(cfg: Config): Tokens {
    * a knob any more: the floor is fixed and the choice moves above it. Faint
    * still reads lighter than Strong; it just cannot disappear. */
   const inputBorderRaw = nStep(Math.min(9, BORDER_STEP[cfg.borders][dark ? 1 : 0] + 1))
+  /* The fill the border ENCLOSES — declared here so the floor below and the
+   * --k-input-bg token read one expression. In light mode it is nStep(2), a step
+   * darker than the surface, and it was not among the neighbours the floor
+   * checked: measured 2026-08-16, Light · Faint sat at 2.85 against its own
+   * fill while clearing 3.03 against the page. The rand raakt de vulling altijd. */
+  const inputBg = dark ? surf.sunken : nStep(2)
   const inputBorder = (() => {
-    /* Against BOTH neighbours, because a field lands on either: the fill it
-     * encloses and the page it sits on. Flooring against one and measuring
-     * against the other left ten of thirty-two combinations at 2.85. */
-    /* Against BOTH neighbours, because a field lands on either: the fill it
-     * encloses and the page it sits on. Flooring against one and measuring
-     * against the other left ten of thirty-two combinations at 2.85.
+    /* Against ALL THREE neighbours, because a field lands on any of them: the
+     * fill it encloses, the surface it sits in and the page behind that.
+     * Flooring against one and measuring against another left ten of
+     * thirty-two combinations at 2.85 — and then one more, the fill itself.
      *
      * And the knob keeps its RANGE above the floor rather than collapsing onto
      * it. A plain 3:1 clamp made all four settings land within 0.15 of each
@@ -1041,7 +1045,7 @@ export function buildTokens(cfg: Config): Tokens {
      * no longer decides whether there is one. */
     const TARGET: Record<Borders, number> = { faint: 3.0, subtle: 3.35, medium: 3.9, strong: 4.6 }
     const want = TARGET[cfg.borders]
-    const neighbours = [oklchStrToHex(surf.base), oklchStrToHex(pageBg)]
+    const neighbours = [oklchStrToHex(inputBg), oklchStrToHex(surf.base), oklchStrToHex(pageBg)]
     const clears = (hex: string, bar: number) => neighbours.every((n) => contrast(hex, n) >= bar)
     const raw = oklchStrToHex(inputBorderRaw)
     if (clears(raw, want)) return inputBorderRaw
@@ -1115,7 +1119,7 @@ export function buildTokens(cfg: Config): Tokens {
       // well) to step 2 (95.8%) — a whisper well below the pure-white card, which
       // paired with the now-near-black value text reads as "a field ready for
       // input", not "disabled". Dark keeps the deep sunken well. [BEAUTY-SPEC §1.3]
-      '--k-input-bg': dark ? surf.sunken : nStep(2),
+      '--k-input-bg': inputBg,
       // === Surface treatment (field facet) — the four tokens a field recipe reads
       // so ONE .in rule renders all three Surface modes (no selector branching):
       //   Outlined → fill + full border (the box; default = previous look).

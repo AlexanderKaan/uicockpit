@@ -180,7 +180,7 @@ export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => vo
           />
           <span className="cmpdoc__ask-count" aria-live="polite">{query ? `${shown} of ${total}` : total}</span>
         </div>
-        {verdict && <ForgeAnswer v={verdict} navigate={navigate} />}
+        {verdict && <ForgeAnswer v={verdict} q={q} navigate={navigate} />}
       </form>
 
       {/* The list matched nothing but the forge did: show what it found as a
@@ -255,8 +255,9 @@ function forgePages(v: ForgeVerdict): ComponentPage[] {
   add(v.recipe); add(v.primary?.recipe); for (const p of v.parts ?? []) add(p.recipe)
   return slugs.map((s) => componentPageBySlug(s)).filter((p): p is ComponentPage => !!p)
 }
-function ForgeAnswer({ v, navigate }: { v: ForgeVerdict; navigate: (to: string) => void }) {
+function ForgeAnswer({ v, q, navigate }: { v: ForgeVerdict; q: string; navigate: (to: string) => void }) {
   const pages = forgePages(v)
+  const deep = `/forge?q=${encodeURIComponent(q.trim())}`
   const cite = v.citations.find((c) => c.layer !== 3)
   return (
     <div className={`cmpdoc__answer cmpdoc__answer--${v.verdict}`} aria-live="polite">
@@ -268,9 +269,7 @@ function ForgeAnswer({ v, navigate }: { v: ForgeVerdict; navigate: (to: string) 
         {pages.map((p) => (
           <a key={p.slug} className="cmpdoc__answer-page" href={`/components/${p.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/components/${p.slug}`) }}>{p.name} →</a>
         ))}
-        {pages.length === 0 && (
-          <a className="cmpdoc__answer-page" href="/forge" onClick={(e) => { e.preventDefault(); navigate('/forge') }}>Open in the forge →</a>
-        )}
+        <a className="cmpdoc__answer-page" href={deep} onClick={(e) => { e.preventDefault(); navigate(deep) }}>{pages.length ? 'See it in the forge →' : 'Open in the forge →'}</a>
       </span>
     </div>
   )

@@ -661,6 +661,8 @@ export function formatVerdict(v) {
   }
   if (v.composition) { out.push(''); out.push('Composition:'); out.push(v.composition.split('\n').map((l) => '  ' + l).join('\n')) }
   if (v.unknown?.length) { out.push(''); out.push(`Not understood: ${v.unknown.join(', ')}`) }
+  out.push('')
+  out.push(`Rendered, with the citations: https://uicockpit.com/forge?q=${encodeURIComponent(v.query)}`)
   return out.join('\n')
 }
 

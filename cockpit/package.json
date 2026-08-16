@@ -37,7 +37,7 @@
     "audit:values": "node scripts/audit-values.mjs",
     "audit:derivation": "node scripts/derive-coverage.mjs --gate",
     "audit:surfaces": "node scripts/audit-surfaces.mjs",
-    "gates:rendered": "npm run a11y:matrix && npm run a11y:tree && npm run audit:uniformity && npm run check:components && npm run audit:shape",
+    "gates:rendered": "npm run a11y:matrix && npm run a11y:tree && npm run a11y:css && npm run audit:uniformity && npm run check:components && npm run audit:shape",
     "gen:forge": "npx vite-node scripts/gen-forge-data.ts"
   },
   "dependencies": {

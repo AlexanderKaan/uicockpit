@@ -53,7 +53,7 @@ Change a setting and the contrast figures change; the structural findings
 
 ### Measured live, for the configuration above
 
-All 19 audited colour relationships meet their required ratio.
+All 20 audited colour relationships meet their required ratio.
 
 | Relationship | Measured | Required | |
 |---|---|---|---|
@@ -74,7 +74,8 @@ All 19 audited colour relationships meet their required ratio.
 | Link text on surface | 5.45:1 | 4.5:1 | Pass |
 | Link hover on surface | 7.63:1 | 4.5:1 | Pass |
 | Primary against background | 4.38:1 | 3:1 | Pass |
-| Input border against background | 3.47:1 | 3:1 | Pass |
+| Input border against background | 3.61:1 | 3:1 | Pass |
+| Input border against its fill | 3.39:1 | 3:1 | Pass |
 | Focus ring against background | 4.38:1 | 3:1 | Pass |
 
 
@@ -219,7 +220,7 @@ Change a setting and the contrast figures change; the structural findings
 
 ### Measured live, for the configuration above
 
-All 19 audited colour relationships meet their required ratio.
+All 20 audited colour relationships meet their required ratio.
 
 | Relationship | Measured | Required | |
 |---|---|---|---|
@@ -240,7 +241,8 @@ All 19 audited colour relationships meet their required ratio.
 | Link text on surface | 5.45:1 | 4.5:1 | Pass |
 | Link hover on surface | 7.63:1 | 4.5:1 | Pass |
 | Primary against background | 4.38:1 | 3:1 | Pass |
-| Input border against background | 3.47:1 | 3:1 | Pass |
+| Input border against background | 3.61:1 | 3:1 | Pass |
+| Input border against its fill | 3.39:1 | 3:1 | Pass |
 | Focus ring against background | 4.38:1 | 3:1 | Pass |
 
 
@@ -428,7 +430,7 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
         "value": "oklch(89.2% 0.0000 0.0)"
       },
       "input-border": {
-        "value": "oklch(61.8% 0.0000 89.9)"
+        "value": "oklch(60.8% 0.0000 89.9)"
       },
       "ring": {
         "value": "oklch(23.9% 0.0000 89.9)"
@@ -951,7 +953,13 @@ exports[`genJson > matches snapshot for mono baseline 1`] = `
       },
       {
         "label": "Input border against background",
-        "ratio": 3.47,
+        "ratio": 3.62,
+        "required": 3,
+        "passes": true
+      },
+      {
+        "label": "Input border against its fill",
+        "ratio": 3.4,
         "required": 3,
         "passes": true
       },
@@ -1107,7 +1115,7 @@ exports[`genRegistry (shadcn registry:theme JSON) > matches snapshot for soft + 
       "destructive": "oklch(55.7% 0.1997 17.4)",
       "destructive-foreground": "#ffffff",
       "border": "oklch(89.2% 0.0077 249.9)",
-      "input": "oklch(61.8% 0.0088 247.9)",
+      "input": "oklch(60.8% 0.0088 247.9)",
       "ring": "oklch(56.4% 0.1689 253.9)",
       "chart-1": "oklch(62.3% 0.1589 252.4)",
       "chart-2": "oklch(64.9% 0.2616 332.9)",
@@ -1224,6 +1232,23 @@ Radix / Headless UI / cmdk):
 - Type: Inter display / Inter body · Icons Lucide (1.75px stroke, balanced)
 - Full values + rationale live in **design.md**; the live \`tokens.css\` link is the source of truth.
 
+## Before you invent a component — ask the forge
+The kit's component list is DERIVED (HTML · WAI-ARIA APG · GOV.UK/USWDS/NL Design System),
+so most things you are about to build either exist already, or are the platform's, or must
+not become a component. Before hand-rolling anything the kit does not obviously have,
+describe it in a sentence:
+
+\`\`\`bash
+npx uicockpit forge "a toast that confirms the save"   # or, over MCP: call resolve_component
+\`\`\`
+
+Act on the answer, not around it: **EXISTS** → use that recipe (it comes with its usage,
+APG keys and page) · **PLATFORM** → use the element, the floor styles it, do not build a
+component · **MAY EXIST** → start from the returned scaffold (tokens only, data-role for
+the look) · **NO** → build it outside the system as a local extension and mark it so —
+never as a new \`.something\` that pretends to be kit. Every answer is a citation you can
+click, not an opinion.
+
 ## Verify — run this after EVERY change, not once (the loop that actually binds)
 The rules above are a nudge; a fresh session — or a later you — drifts anyway (a wrong
 blue, an off-scale radius, a magic \`20px\`). Nothing catches that by eye. So after **every**
@@ -1288,7 +1313,7 @@ exports[`genTailwind > matches snapshot for soft + cobalt sample 1`] = `
   --color-accent-foreground: #ffffff;
   --color-fill: oklch(56.4% 0.1689 253.9);
   --color-border: oklch(89.2% 0.0077 249.9);
-  --color-input-border: oklch(61.8% 0.0088 247.9);
+  --color-input-border: oklch(60.8% 0.0088 247.9);
   --color-ring: oklch(56.4% 0.1689 253.9);
   --color-ring-soft: oklch(95.8% 0.0372 253.9);
   --color-secondary-soft-foreground: #16160c;

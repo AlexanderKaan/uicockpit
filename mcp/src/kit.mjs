@@ -172,6 +172,7 @@ export function designContext(contract, hash = null) {
   }
 
   lines.push('')
+  lines.push('Before inventing a component the kit does not obviously have, call `resolve_component` with a one-sentence description: it answers EXISTS (use that recipe), PLATFORM (use the element), MAY EXIST (start from the scaffold) or NO — with a citation. Do not hand-roll a `.something` that pretends to be kit.')
   lines.push('After applying, run the `check_conformance` tool to catch any drift.')
   return lines.join('\n')
 }

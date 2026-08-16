@@ -886,15 +886,19 @@ textarea.in[readonly] {
  * \`.in:focus\` above sets a transparent outline, but it's only EQUAL
  * specificity to the global rule, so under real keyboard focus (where
  * :focus-visible matches) the cascade is decided by source order alone —
- * fragile. This rule is higher specificity (.cockpit-preview prefix → 0,3,0)
- * so it ALWAYS wins, killing the blue outline that otherwise:
+ * fragile. This rule used to carry a .cockpit-preview prefix for (0,3,0) —
+ * which made it DEAD IN THE EXPORT, where no such class exists (Sprint N,
+ * 2026-08-16). Unscoped it is (0,2,0): in the export that beats the floor's
+ * plain :focus-visible (0,1,0) on specificity; in the app it ties the scoped
+ * floor and wins on order (floor → global layer → recipes, fixed in
+ * injectKit). It kills the blue outline that otherwise:
  *   • doubles up on a plain .in (heavier ring than wrapper fields), and
  *   • clashes on validation states (green/red border + a stray blue ring).
  * Mirrors the wrapper-child suppression at line ~4574 — same bug, same cure,
  * now applied to every standalone field shape. Validation border+halo come
  * from the (0,3,0) state rules above; this only touches \`outline\`, no clash. */
-.cockpit-preview .in:focus-visible,
-.cockpit-preview .select-trigger:focus-visible {
+.in:focus-visible,
+.select-trigger:focus-visible {
   /* OTP slots are real <input>s — they own the soft border+halo via
    * \`.otp__slot:focus\`, so suppress the global solid :focus-visible outline
    * too (else keyboard focus paints BOTH = the default solid ring on top). */
@@ -1801,7 +1805,7 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .slider:hover .slider__knob {
   box-shadow: var(--k-shadow-sm), 0 0 0 var(--k-ring-w) var(--k-ring-halo);
 }
-.cockpit-preview .slider:focus-visible { outline: none; }
+.slider:focus-visible { outline: none; }
 /* Selection = ONLY the soft halo (--k-ring-halo) around the knob — the SAME
    halo a focused field gets. The knob keeps its normal (white) ring; we do NOT
    recolour the border (that turned the knob into a big solid disc, esp. in mono
@@ -1978,14 +1982,16 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   box-shadow: 0 0 0 var(--k-ring-w) color-mix(in srgb, var(--k-input-error-border) 22%, transparent);
 }
 
-/* Native <select class="select"> as a first-class PREVIEW form control.
- * The configurator chrome has its OWN unscoped \`.select\` in panel.css
- * (hardcoded 8px radius + --app-* colours). App/preview screens must not
- * borrow that — scope this one to .cockpit-preview and key it to --k-* so a
- * native select matches the .in search field beside it (same radius, surface,
+/* Native <select class="select"> as a first-class form control, keyed to
+ * --k-* so it matches the .in search field beside it (same radius, surface,
  * border, height) and tracks the box/input radius like every other field.
- * Buttons keep their independent --k-radius-button on purpose (#75). */
-.cockpit-preview select.select {
+ * Buttons keep their independent --k-radius-button on purpose (#75).
+ * It was scoped to .cockpit-preview because the configurator chrome once had
+ * its own unscoped .select in panel.css — which made this rule DEAD IN THE
+ * EXPORT (a consumer never has that class). The chrome stopped rendering
+ * .select long ago; the dead chrome rule is gone and this one ships (Sprint N,
+ * 2026-08-16). */
+select.select {
   /* Reads the control-row height FIRST. This selector is (0,2,1) and the
      toolbar's one-height rule is (0,2,0), so a native select in a .toolbar--sm
      rendered 36px in a 32px row — found by audit:uniformity C5 the first time
@@ -2008,9 +2014,9 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   background-position: right 11px center;
   cursor: pointer;
 }
-.cockpit-preview select.select:hover { border-color: var(--k-state-border, var(--k-fg-faint)); }
-.cockpit-preview select.select:focus,
-.cockpit-preview select.select:focus-visible {
+select.select:hover { border-color: var(--k-state-border, var(--k-fg-faint)); }
+select.select:focus,
+select.select:focus-visible {
   outline: none;
   /* Match the .in focus exactly — --k-ring border + --k-ring-halo (28%) shadow.
      Was an UNDEFINED --k-focus-ring token (silently fell back to a 22% halo) so
@@ -4287,11 +4293,17 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   grid-auto-flow: column;
   grid-auto-columns: minmax(min(9rem, 100%), 1fr);
   grid-template-columns: none;
-  overflow-x: auto;
   gap: 0;
   border: var(--k-bw) solid var(--k-border);
   border-radius: var(--k-radius-md);
-  overflow: hidden;
+  /* ⚠️ Per axis, on purpose. This read overflow-x: auto and then, two lines
+     later, overflow: hidden — the shorthand wins, so the band CLIPPED instead
+     of scrolling and at 320px "This month · $48" was simply gone. Found by
+     a11y:css (1.4.10 Reflow) as the one real failure among what the report had
+     called three known ones. overflow-y hidden keeps the radius clipping the
+     cell dividers; overflow-x auto is the scroll the comment above promised. */
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 .dl--band > div {
   display: flex;

@@ -79,12 +79,23 @@ export function ForgePage({ navigate }: { navigate: (to: string) => void }) {
     return () => { document.title = prev }
   }, [])
 
-  const ask = (text: string) => {
+  /* Deep link: /forge?q=… resolves on arrival, and every answer writes its
+   * question back into the URL — so a verdict can be linked, shared, and
+   * reached from the components index, the CLI and the MCP tool without
+   * typing it again. replaceState, not push: the router listens to popstate
+   * and the page is the same page. */
+  const ask = (text: string, { fromUrl = false } = {}) => {
     const t = text.trim()
     if (!t) return
     setQuery(t)
     setVerdict(forge.resolve(t) as Verdict)
+    if (!fromUrl && typeof history !== 'undefined') history.replaceState({}, '', `/forge?q=${encodeURIComponent(t)}`)
   }
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('q')
+    if (q) ask(q, { fromUrl: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const onSubmit = (e: FormEvent) => { e.preventDefault(); ask(query) }
 
   return (

@@ -254,6 +254,7 @@ const REMEDIES: Record<string, string> = {
   'Info text on info-soft':        'Try Background: Crisp — system colors widen their gap on Crisp.',
   'Primary against background':       'Primary as a SURFACE is fine here; for colored TEXT, use primary-soft tints.',
   'Input border against background':  'Common in modern UIs (Apple, Stripe both subtle here). Set Borders: Strong if you need strict WCAG, otherwise rely on labels + placeholders for affordance.',
+  'Input border against its fill':    'The border is floored at 3:1 against the field fill at every Borders setting; if this fails, the fill token was changed by hand.',
   'Focus ring against background':    'Pick a higher-saturation primary, or set Background: Crisp.',
 }
 
@@ -318,6 +319,11 @@ export function auditContrast(tk: Tokens): ContrastPair[] {
     // borders are explicitly excluded. Audit the INPUT border instead: that
     // one IS functional (it tells the user "here's a form field").
     ['Input border against background',  '--k-input-border',  '--k-bg', 3],
+    // …and against the fill it ENCLOSES, which is the neighbour it always has.
+    // The floor in buildTokens checked surface + page and not this one, and
+    // Light · Faint sat at 2.85 against its own fill (2026-08-16). Now a pair
+    // the knob sweep holds, so it cannot come back.
+    ['Input border against its fill',    '--k-input-border',  '--k-input-bg', 3],
     ['Focus ring against background',    '--k-ring',          '--k-bg', 3],
   ]
   return pairs.map(([label, fgVar, bgVar, required]) => {

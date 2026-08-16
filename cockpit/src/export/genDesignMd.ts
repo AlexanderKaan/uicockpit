@@ -34,6 +34,14 @@ ${componentModel()}
 
 ${bestPractices()}
 
+## Before you invent a component
+
+The component list is derived, not chosen. Before building anything the kit does
+not obviously have, ask the forge — \`npx uicockpit forge "…"\` or the MCP tool
+\`resolve_component\` — and act on its answer: it exists (use it), the platform
+has it (use the element), it may exist (start from the scaffold), or no layer
+names it (build it outside the system, marked as such).
+
 ## Verify your work
 
 This pack ships a machine-readable \`contract.json\`. After applying the kit, run

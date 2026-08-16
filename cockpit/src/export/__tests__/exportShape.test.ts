@@ -105,6 +105,18 @@ describe('the CSS export carries the kit, whole', () => {
     expect(positions).toEqual([...positions].sort((a, b) => a - b))
   })
 
+  it('no recipe rule is scoped to the preview root — a scoped rule is dead on the way out', () => {
+    /* The recipe contract at the top of recipes/index.ts says UNSCOPED, and for
+     * a reason a consumer feels: `.cockpit-preview select.select {…}` embeds
+     * fine and matches nothing on their page. Four rules carried the prefix
+     * (found in Sprint K, fixed in N); this holds the contract for the next
+     * one. Derived over every parsed rule — no list. */
+    const scoped = RECIPES.flatMap((r) => parseCss(stripComments(r.css))
+      .filter((rule: { selector: string }) => /\.cockpit-preview/.test(rule.selector))
+      .map((rule: { selector: string }) => `${r.id}: ${rule.selector.trim().slice(0, 60)}`))
+    expect(scoped, `recipe rules scoped to .cockpit-preview (dead in the export):\n  ${scoped.join('\n  ')}`).toEqual([])
+  })
+
   it('puts :root before .dark, so dark mode overrides rather than is overridden', () => {
     expect(css.indexOf(':root {')).toBeGreaterThanOrEqual(0)
     expect(css.indexOf(':root {')).toBeLessThan(css.indexOf('.dark {'))
