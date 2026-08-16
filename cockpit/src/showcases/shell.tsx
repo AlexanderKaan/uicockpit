@@ -48,6 +48,20 @@ function paneOf(pane: PaneSpec, i: number) {
 export function ShowcaseShell({ manifest: m }: { manifest: ShowcaseManifest }) {
   return (
     <div className={`scaffold scaffold--${m.archetype}`}>
+      {/* GOV.UK Cookie banner — a labelled region BEFORE everything else on the
+          page. Page furniture for every public service in the EU, which is why a
+          design system for them ships one and a component census does not. */}
+      <div className="cookiebanner" role="region" aria-label={`Cookies on ${m.title}`}>
+        <div className="cookiebanner__inner">
+          <h2 className="cookiebanner__heading">Cookies on {m.title}</h2>
+          <p className="cookiebanner__body">We use some essential cookies to make this service work. We would also like to use analytics cookies so we can understand how you use it and make improvements.</p>
+          <div className="cookiebanner__actions">
+            <button type="button" className="btn btn--primary">Accept analytics cookies</button>
+            <button type="button" className="btn btn--secondary">Reject analytics cookies</button>
+            <a href="#cookies">View cookies</a>
+          </div>
+        </div>
+      </div>
       <div className="scaffold__frame">
         <div className="scaffold__bar appbar">
           <span className="appbar__title">{m.barTitle}</span>

@@ -672,7 +672,7 @@ ${w('hr')} { border: 0; block-size: var(--k-bw); background: var(--k-border); ma
    knowing our class names, which is the whole argument for the floor. */
 ${w('hr[aria-orientation="vertical"]')} { inline-size: var(--k-bw); block-size: auto; align-self: stretch; margin: 0 var(--k-s-8); }
 
-${w('ul, ol')} { margin: 0 0 var(--k-s-12); padding-inline-start: var(--k-s-24); }
+${w('ul, ol, menu')} { margin: 0 0 var(--k-s-12); padding-inline-start: var(--k-s-24); }
 ${w('li')} { margin-block-end: var(--k-s-4); line-height: var(--k-leading-normal); }
 ${w('dl')} { margin: 0 0 var(--k-s-12); }
 ${w('dt')} { font-weight: var(--k-weight-semibold); }
@@ -694,6 +694,14 @@ ${w('mark')} { background: var(--k-primary-soft); color: var(--k-primary-soft-fg
 ${w('small')} { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
 ${w('abbr[title]')} { text-decoration: underline dotted; cursor: help; text-decoration-thickness: var(--k-bw); }
 ${w('cite')} { font-style: normal; color: var(--k-fg-muted); }
+/* Four elements the UA styles with an opinion of its own — italic, quote glyphs,
+   an underline — that derive-coverage found the floor did not override. One rule
+   each: an address is not italic (that convention died with letters), quotes come
+   from the document language, and an insertion is marked the way a deletion
+   already is (with a colour a reviewer reads, not underline alone). */
+${w('address')} { font-style: normal; }
+${w('q')} { quotes: auto; }
+${w('ins')} { text-decoration: underline; text-decoration-color: var(--k-success); text-underline-offset: 0.15em; }
 ${w('s, del')} { text-decoration-line: line-through; color: var(--k-fg-muted); }
 ${w('strong, b')} { font-weight: var(--k-weight-semibold); }
 ${w('time')} { font-variant-numeric: tabular-nums; }
@@ -795,6 +803,23 @@ ${w('dialog')} {
   max-inline-size: min(90vw, 32rem);
 }
 ${w('dialog::backdrop')} { background: var(--k-scrim, rgb(0 0 0 / 0.4)); }
+/* [popover] — the platform's own floating panel (Baseline 2024). The .popover
+   RECIPE left on the four-layer cut; the ATTRIBUTE is layer 1 and gets the same
+   overlay surface .menu carries, so a consumer who writes <div popover> gets a
+   kit-styled panel with the browser's light-dismiss and top-layer for free. The
+   UA default (a black-bordered box centred in the viewport) is exactly the
+   opinion a floor exists to replace. Placement stays the author's, as it does
+   for every overlay here. */
+${w('[popover]')} {
+  margin: 0; inset: auto;
+  padding: var(--k-s-12);
+  background: var(--k-surface-overlay, var(--k-surface-raised, var(--k-surface)));
+  color: var(--k-fg);
+  border: var(--k-hairline, 1px solid var(--k-border));
+  border-radius: var(--k-radius-md);
+  box-shadow: var(--k-shadow-lg, var(--k-shadow-md));
+}
+${w('[popover]::backdrop')} { background: transparent; }
 
 /* ---- 7 · STRUCTURE gets defence and nothing else. -------------------------- */
 ${w('header, footer, main, nav, aside, section, article')} { min-inline-size: 0; }

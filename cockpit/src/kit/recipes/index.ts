@@ -3198,6 +3198,100 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .errorsummary__link:hover { text-decoration-thickness: 2px; }`,
   },
   {
+    id: 'backlink',
+    section: "Back link",
+    root: 'backlink',
+    css: `/* === Back link ============================================================
+ * GOV.UK Back link: "help users go back to the previous page in a multi-page
+ * transaction". A LINK, not a button — it is navigation, the platform's <a>
+ * carries the semantics and the floor already styles links; this recipe adds
+ * the chevron and the quiet weight so it reads as a way back rather than as a
+ * call to action. Place it above the page heading, first thing after the
+ * header. GOV.UK: do not use it on the first page of a journey — there is
+ * nothing to go back to. */
+.backlink {
+  display: inline-flex; align-items: center; gap: var(--k-s-4);
+  font-size: var(--k-type-small); color: var(--k-fg-muted);
+  text-decoration: underline; text-underline-offset: 0.15em; text-decoration-color: var(--k-border);
+  min-block-size: var(--k-hit-min, 24px);
+}
+.backlink::before {
+  content: '';
+  inline-size: 0.45em; block-size: 0.45em; flex: none;
+  border-inline-start: 2px solid currentColor; border-block-end: 2px solid currentColor;
+  transform: rotate(45deg); margin-inline-end: var(--k-s-2);
+}
+.backlink:hover { color: var(--k-fg); text-decoration-color: currentColor; }`,
+  },
+  {
+    id: 'warningtext',
+    section: "Warning text",
+    root: 'warningtext',
+    css: `/* === Warning text =========================================================
+ * GOV.UK Warning text: "when you need to warn users about something important,
+ * such as legal consequences of an action, or lack of action, that they might
+ * take". Not an alert box — a paragraph with a strong "!" glyph, INLINE with the
+ * content it warns about, at the point of decision.
+ *
+ * The glyph is aria-hidden and the word "Warning" travels in the text (visually
+ * hidden by the consumer, or spoken as written) — colour and a symbol alone
+ * cannot carry the meaning (WCAG 1.4.1), and the assertive tone comes from the
+ * words, not from a role. */
+.warningtext {
+  display: flex; align-items: flex-start; gap: var(--k-s-12);
+  font-weight: var(--k-weight-semibold); color: var(--k-fg);
+}
+.warningtext__icon {
+  flex: none; display: grid; place-items: center;
+  inline-size: var(--k-icon-chip); block-size: var(--k-icon-chip);
+  border-radius: 999px; background: var(--k-fg); color: var(--k-bg);
+  font-weight: var(--k-weight-bold); font-size: var(--k-type-body); line-height: 1;
+}
+.warningtext__text { padding-block-start: calc((var(--k-icon-chip) - 1lh) / 2); }`,
+  },
+  {
+    id: 'exitpage',
+    section: "Exit this page",
+    root: 'exitpage',
+    css: `/* === Exit this page =======================================================
+ * GOV.UK Exit this page: "give users a way to quickly and safely exit a service,
+ * website or application" — built for services where being seen using them is a
+ * risk (domestic abuse, gender identity). Composes .btn--danger at the large
+ * size and stays visible while the page scrolls; the behaviour the consumer owes
+ * is the platform's — a link to a neutral site that REPLACES the current entry
+ * in history so the back button does not return here, and (GOV.UK) the Shift
+ * key pressed three times as a keyboard shortcut. The visible hint says so. */
+.exitpage {
+  position: sticky; top: var(--k-s-16); z-index: var(--k-z-sticky, 30);
+  display: flex; flex-direction: column; align-items: flex-end; gap: var(--k-s-4);
+  margin-inline-start: auto; inline-size: max-content;
+}
+.exitpage__hint { font-size: var(--k-type-caption); color: var(--k-fg-muted); }`,
+  },
+  {
+    id: 'cookiebanner',
+    section: "Cookie banner",
+    root: 'cookiebanner',
+    css: `/* === Cookie banner ========================================================
+ * GOV.UK Cookie banner: a region at the very top of the page, before anything
+ * else, that says which cookies the service wants to set and lets the user
+ * accept or reject the non-essential ones — then confirms the choice and offers
+ * to hide itself. role="region" with the service named in the label, so a
+ * screen-reader user can jump past it and find it again. It is page furniture
+ * for every public service in the EU, which is exactly why a design system for
+ * them ships one and a component census does not.
+ *
+ * Composes .btn for the two choices; the link to the cookies page is a link. */
+.cookiebanner {
+  padding: var(--k-s-20) var(--k-s-24);
+  background: var(--k-surface-sunken); border-block-end: var(--k-bw) solid var(--k-border);
+}
+.cookiebanner__inner { max-inline-size: var(--k-measure-wide, 60rem); }
+.cookiebanner__heading { margin: 0 0 var(--k-s-8); font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); }
+.cookiebanner__body { margin: 0 0 var(--k-s-12); font-size: var(--k-type-body); color: var(--k-fg-muted); max-inline-size: var(--k-measure-prose, 68ch); }
+.cookiebanner__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--k-s-8) var(--k-s-12); }`,
+  },
+  {
     id: 'dialog',
     section: "Dialog",
     doc: {

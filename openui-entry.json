@@ -21,6 +21,11 @@
       "definition": "A confirmation modal that names the object and its destructive action."
     },
     {
+      "name": "Back link",
+      "url": "https://uicockpit.com/components/back-link",
+      "definition": "A link above the page heading that takes the user to the previous step of a journey — GOV.UK Back link."
+    },
+    {
       "name": "Badge",
       "url": "https://uicockpit.com/components/badge",
       "definition": "The status tag — soft tones for state, solid only for a count or a critical flag."
@@ -82,6 +87,11 @@
       "definition": "Right-click actions on a surface — the same menu vocabulary, summoned in place."
     },
     {
+      "name": "Cookie banner",
+      "url": "https://uicockpit.com/components/cookie-banner",
+      "definition": "The consent region before everything else on the page: which cookies, accept or reject, and a link to the details — GOV.UK Cookie banner."
+    },
+    {
       "name": "Data Table",
       "url": "https://uicockpit.com/components/data-table",
       "definition": "The flagship data surface — toolbar, selection, sticky header, pagination and every state.",
@@ -113,6 +123,11 @@
       "name": "Empty State",
       "url": "https://uicockpit.com/components/empty-state",
       "definition": "The zero-data screen — an icon, a line of guidance and one action."
+    },
+    {
+      "name": "Exit this page",
+      "url": "https://uicockpit.com/components/exit-this-page",
+      "definition": "A prominent, always-visible way to leave a sensitive service without a trace — GOV.UK Exit this page."
     },
     {
       "name": "File Upload",
@@ -274,6 +289,11 @@
       "name": "Usage Meter",
       "url": "https://uicockpit.com/components/usage-meter",
       "definition": "A quota bar whose fill shifts to a warning tone past a threshold."
+    },
+    {
+      "name": "Warning text",
+      "url": "https://uicockpit.com/components/warning-text",
+      "definition": "A strong inline warning at the point of decision, with the word carried in text — GOV.UK Warning text."
     }
   ]
 }

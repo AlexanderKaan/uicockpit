@@ -73,7 +73,8 @@
       "legend": "/legend",
       "label": "/label",
       "form": "/form",
-      "a": "/a"
+      "a": "/a",
+      "[popover]": "/Global_attributes/popover"
     },
     "structure": {
       "table": "/table",

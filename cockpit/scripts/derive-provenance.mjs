@@ -237,6 +237,10 @@ const SERVICE_ALIAS = {
   slider: ['Range slider'],
   searchinput: ['Search'],
   'sheet-drawer': ['Drawer'],
+  backlink: ['Back link'],
+  warningtext: ['Warning text'],
+  exitpage: ['Exit this page', 'Exit a page quickly'],
+  cookiebanner: ['Cookie banner', 'Cookies page'],
 }
 
 /* One index over all three catalogues, keyed by every form of the component's

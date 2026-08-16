@@ -68,6 +68,10 @@ const CARD_KEYWORDS: Record<string, string> = {
   LanguageNavCard: 'Language navigation multilingual locale switcher',
   FieldsetCard: 'Fieldset legend group radio checkbox accessibility',
   ErrorSummaryCard: 'Error summary form validation accessibility',
+  BackLinkCard: 'Back link previous page navigation GOV.UK',
+  WarningTextCard: 'Warning text legal consequence GOV.UK',
+  ExitPageCard: 'Exit this page quickly safety GOV.UK',
+  CookieBannerCard: 'Cookie banner consent analytics GOV.UK',
   PaginationCard: 'Search results pagination pages',
   StepperCard: 'Get started stepper steps progress',
   NavCard: 'Side navigation sidebar nav rail',
@@ -220,7 +224,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [LoginCard, 'component'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
-    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [InPageNavCard, 'component'], [SiteFooterCard, 'section'], [RequirementsCard, 'component'], [ProcessListCard, 'component'], [IdentifierCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
+    [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [BackLinkCard, 'atom'], [WarningTextCard, 'atom'], [ExitPageCard, 'component'], [CookieBannerCard, 'component'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [InPageNavCard, 'component'], [SiteFooterCard, 'section'], [RequirementsCard, 'component'], [ProcessListCard, 'component'], [IdentifierCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [InboxFilterCard, 'component'], [ToolbarRecipeCard, 'atom'], 
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
@@ -325,9 +329,9 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
   ['Choice & toggles', [BadgesCard, SwitchCard, SelectionCard, RadioCardCard, ColorPickerCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
-  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, LanguageNavCard, PaginationCard, StepperCard, TaskListCard]],
+  ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, BackLinkCard, ExitPageCard, LanguageNavCard, PaginationCard, StepperCard, TaskListCard]],
   ['Overlays & disclosure', [TooltipCard, ToggletipCard, AccordionCard]],
-  ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard]],
+  ['Feedback & status', [ValidationCard, ErrorSummaryCard, WarningTextCard, CookieBannerCard, BannerCard, AlertsCard, ProgressCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
   ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, InteractiveCardCard]],
 ]
@@ -799,6 +803,89 @@ function ErrorSummaryCard() {
         Move focus here on a failed submit. Per-field messages alone are only
         found by walking the whole form again.
       </p>
+    </Card>
+  )
+}
+
+function BackLinkCard() {
+  // GOV.UK Back link — a LINK above the page heading. Navigation, not an action:
+  // the platform's <a> carries the semantics; the recipe adds the chevron.
+  return (
+    <Card docId="backlink" title="Your applications" desc="A back link sits above the page heading, first thing after the header.">
+      <a className="backlink" href="#applications">Back to your applications</a>
+      <h3 className="card__title" style={{ marginTop: 'var(--k-s-8)' }}>Application 4821 — Housing benefit</h3>
+      <p className="card__desc">Submitted 12 May · awaiting documents</p>
+    </Card>
+  )
+}
+
+function WarningTextCard() {
+  // GOV.UK Warning text — a strong paragraph with a "!" glyph, INLINE with the
+  // content it warns about. The word "Warning" travels in the text for screen
+  // readers; the glyph is aria-hidden. Colour and a symbol alone cannot carry
+  // the meaning (WCAG 1.4.1).
+  return (
+    <Card docId="warningtext" title="Declaration" desc="Warn at the point of decision — not in a box, in the flow.">
+      <p className="card__desc">By continuing you confirm the information you have given is correct.</p>
+      <div className="warningtext">
+        <span className="warningtext__icon" aria-hidden="true">!</span>
+        <strong className="warningtext__text"><span className="sr-only">Warning: </span>You can be fined up to £5,000 if you do not register.</strong>
+      </div>
+      <div className="card__foot">
+        <button type="button" className="btn btn--primary">Accept and send</button>
+      </div>
+    </Card>
+  )
+}
+
+function ExitPageCard() {
+  // GOV.UK Exit this page — for services where being seen using them is a risk.
+  // A button-shaped link to a neutral site that REPLACES the current history
+  // entry; the visible hint promises the Shift ×3 shortcut the consumer wires.
+  return (
+    <Card docId="exitpage" title="Get help" desc="A way out that stays on screen and leaves no trace in the back button.">
+      <div className="exitpage">
+        <a className="btn btn--danger btn--lg" role="button" href="https://www.bbc.co.uk/weather" rel="nofollow noopener">Exit this page</a>
+        <span className="exitpage__hint">or press <kbd>Shift</kbd> 3 times</span>
+      </div>
+      <p className="card__desc" style={{ marginTop: 'var(--k-s-16)' }}>
+        If you are in immediate danger, call 999. This service is confidential and your visit is not stored in your history.
+      </p>
+    </Card>
+  )
+}
+
+function CookieBannerCard() {
+  // GOV.UK Cookie banner — a labelled region before everything else: which
+  // cookies, accept / reject, a link to the cookies page. Every part is a
+  // platform control; the region and its name are what the recipe asks for.
+  const [choice, setChoice] = useState<null | 'accept' | 'reject'>(null)
+  const [hidden, setHidden] = useState(false)
+  if (hidden) return <Card docId="cookiebanner" title="Cookies on Tax Service" desc="Hidden after a choice."><button type="button" className="btn btn--ghost btn--sm" onClick={() => { setHidden(false); setChoice(null) }}>Show the banner again</button></Card>
+  return (
+    <Card wide docId="cookiebanner" title="Cookies on Tax Service" desc="Before anything else on the page: which cookies, and a real choice.">
+      <div className="cookiebanner" role="region" aria-label="Cookies on Tax Service" style={{ margin: 'calc(var(--k-card-pad, var(--k-s-16)) * -1)', marginBottom: 0 }}>
+        <div className="cookiebanner__inner">
+          {choice === null ? (
+            <>
+              <h3 className="cookiebanner__heading">Cookies on Tax Service</h3>
+              <p className="cookiebanner__body">We use some essential cookies to make this service work. We would also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
+              <div className="cookiebanner__actions">
+                <button type="button" className="btn btn--primary" onClick={() => setChoice('accept')}>Accept analytics cookies</button>
+                <button type="button" className="btn btn--secondary" onClick={() => setChoice('reject')}>Reject analytics cookies</button>
+                <a href="#cookies">View cookies</a>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="cookiebanner__body">You have {choice === 'accept' ? 'accepted' : 'rejected'} analytics cookies. You can <a href="#cookies">change your cookie settings</a> at any time.</p>
+              <div className="cookiebanner__actions">
+                <button type="button" className="btn btn--secondary" onClick={() => setHidden(true)}>Hide cookie message</button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </Card>
   )
 }
@@ -4791,6 +4878,10 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   // Feedback & status
   { slug: 'alert', name: 'Alert', group: 'Feedback', recipeId: 'alert', blurb: 'An inline message in the toned status colours — info, success, warning, danger.', Preview: AlertsCard },
   { slug: 'banner', name: 'Banner', group: 'Feedback', recipeId: 'banner', blurb: 'A full-width page-level notice with an action and a dismiss.', Preview: BannerCard },
+  { slug: 'back-link', name: 'Back link', group: 'Navigation', recipeId: 'backlink', blurb: 'A link above the page heading that takes the user to the previous step of a journey — GOV.UK Back link.', Preview: BackLinkCard },
+  { slug: 'warning-text', name: 'Warning text', group: 'Feedback', recipeId: 'warningtext', blurb: 'A strong inline warning at the point of decision, with the word carried in text — GOV.UK Warning text.', Preview: WarningTextCard },
+  { slug: 'exit-this-page', name: 'Exit this page', group: 'Navigation', recipeId: 'exitpage', blurb: 'A prominent, always-visible way to leave a sensitive service without a trace — GOV.UK Exit this page.', Preview: ExitPageCard },
+  { slug: 'cookie-banner', name: 'Cookie banner', group: 'Feedback', recipeId: 'cookiebanner', blurb: 'The consent region before everything else on the page: which cookies, accept or reject, and a link to the details — GOV.UK Cookie banner.', Preview: CookieBannerCard },
   { slug: 'progress', name: 'Progress', group: 'Feedback', recipeId: 'progress', blurb: 'A determinate progress bar, heavier than the slider to read as ongoing work.', Preview: ProgressCard },
   { slug: 'empty-state', name: 'Empty State', group: 'Feedback', recipeId: 'empty-state', blurb: 'The zero-data screen — an icon, a line of guidance and one action.', Preview: EmptyStateCard },
 

@@ -363,6 +363,9 @@ export function renderSection(spec: SectionSpec, key: number) {
       const muted: CSSProperties = { color: 'var(--k-fg-muted)', fontSize: 'var(--k-type-small)' }
       return (
         <div className="l-stack" key={key} style={{ '--l-gap': 'var(--k-s-16)' } as CSSProperties}>
+          {/* GOV.UK Back link — the way back in a multi-page transaction. Above the
+              heading, first thing after the header. */}
+          <a className="backlink" href="#invoices">Back to invoices</a>
           {/* Trail back to the list — the real .breadcrumb recipe. */}
           <nav aria-label="Breadcrumb">
             <ol className="breadcrumb">
@@ -388,6 +391,13 @@ export function renderSection(spec: SectionSpec, key: number) {
               <button type="button" className="btn btn--ghost btn--sm">Edit</button>
               <button type="button" className="btn btn--primary btn--sm"><Icon name="chevR" /> Send</button>
             </div>
+          </div>
+
+          {/* GOV.UK Warning text — at the point of decision, in the flow, not in a
+              box. The word "Warning" travels in the text; the glyph is aria-hidden. */}
+          <div className="warningtext">
+            <span className="warningtext__icon" aria-hidden="true">!</span>
+            <strong className="warningtext__text"><span className="sr-only">Warning: </span>Sending marks this invoice as issued. Amounts and the due date cannot be edited afterwards.</strong>
           </div>
 
           {/* Document (wide) + rail (narrow) */}
@@ -796,6 +806,14 @@ export function renderSection(spec: SectionSpec, key: number) {
     case 'form':
       return (
         <div className="card" key={key}>
+          {/* GOV.UK Exit this page — composed here so the fixture holds the kit to
+              it. On a real service it belongs to pages where being seen matters;
+              a billing form is a stand-in, and the recipe does not know the
+              difference: sticky, always visible, a link that replaces history. */}
+          <div className="exitpage">
+            <a className="btn btn--danger btn--lg" role="button" href="https://www.bbc.co.uk/weather" rel="nofollow noopener">Exit this page</a>
+            <span className="exitpage__hint">or press <kbd>Shift</kbd> 3 times</span>
+          </div>
           <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>
           {spec.seed.intro && <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>{spec.seed.intro}</p>}
           {/* The error summary sits ABOVE the fields, which is the whole point of

@@ -486,6 +486,25 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
     aria: ['<footer> is the contentinfo landmark', 'Its link groups are headed lists, not a wall of anchors'],
     free: 'The element is the landmark.',
   },
+  /* GOV.UK Back link. A link — navigation, not an action — so the platform's <a>
+   * is the whole behaviour and the pattern is APG Link, which the platform gives. */
+  backlink: {
+    pattern: 'Link',
+    url: `${APG}/link/`,
+    keys: [['Enter', 'Go back to the previous page']],
+    aria: ['An <a href> — never a <button>: it navigates', 'Its text says where it goes ("Back", or "Back to your applications"), not "click here"', 'Placed before the page heading and after the header, so it is the first thing after the skip link'],
+    free: '<a href> is the entire pattern. Do not add role="button", and do not implement it with history.back() alone — a link works when JavaScript does not.',
+  },
+  /* GOV.UK Exit this page. A button-shaped LINK to a neutral site; the pattern is
+   * the platform's, and the two behaviours the consumer owes are stated in the
+   * hint the recipe renders. */
+  exitpage: {
+    pattern: 'Button',
+    url: `${APG}/button/`,
+    keys: [['Enter / Space', 'Leave immediately'], ['Shift ×3', 'The GOV.UK keyboard shortcut — the consumer wires it, the visible hint promises it']],
+    aria: ['An <a href role="button"> to a neutral site — GOV.UK uses BBC Weather', 'The current page is REPLACED in history (location.replace), so the back button does not return here', 'Visible at all times while the page scrolls; never inside a collapsed region', 'Text is "Exit this page" — recognisable at a glance, not a euphemism'],
+    free: 'A link is the platform pattern; the sticky placement and the history replacement are the two things the recipe cannot do for you.',
+  },
   skiplink: {
     pattern: 'Landmarks (bypass blocks)',
     url: LANDMARKS,
@@ -505,6 +524,15 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
  * (a name, a live region, a text alternative) are stricter than a key map.
  */
 export const APG_NOT_APPLICABLE: Record<string, string> = {
+  /* GOV.UK Warning text — a paragraph, not a widget: an aria-hidden "!" glyph and
+   * a <strong> whose text carries the word "Warning". Nothing to operate, no role
+   * to claim; the meaning is in the words, which is the point (WCAG 1.4.1). */
+  warningtext: 'A strong paragraph with a symbol. The word "Warning" is IN the text (visually hidden by the consumer if they wish); the glyph is aria-hidden. No role — the assertive tone comes from the words, not from ARIA.',
+  /* GOV.UK Cookie banner — a labelled region with a heading, two buttons and a
+   * link. Each part is the platform\'s; the region role and its name are the one
+   * obligation, so a screen-reader user can skip it and find it again. */
+  cookiebanner: 'A role="region" named after the service ("Cookies on Tax Service"), placed before everything else. Two <button>s for the choice, a link to the cookies page, and after a choice a confirmation the user can hide. Every part is a platform control; the region and its name are what the recipe asks for.',
+
   card: 'A card is a visual container, not an interaction pattern. APG has none, and inventing roles for it is how a div ends up announced as a widget.',
   'badges-pills': 'Static text with a tone. Its meaning must be in the words, which is WCAG 1.4.1, not an APG pattern.',
   prose: 'Long-form content — HTML semantics, not a widget.',

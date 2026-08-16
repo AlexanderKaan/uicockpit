@@ -561,6 +561,62 @@
         "url": "https://design-system.service.gov.uk/components/error-summary/"
       }
     ],
+    "backlink": [
+      {
+        "layer": 2,
+        "source": "APG · Link",
+        "because": "WAI-ARIA APG names the Link pattern and specifies its behaviour.",
+        "url": "https://www.w3.org/WAI/ARIA/apg/link/"
+      },
+      {
+        "layer": 3,
+        "source": "Open UI · Link",
+        "because": "6 of 27 surveyed design systems ship this independently (22%).",
+        "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Back link",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/back-link/"
+      }
+    ],
+    "warningtext": [
+      {
+        "layer": 3,
+        "source": "Open UI · Text",
+        "because": "7 of 27 surveyed design systems ship this independently (26%).",
+        "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Warning text",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/warning-text/"
+      }
+    ],
+    "exitpage": [
+      {
+        "layer": 2,
+        "source": "APG · Button",
+        "because": "WAI-ARIA APG names the Button pattern and specifies its behaviour.",
+        "url": "https://www.w3.org/WAI/ARIA/apg/button/"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Exit this page",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/exit-this-page/"
+      }
+    ],
+    "cookiebanner": [
+      {
+        "layer": 4,
+        "source": "GOV.UK · Cookie banner",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/cookie-banner/"
+      }
+    ],
     "dialog": [
       {
         "layer": 1,

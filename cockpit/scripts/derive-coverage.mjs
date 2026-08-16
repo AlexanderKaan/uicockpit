@@ -117,9 +117,10 @@ const FLOORED = new Set()
 for (const m of floorSrc.matchAll(/\bw\(\s*'([^']+)'/g)) {
   for (const sel of m[1].split(',')) {
     const t = sel.trim().match(/^([a-z][a-z0-9]*)(\[[^\]]*\])?/)
-    if (!t) continue
-    FLOORED.add(t[1])
-    if (t[2]) FLOORED.add(t[1] + t[2])
+    if (t) { FLOORED.add(t[1]); if (t[2]) FLOORED.add(t[1] + t[2]); continue }
+    // A bare attribute selector — [popover] — is a platform thing with no tag.
+    const a = sel.trim().match(/^\[[a-z-]+\]/)
+    if (a) FLOORED.add(a[0])
   }
 }
 const NO_RENDER = new Set(Object.keys(platform.html._no_render ?? {}).filter((k) => !k.startsWith('_')))

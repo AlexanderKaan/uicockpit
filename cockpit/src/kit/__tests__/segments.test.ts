@@ -50,16 +50,16 @@ describe('segment graph integrity', () => {
     expect(f + a + b + sh).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 5 · Component 21 · Section 14 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 5 · Component 23 · Section 14 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('component')).toHaveLength(Object.keys(COMPONENT_USES).length)
     expect(idsByTier('section')).toHaveLength(Object.keys(SECTION_USES).length)
     expect(idsByTier('foundation')).toHaveLength(5)
-    // 21 after the four-layer cut. It was 27: danger-zone, breakdown, chart,
-    // stat-tile, timeline, then entity-card and toast-stack (Sprint J) — none
-    // could name a core source. (`treeview` came the other way: splitting it out
-    // of the chart recipe gave it back the APG anchor the mis-scoping had hidden.)
-    expect(idsByTier('component')).toHaveLength(21)
+    // 23 after the four-layer cut and the service additions. Down from 27 —
+    // danger-zone, breakdown, chart, stat-tile, timeline, entity-card and
+    // toast-stack left, none able to name a core source — then up by two:
+    // exitpage and cookiebanner, GOV.UK components that compose buttons.
+    expect(idsByTier('component')).toHaveLength(23)
     // The 2026-06-15 "slab vs widget" re-audit: a SECTION is a full-width page slab
     // (its own job + heading; stacked to build a page); a COMPONENT is a widget you
     // drop INSIDE one. 14 sections = 4 shell regions (scaffold/navsuite/pane + the
