@@ -23,7 +23,7 @@ interface MktNavProps {
   /** Client-side navigate (App's pushState router). */
   navigate: (to: string) => void
   /** Which page we're on — drives aria-current on the matching destination. */
-  current?: 'manifesto' | 'docs' | 'audit' | 'components' | 'changelog'
+  current?: 'manifesto' | 'docs' | 'audit' | 'components' | 'changelog' | 'forge' | 'configure'
 }
 
 /**
@@ -56,7 +56,8 @@ export function MktNav({ navigate, current }: MktNavProps) {
     setMenu(false)
     navigate(to)
   }
-  const door = (to: string, kind: 'audit' | 'configure') => () => {
+  const door = (to: string, kind: 'audit' | 'configure') => (e?: React.MouseEvent) => {
+    e?.preventDefault()
     setMenu(false)
     // From inside the audit, "Build my UI kit" IS the bridge, not a door —
     // counting it as a door would undercount the crossing we want to measure.
@@ -74,8 +75,16 @@ export function MktNav({ navigate, current }: MktNavProps) {
           <Wordmark height={24} className="mkt__brand-mark" />
         </a>
 
+        {/* Components first — they are the ground; the three services stand on
+            them and read as a group; the guide last. One primary action on the
+            right: use the components. */}
         <nav className="mkt__nav-links">
-          <a href="/components" className="mkt__nav-link" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
+          <a href="/components" className="mkt__nav-link mkt__nav-link--first" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
+          <span className="mkt__nav-sep" aria-hidden="true" />
+          <a href="/app" className="mkt__nav-link" {...ariaCurrent('configure')} onClick={door('/app', 'configure')}>Configure</a>
+          <a href="/audit" className="mkt__nav-link" {...ariaCurrent('audit')} onClick={door('/audit', 'audit')}>Audit</a>
+          <a href="/forge" className="mkt__nav-link" {...ariaCurrent('forge')} onClick={(e) => go(e, '/forge')}>Forge</a>
+          <span className="mkt__nav-sep" aria-hidden="true" />
           <a href="/docs" className="mkt__nav-link" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
         </nav>
 
@@ -110,13 +119,12 @@ export function MktNav({ navigate, current }: MktNavProps) {
             <GithubMark />
           </a>
 
-          {/* Both entrances, on every page — the nav is where someone who
-              arrived on the wrong side of the fork changes their mind. */}
-          <button className="btn btn--secondary btn--lg mkt__nav-door" onClick={door('/audit', 'audit')}>
-            Audit my UI
-          </button>
-          <button className="btn btn--primary btn--lg" onClick={door('/app', 'configure')}>
-            Build my UI kit
+          {/* One primary action: use the components (the guide — install, copy,
+              hand to your agent). The services are links in the row; they used
+              to be two competing buttons here, which read as a two-door product
+              with the components as a menu item. */}
+          <button className="btn btn--primary btn--lg mkt__nav-use" onClick={() => { setMenu(false); ping('door', 'use'); navigate('/docs') }}>
+            Use the components
           </button>
 
           {/* Below 700px the row cannot hold two equal doors plus the links, and
@@ -138,18 +146,19 @@ export function MktNav({ navigate, current }: MktNavProps) {
       {menu && (
         <div className="mkt__sheet" id="mkt-menu">
           <div className="mkt__container mkt__sheet-inner">
-            {/* The two doors first and EQUAL — the whole proposition is that
-                there are two ways in, and a menu that leads with one of them
-                is the one-door product wearing a hamburger. */}
-            <button className="btn btn--secondary btn--lg mkt__sheet-door" onClick={door('/audit', 'audit')}>
-              Audit my UI
-            </button>
-            <button className="btn btn--primary btn--lg mkt__sheet-door" onClick={door('/app', 'configure')}>
-              Build my UI kit
+            {/* Components first, then the three services, then the guide — the
+                same order as the row above, in a sheet. */}
+            <button className="btn btn--primary btn--lg mkt__sheet-door" onClick={() => { setMenu(false); ping('door', 'components'); navigate('/components') }}>
+              Browse the components
             </button>
 
             <nav className="mkt__sheet-links">
               <a href="/components" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
+              <span className="mkt__sheet-head">Services</span>
+              <a href="/app" {...ariaCurrent('configure')} onClick={door('/app', 'configure')}>Configure</a>
+              <a href="/audit" {...ariaCurrent('audit')} onClick={door('/audit', 'audit')}>Audit</a>
+              <a href="/forge" {...ariaCurrent('forge')} onClick={(e) => go(e, '/forge')}>Forge</a>
+              <span className="mkt__sheet-head">More</span>
               <a href="/docs" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
               <a href="/manifesto" {...ariaCurrent('manifesto')} onClick={(e) => go(e, '/manifesto')}>Manifesto</a>
               <a href="/changelog" {...ariaCurrent('changelog')} onClick={(e) => go(e, '/changelog')}>What&rsquo;s new</a>

@@ -258,7 +258,8 @@
 @media (max-width: 700px) {
   .mkt__nav-links,
   .mkt__gh,
-  .mkt__nav-tools .mkt-btn { display: none; }
+  .mkt__nav-tools .mkt-btn,
+  .mkt__nav-tools .mkt__nav-use { display: none; }   /* the sheet's first button carries it */
   /* Scoped for the same reason as the line above: the base rule that hides the
      burger is declared further down this file, and at equal specificity the
      later rule wins — which left the sheet open with no way to close it. */
@@ -2903,3 +2904,26 @@
   .cmpdoc__prov-list { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); }
   .cmpdoc__prov-list li { gap: var(--k-s-6); }
 }
+
+/* ── the front door (Sprint M·3): components first, services on them ─────────
+ * No raw px in this block — em/rem and the site's own vars, so the marketing
+ * ratchet does not move for a homepage that is supposed to be the example. */
+.mkt__nav-link--first { color: var(--mkt-fg); font-weight: 600; }
+.mkt__nav-sep { display: inline-block; width: 1px; height: .9em; background: var(--mkt-border); }
+.mkt__sheet-head { display: block; font-size: .6875rem; letter-spacing: .12em; text-transform: uppercase; color: var(--mkt-fg-faint);
+  padding: .875rem .125rem .25rem; }
+.mkt__hero-ctas { margin-bottom: 2.25rem; }
+.mkt__canon { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; max-width: 66rem; margin: 0 auto 3rem; }
+.mkt__canon-item { display: inline-flex; align-items: baseline; gap: .4em; padding: .45em .85em; border-radius: 999px;
+  border: 1px solid var(--mkt-border); background: var(--mkt-bg); color: var(--mkt-fg); text-decoration: none; font-size: .875rem; }
+.mkt__canon-item:hover { border-color: var(--mkt-fg); }
+.mkt__canon-item:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 2px; }
+.mkt__canon-n { font-size: .75rem; color: var(--mkt-fg-faint); font-variant-numeric: tabular-nums; }
+.mkt__services-head { text-align: center; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--mkt-fg-faint); margin: 0 0 1rem; }
+.mkt__fork--4 { grid-template-columns: repeat(4, 1fr); max-width: 72rem; }
+@media (max-width: 1100px) { .mkt__fork--4 { grid-template-columns: 1fr 1fr; max-width: 46rem; } }
+@media (max-width: 720px) { .mkt__fork--4 { grid-template-columns: 1fr; } }
+.mkt__door--next { border-style: dashed; cursor: default; background: transparent; }
+.mkt__door--next:hover, .mkt__door--next:focus-visible { transform: none; box-shadow: none; }
+.mkt__door--next .mkt__door-tag { color: var(--mkt-fg-faint); }
+.mkt__door--next .mkt__door-h { color: var(--mkt-fg-muted); }

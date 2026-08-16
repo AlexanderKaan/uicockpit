@@ -9,6 +9,16 @@ import { ToolLogo } from '../brand/toolLogos'
 import { MktFooter } from './MktFooter'
 import { MktStats } from './MktStats'
 import { ping } from '../analytics/beacon'
+import { COMPONENT_PAGES } from '../stage/views/ComponentGallery'
+
+/* The canon, on the front door: the component groups with their counts, read
+ * off the same registry the /components index renders — so the number on the
+ * homepage is the number on the index, always. */
+const CANON = COMPONENT_PAGES.reduce<{ group: string; n: number }[]>((acc, p) => {
+  const g = acc.find((x) => x.group === p.group)
+  if (g) g.n++; else acc.push({ group: p.group, n: 1 })
+  return acc
+}, [])
 // Note: feature icons stay Lucide (decorative). The brand mark uses the
 // actual /logo.svg so the nav matches the panel inside /app exactly.
 
@@ -104,18 +114,58 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
             <span className="mkt__eyebrow-dot" />
             Free &amp; open source
           </div>
-          <h1>Ship AI apps that look designed, not generated.</h1>
+          <h1>Every component has a source.</h1>
           <p className="mkt__hero-sub">
-            UIcockpit is <strong>the design system generator for AI-built apps</strong>. Dial in
-            your colour, type, shape and motion, preview it live, and export it as{' '}
-            <strong>framework-neutral tokens + components</strong> behind one link. Then hand it
-            to your AI — a checker keeps every new screen on it, instead of drifting back to generic.
+            {COMPONENT_PAGES.length} components. Each is here because the platform has it, WAI-ARIA APG names it, or
+            GOV.UK · USWDS · NL Design System ships it — never because we liked it. Measured for accessibility,
+            themeable, <strong>framework-neutral CSS</strong>. Hand them to your AI: it builds with them, and a
+            checker keeps every screen on them.
           </p>
-          {/* Two doors — navigation only. The wall below carries its own single
-              control, because one click should do the whole demonstration.
-              Both are counted: which door people take is the one question we
-              could not reason our way through, and it is cheap to just measure. */}
-          <div className="mkt__fork">
+          <div className="mkt__hero-ctas">
+            <button type="button" className="btn btn--primary btn--lg" onClick={() => { ping('door', 'components'); navigate('/components') }}>
+              Browse the components <ArrowRight size={17} strokeWidth={2} />
+            </button>
+            <button type="button" className="btn btn--secondary btn--lg" onClick={() => { ping('door', 'use'); navigate('/docs') }}>
+              Use in your project
+            </button>
+          </div>
+
+          {/* The canon itself, on the door: the groups and their counts, from the
+              same registry as /components. Components are the ground; the
+              services below stand on them. */}
+          <nav className="mkt__canon" aria-label="The components, by group">
+            {CANON.map((c) => (
+              <a
+                key={c.group}
+                href="/components"
+                className="mkt__canon-item"
+                onClick={(e) => { e.preventDefault(); ping('door', 'canon'); navigate('/components') }}
+              >
+                <span className="mkt__canon-name">{c.group}</span>
+                <span className="mkt__canon-n">{c.n}</span>
+              </a>
+            ))}
+          </nav>
+
+          {/* Three services on the components — and the fourth, next. Not four
+              equal doors: the components are the ground, these stand on them.
+              Which service people take is counted (ping), the fourth is a
+              statement of direction, not a promise with a date. */}
+          <p className="mkt__services-head">Three services on the components — and a fourth, next</p>
+          <div className="mkt__fork mkt__fork--4">
+            <button
+              type="button"
+              className="mkt__door mkt__door--make"
+              onClick={() => { ping('door', 'configure'); onLaunch() }}
+            >
+              <span className="mkt__door-tag">Configure</span>
+              <span className="mkt__door-h">Make them yours.</span>
+              <span className="mkt__door-p">
+                Colour, type, shape, motion — tune the whole set live and export tokens your agent will actually follow.
+              </span>
+              <span className="mkt__door-meta">19 controls · Tailwind · shadcn · plain CSS</span>
+            </button>
+
             <button
               type="button"
               className="mkt__door mkt__door--audit"
@@ -131,19 +181,6 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
 
             <button
               type="button"
-              className="mkt__door mkt__door--make"
-              onClick={() => { ping('door', 'configure'); onLaunch() }}
-            >
-              <span className="mkt__door-tag">Configure</span>
-              <span className="mkt__door-h">Start a design system.</span>
-              <span className="mkt__door-p">
-                Pick a direction, tune it, and export tokens your agent will actually follow.
-              </span>
-              <span className="mkt__door-meta">19 controls · Tailwind · shadcn · plain CSS</span>
-            </button>
-
-            <button
-              type="button"
               className="mkt__door mkt__door--forge"
               onClick={() => { ping('door', 'forge'); navigate('/forge') }}
             >
@@ -152,12 +189,21 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               <span className="mkt__door-p">
                 Describe a component. The derivation says whether it may exist — and where it comes from.
               </span>
-              <span className="mkt__door-meta">78 components with a source · a citation, not an opinion</span>
+              <span className="mkt__door-meta">a citation, not an opinion</span>
             </button>
+
+            <div className="mkt__door mkt__door--next" aria-label="Generative UI — next">
+              <span className="mkt__door-tag">Generative UI · next</span>
+              <span className="mkt__door-h">The same components, spoken by a model.</span>
+              <span className="mkt__door-p">
+                A closed, measured vocabulary for AI-generated interfaces: the model can only ask for what exists,
+                in the shape it exists — and every word in it is accessible.
+              </span>
+              <span className="mkt__door-meta">for public services that have to be sure</span>
+            </div>
           </div>
         </div>
-
-</section>
+      </section>
 
       {/* Stats strip */}
       <section className="mkt__container">
@@ -171,7 +217,7 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
           <div className="mkt__section-head">
             <div className="mkt__eyebrow">
               <span className="mkt__eyebrow-dot" />
-              The other door
+              Service · Audit
             </div>
             <h2>Most design-system advice assumes an empty repo.</h2>
             <p className="mkt__section-sub">
@@ -252,13 +298,13 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               <span className="mkt__eyebrow-dot" />
               Where it fits
             </div>
-            <h2>Not another component library.</h2>
+            <h2>Not another component library — a derived one.</h2>
             <p className="mkt__section-sub">
-              A design system hands you someone else&apos;s taste, themed — a{' '}
-              <strong>generator</strong> ships your own. Tailwind is <em>how</em> you style.
-              shadcn is <em>what</em> you assemble. UIcockpit is the{' '}
-              <strong>design language that makes it yours</strong> — the layer that owns how
-              your app looks, and keeps it coherent as it (and your AI) grows.
+              Most libraries are somebody&apos;s taste. This list is <strong>derived</strong>: a component is
+              in it because the platform has it, WAI-ARIA APG names it, or a public service ships it — and it
+              carries that source on its page. Tailwind is <em>how</em> you style. shadcn is <em>what</em>{' '}
+              you assemble. This is the <strong>set that can say why it exists</strong>, themed to be yours,
+              and kept coherent as your app (and your AI) grows.
             </p>
           </div>
           <div className="mkt__triad">

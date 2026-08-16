@@ -89,13 +89,13 @@ export function ForgePage({ navigate }: { navigate: (to: string) => void }) {
 
   return (
     <div className="mkt">
-      <MktNav navigate={navigate} />
+      <MktNav navigate={navigate} current="forge" />
       {/* The kit's tokens on the page itself: the forge is sized through --k-s-*,
         * --k-type-* and --k-radius-* (see the .frg block in marketing.css), so the
         * site composes through the kit's scale rather than adding raw px. */}
       <main className="mkt__container frg" style={tokens}>
         <header className="frg__head">
-          <p className="frg__eyebrow">The forge</p>
+          <p className="frg__eyebrow">A service on the components · Forge</p>
           <h1>Describe a component. The derivation says whether it may exist.</h1>
           <p className="frg__lede">
             The kit's component list is not chosen, it is <em>derived</em>: the platform has it (HTML), WAI-ARIA APG names it,

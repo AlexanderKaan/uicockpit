@@ -149,7 +149,7 @@ export function AuditPage({ navigate }: { navigate: (to: string) => void }) {
       <main className="mkt__container aud">
         <p className="aud__local">
           <ShieldCheck size={14} strokeWidth={2} />
-          Runs in this tab · no upload, no account, no server
+          A service on the components · Audit — runs in this tab · no upload, no account, no server
         </p>
 
         {phase === 'door' && (
