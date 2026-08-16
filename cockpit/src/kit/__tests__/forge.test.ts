@@ -5,6 +5,8 @@ import { createForge } from '../../../../cli/src/forge.mjs'
 // @ts-expect-error — same: scripts/lib/values.mjs is audit:values' judgement.
 import { judgeText, AXES } from '../../../scripts/lib/values.mjs'
 import FORGE_DATA from '../../../../cli/data/forge.json'
+// @ts-expect-error — the kit model is the single .mjs parser the gates read
+import { parseKit } from '../../../scripts/lib/kit-model.mjs'
 import { RECIPES } from '../recipes'
 import { COMPONENT_PAGES } from '../../stage/views/ComponentGallery'
 import { buildTokens } from '../../tokens/buildTokens'
@@ -75,8 +77,10 @@ describe('what the forge generates passes the value gate the kit is held to', ()
   it('a composition uses only classes the kit ships', () => {
     const v = forge.resolve('a dialog with a form and two buttons')
     expect(v.verdict).toBe('compose')
-    const kitClasses = new Set<string>()
-    for (const r of FORGE_DATA.kit.recipes) { if (r.block) kitClasses.add(r.block); for (const p of r.parts) kitClasses.add(p) }
+    // Every class the kit ships — not only blocks and parts: a manifest skeleton
+    // legitimately carries .dialog-frame, .num, .lab, which are kit classes that
+    // are neither. Same reading as the manifest test.
+    const kitClasses = new Set<string>([...parseKit().classes.keys()])
     for (const m of (v.composition as string).matchAll(/class="([^"]+)"/g)) {
       for (const c of (m[1] ?? '').split(/\s+/).filter(Boolean)) {
         // btn--sm and friends are modifiers of a shipped block

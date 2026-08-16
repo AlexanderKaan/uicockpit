@@ -2927,3 +2927,7 @@
 .mkt__door--next:hover, .mkt__door--next:focus-visible { transform: none; box-shadow: none; }
 .mkt__door--next .mkt__door-tag { color: var(--mkt-fg-faint); }
 .mkt__door--next .mkt__door-h { color: var(--mkt-fg-muted); }
+/* the manifest's parts table on the component page */
+.cmpdoc__parts th[scope="col"] { font-size: var(--k-type-eyebrow); letter-spacing: .06em; text-transform: uppercase; color: var(--mkt-fg-faint); font-weight: var(--k-weight-semibold); text-align: left; padding-bottom: var(--k-s-6); }
+.cmpdoc__parts td, .cmpdoc__parts th[scope="row"] { vertical-align: top; }
+.cmpdoc__part--unseen { color: var(--mkt-fg-faint); }

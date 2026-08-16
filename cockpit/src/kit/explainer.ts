@@ -54,7 +54,10 @@ const STATEFUL = [
  */
 function blockOf(css: string): string | null {
   const counts = new Map<string, number>()
-  for (const m of css.matchAll(/(?:^|[\s,>+~(])\.([a-z][a-z0-9-]*)(?:__[a-z0-9-]+)?(?:--[a-z0-9-]+)?(?=[\s,{:.[)])/gm)) {
+  /* Single hyphens only in the block name: `[a-z0-9-]*` swallowed `--over`,
+   * so `.charcount--over` counted as its own root and out-voted `.charcount`
+   * (the manifest generator read the block as a modifier, 2026-08-16). */
+  for (const m of css.matchAll(/(?:^|[\s,>+~(])\.([a-z][a-z0-9]*(?:-[a-z0-9]+)*)(?:__[a-z0-9-]+)?(?:--[a-z0-9-]+)?(?=[\s,{:.[)-])/gm)) {
     // The preview root is never a block: four recipe rules are scoped to it
     // (see the Sprint K note in ROADMAP), and select-trigger mentions it more
     // often than its own class — the forge read "cockpit-preview" as its block.

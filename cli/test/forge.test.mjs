@@ -136,8 +136,13 @@ test('COMPOSE arranges several things we have, primary first, controls in the fo
   assert.equal(v.verdict, 'compose')
   assert.equal(v.primary.recipe.id, 'dialog')
   assert.ok(v.parts.some((p) => p.recipe?.id === 'buttons'))
-  assert.match(v.composition, /<dialog class="dialog">/)
-  assert.match(v.composition, /dialog__foot">\n\s*(<!--[^]*?-->\n\s*)?<button/)
+  assert.match(v.composition, /<dialog class="dialog"/)
+  // the form landed in the body, the button in the foot — placed into the
+  // manifest's real shape, not appended
+  const body = v.composition.slice(v.composition.indexOf('dialog__body'), v.composition.indexOf('dialog__foot'))
+  const foot = v.composition.slice(v.composition.indexOf('dialog__foot'))
+  assert.match(body, /class="in/)
+  assert.match(foot, /class="btn/)
 })
 
 test('a synonym reaches the catalogue, and the answer cites the catalogue — never the synonym', () => {

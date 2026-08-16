@@ -330,8 +330,50 @@ export function createForge(data) {
   const PATTERN_ELEMENT = { Link: 'a', Button: 'button', Checkbox: 'input', Switch: 'button', Meter: 'meter', 'Dialog (Modal)': 'dialog', 'Alert Dialog': 'dialog', Table: 'table', Slider: 'input' }
   // …but only for a LEAF: a block with parts is a container, whatever pattern it
   // anchors to (a task list anchors to Checkbox and is not an <input>).
-  const elementOf = (r) => r.element ?? ((r.parts?.length ? null : PATTERN_ELEMENT[r.apg?.pattern]) ?? 'div')
+  // The manifest (read off the rendered wall) knows the element for real; the
+  // measured layer-1 provenance next; the pattern only for a leaf.
+  const elementOf = (r) => r.manifest?.element ?? r.element ?? ((r.parts?.length ? null : PATTERN_ELEMENT[r.apg?.pattern]) ?? 'div')
+  /** Put composed children into a manifest skeleton: controls into a foot /
+   *  actions part when the shape has one, the rest into a body / content part;
+   *  otherwise before the closing tag. The skeleton is text, so this works on
+   *  its lines: an inline part line is opened up around the children. */
+  function placeInto(skel, children) {
+    if (!children.length) return skel
+    const lines = skel.split('\n')
+    const isControl = (h) => /^(<!--[^]*?-->\n)?<(button|a |input|select|textarea)/.test(h)
+    const indentOf = (l) => (l.match(/^\s*/) || [''])[0]
+    const find = (re) => lines.findIndex((l) => re.test(l))
+    const groups = [
+      { idx: find(/class="[^"]*__(foot|footer|actions)\b/), items: children.filter(isControl) },
+      { idx: find(/class="[^"]*__(body|content|main)\b/), items: children.filter((c) => !isControl(c)) },
+    ]
+    const rest = []
+    for (const g of groups) if (g.idx < 0) rest.push(...g.items)
+    const insertAt = (idx, items) => {
+      if (!items.length) return
+      const line = lines[idx]
+      const pad = indentOf(line) + '  '
+      const inline = line.match(/^(\s*)(<(\w+)[^>]*>)(.*?)<\/\3>$/)
+      const block = items.map((h) => h.split('\n').map((l) => pad + l).join('\n'))
+      if (inline) lines.splice(idx, 1, `${inline[1]}${inline[2]}`, ...block, `${inline[1]}</${inline[3]}>`)
+      else lines.splice(idx + 1, 0, ...block)
+    }
+    for (const g of [...groups].sort((a, b) => b.idx - a.idx)) if (g.idx >= 0) insertAt(g.idx, g.items)   // bottom-up keeps indexes valid
+    if (rest.length) {
+      const closeIdx = lines.length - 1
+      const pad = indentOf(lines[closeIdx]) + '  '
+      lines.splice(closeIdx, 0, ...rest.map((h) => h.split('\n').map((l) => pad + l).join('\n')))
+    }
+    return lines.join('\n')
+  }
   function skeleton(r, children = []) {
+    /* The manifest's skeleton when the wall has rendered this block: real
+     * elements, roles and ARIA, read off the specimen — a shape, not a guess.
+     * The heuristic below is the fallback for a recipe the wall does not show. */
+    if (r.manifest?.skeleton) {
+      const head = r.apg?.aria?.length ? `<!-- ${r.apg.pattern}: ${r.apg.aria.slice(0, 3).map(esc).join(' · ')} -->\n` : ''
+      return head + placeInto(r.manifest.skeleton, children)
+    }
     const el = elementOf(r)
     // Parts, not modifiers of parts (`datatable__bar--active` is a state); in a
     // head → body → foot order rather than authored order, four at most.

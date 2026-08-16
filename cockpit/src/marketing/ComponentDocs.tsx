@@ -13,12 +13,20 @@ import EVIDENCE from '../kit/evidence.json'
 // source for the CLI, the MCP tool, /forge and this page); no types on purpose.
 import { createForge } from '../../../cli/src/forge.mjs'
 import FORGE_DATA from '../../../cli/data/forge.json'
+import MANIFEST from '../kit/manifest.json'
 
 /* The forge's data is the derivation's published answer per recipe — its
  * provenance line, what it covers, its APG contract — generated from the same
  * sources the build gate reads. The component page shows it as "where this
  * comes from", and uses the forge's skeleton as the copyable usage. One source. */
 type ForgeRecipe = (typeof FORGE_DATA)['kit']['recipes'][number]
+/* The SHAPE, read off the rendered wall by scripts/gen-manifest.ts: which
+ * element the block is, its parts with their elements, which parts every
+ * instance carries, which repeat, how they nest, the states seen. Structure
+ * only — measured, not written. */
+type ManifestPart = { element: string | null; required?: boolean; repeatable: boolean; parent: string | null; rendered: boolean; cssDeclared: boolean; aria: Record<string, string[]>; in: number }
+type ManifestEntry = { block: string; instances: number; element: string | null; container: string | null; parts: Record<string, ManifestPart>; states: { modifiers: string[]; partModifiers: string[]; aria: Record<string, string[]> }; composes: string[]; skeleton: string | null }
+const manifestOf = (id: string): ManifestEntry | undefined => (MANIFEST.components as Record<string, ManifestEntry>)[id]
 const FORGE = createForge(FORGE_DATA)
 const forgeRecipe = (id: string): ForgeRecipe | undefined => FORGE_DATA.kit.recipes.find((r) => r.id === id)
 const LAYER_LABEL: Record<number, string> = { 1: 'HTML', 2: 'APG', 3: 'Open UI', 4: 'Public service' }
@@ -468,6 +476,7 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
   const doc = recipe?.doc
   const ex = explainerFor(page.recipeId)
   const fr = forgeRecipe(page.recipeId)
+  const mf = manifestOf(page.recipeId)
   const usage: string = fr ? FORGE.skeleton(fr) : ''
   const stageRef = useRef<HTMLDivElement>(null)
   const [copied, copy] = useCopy()
@@ -558,21 +567,50 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
             </div>
           ) : null}
 
-          {ex.parts.length > 0 && (
+          {mf && mf.instances > 0 ? (
+            <div className="cmpdoc__spec-group">
+              <h3>Shape</h3>
+              <p className="cmpdoc__spec-note">
+                Read off the rendered specimen{mf.instances > 1 ? `s (${mf.instances} instances on the wall)` : ''} on {MANIFEST.measuredOn}:
+                the block is <code>&lt;{mf.element}&gt;</code>
+                {mf.container && <> inside <code>.{mf.container}</code></>}
+                {mf.composes.length > 0 && <>; it composes {mf.composes.map((c, i) => <span key={c}>{i > 0 ? ', ' : ''}{label(c)}</span>)}</>}.
+              </p>
+              {Object.keys(mf.parts).length > 0 && (
+                <table className="cmpdoc__spec-keys cmpdoc__parts">
+                  <thead><tr><th scope="col">Part</th><th scope="col">Element</th><th scope="col">Presence</th><th scope="col">Nests in</th><th scope="col">ARIA seen</th></tr></thead>
+                  <tbody>
+                    {Object.entries(mf.parts).map(([name, p]) => (
+                      <tr key={name} className={p.rendered ? '' : 'cmpdoc__part--unseen'}>
+                        <th scope="row"><code>.{mf.block}__{name}</code></th>
+                        <td>{p.rendered ? <code>&lt;{p.element}&gt;</code> : '—'}</td>
+                        <td>{!p.rendered ? 'declared in CSS, not on the wall' : p.required ? 'in every instance' : `in ${p.in} of ${mf.instances}`}{p.rendered && p.repeatable ? ' · repeats' : ''}</td>
+                        <td>{p.rendered ? (p.parent === 'block' ? 'the block' : <code>__{p.parent}</code>) : '—'}</td>
+                        <td>{Object.entries(p.aria).map(([k, v]) => `${k}=${v.join('|')}`).join(' ') || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          ) : ex.parts.length > 0 ? (
             <div className="cmpdoc__spec-group">
               <h3>Parts</h3>
               <p className="cmpdoc__spec-classes">
                 {ex.parts.map((c: string, i: number) => <span key={c}>{i > 0 ? ' ' : ''}<code>.{c}</code></span>)}
               </p>
             </div>
-          )}
+          ) : null}
 
-          {ex.states.length > 0 && (
+          {(ex.states.length > 0 || (mf && (mf.states.modifiers.length > 0 || Object.keys(mf.states.aria).length > 0))) && (
             <div className="cmpdoc__spec-group">
               <h3>States and variants</h3>
               <p className="cmpdoc__spec-classes">
                 {ex.states.map((c: string, i: number) => <span key={c}>{i > 0 ? ' ' : ''}<code>{c}</code></span>)}
               </p>
+              {mf && Object.keys(mf.states.aria).length > 0 && (
+                <p className="cmpdoc__spec-note">Rendered with {Object.entries(mf.states.aria).map(([k, v]) => `${k}=${v.join('|')}`).join(' · ')}.</p>
+              )}
             </div>
           )}
 
@@ -612,8 +650,9 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
             <CopyButton id="usage2" label="Copy" text={() => usage} />
           </div>
           <p className="cmpdoc__note">
-            The block on its element, its parts, and the ARIA the contract names — a shape to fill, derived from the
-            recipe’s own classes. Not a specimen; the stage above is.
+            {mf?.skeleton
+              ? <>The shape as rendered: real elements, roles and ARIA read off the specimen above, text replaced by placeholders, repeated siblings collapsed. A shape to fill — not the specimen itself.</>
+              : <>The block on its element, its parts, and the ARIA the contract names — a shape to fill, derived from the recipe’s own classes. Not a specimen; the stage above is.</>}
           </p>
           <pre className="cmpdoc__css"><code>{usage}</code></pre>
         </section>

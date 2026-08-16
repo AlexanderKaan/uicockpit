@@ -43,6 +43,13 @@ const services = readJson('data/service-systems.json')
 const openui = readJson('data/openui-names.json')
 const vocabulary = readJson('data/forge-vocabulary.json')
 const decisions = readJson('data/derivation-decisions.json')
+/* The SHAPE per recipe, read off the rendered wall by gen-manifest.ts: element,
+ * container, parts with element/required/repeatable/parent, states seen,
+ * composes, and a canonical skeleton. Structure only; the contract stays in
+ * apg.ts. Optional here so the forge data still builds before a first run. */
+type ManifestPart = { element: string | null; required?: boolean; repeatable: boolean; parent: string | null; rendered: boolean; cssDeclared: boolean; aria: Record<string, string[]>; in: number }
+type ManifestEntry = { block: string; instances: number; element: string | null; container: string | null; parts: Record<string, ManifestPart>; states: { modifiers: string[]; partModifiers: string[]; aria: Record<string, string[]> }; composes: string[]; skeleton: string | null }
+const manifestFile = existsSync(join(here, '../src/kit/manifest.json')) ? (readJson('../src/kit/manifest.json') as { components: Record<string, ManifestEntry> }) : null
 
 /* ── the floor: every w('…') selector in globalLayer.ts, with the rule body
  * when it is a simple block, so a PLATFORM verdict can quote the rule that
@@ -104,6 +111,7 @@ const recipes = RECIPES.map((r) => {
     covers: coversOf.get(r.id) ?? { openui: [], service: [] },
     apg: ex?.apg ? { pattern: ex.apg.pattern, url: ex.apg.url, keys: ex.apg.keys, aria: ex.apg.aria, free: ex.apg.free ?? null } : null,
     apgNote: ex?.apgNote ?? null,
+    manifest: manifestFile?.components[r.id] ?? null,
   }
 })
 
