@@ -76,7 +76,14 @@ const forms = (x) => {
  * catalogue entry we cover, by definition. So this script runs it, reads what was
  * claimed, and only supplies the denominators. Two directions, one resolution —
  * they cannot disagree, because there is nothing left to disagree about. */
-const prov = JSON.parse(execFileSync('node', [join(HERE, 'derive-provenance.mjs'), '--json'], {
+/* --gate: run static (no browser, no dev server) and EXIT 1 when the set is not
+ * exact — a component-tier recipe with no core line, or a core catalogue entry
+ * with nothing in the kit. This is what lets the derivation replace audit:apg
+ * and audit:naming as the thing that decides whether a component may exist: from
+ * here the set cannot drift silently in either direction. Layer 1 is not measured
+ * in this mode; it is the floor's business and not part of the verdict. */
+const GATE = process.argv.includes('--gate')
+const prov = JSON.parse(execFileSync('node', [join(HERE, 'derive-provenance.mjs'), '--json', ...(GATE ? ['--static'] : [])], {
   encoding: 'utf8', maxBuffer: 32 * 1024 * 1024,
 }))
 const CLAIMED = { 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set() }
@@ -327,4 +334,22 @@ const coreCov = l2.covered.length + l4.covered.length + l2.decided.length
 line('  ' + '─'.repeat(74))
 line(`  core coverage: ${coreCov} of ${coreTotal} — ${pct(coreCov, coreTotal)}  (decided gaps count as answered)`)
 line(`  the set on paper: ${stays.length} stay · ${leaves.length} leave · ${l2m.length + l4m.length} to add · ${l4.pagePatterns.length} page patterns for the section tier`)
+
+if (GATE) {
+  const breaches = []
+  for (const l of leaves) breaches.push(`${l.id} — ${l.why}`)
+  for (const r of l2m) breaches.push(`APG · ${r.name} — a named pattern with a spec, and nothing in the kit implements it`)
+  for (const r of l4m) breaches.push(`${r.system} · ${r.name} — a public service ships it, and nothing in the kit covers it`)
+  if (breaches.length) {
+    line()
+    line(`  ✗ derive:coverage --gate — the set is not exact: ${breaches.length} breach(es).`)
+    for (const b of breaches) line(`      ${b}`)
+    line()
+    line('  A recipe needs a line from layer 2 (APG) or layer 4 (a public service), or it')
+    line('  leaves; a core catalogue entry needs a recipe, the floor, or a written decision')
+    line('  in DECIDED — never a hole. Layer 3 is a check and does not count.')
+    process.exit(1)
+  }
+  line('\n  ✓ derive:coverage --gate — the set is exact: every recipe has a core line, every core entry is covered.')
+}
 process.exit(0)

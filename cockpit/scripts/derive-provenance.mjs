@@ -314,6 +314,19 @@ const PLATFORM = {
   TIME:     { el: '<time>',     concept: 'time' },
 }
 
+/* --static: no browser. Layer 1 is MEASURED off the rendered DOM — which tag
+ * carries the recipe's primary class — and that needs a page. But the GATE
+ * question (is every component-tier recipe on layer 2 or 4? is every layer-2/4
+ * catalogue entry covered?) does not touch layer 1 at all: layer 1 is the floor's
+ * business, reported, never part of CORE. So the build runs this static, layer 1
+ * reads "not measured", and the by-hand run with a dev server still measures it
+ * and still reports the layer-1 violations (a recipe declaring Spinbutton over a
+ * text input) that only a browser can see. */
+const STATIC = process.argv.includes('--static')
+let measured = {}
+if (STATIC) {
+  measured = Object.fromEntries(RECIPES.map((r) => [r.cls, null]))
+} else {
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 1400 } })
 await page.goto(APP, { waitUntil: 'networkidle' })
@@ -325,7 +338,7 @@ await page.evaluate(() => {
 })
 await page.waitForTimeout(400)
 
-const measured = await page.evaluate((classes) => {
+measured = await page.evaluate((classes) => {
   const out = {}
   for (const cls of classes) {
     if (!cls) continue
@@ -341,6 +354,7 @@ const measured = await page.evaluate((classes) => {
   return out
 }, RECIPES.map((r) => r.cls))
 await browser.close()
+}
 
 /* ---- the assignment ------------------------------------------------------ *
  * ⚠️ EVERY LAYER THAT APPLIES, not the first one that hits. The first version
@@ -429,7 +443,7 @@ for (const r of RECIPES) {
   }
 
   if (sources.length) assigned.push({ ...r, sources, covers })
-  else unassigned.push({ ...r, renders: dom ? dom.tag : 'NOT ON THE WALL' })
+  else unassigned.push({ ...r, renders: dom ? dom.tag : (STATIC ? '(static run — not measured)' : 'NOT ON THE WALL') })
 
   /* 🚨 THE LAYER-1 VIOLATION. The rule is "if the platform has it, we style it,
    * we do not rebuild it" — so a recipe whose NAME is a platform element while
