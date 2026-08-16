@@ -483,7 +483,17 @@ export function Panel({ cfg, tokens, dispatch, onCollapse, onRandomize, onReset,
     <aside className="panel" ref={rootRef}>
       {/* Drag grabber — only shown on phones (CSS), where the panel is a bottom
           sheet. Sticky-pinned to the sheet's top so it's always draggable. */}
-      <div className="panel__grip" ref={gripRef} role="button" tabIndex={-1} aria-label="Drag to resize controls">
+      {/* NO role="button" HERE, and dropping it is the fix rather than a retreat.
+          It carried role="button" with tabIndex={-1}: a control that announces
+          itself as a button while no keyboard can ever reach it. That is a worse
+          answer than silence — a screen-reader user is told there is a button
+          and then cannot get to it.
+          What this actually is: a pointer-only grab handle for the mobile sheet,
+          a gesture affordance. Gestures are not announced, so it is aria-hidden.
+          WCAG 2.5.7 (Dragging Movements) is satisfied because the drag is an
+          ENHANCEMENT — the sheet opens and closes from the topbar toggle, which
+          is a single-pointer control and keyboard-reachable. */}
+      <div className="panel__grip" ref={gripRef} aria-hidden="true">
         <span className="panel__handle" />
       </div>
       <div className="card fmenu">

@@ -7128,9 +7128,13 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
      .tool-call--running   in flight (info dot)
      .tool-call--done      finished (success dot)
      .tool-call--error     failed (danger dot + danger name)
-   Stack several between a question and the answer; sits inside .msg after the
-   body, or standalone in a feed. Quiet by design — a surface-2 well in caption
-   type, so the conversation stays the foreground. */
+   Stack several between a question and the answer, or standalone in a feed.
+   (This used to say "sits inside .msg" — .msg was the chat-bubble recipe and it
+   left the kit in the V1 prune, because a foundation for public services does
+   not need a chat bubble. A component's own documentation pointing at something
+   that no longer exists is the cheapest kind of lie to tell and the easiest to
+   leave behind.) Quiet by design — a surface-2 well in caption type, so the
+   conversation stays the foreground. */
 .tool-call {
   border: var(--k-bw) solid var(--k-border);
   border-radius: var(--k-radius-md);
@@ -7214,7 +7218,8 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    <details> opens a quiet, rail-marked transcript in faint caption type. One
    optional axis:
      .reasoning--live   still thinking (info-tinted label)
-   Compose INSIDE .msg before the body, or above a .prose answer. */
+   Compose above a .prose answer, or at the top of whatever holds the turn.
+   (Was "INSIDE .msg" — that recipe left in the V1 prune.) */
 .reasoning { font-size: var(--k-type-caption); }
 .reasoning summary {
   list-style: none;

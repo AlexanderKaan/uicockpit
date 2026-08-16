@@ -572,7 +572,16 @@
  * Absolutely positioned so it costs the card no layout at all; the component
  * inside sits exactly where it would with no chrome. */
 .cockpit-preview .gallery .card { position: relative; }
-.cardinfo { position: absolute; top: var(--k-s-8); right: var(--k-s-8); z-index: 3; }
+/* ⚠️ ON THE CARD'S CORNER, NOT INSIDE ITS CONTENT. At top/right 8px this button
+   is 24px wide and reaches 32px in from the card edge, while card content starts
+   at the 24px padding — so it lay 8px across whatever sits in the top-right, and
+   axe reported three WCAG 2.5.8 breaches against `Next month`, `More actions`
+   and `Open menu`. All three components are 28x28 and pass the criterion on
+   their own; the failure was OUR harness sitting on top of them.
+   A demo affordance that makes the thing it explains fail a success criterion is
+   worse than no affordance. It sits on the border now — attached to the card,
+   over nothing. */
+.cardinfo { position: absolute; top: calc(var(--k-s-10) * -1); right: calc(var(--k-s-10) * -1); z-index: 3; }
 /* Addressed BY ITS NAME, not by `> summary`. The markup has carried
    .cardinfo__btn on 127 elements the whole time while every rule here
    selected the element structurally, so the class did nothing and a rename of

@@ -47,6 +47,16 @@
  * for our implementation. Run a11y:matrix after acting on anything from this
  * list; if the count goes up, the attribute was not the fix.
  *
+ * ⚠️ ITS WEAK POINT IS STATE, and this is worth knowing before trusting a number.
+ * A component whose markup only exists while it is open can only be checked if
+ * the drive reaches it, and the drive is two passes of clicking everything
+ * closed. `calendar` still reports a missing aria-selected: opened by hand, its
+ * date-range picker renders 31 cells that all carry the attribute — verified —
+ * but the drive does not get there, and four attempts at the opening routine did
+ * not change it. The finding is left standing rather than silenced, because a
+ * gate that hides what it cannot check is the failure mode this file exists to
+ * avoid. Treat a state-dependent finding as "go and look", not as a defect.
+ *
  * ⚠️ AND THE ORACLE IS WEAK ON PURPOSE. It presses the key and asks whether
  * anything observable moved. It cannot tell whether the key did the RIGHT thing.
  * It also cannot tell "not implemented" from "the component is not in the state
@@ -219,17 +229,31 @@ const opening = await page.evaluate(async () => {
   const wait = (ms) => new Promise((r) => setTimeout(r, ms))
   const refused = []
   let opened = 0
-  const triggers = [...document.querySelectorAll('[aria-expanded="false"], details:not([open]), [aria-haspopup]')]
-  for (const el of triggers) {
-    try {
-      if (el.tagName === 'DETAILS') { el.open = true; opened++; continue }
-      el.click()
-      await wait(20)
-      if (el.getAttribute('aria-expanded') === 'true' || el.getAttribute('aria-expanded') === null) opened++
-      else refused.push(el.className || el.tagName)
-    } catch { refused.push(el.className || el.tagName) }
+  /* ⚠️ TWO PASSES, because opening one disclosure REVEALS another. The date-range
+   * picker's calendar only exists once its trigger is open, and a single sweep
+   * collects the triggers that exist at the start — so the calendar's
+   * aria-selected was reported missing while 31 cells carried it, one click
+   * deeper. A second pass costs a second and closes the whole nesting problem. */
+  let triggers = 0
+  for (let pass = 0; pass < 2; pass++) {
+    /* ⚠️ AND NEVER CLICK WHAT IS ALREADY OPEN. [aria-haspopup] matches regardless
+     * of state, so pass 2 re-clicked every trigger pass 1 had opened and TOGGLED
+     * IT SHUT — the gap count went up rather than down. The selector asks for
+     * things that are closed, which is what "open everything" actually means. */
+    const found = [...document.querySelectorAll('[aria-expanded="false"], details:not([open]), [aria-haspopup]:not([aria-expanded="true"])')]
+    triggers += found.length
+    for (const el of found) {
+      try {
+        if (el.tagName === 'DETAILS') { el.open = true; opened++; continue }
+        el.click()
+        await wait(20)
+        if (el.getAttribute('aria-expanded') === 'true' || el.getAttribute('aria-expanded') === null) opened++
+        else if (pass === 1) refused.push(el.className || el.tagName)
+      } catch { if (pass === 1) refused.push(el.className || el.tagName) }
+    }
+    await wait(200)
   }
-  return { opened, refused: [...new Set(refused)].slice(0, 12), triggers: triggers.length }
+  return { opened, refused: [...new Set(refused)].slice(0, 12), triggers }
 })
 await page.waitForTimeout(500)
 
