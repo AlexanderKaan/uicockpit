@@ -295,12 +295,6 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
   },
 
   // — Alert / live regions —
-  'toast-stack': {
-    pattern: 'Alert',
-    url: `${APG}/alert/`,
-    keys: [['Tab', 'Reach the toast’s own action or dismiss control']],
-    aria: ['role="status" for the ordinary case, role="alert" only when it is genuinely urgent', 'The container must EXIST before the toast is inserted or nothing is announced', 'Never move focus to a toast', 'Auto-dismiss fights WCAG 2.2.1 — give a way to keep it'],
-  },
   banner: {
     pattern: 'Alert',
     url: `${APG}/alert/`,
@@ -414,13 +408,6 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
     keys: [['Space', 'Toggle the focused task']],
     aria: ['A real <input type="checkbox"> per row, labelled by the task text', 'Completion is carried in the checked state, not by a line through the text'],
     free: 'Native checkboxes give the key, the state and the label association.',
-  },
-  chip: {
-    pattern: 'Button',
-    url: `${APG}/button/`,
-    keys: [['Enter / Space', 'Activate'], ['Backspace / Delete', 'Remove, on a removable chip']],
-    aria: ['aria-pressed on a filter chip — it is a toggle, and a toggle that does not say so reads as a plain button', 'A removable chip needs a remove control naming what it removes'],
-    free: 'A <button> gives activation and focus; the pressed state is yours.',
   },
 
   // — Meters —
@@ -536,7 +523,6 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   auth: 'A page composition of fields and buttons. Every part is covered by its own recipe.',
   form: 'A <form> is HTML, not a widget. What matters lives in the fields, the labels and the error handling — and in a submit button that says what it submits.',
   fieldset: '<fieldset>/<legend> IS the grouping mechanism; APG has no pattern because HTML already has the element. The failure mode is not using it: a set of radios without a legend has options with no question.',
-  'entity-card': 'A card describing a thing. If the whole card is clickable it is one link with one name, not a card full of separate targets — that is the only real decision here.',
   infocard: 'A compact information tile. Label/value pairs; a description list if the pairs are data.',
   'file-grid': 'A grid of file tiles. Visually a grid, semantically a list — role="grid" here would promise arrow-key navigation between cells that no file browser actually wants.',
   list: 'A list. <ul>/<li>, and the row semantics come from what is in the row.',
@@ -546,7 +532,6 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   wizardstepper: 'Same as the stepper: an indicator, not a control. aria-current="step" and the position said in words.',
 
   // — Media, text and status: the alternative IS the obligation —
-  avatar: 'An image or initials. Decorative beside a name (aria-hidden), and named when it stands alone — a photo whose alt text is the file name is the classic failure.',
   'empty-state': 'A message and usually one action. The message is text; there is nothing to specify.',
   codeblock: 'A code block. <pre><code>, with a language label as text. The copy button is a plain button that must confirm what it did in a live region. And the <pre> itself needs tabindex="0" with a role and a name: it scrolls sideways whenever the code is wider than the box, and a scroll container with no focusable content cannot be reached by keyboard at all (WCAG 2.1.1, Level A). Found here for real — and only at widths where the code overflows, which a scan pinned at one viewport never reaches.',
   'roll-down-item-stagger': 'An entrance animation. It must respect prefers-reduced-motion, which is WCAG 2.3.3 and a media query, not a role.',

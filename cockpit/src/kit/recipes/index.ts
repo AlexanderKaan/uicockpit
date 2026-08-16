@@ -701,28 +701,6 @@ export const RECIPES: readonly Recipe[] = [
 .section--fill .section__head { background: var(--k-surface-fill); padding: var(--k-s-8) var(--k-s-12); border-radius: var(--k-radius-md) var(--k-radius-md) 0 0; }`,
   },
   {
-    id: 'entity-card',
-    section: "Entity card",
-    css: `/* === Entity card (SECTION tier) ==========================================
- * A card for "a thing with an identity + a few key facts": a logo/avatar + name
- * + kebab in a compact header, a FULL-BLEED divider, then label/value meta rows.
- * Reusable for clients, contacts, team members, repos, integrations. Anatomy:
- * .entity-card > .entity-card__head (mark slot · .entity-card__name · .entity-card__menu)
- * + .entity-card__meta (.entity-card__row × N: .entity-card__label / .entity-card__value).
- * Padding lives on the head/meta (not the card) so the header divider is full-bleed. */
-.entity-card { display: flex; flex-direction: column; padding: 0; overflow: hidden; background: var(--k-surface); border: 1px solid var(--k-border); border-radius: var(--k-radius-lg); box-shadow: var(--k-shadow-xs); }
-.entity-card__head { display: flex; align-items: center; gap: var(--k-s-10); padding: var(--k-s-12) var(--k-s-14); border-bottom: var(--k-divider); }
-.entity-card__name { font-weight: var(--k-weight-semibold); color: var(--k-fg); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.entity-card__menu { margin-left: auto; flex: none; }
-.entity-card__meta { display: flex; flex-direction: column; gap: var(--k-s-10); padding: var(--k-s-14); }
-.entity-card__row { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-8); }
-.entity-card__label { color: var(--k-fg-muted); font-size: var(--k-type-small); }
-.entity-card__value { font-weight: var(--k-weight-medium); color: var(--k-fg); }
-/* --fill: a compact tinted header (less tall, slightly coloured, full-bleed
- * divider) — the head wears --k-surface-fill. */
-.entity-card--fill .entity-card__head { background: var(--k-surface-fill); }`,
-  },
-  {
     id: 'action-panel',
     section: "Action panel",
     css: `/* === Action panel (SECTION tier) =========================================
@@ -1699,86 +1677,6 @@ input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appe
 .tooltip--always .tooltip__pop {
   opacity: 1;
 }`,
-  },
-  {
-    id: 'avatar',
-    section: "Avatar",
-    css: `/* === Avatar — sizes, group stack, status dot === */
-.avatar {
-  width: var(--k-avatar);
-  height: var(--k-avatar);
-  border-radius: 50%;
-  background: var(--k-primary-soft);
-  color: var(--k-primary-soft-fg);
-  display: inline-grid;
-  place-items: center;
-  font-size: var(--k-type-eyebrow);
-  font-weight: var(--k-weight-semibold);
-  position: relative;
-  flex: none;
-}
-.avatar--sm { width: calc(var(--k-avatar) - 0.375rem); height: calc(var(--k-avatar) - 0.375rem); font-size: var(--k-type-caption); }
-.avatar--lg { width: calc(var(--k-avatar) + 0.5rem); height: calc(var(--k-avatar) + 0.5rem); font-size: var(--k-type-small); }
-/* Photo avatar — the <img> covers the initials once it loads; on a broken/slow
-   src the consumer removes it (onError) and the initials underneath show through.
-   No layout shift either way (absolute-filled), and the initials stay the
-   accessible name. */
-.avatar__img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
-
-/* Decorative-palette avatars — one per accent swatch, each with its own
-   readable ink. Use for colour-coded identity (per-org / per-user) instead
-   of hardcoding hex. Rotates with the brand colour + Palette character. */
-.avatar--a1 { background: var(--k-accent-1); color: var(--k-accent-1-ink); }
-.avatar--a2 { background: var(--k-accent-2); color: var(--k-accent-2-ink); }
-.avatar--a3 { background: var(--k-accent-3); color: var(--k-accent-3-ink); }
-.avatar--a4 { background: var(--k-accent-4); color: var(--k-accent-4-ink); }
-.avatar--a5 { background: var(--k-accent-5); color: var(--k-accent-5-ink); }
-.avatar--a6 { background: var(--k-accent-6); color: var(--k-accent-6-ink); }
-
-/* Gradient placeholder — square media tile (cover art, category, preload).
-   .ph--g1..g6 pull the 6 decorative gradient pairs. */
-.ph { border-radius: var(--k-radius-md); background: var(--k-fill); }
-.ph--g1 { background: var(--k-grad-1); }
-.ph--g2 { background: var(--k-grad-2); }
-.ph--g3 { background: var(--k-grad-3); }
-.ph--g4 { background: var(--k-grad-4); }
-.ph--g5 { background: var(--k-grad-5); }
-.ph--g6 { background: var(--k-grad-6); }
-
-/* Group: stacked avatars with negative margin + ring border to separate.
-   Industry convention (Slack/Linear/GitHub/Notion): stacked avatars never
-   show status dots — the next avatar's overlap always covers the dot's
-   bottom-right corner. For status communication use the count label
-   ("5 online") or a non-stacked horizontal list with gap. */
-.avatar-group {
-  display: inline-flex;
-  align-items: center;
-  padding-left: var(--k-s-6);
-}
-.avatar-group > .avatar {
-  margin-left: calc(var(--k-s-6) * -1);
-  box-shadow: 0 0 0 2.5px var(--k-surface);
-}
-.avatar-group .avatar__status { display: none; }
-.avatar-group__more {
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-  margin-left: var(--k-s-10);
-}
-
-/* Online/offline status dot at bottom-right */
-.avatar__status {
-  position: absolute;
-  bottom: -1px;
-  right: -1px;
-  width: var(--k-dot);
-  height: var(--k-dot);
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--k-surface);
-}
-.avatar__status--online { background: var(--k-success); }
-.avatar__status--away { background: var(--k-warning); }
-.avatar__status--offline { background: var(--k-fg-faint); }`,
   },
   {
     id: 'switch-toggle',
@@ -4033,117 +3931,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .dropzone__hint { font-size: var(--k-type-caption); }`,
   },
   {
-    id: 'toast-stack',
-    section: "Toast stack",
-    doc: {
-      dos: [
-        "A passive confirmation uses the toned variants (.toast--success/info/warn/error) and auto-dismisses.",
-        "An actionable toast ('Saved \u2014 Undo') is the snackbar: .toast--snackbar on the inverse surface, ONE .toast__action, one at a time.",
-        "Anchor the stack in one corner via .toast-stack and cap it at about three visible.",
-      ],
-      donts: [
-        "Don't use a toast for anything that needs a decision \u2014 that is a .dialog.",
-        "Don't auto-dismiss a toast that carries an action.",
-      ],
-    },
-    css: `/* === Toast stack ===
-   In production this stack pins bottom-right of the viewport (use position:
-   fixed + bottom/right). In the gallery demo it lives inside a bordered
-   .toast-demo-frame with trigger buttons — clearly a sandbox, not chrome.
-   The tone-coded left border + dismiss button are the actual pattern;
-   positioning is a consumer concern, not a token concern. */
-.toast-demo-frame {
-  position: relative;
-  min-height: 110px;
-  border: 1px dashed var(--k-border);
-  border-radius: var(--k-radius-md);
-  background: var(--k-surface-sunken);
-  padding: var(--k-s-10);
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-}
-.toast-demo-frame__empty {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-faint);
-  pointer-events: none;
-}
-.toast-stack {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: var(--k-s-6);
-  align-items: stretch;
-  width: 100%;
-}
-.toast {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--k-s-10);
-  padding: var(--k-s-10) var(--k-s-12);
-  background: var(--k-surface-overlay, var(--k-surface-raised));
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-  box-shadow: var(--k-shadow-md);
-  font-size: var(--k-type-small);
-  animation: var(--k-anim-slide-up, k-slide-up 240ms ease backwards);
-}
-.toast--success { border-left: 3px solid var(--k-success); }
-.toast--info    { border-left: 3px solid var(--k-info); }
-.toast--warn    { border-left: 3px solid var(--k-warning); }
-.toast--error   { border-left: 3px solid var(--k-danger); }
-.toast__body { flex: 1; min-width: 0; }
-.toast__title { font-weight: var(--k-weight-semibold); }
-.toast__sub { color: var(--k-fg-muted); font-size: var(--k-type-small); margin-top: 1px; }
-.toast__close {
-  background: transparent;
-  border: 0;
-  padding: var(--k-s-2);
-  cursor: pointer;
-  color: var(--k-fg-muted);
-  display: inline-flex;
-  border-radius: var(--k-radius-md);
-  transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease), opacity var(--k-dur-fast, 120ms) var(--k-ease, ease), color var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-.toast__close:hover { color: var(--k-fg); background: var(--k-state-hover); }
-/* Inline text action ("Undo", "Retry") — sits after the body, before the
-   dismiss ✕. On a regular toast it's primary-tinted; the snackbar recolors
-   it below. NEVER make the action "Dismiss" — that's what the ✕ is for. */
-.toast__action {
-  background: none;
-  border: 0;
-  padding: var(--k-s-2) var(--k-s-6);
-  border-radius: var(--k-radius-sm, 6px);
-  font: inherit;
-  font-size: var(--k-type-small);
-  font-weight: var(--k-weight-semibold);
-  color: var(--k-primary-text);
-  cursor: pointer;
-  flex: none;
-}
-.toast__action:hover { background: var(--k-state-hover); }
-/* Snackbar (H4) — the M3 snackbar CONTRACT on the toast primitive. Look:
-   INVERSE surface (the H1 inverse roles — guaranteed contrast on any theme),
-   no tone border (a snackbar is neutral app feedback, not a status), one
-   optional text action in inverse-primary. Behavior contract (consumer-
-   owned): one line, ONE action max, auto-dismiss 4-10s, and one snackbar at
-   a time — queue them, never stack. */
-.toast--snackbar {
-  background: var(--k-inverse-surface);
-  color: var(--k-inverse-fg);
-  border-color: transparent;
-  align-items: center;
-}
-.toast--snackbar .toast__sub { color: var(--k-inverse-fg-muted, var(--k-inverse-fg)); }
-.toast--snackbar .toast__action { color: var(--k-inverse-primary); }
-.toast--snackbar .toast__action:hover { background: transparent; text-decoration: underline; text-underline-offset: 3px; }
-.toast--snackbar .toast__close { color: var(--k-inverse-fg); }
-.toast--snackbar .toast__close:hover { color: var(--k-inverse-fg); background: transparent; opacity: 1; }`,
-  },
-  {
     id: 'tag-input',
     section: "Tag input",
     css: `/* === Tag input ===
@@ -5774,7 +5561,28 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .filterbar__active-label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); color: var(--k-fg-muted); }
 .filterbar__count { margin-left: auto; font-size: var(--k-type-small); color: var(--k-fg-muted); white-space: nowrap; }
 .filterbar__clear { font-size: var(--k-type-small); color: var(--k-primary-text); background: none; border: 0; cursor: pointer; padding: 0; }
-.filterbar__clear:hover { text-decoration: underline; }`,
+.filterbar__clear:hover { text-decoration: underline; }
+
+/* ----- The active-filter TOKEN — folded in from the chip recipe (2026-08-16).
+   .chip left on the four-layer cut (core only through APG Button, the pattern of
+   anything clickable). What the filter bar needs from it — a removable token that
+   says which filters are on — is the filter bar's own part, and it lives here.
+   Height = one notch under buttons; the × keeps a 24px hit-target under a small
+   glyph (WCAG 2.5.8 through a transparent ::before, not by fattening the ×). */
+.filterbar__token {
+  display: inline-flex; align-items: center; gap: var(--k-s-6);
+  min-height: var(--k-control-h-sm); padding-inline: var(--k-s-12);
+  border: var(--k-bw) solid transparent; border-radius: var(--k-radius-md);
+  background: var(--k-surface-container); color: var(--k-fg);
+  font-size: var(--k-type-small); font-weight: var(--k-weight-medium); line-height: 1;
+}
+.filterbar__token-remove {
+  position: relative; display: grid; place-items: center;
+  width: var(--k-icon-sm); height: var(--k-icon-sm); margin-inline-end: calc(var(--k-s-4) * -1);
+  border: 0; padding: 0; border-radius: 999px; background: transparent; color: var(--k-fg-muted); cursor: pointer;
+}
+.filterbar__token-remove::before { content: ''; position: absolute; top: 50%; left: 50%; width: var(--k-hit-min); height: var(--k-hit-min); transform: translate(-50%, -50%); }
+.filterbar__token-remove:hover { background: var(--k-state-press); color: var(--k-fg); }`,
   },
   {
     id: 'layout-primitives',
@@ -5826,80 +5634,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 .bento__item--hero { grid-column: 1 / -1; }
 .bento--cols { grid-template-columns: repeat(var(--bento-cols, 2), minmax(0, 1fr)); }
 .bento--cols > * { grid-column: span min(var(--bento-span, 1), var(--bento-cols, 2)); }`,
-  },
-  {
-    id: 'chip',
-    section: "Chip",
-    css: `/* === Chip — the interactive chip system (H4) ===
-   M3's four chip species as ONE atom. Chips are CONTROLS (real buttons) —
-   distinct from .badge (passive status) and .taginput__chip (the token
-   inside an input field). Species:
-     (base)        assist — an in-context action ("Summarize", "Add to cal")
-     .chip--on     filter, selected — swaps to the SECONDARY container (the
-                   H1 harmony family doing real work in the UI)
-     .chip--input  a user-entered token wearing the surface-container ladder,
-                   with a trailing .chip__remove
-     .chip--suggestion  the quietest species: a prompt, not a state
-   Height = the control scale one notch under buttons (--k-control-h-sm). */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-6);
-  min-height: var(--k-control-h-sm);
-  padding-inline: var(--k-s-12);
-  border: var(--k-bw) solid var(--k-input-border);
-  border-radius: var(--k-chip-radius, var(--k-radius-md));
-  background: transparent;
-  color: var(--k-fg);
-  font-family: var(--k-font-body);
-  font-size: var(--k-type-small);
-  font-weight: var(--k-weight-medium);
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    background var(--k-dur-fast, 120ms) var(--k-ease, ease),
-    border-color var(--k-dur-fast, 120ms) var(--k-ease, ease),
-    color var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-.chip:hover:not(:disabled) { background: var(--k-state-hover); }
-.chip:active:not(:disabled) { background: var(--k-state-press); }
-/* Transparent control → fade, don't inherit the global opaque grey :disabled box. */
-.chip:disabled, .chip.is-disabled, .chip[aria-disabled="true"] {
-  background: transparent !important; color: var(--k-fg-muted) !important;
-  opacity: var(--k-disabled-opacity); cursor: not-allowed;
-}
-.chip > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
-.chip--on {
-  background: var(--k-secondary-soft);
-  border-color: transparent;
-  color: var(--k-secondary-soft-fg);
-}
-.chip--on:hover:not(:disabled) { background: var(--k-secondary-soft); filter: brightness(0.96); }
-.chip--input {
-  background: var(--k-surface-container);
-  border-color: transparent;
-}
-.chip__remove {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 16px;
-  height: 16px;
-  margin-inline-end: calc(var(--k-s-4) * -1);
-  border: 0;
-  padding: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--k-fg-muted);
-  cursor: pointer;
-}
-/* Hit-target (Invariant I4) — the visual × stays small, but a transparent ::before
-   centres a --k-hit-min (WCAG-AA, 24px) square so the CLICK area reaches the floor.
-   Glyph-independent: the same rule lifts any small control to a real touch target. */
-.chip__remove::before { content: ''; position: absolute; top: 50%; left: 50%; width: var(--k-hit-min); height: var(--k-hit-min); transform: translate(-50%, -50%); }
-.chip__remove:hover { background: var(--k-state-press); color: var(--k-fg); }
-.chip--suggestion { color: var(--k-fg-muted); border-color: var(--k-border); }
-.chip--suggestion:hover:not(:disabled) { color: var(--k-fg); }`,
   },
   {
     id: 'scaffold',

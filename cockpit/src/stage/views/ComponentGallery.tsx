@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useRef, useState, type CSSPropert
 import type { KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
-import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar, Resizable, Toggle } from './apps/AppHelpers'
+import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, Menubar, Resizable, Toggle } from './apps/AppHelpers'
 import { popGalleryJump } from '../../state/galleryJump'
 import { RECIPES } from '../../kit'
 
@@ -30,7 +30,6 @@ const CARD_KEYWORDS: Record<string, string> = {
   ComboboxCard: 'Framework combobox autocomplete typeahead',
   SelectCard: 'Deploy region select dropdown',
   TagInputCard: 'Topics tags chips tokens',
-  ChipsCard: 'Chips assist filter input suggestion facet token chip',
   DateCard: 'Schedule date picker calendar range',
   CalendarWeekCard: 'Calendar week day view schedule time grid agenda events now line lanes overlap',
   CalendarMonthCard: 'Calendar month scheduler event chips all day overflow more colour coded',
@@ -38,6 +37,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   CalendarRangeCard: 'Calendar range double two months date range booking',
   SlotPickerCard: 'Slot picker time booking availability',
   // — Choice & toggles —
+  BadgesCard: 'Status badge tag pill count',
   SwitchCard: 'Notification settings switch toggle on off',
   SelectionCard: 'Create repository radio checkbox option',
   RadioCardCard: 'Radio card option choice',
@@ -82,7 +82,6 @@ const CARD_KEYWORDS: Record<string, string> = {
   BannerCard: 'Maintenance banner alert notice',
   AlertsCard: 'Activity alerts inline messages',
   ProgressCard: 'Storage progress bar',
-  ToastStackCard: 'Toast notification snackbar',
   EmptyStateCard: 'Projects empty state zero blank',
   NotificationCenterCard: 'Notification center inbox bell',
   // — Data & content —
@@ -101,7 +100,6 @@ const CARD_KEYWORDS: Record<string, string> = {
   DescriptionListCard: 'Subscription description list key value',
   SettingsRowCard: 'Website settings row toggle preference',
   InteractiveCardCard: 'Workspaces interactive card selectable',
-  AvatarCard: 'Avatar profile picture user',
   UsageMeterCard: 'Monthly quota usage meter limit',
   FileGridCard: 'Files file grid thumbnails',
   TreeViewCard: 'Explorer tree view folders files',
@@ -207,15 +205,15 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     // re-audit): headers/region wrappers + data-table/form-panel/pricing/sidebar/
     // empty-state/file-grid + the stats band + calendar VIEWS. Widgets (date picker,
     // chart, timeline, danger-zone, auth card, stat tile…) are 'component'.
-    [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [CanvasCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
+    [PageHeadCard, 'section'], [SectionCard, 'section'], [PresentationCardCard, 'component'], [CanvasCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
     [MusicPlayerCard, 'component'], [WeatherCard, 'component'], [CheckoutCard, 'component'], [ProductCardCard, 'component'],
-    [FormCard, 'atom'], [ValidationCard, 'atom'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
+    [FormCard, 'atom'], [ValidationCard, 'atom'], [BadgesCard, 'atom'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarMonthCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
     [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [FrozenColumnTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
     [ComboboxCard, 'atom'], [DialogCard, 'component'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
-    [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
+    [TagInputCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'component'], [SheetCard, 'component'], [DescriptionListCard, 'atom'], 
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], 
     [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ProseCard, 'component'], [ActivityFeedCard, 'component'],
@@ -224,7 +222,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
     [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [InPageNavCard, 'component'], [SiteFooterCard, 'section'], [RequirementsCard, 'component'], [ProcessListCard, 'component'], [IdentifierCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [InboxFilterCard, 'component'], [ToolbarRecipeCard, 'atom'], 
-    [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
+    [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
     [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], 
   ]
@@ -325,13 +323,13 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
 const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElement>]> = [
   ['Text inputs', [FormCard, SearchInputCard, InputAddonsCard, PasswordInputCard, NumberInputCard]],
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
-  ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, ColorPickerCard, SliderCard]],
+  ['Choice & toggles', [BadgesCard, SwitchCard, SelectionCard, RadioCardCard, ColorPickerCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, LanguageNavCard, PaginationCard, StepperCard, TaskListCard]],
   ['Overlays & disclosure', [TooltipCard, ToggletipCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
-  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, InteractiveCardCard, AvatarCard]],
+  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, InteractiveCardCard]],
 ]
 
 /* ── Promoted dashboard widgets — formerly app-only (SupaDash), now first-class
@@ -824,37 +822,6 @@ function BreadcrumbCard() {
 }
 
 
-function AvatarCard() {
-  return (
-    <Card title="Avatar" desc="Sizes, status dot and an overlapping group.">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
-        <span className="avatar avatar--sm avatar--a1">JM</span>
-        <span className="avatar avatar--a2">AC</span>
-        <span className="avatar avatar--lg avatar--a3">MK</span>
-        <span className="avatar avatar--a4">LN<span className="avatar__status avatar__status--online" role="img" aria-label="Online" /></span>
-        <span className="avatar avatar--a5">EF<span className="avatar__status avatar__status--away" role="img" aria-label="Away" /></span>
-      </div>
-      <div className="avatar-group" style={{ marginBottom: 16 }}>
-        <span className="avatar avatar--sm avatar--a1">JM</span>
-        <span className="avatar avatar--sm avatar--a2">AC</span>
-        <span className="avatar avatar--sm avatar--a3">MK</span>
-        <span className="avatar avatar--sm avatar--a6">RP</span>
-        <span className="avatar-group__more">+3</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <ImgAvatar src={PHOTO_SVG} initials="DV" label="Dana Vance" />
-        <ImgAvatar src={PHOTO_SVG} initials="KW" size="lg" label="Kai Wong" />
-        <ImgAvatar src="/__broken-on-purpose.jpg" initials="BR" tint={4} label="Broken photo — initials fallback" />
-        <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>photo · photo · broken→initials</span>
-      </div>
-    </Card>
-  )
-}
-
-/* Inline SVG stand-in for a profile photo (always loads, no network) — a soft
-   two-stop gradient so the demo reads as "image", not a flat swatch. */
-const PHOTO_SVG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23a5b4fc'/%3E%3Cstop offset='1' stop-color='%23f0abfc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' fill='url(%23g)'/%3E%3Ccircle cx='24' cy='19' r='8' fill='%23ffffff' opacity='.85'/%3E%3Cellipse cx='24' cy='40' rx='14' ry='10' fill='%23ffffff' opacity='.85'/%3E%3C/svg%3E"
 
 function AccordionCard() {
   const items: [string, string][] = [
@@ -1103,9 +1070,9 @@ function TabsCard() {
         )}
         {tab === 2 && (
           <div className="card__col" style={{ gap: 8, fontSize: 'var(--k-type-small)' }}>
-            <div className="card__row" style={{ gap: 8 }}><span className="avatar avatar--sm">MK</span><span><strong>Mira</strong> merged #482 · 2h</span></div>
-            <div className="card__row" style={{ gap: 8 }}><span className="avatar avatar--sm">JD</span><span><strong>Jordan</strong> opened #485 · 5h</span></div>
-            <div className="card__row" style={{ gap: 8 }}><span className="avatar avatar--sm">LN</span><span><strong>Lena</strong> deployed v2.4 · 1d</span></div>
+            <div className="card__row" style={{ gap: 8 }}><span><strong>Mira</strong> merged #482 · 2h</span></div>
+            <div className="card__row" style={{ gap: 8 }}><span><strong>Jordan</strong> opened #485 · 5h</span></div>
+            <div className="card__row" style={{ gap: 8 }}><span><strong>Lena</strong> deployed v2.4 · 1d</span></div>
           </div>
         )}
       </div>
@@ -1218,49 +1185,6 @@ function TooltipCard() {
  * + the switch on the right, the way it actually appears in product. Reads
  * as a mini settings panel, not three loose toggles. (Mini-interface
  * recompose pattern — #200.) */
-function ChipsCard() {
-  const [facets, setFacets] = useState<string[]>(['Design'])
-  const [tokens, setTokens] = useState(['Q3 report', 'roadmap.fig'])
-  const toggleFacet = (f: string) =>
-    setFacets((cur) => (cur.includes(f) ? cur.filter((x) => x !== f) : [...cur, f]))
-  const row: CSSProperties = { display: 'flex', flexWrap: 'wrap', gap: 'var(--k-gap)', alignItems: 'center' }
-  const lbl: CSSProperties = { fontSize: 'var(--k-type-eyebrow)', fontWeight: 'var(--k-weight-medium)' as never, textTransform: 'uppercase', letterSpacing: 'var(--k-track-eyebrow)', color: 'var(--k-fg-muted)', width: 76, flex: 'none' }
-  return (
-    <Card title="Chips">
-      <div style={row}>
-        <span style={lbl}>Assist</span>
-        <button type="button" className="chip"><Icon name="spark" size={14} />Summarize</button>
-        <button type="button" className="chip"><Icon name="cal" size={14} />Add to calendar</button>
-      </div>
-      <div style={row}>
-        <span style={lbl}>Filter</span>
-        {['Design', 'Engineering', 'Marketing'].map((f) => (
-          <button key={f} type="button" className={`chip ${facets.includes(f) ? 'chip--on' : ''}`} aria-pressed={facets.includes(f)} onClick={() => toggleFacet(f)}>
-            {facets.includes(f) && <Icon name="check" size={13} />}
-            {f}
-          </button>
-        ))}
-      </div>
-      <div style={row}>
-        <span style={lbl}>Input</span>
-        {tokens.map((t) => (
-          <span key={t} className="chip chip--input">
-            {t}
-            <button type="button" className="chip__remove" aria-label={`Remove ${t}`} onClick={() => setTokens(tokens.filter((x) => x !== t))}>
-              <Icon name="x" size={11} />
-            </button>
-          </span>
-        ))}
-        {tokens.length === 0 && <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-faint)' }}>All cleared</span>}
-      </div>
-      <div style={row}>
-        <span style={lbl}>Suggestion</span>
-        <button type="button" className="chip chip--suggestion">Tell me more</button>
-        <button type="button" className="chip chip--suggestion">Give examples</button>
-      </div>
-    </Card>
-  )
-}
 
 function SwitchCard() {
   const [push, setPush] = useState(true)
@@ -1608,9 +1532,8 @@ function InboxFilterCard() {
         ) : (
           rows.map((m) => (
             <div key={m.id} className="list__row" role="button" tabIndex={0} aria-label={`${m.from}: ${m.subject}`}>
-              <span className="avatar" style={{ background: `var(--k-accent-${m.accent}-soft)`, color: `var(--k-accent-${m.accent}-soft-fg)`, width: 32, height: 32, fontSize: 12 }}>
-                {m.initials}
-              </span>
+              {/* The row's lead slot — the list recipe's own — not an .avatar; that recipe left. */}
+              <span className="list__lead list__lead--avatar">{m.initials}</span>
               <div className="card__col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
                 <span style={{ fontWeight: m.unread ? 600 : 500 }}>{m.from}</span>
                 <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.subject}</span>
@@ -1878,7 +1801,7 @@ function FilterBarCard() {
           <div className="filterbar__active">
             <span className="filterbar__active-label">Active</span>
             {chips.map((c) => (
-              <span key={c} className="chip chip--input">{c}<button type="button" className="chip__remove" onClick={() => setChips(chips.filter((x) => x !== c))} aria-label={`Remove ${c}`}><Icon name="x" size={11} /></button></span>
+              <span key={c} className="filterbar__token">{c}<button type="button" className="filterbar__token-remove" onClick={() => setChips(chips.filter((x) => x !== c))} aria-label={`Remove ${c}`}><Icon name="x" size={11} /></button></span>
             ))}
             <button className="filterbar__clear" onClick={() => setChips([])}>Clear all</button>
             <span className="filterbar__count">128 results</span>
@@ -2403,7 +2326,7 @@ function AppBarCard() {
         </button>
         <div style={{ position: 'relative' }}>
           <button type="button" aria-haspopup="menu" aria-expanded={open} aria-label="Account" onClick={() => setOpen((o) => !o)} style={{ border: 0, background: 'none', padding: 0, cursor: 'pointer' }}>
-            <span className="avatar avatar--sm avatar--a3">PN</span>
+            PN
           </button>
           {open && (
             <div className="menu" role="menu" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 50, minWidth: 180 }}>
@@ -3320,6 +3243,30 @@ function ResponsiveTableCard() {
   )
 }
 
+function BadgesCard() {
+  /* The status tag, on its own card for the first time. badges-pills is core —
+   * GOV.UK ships it as Tag, the NL Design System as Status badge — and until the
+   * four-layer cut it was demonstrated only inside other cards, while a "Badge &
+   * Chip" page pointed at the chip recipe. The chip left; the badge is the thing. */
+  return (
+    <Card docId="badges-pills" title="Status" desc="Soft by default; solid only for a count or a critical state.">
+      <div className="card__row" style={{ flexWrap: 'wrap', gap: 'var(--k-s-8)' }}>
+        <span className="badge badge--neutral">Draft</span>
+        <span className="badge badge--info">In review</span>
+        <span className="badge badge--success">Approved</span>
+        <span className="badge badge--warn">Needs attention</span>
+        <span className="badge badge--danger">Rejected</span>
+      </div>
+      <div className="card__row" style={{ flexWrap: 'wrap', gap: 'var(--k-s-8)' }}>
+        <span className="badge badge--neutral"><span className="badge__dot" style={{ background: 'var(--k-success)' }} /> Active</span>
+        <span className="badge badge--count">12</span>
+        <span className="badge badge--solid-danger">Overdue</span>
+        <span className="badge badge--primary">New</span>
+      </div>
+    </Card>
+  )
+}
+
 function CardTableCard() {
   // Card-framed table: .table--card flips the atom to separate borders with
   // inset-shadow dividers + a rounded bordered frame + a sticky opaque header,
@@ -3758,13 +3705,7 @@ function DropzoneCard() {
       </label>
       <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="avatar-group">
-            <span className="avatar avatar--sm avatar--a1">AB</span>
-            <span className="avatar avatar--sm avatar--a2">CD</span>
-            <span className="avatar avatar--sm avatar--a4">EF</span>
-            <span className="avatar-group__more">+2</span>
-          </span>
-          <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Shared with team</span>
+          <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Shared with 5 people</span>
         </span>
         <button className="btn btn--primary btn--sm">
           Uploading…
@@ -3774,74 +3715,6 @@ function DropzoneCard() {
   )
 }
 
-// 'snackbar' (H4) is the fifth shape: inverse surface, no tone border, one
-// text action — the M3 snackbar contract on the same .toast primitive.
-type ToastTone = 'success' | 'info' | 'warn' | 'error' | 'snackbar'
-interface ToastEntry { id: number; tone: ToastTone; title: string; sub: string }
-
-const TOAST_PRESETS: Record<ToastTone, Omit<ToastEntry, 'id' | 'tone'>> = {
-  success: { title: 'Saved', sub: 'Changes synced just now.' },
-  info:    { title: 'New version', sub: 'v2.4.0 is available.' },
-  warn:    { title: 'Heads up', sub: 'API quota at 78%.' },
-  error:   { title: 'Upload failed', sub: 'Network error — please retry.' },
-  snackbar: { title: 'Message archived', sub: '' },
-}
-const TOAST_ICON: Record<ToastTone, IconName> = { success: 'check', info: 'info', warn: 'info', error: 'x', snackbar: 'check' }
-
-function ToastStackCard() {
-  const [toasts, setToasts] = useState<ToastEntry[]>([])
-  const dismiss = (id: number) => setToasts((t) => t.filter((x) => x.id !== id))
-  const fire = (tone: ToastTone) => {
-    const id = Date.now() + Math.random()
-    setToasts((t) => [...t, { id, tone, ...TOAST_PRESETS[tone] }])
-    // Auto-dismiss after 4s — feels like a real toast without manual cleanup
-    window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000)
-  }
-  return (
-    <Card docId="toast-stack" title="Toast" desc="Trigger a sample notification.">
-      <div className="card__row" style={{ flexWrap: 'wrap', gap: 6 }}>
-        <button className="btn btn--ghost btn--sm" onClick={() => fire('success')}>
-          <Icon name="check" /> Success
-        </button>
-        <button className="btn btn--ghost btn--sm" onClick={() => fire('info')}>
-          <Icon name="info" /> Info
-        </button>
-        <button className="btn btn--ghost btn--sm" onClick={() => fire('warn')}>
-          <Icon name="info" /> Warn
-        </button>
-        <button className="btn btn--ghost btn--sm" onClick={() => fire('error')}>
-          <Icon name="x" /> Error
-        </button>
-        <button className="btn btn--ghost btn--sm" onClick={() => fire('snackbar')}>
-          <Icon name="chat" /> Snackbar
-        </button>
-      </div>
-      <div className="toast-demo-frame">
-        {toasts.length === 0 && (
-          <span className="toast-demo-frame__empty">Trigger a toast above ↑</span>
-        )}
-        <div className="toast-stack">
-          {toasts.map((t) => (
-            <div key={t.id} className={`toast toast--${t.tone}`} role={t.tone === 'error' ? 'alert' : 'status'}>
-              {/* Snackbar contract: no tone icon, no sub — one line + ONE text action. */}
-              {t.tone !== 'snackbar' && <Icon name={TOAST_ICON[t.tone]} />}
-              <div className="toast__body">
-                <div className="toast__title">{t.title}</div>
-                {t.sub && <div className="toast__sub">{t.sub}</div>}
-              </div>
-              {t.tone === 'snackbar' && (
-                <button className="toast__action" onClick={() => dismiss(t.id)}>Undo</button>
-              )}
-              <button className="toast__close" onClick={() => dismiss(t.id)} aria-label="Dismiss">
-                <Icon name="x" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </Card>
-  )
-}
 
 function TagInputCard() {
   const [tags, setTags] = useState(['design', 'frontend', 'open-source'])
@@ -4742,36 +4615,6 @@ function ProductCardCard() {
   )
 }
 
-function EntityCardCard() {
-  return (
-    <Card wide title="Entity card" desc="An identity + a few key facts: mark · name · kebab, full-bleed divider, meta rows. --fill tints the head. Stacks in a .bento.">
-      <div className="bento">
-        <div className="entity-card entity-card--fill">
-          <div className="entity-card__head">
-            <span className="avatar avatar--sm" aria-hidden="true">T</span>
-            <span className="entity-card__name">Tuple, Inc</span>
-            <MenuButton icon={<Icon name="dots" />} ariaLabel="Actions for Tuple, Inc" triggerClass="btn btn--ghost btn--icon btn--sm" wrapClass="entity-card__menu" align="right" items={[{ label: 'View', icon: <Icon name="file" /> }, { label: 'Send reminder', icon: <Icon name="bell" /> }, { label: 'Duplicate', icon: <Icon name="plus" /> }, { label: 'Delete', icon: <Icon name="trash" />, danger: true }]} />
-          </div>
-          <div className="entity-card__meta">
-            <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Dec 13, 2025</span></div>
-            <div className="entity-card__row"><span className="entity-card__label">Amount</span><span className="entity-card__value">$2,000.00 <span className="badge badge--danger">Overdue</span></span></div>
-          </div>
-        </div>
-        <div className="entity-card">
-          <div className="entity-card__head">
-            <span className="avatar avatar--sm" aria-hidden="true">S</span>
-            <span className="entity-card__name">SavvyCal</span>
-            <MenuButton icon={<Icon name="dots" />} ariaLabel="Actions for SavvyCal" triggerClass="btn btn--ghost btn--icon btn--sm" wrapClass="entity-card__menu" align="right" items={[{ label: 'View', icon: <Icon name="file" /> }, { label: 'Send reminder', icon: <Icon name="bell" /> }, { label: 'Duplicate', icon: <Icon name="plus" /> }, { label: 'Delete', icon: <Icon name="trash" />, danger: true }]} />
-          </div>
-          <div className="entity-card__meta">
-            <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">Jan 22, 2026</span></div>
-            <div className="entity-card__row"><span className="entity-card__label">Amount</span><span className="entity-card__value">$14,000.00 <span className="badge badge--success">Paid</span></span></div>
-          </div>
-        </div>
-      </div>
-    </Card>
-  )
-}
 
 /* Action panel (Tailwind App-UI "Action panels") — a card stating one thing +
  * one action: a button, a toggle, or an inline input. The settings workhorse. */
@@ -4941,16 +4784,13 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'data-table', name: 'Data Table', group: 'Data display', recipeId: 'data-table', blurb: 'The flagship data surface — toolbar, selection, sticky header, pagination and every state.', Preview: DataTableProCard },
   { slug: 'list', name: 'List', group: 'Data display', recipeId: 'list', blurb: 'Rows of items with lead media, meta and trailing actions or badges.', Preview: ListCard },
   { slug: 'description-list', name: 'Description List', group: 'Data display', recipeId: 'description-list', blurb: 'Key–value pairs — account info, plan details, a spec sheet.', Preview: DescriptionListCard },
-  { slug: 'avatar', name: 'Avatar', group: 'Data display', recipeId: 'avatar', blurb: 'A user image or initials, with sizes and a status dot.', Preview: AvatarCard },
-  { slug: 'badge', name: 'Badge & Chip', group: 'Data display', recipeId: 'chip', blurb: 'Compact status pills and removable chips in the toned status colours.', Preview: ChipsCard },
-  { slug: 'entity-card', name: 'Entity Card', group: 'Data display', recipeId: 'entity-card', blurb: 'An identity + a few key facts — mark, name, a kebab menu and meta rows.', Preview: EntityCardCard },
+  { slug: 'badge', name: 'Badge', group: 'Data display', recipeId: 'badges-pills', blurb: 'The status tag — soft tones for state, solid only for a count or a critical flag.', Preview: BadgesCard },
   { slug: 'usage-meter', name: 'Usage Meter', group: 'Data display', recipeId: 'usage-meter', blurb: 'A quota bar whose fill shifts to a warning tone past a threshold.', Preview: UsageMeterCard },
   { slug: 'code-block', name: 'Code Block', group: 'Data display', recipeId: 'codeblock', blurb: 'A mono code surface with a header, copy button and language tag.', Preview: CodeBlockCard },
 
   // Feedback & status
   { slug: 'alert', name: 'Alert', group: 'Feedback', recipeId: 'alert', blurb: 'An inline message in the toned status colours — info, success, warning, danger.', Preview: AlertsCard },
   { slug: 'banner', name: 'Banner', group: 'Feedback', recipeId: 'banner', blurb: 'A full-width page-level notice with an action and a dismiss.', Preview: BannerCard },
-  { slug: 'toast', name: 'Toast', group: 'Feedback', recipeId: 'toast-stack', blurb: 'Transient confirmations — the toned variants and the actionable snackbar.', Preview: ToastStackCard },
   { slug: 'progress', name: 'Progress', group: 'Feedback', recipeId: 'progress', blurb: 'A determinate progress bar, heavier than the slider to read as ongoing work.', Preview: ProgressCard },
   { slug: 'empty-state', name: 'Empty State', group: 'Feedback', recipeId: 'empty-state', blurb: 'The zero-data screen — an icon, a line of guidance and one action.', Preview: EmptyStateCard },
 

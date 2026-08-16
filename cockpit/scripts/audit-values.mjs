@@ -194,7 +194,7 @@ for (const d of declarations()) {
  * and not a token DEFINITION. Separate baselines per file on purpose: the chrome's
  * debt must not hide behind the kit's progress. */
 const PX_TARGETS = [
-  { src: 'src/kit/recipes/index.ts', baseline: 115, what: 'the kit' },
+  { src: 'src/kit/recipes/index.ts', baseline: 106, what: 'the kit' },
   { src: 'src/styles/panel.css', baseline: 169, what: 'the panel' },
   { src: 'src/styles/stage.css', baseline: 189, what: 'the stage + topbar' },
   { src: 'src/styles/chrome.css', baseline: 53, what: 'the app shell' },

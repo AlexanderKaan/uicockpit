@@ -32,7 +32,6 @@ export const CONTRACT: Record<string, Part[]> = {
   input: [{ part: 'Field', role: 'control' }, { part: 'Label', role: 'text-slot' }],
   switch: [{ part: 'Toggle', role: 'control' }, { part: 'On-state', role: 'selectable' }],
   badge: [{ part: 'Badge', role: 'tone-bearer' }, { part: 'Label', role: 'text-slot' }],
-  chip: [{ part: 'Chip', role: 'selectable' }, { part: 'Label', role: 'text-slot' }],
   table: [
     { part: 'Row', role: 'selectable' },
     { part: 'Cell', role: 'text-slot' },
@@ -42,7 +41,6 @@ export const CONTRACT: Record<string, Part[]> = {
   list: [{ part: 'Item', role: 'selectable' }, { part: 'Text', role: 'text-slot' }],
   card: [{ part: 'Card', role: 'surface' }, { part: 'Title', role: 'text-slot' }, { part: 'Action', role: 'control' }],
   stat: [{ part: 'Tile', role: 'surface' }, { part: 'Value', role: 'text-slot' }],
-  avatar: [{ part: 'Avatar', role: 'surface' }],
   tabs: [{ part: 'Tab', role: 'selectable' }, { part: 'Label', role: 'text-slot' }],
   chart: [{ part: 'Plot', role: 'surface' }, { part: 'Series', role: 'tone-bearer' }],
   kanban: [{ part: 'Card', role: 'selectable' }, { part: 'Tag', role: 'tone-bearer' }],

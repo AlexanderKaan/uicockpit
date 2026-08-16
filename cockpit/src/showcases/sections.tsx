@@ -104,7 +104,7 @@ function RowMenu() {
   )
 }
 
-/** Entity-card kebab — the real `.menu` dropdown on an `.entity-card__menu`
+/** Card kebab — the real `.menu` dropdown on a client card
  *  trigger (keeps the card-head styling, gains a working menu via MenuButton). */
 function CardMenu({ name }: { name: string }) {
   return (
@@ -112,7 +112,6 @@ function CardMenu({ name }: { name: string }) {
       icon={<Icon name="dots" />}
       ariaLabel={`Actions for ${name}`}
       triggerClass="btn btn--ghost btn--icon btn--sm"
-      wrapClass="entity-card__menu"
       align="right"
       items={[
         { label: 'View', icon: <Icon name="file" /> },
@@ -178,25 +177,13 @@ function FilterTable<T extends { status: string }>({
 /** Plan comparison — the real `.plan-compare` tier × feature matrix. One column
  *  (the featured/current plan) is highlighted by a band behind its cells. */
 
-/** Photo avatar with a graceful initial fallback — the flagship's "real app"
- *  tell. Real portrait via .avatar__img; on load error, swap to the initial. */
+/** Photo of a person — the platform's <img>, sized by the icon ladder. */
 function PhotoAvatar({ url, name, sm }: { url: string; name: string; sm?: boolean }) {
-  return (
-    <span className={`avatar ${sm ? 'avatar--sm' : ''}`} aria-hidden="true">
-      <img
-        className="avatar__img"
-        src={url}
-        alt=""
-        loading="lazy"
-        onError={(e) => {
-          const img = e.currentTarget
-          img.style.display = 'none'
-          const host = img.parentElement
-          if (host && !host.textContent) host.textContent = name.charAt(0)
-        }}
-      />
-    </span>
-  )
+  /* Was .avatar — census-only (Open UI · Avatar), gone on the four-layer cut. What
+   * remains is what it always was underneath: an <img> the platform renders and
+   * the floor styles, sized by the icon ladder. The name is the alt, because the
+   * image is the person, not decoration. */
+  return <img src={url} alt={name} loading="lazy" width={sm ? 24 : 32} height={sm ? 24 : 32} style={{ inlineSize: sm ? 'var(--k-icon-md)' : 'var(--k-icon-chip)', blockSize: sm ? 'var(--k-icon-md)' : 'var(--k-icon-chip)', objectFit: 'cover', flex: 'none' }} />
 }
 
 /** The summary band — the ONE focal "state at a glance" zone per screen.
@@ -298,7 +285,8 @@ export function renderSection(spec: SectionSpec, key: number) {
             {spec.seed.greeting && <h2 className="t-display" style={{ margin: 0, fontSize: 'var(--k-type-h1)' }}>{spec.seed.greeting}</h2>}
             {spec.seed.suggestions && spec.seed.suggestions.length > 0 && (
               <div className="card__row" style={{ flexWrap: 'wrap' }}>
-                {spec.seed.suggestions.map((s) => <span className="chip" key={s}>{s}</span>)}
+                {/* Were .chip — gone on the four-layer cut. A tappable suggestion is a button. */}
+                {spec.seed.suggestions.map((s) => <button type="button" className="btn btn--ghost btn--sm" key={s}>{s}</button>)}
               </div>
             )}
             <textarea className="in tx" placeholder={spec.seed.placeholder} aria-label="Message" rows={3} />
@@ -565,7 +553,7 @@ export function renderSection(spec: SectionSpec, key: number) {
             ))}
           </div>
 
-          {/* Recent clients — a .section region of .entity-card tiles (the kit
+          {/* Recent clients — a .section region of .card tiles (the kit
               recipes finally consumed; was a hand-rolled card header + a rule + rows) */}
           <div className="section">
             <div className="section__head">
@@ -574,17 +562,21 @@ export function renderSection(spec: SectionSpec, key: number) {
             </div>
             <div className="section__body">
               <div className="bento" style={{ '--bento-min': '15rem' } as CSSProperties}>
+                {/* Was .entity-card — census-only (Open UI · Card), gone on the four-layer
+                    cut. It IS a card: USWDS ships Card, and .card carries that provenance;
+                    the two label→value rows are a description list, which GOV.UK ships as
+                    Summary list. Nothing here is a second version. */}
                 {s.clients.map((c) => (
-                  <div key={c.name} className="entity-card">
-                    <div className="entity-card__head">
+                  <div key={c.name} className="card">
+                    <div className="card__row card__row--spread" style={{ alignItems: 'center' }}>
                       <BrandLogo id={c.logo} size={36} />
-                      <span className="entity-card__name">{c.name}</span>
+                      <span className="card__title" style={{ flex: 1 }}>{c.name}</span>
                       <CardMenu name={c.name} />
                     </div>
-                    <div className="entity-card__meta">
-                      <div className="entity-card__row"><span className="entity-card__label">Last invoice</span><span className="entity-card__value">{c.lastInvoice}</span></div>
-                      <div className="entity-card__row"><span className="entity-card__label">Amount</span><span className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}><span style={{ ...money, fontWeight: med }}>{c.amount}</span><span className={`badge badge--${c.tone}`}>{c.status}</span></span></div>
-                    </div>
+                    <dl className="dl">
+                      <dt>Last invoice</dt><dd>{c.lastInvoice}</dd>
+                      <dt>Amount</dt><dd className="l-cluster" style={{ '--l-gap': 'var(--k-s-8)' } as CSSProperties}><span style={{ ...money, fontWeight: med }}>{c.amount}</span><span className={`badge badge--${c.tone}`}>{c.status}</span></dd>
+                    </dl>
                   </div>
                 ))}
               </div>
@@ -791,7 +783,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                       {spec.seed.badgeCols?.includes(j)
                         ? <span className={'badge' + (tone ? ' badge--' + tone : '')}>{cell}</span>
                         : spec.seed.avatarCols?.includes(j)
-                          ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--k-s-6)' }}><span className={`avatar avatar--sm avatar--a${(i % 6) + 1}`} aria-hidden="true">{cell.slice(0, 1)}</span>{cell}</span>
+                          ? cell
                           : cell}
                     </td>
                   )
@@ -874,10 +866,13 @@ export function renderSection(spec: SectionSpec, key: number) {
         </div>
       )
     case 'chips':
+      /* Was a row of .chip radios; .chip left on the four-layer cut. A set of
+       * mutually-exclusive filters IS the segmented control — kept, and anchored
+       * (APG Radio Group). Same ARIA, the kit's own recipe. */
       return (
-        <div className="card__row" key={key} role="radiogroup" aria-label={spec.seed.label} style={{ flexWrap: 'wrap' }}>
+        <div className="segctrl" key={key} role="radiogroup" aria-label={spec.seed.label}>
           {spec.seed.options.map((o, i) => (
-            <button type="button" role="radio" aria-checked={i === spec.seed.active} className={`chip ${i === spec.seed.active ? 'chip--on' : ''}`} key={o}>{o}</button>
+            <button type="button" role="radio" aria-checked={i === spec.seed.active} className={`segctrl__btn ${i === spec.seed.active ? 'segctrl__btn--on' : ''}`} key={o}>{o}</button>
           ))}
         </div>
       )

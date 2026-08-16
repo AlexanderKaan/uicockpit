@@ -155,7 +155,11 @@ const PLATFORM_NAMES = { textarea: 'textarea', textfield: 'input', textinput: 'i
   telephonenumber: 'input[type=tel]', emailaddresse: 'input[type=email]', emailaddress: 'input[type=email]',
   name: 'input', bankdetail: 'input', nationalinsurancenumber: 'input', heading: 'h1',
   ordered: 'ol', orderedlist: 'ol', unorderedlist: 'ul', paragraph: 'p', blockquote: 'blockquote',
-  figure: 'figure', separator: 'hr', article: 'article', logo: 'img' }
+  figure: 'figure', separator: 'hr', article: 'article', logo: 'img',
+  // APG's Disclosure pattern IS <details>/<summary>; the floor styles both. The
+  // recipes that anchored to it (tool-call, reasoning, popover) left on the cut,
+  // and the pattern did not go with them — the platform had it all along.
+  disclosure: 'details' }
 const onTheFloor = (name) => {
   for (const f of forms(name)) {
     const el = PLATFORM_NAMES[f]

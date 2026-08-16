@@ -21,15 +21,9 @@
       "definition": "A confirmation modal that names the object and its destructive action."
     },
     {
-      "name": "Avatar",
-      "url": "https://uicockpit.com/components/avatar",
-      "definition": "A user image or initials, with sizes and a status dot."
-    },
-    {
-      "name": "Badge & Chip",
+      "name": "Badge",
       "url": "https://uicockpit.com/components/badge",
-      "definition": "Compact status pills and removable chips in the toned status colours.",
-      "openUIName": "Badge"
+      "definition": "The status tag — soft tones for state, solid only for a count or a critical flag."
     },
     {
       "name": "Banner",
@@ -119,11 +113,6 @@
       "name": "Empty State",
       "url": "https://uicockpit.com/components/empty-state",
       "definition": "The zero-data screen — an icon, a line of guidance and one action."
-    },
-    {
-      "name": "Entity Card",
-      "url": "https://uicockpit.com/components/entity-card",
-      "definition": "An identity + a few key facts — mark, name, a kebab menu and meta rows."
     },
     {
       "name": "File Upload",
@@ -270,11 +259,6 @@
       "name": "Tag Input",
       "url": "https://uicockpit.com/components/tag-input",
       "definition": "Enter and remove tokens inline — labels, recipients, filters."
-    },
-    {
-      "name": "Toast",
-      "url": "https://uicockpit.com/components/toast",
-      "definition": "Transient confirmations — the toned variants and the actionable snackbar."
     },
     {
       "name": "Toolbar",

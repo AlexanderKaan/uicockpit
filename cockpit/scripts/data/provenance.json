@@ -71,14 +71,6 @@
         "url": "https://nldesignsystem.nl/page-header"
       }
     ],
-    "entity-card": [
-      {
-        "layer": 3,
-        "source": "Open UI · Card",
-        "because": "12 of 27 surveyed design systems ship this independently (44%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
     "action-panel": [
       {
         "layer": 4,
@@ -235,14 +227,6 @@
         "url": "https://designsystem.digital.gov/components/tooltip/"
       }
     ],
-    "avatar": [
-      {
-        "layer": 3,
-        "source": "Open UI · Avatar",
-        "because": "8 of 27 surveyed design systems ship this independently (30%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
     "switch-toggle": [
       {
         "layer": 2,
@@ -317,21 +301,6 @@
         "url": "https://design-system.service.gov.uk/components/select/"
       }
     ],
-    "spinner": [
-      {
-        "layer": 3,
-        "source": "Open UI · Spinner",
-        "because": "5 of 27 surveyed design systems ship this independently (19%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "navigation-row": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks",
-        "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
-      }
-    ],
     "sidebar": [
       {
         "layer": 2,
@@ -364,20 +333,6 @@
         "source": "APG · Feed",
         "because": "WAI-ARIA APG names the Feed pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/feed/"
-      }
-    ],
-    "interactive-list-row": [
-      {
-        "layer": 2,
-        "source": "APG · Grid (for interactive rows)",
-        "because": "WAI-ARIA APG names the Grid (for interactive rows) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · List",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
       }
     ],
     "auth": [
@@ -606,14 +561,6 @@
         "url": "https://design-system.service.gov.uk/components/error-summary/"
       }
     ],
-    "kbd": [
-      {
-        "layer": 1,
-        "source": "<kbd>",
-        "because": "The platform provides <kbd>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd"
-      }
-    ],
     "dialog": [
       {
         "layer": 1,
@@ -776,20 +723,6 @@
         "url": "https://design-system.service.gov.uk/components/file-upload/"
       }
     ],
-    "toast-stack": [
-      {
-        "layer": 2,
-        "source": "APG · Alert",
-        "because": "WAI-ARIA APG names the Alert pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/alert/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Toast",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
     "tag-input": [
       {
         "layer": 2,
@@ -801,34 +734,6 @@
         "layer": 3,
         "source": "Open UI · Tag",
         "because": "6 of 27 surveyed design systems ship this independently (22%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "popover": [
-      {
-        "layer": 2,
-        "source": "APG · Disclosure",
-        "because": "WAI-ARIA APG names the Disclosure pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/disclosure/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Popover",
-        "because": "5 of 27 surveyed design systems ship this independently (19%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "hover-card": [
-      {
-        "layer": 2,
-        "source": "APG · Tooltip",
-        "because": "WAI-ARIA APG names the Tooltip pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/tooltip/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Card",
-        "because": "12 of 27 surveyed design systems ship this independently (44%).",
         "url": "https://open-ui.org/research/component-matrix"
       }
     ],
@@ -899,14 +804,6 @@
         "layer": 3,
         "source": "Open UI · Alert",
         "because": "11 of 27 surveyed design systems ship this independently (41%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "input-otp": [
-      {
-        "layer": 3,
-        "source": "Open UI · Input",
-        "because": "5 of 27 surveyed design systems ship this independently (19%).",
         "url": "https://open-ui.org/research/component-matrix"
       }
     ],
@@ -1020,14 +917,6 @@
         "url": "https://designsystem.digital.gov/components/search/"
       }
     ],
-    "phoneinput": [
-      {
-        "layer": 1,
-        "source": "<input type=\"tel\">",
-        "because": "The platform provides <input type=\"tel\">; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
-      }
-    ],
     "infocard": [
       {
         "layer": 4,
@@ -1104,14 +993,6 @@
         "url": "https://www.w3.org/WAI/ARIA/apg/toolbar/"
       }
     ],
-    "chip": [
-      {
-        "layer": 2,
-        "source": "APG · Button",
-        "because": "WAI-ARIA APG names the Button pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/button/"
-      }
-    ],
     "scaffold": [
       {
         "layer": 2,
@@ -1130,22 +1011,6 @@
         "source": "Open UI · Nav",
         "because": "8 of 27 surveyed design systems ship this independently (30%).",
         "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "tool-call": [
-      {
-        "layer": 2,
-        "source": "APG · Disclosure",
-        "because": "WAI-ARIA APG names the Disclosure pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/disclosure/"
-      }
-    ],
-    "reasoning": [
-      {
-        "layer": 2,
-        "source": "APG · Disclosure",
-        "because": "WAI-ARIA APG names the Disclosure pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/disclosure/"
       }
     ],
     "prose": [

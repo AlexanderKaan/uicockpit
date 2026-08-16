@@ -41,7 +41,7 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   pane: [],
   // The top app-shell header — sibling of the sidebar; composes the trailing
   // atoms (search · a notification button · the account avatar/menu).
-  appbar: ['searchinput', 'avatar', 'dropdown-menu', 'badges-pills', 'buttons'],
+  appbar: ['searchinput', 'dropdown-menu', 'badges-pills', 'buttons'],
   // Header / region wrappers — the grammar a page is built FROM. A page =
   // page-head + a stack of titled .section regions; each arranges component fillers.
   'page-head': ['buttons'],
@@ -59,7 +59,7 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'switch-toggle', 'radio-card'],
   // Pricing table, file gallery, the empty-content region, the nav rail — each a
   // full-width slab you stack into a page.
-  sidebar: ['avatar', 'badges-pills'],
+  sidebar: ['badges-pills'],
   'empty-state': ['buttons'],
   'file-grid': ['card', 'badges-pills'],
   // Calendar VIEWS — the main content region of a calendar app (a week scheduler,
@@ -101,7 +101,6 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   'alert-dialog': ['card', 'buttons'],
   'sheet-drawer': ['card', 'buttons'],
   'command-palette': ['searchinput', 'list'],
-  'toast-stack': [],
   lightbox: ['buttons'],
   wizardstepper: ['stepper', 'form-primitives', 'buttons'],
   'file-upload-dropzone': ['buttons'],
@@ -113,14 +112,13 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   resizable: [],
   // Widgets you drop INSIDE a section (the 2026-06-15 re-audit demoted these from
   // section → component: each is a part of a page-part, not a full-width slab).
-  'entity-card': ['avatar', 'badges-pills', 'buttons'], // a card for one entity
   'action-panel': ['card', 'buttons', 'switch-toggle'], // heading + one action (incl. danger-zone)
-  'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons', 'chip'], // a query toolbar — part of a data section
+  'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons'], // a query toolbar — part of a data section
   auth: ['form-primitives', 'passwordinput', 'buttons', 'card'], // the sign-in form card
   calendar: ['buttons'], // the month-grid date picker
   'calendar-range': ['calendar', 'buttons'], // the double-month range picker
   treeview: [],
-  'activity-feed': ['avatar', 'badges-pills', 'list'], // a feed list
+  'activity-feed': ['badges-pills', 'list'], // a feed list
 }
 
 /**

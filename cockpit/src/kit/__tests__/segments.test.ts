@@ -50,17 +50,16 @@ describe('segment graph integrity', () => {
     expect(f + a + b + sh).toBe(RECIPES.length)
   })
 
-  it('tier counts match the registry (Foundation 5 · Component 23 · Section 14 · Atom = rest)', () => {
+  it('tier counts match the registry (Foundation 5 · Component 21 · Section 14 · Atom = rest)', () => {
     expect(idsByTier('foundation')).toHaveLength(FOUNDATIONS.length)
     expect(idsByTier('component')).toHaveLength(Object.keys(COMPONENT_USES).length)
     expect(idsByTier('section')).toHaveLength(Object.keys(SECTION_USES).length)
     expect(idsByTier('foundation')).toHaveLength(5)
-    // 23 after the four-layer cut. It was 27; `danger-zone` and `breakdown` went
-    // in the first round, `chart`, `stat-tile` and `timeline` in the second —
-    // five component-tier recipes, none of which could name a source. (`treeview`
-    // came the other way: splitting it out of the chart recipe gave it back the
-    // APG Treeview anchor the mis-scoping had hidden, so it stays.)
-    expect(idsByTier('component')).toHaveLength(23)
+    // 21 after the four-layer cut. It was 27: danger-zone, breakdown, chart,
+    // stat-tile, timeline, then entity-card and toast-stack (Sprint J) — none
+    // could name a core source. (`treeview` came the other way: splitting it out
+    // of the chart recipe gave it back the APG anchor the mis-scoping had hidden.)
+    expect(idsByTier('component')).toHaveLength(21)
     // The 2026-06-15 "slab vs widget" re-audit: a SECTION is a full-width page slab
     // (its own job + heading; stacked to build a page); a COMPONENT is a widget you
     // drop INSIDE one. 14 sections = 4 shell regions (scaffold/navsuite/pane + the
@@ -91,8 +90,8 @@ describe('segment graph integrity', () => {
   it('usesOf returns [] for atoms and foundations', () => {
     expect(usesOf('buttons')).toEqual([])
     expect(usesOf('button-finish')).toEqual([])
-    // navigation-row folded INTO sidebar on 2026-08-16 — the nav row is the sidebar's row.
-    expect(usesOf('sidebar')).toEqual(['avatar', 'badges-pills'])
+    // navigation-row folded INTO sidebar and avatar left, both 2026-08-16.
+    expect(usesOf('sidebar')).toEqual(['badges-pills'])
   })
 })
 

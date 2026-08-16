@@ -102,7 +102,7 @@ for (const r of kit.recipes) {
 /* The ratchet. It may fall; it may not rise. Do NOT raise it to make a build
  * pass — if the number went DOWN the gate fails on purpose until the win is
  * locked in, same contract as audit:apg and audit:structural-inline. */
-const CEILING = 42
+const CEILING = 41
 
 const line = (s = '') => console.log(s)
 line('=== audit:coverage — does anything COMPOSE this recipe into a page? ===')

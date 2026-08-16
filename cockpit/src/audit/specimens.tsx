@@ -144,18 +144,6 @@ export const SPECIMENS: Record<string, Specimen> = {
     },
   },
 
-  toast: {
-    label: 'Toast',
-    render: () => (
-      <div className="toast toast--success" role="status" style={{ position: 'static' }}>
-        <div className="toast__body">
-          <div className="toast__title">Changes saved</div>
-          <div className="toast__sub">Everyone on the team can see them</div>
-        </div>
-        <button type="button" className="toast__action">Undo</button>
-      </div>
-    ),
-  },
 
   badge: {
     label: 'Badges',
@@ -202,16 +190,6 @@ export const SPECIMENS: Record<string, Specimen> = {
     ),
   },
 
-  avatar: {
-    label: 'Avatars',
-    render: () => (
-      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-        <span className="avatar">MK</span>
-        <span className="avatar">JD</span>
-        <span className="avatar avatar--sm">RL</span>
-      </div>
-    ),
-  },
 
   breadcrumb: {
     label: 'Breadcrumb',
@@ -297,7 +275,7 @@ export const SHELL_SPECIMENS: Record<string, Specimen> = {
     label: 'Side navigation',
     render: () => (
       <div className="sidenav" style={{ minWidth: 190, position: 'static' }}>
-        <div className="sidenav__brand"><span className="avatar avatar--sm">A</span><b>Acme</b></div>
+        <div className="sidenav__brand"><b>Acme</b></div>
         <div className="nav-group">Workspace</div>
         {([['home', 'Overview', false], ['feed', 'Records', true], ['chat', 'People', false]] as const).map(
           ([icon, label, on]) => (
@@ -322,7 +300,6 @@ export const SHELL_SPECIMENS: Record<string, Specimen> = {
         <span className="appbar__title">Records</span>
         <span className="appbar__spacer" />
         <span className="badge badge--count">4</span>
-        <span className="avatar avatar--sm">MK</span>
       </div>
     ),
   },
