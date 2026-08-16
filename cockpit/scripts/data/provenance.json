@@ -33,6 +33,12 @@
         "source": "Open UI · Button",
         "because": "25 of 27 surveyed design systems ship this independently (93%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Button",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/button/"
       }
     ],
     "button-finish": [
@@ -49,6 +55,20 @@
         "source": "Open UI · Card",
         "because": "12 of 27 surveyed design systems ship this independently (44%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Card",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/card/"
+      }
+    ],
+    "page-head": [
+      {
+        "layer": 4,
+        "source": "NL Design System · Page header",
+        "because": "NL Design System ships this as a component because a public service needs it.",
+        "url": "https://nldesignsystem.nl/page-header"
       }
     ],
     "entity-card": [
@@ -57,6 +77,14 @@
         "source": "Open UI · Card",
         "because": "12 of 27 surveyed design systems ship this independently (44%).",
         "url": "https://open-ui.org/research/component-matrix"
+      }
+    ],
+    "action-panel": [
+      {
+        "layer": 4,
+        "source": "NL Design System · Spotlight section",
+        "because": "NL Design System ships this as a component because a public service needs it.",
+        "url": "https://nldesignsystem.nl/spotlight-section"
       }
     ],
     "button-group": [
@@ -71,12 +99,26 @@
         "source": "Open UI · Button group",
         "because": "5 of 27 surveyed design systems ship this independently (19%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Button group",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/button-group/"
       }
     ],
     "form": [
       {
         "layer": 3,
         "source": "Open UI · Form",
+        "because": "10 of 27 surveyed design systems ship this independently (37%).",
+        "url": "https://open-ui.org/research/component-matrix"
+      }
+    ],
+    "badges-pills": [
+      {
+        "layer": 3,
+        "source": "Open UI · Badge",
         "because": "10 of 27 surveyed design systems ship this independently (37%).",
         "url": "https://open-ui.org/research/component-matrix"
       }
@@ -93,6 +135,12 @@
         "source": "Open UI · Alert",
         "because": "11 of 27 surveyed design systems ship this independently (41%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Alert",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/alert/"
       }
     ],
     "tabs": [
@@ -107,6 +155,12 @@
         "source": "Open UI · Tabs",
         "because": "13 of 27 surveyed design systems ship this independently (48%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Tabs",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/tabs/"
       }
     ],
     "table": [
@@ -127,6 +181,12 @@
         "source": "Open UI · Table",
         "because": "10 of 27 surveyed design systems ship this independently (37%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Table",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/table/"
       }
     ],
     "data-table": [
@@ -155,6 +215,12 @@
         "source": "Open UI · Tooltip",
         "because": "18 of 27 surveyed design systems ship this independently (67%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Tooltip",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/tooltip/"
       }
     ],
     "avatar": [
@@ -202,9 +268,9 @@
       },
       {
         "layer": 2,
-        "source": "APG · Meter",
-        "because": "WAI-ARIA APG names the Meter pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/meter/"
+        "source": "APG · Progressbar",
+        "because": "WAI-ARIA APG names the Progressbar pattern and specifies its behaviour.",
+        "url": "https://www.w3.org/WAI/ARIA/apg/progressbar/"
       },
       {
         "layer": 3,
@@ -247,6 +313,12 @@
         "layer": 2,
         "source": "APG · Landmarks",
         "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Side navigation",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/side-navigation/"
       }
     ],
     "appbar": [
@@ -276,6 +348,14 @@
         "source": "Open UI · List",
         "because": "7 of 27 surveyed design systems ship this independently (26%).",
         "url": "https://open-ui.org/research/component-matrix"
+      }
+    ],
+    "auth": [
+      {
+        "layer": 4,
+        "source": "GOV.UK · Sign in",
+        "because": "GOV.UK ships this as a pattern because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/patterns/sign-in/"
       }
     ],
     "lightbox": [
@@ -329,6 +409,12 @@
         "layer": 2,
         "source": "APG · Landmarks",
         "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · In-page navigation",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/in-page-navigation/"
       }
     ],
     "sitefooter": [
@@ -339,16 +425,16 @@
       },
       {
         "layer": 4,
-        "source": "USWDS · Footer",
-        "because": "USWDS ships it because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/footer/"
+        "source": "GOV.UK · Footer",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/footer/"
       }
     ],
     "requirements": [
       {
         "layer": 4,
-        "source": "GOV.UK · Password requirements / checklist",
-        "because": "GOV.UK ships it because a public service needs it.",
+        "source": "GOV.UK · Passwords",
+        "because": "GOV.UK ships this as a pattern because a public service needs it.",
         "url": "https://design-system.service.gov.uk/patterns/passwords/"
       }
     ],
@@ -362,7 +448,7 @@
       {
         "layer": 4,
         "source": "USWDS · Process list",
-        "because": "USWDS ships it because a public service needs it.",
+        "because": "USWDS ships this as a component because a public service needs it.",
         "url": "https://designsystem.digital.gov/components/process-list/"
       }
     ],
@@ -370,7 +456,7 @@
       {
         "layer": 4,
         "source": "USWDS · Identifier",
-        "because": "USWDS ships it because a public service needs it.",
+        "because": "USWDS ships this as a component because a public service needs it.",
         "url": "https://designsystem.digital.gov/components/identifier/"
       }
     ],
@@ -378,7 +464,7 @@
       {
         "layer": 4,
         "source": "GOV.UK · Character count",
-        "because": "GOV.UK ships it because a public service needs it.",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
         "url": "https://design-system.service.gov.uk/components/character-count/"
       }
     ],
@@ -386,7 +472,7 @@
       {
         "layer": 4,
         "source": "GOV.UK · Date input",
-        "because": "GOV.UK ships it because a public service needs it.",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
         "url": "https://design-system.service.gov.uk/components/date-input/"
       }
     ],
@@ -406,7 +492,7 @@
       {
         "layer": 4,
         "source": "GOV.UK · Task list",
-        "because": "GOV.UK ships it because a public service needs it.",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
         "url": "https://design-system.service.gov.uk/components/task-list/"
       }
     ],
@@ -427,7 +513,7 @@
       {
         "layer": 4,
         "source": "USWDS · Language selector",
-        "because": "USWDS ships it because a public service needs it.",
+        "because": "USWDS ships this as a component because a public service needs it.",
         "url": "https://designsystem.digital.gov/components/language-selector/"
       }
     ],
@@ -446,7 +532,7 @@
       {
         "layer": 4,
         "source": "GOV.UK · Skip link",
-        "because": "GOV.UK ships it because a public service needs it.",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
         "url": "https://design-system.service.gov.uk/components/skip-link/"
       }
     ],
@@ -456,6 +542,12 @@
         "source": "<fieldset>",
         "because": "The platform provides <fieldset>; this recipe styles it rather than rebuilding it.",
         "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/fieldset"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Fieldset",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/fieldset/"
       }
     ],
     "errorsummary": [
@@ -468,7 +560,7 @@
       {
         "layer": 4,
         "source": "GOV.UK · Error summary",
-        "because": "GOV.UK ships it because a public service needs it.",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
         "url": "https://design-system.service.gov.uk/components/error-summary/"
       }
     ],
@@ -478,14 +570,6 @@
         "source": "<kbd>",
         "because": "The platform provides <kbd>; this recipe styles it rather than rebuilding it.",
         "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd"
-      }
-    ],
-    "code": [
-      {
-        "layer": 1,
-        "source": "<code>",
-        "because": "The platform provides <code>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/code"
       }
     ],
     "dialog": [
@@ -528,6 +612,12 @@
         "source": "Open UI · Accordion",
         "because": "14 of 27 surveyed design systems ship this independently (52%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Accordion",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/accordion/"
       }
     ],
     "pagination-breadcrumb": [
@@ -570,6 +660,12 @@
         "source": "Open UI · Combobox",
         "because": "9 of 27 surveyed design systems ship this independently (33%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · Combo box",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/combo-box/"
       }
     ],
     "dropdown-menu": [
@@ -600,6 +696,22 @@
         "source": "APG · Window Splitter",
         "because": "WAI-ARIA APG names the Window Splitter pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/windowsplitter/"
+      }
+    ],
+    "stepper": [
+      {
+        "layer": 4,
+        "source": "USWDS · Step indicator",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/step-indicator/"
+      }
+    ],
+    "file-upload-dropzone": [
+      {
+        "layer": 4,
+        "source": "GOV.UK · File upload",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/file-upload/"
       }
     ],
     "toast-stack": [
@@ -674,14 +786,6 @@
         "url": "https://www.w3.org/WAI/ARIA/apg/radio/"
       }
     ],
-    "separator": [
-      {
-        "layer": 1,
-        "source": "<hr>",
-        "because": "The platform provides <hr>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/hr"
-      }
-    ],
     "description-list": [
       {
         "layer": 1,
@@ -694,6 +798,12 @@
         "source": "Open UI · List",
         "because": "7 of 27 surveyed design systems ship this independently (26%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Summary list",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/summary-list/"
       }
     ],
     "banner": [
@@ -706,17 +816,11 @@
       {
         "layer": 4,
         "source": "USWDS · Banner",
-        "because": "USWDS ships it because a public service needs it.",
+        "because": "USWDS ships this as a component because a public service needs it.",
         "url": "https://designsystem.digital.gov/components/banner/"
       }
     ],
     "alert-dialog": [
-      {
-        "layer": 1,
-        "source": "<dialog>",
-        "because": "The platform provides <dialog>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog"
-      },
       {
         "layer": 2,
         "source": "APG · Alert Dialog",
@@ -814,6 +918,12 @@
         "source": "<input type=\"password\">",
         "because": "The platform provides <input type=\"password\">; this recipe styles it rather than rebuilding it.",
         "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+      },
+      {
+        "layer": 4,
+        "source": "GOV.UK · Password input",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/password-input/"
       }
     ],
     "searchinput": [
@@ -838,12 +948,42 @@
         "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
       }
     ],
+    "infocard": [
+      {
+        "layer": 4,
+        "source": "GOV.UK · Inset text",
+        "because": "GOV.UK ships this as a component because a public service needs it.",
+        "url": "https://design-system.service.gov.uk/components/inset-text/"
+      }
+    ],
     "list": [
       {
         "layer": 3,
         "source": "Open UI · List",
         "because": "7 of 27 surveyed design systems ship this independently (26%).",
         "url": "https://open-ui.org/research/component-matrix"
+      },
+      {
+        "layer": 4,
+        "source": "USWDS · List",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/list/"
+      }
+    ],
+    "codeblock": [
+      {
+        "layer": 4,
+        "source": "NL Design System · Code block",
+        "because": "NL Design System ships this as a component because a public service needs it.",
+        "url": "https://nldesignsystem.nl/code-block"
+      }
+    ],
+    "wizardstepper": [
+      {
+        "layer": 4,
+        "source": "USWDS · Step indicator",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/step-indicator/"
       }
     ],
     "file-grid": [
@@ -927,37 +1067,35 @@
         "because": "WAI-ARIA APG names the Disclosure pattern and specifies its behaviour.",
         "url": "https://www.w3.org/WAI/ARIA/apg/disclosure/"
       }
+    ],
+    "prose": [
+      {
+        "layer": 4,
+        "source": "USWDS · Prose",
+        "because": "USWDS ships this as a component because a public service needs it.",
+        "url": "https://designsystem.digital.gov/components/prose/"
+      }
     ]
   },
   "unassigned": [
     "composition",
     "rating",
-    "page-head",
     "section",
-    "action-panel",
     "aspect-ratio",
     "scroll-area",
-    "badges-pills",
     "skeleton",
     "empty-state",
     "danger-zone",
-    "auth",
     "chart",
     "breakdown",
     "sparkline",
     "roll-down-item-stagger",
-    "stepper",
-    "file-upload-dropzone",
     "stat-tile",
     "attachment-chip-family",
     "inline-status-meta-micro-components",
-    "infocard",
     "timeline",
-    "codeblock",
     "twocolumnlayout",
-    "wizardstepper",
     "layout-primitives",
-    "pane",
-    "prose"
+    "pane"
   ]
 }

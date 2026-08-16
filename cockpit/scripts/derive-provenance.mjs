@@ -47,6 +47,28 @@ const JSON_OUT = process.argv.includes('--json')
 const recipeSrc = readFileSync(join(HERE, '../src/kit/recipes/index.ts'), 'utf8')
 const apgSrc = readFileSync(join(HERE, '../src/kit/apg.ts'), 'utf8')
 const openui = JSON.parse(readFileSync(join(HERE, 'data/openui-names.json'), 'utf8'))
+const services = JSON.parse(readFileSync(join(HERE, 'data/service-systems.json'), 'utf8'))
+
+/* ---- the tier, read from the segment graph -------------------------------- *
+ * Not every recipe is a COMPONENT, and asking "which design system ships this
+ * component" about the grid is a category error that inflates the cut list by a
+ * third. The distinction already exists and is already maintained — segments.ts
+ * declares the tier ladder — so it is read rather than re-decided here.
+ *
+ * FOUNDATION is the spacing/motion/layout substrate: `composition` is .num and
+ * .eyebrow, `roll-down-item-stagger` is a keyframe schedule, `layout-primitives`
+ * is the bento grid. SECTION is a page shell. Neither is the kind of thing GOV.UK
+ * has a page for, and neither leaves for want of one. */
+const segSrc = readFileSync(join(HERE, '../src/kit/segments.ts'), 'utf8')
+const blockOfSeg = (name) => (segSrc.match(new RegExp(`export const ${name}[^=]*=\\s*[\\[{]([\\s\\S]*?)\\n[\\]}]`, 'm')) ?? ['', ''])[1]
+const FOUNDATION_SRC = blockOfSeg('FOUNDATIONS')
+const SECTION_SRC = blockOfSeg('SECTION_USES')
+const tierOfId = (id) => {
+  const esc = id.replace(/-/g, '\\-')
+  if (new RegExp(`'${esc}'`).test(FOUNDATION_SRC)) return 'foundation'
+  if (new RegExp(`(^|\\n)\\s*'?${esc}'?\\s*:`).test(SECTION_SRC)) return 'section'
+  return 'component'
+}
 
 /* ---- the recipes, and the class each one stands for ----------------------- */
 const RECIPES = []
@@ -102,29 +124,90 @@ const OPENUI = {}
  * name is ours. Provenance asks something else: does the field ship this concept
  * at all. "7 of 27 systems" is weaker evidence than "25 of 27" and it is still
  * evidence, so every surveyed concept counts and the number is printed. */
+/* ⚠️ INDEX EVERY FORM, ON BOTH SIDES. The comment two blocks down claims the
+ * "Badges & pills" case was fixed; it was not, and the report went on printing
+ * badges-pills as sourceless while `badge` sat in this very list. The stemmer is
+ * asymmetric and over-eager: it turns "badges" into "badg", and "badge" itself
+ * was never tried. So both the concept and the query are registered under three
+ * forms — stemmed, bare, and bare-minus-a-plural-s — and the two finally meet.
+ *
+ * The lesson is not about plurals. A matcher that fails silently reports a
+ * MISSING SOURCE, and the missing-source list is the cut list — the one thing
+ * here anybody will act on. A matching bug in this script deletes components. */
+const forms = (x) => {
+  const bare = String(x).toLowerCase().replace(/[\s-_&]/g, '')
+  return [norm(x), bare, bare.replace(/s$/, ''), bare + 's']
+}
 for (const [concept, v] of Object.entries(openui.names)) {
-  for (const k of [norm(concept), concept.toLowerCase().replace(/[\s-_]/g, '')]) {
+  for (const k of forms(concept)) {
+    if (!k) continue
     if (!OPENUI[k] || OPENUI[k].pct < v.pct) OPENUI[k] = { ...v, concept }
   }
 }
 
 /* ---- layer 4 · the service systems --------------------------------------- *
- * The only hand-written table here, and it stays hand-written on purpose: these
- * components exist BECAUSE a named public-service system ships them, and that
- * fact has no machine-readable home in this repo. Each entry names the system's
- * own component so the claim can be checked against their page in one click. */
-const SERVICE = {
-  processlist:      { system: 'USWDS',   name: 'Process list',        url: 'https://designsystem.digital.gov/components/process-list/' },
-  requirements:     { system: 'GOV.UK',  name: 'Password requirements / checklist', url: 'https://design-system.service.gov.uk/patterns/passwords/' },
-  identifier:       { system: 'USWDS',   name: 'Identifier',          url: 'https://designsystem.digital.gov/components/identifier/' },
-  langnav:          { system: 'USWDS',   name: 'Language selector',   url: 'https://designsystem.digital.gov/components/language-selector/' },
-  'memorable-date': { system: 'GOV.UK',  name: 'Date input',          url: 'https://design-system.service.gov.uk/components/date-input/' },
-  errorsummary:     { system: 'GOV.UK',  name: 'Error summary',       url: 'https://design-system.service.gov.uk/components/error-summary/' },
-  skiplink:         { system: 'GOV.UK',  name: 'Skip link',           url: 'https://design-system.service.gov.uk/components/skip-link/' },
-  charcount:        { system: 'GOV.UK',  name: 'Character count',     url: 'https://design-system.service.gov.uk/components/character-count/' },
-  tasklist:         { system: 'GOV.UK',  name: 'Task list',           url: 'https://design-system.service.gov.uk/components/task-list/' },
-  sitefooter:       { system: 'USWDS',   name: 'Footer',              url: 'https://designsystem.digital.gov/components/footer/' },
-  banner:           { system: 'USWDS',   name: 'Banner',              url: 'https://designsystem.digital.gov/components/banner/' },
+ *
+ * 🚨 THIS USED TO BE A HAND-WRITTEN TABLE OF ELEVEN, and it was the same mistake
+ * this whole arc is about: a reference somebody typed measures what they typed.
+ * Eleven recipes could carry a layer-4 source and no twelfth ever would, because
+ * nobody would think to add it — so the NO-SOURCE list, which is the cut list and
+ * the one output anyone acts on, was too long by however many components GOV.UK,
+ * USWDS and the NL Design System ship that we had not happened to notice.
+ *
+ * The three catalogues are captured in data/service-systems.json now and matched
+ * the same way layer 3 is. What stays hand-written is only the ALIAS map below:
+ * the handful of places where their name for a thing is not derivable from ours
+ * (`errorsummary` → "Error summary" derives fine; `file-upload-dropzone` →
+ * "File input" does not). An alias is a translation, not a decision — it names
+ * their component, and their page settles it in one click. */
+const SERVICE_ALIAS = {
+  'file-upload-dropzone': ['File upload', 'File input'],
+  requirements: ['Passwords'],
+  langnav: ['Language selector'],
+  'memorable-date': ['Date input', 'Memorable date'],
+  errorsummary: ['Error summary'],
+  sitefooter: ['Footer', 'Page footer'],
+  charcount: ['Character count'],
+  processlist: ['Process list'],
+  tasklist: ['Task list'],
+  stepper: ['Step indicator', 'Step by step navigation'],
+  wizardstepper: ['Step indicator', 'Step by step navigation'],
+  'page-head': ['Page header'],
+  codeblock: ['Code block'],
+  prose: ['Prose'],
+  infocard: ['Inset text', 'Summary box'],
+  'action-panel': ['Spotlight section', 'Summary box'],
+  auth: ['Sign in'],
+  'description-list': ['Summary list', 'Data list'],
+  banner: ['Banner', 'Phase banner'],
+  identifier: ['Identifier'],
+  skiplink: ['Skip link'],
+  inpagenav: ['In-page navigation'],
+  fieldset: ['Fieldset'],
+  sidebar: ['Side navigation', 'Sidenav'],
+}
+
+/* One index over all three catalogues, keyed by every form of the component's
+ * own name — so a recipe whose id or section already matches lands without an
+ * alias, which is most of them. */
+const SERVICE_INDEX = {}
+for (const [system, sv] of Object.entries(services.systems)) {
+  for (const kind of ['components', 'patterns']) {
+    for (const [name, path] of Object.entries(sv[kind] ?? {})) {
+      for (const k of forms(name)) {
+        if (!k || SERVICE_INDEX[k]) continue
+        SERVICE_INDEX[k] = { system, name, url: sv.url.replace(/\/[^/]*\/?$/, '') + path, kind }
+      }
+    }
+  }
+}
+const serviceFor = (r) => {
+  for (const alias of SERVICE_ALIAS[r.id] ?? []) {
+    for (const k of forms(alias)) if (SERVICE_INDEX[k]) return SERVICE_INDEX[k]
+  }
+  const words = [...forms(r.id), ...forms(r.section)]
+  for (const w of words) if (SERVICE_INDEX[w]) return SERVICE_INDEX[w]
+  return null
 }
 
 /* ---- layer 1 · MEASURED off the rendered page ----------------------------- *
@@ -242,17 +325,16 @@ for (const r of RECIPES) {
   /* ⚠️ AND TRY THE BARE WORD TOO. The shared normaliser turns "badges" into
    * "badg" while Open UI's own key is "badge" — the stemmer is asymmetric, so
    * the two never met and a concept 37% of the field ships read as sourceless. */
-  const raw = (x) => String(x).toLowerCase().replace(/[\s-_]/g, '')
-  const words = [norm(r.id), norm(r.section), raw(r.id), raw(r.section),
-    ...String(r.section).split(/[^A-Za-z]+/).filter(Boolean).flatMap((w) => [norm(w), raw(w)]),
-    ...String(r.id).split('-').flatMap((w) => [norm(w), raw(w)])]
+  const words = [...forms(r.id), ...forms(r.section),
+    ...String(r.section).split(/[^A-Za-z]+/).filter(Boolean).flatMap(forms),
+    ...String(r.id).split('-').flatMap(forms)]
   const hit = words.map((w) => OPENUI[w]).find(Boolean)
   if (hit) {
     sources.push({ layer: 3, source: `Open UI · ${hit.spelled}`, because: `${hit.systems} of 27 surveyed design systems ship this independently (${hit.pct}%).`, url: openui._source })
   }
-  if (SERVICE[r.id]) {
-    const sv = SERVICE[r.id]
-    sources.push({ layer: 4, source: `${sv.system} · ${sv.name}`, because: `${sv.system} ships it because a public service needs it.`, url: sv.url })
+  const sv = serviceFor(r)
+  if (sv) {
+    sources.push({ layer: 4, source: `${sv.system} · ${sv.name}`, because: `${sv.system} ships this as a ${sv.kind === 'patterns' ? 'pattern' : 'component'} because a public service needs it.`, url: sv.url })
   }
 
   if (sources.length) assigned.push({ ...r, sources })
@@ -300,9 +382,29 @@ if (violations.length) {
   for (const v of violations) console.log(`      ${v.id.padEnd(24)} wants ${v.wants.padEnd(12)} renders <${v.renders.toLowerCase()}>`)
 }
 
-console.log(`\n  ⛔ NO SOURCE — ${unassigned.length} of ${RECIPES.length}. This is the V1 cut list; the only line`)
-console.log('     left for these is "because we liked it", and that is not a provenance.\n')
-for (const u of unassigned) console.log(`      ${u.id.padEnd(28)} .${u.cls ?? '—'}  renders ${u.renders}`)
+/* ⚠️ THE CUT LIST IS THE COMPONENT-TIER HALF, and separating it is the difference
+ * between a list somebody can act on and a list that gets argued about. The
+ * substrate and the page shells are printed too — silently dropping them would be
+ * the "quiet exclusion" this repo has been bitten by — but they are printed as
+ * what they are, not as candidates for deletion. */
+const notComponents = unassigned.filter((u) => tierOfId(u.id) !== 'component')
+const cutList = unassigned.filter((u) => tierOfId(u.id) === 'component')
+
+console.log(`\n  ⛔ NO SOURCE — ${unassigned.length} of ${RECIPES.length}.\n`)
+
+if (notComponents.length) {
+  console.log(`     ${notComponents.length} of them are NOT COMPONENTS — the substrate and the page shells,`)
+  console.log('     read from the tier ladder in segments.ts. "Which design system ships this')
+  console.log('     component" is the wrong question about a grid, and they do not leave for')
+  console.log('     want of an answer:\n')
+  for (const u of notComponents) console.log(`      ${tierOfId(u.id).padEnd(11)} ${u.id.padEnd(28)} .${u.cls ?? '—'}`)
+  console.log()
+}
+
+console.log(`     ⛔ THE V1 CUT LIST IS THE REMAINING ${cutList.length}. These are component-tier and`)
+console.log('     the only line left for them is "because we liked it", which is not a')
+console.log('     provenance:\n')
+for (const u of cutList) console.log(`      ${u.id.padEnd(28)} .${u.cls ?? '—'}  renders ${u.renders}`)
 
 if (WRITE) {
   const path = join(HERE, 'data/provenance.json')
