@@ -3,11 +3,12 @@
  *
  *   npm run dev  &&  node scripts/a11y-matrix.mjs
  *
- * `npm run a11y` measures ONE config: light, default density, 1440px. That is
- * the number we have been quoting, and it is not the number a claim can rest
- * on — P1 rebuilt the ink ramp and P4 moved the comfortable rung, so the other
- * five combinations have never been measured at all. Dark mode in particular
- * runs a completely different neutral scale.
+ * The predecessor (`a11y-scan`, folded in here on 2026-08-16) measured ONE
+ * config: light, default density, 1440px. That was the number being quoted, and
+ * it is not a number a claim can rest on — dark mode runs a completely different
+ * neutral scale and the densities move every control. Its two features this
+ * file did not have came with it: contrast verified against painted pixels, and
+ * a separate, ungated pass over our own chrome.
  *
  * Driven through the real controls rather than a synthesised URL, so it also
  * proves the paths a person would take.
@@ -41,10 +42,24 @@ const toggleMode = () => page.evaluate(() => {
   return !!b
 })
 
-const scan = () => page.evaluate(async (tags) => {
+/* ── axe's CONTRAST verdicts are VERIFIED against painted pixels, never trusted.
+ * (Ported from a11y-scan when it folded into this file.) axe parses the computed
+ * oklch() string with its own colour code, and for a saturated colour that lands
+ * somewhere the browser never paints: it read a calendar chip as #2e87d5 / 3.32:1
+ * where the screen shows #016ccb / 4.60:1 — a PASS reported as a failure. The
+ * error grows with chroma, so a token system that emits OKLCH gets systematically
+ * wrong answers on exactly its most saturated pairs. Ground truth is what the
+ * compositor paints: rasterise both colours through a canvas and recompute. A
+ * flagged pair that survives is real; one that does not is the tool's arithmetic,
+ * and it is DISCOUNTED and printed as such — acting on it would mean changing a
+ * design to satisfy a bug. The opacity chain is composited first, or the check
+ * produces false negatives (.slot--off is near-black at opacity 0.4, and axe read
+ * the composited grey correctly). */
+const scan = (include = '.cockpit-preview', exclude = null) => page.evaluate(async ({ tags, include, exclude }) => {
+  const ctx0 = { include: [[include]] }
+  if (exclude) ctx0.exclude = [[exclude]]
   // eslint-disable-next-line no-undef
-  const r = await axe.run({ include: [['.cockpit-preview']] },
-    { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })
+  const r = await axe.run(ctx0, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })
   const c = document.createElement('canvas'); c.width = c.height = 1
   const ctx = c.getContext('2d', { willReadFrequently: true })
   const px = (v) => { ctx.clearRect(0,0,1,1); ctx.fillStyle = v; ctx.fillRect(0,0,1,1)
@@ -52,6 +67,7 @@ const scan = () => page.evaluate(async (tags) => {
   const lum = ([r2,g,b]) => { const f=(v)=>{const x=v/255;return x<=0.03928?x/12.92:((x+0.055)/1.055)**2.4}
     return 0.2126*f(r2)+0.7152*f(g)+0.0722*f(b) }
   const rows = []
+  const artifacts = []
   for (const v of r.violations) for (const n of v.nodes) {
     let detail = ''
     if (v.id === 'color-contrast') {
@@ -68,13 +84,20 @@ const scan = () => page.evaluate(async (tags) => {
         for (let p = el; p; p = p.parentElement) a *= Number(getComputedStyle(p).opacity || 1)
         if (a < 1) fg = fg.map((x, i) => Math.round(x * a + bg[i] * (1 - a)))
         const [x, y] = [lum(fg), lum(bg)]
-        detail = `${((Math.max(x,y)+0.05)/(Math.min(x,y)+0.05)).toFixed(2)}:1`
+        const painted = (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)
+        const need = Number(String(n.any?.[0]?.data?.expectedContrastRatio ?? '4.5').replace(':1', '')) || 4.5
+        detail = `${painted.toFixed(2)}:1`
+        if (painted >= need) {
+          // The pixels pass; axe's oklch arithmetic did not. Discount, and say so.
+          artifacts.push({ sel: n.target[0]?.toString().slice(0, 56), axe: n.any?.[0]?.data?.contrastRatio, painted: painted.toFixed(2), need })
+          continue
+        }
       }
     }
     rows.push({ id: v.id, impact: v.impact, sel: n.target[0]?.toString().slice(0, 56), detail })
   }
-  return rows
-}, TAGS)
+  return { rows, artifacts }
+}, { tags: TAGS, include, exclude })
 
 const results = []
 for (const mode of ['light', 'dark']) {
@@ -82,9 +105,10 @@ for (const mode of ['light', 'dark']) {
     await setScale(SCALES[i])
     await page.waitForTimeout(400)
     await page.addScriptTag({ url: 'https://cdn.jsdelivr.net/npm/axe-core@4.10.2/axe.min.js' })
-    const rows = await scan()
+    const { rows, artifacts } = await scan()
     results.push({ mode, scale: SCALES[i], rows })
-    console.log(`${mode.padEnd(6)} ${SCALES[i].padEnd(12)} ${rows.length === 0 ? '✓ 0' : `✗ ${rows.length}`}`)
+    console.log(`${mode.padEnd(6)} ${SCALES[i].padEnd(12)} ${rows.length === 0 ? '✓ 0' : `✗ ${rows.length}`}` +
+      (artifacts.length ? `   (${artifacts.length} axe contrast artifact(s) discounted — pixels pass: ${artifacts.slice(0, 2).map((a) => `${a.sel} axe ${a.axe} painted ${a.painted}`).join('; ')})` : ''))
     const g = new Map()
     for (const r of rows) {
       const k = `${r.id}|${r.detail}|${(r.sel.match(/[.#][\w-]+/g) || []).slice(-2).join('')}`
@@ -97,6 +121,30 @@ for (const mode of ['light', 'dark']) {
   }
   if (mode === 'light') { await toggleMode(); await page.waitForTimeout(700) }
 }
+/* ── OUR CHROME — the configurator AROUND the preview ─────────────────────────
+ * Ported from a11y-scan when it folded into this file. Two scopes, reported
+ * separately and never merged: THE KIT is the number that may be published;
+ * the chrome is ours to fix but not the product. It is measured here on every
+ * run because it used to be measured nowhere the build looked — the enforcement
+ * gap in one sentence — and it is printed rather than gated, exactly as the
+ * scan it came from held it. Light, default density, 1440: one configuration,
+ * because the chrome does not re-theme with the kit's controls the way the
+ * preview does. */
+{
+  await toggleMode() // back to light for the chrome pass
+  await page.waitForTimeout(600)
+  await setScale('default')
+  await page.waitForTimeout(400)
+  await page.addScriptTag({ url: 'https://cdn.jsdelivr.net/npm/axe-core@4.10.2/axe.min.js' }).catch(() => {})
+  const chrome = await scan('body', '.cockpit-preview')
+  console.log(`\n── Our chrome (the configurator around the preview) — reported, not gated`)
+  console.log(`  ${chrome.rows.length === 0 ? '✓ 0 violation(s)' : `✗ ${chrome.rows.length} violation(s)`}` +
+    (chrome.artifacts.length ? `  (${chrome.artifacts.length} contrast artifact(s) discounted)` : ''))
+  const g = new Map()
+  for (const r of chrome.rows) { const k = `${r.id}|${(r.sel.match(/[.#][\w-]+/g) || []).slice(-2).join('')}`; g.set(k, (g.get(k) || 0) + 1) }
+  for (const [k, n] of [...g].sort((a, b) => b[1] - a[1]).slice(0, 12)) { const [id, sel] = k.split('|'); console.log(`    ${String(n).padStart(3)}×  ${id}  ${sel}`) }
+}
+
 /* ── Target size, measured on the RENDERED page ────────────────────────────
  *
  * A unit test on the tokens is not enough and we proved it the hard way: the

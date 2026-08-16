@@ -66,7 +66,7 @@ function blockOf(css: string): string | null {
 /** Which gates touch this component, named so the claim is checkable. */
 function testsFor(css: string, hasApg: boolean): string[] {
   const t = [
-    'audit:tokens · audit:type · audit:craft — no raw values, no hardcoded font-size, no magic px',
+    'audit:values — no raw spacing, font-size, font-family or transition literal; magic px and structural inline held by ratchets',
     'audit:modifiers — every variant is defined in CSS and demonstrated in the gallery',
     'npm run a11y:matrix — axe over the rendered component, 3 densities x 2 modes',
   ]
