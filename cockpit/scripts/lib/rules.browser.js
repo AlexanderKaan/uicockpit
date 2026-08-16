@@ -633,6 +633,81 @@
     return { hasIndicator: false }
   }
 
+  /**
+   * MEASURE THE SHAPE OF EVERY KIT ELEMENT ON THE WALL.
+   *
+   * Not a rule, because it produces no findings — it produces a measurement,
+   * and the oracle lives in Node where the stored baseline is. Same shape as
+   * __uicMarkInteractive / __uicProbeIndicator: the page measures, Node judges.
+   *
+   * The subject set is DERIVED and carries no list: an element qualifies if one
+   * of its OWN classes is in the kit's class set. Own, not inherited — every
+   * node in the gallery sits inside .card, and asking the ancestors instead is
+   * exactly the bug that made inKit() report zero chrome findings.
+   *
+   * IDENTITY IS THE HARD PART, and it decides whether the gate is usable. A
+   * CSS path breaks when a sibling is added; a DOM index breaks when a card
+   * moves. So the key is `component ∥ class ∥ nth-of-that-class-in-that-card`,
+   * which survives everything except an edit to the card itself — and an edit
+   * to the card is a change somebody asked for.
+   */
+  window.__uicMeasureShapes = function (rootSel) {
+    var root = document.querySelector(rootSel)
+    if (!root) return { error: 'no ' + rootSel }
+    var set = window.__uicKitClasses
+    var seen = Object.create(null)
+    var out = []
+
+    /* ⚠️ TWO CARDS UNDER ONE NAME IS A BROKEN KEY, NOT A COSMETIC PROBLEM.
+     *
+     * componentOf() prefers data-recipe (the machine identity) and falls back to
+     * data-card (a human heading). Four headings were duplicated on the wall —
+     * "Files", "Profile", "Schedule", "Maintenance" — so two unrelated cards
+     * shared a namespace and their ordinals interleaved by DOM order. Reorder the
+     * wall and rows silently swap owners: the gate would report a regression that
+     * is really a renumbering, which is the failure mode this whole file warns
+     * about. So the collision is MEASURED and returned, never assumed away. */
+    var cards = root.querySelectorAll('[data-recipe], [data-card]')
+    var nameCount = Object.create(null)
+    for (var ci = 0; ci < cards.length; ci++) {
+      var nm = cards[ci].getAttribute('data-recipe') || cards[ci].getAttribute('data-card')
+      ;(nameCount[nm] = nameCount[nm] || []).push(ci)
+    }
+    var collisions = []
+    for (var nm2 in nameCount) if (nameCount[nm2].length > 1) collisions.push({ name: nm2, cards: nameCount[nm2].length })
+
+    var els = root.querySelectorAll('*')
+    for (var i = 0; i < els.length; i++) {
+      var e = els[i]
+      var classes = String(e.className || '').trim().split(/\s+/).filter(Boolean)
+      var own = null
+      for (var c = 0; c < classes.length; c++) {
+        // The BASE class, never the modifier: .btn--ghost and .btn are one
+        // subject, and a variant row would otherwise key on whichever modifier
+        // happened to come first in the class attribute.
+        if (set && set.has(classes[c]) && classes[c].indexOf('--') === -1) { own = classes[c]; break }
+      }
+      if (!own) continue
+      var r = e.getBoundingClientRect()
+      // Nothing to compare: a zero box and a visually-hidden box have no shape,
+      // and reporting them moves noise into the only channel that matters.
+      if (r.width < 1 || r.height < 1) continue
+      if (isVisuallyHidden(e)) continue
+      var comp = componentOf(e)
+      var stem = comp + ' ∥ ' + own
+      seen[stem] = (seen[stem] || 0) + 1
+      out.push({
+        key: stem + ' #' + seen[stem],
+        component: comp,
+        cls: own,
+        tag: e.tagName.toLowerCase(),
+        w: Math.round(r.width * 10) / 10,
+        h: Math.round(r.height * 10) / 10,
+      })
+    }
+    return { rows: out, collisions: collisions }
+  }
+
   window.__uicRules = rules
   window.__uicRun = function (rootSel, ctx) {
     var root = document.querySelector(rootSel)

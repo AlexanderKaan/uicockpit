@@ -49,7 +49,8 @@
     "audit:uniformity": "node scripts/audit-uniformity.mjs",
     "audit:promises": "node scripts/audit-promises.mjs",
     "derive:provenance": "node scripts/derive-provenance.mjs",
-    "audit:platform-floor": "node scripts/audit-platform-floor.mjs"
+    "audit:platform-floor": "node scripts/audit-platform-floor.mjs",
+    "audit:shape": "node scripts/audit-shape.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

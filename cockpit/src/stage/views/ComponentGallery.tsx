@@ -2475,7 +2475,7 @@ function PopoverCard() {
   // (absolute would float out of the card and overlap the next one in the column).
   // The .popover class still applies — only `position` is overridden inline.
   return (
-    <Card title="Profile" desc="A quick profile peek.">
+    <Card docId="popover" title="Profile" desc="A quick profile peek.">
       <div>
         <button
           className={`btn ${open ? 'btn--primary' : 'btn--ghost'} btn--sm`}
@@ -3382,7 +3382,7 @@ function CalendarWeekCard() {
   const cols = view === 'day' ? [DAYS[2]!] : DAYS
   const colIndex = (i: number) => (view === 'day' ? 2 : i)
   return (
-    <Card wide title="Schedule" desc="Week & day views — a time-grid with placed events.">
+    <Card wide docId="calendar-week" title="Schedule" desc="Week & day views — a time-grid with placed events.">
       <div className="segctrl" role="radiogroup" aria-label="Calendar view" style={{ alignSelf: 'flex-start', marginBottom: 'var(--k-s-10)' }}>
         {(['week', 'day'] as const).map((v) => (
           <button key={v} type="button" role="radio" aria-checked={view === v} className={`segctrl__btn ${view === v ? 'segctrl__btn--on' : ''}`} onClick={() => setView(v)} style={{ textTransform: 'capitalize' }}>{v}</button>
@@ -3490,7 +3490,7 @@ function CalendarYearCard() {
     { n: 'Sep', dim: 30 }, { n: 'Oct', dim: 31 }, { n: 'Nov', dim: 30 }, { n: 'Dec', dim: 31 },
   ]
   return (
-    <Card wide title="2026" desc="Year view — twelve months at a glance.">
+    <Card wide docId="calendar-year" title="2026" desc="Year view — twelve months at a glance.">
       <div className="calendar-year">
         {MONTHS.map((m, mi) => {
           const now = m.n === 'Jun'
@@ -3571,7 +3571,7 @@ function CalendarRangeCard() {
     </div>
   )
   return (
-    <Card wide title="Reporting period" desc="Range picker — two months, one continuous selection.">
+    <Card wide docId="calendar-range" title="Reporting period" desc="Range picker — two months, one continuous selection.">
       <div className="calendar-range">
         <Month title="June 2026" dim={30} offset={0} side="start" bound={22} nav="prev" />
         <Month title="July 2026" dim={31} offset={2} side="end" bound={3} nav="next" />
@@ -3679,7 +3679,7 @@ function CardTableCard() {
     { file: 'release-notes-draft.md', size: '6 KB', by: 'Tom' },
   ]
   return (
-    <Card title="Files" desc="Card-framed — rounded frame, sticky header, scrolls.">
+    <Card docId="table" title="Files" desc="Card-framed — rounded frame, sticky header, scrolls.">
       <div style={{ maxHeight: '12rem', overflow: 'auto' }} tabIndex={0} role="region" aria-label="Scrollable list">
         <table className="table table--card">
           <thead>
@@ -4526,7 +4526,7 @@ function FileGridCard() {
     { name: 'design-system.fig', size: '12.3 MB', date: 'Feb 21', badge: 'FIG', tone: 'warn' as const, cover: null },
   ]
   return (
-    <Card wide title="Files" desc="Recently uploaded assets.">
+    <Card wide docId="file-grid" title="Files" desc="Recently uploaded assets.">
       <nav className="breadcrumb">
         <a href="#">Workspace</a>
         <Icon name="chevR" />

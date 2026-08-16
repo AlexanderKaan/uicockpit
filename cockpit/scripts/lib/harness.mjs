@@ -351,6 +351,42 @@ export async function driveTabWalk({
   return { findings, stops: trace.length, marked: total, leftTheRegion }
 }
 
+/**
+ * MEASURE — render the wall once and read the box of every kit element.
+ *
+ * The third driver, after runHarness (render) and driveTabWalk (operate). It
+ * needs no variations and no axe: the question is what the DEFAULT rendering
+ * measures, and the oracle is a stored baseline rather than a rule.
+ *
+ * It measures TWICE and returns both passes, because a shape gate whose own
+ * noise floor is unknown is a gate that cries wolf. If two consecutive reads of
+ * an unchanged page disagree, the disagreement is the instrument, not the kit —
+ * `audit:shape` prints that number before it prints anything else.
+ */
+export async function measureShapes({
+  url = 'http://localhost:5173/app',
+  rootSel = '.cockpit-preview',
+  width = 1440,
+} = {}) {
+  const browser = await chromium.launch()
+  const page = await browser.newPage({ viewport: { width, height: 1000 } })
+  await page.goto(url, { waitUntil: 'networkidle' })
+  await page.waitForSelector(rootSel, { timeout: 25000 })
+  await page.waitForTimeout(1500)
+  await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
+  await page.addScriptTag({ path: RULES_PATH })
+  const kitClasses = [...parseKit().classes.keys()]
+  await page.evaluate((classes) => { window.__uicKitClasses = new Set(classes) }, kitClasses)
+
+  const first = await page.evaluate((sel) => window.__uicMeasureShapes(sel), rootSel)
+  await page.waitForTimeout(400)
+  const second = await page.evaluate((sel) => window.__uicMeasureShapes(sel), rootSel)
+
+  await browser.close()
+  if (first.error) throw new Error(first.error)
+  return { rows: second.rows, control: first.rows, collisions: second.collisions }
+}
+
 /** Group findings by component — the axis a review needs, not the one a gate uses. */
 export function byComponent(findings) {
   const map = new Map()
