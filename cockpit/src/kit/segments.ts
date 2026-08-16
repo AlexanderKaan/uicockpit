@@ -108,7 +108,7 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   'usage-meter': ['progress'],
   infocard: ['card', 'buttons'],
   carousel: ['buttons'],
-  codeblock: ['code', 'buttons'],
+  codeblock: ['buttons'],
   menubar: ['dropdown-menu', 'buttons'],
   resizable: [],
   // Widgets you drop INSIDE a section (the 2026-06-15 re-audit demoted these from
@@ -151,7 +151,7 @@ export const STANDALONE_ATOMS: readonly string[] = [
   // a rich-text container — styles raw semantic tags; no single host (Fase J-8)
   'prose',
   // loading & layout utilities
-  'skeleton', 'spinner', 'separator', 'aspect-ratio', 'scroll-area',
+  'skeleton', 'spinner', 'aspect-ratio', 'scroll-area',
   // data-display primitives
   'description-list', 'rating',
   /* Accessibility primitives (the design-system study, 2026-08-14). All three

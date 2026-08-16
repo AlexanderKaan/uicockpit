@@ -483,7 +483,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                     <div><div style={muted}>Issued on</div><div style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{s.issued}</div></div>
                     <div><div style={muted}>Due on</div><div style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{s.due}</div></div>
                   </div>
-                  <hr className="sep" style={{ margin: 0 }} />
+                  <hr style={{ margin: 0 }} />
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-48)', alignItems: 'flex-start' } as CSSProperties}>
                     <div className="l-stack" style={{ '--l-gap': 'var(--k-s-2)' } as CSSProperties}>
                       <span className="eyebrow">From</span>
@@ -513,7 +513,7 @@ export function renderSection(spec: SectionSpec, key: number) {
                     <div className="l-stack" style={{ '--l-gap': 'var(--k-s-8)', minWidth: '15rem' } as CSSProperties}>
                       <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}><span style={muted}>Subtotal</span><span style={money}>{s.subtotal}</span></div>
                       <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}><span style={muted}>Tax</span><span style={money}>{s.tax}</span></div>
-                      <hr className="sep" style={{ margin: 0 }} />
+                      <hr style={{ margin: 0 }} />
                       <div className="l-cluster" style={{ justifyContent: 'space-between' } as CSSProperties}><span style={{ fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'] }}>Total</span><span style={{ ...money, fontWeight: 'var(--k-weight-semibold)' as CSSProperties['fontWeight'] }}>{s.total}</span></div>
                     </div>
                   </div>
@@ -531,13 +531,13 @@ export function renderSection(spec: SectionSpec, key: number) {
                     <span className="badge badge--success"><span className="badge__dot" />{s.status}</span>
                   </div>
                 </div>
-                <hr className="sep" style={{ margin: 0 }} />
+                <hr style={{ margin: 0 }} />
                 <div className="l-stack" style={{ '--l-gap': 'var(--k-s-12)', padding: 'var(--k-s-20)' } as CSSProperties}>
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}><PhotoAvatar url={s.payerAvatar} name={s.payer} sm /><span style={{ fontWeight: 'var(--k-weight-medium)' as CSSProperties['fontWeight'] }}>{s.payer}</span></div>
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}><Icon name="cal" /><span>{s.paidDate}</span></div>
                   <div className="l-cluster" style={{ '--l-gap': 'var(--k-s-10)' } as CSSProperties}><Icon name="card" /><span>{s.method}</span></div>
                 </div>
-                <hr className="sep" style={{ margin: 0 }} />
+                <hr style={{ margin: 0 }} />
                 <button type="button" className="btn btn--link" style={{ margin: 'var(--k-s-16) var(--k-s-20)' }}>Download receipt <Icon name="chevR" /></button>
               </div>
 
@@ -635,7 +635,7 @@ export function renderSection(spec: SectionSpec, key: number) {
           </div>
 
           {/* Recent clients — a .section region of .entity-card tiles (the kit
-              recipes finally consumed; was a hand-rolled card header + .sep + rows) */}
+              recipes finally consumed; was a hand-rolled card header + a rule + rows) */}
           <div className="section">
             <div className="section__head">
               <div className="section__titles"><span className="section__title">Recent clients</span></div>

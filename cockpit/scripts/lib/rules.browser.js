@@ -22,16 +22,34 @@
  * we have ever written reported per script.
  */
 ;(function () {
+  /** The class list of ANY element, SVG included.
+   *
+   * 🚨 `String(el.className)` returns "[object SVGAnimatedString]" for an SVG
+   * element — className is a string only on HTMLElement. Every DOM-reading gate
+   * here used the string form, so all 740 SVG nodes on the wall read as
+   * UNCLASSED, and the 17 that carry a kit class were invisible: .chart__svg,
+   * .sparkline, .sparkline__path, .sparkline--good, .stat-tile__spark and
+   * .rating__star--empty. So audit:shape never measured a chart or a trend line,
+   * and inKit() sorted every icon into the chrome pile.
+   *
+   * Found the way these always are: an impossible number. The sparkline was
+   * plainly on screen and the evidence generator reported it as never rendered.
+   * getAttribute('class') is correct for both element kinds — there was never a
+   * reason to read className at all. */
+  function classesOf(el) {
+    return String((el.getAttribute && el.getAttribute('class')) || '').trim().split(/\s+/).filter(Boolean)
+  }
+
   /** The recipe/card a node belongs to. The wall is tagged; fall back to a class. */
   function componentOf(el) {
     const card = el.closest('[data-recipe], [data-card]')
     if (card) return card.getAttribute('data-recipe') || card.getAttribute('data-card')
-    const cls = String(el.className || '').trim().split(/\s+/)[0]
+    const cls = classesOf(el)[0]
     return cls ? cls.split('__')[0].split('--')[0] : el.tagName.toLowerCase()
   }
 
   function label(el) {
-    const cls = String(el.className || '').trim().split(/\s+/)[0]
+    const cls = classesOf(el)[0]
     return (cls || el.tagName.toLowerCase()).slice(0, 44)
   }
 
@@ -53,7 +71,7 @@
      * The element's OWN classes decide; an unclassed node inherits from the
      * nearest classed ancestor, because a bare <li> belongs to whatever wraps it. */
     for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
-      const classes = String(e.className || '').trim().split(/\s+/).filter(Boolean)
+      const classes = classesOf(e)
       if (classes.length === 0) continue // unclassed: ask the parent
       for (let i = 0; i < classes.length; i++) if (set.has(classes[i])) return true
       return false // it has classes, none of them ours: chrome
@@ -212,7 +230,7 @@
       run: function (root) {
         const out = []
         const kindOf = (e) => {
-          const c = String(e.className || '').trim().split(/\s+/)[0]
+          const c = classesOf(e)[0]
           return c ? c.split('--')[0] : e.tagName.toLowerCase()
         }
         for (const el of root.querySelectorAll('*')) {
@@ -328,7 +346,7 @@
       run: function (root) {
         const out = []
         const isHeading = (e) => /^H[1-6]$/.test(e.tagName) ||
-          /(__title|__section-title|__group-title|__legend)$/.test(String(e.className).trim().split(/\s+/)[0] || '')
+          /(__title|__section-title|__group-title|__legend)$/.test(classesOf(e)[0] || '')
         const blocks = [...root.querySelectorAll('*')].filter((e) => {
           const r = e.getBoundingClientRect()
           return r.width > 8 && r.height > 4 && !/inline$/.test(getComputedStyle(e).display)
@@ -679,7 +697,7 @@
     var els = root.querySelectorAll('*')
     for (var i = 0; i < els.length; i++) {
       var e = els[i]
-      var classes = String(e.className || '').trim().split(/\s+/).filter(Boolean)
+      var classes = classesOf(e)
       var own = null
       for (var c = 0; c < classes.length; c++) {
         // The BASE class, never the modifier: .btn--ghost and .btn are one

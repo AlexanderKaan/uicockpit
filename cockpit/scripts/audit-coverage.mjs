@@ -30,7 +30,7 @@
  * other components rather than alone in a 400px card. That is worth a gate; it
  * is just not the same claim as "it works in production".
  *
- * ⚠️ 43 RECIPES LEGITIMATELY HAVE NO PLACE IN A STATIC SECTION FIXTURE — a
+ * ⚠️ MOST OF THE REMAINDER LEGITIMATELY HAS NO PLACE IN A STATIC SECTION FIXTURE — a
  * command palette, a toast stack, an alert dialog and a carousel are overlays and
  * interactions, not page furniture. So the bar is a RATCHET, not zero: the
  * uncovered count may fall and may never rise. A new recipe must earn a place in
@@ -102,7 +102,7 @@ for (const r of kit.recipes) {
 /* The ratchet. It may fall; it may not rise. Do NOT raise it to make a build
  * pass — if the number went DOWN the gate fails on purpose until the win is
  * locked in, same contract as audit:apg and audit:structural-inline. */
-const CEILING = 59
+const CEILING = 58
 
 const line = (s = '') => console.log(s)
 line('=== audit:coverage — does anything COMPOSE this recipe into a page? ===')

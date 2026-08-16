@@ -155,7 +155,14 @@ const measure = () => page.evaluate(async (tags) => {
   const recipeOf = (el) => {
     if (!el) return null
     for (let e = el; e && e.nodeType === 1 && e !== root.parentElement; e = e.parentElement) {
-      const cls = String(e.className || '').trim().split(/\s+/).filter(Boolean)
+      /* 🚨 getAttribute, NEVER className. On an SVG element className is an
+       * SVGAnimatedString, so String()-ing it yields "[object SVGAnimatedString]"
+       * and every one of the 740 SVG nodes on the wall read as unclassed. The
+       * sparkline reported measured:false while plainly on screen — an impossible
+       * number, which is always the tell. Six kit classes were invisible to this
+       * and to every rule in rules.browser.js: .chart__svg, .sparkline,
+       * .sparkline__path, .sparkline--good, .stat-tile__spark, .rating__star--empty. */
+      const cls = String(e.getAttribute('class') || '').trim().split(/\s+/).filter(Boolean)
       for (const c of cls) if (owner[c]) return owner[c]
     }
     return null

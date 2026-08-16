@@ -2415,8 +2415,18 @@ function StatTile({
       </div>
       <div className="stat-tile__value">{value}</div>
       <div className="stat-tile__foot">
-        <svg className="stat-tile__spark" viewBox="0 0 80 24" preserveAspectRatio="none" aria-hidden>
-          <path d={sparkPath} fill="none" stroke={tone} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        {/* The kit's own .sparkline, not a second one. This used to be a bare
+            <svg> with stroke and stroke-width set inline, which is how the kit
+            ended up shipping two sparklines — and how the one with a recipe
+            ended up rendering nowhere any instrument could see it. The tile
+            supplies the SLOT class; the recipe supplies the drawing. */}
+        <svg
+          className={`sparkline stat-tile__spark sparkline--${good ? 'good' : 'bad'}`}
+          viewBox="0 0 80 24"
+          preserveAspectRatio="none"
+          aria-hidden
+        >
+          <path className="sparkline__path" d={sparkPath} />
         </svg>
         {/* colour follows SENTIMENT (good/bad); arrow follows DIRECTION (up/down) */}
         <span className={'stat-tile__delta stat-tile__delta--' + (good ? 'up' : 'down')}>

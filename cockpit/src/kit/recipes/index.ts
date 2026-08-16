@@ -3391,24 +3391,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 }`,
   },
   {
-    id: 'code',
-    section: "Code",
-    css: `/* === Code (inline) =======================================================
- * Inline monospace token on the sunken plane. The multi-line block with a copy
- * button + gutter is the separate "CodeBlock" recipe (.codeblock). */
-.code {
-  font-family: var(--k-font-mono);
-  font-size: var(--k-type-small);
-  background: var(--k-surface-sunken);
-  color: var(--k-fg);
-  border-radius: var(--k-radius-md);
-  padding: var(--k-s-10) var(--k-s-12);
-  border: 1px solid var(--k-border);
-  white-space: pre;
-  overflow-x: auto;
-}`,
-  },
-  {
     id: 'dialog',
     section: "Dialog",
     doc: {
@@ -3997,23 +3979,39 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
     id: 'sparkline',
     section: "Sparkline",
     css: `/* === Sparkline ===
-   Inline micro-chart inside a stat-tile. Fixed dimensions so it reads as a
-   "trend hint", not a real chart. Uses --k-primary (not --k-accent) so it
-   matches the stat-tile's tone. */
+   The inline trend hint: a micro-chart that reads as a hint, not a chart.
+
+   🔑 IT IS THE ONLY ONE. The stat tile used to draw its own — a bare <svg> with
+   stroke and stroke-width set inline in JSX — so the kit shipped two sparklines
+   and the one with a recipe rendered nowhere a checker could see it. The tile
+   composes this now and contributes only what it owns: the SLOT (how big the
+   hint is inside that particular tile) and the draw-in animation.
+
+   Which is why the dimensions and the ink are hooks rather than values. A host
+   that needs a different size sets --k-spark-w/-h, and a host that needs a
+   different colour sets --k-spark-ink — it does NOT out-specify .sparkline or
+   re-declare the stroke, because that is how the second version started. */
 .sparkline {
   display: block;
-  width: 100%;
-  height: 30px;
+  inline-size: var(--k-spark-w, 100%);
+  block-size: var(--k-spark-h, 30px);
   margin-top: var(--k-s-6);
   overflow: visible;
 }
 .sparkline__path {
   fill: none;
-  stroke: var(--k-primary);
+  stroke: var(--k-spark-ink, var(--k-primary));
   stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
+/* SENTIMENT, not direction. A fall in churn is good news and must not be red,
+   so the modifier says whether the movement is good — the arrow beside it says
+   which way it went. Same split the stat tile's delta already makes. */
+.sparkline--good { --k-spark-ink: var(--k-success); }
+.sparkline--bad { --k-spark-ink: var(--k-danger); }
 .sparkline__area {
-  fill: var(--k-primary);
+  fill: var(--k-spark-ink, var(--k-primary));
   opacity: 0.12;
   stroke: none;
 }`,
@@ -4841,44 +4839,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 }`,
   },
   {
-    id: 'separator',
-    section: "Separator",
-    css: `/* === Separator ===
-   Hairline divider. .sep--labeled puts a centered label between two lines
-   ("OR continue with email" auth pattern). Vertical variant for inline gaps. */
-.sep {
-  height: var(--k-bw);
-  background: var(--k-border);
-  border: 0;
-  margin: calc(var(--k-space, 16px) * 0.6) 0;
-}
-.sep--vertical {
-  width: 1px;
-  height: auto;
-  align-self: stretch;
-  margin: 0 var(--k-s-8);
-}
-.sep--labeled {
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-12);
-  color: var(--k-fg-faint);
-  font-size: var(--k-type-eyebrow);
-  text-transform: uppercase;
-  letter-spacing: var(--k-track-eyebrow);
-  font-weight: var(--k-weight-medium);
-  background: transparent;
-  height: auto;
-}
-.sep--labeled::before,
-.sep--labeled::after {
-  content: '';
-  flex: 1;
-  height: var(--k-bw);
-  background: var(--k-border);
-}`,
-  },
-  {
     id: 'description-list',
     section: "Description list",
     css: `/* === Description list ===
@@ -5092,10 +5052,14 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   justify-content: space-between;
   gap: var(--k-s-8);
 }
+/* The SLOT, and nothing else. It sizes the hint for this tile through the
+   sparkline's own hooks rather than out-specifying it, and adds the draw-in that
+   belongs to the tile's entrance rather than to the chart. */
 .stat-tile__spark {
-  width: 60%;
+  --k-spark-w: 60%;
+  --k-spark-h: 22px;
   max-width: 80px;
-  height: 22px;
+  margin-top: 0;
   flex-shrink: 1;
 }
 .stat-tile__spark path {

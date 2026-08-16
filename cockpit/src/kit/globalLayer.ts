@@ -664,6 +664,13 @@ ${w('h4, h5, h6')} { font-size: var(--k-type-h3); font-weight: var(--k-weight-se
 ${w('p')} { margin: 0 0 var(--k-s-12); line-height: var(--k-leading-normal); }
 ${w('blockquote')} { margin: var(--k-s-16) 0; padding-inline-start: var(--k-s-16); border-inline-start: var(--k-s-2) solid var(--k-border); color: var(--k-fg-muted); }
 ${w('hr')} { border: 0; block-size: var(--k-bw); background: var(--k-border); margin: var(--k-s-24) 0; }
+/* The vertical rule, taken from the element rather than from a class.
+   <hr> has the implicit role separator, and separator is one of the roles
+   that takes aria-orientation — so the markup already has a standard way to say
+   "this rule is vertical" and a .sep--vertical class was a second one. Reading
+   the ARIA means an author who writes correct HTML gets the treatment without
+   knowing our class names, which is the whole argument for the floor. */
+${w('hr[aria-orientation="vertical"]')} { inline-size: var(--k-bw); block-size: auto; align-self: stretch; margin: 0 var(--k-s-8); }
 
 ${w('ul, ol')} { margin: 0 0 var(--k-s-12); padding-inline-start: var(--k-s-24); }
 ${w('li')} { margin-block-end: var(--k-s-4); line-height: var(--k-leading-normal); }
