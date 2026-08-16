@@ -38,4 +38,19 @@ export interface Recipe {
   css: string
   /** Do/Don't craft rules (LP1) — flagship components first; optional elsewhere. */
   doc?: RecipeDoc
+  /**
+   * THE CLASS THIS RECIPE IS, when its name cannot be derived from its id.
+   *
+   * The rendered gates (`audit:promises`, `derive-provenance`) need to find the
+   * element a recipe stands for, and both were guessing it from the first or
+   * shortest selector in the block. That guess put the Checkbox pattern on
+   * `.pwinput` and the alert dialog on plain `.dialog` — so the findings were
+   * about the wrong element, and every attempt to improve the heuristic moved
+   * the list without making it truer.
+   *
+   * Twelve recipes name their class differently from their id (`buttons` → `.btn`,
+   * `sidebar` → `.sidenav`). Those twelve say so here. The rest are derived, and
+   * a gate that can neither derive nor read this ABSTAINS rather than guessing.
+   */
+  root?: string
 }

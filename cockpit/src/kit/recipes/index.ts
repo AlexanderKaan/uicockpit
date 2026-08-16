@@ -203,6 +203,7 @@ export const RECIPES: readonly Recipe[] = [
   },
   {
     id: 'buttons',
+    root: 'btn',
     section: "Buttons",
     doc: {
       dos: [
@@ -763,6 +764,7 @@ export const RECIPES: readonly Recipe[] = [
   },
   {
     id: 'button-group',
+    root: 'btn-group',
     section: "Button group",
     css: `/* === Button group ========================================================
  * A row of buttons fused into one control — shared edges, outer corners follow
@@ -2186,6 +2188,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'navigation-row',
+    root: 'navrow',
     section: "Navigation row",
     css: `/* === Navigation row =====================================================
  * Sidebar / settings nav follows the LG row grammar — these are destinations
@@ -2239,6 +2242,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'sidebar',
+    root: 'sidenav',
     section: "Sidebar",
     css: `/* === Sidebar ============================================================
  * App-shell navigation column. Sits on the Chrome plane (--k-chrome-bg), which
@@ -2426,6 +2430,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'interactive-list-row',
+    root: 'list__item',
     section: "Interactive list row",
     css: `/* === Interactive list row (.list__row) — list family ===
  * Bordered, surface-filled row that's clickable — opens a menu/popover or
@@ -3511,6 +3516,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'command-palette',
+    root: 'cmdp',
     section: "Command palette",
     css: `/* === Command palette ===
    Spacing scales with --k-space (density token) — Compact/Default/Comfortable
@@ -4754,6 +4760,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'segmented-control-toggle-group',
+    root: 'segctrl',
     section: "Segmented control / Toggle group",
     css: `/* === Segmented control / Toggle group ===
    iOS-style multi-option button. Wrapper holds a quiet recessed background,
@@ -4938,6 +4945,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'alert-dialog',
+    root: 'dialog--alert',
     section: "Alert Dialog",
     css: `/* === Alert Dialog ===
    Dialog variant with a destructive emphasis — used for "Delete account?",
@@ -5489,6 +5497,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'navigation-menu',
+    root: 'navmenu',
     section: "Navigation menu",
     css: `/* === Navigation menu (.navmenu) — shadcn gap filler ==================
  * Horizontal top nav; one item opens a .menu flyout positioned below. */
@@ -5510,6 +5519,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'context-menu',
+    root: 'ctxmenu',
     section: "Context menu",
     css: `/* === Context menu (.ctxmenu) — shadcn gap filler =====================
  * A right-click drop area; the popup reuses the .menu component, placed
@@ -5526,6 +5536,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'form-primitives',
+    root: 'checkbox',
     section: "Form primitives",
     css: `/* === Form primitives (Tier 4) ==========================================
  * Four primitives that live next to the standard .in recipe but each has
@@ -5624,6 +5635,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   },
   {
     id: 'numberinput',
+    root: 'numinput',
     section: "NumberInput",
     css: `/* === NumberInput (#5) === THE SPINBUTTON, DONE BY THE PLATFORM.
  *

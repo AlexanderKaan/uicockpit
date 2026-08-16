@@ -422,10 +422,10 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
 
   // — Meters —
   progress: {
-    pattern: 'Meter',
-    url: `${APG}/meter/`,
+    pattern: 'Progressbar',
+    url: `${APG}/progressbar/`,
     keys: [],
-    aria: ['role="progressbar" for a task that completes, role="meter" for a level that fluctuates', 'aria-valuenow · aria-valuemin · aria-valuemax, or omit valuenow for indeterminate', 'A name saying WHAT is progressing'],
+    aria: ['role="progressbar" for a task that completes, role="progressbar" (or a native <progress>) for a level that fluctuates', 'aria-valuenow · aria-valuemin · aria-valuemax, or omit valuenow for indeterminate', 'A name saying WHAT is progressing'],
     free: '<progress> gives the role and the value semantics.',
   },
   'usage-meter': {

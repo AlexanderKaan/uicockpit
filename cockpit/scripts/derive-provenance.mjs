@@ -50,7 +50,12 @@ const openui = JSON.parse(readFileSync(join(HERE, 'data/openui-names.json'), 'ut
 
 /* ---- the recipes, and the class each one stands for ----------------------- */
 const RECIPES = []
-for (const m of recipeSrc.matchAll(/^    id: '([\w-]+)',\n    section: ['"`]([^'"`]+)['"`]/gm)) {
+/* ⚠️ TOLERANT OF FIELD ORDER. This required `section:` on the line directly after
+ * `id:`, so adding a `root:` field between them silently dropped twelve recipes
+ * and the report read 98 of 110 without saying anything was missing. A parser
+ * that depends on two fields being adjacent is a parser that breaks the next
+ * time somebody adds a third. */
+for (const m of recipeSrc.matchAll(/^    id: '([\w-]+)',\n(?:    \w+: [^\n]*\n)*?    section: ['"`]([^'"`]+)['"`]/gm)) {
   const [, id, section] = m
   const at = recipeSrc.indexOf(`    id: '${id}',`)
   const end = recipeSrc.indexOf('\n  },', at)
@@ -60,6 +65,9 @@ for (const m of recipeSrc.matchAll(/^    id: '([\w-]+)',\n    section: ['"`]([^'
    * on its own decoration and came back sourceless while it is literally
    * <input type="password">. Prefer the class that reads like the id, then a
    * root-looking one, and only then the first. */
+  /* THE RECIPE'S OWN ANSWER WINS. Twelve name their class differently from their
+   * id, and guessing at that is what put the Checkbox pattern on .pwinput. */
+  const declaredRoot = block.match(/^    root: '([^']+)'/m)?.[1]
   const all = [...block.matchAll(/^\.([a-z][\w-]*)/gm)].map((m) => m[1])
   const key = id.replace(/[-_]/g, '')
   const roots = all.filter((c) => !c.includes('__') && !c.includes('--'))
@@ -68,7 +76,8 @@ for (const m of recipeSrc.matchAll(/^    id: '([\w-]+)',\n    section: ['"`]([^'
    * one is the root by construction. That is a fact about the class name, not a
    * guess: `.pwinput__eye` belongs to `.pwinput` and nothing else. */
   const bemBase = all[0] ? all[0].split('__')[0].split('--')[0] : null
-  const cls = all.find((c) => c.replace(/[-_]/g, '') === key)
+  const cls = declaredRoot
+    ?? all.find((c) => c.replace(/[-_]/g, '') === key)
     ?? roots.find((c) => key.includes(c.replace(/[-_]/g, '')))
     ?? roots.sort((a, b) => a.length - b.length)[0]
     ?? bemBase ?? all[0] ?? null

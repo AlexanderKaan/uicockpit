@@ -91,7 +91,41 @@ function primaryClass(id) {
    * derivation that can silently read the neighbour is not a derivation. */
   const end = recipeSrc.indexOf("\n  },", at)
   const block = recipeSrc.slice(at, end === -1 ? at + 6000 : end)
-  return block.match(/^\.([a-z][\w-]*)/m)?.[1] ?? null
+  /* ⚠️ THE SAME FIX derive-provenance needed, and this file still had the old
+   * version — two scripts, one bug, fixed once. The FIRST selector is not always
+   * the component: `form-primitives` opens on a helper, so the Checkbox pattern
+   * was being checked against the wrong element and reported a native checkbox
+   * as missing role="checkbox". Prefer the class that reads like the id, then a
+   * root-looking one, then the BEM base of the first. */
+  /* THE RECIPE'S OWN ANSWER WINS. Twelve name their class differently from their
+   * id, and guessing at that is what put the Checkbox pattern on .pwinput. */
+  const declaredRoot = block.match(/^    root: '([^']+)'/m)?.[1]
+  const all = [...block.matchAll(/^\.([a-z][\w-]*)/gm)].map((m) => m[1])
+  const key = id.replace(/[-_]/g, '')
+  const roots = all.filter((c) => !c.includes('__') && !c.includes('--'))
+  const bemBase = all[0] ? all[0].split('__')[0].split('--')[0] : null
+  if (declaredRoot) return { cls: declaredRoot, sure: true }
+  const exact = all.find((c) => c.replace(/[-_]/g, '') === key)
+  const related = roots.find((c) => key.includes(c.replace(/[-_]/g, '')))
+    ?? roots.find((c) => c.replace(/[-_]/g, '').includes(key))
+  if (exact) return { cls: exact, sure: true }
+  if (related) return { cls: related, sure: true }
+
+  /* 🚨 AND WHEN IT CANNOT TELL, IT SAYS SO RATHER THAN GUESSING. Falling back to
+   * "the shortest root class in the block" resolved `form-primitives` to
+   * `.pwinput` — so the Checkbox pattern was being checked against a password
+   * field and reported a native checkbox as missing role="checkbox". It put
+   * `alert-dialog` on plain `.dialog` too. Every patch to the heuristic changed
+   * WHICH element got measured, so the finding list moved each time and none of
+   * it was actionable.
+   *
+   * A guess that reports a defect is worse than no report: it costs a person the
+   * time to chase something that was never broken, and it teaches them to
+   * distrust the gate. Unsure is a legitimate answer and it is printed as one.
+   * The durable fix is a `root` field on the Recipe type so a recipe DECLARES
+   * its element — see ROADMAP Sprint C. Until then, this abstains. */
+  const guess = roots.sort((a, b) => a.length - b.length)[0] ?? bemBase ?? all[0] ?? null
+  return { cls: guess, sure: false }
 }
 
 /* Declared ARIA, reduced to the tokens a DOM can be asked about. The prose
@@ -100,11 +134,19 @@ function primaryClass(id) {
 function ariaTokens(list) {
   const roles = new Set()
   const attrs = new Set()
+  const advisory = new Set()
   for (const line of list) {
-    for (const m of line.matchAll(/role="([\w-]+)"/g)) roles.add(m[1])
-    for (const m of line.matchAll(/\b(aria-[a-z]+)/g)) attrs.add(m[1])
+    /* ⚠️ A CONDITIONAL CLAIM IS NOT A REQUIREMENT. Nineteen of these lines are
+     * phrased with a condition — "aria-valuetext WHEN the number alone is not
+     * meaningful", "a pause control IF it auto-rotates", "aria-label when more
+     * than one toolbar is present". Reading those as hard requirements is the
+     * gate over-reporting, and an over-reporting gate gets ignored, which is
+     * worse than not having it. They are collected and printed as advisory. */
+    const conditional = /\b(when|if|only|optional|unless)\b/i.test(line)
+    for (const m of line.matchAll(/role="([\w-]+)"/g)) (conditional ? advisory : roles).add(m[1])
+    for (const m of line.matchAll(/\b(aria-[a-z]+)/g)) (conditional ? advisory : attrs).add(m[1])
   }
-  return { roles: [...roles], attrs: [...attrs] }
+  return { roles: [...roles], attrs: [...attrs], advisory: [...advisory] }
 }
 
 /* Key names APG writes as prose → what Playwright presses. */
@@ -121,7 +163,7 @@ function pressable(combo) {
 
 const targets = Object.entries(ANCHORS)
   .filter(([id]) => !ONLY || id === ONLY)
-  .map(([id, a]) => ({ id, ...a, cls: primaryClass(id) }))
+  .map(([id, a]) => { const r = primaryClass(id) ?? {}; return { id, ...a, cls: r.cls, sure: r.sure } })
   .filter((t) => t.cls)
 
 const browser = await chromium.launch()
@@ -144,7 +186,9 @@ for (const t of targets) {
 
   /* ---- 1 · the declared ARIA ---------------------------------------------- */
   const want = ariaTokens(t.aria)
-  if (want.roles.length || want.attrs.length) {
+  if (!t.sure) {
+    findings.push({ id: t.id, kind: 'unsure', detail: `cannot tell which element this recipe is (best guess .${t.cls}) — not checked` })
+  } else if (want.roles.length || want.attrs.length) {
     checked.aria++
     /* AN IMPLICIT ROLE IS A REAL ROLE. The first version looked for
      * role="spinbutton" as an ATTRIBUTE and reported the number input as
@@ -193,11 +237,32 @@ for (const t of targets) {
         }))
       }, { cls: t.cls, attrs: axAttrs })
     }
+    /* ⚠️ AND A NATIVE ELEMENT SUPPLIES THE STATE WITHOUT WRITING IT. The same
+     * correction as the implicit ROLE above, one level down: a checkbox has
+     * aria-checked, an open <details> has aria-expanded, a <progress value max>
+     * has the whole value family. Demanding the attribute on markup that already
+     * carries the state is demanding redundancy — and redundant ARIA on a native
+     * control is a defect in its own right, not a fix. */
     const missing = await page.evaluate(({ cls, attrs }) => {
       const el = document.querySelector('.' + cls)
       if (!el) return null
-      const has = (sel) => el.matches(sel) || !!el.querySelector(sel) || !!el.closest(sel)
-      return { attrs: attrs.filter((a) => !has('[' + a + ']')).concat([]) }
+      const IMPLIED = {
+        'aria-checked':  'input[type="checkbox"], input[type="radio"], option',
+        'aria-selected': 'option, input[type="checkbox"], input[type="radio"]',
+        'aria-expanded': 'details, summary',
+        'aria-valuenow': 'input[type="range"], input[type="number"], progress, meter',
+        'aria-valuemin': 'input[type="range"], input[type="number"], progress, meter',
+        'aria-valuemax': 'input[type="range"], input[type="number"], progress, meter',
+        'aria-disabled': '[disabled]',
+      }
+      const scope = [el, ...el.querySelectorAll('*')]
+      const has = (a) => scope.some((n) => {
+        if (n.hasAttribute(a)) return true
+        const native = IMPLIED[a]
+        if (!native) return false
+        try { return n.matches(native) } catch { return false }
+      })
+      return { attrs: attrs.filter((a) => !has(a)).concat([]) }
     }, { cls: t.cls, attrs: domAttrs })
     if (missing) missing.attrs = missing.attrs.concat(axMissing)
     if (missing) missing.roles = missingRoles
@@ -301,6 +366,7 @@ const show = (title, rows, fmt) => {
 show('the demo does not show this declared behaviour (information — the kit ships CSS, the consumer owes the keys)', byKind('key-dead'), (r) => `${r.id} (${r.pattern}): ${r.detail}`)
 show('declared ARIA that is not in the DOM', byKind('aria-missing'), (r) => `${r.id} (${r.pattern}): ${r.detail}`)
 show('declared but not on the wall — unverifiable, not passing', byKind('not-rendered'), (r) => `${r.id}: ${r.detail}`)
+show('the gate cannot identify this recipe\'s element — abstained rather than guessed', byKind('unsure'), (r) => `${r.id}: ${r.detail}`)
 
 const real = byKind('aria-missing').length
 console.log(real
