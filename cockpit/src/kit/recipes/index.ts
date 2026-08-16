@@ -3030,7 +3030,13 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   font-size: var(--k-type-small); font-weight: var(--k-weight-semibold);
   font-variant-numeric: tabular-nums;
 }
-.processlist__title { margin: 0 0 var(--k-s-6); font-weight: var(--k-weight-semibold); }
+/* THE SIZE IS DECLARED, and that is the point rather than the value. This is an
+   <h3> and it never said how big it was, so it inherited the body size for as
+   long as nothing styled headings — and the moment the platform floor did, every
+   step title jumped to 22px and the card read like three sub-headings.
+   A component that renders a heading owns its size. Relying on the absence of a
+   floor is a dependency on nothing being there. */
+.processlist__title { font-size: var(--k-type-body); line-height: var(--k-leading-snug); margin: 0 0 var(--k-s-6); font-weight: var(--k-weight-semibold); }
 .processlist__body { margin: 0; color: var(--k-fg-muted); }
 `,
   },
@@ -3122,11 +3128,16 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
    * --k-hit-min because a target is an AREA: 4ch is ~30px, which clears nothing
    * on the width axis even when the height is fine. Our own matrix check missed
    * this by measuring height only. */
-  width: max(4ch, var(--k-hit-min));
+  /* ⚠️ PLUS THE PADDING. width is a border-box, and .in sets a horizontal
+     padding of at least --k-s-12 a side — so max(4ch, …) gave 4ch MINUS 24px of
+     text room, about four pixels, and "27" rendered as "2". Measured: a 28px
+     content box asked for 40. The characters and the padding are two different
+     things and the width has to carry both. */
+  width: max(calc(4ch + 2 * var(--k-s-12)), var(--k-hit-min));
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
-.memdate__part--year .in { width: max(6ch, var(--k-hit-min)); }`,
+.memdate__part--year .in { width: max(calc(6ch + 2 * var(--k-s-12)), var(--k-hit-min)); }`,
   },
   {
     id: 'tasklist',

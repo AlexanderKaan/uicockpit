@@ -621,8 +621,18 @@ ${w('img, video')} { height: auto; }
 /* An IBAN, a reference number, a case number. Value anywhere, not
    break-word, so it also shrinks the element's min-content size — without
    that, a long token still forces a scrollbar on the container. */
-${w('p, li, dd, dt, td, th, caption, figcaption, blockquote, label, legend, summary, h1, h2, h3, h4, h5, h6')} {
+${w('p, li, dd, dt, figcaption, blockquote')} {
   overflow-wrap: anywhere;
+}
+/* ⚠️ break-word, NOT anywhere, ON SHORT LABELS. The two look interchangeable and
+   are not: anywhere also counts for MIN-CONTENT sizing, so a grid or table
+   track will happily shrink to one character per line. With it on <th>, a data
+   table rendered its "SERVICE" header as S/E/R/V/I/C/E stacked vertically.
+   break-word gives the same last-resort break without letting the column
+   collapse. Free-running text above keeps anywhere, because there we DO want
+   an IBAN to shrink its container rather than overflow it. */
+${w('td, th, caption, label, legend, summary, h1, h2, h3, h4, h5, h6')} {
+  overflow-wrap: break-word;
 }
 
 /* Code and preformatted text keep their line breaks, so they scroll rather
