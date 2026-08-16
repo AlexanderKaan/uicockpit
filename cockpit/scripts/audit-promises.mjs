@@ -32,6 +32,21 @@
  *     show this behaviour." Useful for deciding which demos to wire up. Not a
  *     conformance claim, because the kit makes none.
  *
+ * 🚨 A MISSING ATTRIBUTE IS NOT ALWAYS A FIX WAITING TO HAPPEN, and this gate
+ * cannot tell the difference. It reported `calendar` as missing role="grid", so
+ * I added it — and a11y:matrix went from 3 violations to 16, twelve of them
+ * `aria-required-children`. A grid needs role="row" children; our calendar is a
+ * flat CSS grid of buttons, so the role made the accessibility tree WORSE than
+ * no role. It reported `usage-meter` as missing role="meter", I put it on the
+ * card, and the button inside became nested-interactive.
+ *
+ * Two gates disagreed twice and AXE WAS RIGHT BOTH TIMES: a role without the
+ * structure it requires is broken ARIA, not partial ARIA. So a finding here is a
+ * QUESTION — "should this element carry that?" — and the answer sometimes means
+ * restructuring the component, and sometimes means the anchor is over-claiming
+ * for our implementation. Run a11y:matrix after acting on anything from this
+ * list; if the count goes up, the attribute was not the fix.
+ *
  * ⚠️ AND THE ORACLE IS WEAK ON PURPOSE. It presses the key and asks whether
  * anything observable moved. It cannot tell whether the key did the RIGHT thing.
  * It also cannot tell "not implemented" from "the component is not in the state
@@ -198,12 +213,21 @@ for (const t of targets) {
      * role answers the question about accessibility. Playwright's getByRole uses
      * the browser's own computation, so no implicit-role table lives here to
      * fall out of date. */
+    /* ⚠️ A GROUP ROLE LIVES ON AN ANCESTOR BY DESIGN. role="radiogroup" wraps the
+     * radios, role="listbox" wraps the options, role="grid" wraps the cells —
+     * that is the pattern, not a workaround. Looking only at the element and its
+     * descendants reported `.radio-card` as missing a radiogroup that its parent
+     * carries correctly. Self, descendants, AND ancestors. */
     const missingRoles = []
     for (const r of want.roles) {
       const scope = page.locator('.' + t.cls).first()
       const inside = await scope.getByRole(r, { includeHidden: true }).count().catch(() => 0)
       const isSelf = await scope.and(page.getByRole(r, { includeHidden: true })).count().catch(() => 0)
-      if (!inside && !isSelf) missingRoles.push(r)
+      const onAncestor = inside || isSelf ? 0 : await page.evaluate(({ cls, role }) => {
+        const el = document.querySelector('.' + cls)
+        return el && el.closest(`[role="${role}"]`) ? 1 : 0
+      }, { cls: t.cls, role: r }).catch(() => 0)
+      if (!inside && !isSelf && !onAncestor) missingRoles.push(r)
     }
     /* Same correction, one family further: aria-valuenow / -valuemin / -valuemax
      * are EXPOSED, not written, when the element is <input type="number" min
@@ -255,7 +279,9 @@ for (const t of targets) {
         'aria-valuemax': 'input[type="range"], input[type="number"], progress, meter',
         'aria-disabled': '[disabled]',
       }
-      const scope = [el, ...el.querySelectorAll('*')]
+      /* Ancestors too: aria-activedescendant sits on the input that OWNS a
+       * listbox, not on the listbox. */
+      const scope = [el, ...el.querySelectorAll('*'), ...(function () { const up = []; let n = el.parentElement; while (n && up.length < 4) { up.push(n); n = n.parentElement } return up })()]
       const has = (a) => scope.some((n) => {
         if (n.hasAttribute(a)) return true
         const native = IMPLIED[a]

@@ -69,7 +69,7 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
       ['Escape', 'Close the dialog'],
       ['Tab / Shift+Tab', 'Cycle within the dialog only — focus must not escape'],
     ],
-    aria: ['role="alertdialog"', 'aria-modal="true"', 'aria-labelledby on the title', 'aria-describedby on the message'],
+    aria: ['role="alertdialog"', 'aria-modal="true" when it IS modal — showModal() sets it, and a docked <dialog open> must not claim it', 'aria-labelledby on the title', 'aria-describedby on the message'],
     free: '<dialog> + showModal() gives the focus trap, Escape, inert background and top-layer stacking.',
   },
   dialog: {
@@ -79,7 +79,7 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
       ['Escape', 'Close the dialog'],
       ['Tab / Shift+Tab', 'Cycle within the dialog only'],
     ],
-    aria: ['role="dialog"', 'aria-modal="true"', 'aria-labelledby or aria-label', 'Focus moves INTO the dialog on open and RETURNS to the trigger on close'],
+    aria: ['role="dialog"', 'aria-modal="true" when it IS modal — showModal() sets it, and a docked <dialog open> must not claim it', 'aria-labelledby or aria-label', 'Focus moves INTO the dialog on open and RETURNS to the trigger on close'],
     free: '<dialog> + showModal() gives all of it except the return-focus-to-trigger, which the browser does too when the dialog is closed properly.',
   },
   tabs: {

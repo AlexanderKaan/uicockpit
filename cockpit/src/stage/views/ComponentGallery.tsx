@@ -363,12 +363,20 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
 function UsageMeterCard() {
   return (
     <Card title="Monthly quota" desc="Usage meter — banded fill shifts to warning past 75%.">
+      {/* THE ROLE GOES ON THE BAR, NOT THE CARD. Putting role="meter" on the
+          wrapper made the "Upgrade plan" button inside it nested-interactive —
+          axe caught it and the count went 3 to 4. A meter is a LEAF widget; a
+          card that holds a button is not one. */}
       <div className="usage usage--warn">
         <div className="usage__head">
           <span className="usage__title">API calls — monthly quota</span>
           <span className="usage__pct">782,140 of 1,000,000 (78%)</span>
         </div>
-        <div className="usage__bar" role="progressbar" aria-valuenow={78} aria-valuemin={0} aria-valuemax={100} aria-label="API calls — monthly quota"><div className="usage__fill" style={{ width: '78%' }} /></div>
+        {/* meter, not progressbar: a quota USED OF A TOTAL is a measurement within a
+            known range, where a progressbar reports how far a task has got. Same
+            distinction that moved the .progress anchor the other way. */}
+        <div className="usage__bar" role="meter" aria-valuenow={78} aria-valuemin={0} aria-valuemax={100}
+          aria-valuetext="782,140 of 1,000,000 API calls — 78 percent of quota" aria-label="API calls — monthly quota"><div className="usage__fill" style={{ width: '78%' }} /></div>
         <div className="usage__foot">
           <span className="usage__hint">Resets in 9 days</span>
           <button className="btn btn--ghost btn--sm">Upgrade plan</button>
@@ -3239,6 +3247,16 @@ function DateCard() {
                 <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Next month"><Icon name="chevR" /></button>
               </span>
             </div>
+            {/* NO role="grid" HERE, and the reason is worth keeping. audit:promises asked
+          for it — the anchor declares APG's Grid pattern — so I added it, and
+          a11y:matrix went from 3 violations to 16: aria-required-children, twelve
+          times. A grid needs role="row" children and this calendar is a flat CSS
+          grid of buttons with no rows, so the role made the accessibility tree
+          WORSE than no role at all.
+          Two gates disagreed and axe was right: a role without the structure it
+          requires is broken ARIA, not partial ARIA. Claiming the Grid pattern here
+          means restructuring the calendar into rows, which is real work and is on
+          the roadmap — not an attribute. */}
             <div className="calendar" onMouseLeave={() => setHover(null)}>
               {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
                 <span key={i} className="calendar__head">{d}</span>
@@ -4260,10 +4278,10 @@ function AlertDialogCard() {
         {open ? (
           <>
             <div className="dialog-frame__backdrop" onClick={() => setOpen(false)} />
-            <div className="dialog dialog--alert" role="alertdialog" aria-modal="true" aria-labelledby="alert-title">
+            <div className="dialog dialog--alert" role="alertdialog" aria-modal="true" aria-labelledby="alert-title" aria-describedby="alert-desc">
               <span className="dialog__icon"><Icon name="trash" /></span>
               <h3 id="alert-title" className="dialog__title">Delete project?</h3>
-              <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>
+              <p id="alert-desc" style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', margin: 0 }}>
                 This will permanently delete <strong>ai-router</strong>, its history, and 12 deployed environments. Cannot be undone.
               </p>
               <div className="dialog__foot">
