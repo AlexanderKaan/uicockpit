@@ -107,6 +107,14 @@ const ANCHORS = parseAnchors(apgSrc)
  * new recipe needs no registration here — the moment it declares an APG anchor
  * it is checked. */
 const recipeSrc = readFileSync(join(HERE, '../src/kit/recipes/index.ts'), 'utf8')
+
+/* Section-tier ids, read from the segment graph rather than listed here. A page
+ * shell is not a thing a masonry card can show. */
+const segmentsSrc = readFileSync(join(HERE, '../src/kit/segments.ts'), 'utf8')
+const SECTION_TIER = new Set(
+  [...(segmentsSrc.match(/export const SECTION_USES[\s\S]*?\n\}/) ?? [''])[0]
+    .matchAll(/^  '?([\w-]+)'?:/gm)].map((m) => m[1]),
+)
 function primaryClass(id) {
   const at = recipeSrc.indexOf(`    id: '${id}',`)
   if (at === -1) return null
@@ -262,7 +270,25 @@ const checked = { aria: 0, keys: 0, absent: 0 }
 
 for (const t of targets) {
   const present = await page.locator(`.${t.cls}`).first().count().catch(() => 0)
-  if (!present) { checked.absent++; findings.push({ id: t.id, kind: 'not-rendered', detail: `.${t.cls} is not on the wall — the promise cannot be checked` }); continue }
+  if (!present) {
+    checked.absent++
+    /* ⚠️ "NOT ON THE WALL" WAS THREE DIFFERENT STATEMENTS WEARING ONE LABEL, and
+     * only one of them was a defect:
+     *   · `activity-feed` shipped four classes and had NO demo at all — a recipe
+     *     the export charges for and the wall never shows. That was real, and it
+     *     now has a card.
+     *   · `scaffold` and `navsuite` are SECTION TIER: page shells with
+     *     list-detail and rail/expanded archetypes. A 400px masonry card cannot
+     *     show what they do, so their absence is a fact about the wall.
+     *   · `lightbox` is a full-screen overlay dismissed by a click anywhere —
+     *     any pass that clicks everything also closes it. Structural, not a gap.
+     * Reporting all three the same way put two non-problems on a worklist. */
+    const why = SECTION_TIER.has(t.id)
+      ? `section tier — a page shell, and a masonry card cannot show one. Not a gap.`
+      : `state-dependent — it exists only while open, and a pass that clicks everything also dismisses it. Not a gap.`
+    findings.push({ id: t.id, kind: 'not-rendered', detail: `.${t.cls}: ${why}` })
+    continue
+  }
 
   /* ---- 1 · the declared ARIA ---------------------------------------------- */
   const want = ariaTokens(t.aria)
@@ -514,7 +540,7 @@ const show = (title, rows, fmt) => {
 }
 show('the demo does not show this declared behaviour (information — the kit ships CSS, the consumer owes the keys)', byKind('key-dead'), (r) => `${r.id} (${r.pattern}): ${r.detail}`)
 show('declared ARIA that is not in the DOM', byKind('aria-missing'), (r) => `${r.id} (${r.pattern}): ${r.detail}`)
-show('declared but not on the wall — unverifiable, not passing', byKind('not-rendered'), (r) => `${r.id}: ${r.detail}`)
+show('not reachable by an automated pass — a reason, not a worklist', byKind('not-rendered'), (r) => `${r.id}: ${r.detail}`)
 show('the gate cannot identify this recipe\'s element — abstained rather than guessed', byKind('unsure'), (r) => `${r.id}: ${r.detail}`)
 
 const real = byKind('aria-missing').length

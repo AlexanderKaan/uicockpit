@@ -128,6 +128,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   ToolCallCard: 'Tool call AI agent function receipt status running done error mcp',
   ReasoningCard: 'Reasoning thinking chain of thought AI disclosure thought for',
   ProseCard: 'Article prose rich text body copy changelog docs',
+  ActivityFeedCard: 'Activity feed event stream timeline recent deploy status',
   FilterBarCard: 'Filter bar toolbar facets',
   InboxFilterCard: 'Inbox filter mail messages',
   CodeBlockCard: 'Quick start code block snippet syntax',
@@ -239,7 +240,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'component'], [SheetCard, 'component'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'component'],
-    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ToolCallCard, 'atom'], [ReasoningCard, 'atom'], [ProseCard, 'component'],
+    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ToolCallCard, 'atom'], [ReasoningCard, 'atom'], [ProseCard, 'component'], [ActivityFeedCard, 'component'],
     [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
@@ -3086,6 +3087,39 @@ const LB_IMAGES = [
   'var(--k-grad-3)',
   'var(--k-grad-4)',
 ]
+/* === Activity feed ==================================================
+ * It shipped four classes and had no card of its own — only .activity__dot was
+ * borrowed by the messages demo, so `audit:promises` could not check it and
+ * nobody could see it. A recipe the export ships and the wall never shows is CSS
+ * a consumer pays for and cannot evaluate. */
+function ActivityFeedCard() {
+  const events = [
+    ['var(--k-success)', 'Deploy succeeded', 'ai-router · production', '2m ago'],
+    ['var(--k-primary)', 'Ada Lovelace commented', 'on “Rate limit for /v2/search”', '18m ago'],
+    ['var(--k-warning)', 'Certificate expires in 14 days', 'api.acme.gov', '1h ago'],
+    ['var(--k-danger)', 'Build failed', 'checks/lint · 3 errors', '3h ago'],
+  ] as const
+  return (
+    <Card docId="activity-feed" title="Recent activity" desc="A vertical event stream — the dot carries the status.">
+      <ul className="activity">
+        {events.map(([tone, title, meta, when]) => (
+          <li className="activity__item" key={title}>
+            {/* aria-hidden: the dot is the SAME information the text already
+                carries. A screen reader that also announced "green circle" would
+                hear the status twice and the second one as a shape. */}
+            <span className="activity__dot" style={{ background: tone }} aria-hidden="true" />
+            <span style={{ flex: 1, minWidth: 0 }}>
+              {title}
+              <span className="activity__meta"> · {meta}</span>
+            </span>
+            <time className="activity__meta">{when}</time>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  )
+}
+
 function LightboxCard() {
   const [open, setOpen] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
@@ -3099,7 +3133,13 @@ function LightboxCard() {
     <Card title="Gallery" desc="Click a thumbnail to open the lightbox.">
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
         {LB_IMAGES.map((g, i) => (
-          <button key={i} onClick={() => go(i)} aria-label={`Open image ${i + 1}`} style={{ aspectRatio: '1', borderRadius: 'var(--k-radius-md)', border: 0, background: g, cursor: 'pointer' }} />
+          /* aria-haspopup="dialog": these thumbnails OPEN a modal, and a button
+             that opens one should say so — a screen-reader user otherwise finds
+             out by pressing it. It is also what lets a checker reach the
+             lightbox: the overlay exists only while open, so a gate that never
+             clicks a thumbnail can never see the component at all. Correct
+             markup and reachable markup turn out to be the same edit. */
+          <button key={i} onClick={() => go(i)} aria-haspopup="dialog" aria-expanded={open === i} aria-label={`Open image ${i + 1}`} style={{ aspectRatio: '1', borderRadius: 'var(--k-radius-md)', border: 0, background: g, cursor: 'pointer' }} />
         ))}
       </div>
       {open !== null && (
