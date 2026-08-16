@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { MktNav } from './MktNav'
 import { MktFooter } from './MktFooter'
 import { IconProvider } from '../icons/Icon'
@@ -9,6 +9,19 @@ import { RECIPES } from '../kit'
 import { explainerFor } from '../kit/explainer'
 import { tierOf, usesOf } from '../kit/segments'
 import EVIDENCE from '../kit/evidence.json'
+// @ts-expect-error — the forge core is the cli package's zero-dep module (one
+// source for the CLI, the MCP tool, /forge and this page); no types on purpose.
+import { createForge } from '../../../cli/src/forge.mjs'
+import FORGE_DATA from '../../../cli/data/forge.json'
+
+/* The forge's data is the derivation's published answer per recipe — its
+ * provenance line, what it covers, its APG contract — generated from the same
+ * sources the build gate reads. The component page shows it as "where this
+ * comes from", and uses the forge's skeleton as the copyable usage. One source. */
+type ForgeRecipe = (typeof FORGE_DATA)['kit']['recipes'][number]
+const FORGE = createForge(FORGE_DATA)
+const forgeRecipe = (id: string): ForgeRecipe | undefined => FORGE_DATA.kit.recipes.find((r) => r.id === id)
+const LAYER_LABEL: Record<number, string> = { 1: 'HTML', 2: 'APG', 3: 'Open UI', 4: 'Public service' }
 
 /** One component's measured evidence, as `a11y-matrix --evidence` writes it. */
 type EvidenceEntry = {
@@ -20,6 +33,22 @@ type EvidenceEntry = {
   contrast?: { min: number; nodes: number } | null
   // `smallest` is null when axe evaluated the target but reported no size for it.
   target?: { smallest: number | null; pass: number; fail: number } | null
+}
+
+/** Is the viewport narrow (the rail folds)? Read once, kept live. A <details>
+ *  cannot be told by CSS whether it is open, so the one place layout and state
+ *  meet is here. */
+function useNarrow(): boolean {
+  const mq = () => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 860px)') : null)
+  const [narrow, setNarrow] = useState<boolean>(() => mq()?.matches ?? false)
+  useEffect(() => {
+    const m = mq()
+    if (!m) return
+    const on = () => setNarrow(m.matches)
+    m.addEventListener('change', on)
+    return () => m.removeEventListener('change', on)
+  }, [])
+  return narrow
 }
 
 /** The component reference always shows the DEFAULT kit — one canonical look for
@@ -40,11 +69,18 @@ const byGroup = (g: string) => COMPONENT_PAGES.filter((c) => c.group === g)
 const recipeOf = (id: string) => RECIPES.find((r) => r.id === id)
 const label = (id: string) => COMPONENT_PAGES.find((c) => c.recipeId === id)?.name ?? recipeOf(id)?.section ?? id
 
-/** Left index rail, shared by the index + every detail page. */
+/** Left index rail, shared by the index + every detail page.
+ *
+ *  On a phone the rail used to wrap into a cloud of 78 links above the content
+ *  — the overview that "is not handy on mobile". It is now a native <details>:
+ *  the same list, folded behind "All components", open by default on the index
+ *  (where the list IS the page) and closed on a detail page. No JS, no second
+ *  navigation to keep in step; the CSS only decides which of the two summaries
+ *  is visible. */
 function Sidebar({ current, navigate }: { current?: string; navigate: (to: string) => void }) {
   const go = (e: React.MouseEvent, to: string) => { e.preventDefault(); navigate(to) }
-  return (
-    <nav className="cmpdoc__side" aria-label="Components">
+  const list = (
+    <>
       <a href="/components" className={`cmpdoc__side-link cmpdoc__side-over ${!current ? 'cmpdoc__side-link--on' : ''}`} onClick={(e) => go(e, '/components')}>Overview</a>
       {GROUPS.map((g) => (
         <div className="cmpdoc__side-group" key={g}>
@@ -60,16 +96,32 @@ function Sidebar({ current, navigate }: { current?: string; navigate: (to: strin
           ))}
         </div>
       ))}
+    </>
+  )
+  const narrow = useNarrow()
+  return (
+    <nav className="cmpdoc__side" aria-label="Components">
+      {/* Desktop: always open, summary hidden — the rail. Phone: closed until
+        * tapped; on the index page the rail is not shown at all (the page IS the
+        * list, with search). */}
+      <details className="cmpdoc__side-fold" open={!narrow}>
+        <summary className="cmpdoc__side-summary">All components <span className="cmpdoc__side-count">{COMPONENT_PAGES.length}</span></summary>
+        <div className="cmpdoc__side-list">{list}</div>
+      </details>
     </nav>
   )
 }
 
 /** Shell = site nav + the two-column [sidebar · content] docs body + footer. */
 function DocsShell({ current, navigate, children }: { current?: string; navigate: (to: string) => void; children: ReactNode }) {
+  const { tokens } = useDefaultKit()
   return (
     <div className="mkt">
       <MktNav navigate={navigate} current="components" />
-      <div className="mkt__container cmpdoc">
+      {/* The kit's tokens on the docs container: the page's own chrome is sized
+        * through --k-s-* / --k-type-* (no raw px on the marketing ratchet), and
+        * the stage inherits them. Colours stay --mkt-*. */}
+      <div className={`mkt__container cmpdoc${current ? '' : ' cmpdoc--index'}`} style={tokens}>
         <Sidebar current={current} navigate={navigate} />
         <main className="cmpdoc__main">{children}</main>
       </div>
@@ -82,36 +134,136 @@ function DocsShell({ current, navigate, children }: { current?: string; navigate
  *    The live preview lives on each detail page, not here (a reference index,
  *    not a showcase). ──────────────────────────────────────────────────────── */
 export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => void }) {
+  const [q, setQ] = useState('')
+  const query = q.trim().toLowerCase()
   useEffect(() => {
     const prev = document.title
-    document.title = 'Components — 60+ accessible, framework-neutral components — UIcockpit'
+    document.title = `Components — ${COMPONENT_PAGES.length} accessible, framework-neutral components, each with a source — UIcockpit`
     return () => { document.title = prev }
   }, [])
+
+  /* ONE box, two answers. Typing filters the list by name and blurb — a plain
+   * search. The same words also go to the forge, whose answer sits under the
+   * box: "you have this" with the page, or "the platform has this", or "no
+   * layer names it" — so a search that finds nothing still says WHY, instead
+   * of an empty grid. Nothing leaves the browser: the forge is a lookup over
+   * data that is already on the page. */
+  const matches = (c: ComponentPage) => !query || c.name.toLowerCase().includes(query) || c.blurb.toLowerCase().includes(query) || c.slug.includes(query)
+  const verdict = useMemo(() => (query.length >= 3 ? (FORGE.resolve(q) as ForgeVerdict) : null), [q, query])
+  const visibleGroups = GROUPS.map((g) => [g, byGroup(g).filter(matches)] as const).filter(([, cs]) => cs.length)
+  const total = COMPONENT_PAGES.length
+  const shown = visibleGroups.reduce((n, [, cs]) => n + cs.length, 0)
+
   return (
     <DocsShell navigate={navigate}>
       <div className="cmpdoc__head">
         <h1>Components</h1>
         <p className="cmpdoc__lead">
-          Every component in the kit — accessible, framework-neutral, and endlessly themeable.
-          Pick one for its live example, recipe CSS and best-practice rules.
+          {total} components, each with a source: the platform has it, WAI-ARIA APG names it, or a public service ships it.
+          Pick one for its live example, provenance, contract, usage and recipe CSS — or describe what you need.
         </p>
       </div>
-      {GROUPS.map((g) => (
+
+      <form className="cmpdoc__ask" role="search" onSubmit={(e) => e.preventDefault()}>
+        <label className="cmpdoc__ask-label" htmlFor="cmpdoc-q">Search, or describe what you need</label>
+        <div className="cmpdoc__ask-row">
+          <input
+            id="cmpdoc-q"
+            className="cmpdoc__ask-input"
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="button · a toast that confirms the save · show more"
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <span className="cmpdoc__ask-count" aria-live="polite">{query ? `${shown} of ${total}` : total}</span>
+        </div>
+        {verdict && <ForgeAnswer v={verdict} navigate={navigate} />}
+      </form>
+
+      {/* The list matched nothing but the forge did: show what it found as a
+        * section of its own, so a sentence lands on the same kind of result a
+        * word does. */}
+      {visibleGroups.length === 0 && verdict && forgePages(verdict).length > 0 && (
+        <section className="cmpdoc__idx-section">
+          <h2 className="cmpdoc__idx-head">By description</h2>
+          <div className="cmpdoc__idx-grid">
+            {forgePages(verdict).map((c) => (
+              <a key={c.slug} className="cmpdoc__idx-link" href={`/components/${c.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/components/${c.slug}`) }}>{c.name}<span className="cmpdoc__idx-blurb">{c.blurb}</span></a>
+            ))}
+          </div>
+        </section>
+      )}
+      {visibleGroups.length === 0 && !verdict && <p className="cmpdoc__idx-empty">Nothing in the list matches “{q}”.</p>}
+      {visibleGroups.map(([g, cs]) => (
         <section className="cmpdoc__idx-section" key={g}>
           <h2 className="cmpdoc__idx-head">{g}</h2>
           <div className="cmpdoc__idx-grid">
-            {byGroup(g).map((c) => (
+            {cs.map((c) => (
               <a
                 key={c.slug}
                 className="cmpdoc__idx-link"
                 href={`/components/${c.slug}`}
                 onClick={(e) => { e.preventDefault(); navigate(`/components/${c.slug}`) }}
-              >{c.name}</a>
+              >{c.name}<span className="cmpdoc__idx-blurb">{c.blurb}</span></a>
             ))}
           </div>
         </section>
       ))}
+
+      <aside className="cmpdoc__forge">
+        <p>
+          <strong>Missing a component?</strong> Describe it and the derivation says whether it may exist, and where it comes
+          from — or why not.{' '}
+          <a href="/forge" onClick={(e) => { e.preventDefault(); navigate('/forge') }}>Forge a component →</a>
+        </p>
+      </aside>
     </DocsShell>
+  )
+}
+
+/* The forge's answer, compact, under the search box. The full page (/forge)
+ * renders the thing; here the answer is one line, the citation, and a link. */
+type ForgeVerdict = {
+  verdict: 'exists' | 'platform' | 'core' | 'census' | 'decided' | 'token' | 'none' | 'compose'
+  say: string
+  page?: string | null
+  recipe?: { id: string; page: { slug: string; name: string } | null; pages?: { slug: string; name: string }[] }
+  primary?: ForgeVerdict
+  parts?: ForgeVerdict[]
+  citations: { layer: number; source: string; url?: string }[]
+  unknown: string[]
+}
+const VERDICT_LABEL: Record<ForgeVerdict['verdict'], string> = {
+  exists: 'You have this', platform: 'The platform has this', core: 'May exist', census: 'Local extension',
+  decided: 'Decided not to', token: 'A token, not a component', none: 'No layer names this', compose: 'Several things you have',
+}
+/** The component pages a verdict points at — the recipe's own, the primary's, the parts'. */
+function forgePages(v: ForgeVerdict): ComponentPage[] {
+  const slugs: string[] = []
+  const add = (r?: ForgeVerdict['recipe']) => { for (const p of r?.pages ?? (r?.page ? [r.page] : [])) if (!slugs.includes(p.slug)) slugs.push(p.slug) }
+  add(v.recipe); add(v.primary?.recipe); for (const p of v.parts ?? []) add(p.recipe)
+  return slugs.map((s) => componentPageBySlug(s)).filter((p): p is ComponentPage => !!p)
+}
+function ForgeAnswer({ v, navigate }: { v: ForgeVerdict; navigate: (to: string) => void }) {
+  const pages = forgePages(v)
+  const cite = v.citations.find((c) => c.layer !== 3)
+  return (
+    <div className={`cmpdoc__answer cmpdoc__answer--${v.verdict}`} aria-live="polite">
+      <span className={`cmpdoc__answer-badge cmpdoc__answer-badge--${v.verdict}`}>{VERDICT_LABEL[v.verdict]}</span>
+      <span className="cmpdoc__answer-say">
+        {v.say.split('. ')[0]}.
+        {cite && cite.url && <> <a href={cite.url} target="_blank" rel="noreferrer">{cite.source}</a>.</>}
+        {' '}
+        {pages.map((p) => (
+          <a key={p.slug} className="cmpdoc__answer-page" href={`/components/${p.slug}`} onClick={(e) => { e.preventDefault(); navigate(`/components/${p.slug}`) }}>{p.name} →</a>
+        ))}
+        {pages.length === 0 && (
+          <a className="cmpdoc__answer-page" href="/forge" onClick={(e) => { e.preventDefault(); navigate('/forge') }}>Open in the forge →</a>
+        )}
+      </span>
+    </div>
   )
 }
 
@@ -213,6 +365,91 @@ function Evidence({ recipeId, tests }: { recipeId: string; tests: string[] }) {
   )
 }
 
+/* ── Where it comes from — the provenance line, from the derivation ────────────
+ * Every component carries a line or leaves (Sprint I–J). The page shows the
+ * line: which layer names it (HTML · APG · a public service), linked to the
+ * source, and the sentence the derivation wrote for it. A recipe the derivation
+ * lists as sourceless says so — that is a fact about the kit, not a decoration. */
+function Provenance({ recipeId }: { recipeId: string }) {
+  const fr = forgeRecipe(recipeId)
+  type Src = { layer: number; source: string; because: string; url?: string }
+  const all = (fr?.provenance ?? []) as Src[]
+  const sources = all.filter((s) => s.layer !== 3)
+  const census = all.find((s) => s.layer === 3)
+  const alsoCovers = (fr?.covers?.service ?? []).filter((c) => !sources.some((s) => s.source === c))
+  if (!fr) return null
+  return (
+    <section className="cmpdoc__prov" aria-label="Where this component comes from">
+      <h2 className="cmpdoc__prov-h">Where it comes from</h2>
+      {sources.length === 0 ? (
+        <p className="cmpdoc__prov-none">
+          <strong>No core line.</strong> No HTML element, WAI-ARIA APG pattern or public-service component names this
+          one; the derivation lists it as sourceless. It is ours — kept because a page pattern needs it, and it leaves
+          the day that stops being true.{census && <> Open UI’s census does count it: {census.because}</>}
+        </p>
+      ) : (
+        <>
+          <ul className="cmpdoc__prov-list">
+            {sources.map((src) => (
+              <li key={src.source}>
+                <span className={`cmpdoc__layer cmpdoc__layer--${src.layer}`}>{LAYER_LABEL[src.layer] ?? `L${src.layer}`}</span>
+                {src.url ? <a href={src.url} target="_blank" rel="noreferrer">{src.source}</a> : <span>{src.source}</span>}
+                <span className="cmpdoc__prov-why"> — {src.because}</span>
+              </li>
+            ))}
+          </ul>
+          {alsoCovers.length > 0 && (
+            <p className="cmpdoc__prov-also">Also covers: {alsoCovers.join(' · ')}.</p>
+          )}
+        </>
+      )}
+    </section>
+  )
+}
+
+/** Copy to the clipboard, with a moment of confirmation. */
+function useCopy(): [string | null, (key: string, text: string) => void] {
+  const [copied, setCopied] = useState<string | null>(null)
+  const copy = (key: string, text: string) => {
+    void navigator.clipboard?.writeText(text).then(() => {
+      setCopied(key)
+      window.setTimeout(() => setCopied((k) => (k === key ? null : k)), 1600)
+    })
+  }
+  return [copied, copy]
+}
+
+/* The specimen as HTML — read from the LIVE stage, not re-rendered: what you
+ * copy is exactly what you see, icons and all. The gallery card's own chrome
+ * (the .card frame and its ⓘ panel) is not part of the component and is
+ * stripped; the markup is then broken into lines by tag depth so it pastes
+ * readably. React leaves no framework attributes in the DOM, so this is plain
+ * HTML the kit's CSS styles as-is. */
+function specimenHtml(stage: HTMLElement | null): string {
+  if (!stage) return ''
+  const card = stage.querySelector(':scope > .card') as HTMLElement | null
+  const root = (card ?? stage).cloneNode(true) as HTMLElement
+  root.querySelectorAll('.cardinfo').forEach((n) => n.remove())
+  const raw = card ? root.innerHTML : root.innerHTML
+  return prettyHtml(raw.trim())
+}
+const VOID = new Set(['img', 'input', 'br', 'hr', 'meta', 'link', 'source', 'track', 'wbr', 'area', 'col', 'embed', 'param'])
+function prettyHtml(html: string): string {
+  const tokens = html.replace(/>\s+</g, '><').split(/(?=<)|(?<=>)/g).filter((t) => t.trim().length)
+  let depth = 0
+  const out: string[] = []
+  for (const t of tokens) {
+    const isClose = /^<\//.test(t)
+    const isOpen = /^<[a-zA-Z]/.test(t)
+    const tag = (t.match(/^<\/?([a-zA-Z0-9-]+)/) ?? [])[1]
+    const selfClosing = /\/>$/.test(t) || (tag ? VOID.has(tag.toLowerCase()) : false)
+    if (isClose) depth = Math.max(0, depth - 1)
+    out.push('  '.repeat(depth) + t.trim())
+    if (isOpen && !selfClosing && !isClose) depth++
+  }
+  return out.join('\n')
+}
+
 /* ── The detail — one component: preview · composition · recipe CSS · Do/Don't ── */
 export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate: (to: string) => void }) {
   const page = componentPageBySlug(slug) as ComponentPage
@@ -222,6 +459,15 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
   const composes = usesOf(page.recipeId)
   const doc = recipe?.doc
   const ex = explainerFor(page.recipeId)
+  const fr = forgeRecipe(page.recipeId)
+  const usage: string = fr ? FORGE.skeleton(fr) : ''
+  const stageRef = useRef<HTMLDivElement>(null)
+  const [copied, copy] = useCopy()
+  const CopyButton = ({ id, text, label }: { id: string; text: () => string; label: string }) => (
+    <button type="button" className={`cmpdoc__copy${copied === id ? ' cmpdoc__copy--done' : ''}`} onClick={() => copy(id, text())} aria-live="polite">
+      {copied === id ? 'Copied' : label}
+    </button>
+  )
 
   useEffect(() => {
     const prev = document.title
@@ -244,10 +490,22 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
         <p className="cmpdoc__lead">{page.blurb}</p>
       </div>
 
-      <div className="cockpit-preview cmpdoc__stage" style={tokens}>
+      <Provenance recipeId={page.recipeId} />
+
+      <div className="cockpit-preview cmpdoc__stage" style={tokens} ref={stageRef}>
         <IconProvider set={iconSet}>
           <page.Preview />
         </IconProvider>
+      </div>
+      {/* Copy what you see: the specimen's HTML (read from the stage), the recipe's
+        * CSS, and the usage skeleton the forge derives from the recipe's own
+        * classes and APG contract. Three things an agent or a person needs to use
+        * this component somewhere else, without opening the configurator. */}
+      <div className="cmpdoc__copybar" role="group" aria-label="Copy this component">
+        <CopyButton id="html" label="Copy HTML" text={() => specimenHtml(stageRef.current)} />
+        {recipe && <CopyButton id="css" label="Copy CSS" text={() => recipe.css} />}
+        {usage && <CopyButton id="usage" label="Copy usage" text={() => usage} />}
+        <span className="cmpdoc__copyhint">HTML is the specimen above, as rendered · CSS is the recipe below · usage is the block’s skeleton with its ARIA</span>
       </div>
 
       {/* The explainer: parts · states · behaviour · accessibility · tests.
@@ -339,9 +597,26 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
         </section>
       )}
 
+      {usage && (
+        <section className="cmpdoc__block">
+          <div className="cmpdoc__block-head">
+            <h2>Usage</h2>
+            <CopyButton id="usage2" label="Copy" text={() => usage} />
+          </div>
+          <p className="cmpdoc__note">
+            The block on its element, its parts, and the ARIA the contract names — a shape to fill, derived from the
+            recipe’s own classes. Not a specimen; the stage above is.
+          </p>
+          <pre className="cmpdoc__css"><code>{usage}</code></pre>
+        </section>
+      )}
+
       {recipe && (
         <section className="cmpdoc__block">
-          <h2>Recipe CSS</h2>
+          <div className="cmpdoc__block-head">
+            <h2>Recipe CSS</h2>
+            <CopyButton id="css2" label="Copy" text={() => recipe.css} />
+          </div>
           <p className="cmpdoc__note">
             This is the exact CSS your kit ships for <code>{page.name}</code> — token-driven, so it
             re-themes with every knob. Get it (and the rest) from the configurator&apos;s{' '}
@@ -350,6 +625,14 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
           <pre className="cmpdoc__css"><code>{recipe.css}</code></pre>
         </section>
       )}
+
+      <aside className="cmpdoc__forge">
+        <p>
+          <strong>Not quite this?</strong> Describe what you need and the derivation says whether it may exist — and
+          where it comes from.{' '}
+          <a href="/forge" onClick={(e) => { e.preventDefault(); navigate('/forge') }}>Forge a component →</a>
+        </p>
+      </aside>
     </DocsShell>
   )
 }

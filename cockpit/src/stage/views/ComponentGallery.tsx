@@ -4863,11 +4863,16 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'password-input', name: 'Password Input', group: 'Inputs', recipeId: 'passwordinput', blurb: 'A password field with a reveal toggle and caps-lock warning.', Preview: PasswordInputCard },
   { slug: 'tag-input', name: 'Tag Input', group: 'Inputs', recipeId: 'tag-input', blurb: 'Enter and remove tokens inline — labels, recipients, filters.', Preview: TagInputCard },
   { slug: 'date-picker', name: 'Date Picker', group: 'Inputs', recipeId: 'calendar', blurb: 'A date field whose popover calendar is pure kit — themed, not OS chrome.', Preview: DateFieldCard },
+  { slug: 'date-range-picker', name: 'Date Range Picker', group: 'Inputs', recipeId: 'calendar-range', blurb: 'Two dates in one grid — start, end and the span between them, keyboard-navigable (USWDS Date range picker).', Preview: CalendarRangeCard },
+  { slug: 'segmented-control', name: 'Segmented Control', group: 'Inputs', recipeId: 'segmented-control-toggle-group', blurb: 'A row of exclusive options that reads as one control — a radio group in a segmented shape.', Preview: InboxFilterCard },
 
   // Forms
   { slug: 'form-panel', name: 'Form Panel', group: 'Forms', recipeId: 'form-panel', blurb: 'The full form block — sectioned fields, inline validation and a sunken action bar.', Preview: FormPanelCard },
   { slug: 'filter-bar', name: 'Filter Bar', group: 'Forms', recipeId: 'filter-bar', blurb: 'Search, facets and removable active-filter chips — the query surface for any list.', Preview: FilterBarCard },
   { slug: 'file-upload', name: 'File Upload', group: 'Forms', recipeId: 'file-upload-dropzone', blurb: 'A drag-and-drop dropzone with browse fallback and file-type hints.', Preview: DropzoneCard },
+  { slug: 'fieldset', name: 'Fieldset', group: 'Forms', recipeId: 'fieldset', blurb: 'A group of related fields with a legend that names the question — the platform’s own grouping, styled (GOV.UK Fieldset).', Preview: FieldsetCard },
+  { slug: 'sign-in', name: 'Sign in', group: 'Forms', recipeId: 'auth', blurb: 'The sign-in form as a public service ships it — one column, visible labels, no placeholder-only fields (GOV.UK Sign in).', Preview: LoginCard },
+  { slug: 'wizard-stepper', name: 'Wizard Stepper', group: 'Forms', recipeId: 'wizardstepper', blurb: 'A step indicator with the form body under it — where you are in a multi-step task, and what is left (USWDS Step indicator).', Preview: WizardStepperCard },
 
   // Data & display
   { slug: 'table', name: 'Table', group: 'Data display', recipeId: 'table', blurb: 'The base data table — header, rows, numeric alignment, hover and zebra.', Preview: TableCard },
@@ -4877,6 +4882,11 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'badge', name: 'Badge', group: 'Data display', recipeId: 'badges-pills', blurb: 'The status tag — soft tones for state, solid only for a count or a critical flag.', Preview: BadgesCard },
   { slug: 'usage-meter', name: 'Usage Meter', group: 'Data display', recipeId: 'usage-meter', blurb: 'A quota bar whose fill shifts to a warning tone past a threshold.', Preview: UsageMeterCard },
   { slug: 'code-block', name: 'Code Block', group: 'Data display', recipeId: 'codeblock', blurb: 'A mono code surface with a header, copy button and language tag.', Preview: CodeBlockCard },
+  { slug: 'activity-feed', name: 'Activity Feed', group: 'Data display', recipeId: 'activity-feed', blurb: 'A reverse-chronological stream of events with actor, verb and time — an APG feed, so a screen reader can move through it.', Preview: ActivityFeedCard },
+  { slug: 'tree-view', name: 'Tree View', group: 'Data display', recipeId: 'treeview', blurb: 'A hierarchy that expands and collapses — arrow-key navigation over an APG tree.', Preview: TreeViewCard },
+  { slug: 'file-grid', name: 'File Grid', group: 'Data display', recipeId: 'file-grid', blurb: 'A grid of files or media with covers, names and meta — a listing that shows rather than tells.', Preview: FileGridCard },
+  { slug: 'week-calendar', name: 'Week Calendar', group: 'Data display', recipeId: 'calendar-week', blurb: 'The week view — a time grid with events, built on the same date-grid rules as the picker.', Preview: CalendarWeekCard },
+  { slug: 'year-calendar', name: 'Year Calendar', group: 'Data display', recipeId: 'calendar-year', blurb: 'The year at a glance — twelve month grids on one surface.', Preview: CalendarYearCard },
 
   // Feedback & status
   { slug: 'alert', name: 'Alert', group: 'Feedback', recipeId: 'alert', blurb: 'An inline message in the toned status colours — info, success, warning, danger.', Preview: AlertsCard },
@@ -4887,6 +4897,7 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'cookie-banner', name: 'Cookie banner', group: 'Feedback', recipeId: 'cookiebanner', blurb: 'The consent region before everything else on the page: which cookies, accept or reject, and a link to the details — GOV.UK Cookie banner.', Preview: CookieBannerCard },
   { slug: 'progress', name: 'Progress', group: 'Feedback', recipeId: 'progress', blurb: 'A determinate progress bar, heavier than the slider to read as ongoing work.', Preview: ProgressCard },
   { slug: 'empty-state', name: 'Empty State', group: 'Feedback', recipeId: 'empty-state', blurb: 'The zero-data screen — an icon, a line of guidance and one action.', Preview: EmptyStateCard },
+  { slug: 'error-summary', name: 'Error summary', group: 'Feedback', recipeId: 'errorsummary', blurb: 'Everything that went wrong, listed at the top, focused on arrival, each item a link to its field (GOV.UK Error summary).', Preview: ErrorSummaryCard },
 
   // Navigation
   { slug: 'tabs', name: 'Tabs', group: 'Navigation', recipeId: 'tabs', blurb: 'A tab strip that switches panels, with an active underline and keyboard flow.', Preview: TabsCard },
@@ -4896,12 +4907,18 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'in-page-navigation', name: 'In-page Navigation', group: 'Navigation', recipeId: 'inpagenav', blurb: 'On this page — a named nav landmark whose current item is announced, not just underlined.', Preview: InPageNavCard },
   { slug: 'process-list', name: 'Process List', group: 'Navigation', recipeId: 'processlist', blurb: 'Numbered steps that carry real content — editorial, not a progress indicator.', Preview: ProcessListCard },
   { slug: 'stepper', name: 'Stepper', group: 'Navigation', recipeId: 'stepper', blurb: 'A multi-step progress indicator — done, current and future states.', Preview: StepperCard },
+  { slug: 'task-list', name: 'Task list', group: 'Navigation', recipeId: 'tasklist', blurb: 'A list of tasks with their status carried in text — completed, in progress, cannot start yet (GOV.UK Task list).', Preview: TaskListCard },
+  { slug: 'skip-link', name: 'Skip link', group: 'Navigation', recipeId: 'skiplink', blurb: 'The first tab stop on the page: a link that jumps to the main content and moves focus there (GOV.UK Skip link).', Preview: SkipLinkCard },
+  { slug: 'language-selector', name: 'Language selector', group: 'Navigation', recipeId: 'langnav', blurb: 'A named navigation of the languages a service is offered in, each in its own tongue (USWDS Language selector).', Preview: LanguageNavCard },
+  { slug: 'side-navigation', name: 'Side navigation', group: 'Navigation', recipeId: 'sidebar', blurb: 'The side navigation rail — grouped rows, the current page marked, collapsible sections (USWDS Side navigation).', Preview: NavCard },
+  { slug: 'app-bar', name: 'App bar', group: 'Navigation', recipeId: 'appbar', blurb: 'The top app bar — brand, search, notifications and account in one navigation landmark (NL Design System Navigation bar).', Preview: AppBarCard },
 
   // Overlays & disclosure
   { slug: 'dialog', name: 'Dialog', group: 'Overlays', recipeId: 'dialog', blurb: 'A focused modal — one screen of content, one primary action in a sunken foot.', Preview: DialogCard },
   { slug: 'alert-dialog', name: 'Alert Dialog', group: 'Overlays', recipeId: 'alert-dialog', blurb: 'A confirmation modal that names the object and its destructive action.', Preview: AlertDialogCard },
   { slug: 'sheet', name: 'Sheet', group: 'Overlays', recipeId: 'sheet-drawer', blurb: 'A slide-in panel from an edge — a longer flow than a dialog holds.', Preview: SheetCard },
   { slug: 'tooltip', name: 'Tooltip', group: 'Overlays', recipeId: 'tooltip', blurb: 'A hover hint — one line of context, never interactive content.', Preview: TooltipCard },
+  { slug: 'toggletip', name: 'Toggletip', group: 'Overlays', recipeId: 'toggletip', blurb: 'A tooltip you open on purpose — a button that reveals a short explanation into a live region, so it works on touch and is announced.', Preview: ToggletipCard },
   { slug: 'accordion', name: 'Accordion', group: 'Overlays', recipeId: 'accordion', blurb: 'Stacked disclosure panels — one section open at a time or many.', Preview: AccordionCard },
   { slug: 'lightbox', name: 'Lightbox', group: 'Overlays', recipeId: 'lightbox', blurb: 'A full-screen media viewer with prev/next and a caption.', Preview: LightboxCard },
 
@@ -4910,9 +4927,13 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'footer', name: 'Footer', group: 'Layout', recipeId: 'sitefooter', blurb: 'The contentinfo landmark — accessibility statement, privacy, contact, the body responsible.', Preview: SiteFooterCard },
   { slug: 'identifier', name: 'Identifier', group: 'Layout', recipeId: 'identifier', blurb: 'Who operates this service, and the statements a person is entitled to find.', Preview: IdentifierCard },
   { slug: 'resizable', name: 'Resizable', group: 'Layout', recipeId: 'resizable', blurb: 'Drag-to-resize split panes with a grabbable handle.', Preview: ResizableCard },
+  { slug: 'card', name: 'Card', group: 'Layout', recipeId: 'card', blurb: 'The surface everything else sits on — media, rows, title and actions, and the interactive and presentation variants.', Preview: ProductCardCard },
+  { slug: 'page-header', name: 'Page header', group: 'Layout', recipeId: 'page-head', blurb: 'The page header — eyebrow, title, description and the actions that belong to the whole page (NL Design System Page header).', Preview: PageHeadCard },
 
   // AI thread
   { slug: 'prose', name: 'Prose', group: 'Content', recipeId: 'prose', blurb: 'A rich-text container that styles raw semantic tags to the kit’s type and rhythm.', Preview: ProseCard },
+  { slug: 'inset-text', name: 'Inset text', group: 'Content', recipeId: 'infocard', blurb: 'Text set apart from the flow to draw attention without alarming — GOV.UK Inset text.', Preview: InfoCardCard },
+  { slug: 'action-panel', name: 'Action panel', group: 'Content', recipeId: 'action-panel', blurb: 'A highlighted region with one clear action — the spotlight for the thing that matters on the page (NL Design System Spotlight section).', Preview: ActionPanelCard },
 ]
 
 export const componentPageBySlug = (slug: string): ComponentPage | undefined =>

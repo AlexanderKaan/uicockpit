@@ -11,6 +11,16 @@
       "definition": "Stacked disclosure panels — one section open at a time or many."
     },
     {
+      "name": "Action panel",
+      "url": "https://uicockpit.com/components/action-panel",
+      "definition": "A highlighted region with one clear action — the spotlight for the thing that matters on the page (NL Design System Spotlight section)."
+    },
+    {
+      "name": "Activity Feed",
+      "url": "https://uicockpit.com/components/activity-feed",
+      "definition": "A reverse-chronological stream of events with actor, verb and time — an APG feed, so a screen reader can move through it."
+    },
+    {
       "name": "Alert",
       "url": "https://uicockpit.com/components/alert",
       "definition": "An inline message in the toned status colours — info, success, warning, danger."
@@ -19,6 +29,11 @@
       "name": "Alert Dialog",
       "url": "https://uicockpit.com/components/alert-dialog",
       "definition": "A confirmation modal that names the object and its destructive action."
+    },
+    {
+      "name": "App bar",
+      "url": "https://uicockpit.com/components/app-bar",
+      "definition": "The top app bar — brand, search, notifications and account in one navigation landmark (NL Design System Navigation bar)."
     },
     {
       "name": "Back link",
@@ -49,6 +64,11 @@
       "name": "Button Group",
       "url": "https://uicockpit.com/components/button-group",
       "definition": "Segmented actions that share one seam — a split button or a related-action cluster."
+    },
+    {
+      "name": "Card",
+      "url": "https://uicockpit.com/components/card",
+      "definition": "The surface everything else sits on — media, rows, title and actions, and the interactive and presentation variants."
     },
     {
       "name": "Carousel",
@@ -103,6 +123,11 @@
       "definition": "A date field whose popover calendar is pure kit — themed, not OS chrome."
     },
     {
+      "name": "Date Range Picker",
+      "url": "https://uicockpit.com/components/date-range-picker",
+      "definition": "Two dates in one grid — start, end and the span between them, keyboard-navigable (USWDS Date range picker)."
+    },
+    {
       "name": "Description List",
       "url": "https://uicockpit.com/components/description-list",
       "definition": "Key–value pairs — account info, plan details, a spec sheet."
@@ -125,9 +150,24 @@
       "definition": "The zero-data screen — an icon, a line of guidance and one action."
     },
     {
+      "name": "Error summary",
+      "url": "https://uicockpit.com/components/error-summary",
+      "definition": "Everything that went wrong, listed at the top, focused on arrival, each item a link to its field (GOV.UK Error summary)."
+    },
+    {
       "name": "Exit this page",
       "url": "https://uicockpit.com/components/exit-this-page",
       "definition": "A prominent, always-visible way to leave a sensitive service without a trace — GOV.UK Exit this page."
+    },
+    {
+      "name": "Fieldset",
+      "url": "https://uicockpit.com/components/fieldset",
+      "definition": "A group of related fields with a legend that names the question — the platform’s own grouping, styled (GOV.UK Fieldset)."
+    },
+    {
+      "name": "File Grid",
+      "url": "https://uicockpit.com/components/file-grid",
+      "definition": "A grid of files or media with covers, names and meta — a listing that shows rather than tells."
     },
     {
       "name": "File Upload",
@@ -166,6 +206,16 @@
       "definition": "The text field and its label/hint/error anatomy — the base of every form."
     },
     {
+      "name": "Inset text",
+      "url": "https://uicockpit.com/components/inset-text",
+      "definition": "Text set apart from the flow to draw attention without alarming — GOV.UK Inset text."
+    },
+    {
+      "name": "Language selector",
+      "url": "https://uicockpit.com/components/language-selector",
+      "definition": "A named navigation of the languages a service is offered in, each in its own tongue (USWDS Language selector)."
+    },
+    {
       "name": "Lightbox",
       "url": "https://uicockpit.com/components/lightbox",
       "definition": "A full-screen media viewer with prev/next and a caption."
@@ -194,6 +244,11 @@
       "name": "Number Input",
       "url": "https://uicockpit.com/components/number-input",
       "definition": "A numeric field with stepper affordances and tabular alignment."
+    },
+    {
+      "name": "Page header",
+      "url": "https://uicockpit.com/components/page-header",
+      "definition": "The page header — eyebrow, title, description and the actions that belong to the whole page (NL Design System Page header)."
     },
     {
       "name": "Pagination",
@@ -236,6 +291,11 @@
       "definition": "A search field with a lead icon, ghost clear button and optional kbd hint."
     },
     {
+      "name": "Segmented Control",
+      "url": "https://uicockpit.com/components/segmented-control",
+      "definition": "A row of exclusive options that reads as one control — a radio group in a segmented shape."
+    },
+    {
       "name": "Select",
       "url": "https://uicockpit.com/components/select",
       "definition": "A themed select trigger + option menu — the native picker, restyled to the kit."
@@ -244,6 +304,21 @@
       "name": "Sheet",
       "url": "https://uicockpit.com/components/sheet",
       "definition": "A slide-in panel from an edge — a longer flow than a dialog holds."
+    },
+    {
+      "name": "Side navigation",
+      "url": "https://uicockpit.com/components/side-navigation",
+      "definition": "The side navigation rail — grouped rows, the current page marked, collapsible sections (USWDS Side navigation)."
+    },
+    {
+      "name": "Sign in",
+      "url": "https://uicockpit.com/components/sign-in",
+      "definition": "The sign-in form as a public service ships it — one column, visible labels, no placeholder-only fields (GOV.UK Sign in)."
+    },
+    {
+      "name": "Skip link",
+      "url": "https://uicockpit.com/components/skip-link",
+      "definition": "The first tab stop on the page: a link that jumps to the main content and moves focus there (GOV.UK Skip link)."
     },
     {
       "name": "Slider",
@@ -276,6 +351,16 @@
       "definition": "Enter and remove tokens inline — labels, recipients, filters."
     },
     {
+      "name": "Task list",
+      "url": "https://uicockpit.com/components/task-list",
+      "definition": "A list of tasks with their status carried in text — completed, in progress, cannot start yet (GOV.UK Task list)."
+    },
+    {
+      "name": "Toggletip",
+      "url": "https://uicockpit.com/components/toggletip",
+      "definition": "A tooltip you open on purpose — a button that reveals a short explanation into a live region, so it works on touch and is announced."
+    },
+    {
       "name": "Toolbar",
       "url": "https://uicockpit.com/components/toolbar",
       "definition": "A row of grouped controls at one locked height — the editor/table action bar."
@@ -286,6 +371,11 @@
       "definition": "A hover hint — one line of context, never interactive content."
     },
     {
+      "name": "Tree View",
+      "url": "https://uicockpit.com/components/tree-view",
+      "definition": "A hierarchy that expands and collapses — arrow-key navigation over an APG tree."
+    },
+    {
       "name": "Usage Meter",
       "url": "https://uicockpit.com/components/usage-meter",
       "definition": "A quota bar whose fill shifts to a warning tone past a threshold."
@@ -294,6 +384,21 @@
       "name": "Warning text",
       "url": "https://uicockpit.com/components/warning-text",
       "definition": "A strong inline warning at the point of decision, with the word carried in text — GOV.UK Warning text."
+    },
+    {
+      "name": "Week Calendar",
+      "url": "https://uicockpit.com/components/week-calendar",
+      "definition": "The week view — a time grid with events, built on the same date-grid rules as the picker."
+    },
+    {
+      "name": "Wizard Stepper",
+      "url": "https://uicockpit.com/components/wizard-stepper",
+      "definition": "A step indicator with the form body under it — where you are in a multi-step task, and what is left (USWDS Step indicator)."
+    },
+    {
+      "name": "Year Calendar",
+      "url": "https://uicockpit.com/components/year-calendar",
+      "definition": "The year at a glance — twelve month grids on one surface."
     }
   ]
 }

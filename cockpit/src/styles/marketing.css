@@ -1780,9 +1780,12 @@
    showcase. The live example lives on each detail page. */
 .cmpdoc__idx-section { margin-bottom: 32px; }
 .cmpdoc__idx-head { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mkt-fg-faint); margin: 0 0 12px; }
-.cmpdoc__idx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 2px 20px; }
-.cmpdoc__idx-link { display: block; padding: 7px 10px; margin-left: -10px; border-radius: 7px; font-size: 14px; color: var(--mkt-fg-muted); text-decoration: none; }
-.cmpdoc__idx-link:hover { background: var(--mkt-bg-soft, #f7f8fa); color: var(--mkt-fg); }
+.cmpdoc__idx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--k-s-2) var(--k-s-20); }
+.cmpdoc__idx-link { display: block; padding: var(--k-s-8) var(--k-s-10); margin-left: calc(-1 * var(--k-s-10)); border-radius: var(--k-radius-md); font-size: var(--k-type-small); font-weight: var(--k-weight-medium); color: var(--mkt-fg); text-decoration: none; }
+.cmpdoc__idx-link:hover { background: var(--mkt-bg-soft, #f7f8fa); }
+.cmpdoc__idx-blurb { display: block; font-size: var(--k-type-caption); font-weight: 400; color: var(--mkt-fg-muted); line-height: var(--k-leading-snug); margin-top: var(--k-s-2);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cmpdoc__idx-empty { color: var(--mkt-fg-muted); font-size: var(--k-type-small); }
 
 /* Detail: the large live preview + composition + best practices + recipe CSS. */
 .cmpdoc__stage { border: var(--k-bw) solid var(--k-border); border-radius: var(--k-radius-lg); background: var(--k-bg); padding: 32px; margin-bottom: 20px; }
@@ -1800,11 +1803,29 @@
 .cmpdoc__dodont li { font-size: 13.5px; color: var(--mkt-fg-muted); line-height: 1.5; }
 .cmpdoc__css { margin: 0; padding: 18px; border-radius: 12px; background: #0d1117; color: #c9d1d9; font-family: var(--mkt-mono, ui-monospace, monospace); font-size: 12.5px; line-height: 1.6; overflow-x: auto; max-height: 520px; overflow-y: auto; }
 
+/* The rail's fold. Desktop: the <details> is always open and its summary hidden
+ * — the rail reads as it always did. Phone: the summary is the whole rail
+ * until tapped; open by default on the index (the list is the page), closed on
+ * a detail page (the component is the page). */
+.cmpdoc__side-fold { display: contents; }
+.cmpdoc__side-summary { display: none; }
+.cmpdoc__side-list { display: flex; flex-direction: column; gap: 2px; }
+.cmpdoc__side-count { font-size: var(--k-type-caption); color: var(--mkt-fg-faint); margin-left: var(--k-s-6); font-weight: 400; }
 @media (max-width: 860px) {
   .cmpdoc { grid-template-columns: 1fr; gap: 0; }
-  .cmpdoc__side { position: static; max-height: none; flex-direction: row; flex-wrap: wrap; gap: 4px; margin-bottom: 24px; }
-  .cmpdoc__side-group { margin-top: 0; display: contents; }
-  .cmpdoc__side-head { display: none; }
+  .cmpdoc__side { position: static; max-height: none; padding-right: 0; margin-bottom: var(--k-s-20); }
+  .cmpdoc--index .cmpdoc__side { display: none; }   /* the index page IS the list, with search */
+  .cmpdoc__side-fold { display: block; border: 1px solid var(--mkt-border); border-radius: var(--k-radius-md); }
+  .cmpdoc__side-fold[open] { padding-bottom: var(--k-s-8); }
+  .cmpdoc__side-summary { display: flex; align-items: center; justify-content: space-between; cursor: pointer; list-style: none;
+    padding: var(--k-s-10) var(--k-s-14); font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); color: var(--mkt-fg); }
+  .cmpdoc__side-summary::-webkit-details-marker { display: none; }
+  .cmpdoc__side-summary::after { content: '+'; color: var(--mkt-fg-faint); font-weight: 400; }
+  .cmpdoc__side-fold[open] > .cmpdoc__side-summary::after { content: '−'; }
+  .cmpdoc__side-list { padding: 0 var(--k-s-8); }
+  .cmpdoc__side-group { display: block; margin-top: var(--k-s-12); }
+  .cmpdoc__side-head { display: block; padding-left: var(--k-s-10); }
+  .cmpdoc__stage { overflow-x: auto; }
   .cmpdoc__dodont { grid-template-columns: 1fr; }
 }
 
@@ -2348,8 +2369,9 @@
 /* ── Hero fork — the two doors ───────────────────────────────────────────────
  * Audit sits FIRST: more visitors have a codebase than don't, and it is the half
  * with demand evidence behind it.                                              */
-.mkt__fork { display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-  max-width: 720px; margin: 0 auto 10px; text-align: left; }
+.mkt__fork { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
+  max-width: 1020px; margin: 0 auto 10px; text-align: left; }
+@media (max-width: 900px) { .mkt__fork { grid-template-columns: 1fr 1fr; max-width: 720px; } }
 @media (max-width: 720px) { .mkt__fork { grid-template-columns: 1fr; } }
 .mkt__door { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px;
   background: var(--mkt-card, #fff); border: 1px solid var(--mkt-line, #e6e6ec);
@@ -2359,6 +2381,8 @@
   box-shadow: 0 8px 24px rgb(0 0 0 / .07); outline: none; }
 .mkt__door--audit:hover, .mkt__door--audit:focus-visible { border-color: #e5934a; }
 .mkt__door--make:hover, .mkt__door--make:focus-visible { border-color: var(--mkt-accent, #0a84ff); }
+.mkt__door--forge:hover, .mkt__door--forge:focus-visible { border-color: #2f855a; }
+.mkt__door--forge .mkt__door-tag { color: #1f6b3a; }
 .mkt__door-tag { font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
   font-weight: 600; }
 .mkt__door--audit .mkt__door-tag { color: #c26a1e; }
@@ -2783,3 +2807,61 @@
 @media (max-width: 600px) { .frg__legend { grid-template-columns: 1fr; gap: var(--k-s-4); } .frg__legend dd { margin-bottom: var(--k-s-8); } }
 .frg__foot { font-size: var(--k-type-small); color: var(--mkt-fg-muted); margin: var(--k-s-24) 0 0; line-height: 1.6; }
 .frg__foot code { font-size: var(--k-type-caption); padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); }
+
+/* ── component page additions (Sprint M·1): provenance · copy · usage · forge CTA.
+ * Sized through the kit's tokens (DocsShell sets them on .cmpdoc); colours --mkt-*. */
+.cmpdoc__prov { margin: 0 0 var(--k-s-20); padding: var(--k-s-14) var(--k-s-16); border: 1px solid var(--mkt-border); border-radius: var(--k-radius-md);
+  background: color-mix(in oklab, var(--mkt-fg) 2.5%, transparent); }
+.cmpdoc__prov-h { font-size: var(--k-type-eyebrow); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--mkt-fg-faint); margin: 0 0 var(--k-s-8); font-weight: var(--k-weight-semibold); }
+.cmpdoc__prov-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-s-6); font-size: var(--k-type-small); line-height: var(--k-leading-normal); }
+.cmpdoc__prov-list li { display: flex; gap: var(--k-s-8); align-items: baseline; flex-wrap: wrap; }
+.cmpdoc__prov-list a { color: var(--mkt-fg); text-decoration: underline; text-decoration-color: var(--mkt-border); text-underline-offset: .2em; }
+.cmpdoc__prov-list a:hover { text-decoration-color: var(--mkt-fg); }
+.cmpdoc__prov-why { color: var(--mkt-fg-muted); }
+.cmpdoc__prov-also, .cmpdoc__prov-none { margin: var(--k-s-8) 0 0; font-size: var(--k-type-small); color: var(--mkt-fg-muted); line-height: var(--k-leading-normal); }
+.cmpdoc__prov-none { margin: 0; }
+.cmpdoc__layer { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: .06em; padding: var(--k-s-2) var(--k-s-6); border-radius: var(--k-radius-sm); white-space: nowrap;
+  background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); color: var(--mkt-fg-muted); }
+.cmpdoc__layer--1 { background: #e6effc; color: #1d4f9c; }
+.cmpdoc__layer--2 { background: #e3f4ea; color: #1f6b3a; }
+.cmpdoc__layer--4 { background: #fff1d6; color: #8a5a00; }
+
+.cmpdoc__copybar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--k-s-8); margin: calc(-1 * var(--k-s-8)) 0 var(--k-s-28); }
+.cmpdoc__copy { font: inherit; font-size: var(--k-type-caption); font-weight: var(--k-weight-semibold); color: var(--mkt-fg); background: var(--mkt-surface);
+  border: 1px solid var(--mkt-border); border-radius: var(--k-radius-pill); padding: var(--k-s-6) var(--k-s-12); cursor: pointer; }
+.cmpdoc__copy:hover { border-color: var(--mkt-fg); }
+.cmpdoc__copy:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 2px; }
+.cmpdoc__copy--done { color: #1f6b3a; border-color: #1f6b3a; }
+.cmpdoc__copyhint { font-size: var(--k-type-caption); color: var(--mkt-fg-faint); }
+.cmpdoc__block-head { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); }
+.cmpdoc__block-head h2 { margin-bottom: 0; }
+.cmpdoc__block-head + .cmpdoc__note { margin-top: var(--k-s-8); }
+.cmpdoc__forge { margin: var(--k-s-32) 0 0; padding: var(--k-s-16) var(--k-s-20); border-radius: var(--k-radius-md); border: 1px dashed var(--mkt-border); font-size: var(--k-type-small); line-height: var(--k-leading-normal); color: var(--mkt-fg-muted); }
+.cmpdoc__forge p { margin: 0; }
+.cmpdoc__forge strong { color: var(--mkt-fg); }
+.cmpdoc__forge a { color: var(--mkt-accent); text-decoration: none; font-weight: var(--k-weight-semibold); }
+.cmpdoc__forge a:hover { text-decoration: underline; }
+/* The app's preview canvas reserves 60vh (stage.css) — right for the configurator,
+ * wrong for a docs stage that should be as tall as the component in it. */
+.cmpdoc__stage.cockpit-preview, .frg__stage.cockpit-preview { min-height: 0; }
+
+/* ── the components index: one box that searches AND asks the forge ────────── */
+.cmpdoc__ask { margin: 0 0 var(--k-s-28); }
+.cmpdoc__ask-label { display: block; font-size: var(--k-type-caption); color: var(--mkt-fg-muted); margin: 0 0 var(--k-s-6); }
+.cmpdoc__ask-row { position: relative; display: flex; align-items: center; }
+.cmpdoc__ask-input { width: 100%; height: var(--k-control-h-lg); padding: 0 var(--k-s-16); padding-right: calc(var(--k-s-32) + var(--k-s-32)); font: inherit; font-size: var(--k-type-body); color: var(--mkt-fg);
+  background: var(--mkt-surface); border: 1px solid var(--mkt-border); border-radius: var(--k-radius-lg); outline: none; }
+.cmpdoc__ask-input:focus-visible { border-color: var(--mkt-accent); box-shadow: 0 0 0 var(--k-s-2) color-mix(in oklab, var(--mkt-accent) 22%, transparent); }
+.cmpdoc__ask-count { position: absolute; right: var(--k-s-14); font-size: var(--k-type-caption); color: var(--mkt-fg-faint); pointer-events: none; }
+.cmpdoc__answer { display: flex; gap: var(--k-s-10); align-items: baseline; flex-wrap: wrap; margin-top: var(--k-s-10); padding: var(--k-s-10) var(--k-s-14);
+  border-radius: var(--k-radius-md); background: color-mix(in oklab, var(--mkt-fg) 3%, transparent); font-size: var(--k-type-small); line-height: var(--k-leading-normal); }
+.cmpdoc__answer-badge { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: .06em; text-transform: uppercase; padding: var(--k-s-2) var(--k-s-8); border-radius: var(--k-radius-pill); white-space: nowrap;
+  background: color-mix(in oklab, var(--mkt-fg) 8%, transparent); color: var(--mkt-fg); }
+.cmpdoc__answer-badge--exists, .cmpdoc__answer-badge--compose { background: #e3f4ea; color: #1f6b3a; }
+.cmpdoc__answer-badge--platform { background: #e6effc; color: #1d4f9c; }
+.cmpdoc__answer-badge--core { background: #fff1d6; color: #8a5a00; }
+.cmpdoc__answer-badge--census, .cmpdoc__answer-badge--token { background: #efe9fb; color: #5b3aa8; }
+.cmpdoc__answer-badge--decided, .cmpdoc__answer-badge--none { background: #fbe7e2; color: #a23a1e; }
+.cmpdoc__answer-say { color: var(--mkt-fg-muted); }
+.cmpdoc__answer-say a { color: var(--mkt-fg); text-decoration: underline; text-decoration-color: var(--mkt-border); text-underline-offset: .2em; }
+.cmpdoc__answer-page { display: inline-block; margin-left: var(--k-s-8); color: var(--mkt-accent) !important; text-decoration: none !important; font-weight: var(--k-weight-semibold); }

@@ -141,6 +141,19 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               </span>
               <span className="mkt__door-meta">19 controls · Tailwind · shadcn · plain CSS</span>
             </button>
+
+            <button
+              type="button"
+              className="mkt__door mkt__door--forge"
+              onClick={() => { ping('door', 'forge'); navigate('/forge') }}
+            >
+              <span className="mkt__door-tag">Forge</span>
+              <span className="mkt__door-h">Ask before you build.</span>
+              <span className="mkt__door-p">
+                Describe a component. The derivation says whether it may exist — and where it comes from.
+              </span>
+              <span className="mkt__door-meta">78 components with a source · a citation, not an opinion</span>
+            </button>
           </div>
         </div>
 

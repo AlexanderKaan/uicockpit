@@ -328,7 +328,9 @@ export function createForge(data) {
    * element it is: a Link is an <a>, a Button is a <button>. Facts about the
    * patterns, not a list of our subjects. */
   const PATTERN_ELEMENT = { Link: 'a', Button: 'button', Checkbox: 'input', Switch: 'button', Meter: 'meter', 'Dialog (Modal)': 'dialog', 'Alert Dialog': 'dialog', Table: 'table', Slider: 'input' }
-  const elementOf = (r) => r.element ?? PATTERN_ELEMENT[r.apg?.pattern] ?? 'div'
+  // …but only for a LEAF: a block with parts is a container, whatever pattern it
+  // anchors to (a task list anchors to Checkbox and is not an <input>).
+  const elementOf = (r) => r.element ?? ((r.parts?.length ? null : PATTERN_ELEMENT[r.apg?.pattern]) ?? 'div')
   function skeleton(r, children = []) {
     const el = elementOf(r)
     // Parts, not modifiers of parts (`datatable__bar--active` is a state); in a

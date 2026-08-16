@@ -3264,8 +3264,20 @@
      ":active"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "card",
+     "name": "Card",
+     "group": "Layout",
+     "blurb": "The surface everything else sits on — media, rows, title and actions, and the interactive and presentation variants."
+    },
+    "pages": [
+     {
+      "slug": "card",
+      "name": "Card",
+      "group": "Layout",
+      "blurb": "The surface everything else sits on — media, rows, title and actions, and the interactive and presentation variants."
+     }
+    ],
     "provenance": [
      {
       "layer": 3,
@@ -3313,8 +3325,20 @@
      "--banner"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "page-header",
+     "name": "Page header",
+     "group": "Layout",
+     "blurb": "The page header — eyebrow, title, description and the actions that belong to the whole page (NL Design System Page header)."
+    },
+    "pages": [
+     {
+      "slug": "page-header",
+      "name": "Page header",
+      "group": "Layout",
+      "blurb": "The page header — eyebrow, title, description and the actions that belong to the whole page (NL Design System Page header)."
+     }
+    ],
     "provenance": [
      {
       "layer": 4,
@@ -3378,8 +3402,20 @@
      "--danger"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "action-panel",
+     "name": "Action panel",
+     "group": "Content",
+     "blurb": "A highlighted region with one clear action — the spotlight for the thing that matters on the page (NL Design System Spotlight section)."
+    },
+    "pages": [
+     {
+      "slug": "action-panel",
+      "name": "Action panel",
+      "group": "Content",
+      "blurb": "A highlighted region with one clear action — the spotlight for the thing that matters on the page (NL Design System Spotlight section)."
+     }
+    ],
     "provenance": [
      {
       "layer": 4,
@@ -4402,8 +4438,20 @@
      ":hover"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "side-navigation",
+     "name": "Side navigation",
+     "group": "Navigation",
+     "blurb": "The side navigation rail — grouped rows, the current page marked, collapsible sections (USWDS Side navigation)."
+    },
+    "pages": [
+     {
+      "slug": "side-navigation",
+      "name": "Side navigation",
+      "group": "Navigation",
+      "blurb": "The side navigation rail — grouped rows, the current page marked, collapsible sections (USWDS Side navigation)."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -4452,8 +4500,20 @@
     ],
     "states": [],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "app-bar",
+     "name": "App bar",
+     "group": "Navigation",
+     "blurb": "The top app bar — brand, search, notifications and account in one navigation landmark (NL Design System Navigation bar)."
+    },
+    "pages": [
+     {
+      "slug": "app-bar",
+      "name": "App bar",
+      "group": "Navigation",
+      "blurb": "The top app bar — brand, search, notifications and account in one navigation landmark (NL Design System Navigation bar)."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -4500,8 +4560,20 @@
     ],
     "states": [],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "activity-feed",
+     "name": "Activity Feed",
+     "group": "Data display",
+     "blurb": "A reverse-chronological stream of events with actor, verb and time — an APG feed, so a screen reader can move through it."
+    },
+    "pages": [
+     {
+      "slug": "activity-feed",
+      "name": "Activity Feed",
+      "group": "Data display",
+      "blurb": "A reverse-chronological stream of events with actor, verb and time — an APG feed, so a screen reader can move through it."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -4557,8 +4629,20 @@
      ":focus-visible"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "sign-in",
+     "name": "Sign in",
+     "group": "Forms",
+     "blurb": "The sign-in form as a public service ships it — one column, visible labels, no placeholder-only fields (GOV.UK Sign in)."
+    },
+    "pages": [
+     {
+      "slug": "sign-in",
+      "name": "Sign in",
+      "group": "Forms",
+      "blurb": "The sign-in form as a public service ships it — one column, visible labels, no placeholder-only fields (GOV.UK Sign in)."
+     }
+    ],
     "provenance": [
      {
       "layer": 4,
@@ -4802,8 +4886,20 @@
      ":active"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "week-calendar",
+     "name": "Week Calendar",
+     "group": "Data display",
+     "blurb": "The week view — a time grid with events, built on the same date-grid rules as the picker."
+    },
+    "pages": [
+     {
+      "slug": "week-calendar",
+      "name": "Week Calendar",
+      "group": "Data display",
+      "blurb": "The week view — a time grid with events, built on the same date-grid rules as the picker."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -4851,8 +4947,20 @@
      "--now"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "year-calendar",
+     "name": "Year Calendar",
+     "group": "Data display",
+     "blurb": "The year at a glance — twelve month grids on one surface."
+    },
+    "pages": [
+     {
+      "slug": "year-calendar",
+      "name": "Year Calendar",
+      "group": "Data display",
+      "blurb": "The year at a glance — twelve month grids on one surface."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -4896,8 +5004,20 @@
     ],
     "states": [],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "date-range-picker",
+     "name": "Date Range Picker",
+     "group": "Inputs",
+     "blurb": "Two dates in one grid — start, end and the span between them, keyboard-navigable (USWDS Date range picker)."
+    },
+    "pages": [
+     {
+      "slug": "date-range-picker",
+      "name": "Date Range Picker",
+      "group": "Inputs",
+      "blurb": "Two dates in one grid — start, end and the span between them, keyboard-navigable (USWDS Date range picker)."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -5337,8 +5457,20 @@
      ":hover"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "task-list",
+     "name": "Task list",
+     "group": "Navigation",
+     "blurb": "A list of tasks with their status carried in text — completed, in progress, cannot start yet (GOV.UK Task list)."
+    },
+    "pages": [
+     {
+      "slug": "task-list",
+      "name": "Task list",
+      "group": "Navigation",
+      "blurb": "A list of tasks with their status carried in text — completed, in progress, cannot start yet (GOV.UK Task list)."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -5399,8 +5531,20 @@
      ":hover"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "toggletip",
+     "name": "Toggletip",
+     "group": "Overlays",
+     "blurb": "A tooltip you open on purpose — a button that reveals a short explanation into a live region, so it works on touch and is announced."
+    },
+    "pages": [
+     {
+      "slug": "toggletip",
+      "name": "Toggletip",
+      "group": "Overlays",
+      "blurb": "A tooltip you open on purpose — a button that reveals a short explanation into a live region, so it works on touch and is announced."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -5447,8 +5591,20 @@
      ":hover"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "language-selector",
+     "name": "Language selector",
+     "group": "Navigation",
+     "blurb": "A named navigation of the languages a service is offered in, each in its own tongue (USWDS Language selector)."
+    },
+    "pages": [
+     {
+      "slug": "language-selector",
+      "name": "Language selector",
+      "group": "Navigation",
+      "blurb": "A named navigation of the languages a service is offered in, each in its own tongue (USWDS Language selector)."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -5496,8 +5652,20 @@
      ":focus-visible"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "skip-link",
+     "name": "Skip link",
+     "group": "Navigation",
+     "blurb": "The first tab stop on the page: a link that jumps to the main content and moves focus there (GOV.UK Skip link)."
+    },
+    "pages": [
+     {
+      "slug": "skip-link",
+      "name": "Skip link",
+      "group": "Navigation",
+      "blurb": "The first tab stop on the page: a link that jumps to the main content and moves focus there (GOV.UK Skip link)."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -5558,8 +5726,20 @@
      "--invalid"
     ],
     "element": "fieldset",
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "fieldset",
+     "name": "Fieldset",
+     "group": "Forms",
+     "blurb": "A group of related fields with a legend that names the question — the platform’s own grouping, styled (GOV.UK Fieldset)."
+    },
+    "pages": [
+     {
+      "slug": "fieldset",
+      "name": "Fieldset",
+      "group": "Forms",
+      "blurb": "A group of related fields with a legend that names the question — the platform’s own grouping, styled (GOV.UK Fieldset)."
+     }
+    ],
     "provenance": [
      {
       "layer": 1,
@@ -5599,8 +5779,20 @@
      ":focus-visible"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "error-summary",
+     "name": "Error summary",
+     "group": "Feedback",
+     "blurb": "Everything that went wrong, listed at the top, focused on arrival, each item a link to its field (GOV.UK Error summary)."
+    },
+    "pages": [
+     {
+      "slug": "error-summary",
+      "name": "Error summary",
+      "group": "Feedback",
+      "blurb": "Everything that went wrong, listed at the top, focused on arrival, each item a link to its field (GOV.UK Error summary)."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -6215,8 +6407,20 @@
      ":hover"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "tree-view",
+     "name": "Tree View",
+     "group": "Data display",
+     "blurb": "A hierarchy that expands and collapses — arrow-key navigation over an APG tree."
+    },
+    "pages": [
+     {
+      "slug": "tree-view",
+      "name": "Tree View",
+      "group": "Data display",
+      "blurb": "A hierarchy that expands and collapses — arrow-key navigation over an APG tree."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -6937,8 +7141,20 @@
      ":disabled"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "segmented-control",
+     "name": "Segmented Control",
+     "group": "Inputs",
+     "blurb": "A row of exclusive options that reads as one control — a radio group in a segmented shape."
+    },
+    "pages": [
+     {
+      "slug": "segmented-control",
+      "name": "Segmented Control",
+      "group": "Inputs",
+      "blurb": "A row of exclusive options that reads as one control — a radio group in a segmented shape."
+     }
+    ],
     "provenance": [
      {
       "layer": 2,
@@ -7661,8 +7877,20 @@
      ":hover"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "inset-text",
+     "name": "Inset text",
+     "group": "Content",
+     "blurb": "Text set apart from the flow to draw attention without alarming — GOV.UK Inset text."
+    },
+    "pages": [
+     {
+      "slug": "inset-text",
+      "name": "Inset text",
+      "group": "Content",
+      "blurb": "Text set apart from the flow to draw attention without alarming — GOV.UK Inset text."
+     }
+    ],
     "provenance": [
      {
       "layer": 4,
@@ -7847,8 +8075,20 @@
     ],
     "states": [],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "wizard-stepper",
+     "name": "Wizard Stepper",
+     "group": "Forms",
+     "blurb": "A step indicator with the form body under it — where you are in a multi-step task, and what is left (USWDS Step indicator)."
+    },
+    "pages": [
+     {
+      "slug": "wizard-stepper",
+      "name": "Wizard Stepper",
+      "group": "Forms",
+      "blurb": "A step indicator with the form body under it — where you are in a multi-step task, and what is left (USWDS Step indicator)."
+     }
+    ],
     "provenance": [
      {
       "layer": 4,
@@ -7898,8 +8138,20 @@
      ":hover"
     ],
     "element": null,
-    "page": null,
-    "pages": [],
+    "page": {
+     "slug": "file-grid",
+     "name": "File Grid",
+     "group": "Data display",
+     "blurb": "A grid of files or media with covers, names and meta — a listing that shows rather than tells."
+    },
+    "pages": [
+     {
+      "slug": "file-grid",
+      "name": "File Grid",
+      "group": "Data display",
+      "blurb": "A grid of files or media with covers, names and meta — a listing that shows rather than tells."
+     }
+    ],
     "provenance": [
      {
       "layer": 3,

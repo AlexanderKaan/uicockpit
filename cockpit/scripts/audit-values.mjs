@@ -80,7 +80,7 @@ const PX_TARGETS = [
   { src: 'src/styles/chrome.css', baseline: 53, what: 'the app shell' },
   { src: 'src/styles/modal.css', baseline: 164, what: 'modals + toasts' },
   { src: 'src/styles/preview-only.css', baseline: 30, what: 'the gallery harness' },
-  { src: 'src/styles/marketing.css', baseline: 696, what: 'the marketing site' },
+  { src: 'src/styles/marketing.css', baseline: 687, what: 'the marketing site' },
 ]
 const HAIRLINE = new Set(['0.5', '1', '1.5', '2'])
 function magicPx(src) {
