@@ -106,20 +106,6 @@ export const RECIPES: readonly Recipe[] = [
 .canvas { background: var(--k-canvas); }`,
   },
   {
-    id: 'rating',
-    section: "Rating",
-    css: `/* === Rating ============================================================
-   A star scale for reviews / products / recipes / restaurants. Read-only
-   display: render N filled stars + the rest as .rating__star--empty, with an
-   optional .rating__count ("4.8" or "(120)"). The kit has no dedicated rating
-   colour, so a filled star borrows the warning tone's amber — a contrast-safe
-   gold. Pass star SVGs as children; the scale rides --k-icon-sm. */
-.rating { display: inline-flex; align-items: center; gap: var(--k-s-2); color: var(--k-rating); line-height: 0; }
-.rating > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
-.rating__star--empty { color: var(--k-border); }
-.rating__count { margin-inline-start: var(--k-s-4); font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1; }`,
-  },
-  {
     id: 'toolbar',
     section: "Toolbar",
     css: `/* === Toolbar ===
@@ -792,31 +778,6 @@ export const RECIPES: readonly Recipe[] = [
   margin-left: 0;
   border-radius: min(var(--btn-r), var(--k-radius-sm, 6px));
 }`,
-  },
-  {
-    id: 'aspect-ratio',
-    section: "Aspect ratio",
-    css: `/* === Aspect ratio ========================================================
- * A ratio-locked media box — children fill + cover, so images/maps/embeds keep
- * their shape across the responsive grid. Rounded + sunken so an empty box still
- * reads as a placeholder. Pick a ratio modifier (the box owns no intrinsic one). */
-.aspect { position: relative; width: 100%; overflow: hidden; border-radius: var(--k-radius-md); background: var(--k-surface-sunken); }
-.aspect--16x9 { aspect-ratio: 16 / 9; }
-.aspect--1x1 { aspect-ratio: 1 / 1; }
-.aspect > img, .aspect > video, .aspect > iframe, .aspect > .aspect__fill { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; border: 0; }`,
-  },
-  {
-    id: 'scroll-area',
-    section: "Scroll area",
-    css: `/* === Scroll area =========================================================
- * An overflow container with a slim, token-tinted scrollbar (the browser default
- * is heavy + off-palette). Thumb sits on a surface-coloured ring so it reads on
- * any plane; track stays invisible. Set a max-height/height on the element. */
-.scroll-area { overflow: auto; scrollbar-width: thin; scrollbar-color: var(--k-border) transparent; }
-.scroll-area::-webkit-scrollbar { width: 10px; height: 10px; }
-.scroll-area::-webkit-scrollbar-track { background: transparent; }
-.scroll-area::-webkit-scrollbar-thumb { background: var(--k-border); border-radius: 999px; border: 2px solid var(--k-surface); }
-.scroll-area::-webkit-scrollbar-thumb:hover { background: var(--k-fg-faint); }`,
   },
   {
     id: 'form',
@@ -2409,26 +2370,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .activity__meta { color: var(--k-fg-faint); font-size: var(--k-type-eyebrow); margin-left: auto; }`,
   },
   {
-    id: 'danger-zone',
-    section: "Danger zone",
-    css: `/* === Danger zone ========================================================
- * A bordered panel that fences off destructive / irreversible settings
- * (delete account, transfer ownership). Danger-hued border + heading. */
-.dangerzone {
-  border: 1px solid var(--k-danger);
-  border-radius: var(--k-radius-lg);
-  padding: var(--k-pad, 24px);
-  margin-top: var(--k-s-24);
-}
-.dangerzone__head {
-  font-weight: var(--k-weight-semibold);
-  /* Header text sits on the card surface (transparent over white/dark), so use
-   * the actual --k-danger hue. *-fg is reserved for text ON a coloured fill. */
-  color: var(--k-danger-text);
-  margin-bottom: var(--k-s-6);
-}`,
-  },
-  {
     id: 'interactive-list-row',
     root: 'list__item',
     section: "Interactive list row",
@@ -3902,80 +3843,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .kanban__prio i { height: 1.5px; border-radius: 1px; background: currentColor; }`,
   },
   {
-    id: 'breakdown',
-    section: "Breakdown",
-    doc: {
-      dos: [
-        "Pair a breakdown with a chart or KPI — it answers “made of what?” where the chart shows “over time.”",
-        "Colour each bar from the --k-chart-1..6 palette (set --bd-color) so a breakdown beside a chart shares its legend.",
-        "Sort rows biggest-first and show the percent so the long tail is obvious at a glance.",
-      ],
-      donts: [
-        "Don't exceed ~6 rows — fold the remainder into an “Other” row so the bars stay readable.",
-        "Don't hardcode a bar colour — drive it from --bd-color so it re-themes with the palette.",
-      ],
-    },
-    css: `/* === Breakdown (.breakdown) — a share-bar list ===========================
- * The analytical companion to a chart: a labelled category list where each
- * row shows a marker + name, its value + percent, and a proportional share
- * bar coloured from the chart palette. Answers "made of what?" — expense
- * categories, revenue by client, traffic sources, aging buckets. Bars draw
- * in on mount. Per row set --bd-color (a --k-chart-n, drives marker + bar)
- * and --bd-pct (the fill width). LAYOUT-only inline vars, never structural. */
-.breakdown { display: flex; flex-direction: column; gap: var(--k-s-14); }
-.breakdown__row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  column-gap: var(--k-s-12);
-  row-gap: var(--k-s-6);
-  align-items: baseline;
-}
-.breakdown__name {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-8);
-  min-width: 0;
-  font-size: var(--k-type-small);
-  color: var(--k-fg);
-}
-/* Category marker — a round dot in the row's palette colour (pseudo, no extra
- * node). Round (not the chart legend's square) reads as a list bullet. */
-.breakdown__name::before {
-  content: "";
-  width: var(--k-marker);
-  height: var(--k-marker);
-  border-radius: 50%;
-  background: var(--bd-color, var(--k-primary));
-  flex: none;
-}
-.breakdown__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.breakdown__val {
-  font-size: var(--k-type-small);
-  font-weight: var(--k-weight-semibold);
-  font-variant-numeric: tabular-nums;
-  color: var(--k-fg);
-  white-space: nowrap;
-}
-.breakdown__pct { margin-left: var(--k-s-6); color: var(--k-fg-muted); font-weight: var(--k-weight-medium); }
-.breakdown__track {
-  grid-column: 1 / -1;
-  height: var(--k-s-6);
-  border-radius: var(--k-radius-pill);
-  background: var(--k-surface-sunken);
-  overflow: hidden;
-}
-.breakdown__bar {
-  height: 100%;
-  width: var(--bd-pct, 0%);
-  border-radius: inherit;
-  background: var(--bd-color, var(--k-primary));
-  transform-origin: left;
-  animation: breakdown-grow 640ms var(--k-ease-out, cubic-bezier(.2, .8, .2, 1)) both;
-}
-@keyframes breakdown-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@media (prefers-reduced-motion: reduce) { .breakdown__bar { animation: none; } }`,
-  },
-  {
     id: 'sparkline',
     section: "Sparkline",
     css: `/* === Sparkline ===
@@ -5133,206 +5000,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .stat-tile-strip--fill .stat-tile-strip__cell { background: var(--k-surface-fill); }`,
   },
   {
-    id: 'attachment-chip-family',
-    section: "Attachment chip family",
-    css: `/* === Attachment chip family (#113) ====================================
- * Pill with left thumb (icon-box) + label/meta stack + remove button.
- * Mid-string truncation via direction:rtl on the label clips from the
- * left when there's not enough room — Apple Finder pattern. */
-.att-chip-stack {
-  display: flex;
-  flex-direction: column;
-  /* The kit's standard vertical gap for stacked cards/rows — one token shared
-   * by radio-cards, kanban column, slot picker, event lists. Scales w/ density. */
-  gap: var(--k-stack-gap, 8px);
-}
-.att-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-8);
-  padding: var(--k-s-4) var(--k-s-6) var(--k-s-4) var(--k-s-4);
-  background: var(--k-surface-2);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-  min-width: 0;
-}
-.att-chip__thumb {
-  flex-shrink: 0;
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--k-radius-sm);
-  background: var(--k-surface);
-  color: var(--k-fg-muted);
-}
-.att-chip--file .att-chip__thumb { background: var(--k-primary-soft); color: var(--k-primary-soft-fg); }
-.att-chip--link .att-chip__thumb { background: var(--k-info-soft); color: var(--k-info-text); }
-.att-chip--audio .att-chip__thumb { background: var(--k-warning-soft); color: var(--k-warning-text); }
-.att-chip--image .att-chip__thumb { background: var(--k-success-soft); color: var(--k-success-text); }
-.att-chip__thumb svg { width: var(--k-icon-sm); height: var(--k-icon-sm); }
-.att-chip__body {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-  flex: 1;
-}
-.att-chip__label {
-  font-size: var(--k-type-small);
-  font-weight: var(--k-weight-medium);
-  color: var(--k-fg);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.att-chip__meta {
-  font-size: var(--k-type-caption);
-  color: var(--k-fg-faint);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.att-chip__x {
-  position: relative;
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  border: 0;
-  background: transparent;
-  color: var(--k-fg-muted);
-  cursor: pointer;
-  font-size: var(--k-type-body);
-  line-height: 1;
-  transition: background var(--k-dur-fast, 110ms) var(--k-ease, ease);
-}
-/* Hit-target (Invariant I4) — visual stays small; ::before centres a --k-hit-min
-   (24px) click area (WCAG-AA floor). */
-.att-chip__x::before { content: ''; position: absolute; top: 50%; left: 50%; width: var(--k-hit-min); height: var(--k-hit-min); transform: translate(-50%, -50%); }
-.att-chip__x:hover { background: var(--k-state-hover); color: var(--k-fg); }`,
-  },
-  {
-    id: 'inline-status-meta-micro-components',
-    section: "Inline status & meta micro-components",
-    css: `/* === Inline status & meta micro-components (#117) =====================
- * Tiny semantic atoms: NEW pill, beta/pro/ai tags, status dots, verified
- * checkmark, notification badge, sort arrow. Each works standalone and
- * composes into list rows / nav items / table cells. */
-/* NEW / BETA / PRO tags use the canonical .badge system (badge--primary /
- * badge--warn / badge--neutral) — there is ONE label vocabulary, no parallel
- * .meta-new / .meta-pill family. */
-.meta-status {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-4);
-  font-size: var(--k-type-eyebrow);
-  color: var(--k-fg-muted);
-}
-.meta-status__dot {
-  width: var(--k-dot);
-  height: var(--k-dot);
-  border-radius: 50%;
-  position: relative;
-}
-.meta-status__dot--online::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  background: var(--k-success);
-  opacity: 0.25;
-  animation: meta-status-pulse 1.8s ease-in-out infinite;
-}
-@keyframes meta-status-pulse {
-  0%, 100% { transform: scale(1);   opacity: 0.25; }
-  50%      { transform: scale(1.4); opacity: 0;    }
-}
-.meta-status__dot--online { background: var(--k-success); }
-.meta-status__dot--away   { background: var(--k-warning); }
-.meta-status__dot--busy   { background: var(--k-danger); }
-.meta-row {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-6);
-  font-size: var(--k-type-small);
-  color: var(--k-fg);
-}
-.meta-avatar {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--k-primary-soft);
-  color: var(--k-primary-soft-fg);
-  display: grid;
-  place-items: center;
-  font-size: var(--k-type-caption);
-  font-weight: var(--k-weight-semibold);
-}
-.meta-verified {
-  display: inline-grid;
-  place-items: center;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--k-info);
-  color: var(--k-info-fg);
-}
-.meta-verified svg { width: 9px; height: 9px; }
-.meta-notif {
-  position: relative;
-  display: inline-grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  /* Sits inside a 28px .btn--icon flex button at the same size — without this
-   * it flex-shrinks to min-content (collapsing the bell to a sliver). */
-  flex: none;
-  color: var(--k-fg-muted);
-}
-.meta-notif svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
-/* Unread indicator — a clean corner DOT, not a number. A count pill would
- * overlap the bell glyph inside the tight 28px button; the count itself lives
- * where there's room (the Inbox row's .badge--count, a "N unread" label). The
- * surface ring lifts the dot off the icon. Any numeric child stays in the DOM
- * for screen-readers but is clipped to the dot. */
-.meta-notif__dot {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 8px;
-  height: 8px;
-  min-width: 0;
-  padding: 0;
-  border-radius: 999px;
-  background: var(--k-danger);
-  border: 1.5px solid var(--k-surface);
-  box-sizing: content-box;
-  font-size: 0;
-  overflow: hidden;
-}
-.meta-sort {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-4);
-  padding: var(--k-s-2) var(--k-s-8);
-  background: transparent;
-  border: 0;
-  color: var(--k-fg-muted);
-  font-size: var(--k-type-eyebrow);
-  font-weight: var(--k-weight-medium);
-  cursor: pointer;
-  border-radius: var(--k-radius-sm);
-  font-family: var(--k-font-body);
-}
-.meta-sort:hover { background: var(--k-state-hover); color: var(--k-fg); }
-.meta-sort__arrow {
-  color: var(--k-primary-text);
-  font-weight: var(--k-weight-bold);
-}
-.meta-sort--asc .meta-sort__arrow { color: var(--k-fg-muted); }`,
-  },
-  {
     id: 'carousel',
     section: "Carousel",
     css: `/* === Carousel (.carousel) — shadcn gap filler ========================
@@ -6398,6 +6065,23 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 }
 /* Cover — the faux preview surface. position:relative anchors the type
  * variants' ::before page/grid and the corner tag. */
+/* The ratio is the PLATFORM's aspect-ratio property, on the element that needs
+   it. There used to be a generic .aspect component wrapping exactly this, which
+   is a component whose whole body is one CSS property somebody else's element
+   already supports — the cut list found it and it left. What the grid needs, the
+   grid declares. */
+.filegrid__hero {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--k-radius-md);
+  overflow: hidden;
+}
+.filegrid__hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.filegrid__cover--sq { aspect-ratio: 1; }
+.filegrid__cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The fill stands in for an image that is not there. It is not a skeleton and
+   must not read as loading — it is the final state for a file with no preview. */
+.filegrid__fill { position: absolute; inset: 0; }
 .filegrid__cover {
   position: relative;
   aspect-ratio: 4 / 3;

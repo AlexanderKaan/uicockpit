@@ -28,9 +28,6 @@ export type SectionSpec =
   // Tabbed chart — a real .tabs strip switching between named chart views (each a
   // ChartFrame with its own data). The Reports screen's metric switcher.
   | { kind: 'chartTabs'; seed: { tabs: Array<{ label: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> }> } }
-  // The `.breakdown` recipe — a share-bar category list ("made of what?"), the
-  // analytical companion beside a chart. unit prefixes the value (e.g. '$').
-  | { kind: 'breakdown'; seed: { title: string; unit?: string; rows: Array<{ name: string; value: number }> } }
   | { kind: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
   | { kind: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[]; greeting?: string } }
   | { kind: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[]; badgeToneByValue?: Record<string, 'success' | 'warning' | 'danger' | 'info'>; avatarCols?: number[] } }
@@ -385,13 +382,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
               { name: 'Outstanding', values: [148, 56, 24, 12, 6] },
             ] },
           ] } },
-          { kind: 'breakdown', seed: { title: 'Revenue by client', unit: '$', rows: [
-            { name: 'Vantage', value: 21400 },
-            { name: 'SavvyCal', value: 14000 },
-            { name: 'Cedar Health', value: 8250 },
-            { name: 'Reform', value: 7600 },
-            { name: 'Tuple, Inc', value: 2000 },
-          ] } },
+          
           { kind: 'list', seed: { title: 'Recent activity', items: [
             { icon: 'check', title: 'Payment received — SavvyCal', sub: 'Invoice #00010 · $14,000.00', trail: '2m', badge: 'success' },
             { icon: 'bell', title: 'Reminder sent — Tuple, Inc', sub: 'Invoice #00009 · 14 days overdue', trail: '1h', badge: 'warning' },

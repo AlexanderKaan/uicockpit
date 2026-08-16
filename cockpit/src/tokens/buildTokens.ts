@@ -1293,7 +1293,6 @@ export function buildTokens(cfg: Config): Tokens {
       // fixed amber, NOT brand-harmonised and NOT the warning tone (re-theming
       // warning to red must not turn every rating red). Surfaced by the a2ui
       // first-customer build test (the kit had no rating colour).
-      '--k-rating': hsl(43, 92, dark ? 60 : 50),
       '--k-radius-sm': radius.sm,
       '--k-radius-md': radius.md,
       '--k-radius-lg': radius.lg,

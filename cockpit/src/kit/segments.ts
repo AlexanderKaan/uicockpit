@@ -115,14 +115,12 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   // section → component: each is a part of a page-part, not a full-width slab).
   'entity-card': ['avatar', 'badges-pills', 'buttons'], // a card for one entity
   'action-panel': ['card', 'buttons', 'switch-toggle'], // heading + one action (incl. danger-zone)
-  'danger-zone': ['card', 'buttons'], // the destructive action panel
   'filter-bar': ['searchinput', 'tag-input', 'select-trigger', 'segmented-control-toggle-group', 'slider', 'buttons', 'chip'], // a query toolbar — part of a data section
   auth: ['form-primitives', 'passwordinput', 'buttons', 'card'], // the sign-in form card
   calendar: ['buttons'], // the month-grid date picker
   'calendar-range': ['calendar', 'buttons'], // the double-month range picker
   'stat-tile': ['card', 'sparkline', 'badges-pills'], // a single metric tile
   chart: ['card'], // a chart widget (lives in a card)
-  breakdown: [], // a share-bar category list — the analytical companion beside a chart
   timeline: ['avatar', 'badges-pills'], // an event list
   'activity-feed': ['avatar', 'badges-pills', 'list'], // a feed list
 }
@@ -143,7 +141,7 @@ export const STANDALONE_ATOMS: readonly string[] = [
   // self-contained input controls usable in any flow
   'input-otp', 'interactive-list-row', 'combobox',
   // inline messaging / status — drop in anywhere
-  'alert', 'banner', 'inline-status-meta-micro-components', 'attachment-chip-family',
+  'alert', 'banner',
   // a chat/comment bubble — self-contained, stacks into a .thread (Fase J-8)
   // AI-thread furniture (LP6) — self-contained receipts/disclosures that drop
   // into any .msg or feed: the tool receipt, the thinking line, the source chip
@@ -151,9 +149,9 @@ export const STANDALONE_ATOMS: readonly string[] = [
   // a rich-text container — styles raw semantic tags; no single host (Fase J-8)
   'prose',
   // loading & layout utilities
-  'skeleton', 'spinner', 'aspect-ratio', 'scroll-area',
+  'skeleton', 'spinner',
   // data-display primitives
-  'description-list', 'rating',
+  'description-list',
   /* Accessibility primitives (the design-system study, 2026-08-14). All three
    * are genuinely parentless: a SKIP LINK belongs to the page and to no
    * component; a FIELDSET groups whatever controls a form happens to hold; an

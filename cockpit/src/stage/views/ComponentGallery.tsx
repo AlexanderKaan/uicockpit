@@ -109,14 +109,12 @@ const CARD_KEYWORDS: Record<string, string> = {
   ListCard: 'Library list rows items',
   DescriptionListCard: 'Subscription description list key value',
   SettingsRowCard: 'Website settings row toggle preference',
-  AttachmentChipCard: 'Attachments file chip',
   InteractiveCardCard: 'Workspaces interactive card selectable',
   AvatarCard: 'Avatar profile picture user',
   StatCard: 'Recurring revenue MRR stat metric KPI sparkline',
   StatGroupCard: 'Overview metrics KPIs summary numbers',
   TrendCard: 'Revenue trend chart sparkline delta',
   ChartCard: 'Traffic by source chart graph analytics',
-  BreakdownCard: 'Breakdown share bar category list expenses by category analytics',
   UsageMeterCard: 'Monthly quota usage meter limit',
   FileGridCard: 'Files file grid thumbnails',
   TreeViewCard: 'Explorer tree view folders files',
@@ -138,12 +136,9 @@ const CARD_KEYWORDS: Record<string, string> = {
   CarouselCard: 'Carousel slider swipe dots',
   LightboxCard: 'Gallery lightbox images photos viewer',
   DropzoneCard: 'Upload files dropzone drag drop',
-  DangerZoneCard: 'Danger zone destructive delete',
   FaqCard: 'Help centre FAQ questions accordion',
   TwoColumnLayoutCard: 'Site overview two column layout',
   ResizableCard: 'Resizable panels split handle',
-  AspectRatioCard: 'Aspect ratio media frame',
-  ScrollAreaCard: 'Scroll area scrollbar overflow',
 }
 const searchText = (C: () => ReactElement) =>
   (labelOf(C) + ' ' + (CARD_KEYWORDS[C.name] ?? '')).toLowerCase()
@@ -230,9 +225,9 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     // empty-state/file-grid + the stats band + calendar VIEWS. Widgets (date picker,
     // chart, timeline, danger-zone, auth card, stat tile…) are 'component'.
     [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [CanvasCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
-    [RatingCard, 'atom'], [MusicPlayerCard, 'component'], [WeatherCard, 'component'], [CheckoutCard, 'component'], [ProductCardCard, 'component'],
+    [MusicPlayerCard, 'component'], [WeatherCard, 'component'], [CheckoutCard, 'component'], [ProductCardCard, 'component'],
     [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
-    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [BreakdownCard, 'component'], [DateCard, 'component'],
+    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarMonthCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
     [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [FrozenColumnTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
@@ -247,8 +242,8 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [InPageNavCard, 'component'], [SiteFooterCard, 'section'], [RequirementsCard, 'component'], [ProcessListCard, 'component'], [IdentifierCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
     [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
-    [WizardStepperCard, 'component'], [DangerZoneCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
-    [AttachmentChipCard, 'atom'], [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], [AspectRatioCard, 'atom'], [ScrollAreaCard, 'atom'],
+    [WizardStepperCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
+    [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], 
   ]
   const filtered = tier && tier !== 'all' ? CARDS.filter(([, t]) => t === tier) : CARDS
   const shown = limit ? filtered.slice(0, limit) : filtered
@@ -354,8 +349,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
   ['AI thread', [ToolCallCard, ReasoningCard]],
-  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, AttachmentChipCard, InteractiveCardCard, AvatarCard]],
-  ['Layout utilities', [AspectRatioCard, ScrollAreaCard]],
+  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, InteractiveCardCard, AvatarCard]],
 ]
 
 /* ── Promoted dashboard widgets — formerly app-only (SupaDash), now first-class
@@ -387,21 +381,6 @@ function UsageMeterCard() {
   )
 }
 
-function DangerZoneCard() {
-  return (
-    <Card title="Danger zone" desc="Destructive-action section — clearly fenced off.">
-      <div className="dangerzone">
-        <div className="dangerzone__head">Danger zone</div>
-        <p style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', marginBottom: 12 }}>
-          This deletes the workspace and all its data permanently.
-        </p>
-        <button className="btn btn--danger btn--sm">
-          <Icon name="trash" /> Delete workspace
-        </button>
-      </div>
-    </Card>
-  )
-}
 
 /* Card = one slice of real interface (shadcn-style). `title` is a natural,
  * in-context heading (e.g. "Payout threshold", "Invite team") — NOT a
@@ -1613,32 +1592,6 @@ function ChartCard() {
 // Breakdown — a share-bar category list, the analytical companion beside a
 // chart ("made of what?"). Each row's marker + bar colour comes from the
 // derived --k-chart-1..6 palette via --bd-color, so it shares the chart legend.
-function BreakdownCard() {
-  const rows = [
-    { name: 'Payroll', value: 13980 },
-    { name: 'Software & tools', value: 6240 },
-    { name: 'Contractors', value: 4820 },
-    { name: 'Office & travel', value: 2960 },
-    { name: 'Other', value: 2156 },
-  ]
-  const total = rows.reduce((s, r) => s + r.value, 0)
-  return (
-    <Card docId="breakdown" title="Expenses by category" desc="A share-bar breakdown — the analytical companion beside a trend chart.">
-      <div className="breakdown">
-        {rows.map((r, i) => {
-          const pct = Math.round((r.value / total) * 100)
-          return (
-            <div key={r.name} className="breakdown__row" style={{ '--bd-color': `var(--k-chart-${(i % 6) + 1})`, '--bd-pct': `${pct}%` } as CSSProperties}>
-              <span className="breakdown__name"><span className="breakdown__label">{r.name}</span></span>
-              <span className="breakdown__val">${r.value.toLocaleString('en-US')}<span className="breakdown__pct">{pct}%</span></span>
-              <div className="breakdown__track"><div className="breakdown__bar" /></div>
-            </div>
-          )
-        })}
-      </div>
-    </Card>
-  )
-}
 
 // FAQ / Help centre — a SEGMENTED CONTROL (General/Billing/Goals) filtering an
 // accordion below, + a Contact Support CTA. The canonical "segmented control on
@@ -2965,35 +2918,8 @@ function ButtonGroupCard() {
 }
 
 // Aspect ratio — ratio-locked media boxes (16:9 + 1:1) whose children cover.
-function AspectRatioCard() {
-  return (
-    <Card title="Aspect ratio" desc="Ratio-locked media boxes — children cover, the shape holds across the grid.">
-      <div className="aspect aspect--16x9">
-        <div className="aspect__fill" style={{ display: 'grid', placeItems: 'center', background: 'var(--k-primary-soft)', color: 'var(--k-primary)' }}><Icon name="grid" size={22} /></div>
-      </div>
-      <div className="card__row">
-        <div className="aspect aspect--1x1" style={{ width: 64, flex: 'none' }}>
-          <div className="aspect__fill" style={{ display: 'grid', placeItems: 'center', background: 'var(--k-surface-sunken)', color: 'var(--k-fg-faint)' }}><Icon name="file" size={18} /></div>
-        </div>
-        <div style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>A 16:9 cover and a 1:1 thumbnail. Pick a ratio modifier — the box owns none.</div>
-      </div>
-    </Card>
-  )
-}
 
 // Scroll area — overflow container with a slim, token-tinted scrollbar.
-function ScrollAreaCard() {
-  const items = ['Overview', 'Analytics', 'Audiences', 'Conversions', 'Funnels', 'Retention', 'Revenue', 'Cohorts', 'Attribution', 'Exports']
-  return (
-    <Card title="Scroll area" desc="Overflow container with a slim, token-tinted scrollbar.">
-      <div className="scroll-area" style={{ maxHeight: 136, border: 'var(--k-divider)', borderRadius: 'var(--k-radius-md)', padding: 'var(--k-s-4)' }}>
-        {items.map((t) => (
-          <button key={t} type="button" className="navrow"><Icon name="chart" /><span className="navrow__label">{t}</span></button>
-        ))}
-      </div>
-    </Card>
-  )
-}
 
 // SSO brand glyphs — small inline marks so the social buttons are instantly
 // recognisable regardless of the chosen icon library (these aren't concepts).
@@ -4473,57 +4399,6 @@ function InputOtpCard() {
  *   Left: [+] attach + tool chips (Files, Search, Tools)
  *   Right: [mic] voice + [↑] send (primary, animates from disabled→active)
  * Container has the crisp/tactile signature: 2-tone sunken bg + hairline. */
-function AttachmentChip({
-  kind, label, meta,
-}: {
-  kind: 'file' | 'link' | 'audio' | 'image'
-  label: string
-  meta: string
-}) {
-  return (
-    <span className={'att-chip att-chip--' + kind}>
-      <span className="att-chip__thumb">
-        {kind === 'file' && <Icon name="file" />}
-        {kind === 'link' && (
-          <svg width="11" height="11" viewBox="0 0 14 14" aria-hidden>
-            <path d="M5 9 L9 5 M5 4 H4 a3 3 0 0 0 0 6 H6 M9 10 H10 a3 3 0 0 0 0-6 H8" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-          </svg>
-        )}
-        {kind === 'audio' && <Icon name="bell" />}
-        {kind === 'image' && (
-          <svg width="11" height="11" viewBox="0 0 14 14" aria-hidden>
-            <rect x="1.5" y="2.5" width="11" height="9" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.2" />
-            <circle cx="5" cy="6" r="1" fill="currentColor" />
-            <path d="M2 10 L5 7.5 L8 9.5 L12 6" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-          </svg>
-        )}
-      </span>
-      <span className="att-chip__body">
-        <span className="att-chip__label">{label}</span>
-        <span className="att-chip__meta">{meta}</span>
-      </span>
-      <button className="att-chip__x" aria-label="Remove">×</button>
-    </span>
-  )
-}
-function AttachmentChipCard() {
-  return (
-    <Card title="Attachments" desc="Files shared in this thread.">
-      <div className="att-chip-stack">
-        <AttachmentChip kind="file" label="Q3-forecast.pdf" meta="2.4 MB · PDF" />
-        <AttachmentChip kind="link" label="figma.com/file/…" meta="Pricing v3" />
-        <AttachmentChip kind="audio" label="standup.m4a" meta="0:42" />
-        <AttachmentChip kind="image" label="hero-mockup.png" meta="1.2 MB" />
-      </div>
-      <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <button className="btn btn--ghost btn--sm">
-          <Icon name="plus" /> Add files
-        </button>
-        <button className="btn btn--secondary btn--sm">Download all</button>
-      </div>
-    </Card>
-  )
-}
 
 function FileGridCard() {
   // Each tile demonstrates a cover TYPE variant (--doc / --img / --sheet)
@@ -5247,32 +5122,16 @@ function CanvasCard() {
    Built as a UIcockpit *consumer* (kit classes + token-valued inline layout +
    own SVGs), to prove the grammar styles real composed UIs. Gaps logged in the
    session report. */
-const Star = ({ empty }: { empty?: boolean }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={empty ? 'rating__star--empty' : undefined} aria-hidden="true">
-    <path d="M12 2.6l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 16.5l-5.6 3.2 1.4-6.3L3 9.1l6.4-.6z" />
-  </svg>
-)
-function RatingCard() {
-  return (
-    <Card title="Rating" desc="A star scale for reviews / products — filled + empty stars + a count. New kit primitive.">
-      <div style={{ display: 'grid', gap: 'var(--k-s-10)', paddingTop: 'var(--k-s-4)' }}>
-        <span className="rating"><Star /><Star /><Star /><Star /><Star /><span className="rating__count">5.0</span></span>
-        <span className="rating"><Star /><Star /><Star /><Star /><Star empty /><span className="rating__count">4.2 (128)</span></span>
-        <span className="rating"><Star /><Star /><Star empty /><Star empty /><Star empty /><span className="rating__count">2.0</span></span>
-      </div>
-    </Card>
-  )
-}
-
 function MusicPlayerCard() {
   const time: CSSProperties = { fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }
   return (
-    <Card title="Music player" desc="Album art · track meta · transport + scrubber — .aspect, .scrubber, .btn--icon.">
+    <Card title="Music player" desc="Album art · track meta · transport + scrubber — .scrubber, .btn--icon.">
       <div className="card" style={{ padding: 'var(--k-s-16)', display: 'grid', gap: 'var(--k-s-14)' }}>
         <div style={{ display: 'flex', gap: 'var(--k-s-12)', alignItems: 'center', minWidth: 0 }}>
-          <div className="aspect aspect--1x1" style={{ width: 56, flex: 'none', borderRadius: 'var(--k-radius-md)' }}>
-            <div className="aspect__fill" style={{ background: 'var(--k-canvas)' }} />
-          </div>
+          {/* aspect-ratio is a CSS property, not a component. The .aspect recipe
+              that used to wrap it left on the four-layer cut — a component whose
+              entire body is one property the platform already provides. */}
+          <div style={{ width: 56, aspectRatio: '1', flex: 'none', borderRadius: 'var(--k-radius-md)', background: 'var(--k-canvas)' }} />
           <div style={{ minWidth: 0 }}>
             <div className="card__title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Midnight City</div>
             <div className="card__desc">M83 — Hurry Up, We're Dreaming</div>
@@ -5358,14 +5217,13 @@ function ProductCardCard() {
   // top radius with NO padding:0 / overflow / manual-radius guess. The card rhythm
   // spaces the body; __row--spread handles the title↔badge and price↔CTA edges.
   return (
-    <Card title="Product card" desc="Built from anatomy — .card__media (image bleed + radius) · __row--spread · .rating.">
+    <Card title="Product card" desc="Built from anatomy — .card__media (image bleed + radius) · __row--spread.">
       <div className="card" style={{ maxWidth: 280 }}>
-        <div className="card__media"><div className="aspect aspect--16x9"><div className="aspect__fill" style={{ background: 'var(--k-canvas)' }} /></div></div>
+        <div className="card__media"><div style={{ aspectRatio: '16 / 9', background: 'var(--k-canvas)' }} /></div>
         <div className="card__row card__row--spread" style={{ alignItems: 'flex-start' }}>
           <div className="card__title">Aeron Chair</div>
           <span className="badge badge--success">In stock</span>
         </div>
-        <span className="rating"><Star /><Star /><Star /><Star /><Star empty /><span className="rating__count">4.2</span></span>
         <div className="card__row card__row--spread">
           <span className="num" style={{ fontSize: 'var(--k-type-h3)', fontWeight: 700 }}>$1,395</span>
           <button className="btn btn--primary">Add to cart</button>
@@ -5631,13 +5489,11 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'form-panel', name: 'Form Panel', group: 'Forms', recipeId: 'form-panel', blurb: 'The full form block — sectioned fields, inline validation and a sunken action bar.', Preview: FormPanelCard },
   { slug: 'filter-bar', name: 'Filter Bar', group: 'Forms', recipeId: 'filter-bar', blurb: 'Search, facets and removable active-filter chips — the query surface for any list.', Preview: FilterBarCard },
   { slug: 'file-upload', name: 'File Upload', group: 'Forms', recipeId: 'file-upload-dropzone', blurb: 'A drag-and-drop dropzone with browse fallback and file-type hints.', Preview: DropzoneCard },
-  { slug: 'rating', name: 'Rating', group: 'Forms', recipeId: 'rating', blurb: 'A star scale for reviews and feedback, filled + empty + a count.', Preview: RatingCard },
 
   // Data & display
   { slug: 'table', name: 'Table', group: 'Data display', recipeId: 'table', blurb: 'The base data table — header, rows, numeric alignment, hover and zebra.', Preview: TableCard },
   { slug: 'data-table', name: 'Data Table', group: 'Data display', recipeId: 'data-table', blurb: 'The flagship data surface — toolbar, selection, sticky header, pagination and every state.', Preview: DataTableProCard },
   { slug: 'chart', name: 'Chart', group: 'Data display', recipeId: 'chart', blurb: 'Line / area / bar / stacked / donut on the kit’s derived 6-series palette.', Preview: ChartCard },
-  { slug: 'breakdown', name: 'Breakdown', group: 'Data display', recipeId: 'breakdown', blurb: 'A share-bar category list — the analytical companion beside a chart.', Preview: BreakdownCard },
   { slug: 'stat-tile', name: 'Stat Tile', group: 'Data display', recipeId: 'stat-tile', blurb: 'A KPI tile — big number, label, delta and an optional sparkline.', Preview: StatCard },
   { slug: 'list', name: 'List', group: 'Data display', recipeId: 'list', blurb: 'Rows of items with lead media, meta and trailing actions or badges.', Preview: ListCard },
   { slug: 'description-list', name: 'Description List', group: 'Data display', recipeId: 'description-list', blurb: 'Key–value pairs — account info, plan details, a spec sheet.', Preview: DescriptionListCard },
@@ -5678,8 +5534,6 @@ export const COMPONENT_PAGES: ComponentPage[] = [
 
   // Layout
   { slug: 'carousel', name: 'Carousel', group: 'Layout', recipeId: 'carousel', blurb: 'Sliding panels with prev/next and dot pagination.', Preview: CarouselCard },
-  { slug: 'aspect-ratio', name: 'Aspect Ratio', group: 'Layout', recipeId: 'aspect-ratio', blurb: 'A box that holds a fixed ratio as it scales — media, embeds, thumbnails.', Preview: AspectRatioCard },
-  { slug: 'scroll-area', name: 'Scroll Area', group: 'Layout', recipeId: 'scroll-area', blurb: 'A scoped scroll container with a themed, overlay scrollbar.', Preview: ScrollAreaCard },
   { slug: 'footer', name: 'Footer', group: 'Layout', recipeId: 'sitefooter', blurb: 'The contentinfo landmark — accessibility statement, privacy, contact, the body responsible.', Preview: SiteFooterCard },
   { slug: 'identifier', name: 'Identifier', group: 'Layout', recipeId: 'identifier', blurb: 'Who operates this service, and the statements a person is entitled to find.', Preview: IdentifierCard },
   { slug: 'resizable', name: 'Resizable', group: 'Layout', recipeId: 'resizable', blurb: 'Drag-to-resize split panes with a grabbable handle.', Preview: ResizableCard },
@@ -5688,7 +5542,6 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'tool-call', name: 'Tool Call', group: 'AI', recipeId: 'tool-call', blurb: 'An AI agent’s tool receipt — mono name, args, a status dot and an expandable result.', Preview: ToolCallCard },
   { slug: 'reasoning', name: 'Reasoning', group: 'AI', recipeId: 'reasoning', blurb: 'The model’s thinking disclosure — “Thought for 12s”, collapsed by default.', Preview: ReasoningCard },
   { slug: 'prose', name: 'Prose', group: 'Content', recipeId: 'prose', blurb: 'A rich-text container that styles raw semantic tags to the kit’s type and rhythm.', Preview: ProseCard },
-  { slug: 'attachment', name: 'Attachment', group: 'Content', recipeId: 'attachment-chip-family', blurb: 'A file chip with type icon, name and size — for messages and forms.', Preview: AttachmentChipCard },
 ]
 
 export const componentPageBySlug = (slug: string): ComponentPage | undefined =>

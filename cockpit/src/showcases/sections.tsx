@@ -210,27 +210,6 @@ function ChartTabs({ tabs }: { tabs: Array<{ label: string; type: 'bar' | 'area'
 
 /** Plan comparison — the real `.plan-compare` tier × feature matrix. One column
  *  (the featured/current plan) is highlighted by a band behind its cells. */
-function BreakdownSection({ title, unit, rows }: { title: string; unit?: string; rows: Array<{ name: string; value: number }> }) {
-  const sorted = [...rows].sort((a, b) => b.value - a.value)
-  const total = sorted.reduce((s, r) => s + r.value, 0) || 1
-  return (
-    <div className="card">
-      <div className="card__head"><span className="card__title">{title}</span></div>
-      <div className="breakdown">
-        {sorted.map((r, i) => {
-          const pct = Math.round((r.value / total) * 100)
-          return (
-            <div key={r.name} className="breakdown__row" style={{ '--bd-color': `var(--k-chart-${(i % 6) + 1})`, '--bd-pct': `${pct}%` } as CSSProperties}>
-              <span className="breakdown__name"><span className="breakdown__label">{r.name}</span></span>
-              <span className="breakdown__val">{unit ?? ''}{r.value.toLocaleString('en-US')}<span className="breakdown__pct">{pct}%</span></span>
-              <div className="breakdown__track"><div className="breakdown__bar" /></div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
 
 /** Photo avatar with a graceful initial fallback — the flagship's "real app"
  *  tell. Real portrait via .avatar__img; on load error, swap to the initial. */
@@ -328,8 +307,6 @@ export function renderSection(spec: SectionSpec, key: number) {
       )
     case 'chartTabs':
       return <ChartTabs key={key} tabs={spec.seed.tabs} />
-    case 'breakdown':
-      return <BreakdownSection key={key} title={spec.seed.title} unit={spec.seed.unit} rows={spec.seed.rows} />
     case 'pageHead': {
       const a = spec.seed.actions
       return (
@@ -1066,8 +1043,8 @@ export function renderSection(spec: SectionSpec, key: number) {
           {/* CP6 — hero cover(s): full-bleed 16:9 with a display-tier title overlay (the
               "asset/cover IS the UI" move). Real img when given, else the brand gradient. */}
           {spec.seed.items.filter((m) => m.hero).map((f, i) => (
-            <div className="aspect aspect--16x9" key={'hero-' + f.name}>
-              {f.img ? <img src={f.img} alt={f.name} /> : <div className="aspect__fill" style={{ background: `var(--k-grad-${(i % 6) + 1})` }} />}
+            <div className="filegrid__hero" key={'hero-' + f.name}>
+              {f.img ? <img src={f.img} alt={f.name} /> : <div className="filegrid__fill" style={{ background: `var(--k-grad-${(i % 6) + 1})` }} />}
               <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', gap: 'var(--k-s-6)', padding: 'var(--k-space)', background: 'linear-gradient(to top, rgba(0,0,0,.62), transparent 62%)' }}>
                 {f.badge && <span className={`badge badge--${f.tone ?? 'info'}`} style={{ alignSelf: 'flex-start' }}>{f.badge}</span>}
                 <span className="t-display" style={{ color: '#fff' }}>{f.name}</span>
@@ -1078,9 +1055,9 @@ export function renderSection(spec: SectionSpec, key: number) {
           <div className="bento" style={{ '--bento-min': '7.5rem', '--k-gutter': 'var(--k-s-12)' } as CSSProperties}>
             {spec.seed.items.filter((m) => !m.hero).map((f, i) => (
               <div key={f.name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k-s-8)' }}>
-                <div className="aspect aspect--1x1">
+                <div className="filegrid__cover filegrid__cover--sq">
                   {f.img ? <img src={f.img} alt={f.name} /> : (
-                  <div className="aspect__fill" style={{ background: f.kind === 'image' ? `var(--k-grad-${(i % 4) + 1})` : 'var(--k-surface-sunken)', display: 'grid', placeItems: 'center', color: f.kind === 'image' ? 'var(--k-primary-fg, #fff)' : 'var(--k-fg-muted)' }}>
+                  <div className="filegrid__fill" style={{ background: f.kind === 'image' ? `var(--k-grad-${(i % 4) + 1})` : 'var(--k-surface-sunken)', display: 'grid', placeItems: 'center', color: f.kind === 'image' ? 'var(--k-primary-fg, #fff)' : 'var(--k-fg-muted)' }}>
                     <Icon name={f.kind === 'image' ? 'grid' : f.kind === 'video' ? 'chart' : 'file'} size={22} />
                   </div>
                   )}

@@ -21,16 +21,6 @@
       "definition": "A confirmation modal that names the object and its destructive action."
     },
     {
-      "name": "Aspect Ratio",
-      "url": "https://uicockpit.com/components/aspect-ratio",
-      "definition": "A box that holds a fixed ratio as it scales — media, embeds, thumbnails."
-    },
-    {
-      "name": "Attachment",
-      "url": "https://uicockpit.com/components/attachment",
-      "definition": "A file chip with type icon, name and size — for messages and forms."
-    },
-    {
       "name": "Avatar",
       "url": "https://uicockpit.com/components/avatar",
       "definition": "A user image or initials, with sizes and a status dot."
@@ -50,11 +40,6 @@
       "name": "Breadcrumb",
       "url": "https://uicockpit.com/components/breadcrumb",
       "definition": "A path trail back up the hierarchy, with a truncating overflow."
-    },
-    {
-      "name": "Breakdown",
-      "url": "https://uicockpit.com/components/breakdown",
-      "definition": "A share-bar category list — the analytical companion beside a chart."
     },
     {
       "name": "Button",
@@ -257,11 +242,6 @@
       "definition": "A rich-text container that styles raw semantic tags to the kit’s type and rhythm."
     },
     {
-      "name": "Rating",
-      "url": "https://uicockpit.com/components/rating",
-      "definition": "A star scale for reviews and feedback, filled + empty + a count."
-    },
-    {
       "name": "Reasoning",
       "url": "https://uicockpit.com/components/reasoning",
       "definition": "The model’s thinking disclosure — “Thought for 12s”, collapsed by default."
@@ -275,11 +255,6 @@
       "name": "Resizable",
       "url": "https://uicockpit.com/components/resizable",
       "definition": "Drag-to-resize split panes with a grabbable handle."
-    },
-    {
-      "name": "Scroll Area",
-      "url": "https://uicockpit.com/components/scroll-area",
-      "definition": "A scoped scroll container with a themed, overlay scrollbar."
     },
     {
       "name": "Search Input",
