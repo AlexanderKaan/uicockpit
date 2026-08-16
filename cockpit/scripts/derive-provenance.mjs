@@ -53,6 +53,7 @@ import { chromium } from '@playwright/test'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { APP } from './lib/base.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const WRITE = process.argv.includes('--write')
@@ -311,7 +312,7 @@ const PLATFORM = {
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 1400 } })
-await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+await page.goto(APP, { waitUntil: 'networkidle' })
 await page.waitForTimeout(800)
 await page.evaluate(() => {
   for (const el of document.querySelectorAll('[aria-expanded="false"], details:not([open])')) {

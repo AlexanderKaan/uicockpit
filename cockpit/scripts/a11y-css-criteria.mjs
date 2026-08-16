@@ -17,6 +17,7 @@
  * 1.4.4 Resize Text — 200% with no loss of content or function.
  */
 import { chromium } from '@playwright/test'
+import { APP } from './lib/base.mjs'
 
 
 /* Two guards, and BOTH were added because the scan reported the solution as the
@@ -74,7 +75,7 @@ const baseline = []
 // ── 1.4.12 Text Spacing ────────────────────────────────────────────────────
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
-  await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+  await page.goto(APP, { waitUntil: 'networkidle' })
   await page.waitForSelector('.cockpit-preview', { timeout: 25000 })
   await page.waitForTimeout(1500)
 
@@ -104,7 +105,7 @@ const baseline = []
 // ── 1.4.10 Reflow ──────────────────────────────────────────────────────────
 {
   const page = await browser.newPage({ viewport: { width: 320, height: 900 } })
-  await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+  await page.goto(APP, { waitUntil: 'networkidle' })
   await page.waitForSelector('.cockpit-preview', { timeout: 25000 })
   await page.waitForTimeout(1500)
   /* Three corrections, all of which changed the answer.
@@ -188,7 +189,7 @@ const baseline = []
 // ── 1.4.4 Resize Text ──────────────────────────────────────────────────────
 {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
-  await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+  await page.goto(APP, { waitUntil: 'networkidle' })
   await page.waitForSelector('.cockpit-preview', { timeout: 25000 })
   await page.waitForTimeout(1500)
   const control = await page.evaluate(clippingIn, '.cockpit-preview')

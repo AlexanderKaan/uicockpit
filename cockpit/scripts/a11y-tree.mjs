@@ -13,6 +13,7 @@
  * platform hands to assistive tech, not our markup's intentions.
  */
 import { chromium } from '@playwright/test'
+import { APP } from './lib/base.mjs'
 
 const FAIL = []
 const note = (ok, what, detail) => {
@@ -24,7 +25,7 @@ const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
 const cdp = await page.context().newCDPSession(page)
 await cdp.send('Accessibility.enable')
-await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+await page.goto(APP, { waitUntil: 'networkidle' })
 await page.waitForSelector('.cockpit-preview', { timeout: 20000 })
 await page.waitForTimeout(1200)
 

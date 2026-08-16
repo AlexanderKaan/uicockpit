@@ -47,10 +47,11 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { measureShapes } from './lib/harness.mjs'
+import { APP } from './lib/base.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const BASELINE = join(HERE, 'data/shape-baseline.json')
-const URL = process.argv.find((a) => a.startsWith('--url='))?.slice(6) ?? 'http://localhost:5173/app'
+const URL = process.argv.find((a) => a.startsWith('--url='))?.slice(6) ?? APP
 const UPDATE = process.argv.includes('--update')
 
 /* The tolerance, and where the number comes from: it is the measured noise

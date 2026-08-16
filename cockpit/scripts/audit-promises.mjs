@@ -74,6 +74,7 @@ import { chromium } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { APP } from './lib/base.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const JSON_OUT = process.argv.includes('--json')
@@ -217,7 +218,7 @@ const targets = Object.entries(ANCHORS)
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 1400 } })
-await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+await page.goto(APP, { waitUntil: 'networkidle' })
 await page.waitForTimeout(800)
 /* ---- OPEN EVERYTHING THAT OPENS, AND VERIFY THAT IT DID ---------------------
  * The three remaining findings were all the same shape: markup that only exists

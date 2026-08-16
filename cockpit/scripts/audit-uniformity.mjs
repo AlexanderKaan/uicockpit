@@ -41,8 +41,9 @@
  * every one of today's defects lived.
  */
 import { chromium } from '@playwright/test'
+import { APP } from './lib/base.mjs'
 
-const URL = process.argv.find((a) => a.startsWith('--url='))?.slice(6) ?? 'http://localhost:5173/app'
+const URL = process.argv.find((a) => a.startsWith('--url='))?.slice(6) ?? APP
 const JSON_OUT = process.argv.includes('--json')
 
 const browser = await chromium.launch()

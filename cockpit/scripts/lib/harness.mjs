@@ -32,6 +32,7 @@ import { chromium } from '@playwright/test'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { parseKit } from './kit-model.mjs'
+import { APP } from './base.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const RULES_PATH = join(HERE, 'rules.browser.js')
@@ -140,7 +141,7 @@ export const VARIATIONS = [
 
 /** Run every rule under every variation. Returns findings grouped by component. */
 export async function runHarness({
-  url = 'http://localhost:5173/app',
+  url = APP,
   rootSel = '.cockpit-preview',
   variations = VARIATIONS,
   withAxe = true,
@@ -251,7 +252,7 @@ export async function runHarness({
  * page, and nothing in a static render can tell you that.
  */
 export async function driveTabWalk({
-  url = 'http://localhost:5173/app',
+  url = APP,
   rootSel = '.cockpit-preview',
   maxSteps = 600,
 } = {}) {
@@ -364,7 +365,7 @@ export async function driveTabWalk({
  * `audit:shape` prints that number before it prints anything else.
  */
 export async function measureShapes({
-  url = 'http://localhost:5173/app',
+  url = APP,
   rootSel = '.cockpit-preview',
   width = 1440,
 } = {}) {

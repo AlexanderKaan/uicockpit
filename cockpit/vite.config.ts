@@ -25,6 +25,10 @@ const mcpVersion = pkgVersion('../mcp/package.json')
 const changelog = readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf8')
 
 export default defineConfig({
+  /* Our own port, strict — see scripts/lib/base.mjs for why 5173 was a mistake:
+   * it is Vite's default and every other Vite project on the machine wants it. */
+  server: { port: 5180, strictPort: true },
+  preview: { port: 5180, strictPort: true },
   define: {
     __UICOCKPIT_VERSION__: JSON.stringify(`v${cliVersion}`),
     __MCP_VERSION__: JSON.stringify(`v${mcpVersion}`),

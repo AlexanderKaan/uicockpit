@@ -12,9 +12,10 @@
  * 1280x640 at 2x, matching the og:image:width/height declared in index.html.
  */
 import { chromium } from '@playwright/test'
+import { BASE } from './lib/base.mjs'
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1280, height: 640 }, deviceScaleFactor: 2 })
-await page.goto('http://localhost:5173/og', { waitUntil: 'networkidle' })
+await page.goto(`${BASE}/og`, { waitUntil: 'networkidle' })
 await page.waitForTimeout(900)
 const card = page.locator('.og-card').first()
 await (await card.count() ? card : page.locator('body')).screenshot({ path: process.argv[2] })

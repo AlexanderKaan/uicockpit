@@ -5,12 +5,13 @@
 //   out:    output PNG path
 //   collapse: "collapse" to hide the panel for clean full-stage shots
 import { chromium } from '@playwright/test'
+import { APP } from './lib/base.mjs'
 
 const [, , view = 'components', theme = 'cobalt', out = '/tmp/shot.png', collapse = ''] = process.argv
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, deviceScaleFactor: 2 })
-await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+await page.goto(APP, { waitUntil: 'networkidle' })
 await page.waitForTimeout(400)
 
 // Pick the brand theme (skip for mono — it's the default).

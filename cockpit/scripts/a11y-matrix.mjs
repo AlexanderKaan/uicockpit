@@ -42,6 +42,7 @@ import { dirname, join } from 'node:path'
 import { deriveTargets, NOT_A_TARGET } from './lib/interactive-targets.mjs'
 import { setDensity, setRow, DENSITY_WITNESS } from './lib/drive-panel.mjs'
 import { parseKit, classesIn } from './lib/kit-model.mjs'
+import { APP } from './lib/base.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const EVIDENCE = process.argv.includes('--evidence')
@@ -94,7 +95,7 @@ const { map: classOwner, absorbedBy } = ownership()
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
-await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+await page.goto(APP, { waitUntil: 'networkidle' })
 await page.waitForSelector('.cockpit-preview', { timeout: 20000 })
 await page.waitForTimeout(1200)
 await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })

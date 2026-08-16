@@ -39,6 +39,7 @@ import { chromium } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { APP } from './lib/base.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const src = readFileSync(join(here, '../src/tokens/fonts.ts'), 'utf8')
@@ -61,7 +62,7 @@ const PAIRS = [
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 900, height: 600 } })
-await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+await page.goto(APP, { waitUntil: 'networkidle' })
 await page.waitForTimeout(1200)
 
 /* Load every family with a real <link>, not addStyleTag.

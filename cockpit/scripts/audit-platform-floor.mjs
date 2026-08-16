@@ -30,6 +30,7 @@
  * elements a person building a public service actually types.
  */
 import { chromium } from '@playwright/test'
+import { APP } from './lib/base.mjs'
 
 const JSON_OUT = process.argv.includes('--json')
 
@@ -146,7 +147,7 @@ const PROPS = [
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
-await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
+await page.goto(APP, { waitUntil: 'networkidle' })
 await page.waitForTimeout(700)
 
 const result = await page.evaluate(async ({ SURFACE, PROPS }) => {
