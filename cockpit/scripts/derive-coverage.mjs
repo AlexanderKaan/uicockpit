@@ -151,23 +151,11 @@ for (const group of ['controls', 'structure', 'content']) {
  * So an entry the other layers list is checked against the floor first, and when
  * the floor covers it the row says so: it is a DEMOTION to the platform, made on
  * purpose, not an absence. */
-const PLATFORM_NAMES = { textarea: 'textarea', textfield: 'input', textinput: 'input', text: 'input',
-  checkbox: 'input[type=checkbox]', checkboxe: 'input[type=checkbox]', radio: 'input[type=radio]',
-  radiogroup: 'input[type=radio]', radiobutton: 'input[type=radio]', select: 'select', label: 'label',
-  detail: 'details', image: 'img', img: 'img', video: 'video', link: 'a', divider: 'hr',
-  rangeslider: 'input[type=range]', range: 'input[type=range]', datepicker: 'input[type=date]',
-  search: 'input[type=search]', meter: 'meter', progressindicator: 'progress', progres: 'progress',
-  // GOV.UK's field-level patterns prescribe the PLAIN element — a single text
-  // input for names, emails, phone numbers, bank details, NI numbers. That is
-  // the floor. (Telephone numbers explicitly says: no country-code picker.)
-  telephonenumber: 'input[type=tel]', emailaddresse: 'input[type=email]', emailaddress: 'input[type=email]',
-  name: 'input', bankdetail: 'input', nationalinsurancenumber: 'input', heading: 'h1',
-  ordered: 'ol', orderedlist: 'ol', unorderedlist: 'ul', paragraph: 'p', blockquote: 'blockquote',
-  figure: 'figure', separator: 'hr', article: 'article', logo: 'img',
-  // APG's Disclosure pattern IS <details>/<summary>; the floor styles both. The
-  // recipes that anchored to it (tool-call, reasoning, popover) left on the cut,
-  // and the pattern did not go with them — the platform had it all along.
-  disclosure: 'details' }
+/* The overlap map lives in data/derivation-decisions.json now (2026-08-16), so
+ * the forge — which needs the same knowledge to say "Heading is <h1>" — reads
+ * the one the gate reads. */
+const DECISIONS = JSON.parse(readFileSync(join(HERE, 'data/derivation-decisions.json'), 'utf8'))
+const PLATFORM_NAMES = DECISIONS.overlap
 const onTheFloor = (name) => {
   for (const f of forms(name)) {
     const el = PLATFORM_NAMES[f]
@@ -182,10 +170,7 @@ const onTheFloor = (name) => {
  * Button and Menubar, which are that page. Link is <a>. */
 const APG_ALIAS = { Menu: ['Menubar', 'Menu Button', 'Menu and Menubar'] }
 /* Decided, with the reason written down rather than left as a hole. */
-const DECIDED = {
-  Treegrid: 'a tree crossed with a grid — rows that expand AND cells that navigate. No service system publishes one; a tax form needs a table or a tree, not both at once. Not shipped, on purpose.',
-  Logo: 'a brand asset, not a component. The header has a slot for it; there is nothing to style.',
-}
+const DECIDED = DECISIONS.decided
 const l2 = { covered: [], missing: [], decided: [] }
 for (const [name, path] of Object.entries(platform.apg.patterns)) {
   const head = name.replace(/\s*\(.*/, '')
@@ -204,7 +189,7 @@ for (const [name, path] of Object.entries(platform.apg.patterns)) {
 /* Covered by TOKENS rather than a recipe. An icon "component" in a CSS kit is a
  * size ladder — --k-icon-xs/sm/md/chip — plus whatever glyph set the consumer
  * wires in; there is no .icon class to ship and no reason to invent one. */
-const TOKEN_COVERED = { Icon: '--k-icon-xs · --k-icon-sm · --k-icon-md · --k-icon-chip' }
+const TOKEN_COVERED = DECISIONS.tokenCovered
 const l3 = { covered: [], missing: [] }
 for (const [concept, v] of Object.entries(openui.names)) {
   const label = v.spelled ?? concept

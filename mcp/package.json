@@ -1,7 +1,7 @@
 {
   "name": "uicockpit-mcp",
   "mcpName": "com.uicockpit/mcp",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "MCP server for UIcockpit, the design system generator for AI-built apps: an agent generates a kit from a brief, reads its tokens + component grammar, and verifies its own code stays on-system (the check). Framework-neutral, free, no Figma or account.",
   "type": "module",
   "bin": {
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "uicockpit": "^0.3.0",
+    "uicockpit": "^0.7.0",
     "zod": "^3.23.8"
   },
   "keywords": [

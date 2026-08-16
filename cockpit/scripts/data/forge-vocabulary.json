@@ -1,0 +1,1889 @@
+{
+  "_what": "The forge's translation table: the words people use for a component → the names the four catalogues (and our own component pages) use for it. Read by scripts/gen-forge-data.ts into cli/data/forge.json.",
+  "_rule": "An entry is a TRANSLATION, never a decision. Every target on the right must be a name that already exists in platform-catalogues.json (HTML element or APG pattern), service-systems.json, openui-names.json, or COMPONENT_PAGES — the forge's tests refuse a target that resolves to nothing, the same guard derive-provenance puts on its alias keys. The verdict cites the catalogue entry, never the synonym; the synonym only gets the reader there.",
+  "_why": "Free text does not say 'Disclosure', it says 'show more'. Without this table the resolver would answer NONE to half of what a person types and the refusal would be about vocabulary, not about the component — a refusal that says nothing. With it, the answer is still the catalogue's: 'show more' resolves to APG Disclosure and the platform's <details>, and the citation is theirs.",
+  "synonyms": {
+    "modal": [
+      "Dialog (Modal)",
+      "Modal",
+      "dialog"
+    ],
+    "popup": [
+      "Dialog (Modal)",
+      "[popover]"
+    ],
+    "pop-up": [
+      "Dialog (Modal)",
+      "[popover]"
+    ],
+    "lightbox": [
+      "Lightbox",
+      "Dialog (Modal)"
+    ],
+    "overlay": [
+      "Dialog (Modal)"
+    ],
+    "confirm dialog": [
+      "Alert Dialog"
+    ],
+    "confirmation dialog": [
+      "Alert Dialog"
+    ],
+    "are you sure": [
+      "Alert Dialog"
+    ],
+    "destructive confirmation": [
+      "Alert Dialog"
+    ],
+    "popover": [
+      "[popover]",
+      "Popover"
+    ],
+    "flyout": [
+      "[popover]",
+      "Menu Button"
+    ],
+    "hover card": [
+      "[popover]",
+      "Tooltip"
+    ],
+    "dropdown": [
+      "Menu Button",
+      "Select",
+      "Dropdown"
+    ],
+    "drop-down": [
+      "Menu Button",
+      "Select"
+    ],
+    "pulldown": [
+      "Menu Button",
+      "Select"
+    ],
+    "action menu": [
+      "Menu Button",
+      "Menu"
+    ],
+    "kebab menu": [
+      "Menu Button"
+    ],
+    "overflow menu": [
+      "Menu Button"
+    ],
+    "right-click menu": [
+      "Context Menu",
+      "Menu"
+    ],
+    "context menu": [
+      "Context Menu",
+      "Menu"
+    ],
+    "menu bar": [
+      "Menu",
+      "Menubar"
+    ],
+    "menubar": [
+      "Menu",
+      "Menubar"
+    ],
+    "command palette": [
+      "Command Palette",
+      "Combobox"
+    ],
+    "command menu": [
+      "Command Palette",
+      "Combobox"
+    ],
+    "launcher": [
+      "Command Palette"
+    ],
+    "cmd+k": [
+      "Command Palette"
+    ],
+    "omnibox": [
+      "Command Palette",
+      "Combobox"
+    ],
+    "toast": [
+      "Alert",
+      "Toast"
+    ],
+    "snackbar": [
+      "Alert",
+      "Toast"
+    ],
+    "notification": [
+      "Alert",
+      "Notification banner"
+    ],
+    "flash message": [
+      "Alert",
+      "Notification banner"
+    ],
+    "success message": [
+      "Alert",
+      "Notification banner"
+    ],
+    "status message": [
+      "Alert"
+    ],
+    "hint": [
+      "Tooltip",
+      "Text input"
+    ],
+    "hover hint": [
+      "Tooltip"
+    ],
+    "infotip": [
+      "Tooltip"
+    ],
+    "help text": [
+      "Text input",
+      "Form field"
+    ],
+    "toggle": [
+      "Switch"
+    ],
+    "toggle switch": [
+      "Switch"
+    ],
+    "on off": [
+      "Switch"
+    ],
+    "on/off": [
+      "Switch"
+    ],
+    "stepper": [
+      "Step indicator",
+      "Spinbutton"
+    ],
+    "wizard": [
+      "Step indicator",
+      "Step by step navigation"
+    ],
+    "multi-step form": [
+      "Step indicator",
+      "Step by step navigation"
+    ],
+    "multi step": [
+      "Step indicator"
+    ],
+    "progress steps": [
+      "Step indicator",
+      "Process list"
+    ],
+    "step indicator": [
+      "Step indicator"
+    ],
+    "steps": [
+      "Process list",
+      "Step indicator"
+    ],
+    "how it works": [
+      "Process list"
+    ],
+    "numbered steps": [
+      "Process list"
+    ],
+    "checklist": [
+      "Task list",
+      "Checkboxes"
+    ],
+    "todo list": [
+      "Task list"
+    ],
+    "to-do": [
+      "Task list"
+    ],
+    "chip": [
+      "Tag",
+      "Badge"
+    ],
+    "pill": [
+      "Tag",
+      "Badge"
+    ],
+    "label": [
+      "Tag",
+      "Badge",
+      "Label"
+    ],
+    "status label": [
+      "Status badge",
+      "Tag"
+    ],
+    "status": [
+      "Status badge",
+      "Tag"
+    ],
+    "count badge": [
+      "Badge"
+    ],
+    "counter badge": [
+      "Badge"
+    ],
+    "unread count": [
+      "Badge"
+    ],
+    "carousel": [
+      "Carousel"
+    ],
+    "slideshow": [
+      "Carousel"
+    ],
+    "image slider": [
+      "Carousel"
+    ],
+    "gallery": [
+      "Carousel",
+      "Collection"
+    ],
+    "slider": [
+      "Slider",
+      "Range slider"
+    ],
+    "range": [
+      "Slider",
+      "Range slider",
+      "input[type=range]"
+    ],
+    "range slider": [
+      "Range slider",
+      "Slider"
+    ],
+    "two-handle slider": [
+      "Slider (Multi-Thumb)"
+    ],
+    "dual slider": [
+      "Slider (Multi-Thumb)"
+    ],
+    "price range": [
+      "Slider (Multi-Thumb)"
+    ],
+    "knob": [
+      "Slider"
+    ],
+    "spinner": [
+      "Spinner",
+      "Progress"
+    ],
+    "loading spinner": [
+      "Spinner",
+      "Progress"
+    ],
+    "loader": [
+      "Spinner",
+      "Progress"
+    ],
+    "busy indicator": [
+      "Spinner",
+      "Progress"
+    ],
+    "skeleton": [
+      "Progress"
+    ],
+    "loading placeholder": [
+      "Progress"
+    ],
+    "shimmer": [
+      "Progress"
+    ],
+    "progress bar": [
+      "progress",
+      "Progress"
+    ],
+    "loading bar": [
+      "progress",
+      "Progress"
+    ],
+    "percent complete": [
+      "progress"
+    ],
+    "gauge": [
+      "Meter",
+      "meter"
+    ],
+    "strength meter": [
+      "Meter",
+      "Passwords"
+    ],
+    "password strength": [
+      "Passwords",
+      "Meter"
+    ],
+    "table": [
+      "Table",
+      "table"
+    ],
+    "data table": [
+      "Table",
+      "Grid"
+    ],
+    "data grid": [
+      "Grid",
+      "Table"
+    ],
+    "datagrid": [
+      "Grid",
+      "Table"
+    ],
+    "spreadsheet": [
+      "Grid"
+    ],
+    "sortable table": [
+      "Table",
+      "Grid"
+    ],
+    "tree table": [
+      "Treegrid"
+    ],
+    "accordion": [
+      "Accordion"
+    ],
+    "collapsible": [
+      "Accordion",
+      "Disclosure"
+    ],
+    "collapsible section": [
+      "Accordion",
+      "Disclosure"
+    ],
+    "expander": [
+      "Disclosure",
+      "details"
+    ],
+    "expandable": [
+      "Disclosure",
+      "details"
+    ],
+    "expand collapse": [
+      "Disclosure",
+      "details"
+    ],
+    "show more": [
+      "Disclosure",
+      "details"
+    ],
+    "read more": [
+      "Disclosure",
+      "details"
+    ],
+    "show hide": [
+      "Disclosure",
+      "details"
+    ],
+    "reveal": [
+      "Disclosure",
+      "details"
+    ],
+    "disclosure": [
+      "Disclosure",
+      "details"
+    ],
+    "faq": [
+      "Accordion",
+      "details"
+    ],
+    "tabs": [
+      "Tabs"
+    ],
+    "tabbed": [
+      "Tabs"
+    ],
+    "tab bar": [
+      "Tabs"
+    ],
+    "segmented control": [
+      "Radio Group",
+      "Tabs"
+    ],
+    "segmented": [
+      "Radio Group",
+      "Tabs"
+    ],
+    "tree": [
+      "Treeview"
+    ],
+    "tree view": [
+      "Treeview"
+    ],
+    "file tree": [
+      "Treeview"
+    ],
+    "folder tree": [
+      "Treeview"
+    ],
+    "breadcrumb": [
+      "Breadcrumb",
+      "Breadcrumbs"
+    ],
+    "breadcrumbs": [
+      "Breadcrumb",
+      "Breadcrumbs"
+    ],
+    "crumbs": [
+      "Breadcrumb"
+    ],
+    "you are here": [
+      "Breadcrumb"
+    ],
+    "pagination": [
+      "Pagination"
+    ],
+    "pager": [
+      "Pagination"
+    ],
+    "page numbers": [
+      "Pagination"
+    ],
+    "next previous": [
+      "Pagination"
+    ],
+    "load more": [
+      "Pagination"
+    ],
+    "search": [
+      "Search",
+      "input[type=search]"
+    ],
+    "search box": [
+      "Search",
+      "input[type=search]"
+    ],
+    "search field": [
+      "Search",
+      "input[type=search]"
+    ],
+    "search bar": [
+      "Search",
+      "input[type=search]"
+    ],
+    "date": [
+      "Date picker",
+      "Date input",
+      "input[type=date]"
+    ],
+    "date picker": [
+      "Date picker",
+      "Date input"
+    ],
+    "datepicker": [
+      "Date picker",
+      "Date input"
+    ],
+    "calendar": [
+      "Date picker",
+      "Grid"
+    ],
+    "date of birth": [
+      "Memorable date",
+      "Date input",
+      "Dates"
+    ],
+    "memorable date": [
+      "Memorable date",
+      "Date input"
+    ],
+    "date range": [
+      "Date range picker"
+    ],
+    "date range picker": [
+      "Date range picker"
+    ],
+    "from to date": [
+      "Date range picker"
+    ],
+    "time": [
+      "Time picker",
+      "input[type=time]",
+      "time"
+    ],
+    "time picker": [
+      "Time picker"
+    ],
+    "clock": [
+      "Time picker"
+    ],
+    "timestamp": [
+      "time"
+    ],
+    "relative time": [
+      "time"
+    ],
+    "file": [
+      "File upload",
+      "File input",
+      "input[type=file]"
+    ],
+    "file upload": [
+      "File upload",
+      "File input"
+    ],
+    "upload": [
+      "File upload",
+      "File input"
+    ],
+    "dropzone": [
+      "File upload",
+      "File input"
+    ],
+    "drag and drop upload": [
+      "File upload",
+      "File input"
+    ],
+    "attachment": [
+      "File upload",
+      "File input"
+    ],
+    "password": [
+      "Password input",
+      "Passwords",
+      "input[type=password]"
+    ],
+    "password field": [
+      "Password input",
+      "input[type=password]"
+    ],
+    "show password": [
+      "Password input"
+    ],
+    "reveal password": [
+      "Password input"
+    ],
+    "phone": [
+      "Telephone numbers",
+      "input[type=tel]"
+    ],
+    "phone number": [
+      "Telephone numbers",
+      "input[type=tel]"
+    ],
+    "telephone": [
+      "Telephone numbers",
+      "input[type=tel]"
+    ],
+    "email": [
+      "Email addresses",
+      "input[type=email]"
+    ],
+    "email address": [
+      "Email addresses",
+      "input[type=email]"
+    ],
+    "email field": [
+      "Email addresses",
+      "input[type=email]"
+    ],
+    "url field": [
+      "input[type=url]"
+    ],
+    "website field": [
+      "input[type=url]"
+    ],
+    "number": [
+      "Spinbutton",
+      "input[type=number]"
+    ],
+    "number input": [
+      "Spinbutton",
+      "input[type=number]"
+    ],
+    "numeric input": [
+      "Spinbutton",
+      "input[type=number]"
+    ],
+    "quantity": [
+      "Spinbutton",
+      "input[type=number]"
+    ],
+    "increment": [
+      "Spinbutton"
+    ],
+    "plus minus": [
+      "Spinbutton"
+    ],
+    "colour picker": [
+      "input[type=color]"
+    ],
+    "color picker": [
+      "input[type=color]"
+    ],
+    "swatch": [
+      "input[type=color]"
+    ],
+    "footer": [
+      "Footer",
+      "Page footer",
+      "footer"
+    ],
+    "site footer": [
+      "Footer",
+      "Page footer"
+    ],
+    "header": [
+      "Header",
+      "Page header",
+      "header"
+    ],
+    "site header": [
+      "Header",
+      "Navigation bar"
+    ],
+    "masthead": [
+      "Header",
+      "Navigation bar"
+    ],
+    "top bar": [
+      "Header",
+      "Navigation bar"
+    ],
+    "topbar": [
+      "Header",
+      "Navigation bar"
+    ],
+    "navbar": [
+      "Navigation bar",
+      "Header"
+    ],
+    "nav bar": [
+      "Navigation bar",
+      "Header"
+    ],
+    "app bar": [
+      "Navigation bar",
+      "Header"
+    ],
+    "appbar": [
+      "Navigation bar",
+      "Header"
+    ],
+    "navigation": [
+      "Navigation bar",
+      "Service navigation",
+      "nav"
+    ],
+    "main menu": [
+      "Navigation bar",
+      "Service navigation"
+    ],
+    "primary navigation": [
+      "Navigation bar",
+      "Service navigation"
+    ],
+    "sidebar": [
+      "Side navigation",
+      "Sidenav"
+    ],
+    "side nav": [
+      "Side navigation",
+      "Sidenav"
+    ],
+    "sidenav": [
+      "Side navigation",
+      "Sidenav"
+    ],
+    "left nav": [
+      "Side navigation",
+      "Sidenav"
+    ],
+    "side menu": [
+      "Side navigation",
+      "Sidenav"
+    ],
+    "drawer": [
+      "Drawer"
+    ],
+    "sheet": [
+      "Drawer"
+    ],
+    "side panel": [
+      "Drawer"
+    ],
+    "slide-over": [
+      "Drawer"
+    ],
+    "slideover": [
+      "Drawer"
+    ],
+    "off-canvas": [
+      "Drawer"
+    ],
+    "offcanvas": [
+      "Drawer"
+    ],
+    "bottom sheet": [
+      "Drawer"
+    ],
+    "menu": [
+      "Menu",
+      "menu"
+    ],
+    "list": [
+      "List",
+      "ul"
+    ],
+    "bulleted list": [
+      "Unordered list",
+      "ul"
+    ],
+    "unordered list": [
+      "Unordered list",
+      "ul"
+    ],
+    "numbered list": [
+      "Ordered list",
+      "ol"
+    ],
+    "ordered list": [
+      "Ordered list",
+      "ol"
+    ],
+    "link list": [
+      "Link list",
+      "List"
+    ],
+    "list of links": [
+      "Link list",
+      "List"
+    ],
+    "icon list": [
+      "Icon list"
+    ],
+    "listing": [
+      "Collection",
+      "List"
+    ],
+    "collection": [
+      "Collection"
+    ],
+    "grid of cards": [
+      "Collection"
+    ],
+    "card grid": [
+      "Collection"
+    ],
+    "summary": [
+      "Summary list",
+      "Summary box"
+    ],
+    "summary list": [
+      "Summary list",
+      "Data list"
+    ],
+    "key value": [
+      "Summary list",
+      "Data list",
+      "dl"
+    ],
+    "key-value": [
+      "Summary list",
+      "Data list",
+      "dl"
+    ],
+    "definition list": [
+      "Data list",
+      "dl"
+    ],
+    "description list": [
+      "Data list",
+      "dl"
+    ],
+    "details list": [
+      "Summary list",
+      "Data list"
+    ],
+    "check your answers": [
+      "Check answers",
+      "Summary list"
+    ],
+    "check answers": [
+      "Check answers",
+      "Summary list"
+    ],
+    "review page": [
+      "Check answers",
+      "Summary list"
+    ],
+    "card": [
+      "Card",
+      "Surface"
+    ],
+    "tile": [
+      "Card",
+      "Surface"
+    ],
+    "panel": [
+      "Panel",
+      "Card",
+      "Surface"
+    ],
+    "box": [
+      "Surface",
+      "Card"
+    ],
+    "surface": [
+      "Surface"
+    ],
+    "container": [
+      "Surface"
+    ],
+    "banner": [
+      "Banner",
+      "Notification banner",
+      "Site alert"
+    ],
+    "announcement": [
+      "Notification banner",
+      "Site alert"
+    ],
+    "site-wide message": [
+      "Site alert",
+      "Notification banner"
+    ],
+    "site alert": [
+      "Site alert"
+    ],
+    "phase banner": [
+      "Phase banner"
+    ],
+    "beta banner": [
+      "Phase banner"
+    ],
+    "alpha banner": [
+      "Phase banner"
+    ],
+    "official website banner": [
+      "Banner",
+      "Identifier"
+    ],
+    "cookie": [
+      "Cookie banner",
+      "Cookies page"
+    ],
+    "cookie banner": [
+      "Cookie banner"
+    ],
+    "cookie consent": [
+      "Cookie banner",
+      "Cookies page"
+    ],
+    "consent": [
+      "Cookie banner"
+    ],
+    "gdpr": [
+      "Cookie banner",
+      "Cookies page"
+    ],
+    "warning": [
+      "Warning text",
+      "Alert"
+    ],
+    "warning text": [
+      "Warning text"
+    ],
+    "caution": [
+      "Warning text"
+    ],
+    "important notice": [
+      "Warning text",
+      "Notification banner"
+    ],
+    "error summary": [
+      "Error summary",
+      "Validation"
+    ],
+    "validation summary": [
+      "Error summary",
+      "Validation"
+    ],
+    "error list": [
+      "Error summary"
+    ],
+    "list of errors": [
+      "Error summary"
+    ],
+    "error message": [
+      "Error message",
+      "Validation"
+    ],
+    "field error": [
+      "Error message"
+    ],
+    "inline error": [
+      "Error message"
+    ],
+    "validation message": [
+      "Error message",
+      "Validation"
+    ],
+    "validation": [
+      "Validation",
+      "Error message"
+    ],
+    "form errors": [
+      "Error summary",
+      "Validation"
+    ],
+    "back link": [
+      "Back link"
+    ],
+    "back button": [
+      "Back link",
+      "Button"
+    ],
+    "go back": [
+      "Back link"
+    ],
+    "skip link": [
+      "Skip link"
+    ],
+    "skip to content": [
+      "Skip link"
+    ],
+    "skip to main": [
+      "Skip link"
+    ],
+    "exit this page": [
+      "Exit this page",
+      "Exit a page quickly"
+    ],
+    "quick exit": [
+      "Exit this page",
+      "Exit a page quickly"
+    ],
+    "panic button": [
+      "Exit this page",
+      "Exit a page quickly"
+    ],
+    "safety exit": [
+      "Exit this page",
+      "Exit a page quickly"
+    ],
+    "leave quickly": [
+      "Exit this page",
+      "Exit a page quickly"
+    ],
+    "language": [
+      "Language selector"
+    ],
+    "language selector": [
+      "Language selector"
+    ],
+    "language switcher": [
+      "Language selector"
+    ],
+    "locale switcher": [
+      "Language selector"
+    ],
+    "in-page navigation": [
+      "In-page navigation"
+    ],
+    "in page navigation": [
+      "In-page navigation"
+    ],
+    "table of contents": [
+      "In-page navigation"
+    ],
+    "toc": [
+      "In-page navigation"
+    ],
+    "on this page": [
+      "In-page navigation"
+    ],
+    "jump links": [
+      "In-page navigation"
+    ],
+    "anchor navigation": [
+      "In-page navigation"
+    ],
+    "identifier": [
+      "Identifier"
+    ],
+    "agency identifier": [
+      "Identifier"
+    ],
+    "government identifier": [
+      "Identifier"
+    ],
+    "character count": [
+      "Character count"
+    ],
+    "character limit": [
+      "Character count"
+    ],
+    "char count": [
+      "Character count"
+    ],
+    "remaining characters": [
+      "Character count"
+    ],
+    "word count": [
+      "Character count"
+    ],
+    "task list": [
+      "Task list",
+      "Task list pages"
+    ],
+    "process list": [
+      "Process list"
+    ],
+    "process": [
+      "Process list"
+    ],
+    "fieldset": [
+      "Fieldset",
+      "fieldset"
+    ],
+    "group of fields": [
+      "Fieldset",
+      "fieldset"
+    ],
+    "field group": [
+      "Fieldset",
+      "fieldset"
+    ],
+    "legend": [
+      "Fieldset",
+      "legend"
+    ],
+    "radio": [
+      "Radio Group",
+      "Radios",
+      "input[type=radio]"
+    ],
+    "radios": [
+      "Radio Group",
+      "Radios"
+    ],
+    "radio button": [
+      "Radio Group",
+      "Radio button",
+      "input[type=radio]"
+    ],
+    "radio buttons": [
+      "Radio Group",
+      "Radio buttons"
+    ],
+    "radio group": [
+      "Radio Group"
+    ],
+    "single choice": [
+      "Radio Group",
+      "Radios"
+    ],
+    "choose one": [
+      "Radio Group",
+      "Radios"
+    ],
+    "one of": [
+      "Radio Group",
+      "Radios"
+    ],
+    "checkbox": [
+      "Checkbox",
+      "Checkboxes",
+      "input[type=checkbox]"
+    ],
+    "checkboxes": [
+      "Checkboxes",
+      "Checkbox"
+    ],
+    "check box": [
+      "Checkbox",
+      "input[type=checkbox]"
+    ],
+    "tick box": [
+      "Checkbox",
+      "input[type=checkbox]"
+    ],
+    "multi choice": [
+      "Checkboxes"
+    ],
+    "select all that apply": [
+      "Checkboxes"
+    ],
+    "select": [
+      "Select",
+      "select"
+    ],
+    "select box": [
+      "Select",
+      "select"
+    ],
+    "picker": [
+      "Select",
+      "Combobox"
+    ],
+    "combobox": [
+      "Combobox",
+      "Combo box"
+    ],
+    "combo box": [
+      "Combobox",
+      "Combo box"
+    ],
+    "autocomplete": [
+      "Combobox",
+      "Combo box"
+    ],
+    "typeahead": [
+      "Combobox",
+      "Combo box"
+    ],
+    "type-ahead": [
+      "Combobox",
+      "Combo box"
+    ],
+    "autosuggest": [
+      "Combobox",
+      "Combo box"
+    ],
+    "listbox": [
+      "Listbox"
+    ],
+    "list box": [
+      "Listbox"
+    ],
+    "multi-select": [
+      "Listbox",
+      "Combobox"
+    ],
+    "multiselect": [
+      "Listbox",
+      "Combobox"
+    ],
+    "tag input": [
+      "Tag Input",
+      "Combobox"
+    ],
+    "tags input": [
+      "Tag Input",
+      "Combobox"
+    ],
+    "token input": [
+      "Tag Input",
+      "Combobox"
+    ],
+    "multi-value input": [
+      "Tag Input"
+    ],
+    "textarea": [
+      "Textarea",
+      "textarea"
+    ],
+    "text area": [
+      "Textarea",
+      "textarea"
+    ],
+    "multiline": [
+      "Textarea",
+      "textarea"
+    ],
+    "multi-line": [
+      "Textarea",
+      "textarea"
+    ],
+    "long text": [
+      "Textarea",
+      "textarea"
+    ],
+    "message box": [
+      "Textarea",
+      "textarea"
+    ],
+    "input": [
+      "Text input",
+      "Textbox",
+      "input[type=text]"
+    ],
+    "text input": [
+      "Text input",
+      "Textbox",
+      "input[type=text]"
+    ],
+    "text field": [
+      "Text input",
+      "Textbox",
+      "Textfield",
+      "input[type=text]"
+    ],
+    "textfield": [
+      "Text input",
+      "Textbox",
+      "Textfield",
+      "input[type=text]"
+    ],
+    "textbox": [
+      "Textbox",
+      "Text input",
+      "input[type=text]"
+    ],
+    "field": [
+      "Form field",
+      "Text input"
+    ],
+    "form field": [
+      "Form field",
+      "Text input"
+    ],
+    "form": [
+      "Form field",
+      "Form"
+    ],
+    "form control": [
+      "Form field"
+    ],
+    "required field": [
+      "Form field",
+      "Text input"
+    ],
+    "optional field": [
+      "Form field",
+      "Text input"
+    ],
+    "prefix suffix": [
+      "Text input"
+    ],
+    "currency": [
+      "Text input"
+    ],
+    "amount": [
+      "Text input"
+    ],
+    "money": [
+      "Text input",
+      "Bank details"
+    ],
+    "iban": [
+      "Bank details"
+    ],
+    "sort code": [
+      "Bank details"
+    ],
+    "bank account": [
+      "Bank details"
+    ],
+    "bank details": [
+      "Bank details"
+    ],
+    "card number": [
+      "Payment card details"
+    ],
+    "credit card": [
+      "Payment card details"
+    ],
+    "payment card": [
+      "Payment card details"
+    ],
+    "postcode": [
+      "Addresses"
+    ],
+    "postal code": [
+      "Addresses"
+    ],
+    "zip code": [
+      "Addresses"
+    ],
+    "address": [
+      "Addresses",
+      "address"
+    ],
+    "address lookup": [
+      "Addresses"
+    ],
+    "national insurance": [
+      "National Insurance numbers"
+    ],
+    "social security": [
+      "National Insurance numbers"
+    ],
+    "bsn": [
+      "National Insurance numbers"
+    ],
+    "full name": [
+      "Names"
+    ],
+    "first name": [
+      "Names"
+    ],
+    "last name": [
+      "Names"
+    ],
+    "surname": [
+      "Names"
+    ],
+    "sign in": [
+      "Sign in",
+      "Create accounts"
+    ],
+    "signin": [
+      "Sign in"
+    ],
+    "log in": [
+      "Sign in"
+    ],
+    "login": [
+      "Sign in"
+    ],
+    "sign up": [
+      "Create accounts"
+    ],
+    "signup": [
+      "Create accounts"
+    ],
+    "register": [
+      "Create accounts"
+    ],
+    "registration": [
+      "Create accounts"
+    ],
+    "create account": [
+      "Create accounts"
+    ],
+    "auth": [
+      "Sign in",
+      "Create accounts"
+    ],
+    "authentication": [
+      "Sign in"
+    ],
+    "start page": [
+      "Start pages"
+    ],
+    "landing page": [
+      "Start pages"
+    ],
+    "confirmation page": [
+      "Confirmation pages"
+    ],
+    "thank you page": [
+      "Confirmation pages"
+    ],
+    "success page": [
+      "Confirmation pages"
+    ],
+    "done page": [
+      "Confirmation pages"
+    ],
+    "question page": [
+      "Question pages"
+    ],
+    "one thing per page": [
+      "Question pages"
+    ],
+    "button": [
+      "Button",
+      "button"
+    ],
+    "cta": [
+      "Button"
+    ],
+    "call to action": [
+      "Button"
+    ],
+    "primary button": [
+      "Button"
+    ],
+    "secondary button": [
+      "Button"
+    ],
+    "icon button": [
+      "Button"
+    ],
+    "toggle button": [
+      "Button",
+      "Switch"
+    ],
+    "button group": [
+      "Button group"
+    ],
+    "split button": [
+      "Button group",
+      "Menu Button"
+    ],
+    "button bar": [
+      "Toolbar",
+      "Button group"
+    ],
+    "link": [
+      "Link",
+      "a"
+    ],
+    "anchor": [
+      "Link",
+      "a"
+    ],
+    "hyperlink": [
+      "Link",
+      "a"
+    ],
+    "text link": [
+      "Link",
+      "a"
+    ],
+    "tooltip": [
+      "Tooltip"
+    ],
+    "toolbar": [
+      "Toolbar"
+    ],
+    "action bar": [
+      "Toolbar"
+    ],
+    "formatting bar": [
+      "Toolbar"
+    ],
+    "editor toolbar": [
+      "Toolbar"
+    ],
+    "divider": [
+      "Separator",
+      "hr"
+    ],
+    "separator": [
+      "Separator",
+      "hr"
+    ],
+    "horizontal rule": [
+      "hr"
+    ],
+    "rule": [
+      "hr"
+    ],
+    "hr": [
+      "hr"
+    ],
+    "horizontal line": [
+      "hr"
+    ],
+    "line between sections": [
+      "hr"
+    ],
+    "resizable": [
+      "Window Splitter"
+    ],
+    "resize handle": [
+      "Window Splitter"
+    ],
+    "split pane": [
+      "Window Splitter"
+    ],
+    "splitter": [
+      "Window Splitter"
+    ],
+    "split view": [
+      "Window Splitter"
+    ],
+    "draggable divider": [
+      "Window Splitter"
+    ],
+    "code": [
+      "Code block",
+      "code"
+    ],
+    "code block": [
+      "Code block",
+      "pre"
+    ],
+    "code snippet": [
+      "Code block",
+      "code"
+    ],
+    "snippet": [
+      "Code block",
+      "code"
+    ],
+    "monospace": [
+      "Code block",
+      "code"
+    ],
+    "inline code": [
+      "code"
+    ],
+    "keyboard shortcut": [
+      "kbd"
+    ],
+    "shortcut": [
+      "kbd"
+    ],
+    "kbd": [
+      "kbd"
+    ],
+    "keycap": [
+      "kbd"
+    ],
+    "keyboard key": [
+      "kbd"
+    ],
+    "quote": [
+      "Blockquote",
+      "blockquote"
+    ],
+    "blockquote": [
+      "Blockquote",
+      "blockquote"
+    ],
+    "pull quote": [
+      "Blockquote",
+      "blockquote"
+    ],
+    "testimonial": [
+      "Blockquote",
+      "blockquote"
+    ],
+    "citation": [
+      "cite",
+      "Blockquote"
+    ],
+    "inline quote": [
+      "q"
+    ],
+    "image": [
+      "Image",
+      "img"
+    ],
+    "picture": [
+      "Image",
+      "img"
+    ],
+    "photo": [
+      "Image",
+      "img"
+    ],
+    "figure": [
+      "Figure",
+      "figure"
+    ],
+    "figure with caption": [
+      "Figure",
+      "figure"
+    ],
+    "caption": [
+      "figcaption",
+      "caption"
+    ],
+    "video": [
+      "Video",
+      "video"
+    ],
+    "video player": [
+      "Video",
+      "video"
+    ],
+    "audio": [
+      "audio"
+    ],
+    "audio player": [
+      "audio"
+    ],
+    "media player": [
+      "video",
+      "audio"
+    ],
+    "embed": [
+      "iframe"
+    ],
+    "iframe": [
+      "iframe"
+    ],
+    "map embed": [
+      "iframe"
+    ],
+    "heading": [
+      "Heading",
+      "h1"
+    ],
+    "title": [
+      "Heading",
+      "h1"
+    ],
+    "headline": [
+      "Heading",
+      "h1"
+    ],
+    "page title": [
+      "Page header",
+      "Heading"
+    ],
+    "page header": [
+      "Page header"
+    ],
+    "page head": [
+      "Page header"
+    ],
+    "paragraph": [
+      "Paragraph",
+      "p"
+    ],
+    "body text": [
+      "Paragraph",
+      "Prose",
+      "p"
+    ],
+    "prose": [
+      "Prose",
+      "Article"
+    ],
+    "rich text": [
+      "Prose",
+      "Article"
+    ],
+    "article": [
+      "Article",
+      "article"
+    ],
+    "long-form": [
+      "Prose",
+      "Article"
+    ],
+    "text": [
+      "Text",
+      "Paragraph"
+    ],
+    "abbreviation": [
+      "abbr"
+    ],
+    "acronym": [
+      "abbr"
+    ],
+    "highlight": [
+      "mark"
+    ],
+    "marked text": [
+      "mark"
+    ],
+    "fine print": [
+      "small"
+    ],
+    "small print": [
+      "small"
+    ],
+    "footnote": [
+      "small",
+      "sup"
+    ],
+    "subscript": [
+      "sub"
+    ],
+    "superscript": [
+      "sup"
+    ],
+    "strikethrough": [
+      "del"
+    ],
+    "deleted text": [
+      "del"
+    ],
+    "inserted text": [
+      "ins"
+    ],
+    "inset text": [
+      "Inset text"
+    ],
+    "callout": [
+      "Inset text",
+      "Summary box"
+    ],
+    "note": [
+      "Inset text"
+    ],
+    "info box": [
+      "Inset text",
+      "Summary box"
+    ],
+    "tip": [
+      "Inset text"
+    ],
+    "aside": [
+      "Inset text",
+      "aside"
+    ],
+    "sidebar note": [
+      "aside"
+    ],
+    "summary box": [
+      "Summary box"
+    ],
+    "key facts": [
+      "Summary box"
+    ],
+    "spotlight": [
+      "Spotlight section"
+    ],
+    "spotlight section": [
+      "Spotlight section"
+    ],
+    "highlight section": [
+      "Spotlight section"
+    ],
+    "hero": [
+      "Spotlight section",
+      "Start pages"
+    ],
+    "jumbotron": [
+      "Spotlight section"
+    ],
+    "logo": [
+      "Logo"
+    ],
+    "brand mark": [
+      "Logo"
+    ],
+    "wordmark": [
+      "Logo"
+    ],
+    "icon": [
+      "Icon"
+    ],
+    "avatar": [
+      "Avatar"
+    ],
+    "profile picture": [
+      "Avatar",
+      "img"
+    ],
+    "user picture": [
+      "Avatar",
+      "img"
+    ],
+    "initials": [
+      "Avatar"
+    ],
+    "activity feed": [
+      "Feed"
+    ],
+    "feed": [
+      "Feed"
+    ],
+    "timeline": [
+      "Feed",
+      "Process list"
+    ],
+    "history": [
+      "Feed"
+    ],
+    "activity log": [
+      "Feed"
+    ],
+    "audit log": [
+      "Feed",
+      "Table"
+    ],
+    "news feed": [
+      "Feed"
+    ],
+    "stream": [
+      "Feed"
+    ],
+    "landmark": [
+      "Landmarks"
+    ],
+    "landmarks": [
+      "Landmarks"
+    ],
+    "main content": [
+      "Landmarks",
+      "main"
+    ],
+    "main region": [
+      "Landmarks",
+      "main"
+    ],
+    "page section": [
+      "section"
+    ],
+    "grid": [
+      "Grid"
+    ],
+    "layout grid": [
+      "Grid"
+    ],
+    "empty state": [
+      "Empty State"
+    ],
+    "no results": [
+      "Empty State"
+    ],
+    "nothing here yet": [
+      "Empty State"
+    ],
+    "zero state": [
+      "Empty State"
+    ],
+    "blank slate": [
+      "Empty State"
+    ],
+    "meter": [
+      "Meter",
+      "meter"
+    ],
+    "output": [
+      "output"
+    ],
+    "calculation result": [
+      "output"
+    ],
+    "computed value": [
+      "output"
+    ],
+    "form output": [
+      "output"
+    ],
+    "details": [
+      "Details",
+      "details"
+    ],
+    "summary/details": [
+      "details",
+      "summary"
+    ],
+    "kanban": [],
+    "board": [],
+    "chart": [],
+    "graph": [],
+    "bar chart": [],
+    "line chart": [],
+    "pie chart": [],
+    "sparkline": [],
+    "kpi": [],
+    "stat": [],
+    "metric": [],
+    "stat tile": [],
+    "rating": [],
+    "stars": [],
+    "star rating": [],
+    "pricing": [],
+    "pricing table": [],
+    "plans": [],
+    "otp": [],
+    "one-time code": [],
+    "verification code": [],
+    "pin code": [],
+    "scroll area": [],
+    "custom scrollbar": [],
+    "aspect ratio": [],
+    "ratio box": [],
+    "hover effect": [],
+    "animation": [],
+    "transition": [],
+    "back": [
+      "Back link"
+    ],
+    "goes back": [
+      "Back link"
+    ],
+    "previous step": [
+      "Back link"
+    ],
+    "content section": [
+      "section"
+    ],
+    "treegrid": [
+      "Treegrid"
+    ],
+    "expandable rows": [
+      "Treegrid"
+    ]
+  },
+  "_deliberately_empty": "Entries with an empty list are words we RECOGNISE and can say NO to precisely: the concept exists in the wider field but no layer names it — no HTML element, no APG pattern, no public-service component. They resolve to NONE with a message that names the word, so the refusal is about the component and not about the vocabulary. Most of them are things the four-layer cut removed on purpose (kanban, chart, rating, stat tile, otp)."
+}

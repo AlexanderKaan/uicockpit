@@ -10,6 +10,7 @@ import { ComponentsIndexPage, ComponentDetailPage } from './marketing/ComponentD
 import { componentPageBySlug } from './stage/views/ComponentGallery'
 import { findEntry } from './marketing/seo/seoData'
 import { AuditPage } from './marketing/AuditPage'
+import { ForgePage } from './marketing/ForgePage'
 import { ConformancePage } from './audit/conformance'
 import './styles/marketing.css'
 
@@ -76,6 +77,9 @@ export function App() {
 
   // The retroactive door — point at existing code, entirely client-side.
   if (path.startsWith('/audit')) return <AuditPage navigate={navigate} />
+
+  // The forge — describe a component; the derivation says whether it may exist.
+  if (path.startsWith('/forge')) return <ForgePage navigate={navigate} />
 
   // The social-preview / OG card (1280×640) — not linked; screenshotted to a PNG.
   if (path === '/og') return <OgCard />

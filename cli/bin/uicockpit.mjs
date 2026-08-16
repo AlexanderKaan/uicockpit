@@ -4,6 +4,7 @@
  *
  *   npx uicockpit init <hash>   pull a configured kit (tokens.css + contract.json)
  *   npx uicockpit check [dir]   verify a codebase against the kit's contract
+ *   npx uicockpit forge "…"     may this component exist? — the four-layer derivation, pointed at a sentence
  *
  * Zero dependencies — Node ≥18 built-ins only. The check core is pure and lives
  * in src/check.mjs (the cockpit repo re-exports it so there's a single source).
@@ -30,6 +31,14 @@ Usage:
       already implies, and score how far it sits from its own system.
       Writes .uicockpit/audit.html — everything stays on your machine.
 
+  npx uicockpit forge "<describe a component>" [--json]
+      Ask whether a component may exist before building it. Resolves the
+      sentence against the four catalogues the kit is derived from (HTML ·
+      WAI-ARIA APG · Open UI · GOV.UK/USWDS/NL) and answers with a citation:
+      EXISTS (here is ours, its contract and page) · PLATFORM (use the element,
+      the floor styles it) · MAY EXIST (what it owes + a scaffold) · LOCAL
+      EXTENSION · DECIDED NOT TO · NO. Exit 0 = have it / may build · 1 = refused.
+
   npx uicockpit help | --version
 
 Docs: https://uicockpit.com`)
@@ -50,6 +59,10 @@ async function main() {
     case 'audit': {
       const { runAudit } = await import(new URL('../src/audit.mjs', import.meta.url))
       return runAudit(rest)
+    }
+    case 'forge': {
+      const { runForge } = await import(new URL('../src/forge.mjs', import.meta.url))
+      return runForge(rest)
     }
     case 'version':
     case '-v':

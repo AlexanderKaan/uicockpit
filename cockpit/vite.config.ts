@@ -27,7 +27,9 @@ const changelog = readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf
 export default defineConfig({
   /* Our own port, strict — see scripts/lib/base.mjs for why 5173 was a mistake:
    * it is Vite's default and every other Vite project on the machine wants it. */
-  server: { port: 5180, strictPort: true },
+  // fs.allow reaches one level up: the /forge page imports the forge core and
+  // its data from ../cli (one source for the CLI, the MCP tool and the page).
+  server: { port: 5180, strictPort: true, fs: { allow: ['..'] } },
   preview: { port: 5180, strictPort: true },
   define: {
     __UICOCKPIT_VERSION__: JSON.stringify(`v${cliVersion}`),

@@ -7,6 +7,7 @@
  *   • install_kit        — pull a configured kit (tokens.css + contract.json)
  *   • get_design_context — read the kit's tokens + rules to build on-system
  *   • check_conformance  — verify the code conforms to the contract (the moat)
+ *   • resolve_component  — may this component exist? the four-layer derivation, pointed at a sentence
  *
  * The verifier core is the published `uicockpit` package (single source); kit
  * content comes from the CDN (stateless over the share-hash). stdio transport.
@@ -187,6 +188,46 @@ server.registerTool(
         ? `\n\n✓ no errors · ${res.warns.length} warning${res.warns.length === 1 ? '' : 's'} to review (set strict to enforce).`
         : '\n\n✓ conforms to the design contract.'
     return text((lines.length ? lines.join('\n') + '\n\n' : '') + head + verdict)
+  },
+)
+
+/* ── resolve_component (the forge) ─────────────────────────────────────────── */
+server.registerTool(
+  'resolve_component',
+  {
+    title: 'May this component exist? — resolve a description against the four-layer derivation',
+    description:
+      'Call this BEFORE building any UI component the kit does not obviously have. Describe it in a ' +
+      'sentence ("a link above the heading that goes back one step", "a toast that confirms the save", ' +
+      '"a kanban board"). The forge resolves the sentence against the four catalogues the kit is derived ' +
+      'from — HTML (MDN) · WAI-ARIA APG · Open UI · GOV.UK/USWDS/NL Design System — and answers with a ' +
+      'citation: EXISTS (the kit ships it: recipe, provenance line, APG keyboard/ARIA contract, page, ' +
+      'usage), PLATFORM (the browser has it and the kit\'s floor already styles it — use the element, do ' +
+      'not build a component), MAY EXIST (a source names it, nothing in the kit covers it: what it owes ' +
+      'plus a tokens-only scaffold composed from the kit\'s grammar), LOCAL EXTENSION (only Open UI\'s ' +
+      'census names it — allowed outside the core), DECIDED NOT TO (with the reason), A TOKEN, or NO ' +
+      '(nothing names it — with the words that were not understood). A sentence naming several things ' +
+      'you have returns them COMPOSED, primary first. There is no model in it: everything it says is a ' +
+      'citation from the same data the build gate reads.',
+    inputSchema: {
+      description: z.string().min(2).describe('The component, in a sentence — what it is for and what it does.'),
+      json: z.boolean().optional().describe('Return the full verdict object as JSON instead of the readable answer (default: false).'),
+    },
+  },
+  async ({ description, json }) => {
+    let mod
+    try {
+      mod = await import('uicockpit/forge')
+    } catch (err) {
+      return errText(
+        `The forge needs uicockpit ≥ 0.7 (which exports "uicockpit/forge"); the installed uicockpit does not have it: ${err.message}. ` +
+          'Upgrade the uicockpit package next to this server.',
+      )
+    }
+    const { createForge, loadForgeData, formatVerdict } = mod
+    const forge = createForge(await loadForgeData())
+    const v = forge.resolve(description)
+    return { content: [{ type: 'text', text: json ? JSON.stringify(v, null, 2) : formatVerdict(v) }], isError: v.verdict === 'none' }
   },
 )
 

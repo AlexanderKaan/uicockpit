@@ -142,6 +142,9 @@ const staticRoutes: Array<{ loc: string; freq: string; pri: string }> = [
   // The retroactive door — its own entrance, its own intent, and the landing
   // spot for the CLI one-liner and shared reports.
   { loc: '/audit', freq: 'weekly', pri: '0.9' },
+  // The forge — describe a component; the derivation says whether it may exist.
+  // Client-rendered like /audit (its value is the answer, not prose).
+  { loc: '/forge', freq: 'weekly', pri: '0.8' },
   { loc: '/components', freq: 'weekly', pri: '0.9' },
   { loc: '/changelog', freq: 'weekly', pri: '0.6' },
   { loc: '/docs', freq: 'monthly', pri: '0.8' },

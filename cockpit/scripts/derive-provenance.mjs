@@ -560,7 +560,11 @@ if (WRITE) {
   writeFileSync(path, JSON.stringify({
     _derived: 'scripts/derive-provenance.mjs — layer 1 measured off the rendered DOM, 2 from apg.ts, 3 from openui-names.json (a CHECK, not a source since 2026-08-16), 4 matched against service-systems.json',
     _layers: { 1: 'MDN / HTML', 2: 'WAI-ARIA APG', 3: 'Open UI', 4: 'GOV.UK · NL Design System · USWDS' },
-    assigned: Object.fromEntries(assigned.map((a) => [a.id, a.sources])),
+    /* sources = one line per layer (the report's shape); covers = EVERY
+     * catalogue entry the recipe matched, which is what the reverse reading
+     * and the forge need — banner is USWDS Banner AND GOV.UK Notification
+     * banner AND Phase banner AND USWDS Site alert, not just the first. */
+    assigned: Object.fromEntries(assigned.map((a) => [a.id, { sources: a.sources, covers: a.covers }])),
     unassigned: unassigned.map((u) => u.id),
   }, null, 2) + '\n')
   console.log(`\n  → written to scripts/data/provenance.json`)

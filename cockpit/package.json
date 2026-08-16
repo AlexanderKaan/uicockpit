@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run audit:backticks && npm run verify:icons && npm run audit:vocabulary && npm run audit:values && npm run audit:components && npm run audit:surfaces && npm run audit:naming && npm run audit:derivation && node scripts/gen-openui-entry.mjs --check && npm run audit:role-treatments && tsc -b && vite build && npm run prerender",
+    "build": "npm run audit:backticks && npm run verify:icons && npm run audit:vocabulary && npm run audit:values && npm run audit:components && npm run audit:surfaces && npm run audit:naming && npm run audit:derivation && npm run gen:forge -- --check && node scripts/gen-openui-entry.mjs --check && npm run audit:role-treatments && tsc -b && vite build && npm run prerender",
     "shoot:og": "node scripts/shoot-og.mjs public/og-image.png",
     "prerender": "npx vite-node scripts/prerender.tsx",
     "lint": "eslint .",
@@ -37,7 +37,8 @@
     "audit:values": "node scripts/audit-values.mjs",
     "audit:derivation": "node scripts/derive-coverage.mjs --gate",
     "audit:surfaces": "node scripts/audit-surfaces.mjs",
-    "gates:rendered": "npm run a11y:matrix && npm run a11y:tree && npm run audit:uniformity && npm run check:components && npm run audit:shape"
+    "gates:rendered": "npm run a11y:matrix && npm run a11y:tree && npm run audit:uniformity && npm run check:components && npm run audit:shape",
+    "gen:forge": "npx vite-node scripts/gen-forge-data.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

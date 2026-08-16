@@ -2698,3 +2698,88 @@
 }
 .cmpdoc__spec-keys tr + tr th,
 .cmpdoc__spec-keys tr + tr td { border-top: 1px solid var(--mkt-border); }
+
+/* ── /forge — describe a component; the derivation answers ─────────────────────
+ * Sized through the KIT's tokens (--k-s-* · --k-type-* · --k-radius-*), which the
+ * page sets on <main> from buildTokens(DEFAULT_CONFIG): the site composes
+ * through the kit's scale instead of adding raw px to the marketing ratchet.
+ * Colours stay --mkt-* — the site's chrome, not the kit's. */
+.frg { padding-block: calc(var(--k-s-32) + var(--k-s-8)) calc(var(--k-s-32) * 3); }
+.frg__head { max-width: 46rem; margin-bottom: calc(var(--k-s-32) + var(--k-s-2)); }
+.frg__eyebrow { font-size: var(--k-type-eyebrow); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--mkt-fg-faint); margin: 0 0 var(--k-s-12); }
+.frg__head h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); line-height: 1.06; letter-spacing: -.032em; font-weight: 600; margin: 0 0 var(--k-s-16); text-wrap: balance; }
+.frg__lede { font-size: var(--k-type-body); color: var(--mkt-fg-muted); margin: 0; max-width: 60ch; line-height: var(--k-leading-normal); }
+.frg__lede em { font-style: normal; color: var(--mkt-fg); }
+
+.frg__ask { max-width: 46rem; }
+.frg__label { display: block; font-size: var(--k-type-caption); color: var(--mkt-fg-muted); margin: 0 0 var(--k-s-8); }
+.frg__row { display: flex; gap: var(--k-s-8); }
+.frg__input { flex: 1 1 auto; min-width: 0; height: var(--k-control-h-lg); padding: 0 var(--k-s-16); font: inherit; font-size: var(--k-type-body); color: var(--mkt-fg);
+  background: var(--mkt-surface); border: 1px solid var(--mkt-border); border-radius: var(--k-radius-lg); outline: none; }
+.frg__input:focus-visible { border-color: var(--mkt-accent); box-shadow: 0 0 0 var(--k-s-2) color-mix(in oklab, var(--mkt-accent) 22%, transparent); }
+.frg__go { height: var(--k-control-h-lg); padding: 0 var(--k-s-20); font: inherit; font-weight: var(--k-weight-semibold); font-size: var(--k-type-body); color: #fff; background: var(--mkt-fg);
+  border: 0; border-radius: var(--k-radius-lg); cursor: pointer; }
+.frg__go:hover { background: var(--mkt-accent); }
+.frg__go:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 2px; }
+.frg__examples { display: flex; flex-wrap: wrap; gap: var(--k-s-6); margin-top: var(--k-s-12); }
+.frg__chip { font: inherit; font-size: var(--k-type-caption); color: var(--mkt-fg-muted); background: color-mix(in oklab, var(--mkt-fg) 5%, transparent);
+  border: 0; border-radius: var(--k-radius-pill); padding: var(--k-s-6) var(--k-s-12); cursor: pointer; }
+.frg__chip:hover { color: var(--mkt-fg); background: color-mix(in oklab, var(--mkt-fg) 9%, transparent); }
+.frg__chip:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 1px; }
+
+.frg__result { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--k-s-28); margin-top: calc(var(--k-s-32) + var(--k-s-8)); align-items: start; }
+@media (max-width: 900px) { .frg__result { grid-template-columns: 1fr; } }
+.frg__card { border: 1px solid var(--mkt-border); border-radius: var(--k-radius-lg); padding: var(--k-s-24) var(--k-s-28); background: var(--mkt-surface); }
+.frg__verdict { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; margin-bottom: var(--k-s-14); }
+.frg__badge { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: .06em; text-transform: uppercase; padding: var(--k-s-4) var(--k-s-10); border-radius: var(--k-radius-pill);
+  background: color-mix(in oklab, var(--mkt-fg) 8%, transparent); color: var(--mkt-fg); }
+.frg__badge--exists, .frg__badge--compose { background: #e3f4ea; color: #1f6b3a; }
+.frg__badge--platform { background: #e6effc; color: #1d4f9c; }
+.frg__badge--core { background: #fff1d6; color: #8a5a00; }
+.frg__badge--census, .frg__badge--token { background: #efe9fb; color: #5b3aa8; }
+.frg__badge--decided, .frg__badge--none { background: #fbe7e2; color: #a23a1e; }
+.frg__query { font-size: var(--k-type-small); color: var(--mkt-fg-muted); }
+.frg__say { font-size: var(--k-type-body); line-height: var(--k-leading-normal); margin: 0 0 var(--k-s-14); }
+.frg__words { font-size: var(--k-type-caption); color: var(--mkt-fg-muted); margin: 0 0 var(--k-s-14); line-height: 2; }
+.frg__word { display: inline-block; margin: 0 var(--k-s-4) 0 var(--k-s-2); padding: 0 var(--k-s-8); border-radius: var(--k-radius-sm); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); color: var(--mkt-fg); }
+.frg__word--unknown { background: #fbe7e2; color: #a23a1e; text-decoration: line-through; text-decoration-thickness: 1px; }
+.frg__link { font-size: var(--k-type-small); margin: 0 0 var(--k-s-14); }
+.frg__link a { color: var(--mkt-accent); text-decoration: none; }
+.frg__link a:hover { text-decoration: underline; }
+.frg__alt { color: var(--mkt-fg-muted); }
+.frg__cites h3, .frg__contract h3, .frg__code h3 { font-size: var(--k-type-eyebrow); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--mkt-fg-faint); margin: var(--k-s-20) 0 var(--k-s-8); font-weight: var(--k-weight-semibold); }
+.frg__cites ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-s-6); }
+.frg__cites li { font-size: var(--k-type-small); display: flex; gap: var(--k-s-8); align-items: baseline; flex-wrap: wrap; }
+.frg__cites a { color: var(--mkt-fg); text-decoration: underline; text-decoration-color: var(--mkt-border); text-underline-offset: 0.2em; }
+.frg__cites a:hover { text-decoration-color: var(--mkt-fg); }
+.frg__layer { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: .06em; padding: var(--k-s-2) var(--k-s-6); border-radius: var(--k-radius-sm); white-space: nowrap;
+  background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); color: var(--mkt-fg-muted); }
+.frg__layer--1 { background: #e6effc; color: #1d4f9c; }
+.frg__layer--2 { background: #e3f4ea; color: #1f6b3a; }
+.frg__layer--3 { background: #f1f1f4; color: #66666e; }
+.frg__layer--4 { background: #fff1d6; color: #8a5a00; }
+.frg__note { color: var(--mkt-fg-muted); }
+.frg__keys { border-collapse: collapse; width: 100%; font-size: var(--k-type-small); }
+.frg__keys th { text-align: left; font-weight: var(--k-weight-semibold); white-space: nowrap; padding: var(--k-s-6) var(--k-s-12) var(--k-s-6) 0; vertical-align: top; width: 1%; }
+.frg__keys td { padding: var(--k-s-6) 0; color: var(--mkt-fg-muted); }
+.frg__keys tr + tr th, .frg__keys tr + tr td { border-top: 1px solid var(--mkt-border); }
+.frg__aria { margin: var(--k-s-10) 0 0; padding-left: var(--k-s-20); font-size: var(--k-type-small); color: var(--mkt-fg-muted); line-height: var(--k-leading-normal); }
+.frg__contract-none, .frg__reason { font-size: var(--k-type-small); color: var(--mkt-fg-muted); line-height: var(--k-leading-normal); margin: var(--k-s-12) 0 0; }
+.frg__code pre { margin: 0; padding: var(--k-s-14) var(--k-s-16); border-radius: var(--k-radius-md); background: #0f1115; color: #e8e8ec; font-size: var(--k-type-caption); line-height: var(--k-leading-normal); overflow: auto; }
+.frg__code pre + h3 { margin-top: var(--k-s-16); }
+
+.frg__stagewrap { position: sticky; top: var(--k-s-24); }
+.frg__stage { border: 1px solid var(--mkt-border); border-radius: var(--k-radius-lg); padding: var(--k-s-28); min-height: 12rem; overflow: auto;
+  background: var(--k-bg, #f8f9fb); }
+.frg__stage-note { font-size: var(--k-type-caption); color: var(--mkt-fg-faint); margin: var(--k-s-10) var(--k-s-4) 0; }
+.frg__html { display: grid; gap: var(--k-s-12); }
+.frg__empty { color: var(--mkt-fg-faint); margin: 0; }
+
+.frg__how { max-width: 46rem; margin-top: calc(var(--k-s-32) * 2); }
+.frg__how h2 { font-size: var(--k-type-h3); letter-spacing: -.02em; margin: 0 0 var(--k-s-16); }
+.frg__legend { display: grid; grid-template-columns: max-content 1fr; gap: var(--k-s-10) var(--k-s-20); margin: 0; font-size: var(--k-type-small); line-height: var(--k-leading-normal); }
+.frg__legend dt { font-weight: var(--k-weight-semibold); white-space: nowrap; }
+.frg__legend dd { margin: 0; color: var(--mkt-fg-muted); }
+@media (max-width: 600px) { .frg__legend { grid-template-columns: 1fr; gap: var(--k-s-4); } .frg__legend dd { margin-bottom: var(--k-s-8); } }
+.frg__foot { font-size: var(--k-type-small); color: var(--mkt-fg-muted); margin: var(--k-s-24) 0 0; line-height: 1.6; }
+.frg__foot code { font-size: var(--k-type-caption); padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); }

@@ -19,6 +19,7 @@ verify the agent's output conforms** — generate → apply → **check**, witho
 | `install_kit` | Pulls a configured kit into the project — writes `uicockpit.tokens.css` (the full kit) and `uicockpit.contract.json`. Takes the kit `hash` from `create_kit` or from uicockpit.com. |
 | `get_design_context` | Returns the kit's *grammar* — tokens (grouped) + each component's anatomy (BEM parts) + composition rules + intent routing ("a status pill → a `.badge` tone"; "compose the card anatomy, don't inline layout") — so the agent builds on-system, even components the kit never drew, without loading the full CSS. |
 | `check_conformance` | Verifies the code against the contract: flags unknown tokens, undefined component modifiers, raw colours, off-grid spacing, non-token radii/font-sizes. The moat. |
+| `resolve_component` | **Before** building a component: describe it in a sentence and the four-layer derivation the kit is built from answers whether it may exist — EXISTS (recipe, provenance line, APG keyboard/ARIA contract, page, usage) · PLATFORM (the browser has it, the floor styles it — use the element) · MAY EXIST (what it owes + a tokens-only scaffold) · LOCAL EXTENSION · DECIDED NOT TO · NO (with the words not understood). Several things at once come back COMPOSED. No model: every answer is a citation. Needs `uicockpit` ≥ 0.7. |
 
 ## Setup
 
@@ -50,7 +51,7 @@ via `npx`, no install needed.
 
 1. Get a kit hash — either ask your agent to `create_kit` from a brief (brand/radius/density), or configure one at [uicockpit.com](https://uicockpit.com) and copy its hash (from the share URL / the "Use this kit" panel).
 2. Ask your agent to `install_kit` with that hash.
-3. The agent calls `get_design_context` to learn the tokens + rules, builds the UI with the `--k-*` tokens, then calls `check_conformance` and fixes whatever it flags.
+3. The agent calls `get_design_context` to learn the tokens + rules, asks `resolve_component` before it invents anything the kit does not obviously have, builds the UI with the `--k-*` tokens, then calls `check_conformance` and fixes whatever it flags.
 
 The verifier core is the published [`uicockpit`](https://www.npmjs.com/package/uicockpit)
 CLI (single source); kit content is served statelessly from the CDN over the kit

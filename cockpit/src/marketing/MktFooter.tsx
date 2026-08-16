@@ -28,6 +28,7 @@ export function MktFooter({ navigate }: MktFooterProps) {
             <a href="/app" className="mkt__footlink" onClick={(e) => go(e, '/app')}>Configurator</a>
             <a href="/components" className="mkt__footlink" onClick={(e) => go(e, '/components')}>Components</a>
             <a href="/audit" className="mkt__footlink" onClick={(e) => go(e, '/audit')}>Audit my UI</a>
+            <a href="/forge" className="mkt__footlink" onClick={(e) => go(e, '/forge')}>The forge</a>
             <a href="/docs" className="mkt__footlink" onClick={(e) => go(e, '/docs')}>Docs</a>
             <a href="/manifesto" className="mkt__footlink" onClick={(e) => go(e, '/manifesto')}>Manifesto</a>
           </nav>

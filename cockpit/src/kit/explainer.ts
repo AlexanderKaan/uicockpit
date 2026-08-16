@@ -55,6 +55,10 @@ const STATEFUL = [
 function blockOf(css: string): string | null {
   const counts = new Map<string, number>()
   for (const m of css.matchAll(/(?:^|[\s,>+~(])\.([a-z][a-z0-9-]*)(?:__[a-z0-9-]+)?(?:--[a-z0-9-]+)?(?=[\s,{:.[)])/gm)) {
+    // The preview root is never a block: four recipe rules are scoped to it
+    // (see the Sprint K note in ROADMAP), and select-trigger mentions it more
+    // often than its own class — the forge read "cockpit-preview" as its block.
+    if (m[1] === 'cockpit-preview') continue
     counts.set(m[1]!, (counts.get(m[1]!) ?? 0) + 1)
   }
   let best: string | null = null

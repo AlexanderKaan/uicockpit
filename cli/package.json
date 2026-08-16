@@ -1,17 +1,19 @@
 {
   "name": "uicockpit",
-  "version": "0.6.1",
-  "description": "The CLI of the UIcockpit design system generator. Two ways in: AUDIT a codebase you already wrote and derive the design system it implies, or apply a kit you configured \u2014 then ENFORCE it anywhere: audit -> apply -> check. The verifier nobody else ships.",
+  "version": "0.7.0",
+  "description": "The CLI of the UIcockpit design system generator. Two ways in: AUDIT a codebase you already wrote and derive the design system it implies, or apply a kit you configured — then ENFORCE it anywhere: audit -> apply -> check, and FORGE: describe a component and the four-layer derivation says whether it may exist, with a citation. The verifier nobody else ships.",
   "type": "module",
   "bin": {
     "uicockpit": "bin/uicockpit.mjs"
   },
   "exports": {
-    "./check": "./src/check.mjs"
+    "./check": "./src/check.mjs",
+    "./forge": "./src/forge.mjs"
   },
   "files": [
     "bin",
     "src",
+    "data",
     "README.md"
   ],
   "engines": {

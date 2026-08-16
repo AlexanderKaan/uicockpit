@@ -128,6 +128,40 @@ Three things it deliberately will not do:
 - **It measures coherence, not quality.** One global button reused everywhere
   scores perfectly, even if it is ugly.
 
+### `uicockpit forge "<describe a component>" [--json]`
+
+Ask **before** building. The kit's component list is not chosen, it is derived
+— the platform has it (HTML), WAI-ARIA APG names it, or a public service ships
+it (GOV.UK · USWDS · NL Design System). `forge` points that derivation at a
+sentence and answers with a citation:
+
+```bash
+npx uicockpit forge "a link above the heading that goes back one step"
+```
+
+```
+EXISTS — a link above the heading that goes back one step
+
+You already have this: Back link (recipe "backlink"). Its line: APG · Link ·
+GOV.UK · Back link. It implements APG Link — and <a href> is the entire pattern.
+Page: /components/back-link.
+
+Citations:
+  L2 APG · Link            https://www.w3.org/WAI/ARIA/apg/link/
+  L4 GOV.UK · Back link    https://design-system.service.gov.uk/components/back-link/
+```
+
+Six answers: **EXISTS** (the recipe, its provenance line, its APG keyboard/ARIA
+contract, its page, a usage skeleton) · **PLATFORM** (an HTML element the kit's
+floor already styles — use the element, do not build a component; the floor
+rule is quoted) · **MAY EXIST** (a source names it, nothing covers it yet: what
+it owes plus a scaffold in tokens only, its look from the Role Canvas floors) ·
+**LOCAL EXTENSION** (only Open UI's census names it) · **DECIDED NOT TO** (with
+the reason) · **NO** (nothing names it — the words that were not understood
+are listed). Name several things and they come back **COMPOSED**, primary first.
+Exit 0 = have it / may build it · 1 = refused. There is no model in it; every
+answer is a lookup over the same data the kit's build gate reads.
+
 ## How it fits
 
 `init` and `check` are stateless over the kit **hash** — the same payload behind

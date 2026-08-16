@@ -7,1070 +7,1851 @@
     "4": "GOV.UK · NL Design System · USWDS"
   },
   "assigned": {
-    "toolbar": [
-      {
-        "layer": 2,
-        "source": "APG · Toolbar",
-        "because": "WAI-ARIA APG names the Toolbar pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/toolbar/"
-      }
-    ],
-    "buttons": [
-      {
-        "layer": 1,
-        "source": "<button>",
-        "because": "The platform provides <button>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button"
-      },
-      {
-        "layer": 2,
-        "source": "APG · Button",
-        "because": "WAI-ARIA APG names the Button pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/button/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Button",
-        "because": "25 of 27 surveyed design systems ship this independently (93%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Button",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/button/"
-      }
-    ],
-    "button-finish": [
-      {
-        "layer": 3,
-        "source": "Open UI · Button",
-        "because": "25 of 27 surveyed design systems ship this independently (93%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "card": [
-      {
-        "layer": 3,
-        "source": "Open UI · Card",
-        "because": "12 of 27 surveyed design systems ship this independently (44%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Card",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/card/"
-      }
-    ],
-    "page-head": [
-      {
-        "layer": 4,
-        "source": "NL Design System · Page header",
-        "because": "NL Design System ships this as a component because a public service needs it.",
-        "url": "https://nldesignsystem.nl/page-header"
-      }
-    ],
-    "action-panel": [
-      {
-        "layer": 4,
-        "source": "NL Design System · Spotlight section",
-        "because": "NL Design System ships this as a component because a public service needs it.",
-        "url": "https://nldesignsystem.nl/spotlight-section"
-      }
-    ],
-    "button-group": [
-      {
-        "layer": 2,
-        "source": "APG · Toolbar",
-        "because": "WAI-ARIA APG names the Toolbar pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/toolbar/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Button group",
-        "because": "5 of 27 surveyed design systems ship this independently (19%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Button group",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/button-group/"
-      }
-    ],
-    "form": [
-      {
-        "layer": 3,
-        "source": "Open UI · Form",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "NL Design System · Form field",
-        "because": "NL Design System ships this as a component because a public service needs it.",
-        "url": "https://nldesignsystem.nl/form-field"
-      }
-    ],
-    "badges-pills": [
-      {
-        "layer": 3,
-        "source": "Open UI · Badge",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "NL Design System · Badge",
-        "because": "NL Design System ships this as a component because a public service needs it.",
-        "url": "https://nldesignsystem.nl/badge"
-      }
-    ],
-    "alert": [
-      {
-        "layer": 2,
-        "source": "APG · Alert",
-        "because": "WAI-ARIA APG names the Alert pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/alert/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Alert",
-        "because": "11 of 27 surveyed design systems ship this independently (41%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Alert",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/alert/"
-      }
-    ],
-    "tabs": [
-      {
-        "layer": 2,
-        "source": "APG · Tabs",
-        "because": "WAI-ARIA APG names the Tabs pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/tabs/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Tabs",
-        "because": "13 of 27 surveyed design systems ship this independently (48%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Tabs",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/tabs/"
-      }
-    ],
-    "table": [
-      {
-        "layer": 1,
-        "source": "<table>",
-        "because": "The platform provides <table>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table"
-      },
-      {
-        "layer": 2,
-        "source": "APG · Table",
-        "because": "WAI-ARIA APG names the Table pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/table/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Table",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Table",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/table/"
-      }
-    ],
-    "data-table": [
-      {
-        "layer": 2,
-        "source": "APG · Table (sortable)",
-        "because": "WAI-ARIA APG names the Table (sortable) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/table/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Table",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "tooltip": [
-      {
-        "layer": 2,
-        "source": "APG · Tooltip",
-        "because": "WAI-ARIA APG names the Tooltip pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/tooltip/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Tooltip",
-        "because": "18 of 27 surveyed design systems ship this independently (67%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Tooltip",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/tooltip/"
-      }
-    ],
-    "switch-toggle": [
-      {
-        "layer": 2,
-        "source": "APG · Switch",
-        "because": "WAI-ARIA APG names the Switch pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/switch/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Switch",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "slider": [
-      {
-        "layer": 2,
-        "source": "APG · Slider",
-        "because": "WAI-ARIA APG names the Slider pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/slider/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Slider",
-        "because": "8 of 27 surveyed design systems ship this independently (30%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Range slider",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/range-slider/"
-      }
-    ],
-    "progress": [
-      {
-        "layer": 1,
-        "source": "<progress>",
-        "because": "The platform provides <progress>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/progress"
-      },
-      {
-        "layer": 2,
-        "source": "APG · Progressbar",
-        "because": "WAI-ARIA APG names the Progressbar pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/progressbar/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Progress",
-        "because": "11 of 27 surveyed design systems ship this independently (41%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "select-trigger": [
-      {
-        "layer": 2,
-        "source": "APG · Listbox",
-        "because": "WAI-ARIA APG names the Listbox pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/listbox/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Select",
-        "because": "16 of 27 surveyed design systems ship this independently (59%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Select",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/select/"
-      }
-    ],
-    "sidebar": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks",
-        "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Side navigation",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/side-navigation/"
-      }
-    ],
-    "appbar": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks",
-        "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
-      },
-      {
-        "layer": 4,
-        "source": "NL Design System · Navigation bar",
-        "because": "NL Design System ships this as a component because a public service needs it.",
-        "url": "https://nldesignsystem.nl/navigation-bar"
-      }
-    ],
-    "activity-feed": [
-      {
-        "layer": 2,
-        "source": "APG · Feed",
-        "because": "WAI-ARIA APG names the Feed pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/feed/"
-      }
-    ],
-    "auth": [
-      {
-        "layer": 4,
-        "source": "GOV.UK · Sign in",
-        "because": "GOV.UK ships this as a pattern because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/patterns/sign-in/"
-      }
-    ],
-    "lightbox": [
-      {
-        "layer": 2,
-        "source": "APG · Dialog (Modal)",
-        "because": "WAI-ARIA APG names the Dialog (Modal) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/dialog-modal/"
-      }
-    ],
-    "calendar": [
-      {
-        "layer": 2,
-        "source": "APG · Grid (date grid)",
-        "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Date picker",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/date-picker/"
-      }
-    ],
-    "calendar-week": [
-      {
-        "layer": 2,
-        "source": "APG · Grid (date grid)",
-        "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
-      }
-    ],
-    "calendar-year": [
-      {
-        "layer": 2,
-        "source": "APG · Grid (date grid)",
-        "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
-      }
-    ],
-    "calendar-range": [
-      {
-        "layer": 2,
-        "source": "APG · Grid (date grid)",
-        "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Range",
-        "because": "6 of 27 surveyed design systems ship this independently (22%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Date range picker",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/date-range-picker/"
-      }
-    ],
-    "inpagenav": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks",
-        "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · In-page navigation",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/in-page-navigation/"
-      }
-    ],
-    "sitefooter": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks",
-        "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Footer",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/footer/"
-      }
-    ],
-    "requirements": [
-      {
-        "layer": 4,
-        "source": "GOV.UK · Passwords",
-        "because": "GOV.UK ships this as a pattern because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/patterns/passwords/"
-      }
-    ],
-    "processlist": [
-      {
-        "layer": 3,
-        "source": "Open UI · List",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Process list",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/process-list/"
-      }
-    ],
-    "identifier": [
-      {
-        "layer": 4,
-        "source": "USWDS · Identifier",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/identifier/"
-      }
-    ],
-    "charcount": [
-      {
-        "layer": 4,
-        "source": "GOV.UK · Character count",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/character-count/"
-      }
-    ],
-    "memorable-date": [
-      {
-        "layer": 4,
-        "source": "GOV.UK · Date input",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/date-input/"
-      }
-    ],
-    "tasklist": [
-      {
-        "layer": 2,
-        "source": "APG · Checkbox",
-        "because": "WAI-ARIA APG names the Checkbox pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/checkbox/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · List",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Task list",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/task-list/"
-      }
-    ],
-    "toggletip": [
-      {
-        "layer": 2,
-        "source": "APG · Tooltip (toggle variant)",
-        "because": "WAI-ARIA APG names the Tooltip (toggle variant) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/tooltip/"
-      }
-    ],
-    "langnav": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks",
-        "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Language selector",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/language-selector/"
-      }
-    ],
-    "skiplink": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks (bypass blocks)",
-        "because": "WAI-ARIA APG names the Landmarks (bypass blocks) pattern and specifies its behaviour."
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Link",
-        "because": "6 of 27 surveyed design systems ship this independently (22%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Skip link",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/skip-link/"
-      }
-    ],
-    "fieldset": [
-      {
-        "layer": 1,
-        "source": "<fieldset>",
-        "because": "The platform provides <fieldset>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/fieldset"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Fieldset",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/fieldset/"
-      }
-    ],
-    "errorsummary": [
-      {
-        "layer": 2,
-        "source": "APG · Alert",
-        "because": "WAI-ARIA APG names the Alert pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/alert/"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Error summary",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/error-summary/"
-      }
-    ],
-    "backlink": [
-      {
-        "layer": 2,
-        "source": "APG · Link",
-        "because": "WAI-ARIA APG names the Link pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/link/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Link",
-        "because": "6 of 27 surveyed design systems ship this independently (22%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Back link",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/back-link/"
-      }
-    ],
-    "warningtext": [
-      {
-        "layer": 3,
-        "source": "Open UI · Text",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Warning text",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/warning-text/"
-      }
-    ],
-    "exitpage": [
-      {
-        "layer": 2,
-        "source": "APG · Button",
-        "because": "WAI-ARIA APG names the Button pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/button/"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Exit this page",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/exit-this-page/"
-      }
-    ],
-    "cookiebanner": [
-      {
-        "layer": 4,
-        "source": "GOV.UK · Cookie banner",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/cookie-banner/"
-      }
-    ],
-    "dialog": [
-      {
-        "layer": 1,
-        "source": "<dialog>",
-        "because": "The platform provides <dialog>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog"
-      },
-      {
-        "layer": 2,
-        "source": "APG · Dialog (Modal)",
-        "because": "WAI-ARIA APG names the Dialog (Modal) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/dialog-modal/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Dialog",
-        "because": "12 of 27 surveyed design systems ship this independently (44%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Modal",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/modal/"
-      }
-    ],
-    "command-palette": [
-      {
-        "layer": 2,
-        "source": "APG · Combobox",
-        "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
-      }
-    ],
-    "accordion": [
-      {
-        "layer": 2,
-        "source": "APG · Accordion",
-        "because": "WAI-ARIA APG names the Accordion pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/accordion/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Accordion",
-        "because": "14 of 27 surveyed design systems ship this independently (52%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Accordion",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/accordion/"
-      }
-    ],
-    "pagination-breadcrumb": [
-      {
-        "layer": 2,
-        "source": "APG · Breadcrumb",
-        "because": "WAI-ARIA APG names the Breadcrumb pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/breadcrumb/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Pagination",
-        "because": "9 of 27 surveyed design systems ship this independently (33%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Breadcrumbs",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/breadcrumbs/"
-      }
-    ],
-    "treeview": [
-      {
-        "layer": 2,
-        "source": "APG · Treeview",
-        "because": "WAI-ARIA APG names the Treeview pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/treeview/"
-      }
-    ],
-    "usage-meter": [
-      {
-        "layer": 2,
-        "source": "APG · Meter",
-        "because": "WAI-ARIA APG names the Meter pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/meter/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Meter",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "combobox": [
-      {
-        "layer": 2,
-        "source": "APG · Combobox",
-        "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Combobox",
-        "because": "9 of 27 surveyed design systems ship this independently (33%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Combo box",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/combo-box/"
-      }
-    ],
-    "dropdown-menu": [
-      {
-        "layer": 2,
-        "source": "APG · Menu Button",
-        "because": "WAI-ARIA APG names the Menu Button pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/menu-button/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Dropdown",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "menubar": [
-      {
-        "layer": 2,
-        "source": "APG · Menubar",
-        "because": "WAI-ARIA APG names the Menubar pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/menubar/"
-      }
-    ],
-    "resizable": [
-      {
-        "layer": 2,
-        "source": "APG · Window Splitter",
-        "because": "WAI-ARIA APG names the Window Splitter pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/windowsplitter/"
-      }
-    ],
-    "stepper": [
-      {
-        "layer": 4,
-        "source": "USWDS · Step indicator",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/step-indicator/"
-      }
-    ],
-    "file-upload-dropzone": [
-      {
-        "layer": 4,
-        "source": "GOV.UK · File upload",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/file-upload/"
-      }
-    ],
-    "tag-input": [
-      {
-        "layer": 2,
-        "source": "APG · Combobox",
-        "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Tag",
-        "because": "6 of 27 surveyed design systems ship this independently (22%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "sheet-drawer": [
-      {
-        "layer": 2,
-        "source": "APG · Dialog (Modal)",
-        "because": "WAI-ARIA APG names the Dialog (Modal) pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/dialog-modal/"
-      },
-      {
-        "layer": 4,
-        "source": "NL Design System · Drawer",
-        "because": "NL Design System ships this as a component because a public service needs it.",
-        "url": "https://nldesignsystem.nl/drawer"
-      }
-    ],
-    "segmented-control-toggle-group": [
-      {
-        "layer": 2,
-        "source": "APG · Radio Group",
-        "because": "WAI-ARIA APG names the Radio Group pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/radio/"
-      }
-    ],
-    "description-list": [
-      {
-        "layer": 1,
-        "source": "<dl>",
-        "because": "The platform provides <dl>; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dl"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · List",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Summary list",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/summary-list/"
-      }
-    ],
-    "banner": [
-      {
-        "layer": 2,
-        "source": "APG · Alert",
-        "because": "WAI-ARIA APG names the Alert pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/alert/"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Banner",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/banner/"
-      }
-    ],
-    "alert-dialog": [
-      {
-        "layer": 2,
-        "source": "APG · Alert Dialog",
-        "because": "WAI-ARIA APG names the Alert Dialog pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/alertdialog/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Alert",
-        "because": "11 of 27 surveyed design systems ship this independently (41%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "carousel": [
-      {
-        "layer": 2,
-        "source": "APG · Carousel",
-        "because": "WAI-ARIA APG names the Carousel pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/carousel/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Carousel",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "navigation-menu": [
-      {
-        "layer": 2,
-        "source": "APG · Disclosure Navigation",
-        "because": "WAI-ARIA APG names the Disclosure Navigation pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/disclosure/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Menu",
-        "because": "11 of 27 surveyed design systems ship this independently (41%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "context-menu": [
-      {
-        "layer": 2,
-        "source": "APG · Menu Button",
-        "because": "WAI-ARIA APG names the Menu Button pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/menu-button/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Menu",
-        "because": "11 of 27 surveyed design systems ship this independently (41%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "form-primitives": [
-      {
-        "layer": 3,
-        "source": "Open UI · Form",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Password input",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/password-input/"
-      }
-    ],
-    "numberinput": [
-      {
-        "layer": 1,
-        "source": "<input type=\"number\">",
-        "because": "The platform provides <input type=\"number\">; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
-      },
-      {
-        "layer": 2,
-        "source": "APG · Spinbutton",
-        "because": "WAI-ARIA APG names the Spinbutton pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/spinbutton/"
-      }
-    ],
-    "passwordinput": [
-      {
-        "layer": 1,
-        "source": "<input type=\"password\">",
-        "because": "The platform provides <input type=\"password\">; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
-      },
-      {
-        "layer": 4,
-        "source": "GOV.UK · Password input",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/password-input/"
-      }
-    ],
-    "searchinput": [
-      {
-        "layer": 1,
-        "source": "<input type=\"search\">",
-        "because": "The platform provides <input type=\"search\">; this recipe styles it rather than rebuilding it.",
-        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
-      },
-      {
-        "layer": 2,
-        "source": "APG · Combobox",
-        "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · Search",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/search/"
-      }
-    ],
-    "infocard": [
-      {
-        "layer": 4,
-        "source": "GOV.UK · Inset text",
-        "because": "GOV.UK ships this as a component because a public service needs it.",
-        "url": "https://design-system.service.gov.uk/components/inset-text/"
-      }
-    ],
-    "list": [
-      {
-        "layer": 3,
-        "source": "Open UI · List",
-        "because": "7 of 27 surveyed design systems ship this independently (26%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      },
-      {
-        "layer": 4,
-        "source": "USWDS · List",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/list/"
-      }
-    ],
-    "codeblock": [
-      {
-        "layer": 4,
-        "source": "NL Design System · Code block",
-        "because": "NL Design System ships this as a component because a public service needs it.",
-        "url": "https://nldesignsystem.nl/code-block"
-      }
-    ],
-    "wizardstepper": [
-      {
-        "layer": 4,
-        "source": "USWDS · Step indicator",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/step-indicator/"
-      }
-    ],
-    "file-grid": [
-      {
-        "layer": 3,
-        "source": "Open UI · Grid",
-        "because": "6 of 27 surveyed design systems ship this independently (22%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "radio-card": [
-      {
-        "layer": 2,
-        "source": "APG · Radio Group",
-        "because": "WAI-ARIA APG names the Radio Group pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/radio/"
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Radio",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "form-panel": [
-      {
-        "layer": 3,
-        "source": "Open UI · Form",
-        "because": "10 of 27 surveyed design systems ship this independently (37%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "filter-bar": [
-      {
-        "layer": 2,
-        "source": "APG · Toolbar",
-        "because": "WAI-ARIA APG names the Toolbar pattern and specifies its behaviour.",
-        "url": "https://www.w3.org/WAI/ARIA/apg/toolbar/"
-      }
-    ],
-    "scaffold": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks",
-        "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
-      }
-    ],
-    "navsuite": [
-      {
-        "layer": 2,
-        "source": "APG · Landmarks",
-        "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
-      },
-      {
-        "layer": 3,
-        "source": "Open UI · Nav",
-        "because": "8 of 27 surveyed design systems ship this independently (30%).",
-        "url": "https://open-ui.org/research/component-matrix"
-      }
-    ],
-    "prose": [
-      {
-        "layer": 4,
-        "source": "USWDS · Prose",
-        "because": "USWDS ships this as a component because a public service needs it.",
-        "url": "https://designsystem.digital.gov/components/prose/"
-      }
-    ]
+    "toolbar": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Toolbar",
+          "because": "WAI-ARIA APG names the Toolbar pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/toolbar/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "buttons": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<button>",
+          "because": "The platform provides <button>; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button"
+        },
+        {
+          "layer": 2,
+          "source": "APG · Button",
+          "because": "WAI-ARIA APG names the Button pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/button/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Button",
+          "because": "25 of 27 surveyed design systems ship this independently (93%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Button",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/button/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Button"
+        ],
+        "service": [
+          "GOV.UK · Button",
+          "USWDS · Button",
+          "NL Design System · Button"
+        ]
+      }
+    },
+    "button-finish": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · Button",
+          "because": "25 of 27 surveyed design systems ship this independently (93%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Button"
+        ],
+        "service": [
+          "GOV.UK · Button",
+          "USWDS · Button",
+          "NL Design System · Button"
+        ]
+      }
+    },
+    "card": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · Card",
+          "because": "12 of 27 surveyed design systems ship this independently (44%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Card",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/card/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Card"
+        ],
+        "service": [
+          "USWDS · Card",
+          "NL Design System · Surface"
+        ]
+      }
+    },
+    "page-head": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "NL Design System · Page header",
+          "because": "NL Design System ships this as a component because a public service needs it.",
+          "url": "https://nldesignsystem.nl/page-header"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Header",
+          "USWDS · Header",
+          "NL Design System · Heading",
+          "NL Design System · Page",
+          "NL Design System · Page header"
+        ]
+      }
+    },
+    "action-panel": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "NL Design System · Spotlight section",
+          "because": "NL Design System ships this as a component because a public service needs it.",
+          "url": "https://nldesignsystem.nl/spotlight-section"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Panel",
+          "USWDS · Summary box",
+          "NL Design System · Spotlight section"
+        ]
+      }
+    },
+    "button-group": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Toolbar",
+          "because": "WAI-ARIA APG names the Toolbar pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/toolbar/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Button group",
+          "because": "5 of 27 surveyed design systems ship this independently (19%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Button group",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/button-group/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Button group",
+          "Button"
+        ],
+        "service": [
+          "GOV.UK · Button",
+          "USWDS · Button",
+          "USWDS · Button group",
+          "NL Design System · Button",
+          "NL Design System · Button group"
+        ]
+      }
+    },
+    "form": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · Form",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "NL Design System · Form field",
+          "because": "NL Design System ships this as a component because a public service needs it.",
+          "url": "https://nldesignsystem.nl/form-field"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Form",
+          "Textfield",
+          "Input",
+          "Text",
+          "Label",
+          "Textarea",
+          "Checkbox",
+          "Radio",
+          "Radio Group"
+        ],
+        "service": [
+          "GOV.UK · Checkboxes",
+          "GOV.UK · Error message",
+          "GOV.UK · Radios",
+          "GOV.UK · Text input",
+          "GOV.UK · Textarea",
+          "GOV.UK · Validation",
+          "USWDS · Checkbox",
+          "USWDS · Radio buttons",
+          "USWDS · Text input",
+          "USWDS · Textarea",
+          "USWDS · Validation",
+          "NL Design System · Checkbox",
+          "NL Design System · Form field",
+          "NL Design System · Radio button",
+          "NL Design System · Textarea",
+          "NL Design System · Textbox"
+        ]
+      }
+    },
+    "badges-pills": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · Badge",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "NL Design System · Badge",
+          "because": "NL Design System ships this as a component because a public service needs it.",
+          "url": "https://nldesignsystem.nl/badge"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Badge",
+          "Tag"
+        ],
+        "service": [
+          "GOV.UK · Tag",
+          "USWDS · Tag",
+          "NL Design System · Badge",
+          "NL Design System · Status badge"
+        ]
+      }
+    },
+    "alert": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Alert",
+          "because": "WAI-ARIA APG names the Alert pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/alert/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Alert",
+          "because": "11 of 27 surveyed design systems ship this independently (41%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Alert",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/alert/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Alert"
+        ],
+        "service": [
+          "USWDS · Alert",
+          "NL Design System · Alert"
+        ]
+      }
+    },
+    "tabs": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Tabs",
+          "because": "WAI-ARIA APG names the Tabs pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/tabs/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Tabs",
+          "because": "13 of 27 surveyed design systems ship this independently (48%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Tabs",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/tabs/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Tabs"
+        ],
+        "service": [
+          "GOV.UK · Tabs"
+        ]
+      }
+    },
+    "table": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<table>",
+          "because": "The platform provides <table>; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table"
+        },
+        {
+          "layer": 2,
+          "source": "APG · Table",
+          "because": "WAI-ARIA APG names the Table pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/table/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Table",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Table",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/table/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Table"
+        ],
+        "service": [
+          "GOV.UK · Table",
+          "USWDS · Table",
+          "NL Design System · Table"
+        ]
+      }
+    },
+    "data-table": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Table (sortable)",
+          "because": "WAI-ARIA APG names the Table (sortable) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/table/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Table",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Table"
+        ],
+        "service": [
+          "GOV.UK · Table",
+          "USWDS · Table",
+          "NL Design System · Table"
+        ]
+      }
+    },
+    "tooltip": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Tooltip",
+          "because": "WAI-ARIA APG names the Tooltip pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/tooltip/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Tooltip",
+          "because": "18 of 27 surveyed design systems ship this independently (67%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Tooltip",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/tooltip/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Tooltip"
+        ],
+        "service": [
+          "USWDS · Tooltip"
+        ]
+      }
+    },
+    "switch-toggle": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Switch",
+          "because": "WAI-ARIA APG names the Switch pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/switch/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Switch",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Switch"
+        ],
+        "service": []
+      }
+    },
+    "slider": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Slider",
+          "because": "WAI-ARIA APG names the Slider pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/slider/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Slider",
+          "because": "8 of 27 surveyed design systems ship this independently (30%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Range slider",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/range-slider/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Slider"
+        ],
+        "service": [
+          "USWDS · Range slider"
+        ]
+      }
+    },
+    "progress": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<progress>",
+          "because": "The platform provides <progress>; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/progress"
+        },
+        {
+          "layer": 2,
+          "source": "APG · Progressbar",
+          "because": "WAI-ARIA APG names the Progressbar pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/progressbar/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Progress",
+          "because": "11 of 27 surveyed design systems ship this independently (41%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Progress"
+        ],
+        "service": []
+      }
+    },
+    "select-trigger": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Listbox",
+          "because": "WAI-ARIA APG names the Listbox pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/listbox/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Select",
+          "because": "16 of 27 surveyed design systems ship this independently (59%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Select",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/select/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Select",
+          "Select.Popup"
+        ],
+        "service": [
+          "GOV.UK · Select",
+          "USWDS · Select",
+          "NL Design System · Select"
+        ]
+      }
+    },
+    "sidebar": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Landmarks",
+          "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Side navigation",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/side-navigation/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "USWDS · Side navigation",
+          "NL Design System · Sidenav"
+        ]
+      }
+    },
+    "appbar": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Landmarks",
+          "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+        },
+        {
+          "layer": 4,
+          "source": "NL Design System · Navigation bar",
+          "because": "NL Design System ships this as a component because a public service needs it.",
+          "url": "https://nldesignsystem.nl/navigation-bar"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Header",
+          "GOV.UK · Service navigation",
+          "USWDS · Header",
+          "NL Design System · Navigation bar"
+        ]
+      }
+    },
+    "activity-feed": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Feed",
+          "because": "WAI-ARIA APG names the Feed pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/feed/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "auth": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "GOV.UK · Sign in",
+          "because": "GOV.UK ships this as a pattern because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/patterns/sign-in/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Sign in",
+          "GOV.UK · Create accounts"
+        ]
+      }
+    },
+    "lightbox": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Dialog (Modal)",
+          "because": "WAI-ARIA APG names the Dialog (Modal) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/dialog-modal/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "calendar": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Grid (date grid)",
+          "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Date picker",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/date-picker/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "USWDS · Date picker",
+          "USWDS · Time picker"
+        ]
+      }
+    },
+    "calendar-week": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Grid (date grid)",
+          "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "calendar-year": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Grid (date grid)",
+          "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "calendar-range": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Grid (date grid)",
+          "because": "WAI-ARIA APG names the Grid (date grid) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/grid/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Range",
+          "because": "6 of 27 surveyed design systems ship this independently (22%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Date range picker",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/date-range-picker/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Range"
+        ],
+        "service": [
+          "USWDS · Date range picker"
+        ]
+      }
+    },
+    "inpagenav": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Landmarks",
+          "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · In-page navigation",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/in-page-navigation/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "USWDS · In-page navigation",
+          "NL Design System · Page"
+        ]
+      }
+    },
+    "sitefooter": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Landmarks",
+          "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Footer",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/footer/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Footer",
+          "USWDS · Footer",
+          "NL Design System · Footer",
+          "NL Design System · Page footer"
+        ]
+      }
+    },
+    "requirements": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "GOV.UK · Passwords",
+          "because": "GOV.UK ships this as a pattern because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/patterns/passwords/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Passwords",
+          "GOV.UK · Validation",
+          "USWDS · Validation"
+        ]
+      }
+    },
+    "processlist": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · List",
+          "because": "7 of 27 surveyed design systems ship this independently (26%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Process list",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/process-list/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "List"
+        ],
+        "service": [
+          "USWDS · List",
+          "USWDS · Process list"
+        ]
+      }
+    },
+    "identifier": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "USWDS · Identifier",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/identifier/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "USWDS · Identifier"
+        ]
+      }
+    },
+    "charcount": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "GOV.UK · Character count",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/character-count/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Character count",
+          "USWDS · Character count"
+        ]
+      }
+    },
+    "memorable-date": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "GOV.UK · Date input",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/date-input/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Date input",
+          "GOV.UK · Dates",
+          "USWDS · Memorable date"
+        ]
+      }
+    },
+    "tasklist": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Checkbox",
+          "because": "WAI-ARIA APG names the Checkbox pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/checkbox/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · List",
+          "because": "7 of 27 surveyed design systems ship this independently (26%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Task list",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/task-list/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "List"
+        ],
+        "service": [
+          "GOV.UK · Task list",
+          "GOV.UK · Task list pages",
+          "USWDS · List"
+        ]
+      }
+    },
+    "toggletip": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Tooltip (toggle variant)",
+          "because": "WAI-ARIA APG names the Tooltip (toggle variant) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/tooltip/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "langnav": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Landmarks",
+          "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Language selector",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/language-selector/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "USWDS · Language selector"
+        ]
+      }
+    },
+    "skiplink": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Landmarks (bypass blocks)",
+          "because": "WAI-ARIA APG names the Landmarks (bypass blocks) pattern and specifies its behaviour."
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Link",
+          "because": "6 of 27 surveyed design systems ship this independently (22%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Skip link",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/skip-link/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Link"
+        ],
+        "service": [
+          "GOV.UK · Skip link",
+          "USWDS · Link",
+          "NL Design System · Link",
+          "NL Design System · Skip link"
+        ]
+      }
+    },
+    "fieldset": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<fieldset>",
+          "because": "The platform provides <fieldset>; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/fieldset"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Fieldset",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/fieldset/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Fieldset",
+          "NL Design System · Fieldset"
+        ]
+      }
+    },
+    "errorsummary": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Alert",
+          "because": "WAI-ARIA APG names the Alert pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/alert/"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Error summary",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/error-summary/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Error summary"
+        ]
+      }
+    },
+    "backlink": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Link",
+          "because": "WAI-ARIA APG names the Link pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/link/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Link",
+          "because": "6 of 27 surveyed design systems ship this independently (22%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Back link",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/back-link/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Link"
+        ],
+        "service": [
+          "GOV.UK · Back link",
+          "USWDS · Link",
+          "NL Design System · Link"
+        ]
+      }
+    },
+    "warningtext": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · Text",
+          "because": "7 of 27 surveyed design systems ship this independently (26%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Warning text",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/warning-text/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Text"
+        ],
+        "service": [
+          "GOV.UK · Warning text"
+        ]
+      }
+    },
+    "exitpage": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Button",
+          "because": "WAI-ARIA APG names the Button pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/button/"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Exit this page",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/exit-this-page/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Exit this page",
+          "GOV.UK · Exit a page quickly",
+          "NL Design System · Page"
+        ]
+      }
+    },
+    "cookiebanner": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "GOV.UK · Cookie banner",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/cookie-banner/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Cookie banner",
+          "GOV.UK · Cookies page",
+          "USWDS · Banner"
+        ]
+      }
+    },
+    "dialog": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<dialog>",
+          "because": "The platform provides <dialog>; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog"
+        },
+        {
+          "layer": 2,
+          "source": "APG · Dialog (Modal)",
+          "because": "WAI-ARIA APG names the Dialog (Modal) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/dialog-modal/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Dialog",
+          "because": "12 of 27 surveyed design systems ship this independently (44%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Modal",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/modal/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Dialog",
+          "Modal"
+        ],
+        "service": [
+          "USWDS · Modal"
+        ]
+      }
+    },
+    "command-palette": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Combobox",
+          "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "accordion": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Accordion",
+          "because": "WAI-ARIA APG names the Accordion pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/accordion/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Accordion",
+          "because": "14 of 27 surveyed design systems ship this independently (52%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Accordion",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/accordion/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Accordion"
+        ],
+        "service": [
+          "GOV.UK · Accordion",
+          "USWDS · Accordion",
+          "NL Design System · Accordion"
+        ]
+      }
+    },
+    "pagination-breadcrumb": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Breadcrumb",
+          "because": "WAI-ARIA APG names the Breadcrumb pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/breadcrumb/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Pagination",
+          "because": "9 of 27 surveyed design systems ship this independently (33%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Breadcrumbs",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/breadcrumbs/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Pagination",
+          "Breadcrumb"
+        ],
+        "service": [
+          "GOV.UK · Breadcrumbs",
+          "GOV.UK · Pagination",
+          "USWDS · Breadcrumb",
+          "USWDS · Pagination",
+          "NL Design System · Breadcrumb navigation",
+          "NL Design System · Pagination"
+        ]
+      }
+    },
+    "treeview": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Treeview",
+          "because": "WAI-ARIA APG names the Treeview pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/treeview/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "usage-meter": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Meter",
+          "because": "WAI-ARIA APG names the Meter pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/meter/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Meter",
+          "because": "7 of 27 surveyed design systems ship this independently (26%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Meter"
+        ],
+        "service": []
+      }
+    },
+    "combobox": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Combobox",
+          "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Combobox",
+          "because": "9 of 27 surveyed design systems ship this independently (33%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Combo box",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/combo-box/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Combobox"
+        ],
+        "service": [
+          "USWDS · Combo box"
+        ]
+      }
+    },
+    "dropdown-menu": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Menu Button",
+          "because": "WAI-ARIA APG names the Menu Button pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/menu-button/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Dropdown",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Dropdown",
+          "Menu"
+        ],
+        "service": []
+      }
+    },
+    "menubar": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Menubar",
+          "because": "WAI-ARIA APG names the Menubar pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/menubar/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "resizable": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Window Splitter",
+          "because": "WAI-ARIA APG names the Window Splitter pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/windowsplitter/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "stepper": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "USWDS · Step indicator",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/step-indicator/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Step by step navigation",
+          "USWDS · Step indicator"
+        ]
+      }
+    },
+    "file-upload-dropzone": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "GOV.UK · File upload",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/file-upload/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · File upload",
+          "USWDS · File input"
+        ]
+      }
+    },
+    "tag-input": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Combobox",
+          "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Tag",
+          "because": "6 of 27 surveyed design systems ship this independently (22%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Tag",
+          "Input"
+        ],
+        "service": [
+          "GOV.UK · Tag",
+          "USWDS · Tag"
+        ]
+      }
+    },
+    "sheet-drawer": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Dialog (Modal)",
+          "because": "WAI-ARIA APG names the Dialog (Modal) pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/dialog-modal/"
+        },
+        {
+          "layer": 4,
+          "source": "NL Design System · Drawer",
+          "because": "NL Design System ships this as a component because a public service needs it.",
+          "url": "https://nldesignsystem.nl/drawer"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "NL Design System · Drawer"
+        ]
+      }
+    },
+    "segmented-control-toggle-group": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Radio Group",
+          "because": "WAI-ARIA APG names the Radio Group pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/radio/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "description-list": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<dl>",
+          "because": "The platform provides <dl>; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dl"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · List",
+          "because": "7 of 27 surveyed design systems ship this independently (26%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Summary list",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/summary-list/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "List"
+        ],
+        "service": [
+          "GOV.UK · Summary list",
+          "USWDS · List",
+          "NL Design System · Data list"
+        ]
+      }
+    },
+    "banner": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Alert",
+          "because": "WAI-ARIA APG names the Alert pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/alert/"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Banner",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/banner/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Notification banner",
+          "GOV.UK · Phase banner",
+          "USWDS · Banner",
+          "USWDS · Site alert"
+        ]
+      }
+    },
+    "alert-dialog": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Alert Dialog",
+          "because": "WAI-ARIA APG names the Alert Dialog pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/alertdialog/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Alert",
+          "because": "11 of 27 surveyed design systems ship this independently (41%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Alert",
+          "Dialog"
+        ],
+        "service": [
+          "USWDS · Alert",
+          "NL Design System · Alert"
+        ]
+      }
+    },
+    "carousel": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Carousel",
+          "because": "WAI-ARIA APG names the Carousel pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/carousel/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Carousel",
+          "because": "7 of 27 surveyed design systems ship this independently (26%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Carousel"
+        ],
+        "service": []
+      }
+    },
+    "navigation-menu": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Disclosure Navigation",
+          "because": "WAI-ARIA APG names the Disclosure Navigation pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/disclosure/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Menu",
+          "because": "11 of 27 surveyed design systems ship this independently (41%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Menu"
+        ],
+        "service": []
+      }
+    },
+    "context-menu": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Menu Button",
+          "because": "WAI-ARIA APG names the Menu Button pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/menu-button/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Menu",
+          "because": "11 of 27 surveyed design systems ship this independently (41%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Menu"
+        ],
+        "service": []
+      }
+    },
+    "form-primitives": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · Form",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Password input",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/password-input/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Form"
+        ],
+        "service": [
+          "GOV.UK · Password input",
+          "USWDS · Search"
+        ]
+      }
+    },
+    "numberinput": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<input type=\"number\">",
+          "because": "The platform provides <input type=\"number\">; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+        },
+        {
+          "layer": 2,
+          "source": "APG · Spinbutton",
+          "because": "WAI-ARIA APG names the Spinbutton pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/spinbutton/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "passwordinput": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<input type=\"password\">",
+          "because": "The platform provides <input type=\"password\">; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+        },
+        {
+          "layer": 4,
+          "source": "GOV.UK · Password input",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/password-input/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Password input"
+        ]
+      }
+    },
+    "searchinput": {
+      "sources": [
+        {
+          "layer": 1,
+          "source": "<input type=\"search\">",
+          "because": "The platform provides <input type=\"search\">; this recipe styles it rather than rebuilding it.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+        },
+        {
+          "layer": 2,
+          "source": "APG · Combobox",
+          "because": "WAI-ARIA APG names the Combobox pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/combobox/"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · Search",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/search/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "USWDS · Search"
+        ]
+      }
+    },
+    "infocard": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "GOV.UK · Inset text",
+          "because": "GOV.UK ships this as a component because a public service needs it.",
+          "url": "https://design-system.service.gov.uk/components/inset-text/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Inset text",
+          "USWDS · Summary box"
+        ]
+      }
+    },
+    "list": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · List",
+          "because": "7 of 27 surveyed design systems ship this independently (26%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        },
+        {
+          "layer": 4,
+          "source": "USWDS · List",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/list/"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "List"
+        ],
+        "service": [
+          "USWDS · Collection",
+          "USWDS · Icon list",
+          "USWDS · List",
+          "NL Design System · Link list"
+        ]
+      }
+    },
+    "codeblock": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "NL Design System · Code block",
+          "because": "NL Design System ships this as a component because a public service needs it.",
+          "url": "https://nldesignsystem.nl/code-block"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "NL Design System · Code block"
+        ]
+      }
+    },
+    "wizardstepper": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "USWDS · Step indicator",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/step-indicator/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "GOV.UK · Step by step navigation",
+          "USWDS · Step indicator"
+        ]
+      }
+    },
+    "file-grid": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · Grid",
+          "because": "6 of 27 surveyed design systems ship this independently (22%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Grid"
+        ],
+        "service": []
+      }
+    },
+    "radio-card": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Radio Group",
+          "because": "WAI-ARIA APG names the Radio Group pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/radio/"
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Radio",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Radio",
+          "Card"
+        ],
+        "service": [
+          "GOV.UK · Radios",
+          "USWDS · Card"
+        ]
+      }
+    },
+    "form-panel": {
+      "sources": [
+        {
+          "layer": 3,
+          "source": "Open UI · Form",
+          "because": "10 of 27 surveyed design systems ship this independently (37%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Form"
+        ],
+        "service": [
+          "GOV.UK · Panel"
+        ]
+      }
+    },
+    "filter-bar": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Toolbar",
+          "because": "WAI-ARIA APG names the Toolbar pattern and specifies its behaviour.",
+          "url": "https://www.w3.org/WAI/ARIA/apg/toolbar/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "scaffold": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Landmarks",
+          "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": []
+      }
+    },
+    "navsuite": {
+      "sources": [
+        {
+          "layer": 2,
+          "source": "APG · Landmarks",
+          "because": "WAI-ARIA APG names the Landmarks pattern and specifies its behaviour."
+        },
+        {
+          "layer": 3,
+          "source": "Open UI · Nav",
+          "because": "8 of 27 surveyed design systems ship this independently (30%).",
+          "url": "https://open-ui.org/research/component-matrix"
+        }
+      ],
+      "covers": {
+        "openui": [
+          "Nav"
+        ],
+        "service": []
+      }
+    },
+    "prose": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "USWDS · Prose",
+          "because": "USWDS ships this as a component because a public service needs it.",
+          "url": "https://designsystem.digital.gov/components/prose/"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "USWDS · Prose",
+          "NL Design System · Article"
+        ]
+      }
+    }
   },
   "unassigned": [
     "composition",
