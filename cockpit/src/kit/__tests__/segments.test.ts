@@ -91,7 +91,8 @@ describe('segment graph integrity', () => {
   it('usesOf returns [] for atoms and foundations', () => {
     expect(usesOf('buttons')).toEqual([])
     expect(usesOf('button-finish')).toEqual([])
-    expect(usesOf('sidebar')).toEqual(['navigation-row', 'avatar', 'badges-pills'])
+    // navigation-row folded INTO sidebar on 2026-08-16 — the nav row is the sidebar's row.
+    expect(usesOf('sidebar')).toEqual(['avatar', 'badges-pills'])
   })
 })
 

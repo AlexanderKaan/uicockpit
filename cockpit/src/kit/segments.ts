@@ -56,10 +56,10 @@ export const SECTION_USES: Readonly<Record<string, readonly string[]>> = {
   'data-table': ['table', 'toolbar', 'pagination-breadcrumb', 'select-trigger'],
   // The editing surface: a titled panel of labelled fields on a responsive grid,
   // with validation + a footer action bar. Composes the field atoms it lays out.
-  'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'phoneinput', 'switch-toggle', 'radio-card'],
+  'form-panel': ['form', 'form-primitives', 'buttons', 'select-trigger', 'numberinput', 'switch-toggle', 'radio-card'],
   // Pricing table, file gallery, the empty-content region, the nav rail — each a
   // full-width slab you stack into a page.
-  sidebar: ['navigation-row', 'avatar', 'badges-pills'],
+  sidebar: ['avatar', 'badges-pills'],
   'empty-state': ['buttons'],
   'file-grid': ['card', 'badges-pills'],
   // Calendar VIEWS — the main content region of a calendar app (a week scheduler,
@@ -100,7 +100,7 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   dialog: ['card', 'buttons'],
   'alert-dialog': ['card', 'buttons'],
   'sheet-drawer': ['card', 'buttons'],
-  'command-palette': ['searchinput', 'list', 'kbd'],
+  'command-palette': ['searchinput', 'list'],
   'toast-stack': [],
   lightbox: ['buttons'],
   wizardstepper: ['stepper', 'form-primitives', 'buttons'],
@@ -133,21 +133,16 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
  */
 export const STANDALONE_ATOMS: readonly string[] = [
   // overlays — attach to any trigger, no owner
-  'tooltip', 'popover', 'hover-card', 'context-menu',
+  'tooltip', 'context-menu',
   // standalone controls / nav — organise any content
   'tabs', 'accordion', 'segmented-control-toggle-group', 'navigation-menu', 'button-group',
   // self-contained input controls usable in any flow
-  'input-otp', 'interactive-list-row', 'combobox',
+  'combobox',
   // inline messaging / status — drop in anywhere
   'alert', 'banner',
-  // a chat/comment bubble — self-contained, stacks into a .thread (Fase J-8)
-  // AI-thread furniture (LP6) — self-contained receipts/disclosures that drop
-  // into any .msg or feed: the tool receipt, the thinking line, the source chip
-  'tool-call', 'reasoning',
   // a rich-text container — styles raw semantic tags; no single host (Fase J-8)
   'prose',
   // loading & layout utilities
-  'spinner',
   // data-display primitives
   'description-list',
   /* Accessibility primitives (the design-system study, 2026-08-14). All three

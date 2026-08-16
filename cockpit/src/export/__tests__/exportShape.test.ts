@@ -77,7 +77,7 @@ describe('the CSS export carries the kit, whole', () => {
     expect(missing, `declared but never exported: ${missing.join(', ')}`).toEqual([])
     // A floor, not a target — it only proves the set is real rather than empty,
     // so it sits well below the true count (794 after the four-layer cut).
-    expect(declared.size).toBeGreaterThan(700)
+    expect(declared.size).toBeGreaterThan(500)
   })
 
   it('invents nothing: the export adds only .dark, which no recipe declares', () => {

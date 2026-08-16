@@ -125,7 +125,7 @@ export function CommandPalette({ open, onClose, tokens, dispatch, onShare, onExp
               aria-controls="cmdk-list"
               aria-activedescendant={matches.length ? `cmdk-opt-${clamped}` : undefined}
             />
-            <span className="kbd">ESC</span>
+            <kbd>ESC</kbd>
           </div>
           {matches.length === 0 ? (
             <div className="cmdp__empty">No commands match “{q}”.</div>
@@ -149,7 +149,7 @@ export function CommandPalette({ open, onClose, tokens, dispatch, onShare, onExp
                           >
                             <c.icon size={15} strokeWidth={1.75} />
                             <span style={{ flex: 1 }}>{c.label}</span>
-                            {c.hint && <span className="cmdp__shortcut"><span className="kbd">{c.hint}</span></span>}
+                            {c.hint && <span className="cmdp__shortcut"><kbd>{c.hint}</kbd></span>}
                           </button>
                         </li>
                       ) : null,

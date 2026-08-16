@@ -916,8 +916,7 @@ textarea.in[readonly] {
  * now applied to every standalone field shape. Validation border+halo come
  * from the (0,3,0) state rules above; this only touches \`outline\`, no clash. */
 .cockpit-preview .in:focus-visible,
-.cockpit-preview .select-trigger:focus-visible,
-.cockpit-preview .otp__slot:focus-visible {
+.cockpit-preview .select-trigger:focus-visible {
   /* OTP slots are real <input>s — they own the soft border+halo via
    * \`.otp__slot:focus\`, so suppress the global solid :focus-visible outline
    * too (else keyboard focus paints BOTH = the default solid ring on top). */
@@ -2116,30 +2115,16 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 }`,
   },
   {
-    id: 'spinner',
-    section: "Spinner",
-    css: `/* === Spinner === — uses --k-anim-spin token */
-.spinner {
-  width: calc(var(--k-in-h-default) / 2);
-  height: calc(var(--k-in-h-default) / 2);
-  border-radius: 50%;
-  border: 2px solid var(--k-surface-2);
-  border-top-color: var(--k-primary);
-  animation: var(--k-anim-spin, k-spin 800ms linear infinite);
-  display: inline-block;
-  flex: none;
-}
-@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
-/* Size tiers — default ≈ half the input height; sm for inline/button use, lg for
-   page/section loaders. Border scales with the ring so it stays proportional. */
-.spinner--sm { width: calc(var(--k-in-h-default) / 3); height: calc(var(--k-in-h-default) / 3); border-width: 1.5px; }
-.spinner--lg { width: var(--k-in-h-default); height: var(--k-in-h-default); border-width: 3px; }`,
-  },
-  {
-    id: 'navigation-row',
-    root: 'navrow',
-    section: "Navigation row",
-    css: `/* === Navigation row =====================================================
+    id: 'sidebar',
+    root: 'sidenav',
+    section: "Sidebar",
+    css: `/* ----- The nav row (.navrow) — FOLDED INTO sidebar (2026-08-16) ----------------
+   It shipped as its own recipe, "navigation-row", anchored to APG Landmarks —
+   which is the pattern of the PAGE REGION it sits in, not of a row. Nine rules
+   in this recipe already style .navrow (rail mode, tooltips, the count badge):
+   the row is the sidebar's row, the way .divider-or is the auth card's rule.
+   USWDS ships this as "Side navigation" and that is the provenance for both. */
+/* === Navigation row =====================================================
  * Sidebar / settings nav follows the LG row grammar — these are destinations
  * (Home, Projects, Analytics), not picks-from-a-list. Slightly taller +
  * roomier than menu/cmdp rows, which signals "this is where you go" vs
@@ -2187,13 +2172,9 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .navsub__item { display: flex; align-items: center; gap: var(--k-s-8); width: 100%; min-height: var(--k-row-h-sm, 28px); padding: 0 var(--k-row-px, 10px); border-radius: var(--k-row-radius, 6px); font-size: var(--k-type-body); color: var(--k-fg-muted); cursor: pointer; font-weight: var(--k-ui-weight, 500); text-align: left; text-decoration: none; background: none; border: 0; font-family: inherit; appearance: none; -webkit-appearance: none; }
 .navsub__item:hover { background: var(--k-state-hover); color: var(--k-fg); }
 .navsub__item--on { color: var(--k-state-selected-fg, var(--k-primary)); font-weight: var(--k-weight-semibold); }
-.nav-group { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-faint); padding: 0 var(--k-row-px, 10px); margin: calc(var(--k-space) * 0.875) 0 var(--k-s-4); }`,
-  },
-  {
-    id: 'sidebar',
-    root: 'sidenav',
-    section: "Sidebar",
-    css: `/* === Sidebar ============================================================
+.nav-group { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-faint); padding: 0 var(--k-row-px, 10px); margin: calc(var(--k-space) * 0.875) 0 var(--k-s-4); }
+
+/* === Sidebar ============================================================
  * App-shell navigation column. Sits on the Chrome plane (--k-chrome-bg), which
  * the Surface axis drives: Outlined/Plain = flush with a hairline seam, Filled =
  * a sunken recessed well. Add .sidenav--floating for the lifted inset-room look.
@@ -2356,38 +2337,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   flex: none;
 }
 .activity__meta { color: var(--k-fg-faint); font-size: var(--k-type-eyebrow); margin-left: auto; }`,
-  },
-  {
-    id: 'interactive-list-row',
-    root: 'list__item',
-    section: "Interactive list row",
-    css: `/* === Interactive list row (.list__row) — list family ===
- * Bordered, surface-filled row that's clickable — opens a menu/popover or
- * navigates. The standalone, card-like variant of the .list family (no .list
- * parent needed): use it for member lists, search results, file rows where
- * each row is its own bordered target. (.list__item is the flat, divider-
- * separated row INSIDE a .list.) Inline-styled rows can't express
- * :hover/:focus-visible, so any clickable row gets this class for a real
- * hover + keyboard affordance. Pair with role="button" + tabindex so the
- * global :focus-visible ring applies. */
-.list__row {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-12);
-  width: 100%;
-  padding: calc(var(--k-space, 16px) * 0.55) calc(var(--k-space, 16px) * 0.7);
-  border: var(--k-bw) solid var(--k-border);
-  border-radius: var(--k-radius-md);
-  background: var(--k-surface);
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease),
-              border-color var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-.list__row:hover { background: var(--k-state-hover); }
-.list__row:active { background: var(--k-state-press); }`,
   },
   {
     id: 'auth',
@@ -3351,22 +3300,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .errorsummary__link:hover { text-decoration-thickness: 2px; }`,
   },
   {
-    id: 'kbd',
-    section: "KBD",
-    css: `/* === KBD ===
-   Fixed small radius (4px) — Kbd is a tactile metaphor, not a brand
-   surface. Mirrors how data-viz elements stay restrained. */
-.kbd {
-  font-family: var(--k-font-mono);
-  font-size: var(--k-type-eyebrow);
-  padding: var(--k-s-2) var(--k-s-6);
-  border-radius: 4px;
-  border: 1px solid var(--k-border);
-  background: var(--k-surface-2);
-  color: var(--k-fg-muted);
-}`,
-  },
-  {
     id: 'dialog',
     section: "Dialog",
     doc: {
@@ -3811,8 +3744,15 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
    * concentric curves. Without this, hover state of first/last item
    * corners look "boxy" against a rounded menu corner. */
   --k-nest-radius: max(2px, calc(var(--k-radius-md) - 4px));
-}`,
-  },
+}
+
+/* --panel: the same overlay surface holding CONTENT rather than a list of items —
+   a saved-kits panel, a date-picker popup, an info disclosure. Item padding (4px)
+   is right for rows that carry their own hit area and wrong for prose; the panel
+   pads for reading. This is what the .popover recipe used to be; it left on the
+   four-layer cut (its only anchor was APG Disclosure, the pattern of its trigger,
+   not of the surface), and its hosts compose .menu--panel now. */
+.menu--panel { padding: var(--k-s-12); max-height: none; overflow: visible; }`,  },
   {
     id: 'roll-down-item-stagger',
     section: "Roll-down item stagger",
@@ -4269,94 +4209,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .taginput input:focus-visible { outline: 0; }`,
   },
   {
-    id: 'popover',
-    section: "Popover",
-    css: `/* === Popover ===
-   Floating panel anchored to a trigger. Always-open variant for the gallery
-   uses .popover--open; in real apps, toggle the class on click. */
-.popover-wrap { position: relative; display: inline-flex; }
-.popover {
-  position: absolute;
-  top: calc(100% + var(--k-s-8));
-  left: 0;
-  min-width: var(--k-overlay-min, 12rem);
-  padding: var(--k-s-12);
-  background: var(--k-surface-overlay, var(--k-surface-raised));
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-lg);
-  box-shadow: var(--k-shadow-lg);
-  font-size: var(--k-type-small);
-  color: var(--k-fg);
-  z-index: var(--k-z-popover);
-  /* shadcn/Radix enter — scale + fade anchored to trigger via transform-origin */
-  transform-origin: top left;
-  animation: var(--k-anim-scale-in, k-scale-in 200ms cubic-bezier(.05,.7,.1,1) backwards);
-}
-/* Arrow pointing back at the trigger — single rotated square, border-clipped */
-.popover__arrow {
-  position: absolute;
-  top: calc(var(--k-s-10) / -2);
-  left: var(--k-s-16);
-  width: var(--k-s-10);
-  height: var(--k-s-10);
-  background: var(--k-surface-overlay, var(--k-surface-raised));
-  border-top: var(--k-divider);
-  border-left: var(--k-divider);
-  transform: rotate(45deg);
-}
-/* Placement — static (no JS collision-flip; pick the side that clears the edge).
- * Default opens below, start-aligned. --top opens above; --end right-aligns. */
-.popover--top { top: auto; bottom: calc(100% + var(--k-s-8)); transform-origin: bottom left; }
-.popover--top .popover__arrow { top: auto; bottom: calc(var(--k-s-10) / -2); transform: rotate(225deg); }
-.popover--end { left: auto; right: 0; transform-origin: top right; }
-.popover--end .popover__arrow { left: auto; right: var(--k-s-16); }`,
-  },
-  {
-    id: 'hover-card',
-    section: "Hover Card",
-    css: `/* === Hover Card ===
-   Like Popover, but auto-reveals on hover/focus. Used for inline profile
-   previews, definitions, link expansions. */
-.hover-card {
-  position: relative;
-  display: inline-flex;
-  cursor: pointer;
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-underline-offset: 3px;
-  color: var(--k-primary-text);
-}
-.hover-card__pop {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  /* A touch wider than menus/popovers (rich content), but tied to the same knob. */
-  min-width: calc(var(--k-overlay-min, 12rem) + 3rem);
-  padding: var(--k-s-12);
-  background: var(--k-surface-overlay, var(--k-surface-raised));
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-lg);
-  box-shadow: var(--k-shadow-lg);
-  font-size: var(--k-type-small);
-  color: var(--k-fg);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-2px);
-  transition: opacity var(--k-dur-fast) var(--k-ease, ease), transform var(--k-dur-fast) var(--k-ease, ease);
-  z-index: var(--k-z-popover);
-}
-.hover-card:hover .hover-card__pop,
-.hover-card:focus-within .hover-card__pop,
-.hover-card--open .hover-card__pop {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-/* Placement — static (no JS collision-flip). Default opens below, start-aligned. */
-.hover-card__pop--top { top: auto; bottom: calc(100% + var(--k-s-8)); }
-.hover-card__pop--end { left: auto; right: 0; }`,
-  },
-  {
     id: 'sheet-drawer',
     section: "Sheet / Drawer",
     css: `/* === Sheet / Drawer ===
@@ -4627,50 +4479,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 }`,
   },
   {
-    id: 'input-otp',
-    section: "Input OTP",
-    css: `/* === Input OTP ===
-   Single-character boxes for one-time codes (2FA, email verification).
-   Each slot is its own input — focus jumps to the next on type. Visual
-   pattern: monospace + generous height so digits read clearly. */
-.otp {
-  display: inline-flex;
-  /* Wrap the slot row instead of overflowing on a narrow viewport (6 × ~40px
-     slots + gaps exceed a 320px phone). */
-  flex-wrap: wrap;
-  gap: var(--k-s-6);
-}
-.otp__slot {
-  width: var(--k-in-h-default);
-  height: var(--k-control-h-lg);
-  text-align: center;
-  font-size: var(--k-type-body);
-  font-family: var(--k-font-mono);
-  font-weight: var(--k-weight-semibold);
-  border: max(1.5px, var(--k-bw)) solid var(--k-input-border);
-  background: var(--k-field-bg);
-  color: var(--k-fg);
-  border-radius: var(--k-radius-md);
-  padding: 0;
-  transition: border-color var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-.otp__slot:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  border-color: var(--k-ring);
-  box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo);
-}
-/* Error state — a wrong/expired code reads as danger, like every other field.
- * Set aria-invalid="true" on each slot (attribute, not a BEM modifier). */
-.otp__slot[aria-invalid="true"] { border-color: var(--k-input-error-border); }
-.otp__sep {
-  align-self: center;
-  color: var(--k-fg-faint);
-  font-size: var(--k-type-h3);
-  margin: 0 var(--k-s-2);
-}`,
-  },
-  {
     id: 'carousel',
     section: "Carousel",
     css: `/* === Carousel (.carousel) — shadcn gap filler ========================
@@ -4848,8 +4656,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
  * vocabulary as .in so they stack neatly in forms. */
 .numinput,
 .pwinput,
-.searchinput,
-.phoneinput {
+.searchinput {
   display: flex;
   align-items: center;
   min-height: var(--k-in-h-default, 40px);
@@ -4873,14 +4680,12 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
  * the visual emphasis). */
 .numinput:hover:not(:focus-within),
 .pwinput:hover:not(:focus-within),
-.searchinput:hover:not(:focus-within),
-.phoneinput:hover:not(:focus-within) {
+.searchinput:hover:not(:focus-within) {
   border-color: var(--k-state-border, var(--k-fg-faint));
 }
 .numinput:focus-within,
 .pwinput:focus-within,
 .searchinput:focus-within,
-.phoneinput:focus-within,
 /* The select/combobox trigger is focusable too — give it the SAME soft halo
    as every other field instead of falling through to the global solid
    :focus-visible outline (the one field control that read inconsistently). */
@@ -4893,8 +4698,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 }
 .numinput__field,
 .pwinput__field,
-.searchinput__field,
-.phoneinput__field {
+.searchinput__field {
   background: transparent;
   border: 0;
   outline: 0;
@@ -4925,9 +4729,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .pwinput__field:focus,
 .pwinput__field:focus-visible,
 .searchinput__field:focus,
-.searchinput__field:focus-visible,
-.phoneinput__field:focus,
-.phoneinput__field:focus-visible {
+.searchinput__field:focus-visible {
   /* ONLY suppress the inner outline — padding stays as the rest rule sets it
      (--k-s-12 floor). Restating padding here (was 0 10px) shifted the caret 2px
      on focus, since the rest state was bumped to 12px but this wasn't. */
@@ -5155,7 +4957,9 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 }
 /* Loading: render a <span class="spinner spinner--sm"> in the leading slot in
  * place of the magnifier while results are fetched (async search). */
-.searchinput > .spinner { flex: none; }
+/* The loading affordance was a .spinner; that recipe left on the four-layer cut.
+   The platform's own busy indicator is a value-less <progress> — indeterminate by
+   definition — and the floor styles it. */
 .searchinput__field { padding-left: 0; padding-right: 0; }
 .searchinput__clear {
   position: relative;
@@ -5228,32 +5032,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .searchinput__item svg { width: var(--k-icon-xs); height: var(--k-icon-xs); color: var(--k-fg-muted); flex-shrink: 0; }
 .searchinput__item--on,
 .searchinput__item:hover { background: var(--k-state-hover); }`,
-  },
-  {
-    id: 'phoneinput',
-    section: "PhoneInput",
-    css: `/* === PhoneInput (#8) === */
-.phoneinput { padding: 0; }
-.phoneinput__country {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-6);
-  padding: 0 var(--k-s-8) 0 var(--k-s-10);
-  height: 100%;
-  background: transparent;
-  border: 0;
-  border-right: var(--k-divider);
-  color: var(--k-fg);
-  font: inherit;
-  font-size: var(--k-type-small);
-  cursor: pointer;
-}
-.phoneinput__country:hover { background: var(--k-state-hover); }
-.phoneinput__flag { font-size: var(--k-type-body); line-height: 1; }
-.phoneinput__code { font-variant-numeric: tabular-nums; }
-/* .phoneinput--invalid border + focus halo defined in the unified
- * validation block at top of file (state-matched halo system). */
-.phoneinput + .phoneinput { margin-top: var(--k-s-6); }`,
   },
   {
     id: 'infocard',
@@ -5454,7 +5232,39 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 /* --sticky: section headings pin to the top while their group scrolls past
    (Tailwind "stacked list with sticky headings"). Put the list in a scroll
    container; the heading gets a surface fill so rows don't show through it. */
-.list--sticky .list__section { position: sticky; top: 0; z-index: 1; background: var(--k-surface); }`,
+.list--sticky .list__section { position: sticky; top: 0; z-index: 1; background: var(--k-surface); }
+
+/* ----- .list__row — FOLDED INTO list (2026-08-16): a BEM part of .list that
+   shipped as its own recipe, anchored to APG Grid "for interactive rows". A
+   row belongs to the list it is a row of; the evidence page already reported it
+   under list because every element it styles sits inside one. */
+/* === Interactive list row (.list__row) — list family ===
+ * Bordered, surface-filled row that's clickable — opens a menu/popover or
+ * navigates. The standalone, card-like variant of the .list family (no .list
+ * parent needed): use it for member lists, search results, file rows where
+ * each row is its own bordered target. (.list__item is the flat, divider-
+ * separated row INSIDE a .list.) Inline-styled rows can't express
+ * :hover/:focus-visible, so any clickable row gets this class for a real
+ * hover + keyboard affordance. Pair with role="button" + tabindex so the
+ * global :focus-visible ring applies. */
+.list__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--k-s-12);
+  width: 100%;
+  padding: calc(var(--k-space, 16px) * 0.55) calc(var(--k-space, 16px) * 0.7);
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+  background: var(--k-surface);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--k-dur-fast, 120ms) var(--k-ease, ease),
+              border-color var(--k-dur-fast, 120ms) var(--k-ease, ease);
+}
+.list__row:hover { background: var(--k-state-hover); }
+.list__row:active { background: var(--k-state-press); }`,
   },
   {
     id: 'codeblock',
@@ -6342,138 +6152,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
   gap: var(--k-gap, var(--k-s-8));
-}`,
-  },
-  {
-    id: 'tool-call',
-    section: 'Tool call',
-    css: `/* === Tool call ===
-   The "assistant used a tool" card in an AI thread — the receipt of an action,
-   not a message. A native <details> (zero-JS disclosure): a mono tool name, a
-   one-line args summary and a status dot in the summary row; open it for the
-   raw result. Status is ONE axis on the root:
-     .tool-call--running   in flight (info dot)
-     .tool-call--done      finished (success dot)
-     .tool-call--error     failed (danger dot + danger name)
-   Stack several between a question and the answer, or standalone in a feed.
-   (This used to say "sits inside .msg" — .msg was the chat-bubble recipe and it
-   left the kit in the V1 prune, because a foundation for public services does
-   not need a chat bubble. A component's own documentation pointing at something
-   that no longer exists is the cheapest kind of lie to tell and the easiest to
-   leave behind.) Quiet by design — a surface-2 well in caption type, so the
-   conversation stays the foreground. */
-.tool-call {
-  border: var(--k-bw) solid var(--k-border);
-  border-radius: var(--k-radius-md);
-  background: var(--k-surface-2);
-  font-size: var(--k-type-caption);
-  /* The .in law, and the worst case in the kit: the body is monospace payload
-     with no break opportunities, so the whole <details> was sized to the longest
-     line inside it — 336px in a 212px card. The body already scrolls; it just
-     needed the box to be allowed to be smaller than its contents. */
-  min-width: 0;
-}
-.tool-call + .tool-call { margin-top: var(--k-s-4); }
-.tool-call summary {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: var(--k-s-6);
-  min-width: 0;
-  padding: var(--k-s-6) var(--k-s-10);
-  cursor: pointer;
-}
-.tool-call summary::-webkit-details-marker { display: none; }
-.tool-call__name {
-  font-family: var(--k-font-mono);
-  font-weight: var(--k-weight-medium);
-  color: var(--k-fg);
-  flex: none;
-}
-.tool-call__meta {
-  color: var(--k-fg-faint);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  min-width: 0;
-}
-.tool-call__status {
-  margin-left: auto;
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-6);
-  color: var(--k-fg-muted);
-}
-/* The status dot — the same --k-marker series dot the chart legend wears. */
-.tool-call__status::before {
-  content: '';
-  width: var(--k-marker);
-  height: var(--k-marker);
-  border-radius: 50%;
-  background: var(--k-fg-faint);
-}
-.tool-call--running .tool-call__status::before { background: var(--k-info); }
-.tool-call--done .tool-call__status::before { background: var(--k-success); }
-.tool-call--error .tool-call__status::before { background: var(--k-danger); }
-.tool-call--error .tool-call__name { color: var(--k-danger-text); }
-.tool-call__chevron {
-  width: var(--k-icon-xs);
-  height: var(--k-icon-xs);
-  color: var(--k-fg-faint);
-  flex: none;
-  transition: transform var(--k-dur, 200ms) var(--k-ease, ease);
-}
-.tool-call[open] .tool-call__chevron { transform: rotate(180deg); }
-.tool-call__body {
-  margin: 0;
-  border-top: var(--k-divider);
-  padding: var(--k-s-8) var(--k-s-10);
-  font-family: var(--k-font-mono);
-  color: var(--k-fg-muted);
-  white-space: pre-wrap;
-  overflow-x: auto;
-}`,
-  },
-  {
-    id: 'reasoning',
-    section: 'Reasoning',
-    css: `/* === Reasoning ===
-   The model's thinking disclosure — the "Thought for 12s" line above an AI
-   reply. Collapsed by default (the thinking is context, not content); a native
-   <details> opens a quiet, rail-marked transcript in faint caption type. One
-   optional axis:
-     .reasoning--live   still thinking (info-tinted label)
-   Compose above a .prose answer, or at the top of whatever holds the turn.
-   (Was "INSIDE .msg" — that recipe left in the V1 prune.) */
-.reasoning { font-size: var(--k-type-caption); }
-.reasoning summary {
-  list-style: none;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--k-s-6);
-  color: var(--k-fg-muted);
-  font-weight: var(--k-weight-medium);
-  cursor: pointer;
-}
-.reasoning summary::-webkit-details-marker { display: none; }
-.reasoning__time { color: var(--k-fg-faint); font-weight: normal; }
-.reasoning--live summary { color: var(--k-info-text); }
-.reasoning__chevron {
-  width: var(--k-icon-xs);
-  height: var(--k-icon-xs);
-  color: var(--k-fg-faint);
-  flex: none;
-  transition: transform var(--k-dur, 200ms) var(--k-ease, ease);
-}
-.reasoning[open] .reasoning__chevron { transform: rotate(180deg); }
-.reasoning__body {
-  margin: var(--k-s-6) 0 0;
-  padding: var(--k-s-2) 0 var(--k-s-2) var(--k-s-10);
-  border-left: var(--k-stroke-3, 3px) solid var(--k-border);
-  color: var(--k-fg-faint);
-  line-height: 1.6;
 }`,
   },
   {

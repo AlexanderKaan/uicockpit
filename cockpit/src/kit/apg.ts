@@ -251,12 +251,6 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
     aria: ['Use a real <table> with <th scope>', 'A caption or aria-label naming the table', 'aria-sort on the sorted column header'],
     free: 'A native table gives the whole structure; ARIA table roles exist only for when you cannot use one.',
   },
-  'interactive-list-row': {
-    pattern: 'Grid (for interactive rows)',
-    url: `${APG}/grid/`,
-    keys: [['Arrow keys', 'Move between cells or rows'], ['Tab', 'Leave the grid — it is one tab stop']],
-    aria: ['role="grid" only when rows are genuinely interactive; a list of links is a list, not a grid'],
-  },
   scaffold: {
     pattern: 'Landmarks',
     url: LANDMARKS,
@@ -283,27 +277,6 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
    */
 
   // — Disclosure: one pattern, three recipes —
-  popover: {
-    pattern: 'Disclosure',
-    url: `${APG}/disclosure/`,
-    keys: [['Enter / Space', 'Toggle the panel'], ['Escape', 'Close it and return focus to the trigger']],
-    aria: ['A <button> trigger with aria-expanded', 'aria-controls pointing at the panel'],
-    free: 'The Popover API ([popover] + popovertarget) gives light-dismiss, Escape and top-layer stacking; aria-expanded is still yours.',
-  },
-  'tool-call': {
-    pattern: 'Disclosure',
-    url: `${APG}/disclosure/`,
-    keys: [['Enter / Space', 'Toggle the payload']],
-    aria: ['aria-expanded on the trigger', 'The status is text, not colour alone (WCAG 1.4.1)'],
-    free: '<details>/<summary> gives the toggle, the state and the keys.',
-  },
-  reasoning: {
-    pattern: 'Disclosure',
-    url: `${APG}/disclosure/`,
-    keys: [['Enter / Space', 'Toggle the reasoning block']],
-    aria: ['aria-expanded on the trigger', 'While streaming, the region needs aria-live="polite" or the text arrives silently'],
-    free: '<details>/<summary>, as above.',
-  },
 
   // — Dialog: the modal family —
   lightbox: {
@@ -486,12 +459,6 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
     keys: [['Left / Right (or Up / Down)', 'Move the splitter by a step'], ['Home / End', 'Minimum / maximum'], ['Enter', 'Collapse or restore the pane']],
     aria: ['role="separator" with tabindex="0" — a splitter that cannot be focused can only be dragged, which fails WCAG 2.5.7', 'aria-valuenow · aria-valuemin · aria-valuemax', 'aria-controls naming the pane it sizes'],
   },
-  'hover-card': {
-    pattern: 'Tooltip',
-    url: `${APG}/tooltip/`,
-    keys: [['Escape', 'Dismiss while the trigger keeps focus']],
-    aria: ['Opens on FOCUS as well as hover, or it does not exist for a keyboard', 'Stays open while the pointer travels onto it (WCAG 1.4.13)', 'Rich content belongs in a disclosure instead — anything interactive inside a tooltip is unreachable'],
-  },
 
   // — Navigation furniture: eight recipes, one practice —
   appbar: {
@@ -512,12 +479,6 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
     url: LANDMARKS,
     keys: [['Tab', 'Move through the links']],
     aria: ['aria-current="page" on the active item', 'A collapsed rail still needs names — an icon with no label is an unnamed link'],
-  },
-  'navigation-row': {
-    pattern: 'Landmarks',
-    url: LANDMARKS,
-    keys: [['Tab', 'Move through the rows']],
-    aria: ['aria-current="page" on the active row', 'The whole row is one control, not a link wrapped around a button'],
   },
   inpagenav: {
     pattern: 'Landmarks',
@@ -586,18 +547,14 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
 
   // — Media, text and status: the alternative IS the obligation —
   avatar: 'An image or initials. Decorative beside a name (aria-hidden), and named when it stands alone — a photo whose alt text is the file name is the classic failure.',
-  spinner: 'A busy indicator. aria-busy on the region it belongs to, and a live region announcing the outcome. Never a spinner that announces itself forever.',
   'empty-state': 'A message and usually one action. The message is text; there is nothing to specify.',
-  kbd: 'A key name. <kbd>. The trap is symbols — "⌘K" needs to be readable, not a glyph a screen reader spells out or skips.',
   codeblock: 'A code block. <pre><code>, with a language label as text. The copy button is a plain button that must confirm what it did in a live region. And the <pre> itself needs tabindex="0" with a role and a name: it scrolls sideways whenever the code is wider than the box, and a scroll container with no focusable content cannot be reached by keyboard at all (WCAG 2.1.1, Level A). Found here for real — and only at widths where the code overflows, which a scan pinned at one viewport never reaches.',
   'roll-down-item-stagger': 'An entrance animation. It must respect prefers-reduced-motion, which is WCAG 2.3.3 and a media query, not a role.',
   'button-finish': 'A surface treatment for buttons. The Button pattern covers the behaviour; this changes only how it looks.',
 
   // — Fields whose obligations are HTML, not ARIA —
   'memorable-date': 'Three text inputs in a fieldset — the GOV.UK pattern, chosen BECAUSE it has no widget behaviour to get wrong. Day/month/year as separate labelled inputs, legend as the question, and no date picker between the person and the answer.',
-  'input-otp': 'A row of single-character inputs. autocomplete="one-time-code" and inputmode="numeric" are the whole accessibility story; the slots need one name for the group, not six unrelated fields.',
   passwordinput: 'A password field. The reveal control is a toggle button that must say which state it is in ("Show password" / "Hide password"), and the field must permit paste — blocking it breaks password managers, which is an accessibility failure with a security costume.',
-  phoneinput: 'A country select beside a tel input. Both halves are ordinary form controls; the pairing needs one label that covers both.',
   requirements: 'A checklist that updates as the person types. The pattern is the live region, not a widget: each rule states met/unmet in text, and the region must be polite or every keystroke interrupts.',
   'file-upload-dropzone': 'No APG pattern, and one hard requirement: the drop target must be paired with a real <input type="file">. A drag-only upload fails WCAG 2.5.7, and drag is also the interaction most likely to be impossible for the person using this.',
 }

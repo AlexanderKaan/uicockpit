@@ -250,12 +250,18 @@
  * scale-in anchored to its trigger, and z-index; `--end` supplies the
  * right-alignment this rule was spelling out by hand. */
 .kits-pop {
-  /* Through the recipe's own tokens, never over its head: out-specifying
-     `.popover` is how a chrome class ends up re-declaring what the recipe owns,
-     which is the duplication this pass exists to remove. The topbar stacks above
-     the rest of the shell, hence the local z. */
+  /* Composes .menu — the kit's overlay surface — since .popover left on the
+     four-layer cut (2026-08-16). Through the recipe's own tokens, never over its
+     head: out-specifying the recipe is how a chrome class ends up re-declaring
+     what the recipe owns. What the chrome DOES own is placement — position,
+     inset, z — which .popover used to carry and .menu deliberately does not
+     (every menu is placed by its host). The topbar stacks above the shell. */
   --k-overlay-min: 300px;
-  --k-z-popover: 1100;
+  --k-overlay-max: 70vh;
+  position: absolute;
+  top: calc(100% + var(--k-s-8));
+  right: 0;
+  z-index: 1100;
   overflow: hidden;
 }
 .kits-pop__head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }

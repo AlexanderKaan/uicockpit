@@ -299,7 +299,7 @@ export function DatePicker({
     // Canonical date-picker pattern — the same .popover-wrap + .in--inline
     // trigger + .popover surface the gallery's DateCard catalogues (single-date
     // mode here; DateCard is the range variant). NOT a parallel .menu one-off.
-    <div className="popover-wrap" ref={ref} style={{ width: '100%' }}>
+    <div ref={ref} style={{ position: 'relative', width: '100%' }}>
       <button
         type="button"
         className="in in--inline"
@@ -314,7 +314,7 @@ export function DatePicker({
         <Icon name="chevD" size={13} />
       </button>
       {open && (
-        <div className="popover" role="dialog" aria-label={ariaLabel} style={{ width: 264 }}>
+        <div className="menu menu--panel" role="dialog" aria-label={ariaLabel} style={{ position: 'absolute', top: 'calc(100% + var(--k-s-8))', left: 0, width: 264, zIndex: 'var(--k-z-popover, 30)' }}>
           <div className="calendar__nav">
             <span className="calendar__nav-title">{DP_MONTHS[view.m]} {view.y}</span>
             <span className="calendar__nav-btns">

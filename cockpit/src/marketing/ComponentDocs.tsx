@@ -275,7 +275,7 @@ export function ComponentDetailPage({ slug, navigate }: { slug: string; navigate
                 <table className="cmpdoc__spec-keys">
                   <tbody>
                     {ex.apg.keys.map(([k, what]: [string, string]) => (
-                      <tr key={k}><th scope="row"><kbd className="kbd">{k}</kbd></th><td>{what}</td></tr>
+                      <tr key={k}><th scope="row"><kbd>{k}</kbd></th><td>{what}</td></tr>
                     ))}
                   </tbody>
                 </table>

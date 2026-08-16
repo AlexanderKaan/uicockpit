@@ -147,11 +147,6 @@
       "openUIName": "Form"
     },
     {
-      "name": "Hover Card",
-      "url": "https://uicockpit.com/components/hover-card",
-      "definition": "A richer hover preview — a profile or link card summoned on dwell."
-    },
-    {
       "name": "Identifier",
       "url": "https://uicockpit.com/components/identifier",
       "definition": "Who operates this service, and the statements a person is entitled to find."
@@ -165,11 +160,6 @@
       "name": "Input",
       "url": "https://uicockpit.com/components/input",
       "definition": "The text field and its label/hint/error anatomy — the base of every form."
-    },
-    {
-      "name": "Input OTP",
-      "url": "https://uicockpit.com/components/input-otp",
-      "definition": "A one-time-code field — separated single-character cells."
     },
     {
       "name": "Lightbox",
@@ -212,16 +202,6 @@
       "definition": "A password field with a reveal toggle and caps-lock warning."
     },
     {
-      "name": "Phone Input",
-      "url": "https://uicockpit.com/components/phone-input",
-      "definition": "A phone field with a country-code select add-on."
-    },
-    {
-      "name": "Popover",
-      "url": "https://uicockpit.com/components/popover",
-      "definition": "A small floating panel anchored to a trigger, for quick forms and pickers."
-    },
-    {
       "name": "Process List",
       "url": "https://uicockpit.com/components/process-list",
       "definition": "Numbered steps that carry real content — editorial, not a progress indicator."
@@ -235,11 +215,6 @@
       "name": "Prose",
       "url": "https://uicockpit.com/components/prose",
       "definition": "A rich-text container that styles raw semantic tags to the kit’s type and rhythm."
-    },
-    {
-      "name": "Reasoning",
-      "url": "https://uicockpit.com/components/reasoning",
-      "definition": "The model’s thinking disclosure — “Thought for 12s”, collapsed by default."
     },
     {
       "name": "Requirements Checklist",
@@ -272,11 +247,6 @@
       "definition": "A drag-to-set value control on a stroke-3 track with a precise handle."
     },
     {
-      "name": "Spinner",
-      "url": "https://uicockpit.com/components/spinner",
-      "definition": "An indeterminate loading indicator at the control-height scale."
-    },
-    {
       "name": "Stepper",
       "url": "https://uicockpit.com/components/stepper",
       "definition": "A multi-step progress indicator — done, current and future states."
@@ -305,11 +275,6 @@
       "name": "Toast",
       "url": "https://uicockpit.com/components/toast",
       "definition": "Transient confirmations — the toned variants and the actionable snackbar."
-    },
-    {
-      "name": "Tool Call",
-      "url": "https://uicockpit.com/components/tool-call",
-      "definition": "An AI agent’s tool receipt — mono name, args, a status dot and an expandable result."
     },
     {
       "name": "Toolbar",

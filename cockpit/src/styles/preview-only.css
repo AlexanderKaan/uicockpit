@@ -606,7 +606,9 @@
 .cardinfo__btn::-webkit-details-marker { display: none; }
 .cardinfo__btn:hover,
 .cardinfo[open] .cardinfo__btn { opacity: 1; color: var(--k-fg-muted); background: var(--k-state-hover); }
-/* The panel IS .popover — the kit's own recipe, not a second version of it.
+/* The panel IS .menu — the kit's own overlay recipe, not a second version of it.
+   (It composed .popover until that recipe left on the four-layer cut; .menu is
+   the same surface, and the panel positions itself.)
  * The first cut hand-rolled the whole surface here, which is the exact rule this
  * repo records me breaking once before with the KPI band. audit:provenance
  * cannot catch it either, because gallery chrome is allowed anything: the

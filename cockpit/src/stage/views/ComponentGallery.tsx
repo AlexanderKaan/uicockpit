@@ -24,8 +24,6 @@ const CARD_KEYWORDS: Record<string, string> = {
   SearchInputCard: 'Search docs search field query',
   PasswordInputCard: 'Set a password strength reveal',
   NumberInputCard: 'Quantity number stepper spinner',
-  PhoneInputCard: 'Phone number country code',
-  InputOtpCard: 'Verify your email OTP one-time code PIN 2FA',
   InputAddonsCard: 'Input add-ons prefix suffix inline unit inset overlapping label group https',
   // — Pickers & selects —
   DateFieldCard: 'Due date field date picker',
@@ -74,9 +72,7 @@ const CARD_KEYWORDS: Record<string, string> = {
   StepperCard: 'Get started stepper steps progress',
   NavCard: 'Side navigation sidebar nav rail',
   // — Overlays & disclosure —
-  PopoverCard: 'Profile popover',
   TooltipCard: 'Last sync tooltip hint',
-  HoverCardCard: 'Mentions hover card preview',
   AccordionCard: 'Accordion collapse expand disclosure',
   DialogCard: 'Delete project dialog modal',
   AlertDialogCard: 'Confirm delete alert dialog confirmation',
@@ -86,7 +82,6 @@ const CARD_KEYWORDS: Record<string, string> = {
   BannerCard: 'Maintenance banner alert notice',
   AlertsCard: 'Activity alerts inline messages',
   ProgressCard: 'Storage progress bar',
-  SpinnerCard: 'Workspace spinner loader loading',
   ToastStackCard: 'Toast notification snackbar',
   EmptyStateCard: 'Projects empty state zero blank',
   NotificationCenterCard: 'Notification center inbox bell',
@@ -113,8 +108,6 @@ const CARD_KEYWORDS: Record<string, string> = {
   InfoCardCard: 'Hosting details info card definition',
   // — Blocks / composed —
   FormPanelCard: 'Form panel labeled fields validation action bar',
-  ToolCallCard: 'Tool call AI agent function receipt status running done error mcp',
-  ReasoningCard: 'Reasoning thinking chain of thought AI disclosure thought for',
   ProseCard: 'Article prose rich text body copy changelog docs',
   ActivityFeedCard: 'Activity feed event stream timeline recent deploy status',
   FilterBarCard: 'Filter bar toolbar facets',
@@ -220,17 +213,17 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarMonthCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
     [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [FrozenColumnTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
-    [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
-    [ComboboxCard, 'atom'], [DialogCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
+    [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
+    [ComboboxCard, 'atom'], [DialogCard, 'component'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
     [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
-    [CodeBlockCard, 'component'], [SheetCard, 'component'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
+    [CodeBlockCard, 'component'], [SheetCard, 'component'], [DescriptionListCard, 'atom'], 
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], 
-    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ToolCallCard, 'atom'], [ReasoningCard, 'atom'], [ProseCard, 'component'], [ActivityFeedCard, 'component'],
+    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ProseCard, 'component'], [ActivityFeedCard, 'component'],
     [LoginCard, 'component'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
     [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [InPageNavCard, 'component'], [SiteFooterCard, 'section'], [RequirementsCard, 'component'], [ProcessListCard, 'component'], [IdentifierCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
-    [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], 
+    [InboxFilterCard, 'component'], [ToolbarRecipeCard, 'atom'], 
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
     [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], 
@@ -330,15 +323,14 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
 // Atom category taxonomy — every atom-tier card bucketed into a matching group.
 // Order = how the groups read top-to-bottom; the masonry packs them by height.
 const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElement>]> = [
-  ['Text inputs', [FormCard, SearchInputCard, InputAddonsCard, PasswordInputCard, NumberInputCard, PhoneInputCard, InputOtpCard]],
+  ['Text inputs', [FormCard, SearchInputCard, InputAddonsCard, PasswordInputCard, NumberInputCard]],
   ['Pickers & selects', [DateFieldCard, ComboboxCard, SelectCard, TagInputCard]],
   ['Choice & toggles', [ChipsCard, SwitchCard, SelectionCard, RadioCardCard, ColorPickerCard, SliderCard]],
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, LanguageNavCard, PaginationCard, StepperCard, TaskListCard]],
-  ['Overlays & disclosure', [PopoverCard, TooltipCard, ToggletipCard, HoverCardCard, AccordionCard]],
-  ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard]],
+  ['Overlays & disclosure', [TooltipCard, ToggletipCard, AccordionCard]],
+  ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
-  ['AI thread', [ToolCallCard, ReasoningCard]],
   ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, InteractiveCardCard, AvatarCard]],
 ]
 
@@ -407,7 +399,7 @@ function Card({ title, desc, children, wide, xwide, docId }: { title?: string; d
           <summary className="cardinfo__btn" aria-label={title ? `About ${title}` : 'About this component'}>
             <span aria-hidden="true">i</span>
           </summary>
-          <div className="popover cardinfo__panel" role="dialog">
+          <div className="menu menu--panel cardinfo__panel" role="dialog">
             {title && <div className="card__title">{title}</div>}
             {desc && <div className="card__desc">{desc}</div>}
             {doc && (
@@ -1475,7 +1467,7 @@ function CmdPaletteCard() {
             aria-controls="cmdp-list"
             aria-activedescendant={matches.length ? `cmdp-opt-${clamped}` : undefined}
           />
-          <kbd className="kbd">⌘K</kbd>
+          <kbd>⌘K</kbd>
         </div>
         {matches.length === 0 ? (
           <div className="cmdp__empty">No commands match “{q}”.</div>
@@ -1497,7 +1489,7 @@ function CmdPaletteCard() {
                       >
                         <span className="cmdp__item-icon"><Icon name={c.icon} /></span>
                         {c.label}
-                        <span className="cmdp__shortcut">{c.keys.map((k, ki) => <kbd key={ki} className="kbd">{k}</kbd>)}</span>
+                        <span className="cmdp__shortcut">{c.keys.map((k, ki) => <kbd key={ki}>{k}</kbd>)}</span>
                       </li>
                     ) : null,
                   )}
@@ -1771,7 +1763,7 @@ function DataTableProCard() {
 // Form panel — the editing-surface block: a titled header, labelled fields on a
 // responsive 2-up grid, a titled section, an inline validation summary (toggled by
 // the primary action to demo the error state), and a footer action bar. Composes
-// the field atoms (.in/.field/.lab · .select · .numinput · .phoneinput · .toggle ·
+// the field atoms (.in/.field/.lab · .select · .numinput · .toggle ·
 // .radio-card) + buttons.
 function FormPanelCard() {
   const [showError, setShowError] = useState(false)
@@ -1810,12 +1802,14 @@ function FormPanelCard() {
                 <button className="numinput__step" onClick={() => setQty((n) => Math.min(99, n + 1))} disabled={qty >= 99} aria-label="Increase seats">+</button>
               </div>
             </div>
-            <div className="lab formpanel__full"><span>Phone (billing alerts)</span>
-              <div className="phoneinput">
-                <button className="phoneinput__country" aria-label="Country"><span className="phoneinput__flag" aria-hidden>🇳🇱</span><span className="phoneinput__code">+31</span></button>
-                <input className="phoneinput__field" type="tel" inputMode="tel" autoComplete="tel" defaultValue="6 1234 5678" aria-label="Phone number" />
-              </div>
-            </div>
+            {/* ONE tel input, international format, no country picker — which is
+                what GOV.UK's "Telephone numbers" pattern prescribes, and the reason
+                the .phoneinput recipe (a country picker beside a tel field) left on
+                the four-layer cut: it did what the only guidance that exists forbids. */}
+            <label className="lab formpanel__full"><span>Phone (billing alerts)</span>
+              <input className="in" type="tel" inputMode="tel" autoComplete="tel" defaultValue="+31 6 1234 5678" aria-describedby="fp-phone-hint" />
+              <span className="field__hint" id="fp-phone-hint">Include the country code, for example +31.</span>
+            </label>
           </div>
           <div className="formpanel__section">
             {/* role="radiogroup" + a name, because a set of radios with nothing
@@ -2158,111 +2152,7 @@ function ToolbarCard() {
  *
  * Two tiles in one card to demo the success + danger delta variants. */
 
-function PopoverCard() {
-  const [open, setOpen] = useState(true)
-  // In real apps the popover is position: absolute and anchors to its trigger.
-  // In this masonry-card demo we render it in-flow so the card grows naturally
-  // (absolute would float out of the card and overlap the next one in the column).
-  // The .popover class still applies — only `position` is overridden inline.
-  return (
-    <Card docId="popover" title="Profile" desc="A quick profile peek.">
-      <div>
-        <button
-          className={`btn ${open ? 'btn--primary' : 'btn--ghost'} btn--sm`}
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-controls="profile-popover"
-        >
-          <Icon name="info" /> {open ? 'Hide popover' : 'Show popover'}
-        </button>
-        {/* aria-controls: the Disclosure pattern requires the trigger to NAME
-            what it opens. There was exactly ONE aria-controls in the whole app,
-            so a screen-reader user meeting any of our 126 disclosures was told
-            something expands and not what. */}
-        {open && (
-          <div
-            id="profile-popover"
-            className="popover"
-            role="dialog"
-            aria-label="Profile"
-            style={{ position: 'relative', top: 'auto', left: 'auto', marginTop: 12 }}
-          >
-            <span className="popover__arrow" />
-            <div className="card__row" style={{ gap: 8, marginBottom: 8 }}>
-              <span className="avatar avatar--sm">JM</span>
-              <div className="card__col" style={{ gap: 1, flex: 1 }}>
-                <span style={{ fontWeight: 600, fontSize: 'var(--k-type-small)' }}>Jordan Maxwell</span>
-                <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>jordan@northwind.dev</span>
-              </div>
-            </div>
-            <button className="btn btn--primary btn--sm" style={{ width: '100%', justifyContent: 'center' }}>View profile</button>
-          </div>
-        )}
-      </div>
-      {/* Placement variants — .popover--top (opens above) · .popover--end (right-aligned).
-          Static, with the arrow repositioned to match. No JS collision-flip. */}
-      <div className="card__row" style={{ gap: 'var(--k-s-16)', paddingTop: 56, justifyContent: 'center' }}>
-        <span className="popover-wrap">
-          <button className="btn btn--ghost btn--sm" tabIndex={-1}>Above</button>
-          <span className="popover popover--top" role="note" style={{ minWidth: 0, padding: 'var(--k-s-8) var(--k-s-12)', fontSize: 11 }}>
-            <span className="popover__arrow" />Opens above
-          </span>
-        </span>
-        <span className="popover-wrap">
-          <button className="btn btn--ghost btn--sm" tabIndex={-1}>End</button>
-          <span className="popover popover--end" role="note" style={{ minWidth: 0, padding: 'var(--k-s-8) var(--k-s-12)', fontSize: 11 }}>
-            <span className="popover__arrow" />Right-aligned
-          </span>
-        </span>
-      </div>
-    </Card>
-  )
-}
 
-function HoverCardCard() {
-  // NB: uses <div> not <p> as the wrapper because .hover-card__pop contains
-  // nested <div>s (avatar + columns) — putting <div> inside <p> is invalid
-  // HTML and React 19 strict mode throws a hydration error.
-  return (
-    <Card title="Mentions" desc="Hover a name to preview their profile.">
-      <div style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>
-        Hover over{' '}
-        <span className="hover-card">
-          @ava_chen
-          <span className="hover-card__pop">
-            <span className="card__row" style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
-              <span className="avatar avatar--sm avatar--a3">AC</span>
-              <span style={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1 }}>
-                <span style={{ fontWeight: 600, fontSize: 'var(--k-type-small)', color: 'var(--k-fg)' }}>Ava Chen</span>
-                <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Design engineer · since 2024</span>
-              </span>
-            </span>
-            <span style={{ display: 'block', fontSize: 11.5, color: 'var(--k-fg-muted)' }}>
-              Builds the Cockpit panel + design tokens.
-            </span>
-          </span>
-        </span>{' '}
-        to see a profile preview.
-      </div>
-      {/* Placement — .hover-card__pop--top (opens above) · --end (right-aligned). */}
-      <div style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)', marginTop: 'var(--k-s-16)' }}>
-        Placement:{' '}
-        <span className="hover-card">
-          @liam
-          <span className="hover-card__pop hover-card__pop--top" style={{ minWidth: 0, padding: 'var(--k-s-8) var(--k-s-12)' }}>
-            <span style={{ fontWeight: 600, color: 'var(--k-fg)' }}>Liam Ortega</span> — opens above
-          </span>
-        </span>{' · '}
-        <span className="hover-card">
-          @noor
-          <span className="hover-card__pop hover-card__pop--end" style={{ minWidth: 0, padding: 'var(--k-s-8) var(--k-s-12)' }}>
-            <span style={{ fontWeight: 600, color: 'var(--k-fg)' }}>Noor Haddad</span> — right-aligned
-          </span>
-        </span>
-      </div>
-    </Card>
-  )
-}
 
 function SheetCard() {
   const [open, setOpen] = useState(true)
@@ -2309,22 +2199,6 @@ function SheetCard() {
   )
 }
 
-function SpinnerCard() {
-  return (
-    <Card title="Workspace">
-      <div className="card__row" style={{ alignItems: 'center', gap: 12 }}>
-        <span className="spinner" role="status" aria-label="Loading" />
-        <span style={{ fontSize: 'var(--k-type-small)', color: 'var(--k-fg-muted)' }}>Loading workspace…</span>
-      </div>
-      <div className="card__row" style={{ alignItems: 'center', gap: 14, marginTop: 8 }}>
-        <span className="spinner spinner--sm" role="status" aria-label="Loading" />
-        <span className="spinner" role="status" aria-label="Loading" />
-        <span className="spinner spinner--lg" role="status" aria-label="Loading" />
-        <span style={{ fontSize: 11, color: 'var(--k-fg-faint)' }}>sm · md · lg</span>
-      </div>
-    </Card>
-  )
-}
 
 function InteractiveCardCard() {
   return (
@@ -2490,7 +2364,7 @@ function NavCard() {
         <div className="sidenav__foot">
           <NavRow icon="cog" label="Settings" />
           <button type="button" className="navrow" data-tip="Quick actions" aria-label="Quick actions">
-            <kbd className="kbd">⌘K</kbd>
+            <kbd>⌘K</kbd>
             <span className="navrow__label">Quick actions</span>
           </button>
         </div>
@@ -2971,7 +2845,7 @@ function DateCard() {
 
   return (
     <Card title="Schedule" desc="Pick the dates for your trip.">
-      <div className="popover-wrap" ref={ref} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+      <div ref={ref} style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
         <button
           ref={triggerRef}
           type="button"
@@ -2988,7 +2862,7 @@ function DateCard() {
         {open && (
           // Docked in-flow (not the absolute .popover) so the gallery masonry measures
           // the card's real height — an open absolute popover overflowed into the card below.
-          <div className="popover" role="dialog" aria-label="Choose a date range" style={{ width: '100%', maxWidth: 300, position: 'static', marginTop: 'var(--k-s-6)' }}>
+          <div className="menu menu--panel" role="dialog" aria-label="Choose a date range" style={{ width: '100%', maxWidth: 300, position: 'static', marginTop: 'var(--k-s-6)' }}>
             <div className="calendar__nav">
               <span className="calendar__nav-title">May 2026</span>
               <span className="calendar__nav-btns">
@@ -3756,7 +3630,7 @@ function ComboboxCard() {
               <input autoFocus value={q} onChange={onQ} placeholder="Filter…" />
             </div>
             {loading ? (
-              <div className="combobox__loading"><span className="spinner spinner--sm" aria-hidden="true" />Searching…</div>
+              <div className="combobox__loading">Searching…</div>
             ) : matches.length === 0 ? (
               <div className="combobox__empty">No results.</div>
             ) : (
@@ -3893,7 +3767,6 @@ function DropzoneCard() {
           <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>Shared with team</span>
         </span>
         <button className="btn btn--primary btn--sm">
-          <span className="spinner" style={{ borderTopColor: 'currentColor' }} />
           Uploading…
         </button>
       </div>
@@ -4168,85 +4041,6 @@ function AlertDialogCard() {
  * system" half — they're our shipped markup. The onPaste handler is the
  * behavior half — a small JS helper. Both together = the modern OTP UX
  * everyone copies from shadcn-otp / react-otp-input / etc. */
-function InputOtpCard() {
-  const [code, setCode] = useState(['', '', '', '', '', ''])
-  const refs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ]
-  const set = (i: number, v: string) => {
-    // Strip non-digits so accidental letters don't pollute the row.
-    const digit = v.replace(/\D/g, '').slice(-1)
-    const next = [...code]
-    next[i] = digit
-    setCode(next)
-    if (digit && i < 5) refs[i + 1]?.current?.focus()
-  }
-  const onKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !code[i] && i > 0) {
-      refs[i - 1]?.current?.focus()
-    }
-  }
-  const onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-    const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
-    if (!text) return
-    e.preventDefault()
-    const next = ['', '', '', '', '', '']
-    text.split('').forEach((d, idx) => { next[idx] = d })
-    setCode(next)
-    refs[Math.min(text.length, 5)]?.current?.focus()
-  }
-  return (
-    <Card title="Verify your email" desc="Paste the 6-digit code we sent you.">
-      <div className="otp" onPaste={onPaste}>
-        {code.slice(0, 3).map((c, i) => (
-          <input
-            key={i}
-            ref={refs[i]}
-            className="otp__slot"
-            aria-label={`Digit ${i + 1} of ${code.length}`}
-            value={c}
-            maxLength={1}
-            inputMode="numeric"
-            pattern="\d*"
-            autoComplete={i === 0 ? 'one-time-code' : 'off'}
-            onChange={(e) => set(i, e.target.value)}
-            onKeyDown={(e) => onKeyDown(i, e)}
-          />
-        ))}
-        <span className="otp__sep">–</span>
-        {code.slice(3).map((c, i) => {
-          const idx = i + 3
-          return (
-            <input
-              key={idx}
-              ref={refs[idx]}
-              className="otp__slot"
-              aria-label={`Digit ${i + 1} of ${code.length}`}
-              value={c}
-              maxLength={1}
-              inputMode="numeric"
-              pattern="\d*"
-              autoComplete="off"
-              onChange={(e) => set(idx, e.target.value)}
-              onKeyDown={(e) => onKeyDown(idx, e)}
-            />
-          )
-        })}
-      </div>
-      <button className="btn btn--primary btn--block" disabled={code.some((c) => !c)}>
-        <Icon name="check" /> Verify
-      </button>
-      <div className="card__row" style={{ justifyContent: 'center' }}>
-        <button className="btn btn--link btn--sm">Resend code</button>
-      </div>
-    </Card>
-  )
-}
 
 /* === Composer (#112) =================================================
  * AI/chat input bar — the pattern from ChatGPT, Claude, Cursor, Lovable.
@@ -4479,7 +4273,6 @@ function SearchInputCard() {
       {/* Loading state — a spinner replaces the magnifier while results fetch. */}
       <span className="eyebrow" style={{ marginTop: 'var(--k-s-12)' }}>Loading</span>
       <div className="searchinput" aria-busy="true">
-        <span className="spinner spinner--sm" aria-hidden="true" />
         <input className="searchinput__field" defaultValue="invoices" placeholder="Search…" readOnly aria-label="Search (loading)" />
       </div>
     </Card>
@@ -4490,54 +4283,6 @@ function SearchInputCard() {
  * Country code picker (flag + +XX) + national number formatter. The
  * picker is a button that opens a list of countries; for the gallery
  * card we render NL selected. */
-function PhoneInputCard() {
-  const [num, setNum] = useState('6 12 34 56 78')
-  return (
-    <Card title="Phone number" desc="We'll text a code to confirm it.">
-      <div className="phoneinput">
-        <button className="phoneinput__country" aria-label="Country">
-          <span className="phoneinput__flag" aria-hidden>🇳🇱</span>
-          <span className="phoneinput__code">+31</span>
-          <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden><path d="M1 1 L5 5 L9 1" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
-        </button>
-        {/* type="tel" — the platform's phone field. It is what puts the phone
-            keypad on a mobile keyboard, and this rendered as plain text (no type
-            at all) in a component literally named phoneinput. autocomplete="tel"
-            is the other half: the browser can fill it. */}
-        <input
-          className="phoneinput__field"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          value={num}
-          onChange={(e) => setNum(e.target.value)}
-          placeholder="6 12 34 56 78"
-          aria-label="Phone number"
-        />
-      </div>
-      <div className="phoneinput phoneinput--invalid">
-        <button className="phoneinput__country" aria-label="Country">
-          <span className="phoneinput__flag" aria-hidden>🇺🇸</span>
-          <span className="phoneinput__code">+1</span>
-          <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden><path d="M1 1 L5 5 L9 1" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
-        </button>
-        <input
-          className="phoneinput__field"
-          type="tel"
-          inputMode="tel"
-          value="555-013"
-          readOnly
-          aria-invalid="true"
-          aria-label="Phone number"
-        />
-      </div>
-      <div style={{ fontSize: 11, color: 'var(--k-danger-text)' }}>Enter a valid 10-digit number.</div>
-      <button className="btn btn--primary btn--block">
-        <Icon name="bell" /> Send code
-      </button>
-    </Card>
-  )
-}
 /* === SettingsRow (Tier 4 #9) =========================================
  * Hostinger admin pattern: label + description left, control right.
  * Three variants: toggle, button, inline badge. Stacks via repeat
@@ -4683,66 +4428,11 @@ function ListCard() {
  * The "assistant used a tool" receipt in an AI thread — a native <details>
  * with mono tool name, args summary and a status dot; open for the raw
  * result. Status = one axis: --running · --done · --error. */
-function ToolCallCard() {
-  return (
-    <Card title="Tool call" desc="An AI agent's tool receipt — status dot, mono name, expandable result.">
-      <div style={{ display: 'grid', gap: 'var(--k-s-4)' }}>
-        <details className="tool-call tool-call--done" open>
-          <summary>
-            <span className="tool-call__name">search_invoices</span>
-            <span className="tool-call__meta">status: overdue · limit: 10</span>
-            <span className="tool-call__status">Done</span>
-            <span className="tool-call__chevron"><ChevronSvg size={11} /></span>
-          </summary>
-          <pre className="tool-call__body">{'2 results\n#00009  Tuple, Inc       $2,000.00   14 days overdue\n#00008  Vantage Retail  $21,400.00   8 days overdue'}</pre>
-        </details>
-        <details className="tool-call tool-call--running">
-          <summary>
-            <span className="tool-call__name">draft_reminder</span>
-            <span className="tool-call__meta">invoice: #00009 · tone: friendly</span>
-            <span className="tool-call__status">Running</span>
-            <span className="tool-call__chevron"><ChevronSvg size={11} /></span>
-          </summary>
-        </details>
-        <details className="tool-call tool-call--error">
-          <summary>
-            <span className="tool-call__name">send_email</span>
-            <span className="tool-call__meta">to: billing@tuple.com</span>
-            <span className="tool-call__status">Failed</span>
-            <span className="tool-call__chevron"><ChevronSvg size={11} /></span>
-          </summary>
-          <pre className="tool-call__body">SMTP 550 — recipient rejected. Check the address and retry.</pre>
-        </details>
-      </div>
-    </Card>
-  )
-}
 
 /* === Reasoning (LP6) =================================================
  * The model's thinking disclosure — "Thought for 12s", collapsed by default;
  * opens a quiet rail-marked transcript. --live tints the label while the
  * model is still thinking. */
-function ReasoningCard() {
-  return (
-    <Card title="Reasoning" desc="The AI's thinking line — collapsed by default, the transcript one click away.">
-      <div style={{ display: 'grid', gap: 'var(--k-s-8)' }}>
-        <details className="reasoning" open>
-          <summary>
-            Thought <span className="reasoning__time">for 12s</span>
-            <span className="reasoning__chevron"><ChevronSvg size={11} /></span>
-          </summary>
-          <p className="reasoning__body">Two invoices match "overdue". The total the user asked for should count all open invoices, not just the overdue ones — compute both and answer with the distinction.</p>
-        </details>
-        <details className="reasoning reasoning--live">
-          <summary>
-            Thinking <span className="reasoning__time">· 4s</span>
-            <span className="reasoning__chevron"><ChevronSvg size={11} /></span>
-          </summary>
-        </details>
-      </div>
-    </Card>
-  )
-}
 
 /* === Prose (Fase J-8) ================================================
  * A rich-text container — semantic headings/paragraphs/lists take the kit's
@@ -5238,8 +4928,6 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'search-input', name: 'Search Input', group: 'Inputs', recipeId: 'searchinput', blurb: 'A search field with a lead icon, ghost clear button and optional kbd hint.', Preview: SearchInputCard },
   { slug: 'number-input', name: 'Number Input', group: 'Inputs', recipeId: 'numberinput', blurb: 'A numeric field with stepper affordances and tabular alignment.', Preview: NumberInputCard },
   { slug: 'password-input', name: 'Password Input', group: 'Inputs', recipeId: 'passwordinput', blurb: 'A password field with a reveal toggle and caps-lock warning.', Preview: PasswordInputCard },
-  { slug: 'phone-input', name: 'Phone Input', group: 'Inputs', recipeId: 'phoneinput', blurb: 'A phone field with a country-code select add-on.', Preview: PhoneInputCard },
-  { slug: 'input-otp', name: 'Input OTP', group: 'Inputs', recipeId: 'input-otp', blurb: 'A one-time-code field — separated single-character cells.', Preview: InputOtpCard },
   { slug: 'tag-input', name: 'Tag Input', group: 'Inputs', recipeId: 'tag-input', blurb: 'Enter and remove tokens inline — labels, recipients, filters.', Preview: TagInputCard },
   { slug: 'date-picker', name: 'Date Picker', group: 'Inputs', recipeId: 'calendar', blurb: 'A date field whose popover calendar is pure kit — themed, not OS chrome.', Preview: DateFieldCard },
 
@@ -5264,7 +4952,6 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'banner', name: 'Banner', group: 'Feedback', recipeId: 'banner', blurb: 'A full-width page-level notice with an action and a dismiss.', Preview: BannerCard },
   { slug: 'toast', name: 'Toast', group: 'Feedback', recipeId: 'toast-stack', blurb: 'Transient confirmations — the toned variants and the actionable snackbar.', Preview: ToastStackCard },
   { slug: 'progress', name: 'Progress', group: 'Feedback', recipeId: 'progress', blurb: 'A determinate progress bar, heavier than the slider to read as ongoing work.', Preview: ProgressCard },
-  { slug: 'spinner', name: 'Spinner', group: 'Feedback', recipeId: 'spinner', blurb: 'An indeterminate loading indicator at the control-height scale.', Preview: SpinnerCard },
   { slug: 'empty-state', name: 'Empty State', group: 'Feedback', recipeId: 'empty-state', blurb: 'The zero-data screen — an icon, a line of guidance and one action.', Preview: EmptyStateCard },
 
   // Navigation
@@ -5280,9 +4967,7 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'dialog', name: 'Dialog', group: 'Overlays', recipeId: 'dialog', blurb: 'A focused modal — one screen of content, one primary action in a sunken foot.', Preview: DialogCard },
   { slug: 'alert-dialog', name: 'Alert Dialog', group: 'Overlays', recipeId: 'alert-dialog', blurb: 'A confirmation modal that names the object and its destructive action.', Preview: AlertDialogCard },
   { slug: 'sheet', name: 'Sheet', group: 'Overlays', recipeId: 'sheet-drawer', blurb: 'A slide-in panel from an edge — a longer flow than a dialog holds.', Preview: SheetCard },
-  { slug: 'popover', name: 'Popover', group: 'Overlays', recipeId: 'popover', blurb: 'A small floating panel anchored to a trigger, for quick forms and pickers.', Preview: PopoverCard },
   { slug: 'tooltip', name: 'Tooltip', group: 'Overlays', recipeId: 'tooltip', blurb: 'A hover hint — one line of context, never interactive content.', Preview: TooltipCard },
-  { slug: 'hover-card', name: 'Hover Card', group: 'Overlays', recipeId: 'hover-card', blurb: 'A richer hover preview — a profile or link card summoned on dwell.', Preview: HoverCardCard },
   { slug: 'accordion', name: 'Accordion', group: 'Overlays', recipeId: 'accordion', blurb: 'Stacked disclosure panels — one section open at a time or many.', Preview: AccordionCard },
   { slug: 'lightbox', name: 'Lightbox', group: 'Overlays', recipeId: 'lightbox', blurb: 'A full-screen media viewer with prev/next and a caption.', Preview: LightboxCard },
 
@@ -5293,8 +4978,6 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'resizable', name: 'Resizable', group: 'Layout', recipeId: 'resizable', blurb: 'Drag-to-resize split panes with a grabbable handle.', Preview: ResizableCard },
 
   // AI thread
-  { slug: 'tool-call', name: 'Tool Call', group: 'AI', recipeId: 'tool-call', blurb: 'An AI agent’s tool receipt — mono name, args, a status dot and an expandable result.', Preview: ToolCallCard },
-  { slug: 'reasoning', name: 'Reasoning', group: 'AI', recipeId: 'reasoning', blurb: 'The model’s thinking disclosure — “Thought for 12s”, collapsed by default.', Preview: ReasoningCard },
   { slug: 'prose', name: 'Prose', group: 'Content', recipeId: 'prose', blurb: 'A rich-text container that styles raw semantic tags to the kit’s type and rhythm.', Preview: ProseCard },
 ]
 
