@@ -2451,21 +2451,37 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
    Single-cell selection + range pattern (shadcn / react-day-picker style).
    Range cells fill with primary-soft and lose corner radius on connection
    sides so the highlight reads as continuous. */
+/* 🔑 A MONTH IS TABULAR DATA — weekdays across, weeks down — so the structure is
+   a <table> and role="grid" upgrades it to the interactive pattern APG names.
+   This was a flat CSS grid of buttons with no rows, which is why the anchor had
+   to carry a paragraph explaining that it declared a pattern it did not
+   implement: adding role="grid" to a rowless grid took a11y:matrix from 3
+   violations to 16, twelve of them aria-required-children. A role without the
+   structure it requires is broken ARIA, not partial ARIA.
+
+   In the accessibility tree a screen-reader user met 42 loose buttons. Now the
+   platform supplies row and gridcell from <tr> and <td> — no ARIA for either —
+   and the reading is "row 3, column 5, Tuesday 14".
+
+   ⚠️ table-layout: fixed also DELETES a bug the old grid needed a paragraph to
+   explain. A 1fr track carries an automatic min-content floor, so one cell
+   whose content will not break — an event chip, a long locale weekday — dragged
+   its column past its share; measured at 320px the seven columns came out
+   26 · 107 · 53 · 26 · 26 · 26 · 129, a 393px grid inside a 212px box. A fixed
+   table has no min-content floor. Seven columns are seven equal columns because
+   the layout algorithm says so, not because we floored every track by hand. */
 .calendar {
-  display: grid;
-  /* minmax(0, …), not a bare 1fr. A 1fr track carries an automatic min-content
-     floor, so ONE cell whose content will not break — an event chip, a long
-     locale weekday — drags its whole column past its share and the seven tracks
-     stop being equal. Measured at 320px (WCAG 1.4.10): the seven columns came
-     out 26 · 107 · 53 · 26 · 26 · 26 · 129, a 393px grid inside a 212px box,
-     with 192 elements hanging outside the frame. */
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: var(--k-s-2) 0;
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
   font-size: var(--k-type-eyebrow);
   /* Its own query context: how much room a DAY has is a property of the grid,
      not of the viewport — the same calendar is a full-page planner and a popover. */
   container-type: inline-size;
 }
+/* <th scope="col">. The scope is not decoration: it is what lets a screen
+   reader answer "which day of the week is this?" from inside a cell. */
 .calendar__head {
   text-align: center;
   font-size: var(--k-type-caption);
@@ -2473,6 +2489,20 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   padding: var(--k-s-4) 0;
   font-weight: var(--k-weight-medium);
 }
+/* The <td> is a SIZING SHELL and nothing else — every visual state stays on the
+   cell inside it, so the whole .calendar__cell--* family is untouched by the
+   restructuring. The 1px block padding replaces the old grid's row gap. */
+.calendar__day {
+  padding: 1px 0;
+  vertical-align: top;
+}
+/* height: 0 on the CELL is what makes height: 100% work on the div inside it.
+   A percentage height needs a definite base, and a <td> has none until the row
+   is laid out — so the browser resolves the child to auto and the stretch is
+   lost. Setting the cell to 0 gives the percentage something to resolve against;
+   the row's own content still decides the real height. Standard table technique,
+   and the alternative was giving up the row-stretch the CSS grid did for free. */
+.calendar--events .calendar__day { height: 0; }
 /* Calendar cells follow Stature: compact = 28px (Linear/Notion slim picker),
  * balanced = 32px (shadcn default), bold = 40px (iOS-style tap target).
  * Aspect-ratio keeps cells square — min-height enforces stature minimum so
@@ -2537,10 +2567,15 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .calendar__nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--k-s-6); }
 .calendar__nav-title { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
 .calendar__nav-btns { display: inline-flex; gap: var(--k-s-2); }
-/* Disabled date (B4) — a day you can't pick (past / blackout / sold-out),
-   DISTINCT from --out (a faded prev/next-month day): muted + struck +
-   non-interactive. The consumer adds the native \`disabled\` + this class; the
-   recipe owns the look. Booking-grade pickers need this state. */
+/* Unavailable day. ⚠️ THE CONSUMER SHOULD REACH FOR aria-disabled, NOT the
+   native disabled, and the reason is the grid's keyboard model: a disabled
+   button cannot take focus, so an arrow key that lands on a blacked-out date
+   dead-ends and the user is stuck mid-month. It also removes the date from the
+   accessibility tree entirely, which for a booking calendar deletes the answer
+   to "why can't I pick the 9th?". aria-disabled keeps the cell focusable and
+   announced — "May 9, unavailable" — and the click handler does the refusing.
+   Found by driving the arrow keys, not by reading: ArrowDown moved the focus
+   index and the focus itself stayed put. */
 .calendar__cell--disabled { color: var(--k-fg-faint); opacity: 0.5; cursor: not-allowed; text-decoration: line-through; }
 .calendar__cell--disabled:hover { background: transparent; }
 /* --- Month as a SCHEDULER (.calendar--events) ----------------------------
@@ -2550,7 +2585,14 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
    becomes a column (day number top-left, then .calendar__event chips, then a
    .calendar__more overflow row). The picker states (--on/--today/--range) still
    work, but events want their own quieter day-number treatment. */
+/* ⚠️ height: 100% is not decoration — it is what the CSS grid used to do for
+   free. As grid items every cell in a row STRETCHED to the tallest one; inside a
+   <td> the div does not, so the six cells beside a busy day dropped from 134px
+   to their own 88px and the week stopped reading as a week. Caught by
+   audit:shape, which is the whole reason that gate exists: nothing else in the
+   run moved, no test failed, and a screenshot of one cell looks fine. */
 .calendar--events .calendar__cell {
+  height: 100%;
   aspect-ratio: auto; min-height: var(--k-cal-cell-events, 5.5rem);
   display: flex; flex-direction: column; align-items: stretch;
   place-items: stretch; gap: var(--k-s-2);
@@ -2787,6 +2829,11 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .calendar-year__title { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
 .calendar-year__month .calendar { font-size: var(--k-type-caption); gap: 0; }
 .calendar-year__month .calendar__head { padding: var(--k-s-2) 0; }
+/* Density is the whole point of a year view, so the row padding the month grid
+   uses for breathing room comes off here. Without it each mini grew 178.5 to
+   194.9px in the table restructure — nine percent, twelve times over, which is a
+   different card. audit:shape is what noticed; nothing else in the run moved. */
+.calendar-year__month .calendar__day { padding: 0; }
 /* the current month is lifted - a soft ring frames its mini-grid. */
 .calendar-year__month--now .calendar { padding: var(--k-s-4); border-radius: var(--k-radius-md); box-shadow: 0 0 0 1px var(--k-primary-soft); }`,
   },

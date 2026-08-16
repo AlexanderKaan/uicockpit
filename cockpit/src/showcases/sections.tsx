@@ -337,22 +337,35 @@ export function renderSection(spec: SectionSpec, key: number) {
               <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Next month"><Icon name="chevR" /></button>
             </span>
           </div>
-          <div className="calendar">
-            {DOW.map((d, i) => <span key={'h' + i} className="calendar__head">{d}</span>)}
-            {cells.map((d, i) => {
-              if (d === null) return <span key={i} className="calendar__cell calendar__cell--out" aria-hidden="true" />
-              const cls = ['calendar__cell']
-              if (d === selected) cls.push('calendar__cell--on')
-              if (d === today) cls.push('calendar__cell--today')
-              const dot = events.includes(d) && d !== selected
-              return (
-                <button type="button" key={i} className={cls.join(' ')} aria-selected={d === selected} aria-current={d === today ? 'date' : undefined}>
-                  {d}
-                  {dot && <span aria-hidden="true" style={{ position: 'absolute', bottom: 5, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, borderRadius: '50%', background: 'var(--k-primary)' }} />}
-                </button>
-              )
-            })}
-          </div>
+          {/* A <table>, not role="grid": the fixture renders a calendar, it does not
+              operate one. The role belongs to the picker in the gallery, which has
+              the onClick and the arrow keys to back it. */}
+          <table className="calendar" aria-label={spec.seed.title ?? 'Calendar'}>
+            <thead>
+              <tr>{DOW.map((d, i) => <th key={'h' + i} scope="col" className="calendar__head">{d}</th>)}</tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: Math.ceil(cells.length / 7) }, (_, w) => cells.slice(w * 7, w * 7 + 7)).map((week, wi) => (
+                <tr key={wi}>
+                  {week.map((d, i) => {
+                    if (d === null) return <td key={i} className="calendar__day"><span className="calendar__cell calendar__cell--out" aria-hidden="true" /></td>
+                    const cls = ['calendar__cell']
+                    if (d === selected) cls.push('calendar__cell--on')
+                    if (d === today) cls.push('calendar__cell--today')
+                    const dot = events.includes(d) && d !== selected
+                    return (
+                      <td key={i} className="calendar__day">
+                        <button type="button" className={cls.join(' ')} aria-selected={d === selected} aria-current={d === today ? 'date' : undefined}>
+                          {d}
+                          {dot && <span aria-hidden="true" style={{ position: 'absolute', bottom: 5, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, borderRadius: '50%', background: 'var(--k-primary)' }} />}
+                        </button>
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )
     }

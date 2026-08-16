@@ -2903,6 +2903,39 @@ function DateCard() {
   const effEnd = end ?? (start !== null && hover !== null && hover >= start ? hover : null)
   const effStart = end === null && start !== null && hover !== null && hover < start ? hover : start
   const days = Array.from({ length: 35 }, (_, i) => i - 2)
+
+  /* THE GRID'S OWN KEYBOARD MODEL, which the APG anchor has declared since the
+   * day it was written and which nothing implemented. Left/Right a day,
+   * Up/Down a week, Home/End the ends of the week, PageUp/PageDown a month —
+   * and Tab leaves, because a roving tabindex makes the month one stop.
+   *
+   * It moves FOCUS, not selection. A grid where arrowing also picks is a grid
+   * you cannot read without committing to a date, which for a booking form is
+   * the difference between browsing and buying. */
+  const [focusDay, setFocusDay] = useState(1)
+  const focusRef = useRef<HTMLButtonElement>(null)
+  const pendingFocus = useRef(false)
+  useEffect(() => {
+    if (!pendingFocus.current) return
+    pendingFocus.current = false
+    focusRef.current?.focus()
+  }, [focusDay])
+
+  const onGridKey = (e: React.KeyboardEvent) => {
+    const STEP: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }
+    let next: number | null = null
+    if (e.key in STEP) next = focusDay + STEP[e.key]!
+    else if (e.key === 'Home') next = focusDay - ((focusDay + 2) % 7)
+    else if (e.key === 'End') next = focusDay + (6 - ((focusDay + 2) % 7))
+    else if (e.key === 'PageUp' || e.key === 'PageDown') next = e.key === 'PageUp' ? 1 : 31
+    if (next === null) return
+    // Clamp inside the month rather than wrapping into the padding cells: those
+    // are aria-hidden and carry no button, so focus would simply vanish.
+    const clamped = Math.min(31, Math.max(1, next))
+    e.preventDefault()
+    pendingFocus.current = true
+    setFocusDay(clamped)
+  }
   // Blackout dates — a couple of "sold-out" days, so the canonical picker demos
   // the disabled-date state (.calendar__cell--disabled) next to range + today.
   const BLOCKED = new Set([8, 9])
@@ -2963,43 +2996,71 @@ function DateCard() {
                 <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Next month"><Icon name="chevR" /></button>
               </span>
             </div>
-            {/* NO role="grid" HERE, and the reason is worth keeping. audit:promises asked
-          for it — the anchor declares APG's Grid pattern — so I added it, and
-          a11y:matrix went from 3 violations to 16: aria-required-children, twelve
-          times. A grid needs role="row" children and this calendar is a flat CSS
-          grid of buttons with no rows, so the role made the accessibility tree
-          WORSE than no role at all.
-          Two gates disagreed and axe was right: a role without the structure it
-          requires is broken ARIA, not partial ARIA. Claiming the Grid pattern here
-          means restructuring the calendar into rows, which is real work and is on
-          the roadmap — not an attribute. */}
-            <div className="calendar" onMouseLeave={() => setHover(null)}>
-              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-                <span key={i} className="calendar__head">{d}</span>
-              ))}
-              {days.map((d, i) => {
-                /* Out-of-month cells are PADDING. As empty disabled buttons they
-                   are ten `button-name` violations and ten keyboard stops that
-                   go nowhere; `sections.tsx` already renders them as inert
-                   spans, and this is the copy that drifted. */
-                if (d < 1 || d > 31) return <span key={i} className={cellClass(d)} aria-hidden="true" />
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    className={cellClass(d)}
-                    disabled={isBlocked(d)}
-                    aria-label={`May ${d}${isBlocked(d) ? ' (unavailable)' : ''}`}
-                    aria-current={d === today ? 'date' : undefined}
-                    aria-selected={cellClass(d).includes('calendar__cell--on') || cellClass(d).includes('--range')}
-                    onClick={() => handleClick(d)}
-                    onMouseEnter={() => setHover(d)}
-                  >
-                    {d}
-                  </button>
-                )
-              })}
-            </div>
+            {/* 🔑 A REAL GRID (Sprint G). This was a flat CSS grid of buttons with
+                no rows, so role="grid" could not be added: it took a11y:matrix
+                from 3 violations to 16, twelve of them aria-required-children.
+                A <table> supplies row and gridcell from <tr> and <td> with no
+                ARIA at all, and role="grid" is then the ONE attribute that turns
+                a data table into the interactive pattern APG names. A screen
+                reader met 42 loose buttons; it now reads "row 3, column 5". */}
+            <table
+              className="calendar"
+              role="grid"
+              aria-label="May 2026"
+              onMouseLeave={() => setHover(null)}
+              onKeyDown={onGridKey}
+            >
+              <thead>
+                <tr>
+                  {DOW.map((d, i) => (
+                    <th key={i} scope="col" className="calendar__head" abbr={DOW_FULL[i]}>{d}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {weeksOf(days).map((week, wi) => (
+                  <tr key={wi}>
+                    {week.map((d, i) => (
+                      <td key={i} className="calendar__day">
+                        {/* Out-of-month cells are PADDING. As empty disabled buttons
+                            they are ten button-name violations and ten keyboard
+                            stops that go nowhere. */}
+                        {d < 1 || d > 31 ? (
+                          <span className={cellClass(d)} aria-hidden="true" />
+                        ) : (
+                          <button
+                            type="button"
+                            className={cellClass(d)}
+                            /* aria-disabled, NOT disabled: a disabled button
+                               cannot take focus, so an arrow key landing on a
+                               blackout date dead-ends — which is exactly what
+                               driving the keyboard found. It also keeps the day
+                               in the accessibility tree, so a screen-reader user
+                               hears "May 9, unavailable" instead of a silent gap
+                               where the 9th should be. */
+                            aria-disabled={isBlocked(d) || undefined}
+                            /* ROVING TABINDEX — the whole month is ONE tab stop,
+                               which is what the APG anchor has been claiming. 42
+                               tab stops to cross a month is the thing the pattern
+                               exists to prevent. */
+                            tabIndex={d === focusDay ? 0 : -1}
+                            ref={d === focusDay ? focusRef : undefined}
+                            aria-label={`May ${d}${isBlocked(d) ? ' (unavailable)' : ''}`}
+                            aria-current={d === today ? 'date' : undefined}
+                            aria-selected={cellClass(d).includes('calendar__cell--on') || cellClass(d).includes('--range')}
+                            onClick={() => { if (!isBlocked(d)) handleClick(d) }}
+                            onFocus={() => setFocusDay(d)}
+                            onMouseEnter={() => setHover(d)}
+                          >
+                            {d}
+                          </button>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             <div className="card__row" style={{ justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
               <span style={{ fontSize: 'var(--k-type-caption)', color: 'var(--k-fg-muted)' }}>{summary}</span>
               {(start !== null || end !== null) && (
@@ -3111,28 +3172,44 @@ function CalendarMonthCard() {
   const CAP = 3
   return (
     <Card wide docId="calendar" title="May 2026" desc="Month scheduler — day cells carry event chips + overflow.">
-      <div className="calendar calendar--events">
-        {DOW.map((d, i) => (<div key={`h${i}`} className="calendar__head">{d}</div>))}
-        {Array.from({ length: 35 }, (_, idx) => {
-          const day = idx - OFFSET + 1
-          const out = day < 1 || day > 31
-          const evs = EVENTS[day] ?? []
-          const shown = evs.slice(0, CAP)
-          const extra = evs.length - shown.length
-          return (
-            <div key={idx} className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${day === today ? 'calendar__cell--today' : ''}`}>
-              <span className="calendar__daynum">{out ? '' : day}</span>
-              {shown.map((ev, j) => (
-                <span key={j} className={`calendar__event${ev.allday ? ' calendar__event--allday' : ''}${ev.v ?? ''}`}>
-                  {ev.time && <span className="calendar__event-time">{ev.time}</span>}
-                  <span className="calendar__event-title">{ev.title}</span>
-                </span>
-              ))}
-              {extra > 0 && <button type="button" className="calendar__more">+{extra} more</button>}
-            </div>
-          )
-        })}
-      </div>
+      {/* A TABLE, not role="grid" — and the distinction is the point of Sprint G.
+          The picker is a grid WIDGET: its cells are selected, so it earns the
+          grid role and the roving tabindex that comes with it. This is a month
+          of events you read; its only controls are the "+N more" buttons. A
+          <table> is already the right answer, and claiming the interactive
+          pattern over a display would be the same overclaim the flat button grid
+          was making from the other direction. */}
+      <table className="calendar calendar--events" aria-label="May 2026 schedule">
+        <thead>
+          <tr>{DOW.map((d, i) => (<th key={`h${i}`} scope="col" className="calendar__head" abbr={DOW_FULL[i]}>{d}</th>))}</tr>
+        </thead>
+        <tbody>
+          {weeksOf(Array.from({ length: 35 }, (_, idx) => idx - OFFSET + 1)).map((week, wi) => (
+            <tr key={wi}>
+              {week.map((day, i) => {
+                const out = day < 1 || day > 31
+                const evs = EVENTS[day] ?? []
+                const shown = evs.slice(0, CAP)
+                const extra = evs.length - shown.length
+                return (
+                  <td key={i} className="calendar__day">
+                    <div className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${day === today ? 'calendar__cell--today' : ''}`}>
+                      <span className="calendar__daynum">{out ? '' : day}</span>
+                      {shown.map((ev, j) => (
+                        <span key={j} className={`calendar__event${ev.allday ? ' calendar__event--allday' : ''}${ev.v ?? ''}`}>
+                          {ev.time && <span className="calendar__event-time">{ev.time}</span>}
+                          <span className="calendar__event-title">{ev.title}</span>
+                        </span>
+                      ))}
+                      {extra > 0 && <button type="button" className="calendar__more">+{extra} more</button>}
+                    </div>
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </Card>
   )
 }
@@ -3142,6 +3219,19 @@ function CalendarMonthCard() {
 function miniMonthDays(offset: number) {
   return Array.from({ length: 35 }, (_, i) => i - offset + 1)
 }
+/* Seven-at-a-time, because a month is TABULAR DATA and a table needs rows.
+ * Every calendar in the kit renders one flat array of day cells; this is the one
+ * place that turns it into weeks, so the five render sites cannot disagree about
+ * where a row begins. */
+function weeksOf<T>(cells: T[]): T[][] {
+  const out: T[][] = []
+  for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7))
+  return out
+}
+/* Full weekday names for <th abbr>. "M" is a column header a sighted reader
+ * decodes from position; a screen reader reading a cell needs the word. */
+const DOW_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
 const DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
 function CalendarYearCard() {
@@ -3161,27 +3251,38 @@ function CalendarYearCard() {
           return (
             <div key={m.n} className={`calendar-year__month ${now ? 'calendar-year__month--now' : ''}`}>
               <span className="calendar-year__title">{m.n}</span>
-              <div className="calendar">
-                {DOW.map((d, i) => <span key={i} className="calendar__head">{d}</span>)}
-                {days.map((d, i) => {
-                  const out = d < 1 || d > m.dim
-                  const isToday = now && d === 15
-                  /* NO aria-selected here. I added it to satisfy audit:promises and
-                     a11y:matrix went from 27 violations to 2211 — aria-allowed-attr,
-                     363 times in a single configuration. aria-selected is only valid on
-                     a role that supports it (option, row, tab, gridcell, treeitem); a
-                     bare <span> is not one, and 420 static cells each took the attribute.
-                     Third time today that satisfying that gate broke conformance, and
-                     the same rule every time: AN ARIA ATTRIBUTE WITHOUT A ROLE THAT
-                     ALLOWS IT IS BROKEN ARIA. These cells are a static year overview,
-                     and aria-current="date" is the whole truth about them. */
-                  return (
-                    <span key={i} className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${isToday ? 'calendar__cell--today' : ''}`} aria-current={isToday ? 'date' : undefined} aria-hidden={out}>
-                      {out ? '' : d}
-                    </span>
-                  )
-                })}
-              </div>
+              {/* Twelve read-only month tables. No role="grid" and no
+                  aria-selected: these cells are an overview, not a widget.
+                  (aria-selected was tried on the old spans to satisfy
+                  audit:promises and a11y:matrix went from 27 violations to
+                  2211 — aria-allowed-attr, 363 times in one configuration.
+                  It is valid only on a role that supports it, and a bare span
+                  is not one. AN ARIA ATTRIBUTE WITHOUT A ROLE THAT ALLOWS IT
+                  IS BROKEN ARIA. Now the cells sit in <td>s, which DO carry a
+                  role — and they still do not need the attribute, because
+                  nothing here is selectable.) */}
+              <table className="calendar" aria-label={`${m.n} 2026`}>
+                <thead>
+                  <tr>{DOW.map((d, i) => <th key={i} scope="col" className="calendar__head" abbr={DOW_FULL[i]}>{d}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {weeksOf(days).map((week, wi) => (
+                    <tr key={wi}>
+                      {week.map((d, i) => {
+                        const out = d < 1 || d > m.dim
+                        const isToday = now && d === 15
+                        return (
+                          <td key={i} className="calendar__day">
+                            <span className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${isToday ? 'calendar__cell--today' : ''}`} aria-current={isToday ? 'date' : undefined} aria-hidden={out}>
+                              {out ? '' : d}
+                            </span>
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )
         })}
@@ -3216,21 +3317,39 @@ function CalendarRangeCard() {
           ? <button type="button" className="btn btn--ghost btn--icon btn--sm" aria-label="Next month"><Icon name="chevR" /></button>
           : <span style={{ width: 'var(--k-btn-h-sm, 1.75rem)' }} />}
       </div>
-      <div className="calendar">
-        {DOW.map((d, i) => <span key={i} className="calendar__head">{d}</span>)}
-        {miniMonthDays(offset).map((d, i) => (
-          /* Padding, not a control — see the note on the single-month calendar.
-             This is the fourth copy of the same day-cell loop in this file, and
-             all four had drifted apart; the duplication is the real defect. */
-          d < 1 || d > dim
-            ? <span key={i} className={rangeCell(d, dim, side, bound)} aria-hidden="true" />
-            : (
-              <button key={i} type="button" className={rangeCell(d, dim, side, bound)} aria-label={`${title.split(' ')[0]} ${d}`}>
-                {d}
-              </button>
-            )
-        ))}
-      </div>
+      {/* ⚠️ NO role="grid" HERE, and the reason is the whole rule of this sprint
+          read from the other side. `grid` names an interactive widget: rows,
+          gridcells AND a keyboard model. This card DISPLAYS a range — the cells
+          carry no onClick and no arrow keys — so the role would be an overclaim
+          exactly like the flat button grid was an underclaim. It is a <table>,
+          which is what it is. Make these cells operable and the role, the
+          roving tabindex and the arrow keys come with them, together. */}
+      <table className="calendar" aria-label={title}>
+        <thead>
+          <tr>{DOW.map((d, i) => <th key={i} scope="col" className="calendar__head" abbr={DOW_FULL[i]}>{d}</th>)}</tr>
+        </thead>
+        <tbody>
+          {weeksOf(miniMonthDays(offset)).map((week, wi) => (
+            <tr key={wi}>
+              {week.map((d, i) => (
+                <td key={i} className="calendar__day">
+                  {/* Padding, not a control — see the note on the single-month
+                      calendar. This was the fourth copy of the same day-cell
+                      loop in this file and all four had drifted apart; they now
+                      at least share weeksOf() and one idea of where a row is. */}
+                  {d < 1 || d > dim
+                    ? <span className={rangeCell(d, dim, side, bound)} aria-hidden="true" />
+                    : (
+                      <button type="button" className={rangeCell(d, dim, side, bound)} aria-label={`${title.split(' ')[0]} ${d}`}>
+                        {d}
+                      </button>
+                    )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
   return (

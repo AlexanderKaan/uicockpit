@@ -373,7 +373,15 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
       ['Page Up / Page Down', 'Previous / next month'],
       ['Tab', 'Leave the grid — the whole month is ONE tab stop'],
     ],
-    aria: ['role="grid" with role="gridcell" days — NOT implemented here, only when the calendar is restructured into rows: adding the role to our flat button grid took a11y:matrix from 3 violations to 16 (aria-required-children), so the pattern is ROADMAP Sprint G and until then this is a labelled group of date buttons', 'aria-selected on the chosen day', 'The month and year are announced when they change', 'Each day needs its full date as its name — "14" alone is not a date'],
+    aria: [
+      'role="grid" on a <table> — the rows and gridcells come from <tr> and <td>, so the only ARIA is the one attribute. (This anchor used to carry a paragraph explaining that it declared a pattern the kit did not implement: over a flat CSS grid of buttons the role took a11y:matrix from 3 violations to 16, twelve of them aria-required-children. A role without the structure it requires is broken ARIA, not partial ARIA — so the calendar was restructured rather than the attribute added.)',
+      'A ROVING TABINDEX — the whole month is ONE tab stop. 42 stops to cross a month is what the pattern exists to prevent.',
+      'aria-selected on the chosen day',
+      'aria-disabled, NEVER the native disabled, on an unavailable date: a disabled button cannot take focus, so an arrow key landing on it dead-ends, and it disappears from the tree along with the answer to "why can\'t I pick the 9th?"',
+      'The month and year are announced when they change',
+      'Each day needs its full date as its name — "14" alone is not a date',
+      'Grid is for a calendar you OPERATE. A month you only read is a <table>, and claiming the widget role over a display is the same overclaim from the other side — the year overview, the scheduler and the range display are plain tables here for that reason.',
+    ],
     free: '<input type="date"> gives the entire pattern in the platform’s idiom, including on mobile. Reach for the grid when the date IS the content.',
   },
   'calendar-week': {
