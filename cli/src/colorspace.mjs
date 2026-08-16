@@ -21,6 +21,8 @@
  * the threshold are emitted in `--json` so anyone can recompute the number.
  */
 
+import { TW_DEFAULTS, TW_DEFAULT_VERSIONS } from './tw-palette.mjs'
+
 export const METRIC = 'CIEDE2000'
 export const NEAR_DUPE_THRESHOLD = 2.0
 
@@ -72,6 +74,27 @@ export function oklchToRgb(L, C, H) {
   })
 }
 
+/**
+ * sRGB → OKLCH — the inverse of oklchToRgb, same matrices, so a round trip is
+ * exact to rounding (the tests pin it). Used to group a ramp's shades into ONE
+ * hue family: Tailwind builds its ramps at near-constant OKLCH hue (blue 260°,
+ * indigo 277°, violet 293°…), so hue is the honest axis on which `indigo-500`,
+ * `indigo-600` and `indigo-700` are one decision and `blue-500` is another.
+ */
+export function rgbToOklch(r, g, b) {
+  const lin = [r, g, b].map((v) => { const c = v / 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4) })
+  const [R, G, B] = lin
+  const l = Math.cbrt(0.4122214708 * R + 0.5363325363 * G + 0.0514459929 * B)
+  const m = Math.cbrt(0.2119034982 * R + 0.6806995451 * G + 0.1073969566 * B)
+  const s = Math.cbrt(0.0883024619 * R + 0.2817188376 * G + 0.6299787005 * B)
+  const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s
+  const a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s
+  const bb = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s
+  const C = Math.hypot(a, bb)
+  const H = ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360
+  return [L, C, H]
+}
+
 /** Strip a Tailwind opacity modifier: `zinc-200/80` is still zinc-200. */
 export const stripAlpha = (name) => String(name).replace(/\/[\d.]+%?$/, '')
 
@@ -103,6 +126,14 @@ export function parseColor(input, palette = null) {
    * nothing else. */
   const bareHsl = s.match(/^(-?[\d.]+)(?:deg)?\s+(-?[\d.]+)%\s+(-?[\d.]+)%$/)
   if (bareHsl) return parseColor(`hsl(${bareHsl[1]} ${bareHsl[2]}% ${bareHsl[3]}%)`, null)
+  /* And the RGB twin of that convention — Tailwind's `<alpha-value>` idiom:
+   * `--immich-primary: 66 80 175`, wrapped as rgb(var(--immich-primary) / 0.5)
+   * at the point of use. Three integers 0–255, nothing else; immich's brand
+   * (#4250af) was invisible for want of it, and the reader confidently reported
+   * the docs site's colour instead. */
+  const bareRgb = s.match(/^(\d{1,3})\s+(\d{1,3})\s+(\d{1,3})$/)
+  if (bareRgb) { const p = [bareRgb[1], bareRgb[2], bareRgb[3]].map(Number); return p.every((n) => n <= 255) ? p : null }
+
 
   const ok = s.match(/^oklch\(([^)]+)\)$/)
   if (ok) {
@@ -145,17 +176,28 @@ export function parseColor(input, palette = null) {
  * Build the palette for the repo under audit, most specific source winning:
  *   1. the project's own `@theme` / `:root` custom properties (a project that
  *      overrides `emerald` means ITS emerald, not Tailwind's)
- *   2. the Tailwind build actually installed in that repo
- *   3. our grey ramps, as the last resort
+ *   2. the Tailwind build actually installed in that repo — that version's
+ *      exact numbers, read from node_modules
+ *   3. the defaults Tailwind SHIPS for the generation the repo is on
+ *      (`generation` = 'v4' | 'v3', decided by the audit from the CSS it read:
+ *      `@import "tailwindcss"` / `@theme` → v4, `@tailwind base` → v3), from
+ *      src/tw-palette.mjs — GENERATED from Tailwind's published files, never
+ *      typed. Pass `null` to opt out (a test that wants a name unresolved).
+ *   4. our grey ramps, as the last resort
  *
- * Deriving it beats shipping a table: it is always the palette that repo really
- * uses, and it cannot rot when Tailwind changes its defaults.
+ * A shallow clone, a folder dropped in the browser and a Phoenix app whose
+ * Tailwind is a standalone binary all have no node_modules — and each of them
+ * writes `bg-indigo-600` meaning exactly what Tailwind means by it. Before (3)
+ * existed no Tailwind colour could compete for the brand in any of those cases:
+ * plausible's 29 `indigo-600` lost to three literal green chart fills.
  *
  * @param {Record<string,string>} cssVars  custom properties seen while scanning
  * @param {Record<string,string>} [installed]  name → colour, from node_modules
+ * @param {'v3'|'v4'|null} [generation]  which shipped defaults to fall back to
  */
-export function resolvePalette(cssVars = {}, installed = {}) {
-  const palette = { ...TW_GRAYS, ...installed }
+export function resolvePalette(cssVars = {}, installed = {}, generation = 'v3') {
+  const defaults = generation && TW_DEFAULTS[generation] ? TW_DEFAULTS[generation] : {}
+  const palette = { ...TW_GRAYS, ...defaults, ...installed }
   // `--color-emerald-500: oklch(...)` → `emerald-500`
   for (const [k, v] of Object.entries(cssVars)) {
     const m = k.match(/^--color-(.+)$/)
@@ -163,6 +205,7 @@ export function resolvePalette(cssVars = {}, installed = {}) {
   }
   return palette
 }
+export { TW_DEFAULTS, TW_DEFAULT_VERSIONS }
 
 function hslToRgb(h, s, l) {
   const c = (1 - Math.abs(2 * l - 1)) * s

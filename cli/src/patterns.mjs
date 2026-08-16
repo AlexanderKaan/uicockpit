@@ -35,7 +35,13 @@ export const GRID = 4
  * verifier's file discovery changes its behaviour. Two constants, one file,
  * explicit difference.
  */
-export const AUDIT_SCAN_EXT = /\.(css|scss|less|html|jsx|tsx|vue|svelte|astro|ts|js|mts|cts)$/
+/* Server templates carry class attributes exactly like JSX does — Phoenix HEEx
+ * (`.heex`), Rails ERB, Laravel Blade, Twig, Handlebars, Nunjucks, Liquid,
+ * Razor, EJS, plain PHP. plausible/analytics keeps its buttons in .heex, and
+ * without this line the audit read only its JS charts and crowned a light green
+ * the brand of an indigo product — with confidence 1. */
+export const TEMPLATE_EXT = /\.(heex|eex|leex|erb|blade\.php|twig|hbs|handlebars|njk|liquid|cshtml|razor|ejs|php|mustache|haml)$/
+export const AUDIT_SCAN_EXT = /\.(css|scss|less|html|jsx|tsx|vue|svelte|astro|ts|js|mts|cts|heex|eex|leex|erb|blade\.php|twig|hbs|handlebars|njk|liquid|cshtml|razor|ejs|php|mustache|haml)$/
 
 /** Build/tooling files that would pollute the value distributions (a Tailwind
  *  config's theme is a DECLARATION of a system, not a usage of one). */
@@ -776,6 +782,13 @@ export function themePath(expr) {
       if (args.length && args.every((a) => /^[\w.-]+$/.test(a))) return `${h.path}.${args.join('.')}`.replace(/\./g, '-').replace(/-+/g, '-')
     }
   }
+  // A string-keyed theme ACCESSOR — `s("accent")`, `themeGet('accent')`,
+  // `token('color.primary')` — names the theme key itself. outline writes
+  // `${s("accent")}` in every styled block, and `accent: "#0366d6"` sits in
+  // theme.ts: the key is the token, so the reference is `var(--accent)`, which
+  // extractThemeObjectVars declares. One string argument, nothing else.
+  const accessor = e.match(/^([a-z][\w$]*)\s*\(\s*['"]([\w.$-]+)['"]\s*\)$/)
+  if (accessor && /^(s|t|th|get|theme|themeGet|token|tokens|color|colou?r|c|v|css|useToken)$/.test(accessor[1])) return accessor[2].replace(/\./g, '-')
   // A BARE scale function — spacing(5), color('white'), fontSize(5.5), radius(2)
   // imported from a tokens module — is the same lookup without the theme
   // prefix (twentyhq/twenty-website writes it so). All arguments literal or
@@ -832,11 +845,44 @@ function replaceInterpolations(body) {
       if (body[j] === '{') depth++
       else if (body[j] === '}') { depth--; if (!depth) break }
     }
-    const path = themePath(body.slice(start, j))
-    out += path ? `var(--${path.replace(/\./g, '-')})` : '/*·*/'
+    const expr = body.slice(start, j)
+    /* A CHOICE BETWEEN LITERALS — `props.readOnly ? "initial" : "none"`,
+     * `({ dir }) => dir === "rtl" ? "auto" : "4px"`, `x ?? "8px"` — is
+     * dynamic per instance, but every value it can take is written down. The
+     * first branch stands in for the declaration; the values are known even
+     * though the pick is not. What stays a blind spot is a value that arrives
+     * from outside: `props.width`, `theme.spacing(props.size)`. */
+    const literal = literalChoice(expr)
+    const path = literal === null ? themePath(expr) : null
+    out += literal !== null ? literal : path ? `var(--${path.replace(/\./g, '-')})` : '/*·*/'
     i = j
   }
   return out
+}
+
+/** The first literal of an expression that can only ever be one of its own
+ *  string literals — a ternary or nullish choice with no computed branch. */
+function literalChoice(expr) {
+  const lits = [...expr.matchAll(/(["'])((?:(?!\1)[^\\]|\\.)*)\1/g)].map((m) => m[2])
+  if (lits.length < 1) return null
+  // strip the literals, then everything that is control flow, an identifier
+  // path, a comparison, or punctuation — if anything else remains, a branch
+  // computes and the choice is not between literals
+  // identifiers FIRST, punctuation after — stripping `(` before the identifier
+  // pass turned `spacing(2)` into `spacing2`, one identifier, and a computed
+  // branch read as a literal one
+  const rest = expr
+    .replace(/(["'])(?:(?!\1)[^\\]|\\.)*\1/g, '')
+    .replace(/[A-Za-z_$][\w$]*/g, '')
+    .replace(/=>|\?\?|===|!==|==|!=|&&|\|\||[?:!()\[\]{},.\s]/g, '')
+  if (rest.trim() !== '') return null
+  // …and the literals must be VALUES, not property names or paths
+  const isValue = (v) => /^(?:#[0-9a-f]{3,8}|-?[\d.]+(?:px|rem|em|%|vh|vw|s|ms)?|[a-z-]+|rgba?\([^)]*\)|hsla?\([^)]*\)|var\(--[\w-]+\)|[\d.]+\s+[\d.]+%\s+[\d.]+%)$/i.test(v.trim())
+  if (!lits.every(isValue)) return null
+  // the expression must actually be a CHOICE (`?` / `??` / `||`), or be the
+  // literal itself — `theme.color("white")` has one literal and is a call
+  if (!/\?|\|\|/.test(expr) && !/^\s*(["'])(?:(?!\1)[^\\]|\\.)*\1\s*$/.test(expr)) return null
+  return lits[0].trim()
 }
 
 /**
@@ -864,8 +910,10 @@ export function cssInJsBlocks(content) {
 export function cssInJsUnreadable(content) {
   let n = 0
   for (const css of cssInJsBlocks(content)) {
-    // A marker standing where a value belongs means that declaration is lost.
-    n += (css.match(/:\s*\/\*·\*\//g) || []).length
+    // A marker standing where a VALUE belongs means that declaration is lost.
+    // Not one in a selector — `&:${hover} {` (outline: hover vs active on
+    // touch) is a selector interpolation and no declaration is lost by it.
+    n += (css.match(/[\w-]\s*:\s*\/\*·\*\/(?!\s*\{)/g) || []).length
   }
   return n
 }
@@ -917,6 +965,68 @@ const PAINT_PROPS = new Set([
  *    the next declaration needs as its own prefix, and the scan would then pick
  *    up only every other variable.
  */
+/** A path that belongs to a SECOND product in the repo — a docs site, a
+ *  marketing website, a Storybook, examples. Their tokens must not define the
+ *  app's brand (immich, 2026-08-17). Path segments, not substrings: `docs/` is
+ *  a docs site; `src/docs-panel/` is a component. */
+export const DOCS_PATH = /(^|[/\\])(docs?|documentation|website|site|www|landing|marketing|storybook|\.storybook|stories|examples?|demo|playground)[/\\]/i
+
+/** A file that IS the alternate theme: `_dark.scss`, `theme/dark.ts`,
+ *  `themes/dark/*`. Its declarations merge under the base scope's, like a
+ *  `.dark {}` block — the base is what the app looks like by default, and for
+ *  a dark-first app the dark values are the base and live in the base files. */
+export const ALT_THEME_PATH = /(^|[/\\])_?dark(?:-?(?:theme|mode))?[\w-]*\.(scss|less|css|ts|js|mjs|tsx|jsx)$|[/\\]themes?[/\\]dark[/\\]/i
+
+/** SCSS / Less variables as token declarations: `$purple: #64f;` and
+ *  `@brand: #64f;`. Also SCSS maps of the form `'primary': $purple,` — an alias
+ *  onto a variable — read as `$primary`. Same shape as extractCssVars' bag,
+ *  keyed with the sigil so a `$primary` cannot collide with `--primary`. */
+export function extractPreprocessorVars(content) {
+  const out = {}
+  const src = blankComments(content)
+  for (const m of src.matchAll(/(?:^|[\n;{])\s*([$@][\w-]+)\s*:\s*([^;\n]+?)\s*(?:!default)?\s*;/g)) {
+    if (/^@(?:media|import|use|include|mixin|if|else|each|for|function|return|extend|supports|font-face|keyframes|charset|layer|container)/.test(m[1])) continue
+    out[m[1]] = m[2].trim()
+  }
+  // map entries: 'primary': $purple  →  $primary: $purple
+  for (const m of src.matchAll(/['"]([\w-]+)['"]\s*:\s*(\$[\w-]+|#[0-9a-f]{3,8}|rgba?\([^)]*\)|hsla?\([^)]*\))\s*[,)]/gi)) {
+    if (!out['$' + m[1]]) out['$' + m[1]] = m[2]
+  }
+  return out
+}
+
+/** A JS/TS THEME OBJECT as a token source: `accent: "#0366d6"`, nested
+ *  `colors: { primary: '#…' }`, `spacing: { sm: '8px' }`. Read only from files
+ *  that announce themselves as a theme (path or export name), and only
+ *  string values that are colours or lengths. Keys become `--<path>` with the
+ *  base object dropped — the same shape themePath() produces for
+ *  `theme.font.color.primary` → `var(--font-color-primary)`, so a declaration
+ *  here MEETS its own references. outline's `theme.ts` (`accent: "#0366d6"`),
+ *  read through `s("accent")`, is why. */
+export const THEME_FILE = /(^|[/\\])(theme|themes|tokens?|palette|colou?rs|design-?tokens|styles?\/[\w-]*(?:theme|tokens?|palette))[\w.-]*\.(ts|tsx|js|jsx|mjs|mts)$/i
+export function extractThemeObjectVars(content) {
+  const out = {}
+  const VALUE = /^(?:#[0-9a-f]{3,8}|rgba?\([^)]*\)|hsla?\([^)]*\)|oklch\([^)]*\)|-?[\d.]+(?:px|rem|em)|[\d.]+\s+[\d.]+%\s+[\d.]+%|\d{1,3}\s+\d{1,3}\s+\d{1,3})$/i
+  // walk `key: {` / `key: 'value'` with a path stack — brace-aware, string-aware
+  const src = blankComments(content)
+  const stack = []
+  const re = /([A-Za-z_$][\w$]*|['"][\w$-]+['"])\s*:\s*(\{|['"`]([^'"`]*)['"`])|(\})/g
+  let m
+  while ((m = re.exec(src))) {
+    if (m[4]) { stack.pop(); continue }
+    const key = m[1].replace(/^['"]|['"]$/g, '')
+    if (m[2] === '{') { stack.push(key); continue }
+    const value = (m[3] || '').trim()
+    if (!VALUE.test(value)) continue
+    // drop a top-level wrapper that names the theme itself
+    const path = [...stack, key].filter((k, i) => !(i === 0 && /^(theme|tokens?|palette|light|dark|default|base|colors?)$/i.test(k) && stack.length > 0))
+    out['--' + path.join('-')] = value
+    // and the bare key too, for the flat `theme.accent` / `s("accent")` read
+    if (!out['--' + key]) out['--' + key] = value
+  }
+  return out
+}
+
 export function extractCssVars(content) {
   const base = {}
   const alt = {}
@@ -943,7 +1053,14 @@ export function extractCssVars(content) {
  *  boundary, so `.dark-mode-disabled` — the class documenso wraps its LIGHT
  *  theme in — read as a dark scope, and their whole light block was filed under
  *  the theme they were opting out of. */
-const ALT_THEME = /(\.|\[data-)(dark|light)(?![\w-])|prefers-color-scheme|theme-(dark|light)(?![\w-])|="(dark|light)"/i
+const ALT_THEME = /(\.|\[data-)(dark|light)(?![\w-])|prefers-color-scheme|theme-(dark|light)(?![\w-])|=\s*['"]?(dark|light)['"]?\s*\]|\[data-[\w-]*(?:theme|mode|scheme|appearance)[\w-]*\s*=|contrast|forced-colors|overrides?(?![\w])|@media[^{]*\bprint\b/i
+/* `contrast` / `overrides` / `forced-colors` / `@media print` are alternate
+ * scopes too: mastodon's `@mixin contrast-overrides { --color-text-brand:
+ * var(--color-indigo-600) }` follows `@mixin tokens { --color-text-brand:
+ * var(--color-indigo-700) }` in the same file, and last-wins reported the
+ * high-contrast override as the brand (#6147e6) when the button on
+ * mastodon.social is painted indigo-700 (#5638cc). A block that names itself
+ * an override is, by its own account, not the base. */
 
 /**
  * Map each class name to the paint-ish declarations of the rules it appears in.
@@ -1025,6 +1142,15 @@ export function deepResolveVar(input, vars, depth = 0) {
     // Unresolvable alias → the fallback is what a browser actually paints.
     return inner[2] ? deepResolveVar(inner[2].trim(), vars, depth + 1) : s
   }
+  // A preprocessor variable, on its own or as the whole value: `$purple`.
+  if (/^[$@][\w-]+$/.test(s) && vars[s] !== undefined) return deepResolveVar(s === raw ? vars[s] : s, vars, depth + 1)
+  // rgb(var(--x)) / hsl(var(--x) / 0.5): resolve the var, keep the wrapper —
+  // parseColor reads a bare triplet inside rgb()/hsl().
+  const wrapped = s.match(/^(rgba?|hsla?)\(\s*var\(\s*(--[\w-]+)\s*\)\s*(\/\s*[\d.]+%?)?\s*\)$/i)
+  if (wrapped && vars[wrapped[2]] !== undefined) {
+    const v = deepResolveVar(wrapped[2], vars, depth + 1)
+    if (v !== wrapped[2] && !/var\(/.test(v)) return `${wrapped[1]}(${v}${wrapped[3] ? ' ' + wrapped[3] : ''})`
+  }
   return s
 }
 
@@ -1078,7 +1204,7 @@ export const UI_KINDS = {
 }
 
 /** Files that can carry markup. Stylesheets name no components. */
-const MARKUP_FILE = /\.(tsx|jsx|vue|svelte|astro|html|ts|js|mts|cts)$/
+const MARKUP_FILE = /\.(tsx|jsx|vue|svelte|astro|html|ts|js|mts|cts|heex|eex|leex|erb|blade\.php|twig|hbs|handlebars|njk|liquid|cshtml|razor|ejs|php|mustache|haml)$/
 
 /**
  * Count, per kind, how many files show evidence of it — and keep one example

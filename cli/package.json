@@ -20,7 +20,9 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test \"test/*.test.mjs\""
+    "test": "node --test \"test/*.test.mjs\"",
+    "gen:tw-palette": "node scripts/gen-tw-palette.mjs",
+    "gen:tw-palette:check": "node scripts/gen-tw-palette.mjs --check"
   },
   "keywords": [
     "design-system",

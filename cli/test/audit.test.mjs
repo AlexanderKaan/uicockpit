@@ -621,9 +621,74 @@ test('a resolved palette makes the brand colour findable', () => {
   const palette = { 'emerald-500': '#10b981' }
   const src = '<div className="bg-emerald-500 p-4">x</div>'.repeat(20)
   const withPalette = auditFiles([file('a.tsx', src)], { palette })
-  const without = auditFiles([file('a.tsx', src)])
   assert.equal(withPalette.inferredConfig.values.colorTheme, 'jade')
-  assert.equal(without.inferredConfig.values.colorTheme, undefined, 'unresolvable → no guess')
+  assert.equal(withPalette.meta.palette, 'installed', 'an installed palette is the source it names')
+  // A name Tailwind does not ship stays unresolved — no guess, whatever the generation.
+  const custom = auditFiles([file('a.tsx', '<div className="bg-brandgreen-500 p-4">x</div>'.repeat(20))])
+  assert.equal(custom.inferredConfig.values.colorTheme, undefined, 'unresolvable → no guess')
+})
+
+test('a Tailwind name resolves through the SHIPPED defaults when nothing is installed — by generation', () => {
+  /* A shallow clone, a browser drop, a Phoenix app with a standalone Tailwind
+   * binary: no node_modules, and `bg-indigo-600` still means what Tailwind means
+   * by it. The generation is read off the CSS: v4 declares itself
+   * (`@import "tailwindcss"` / `@theme`), v3 with `@tailwind base`. plausible
+   * (v4) renders indigo-600 as #4f39f6 on plausible.io — the number the v4
+   * default resolves to; v3's is #4f46e5. */
+  const jsx = '<button className="bg-indigo-600 text-white">x</button>'.repeat(20)
+  const v4 = auditFiles([file('app.css', "@import 'tailwindcss';\n@theme { --spacing: 4px; }"), file('a.tsx', jsx)])
+  assert.equal(v4.inferredConfig.values.brandHex, '#4f39f6', 'v4 marker → v4 numbers')
+  assert.match(v4.meta.palette, /^tailwind v4 defaults \(4\.\d+\.\d+, @import "tailwindcss"\/@theme seen\)$/)
+  const v3 = auditFiles([file('globals.css', '@tailwind base;\n@tailwind components;\n@tailwind utilities;'), file('a.tsx', jsx)])
+  assert.equal(v3.inferredConfig.values.brandHex, '#4f46e5', 'v3 marker → v3 numbers')
+  assert.match(v3.meta.palette, /^tailwind v3 defaults \(3\.\d+\.\d+, @tailwind seen\)$/)
+  // No marker at all: today's default install is v4, and the label says no marker was seen.
+  const bare = auditFiles([file('a.tsx', jsx)])
+  assert.equal(bare.inferredConfig.values.brandHex, '#4f39f6')
+  assert.match(bare.meta.palette, /assumed — no marker seen/)
+  // And a repo that writes no Tailwind utilities at all does not get told it is on Tailwind.
+  const plain = auditFiles([file('a.css', ':root { --primary: #ff3366; } .btn { background: var(--primary); }'.repeat(3))])
+  assert.equal(plain.meta.palette, 'none needed (no Tailwind utilities read)')
+  // The repo's own override beats every default: `--color-indigo-600` in @theme IS their indigo.
+  const own = auditFiles([file('app.css', '@import "tailwindcss";\n@theme { --color-indigo-600: #ff3366; }'), file('a.tsx', jsx)])
+  assert.equal(own.inferredConfig.values.brandHex, '#ff3366', 'the repo\'s @theme override wins over the shipped default')
+  // Opting out (tailwind: null) leaves the name unresolved — the pre-defaults behaviour, on request.
+  const off = auditFiles([file('a.tsx', jsx)], { tailwind: null })
+  assert.equal(off.inferredConfig.values.brandHex, undefined)
+  assert.equal(off.meta.palette, 'none')
+})
+
+test('a contrast/override block is an alternate scope — it never overwrites the base brand', () => {
+  /* mastodon, tokens/theme/_light.scss: `@mixin tokens { --color-text-brand:
+   * var(--color-indigo-700) }` then `@mixin contrast-overrides {
+   * --color-text-brand: var(--color-indigo-600) }`. Last-wins reported the
+   * high-contrast shade; the button on mastodon.social is indigo-700 #5638cc. */
+  const scss = `
+    :root { --color-indigo-600: #6147e6; --color-indigo-700: #5638cc; }
+    @mixin tokens { --color-text-brand: var(--color-indigo-700); --color-bg-brand-base: var(--color-indigo-700); }
+    @mixin contrast-overrides { --color-text-brand: var(--color-indigo-600); }
+    @media (prefers-contrast: more) { :root { --color-bg-brand-base: var(--color-indigo-600); } }
+    .btn { background: var(--color-bg-brand-base); border-color: var(--color-text-brand); }
+  `
+  const r = auditFiles([file('theme.scss', scss)])
+  assert.equal(r.inferredConfig.values.brandHex, '#5638cc')
+  assert.equal(r.inferredConfig.confidence.colorTheme, 1)
+})
+
+test('a ramp is ONE decision: shades of a hue count as one brand family', () => {
+  /* plausible: indigo-600 ×29, indigo-500 ×27, indigo-700 ×9 against red-500
+   * ×11 — counted as rivals no shade reached dominance (share 0.25 → "nobody
+   * decided anything"). Grouped on OKLCH hue the family is 65 of 76 → indigo,
+   * reported as its most-used shade. And blue is NOT indigo: a blue-500 minority
+   * stays a separate family. */
+  const el = (cls) => `<div className="${cls}">x</div>`
+  const src = el('bg-indigo-600').repeat(29) + el('bg-indigo-500').repeat(27) + el('bg-indigo-700').repeat(9) + el('bg-red-500').repeat(11)
+  const r = auditFiles([file('globals.css', '@tailwind base;'), file('a.tsx', src)])
+  assert.equal(r.inferredConfig.values.brandHex, '#4f46e5', 'the family reports its most-used shade')
+  assert.equal(r.inferredConfig.values.colorTheme, 'indigo')
+  assert.ok(r.inferredConfig.confidence.colorTheme >= 0.6, `family share should be dominant, got ${r.inferredConfig.confidence.colorTheme}`)
+  const split = auditFiles([file('globals.css', '@tailwind base;'), file('a.tsx', el('bg-indigo-600').repeat(12) + el('bg-blue-500').repeat(10) + el('bg-blue-600').repeat(9))])
+  assert.equal(split.inferredConfig.values.brandHex, '#3b82f6', 'blue-500 + blue-600 (19) outweigh indigo-600 (12) as a family — and blue is its own family, not indigo\'s')
 })
 
 test('a layered token system counts as one colour, not two', () => {

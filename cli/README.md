@@ -115,6 +115,17 @@ for being bigger.
 swatches, the type specimens, and the **button wall**: every treatment rebuilt
 from its own extracted values, singletons marked.
 
+The `Brand` line says where the colour came from — a token your code NAMES
+(`--primary`, `$brand`, a `theme.ts` accent) beats the most-used colour, a docs
+site's theme never speaks for the app, and a dark or high-contrast redeclaration
+never wins over the base. Tailwind names (`bg-indigo-600`) resolve through your
+own `--color-*` overrides, then the Tailwind build installed in the repo, then
+the defaults Tailwind ships for the generation your CSS declares — and the line
+says which. The reader is held to a bench of sixteen public repos — four with the
+answer read from their own source, four with the answer read off the **running
+product's screen** — and the numbers it prints are the ones you can check against
+your own screen in five seconds.
+
 Everything runs **locally**. Nothing is uploaded, there are no network calls, and
 no account is needed — free and MIT, permanently.
 

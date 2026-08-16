@@ -107,3 +107,4 @@ bench/kit/
 # the audit's benchmark corpus — shallow clones of real repos, fetched on demand by cockpit/scripts/audit-bench.mjs
 bench/audit-corpus/
 bench/audit-fresh/
+bench/audit-live/

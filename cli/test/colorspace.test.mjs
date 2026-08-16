@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   deltaE00, toLab, parseColor, colorDistance, clusterNear, pxDistance,
-  oklchToRgb, stripAlpha, resolvePalette,
+  oklchToRgb, stripAlpha, resolvePalette, rgbToOklch, TW_DEFAULTS,
 } from '../src/colorspace.mjs'
 
 /**
@@ -107,6 +107,33 @@ test('a resolved palette turns a name into a real colour', () => {
   assert.ok(parseColor('emerald-500', palette), 'a palette name must resolve')
   assert.deepEqual(parseColor('brand', palette), [255, 0, 0])
   assert.equal(parseColor('emerald-500'), null, 'and stay unresolved without one')
+})
+
+test('resolvePalette layers: repo override > installed > shipped defaults by generation > greys', () => {
+  const v4 = resolvePalette({}, {}, 'v4'), v3 = resolvePalette({}, {}, 'v3'), none = resolvePalette({}, {}, null)
+  assert.deepEqual(parseColor('indigo-600', v3), [79, 70, 229], 'v3 ships #4f46e5')
+  assert.deepEqual(parseColor('indigo-600', v4), [79, 57, 246], 'v4 ships oklch(51.1% 0.262 276.966) = #4f39f6')
+  assert.equal(parseColor('indigo-600', none), null, 'null opts out of the defaults')
+  assert.deepEqual(parseColor('gray-500', none), parseColor('#6b7280'), 'the grey ramps stay as the last resort')
+  const installed = resolvePalette({}, { 'indigo-600': '#111111' }, 'v4')
+  assert.deepEqual(parseColor('indigo-600', installed), [17, 17, 17], 'an installed build beats the shipped default')
+  const own = resolvePalette({ '--color-indigo-600': '#222222' }, { 'indigo-600': '#111111' }, 'v4')
+  assert.deepEqual(parseColor('indigo-600', own), [34, 34, 34], 'the repo\'s own --color-* beats everything')
+  // The defaults are the generated module, not a hand-typed table: both generations complete, and v4 kept as oklch.
+  assert.ok(Object.keys(TW_DEFAULTS.v3).length >= 240 && Object.keys(TW_DEFAULTS.v4).length >= 240)
+  assert.match(TW_DEFAULTS.v4['indigo-600'], /^oklch\(/)
+})
+
+test('rgbToOklch is the inverse of oklchToRgb', () => {
+  for (const [L, C, H] of [[0.511, 0.262, 276.966], [0.623, 0.214, 259.815], [0.7, 0.1, 30], [0.9, 0.02, 120]]) {
+    const [l2, c2, h2] = rgbToOklch(...oklchToRgb(L, C, H))
+    assert.ok(Math.abs(l2 - L) < 0.01 && Math.abs(c2 - C) < 0.01 && Math.abs(h2 - H) < 1, `${[L, C, H]} → ${[l2, c2, h2]}`)
+  }
+  // a Tailwind ramp holds its hue: v3 indigo 400/600/700 all sit at ~277°, blue at ~260°, violet at ~293°
+  const hue = (hex) => Math.round(rgbToOklch(...parseColor(hex))[2])
+  assert.deepEqual(['#818cf8', '#4f46e5', '#4338ca'].map(hue), [277, 277, 277])
+  assert.equal(hue('#3b82f6'), 260)
+  assert.equal(hue('#7c3aed'), 293)
 })
 
 test('a Tailwind opacity modifier does not hide the base colour', () => {

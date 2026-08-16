@@ -36,10 +36,11 @@ import {
   extractClassStyles, extractCssVars, resolveVar, detectKinds, detectShell, detectVariants,
   cssModuleBindings, moduleClassAttrs, qualify, deepResolveVar, styledClassNames, walkElements,
   countUnreadable, countReadable, norm, TW_GRAY_RAMPS, UTILITY_RX, cssInJsBlocks,
+  DOCS_PATH, ALT_THEME_PATH, THEME_FILE, extractPreprocessorVars, extractThemeObjectVars,
 } from './patterns.mjs'
 import {
   METRIC, NEAR_DUPE_THRESHOLD, colorDistance, pxDistance, clusterNear, parseColor, toLab, deltaE00,
-  resolvePalette, stripAlpha,
+  resolvePalette, stripAlpha, rgbToOklch, TW_DEFAULT_VERSIONS,
 } from './colorspace.mjs'
 
 /* ────────────────────────────── the constants ──────────────────────────────
@@ -755,7 +756,7 @@ const px = (v) => {
   return m[2] === 'rem' ? parseFloat(m[1]) * 16 : parseFloat(m[1])
 }
 
-function inferConfig(dims, palette, cssVars = {}, varRefs = new Map(), project = '') {
+function inferConfig(dims, palette, cssVars = {}, varRefs = new Map(), project = '', docsOnly = new Set()) {
   const values = {}
   const confidence = {}
   const MIN_DOMINANCE = 0.4 // below this, nobody decided anything
@@ -804,7 +805,7 @@ function inferConfig(dims, palette, cssVars = {}, varRefs = new Map(), project =
   // decision itself, so it needs no dominance share to be believed. Only when
   // nobody named one do we fall back to counting literals — and that fallback is
   // gated, because ungated it christened our own cobalt product "ember".
-  const named = pickNamedBrand(cssVars, palette, varRefs, project)
+  const named = pickNamedBrand(cssVars, palette, varRefs, project, docsOnly)
   const brand = named || pickBrandColor(dims.color.values, palette)
   if (brand) {
     let best = null
@@ -812,8 +813,13 @@ function inferConfig(dims, palette, cssVars = {}, varRefs = new Map(), project =
       const d = colorDistance(brand.value, hex, palette)
       if (d !== null && (!best || d < best.d)) best = { name, d }
     }
-    confidence.colorTheme = named ? 1 : round(brand.share, 2)
-    confidence.colorThemeSource = named ? `declared as ${named.name}` : 'most-used literal colour'
+    // A brand declared only by a docs site is a weak claim about the app: reported,
+    // never with the confidence a declaration in the app itself earns. And a
+    // COUNTED brand is only as sure as its sample: a share of 1.0 over three
+    // literals is not certainty (plausible: #9ae6b4, three chart fills, "1.00").
+    const counted = named ? null : Math.min(1, (brand.count ?? 0) / 20)
+    confidence.colorTheme = named ? (named.docs ? 0.5 : 1) : round(Math.min(brand.share, counted), 2)
+    confidence.colorThemeSource = named ? `declared as ${named.name}${named.docs ? ' — in a docs site, not the app' : ''}` : 'most-used literal colour'
     if (best && (named || brand.share >= MIN_DOMINANCE)) {
       // The nearest anchor names the starting point...
       values.colorTheme = best.name
@@ -847,7 +853,9 @@ function inferConfig(dims, palette, cssVars = {}, varRefs = new Map(), project =
  *  plane's brand lives in `--brand-default`, and requiring the name to end in
  *  the brand word left only `--txt-link-primary` — an alias of it — as the
  *  candidate, so their identity came back as the colour of a hyperlink. */
-const BRAND_VAR = /^--?(?:[\w-]*?-)?(?:brand|primary|accent)(?:-(?:default|base|main))?$/i
+// `--primary`, `--color-primary`, `--brand`, `--app-accent` — and the same names
+// as SCSS/Less variables (`$primary`, `@brand`) or theme-object keys.
+const BRAND_VAR = /^(?:--?|[$@])(?:[\w-]*?-)?(?:brand|primary|accent)(?:-(?:default|base|main))?$/i
 
 /* Component-SCOPED tokens that happen to end in a brand-ish word. shadcn ships
  * every one of these with a default, and most apps never touch them — so
@@ -884,7 +892,17 @@ const STATUS_VAR = /(?:^|-)(?:danger|success|warning|error|info|destructive|crit
  * exactly the repos that did the most things right. Asking "what did you call
  * your brand" is the question a human would ask first.
  */
-function pickNamedBrand(cssVars, palette, varRefs = new Map(), project = '') {
+/* The theme namespaces of documentation frameworks — a `--ifm-*` (Docusaurus),
+ * `--vp-*` (VitePress), `--sl-*` (Starlight), `--md-*` (mkdocs-material)
+ * variable describes the docs site's look. Never a brand candidate while any
+ * other declaration exists. */
+/* Tailwind generation markers — see auditFiles. Single or double quotes, both
+ * appear in the wild (plausible writes `@import 'tailwindcss'`). */
+const TW_V4_MARK = /@import\s+["']tailwindcss(?:\/[\w-]+)?["']|@theme\b|@utility\b|@custom-variant\b/
+const TW_V3_MARK = /@tailwind\s+(?:base|components|utilities)\b/
+
+const DOCS_FRAMEWORK_VAR = /^--(?:ifm|vp|sl|md|docsearch|docusaurus|vitepress|starlight|mkdocs)-/i
+function pickNamedBrand(cssVars, palette, varRefs = new Map(), project = '', docsOnly = new Set()) {
   const hits = []
   for (const [name, raw] of Object.entries(cssVars)) {
     if (!BRAND_VAR.test(name) || SCOPED_VAR.test(name) || USAGE_VAR.test(name) || STATUS_VAR.test(name)) continue
@@ -898,9 +916,13 @@ function pickNamedBrand(cssVars, palette, varRefs = new Map(), project = '') {
       refs: varRefs.get(name) || 0,
       // A token that carries the product's own name is the product saying so.
       mine: project.length > 2 && name.toLowerCase().includes(project) ? 1 : 0,
+      // A docs-framework token, or one declared only under docs/, answers last.
+      docs: DOCS_FRAMEWORK_VAR.test(name) || docsOnly.has(name) ? 1 : 0,
     })
   }
   if (!hits.length) return null
+  hits.sort((a, b) => a.docs - b.docs || b.refs - a.refs || b.mine - a.mine || a.name.length - b.name.length)
+  if (hits[0].docs) return { value: hits[0].value, name: hits[0].name, docs: true }
   /* Reach, then self-naming, then length.
    *
    * Reach first: n8n's `--color--primary` is read in 347 places and `--accent`
@@ -912,7 +934,6 @@ function pickNamedBrand(cssVars, palette, varRefs = new Map(), project = '') {
    * the overridable placeholder inside their embeddable survey widget. Between
    * `--brand-default` and `--formbricks-brand`, only one of them claims to be
    * anyone's in particular. `--cal-*` and `--n8n-*` are the same convention. */
-  hits.sort((a, b) => b.refs - a.refs || b.mine - a.mine || a.name.length - b.name.length)
   return { value: hits[0].value, name: hits[0].name }
 }
 
@@ -921,12 +942,31 @@ function pickBrandColor(values, palette) {
   for (const v of values) {
     const lab = toLab(v.value, palette)
     if (!lab) continue
-    if (Math.hypot(lab[1], lab[2]) > 25 && lab[0] > 15 && lab[0] < 92) saturated.push(v)
+    if (Math.hypot(lab[1], lab[2]) > 25 && lab[0] > 15 && lab[0] < 92) {
+      const rgb = parseColor(stripAlpha(String(v.value)), palette)
+      saturated.push({ ...v, hue: rgb ? rgbToOklch(...rgb)[2] : null })
+    }
   }
   if (!saturated.length) return null
   const total = saturated.reduce((a, v) => a + v.count, 0)
-  const top = saturated.reduce((a, v) => (v.count > a.count ? v : a), saturated[0])
-  return { value: top.value, share: total ? top.count / total : 0 }
+  /* A ramp is ONE decision. `indigo-600` ×29, `indigo-500` ×27 and `indigo-700`
+   * ×9 are the brand, its hover and its active — counted as three rivals no
+   * shade reached dominance and plausible was reported as having decided
+   * nothing (share 0.25). Shades are grouped into hue FAMILIES on OKLCH hue,
+   * the axis Tailwind holds constant along a ramp (indigo 277° through
+   * 400–700; blue sits at 260°, violet at 293°): ±10° keeps every default ramp
+   * apart from its neighbours and holds a ramp together. The family's most-used
+   * shade is the brand it reports — the exact colour they wrote most. Seeded
+   * greedily by count, so the biggest decision claims its neighbourhood first. */
+  const HUE_TOL = 10
+  const near = (a, b) => { const d = Math.abs(a - b) % 360; return Math.min(d, 360 - d) <= HUE_TOL }
+  const families = []
+  for (const v of [...saturated].sort((a, b) => b.count - a.count)) {
+    const fam = v.hue == null ? null : families.find((f) => f.hue != null && near(f.hue, v.hue))
+    if (fam) { fam.count += v.count; fam.members.push(v) } else families.push({ hue: v.hue, count: v.count, top: v, members: [v] })
+  }
+  const best = families.reduce((a, f) => (f.count > a.count ? f : a), families[0])
+  return { value: best.top.value, share: total ? best.count / total : 0, count: best.count, shades: best.members.length }
 }
 
 /** A length a browser will accept verbatim. */
@@ -1091,9 +1131,36 @@ export function auditFiles(files, opts = {}) {
   // Counted evidence for the detected-stack summary (never inferred from deps).
   const tally = { utilities: 0, moduleFiles: 0, moduleBindings: 0, moduleRules: 0, plainCssFiles: 0, cssRules: 0, inlineStyles: 0, cssInJsBlocks: 0 }
 
+  /* A monorepo often carries a second product: a docs site (Docusaurus,
+   * VitePress, Starlight, mkdocs), a marketing website, a Storybook. Their
+   * theme variables are THEIR design system, not the app's — immich's docs
+   * declared `--ifm-color-primary` and the reader crowned it the brand of a
+   * photo app. Variables from those paths are kept, but merged UNDER the app's:
+   * they answer only when nothing else does, and the brand pick says so. */
+  const docsVars = {}
+  /* And a theme FILE — `themes/_dark.scss`, `theme/dark.ts` — is the alternate
+   * scope by path, where extractCssVars can only see it by selector: directus
+   * redeclares `$purple: #86f` for dark in a file of its own, and last-file-wins
+   * reported the dark purple as the brand. Alternate-theme files merge UNDER
+   * the base, exactly as a `.dark {}` block does. */
+  const altVars = {}
+  const isDocsPath = (p) => DOCS_PATH.test(p)
+  const isAltThemePath = (p) => ALT_THEME_PATH.test(p)
+  const bagFor = (p) => (isDocsPath(p) ? docsVars : isAltThemePath(p) ? altVars : cssVars)
+  /* Which Tailwind generation the CSS says it is on — decides which SHIPPED
+   * defaults stand in for the palette when the repo has no node_modules to read
+   * (a shallow clone, a browser drop, a Phoenix app with a standalone binary).
+   * v4 declares itself in CSS (`@import "tailwindcss"`, `@theme`, `@utility`,
+   * `@custom-variant`); v3 with `@tailwind base|components|utilities`. */
+  const twMarks = { v4: 0, v3: 0 }
   const absorbCss = (path, css) => {
+    if (TW_V4_MARK.test(css)) twMarks.v4++
+    if (TW_V3_MARK.test(css)) twMarks.v3++
     events.push(...extractCss(path, css))
-    Object.assign(cssVars, extractCssVars(css))
+    Object.assign(bagFor(path), extractCssVars(css))
+    // SCSS/Less variables are token sources too: `$purple: #64f;` is a
+    // declaration exactly like `--purple: #64f`, in an older notation.
+    if (/\.(scss|less)$/.test(path)) Object.assign(bagFor(path), extractPreprocessorVars(css))
     // CSS Modules are file-scoped, so their classes are stored qualified —
     // `Card.module.css#title` — and never merged with an identically named
     // class from another module.
@@ -1103,6 +1170,16 @@ export function auditFiles(files, opts = {}) {
       classStyles[key] = { ...(classStyles[key] || {}), ...decls }
     }
     for (const cls of styledClassNames(css)) styledClasses.add(isModule ? qualify(path, cls) : cls)
+  }
+
+  // ── Pass 0: theme OBJECTS. A theme.ts / tokens.js declares values by key —
+  // `accent: "#0366d6"` — that CSS-in-JS then reads by name (`s("accent")`,
+  // `theme.accent`). Read first, into the same bag as custom properties, so the
+  // declaration is known before any reference asks for it.
+  for (const { path, content } of files) {
+    if (!THEME_FILE.test(path)) continue
+    const vars = extractThemeObjectVars(content)
+    if (Object.keys(vars).length) Object.assign(bagFor(path), vars)
   }
 
   // ── Pass 1: stylesheets first. A component file can be walked before the
@@ -1212,10 +1289,22 @@ export function auditFiles(files, opts = {}) {
   }
 
   // The palette the repo actually uses: its own @theme / :root overrides beat the
-  // Tailwind build installed alongside it, which beats our grey ramps. Derived,
-  // never shipped as a table — so it is always this repo's real palette and it
-  // cannot rot when Tailwind changes its defaults.
-  const palette = resolvePalette(cssVars, opts.palette || {})
+  // Tailwind build installed alongside it (that version's numbers, read from
+  // node_modules), which beats the defaults Tailwind ships for the generation
+  // its CSS declares — generated from Tailwind's published files, never typed
+  // (src/tw-palette.mjs) — which beat our grey ramps. Which source answered is
+  // said in meta.palette, because a default is a fallback and the report should
+  // not dress it up as a reading of the repo.
+  const installed = opts.palette && Object.keys(opts.palette).length ? opts.palette : null
+  const generation = opts.tailwind === null ? null : opts.tailwind || (twMarks.v4 ? 'v4' : twMarks.v3 ? 'v3' : 'v4')
+  const palette = resolvePalette(cssVars, installed || {}, installed ? null : generation)
+  const paletteSource = installed
+    ? 'installed'
+    : !generation
+      ? 'none'
+      : !tally.utilities && !twMarks.v4 && !twMarks.v3
+        ? 'none needed (no Tailwind utilities read)'
+        : `tailwind ${generation} defaults (${TW_DEFAULT_VERSIONS[generation]}${twMarks.v4 || twMarks.v3 ? `, ${twMarks.v4 ? '@import "tailwindcss"/@theme' : '@tailwind'} seen` : ', assumed — no marker seen'})`
 
   // Flatten var() once, so the report never has to know about the cascade.
   const resolvedStyles = {}
@@ -1252,12 +1341,19 @@ export function auditFiles(files, opts = {}) {
   const projectName = String(opts.pkg?.name || '').split('/').pop().replace(/[^a-z0-9]/gi, '').toLowerCase()
 
   // How often each custom property is READ. A token's authority is its reach.
+  // A read inside a docs-site path counts for a docs token only, so a Docusaurus
+  // theme cannot out-reach the app by being referenced all over its own docs.
   const varRefs = new Map()
-  for (const { content } of files) {
+  const docsRefs = new Map()
+  for (const { path, content } of files) {
+    const bag = isDocsPath(path) ? docsRefs : varRefs
     for (const m of content.matchAll(/var\(\s*(--[\w-]+)/g)) {
-      varRefs.set(m[1], (varRefs.get(m[1]) || 0) + 1)
+      bag.set(m[1], (bag.get(m[1]) || 0) + 1)
     }
   }
+  const docsOnly = new Set(Object.keys(docsVars).filter((k) => !(k in cssVars) && !(k in altVars)))
+  Object.assign(cssVars, { ...docsVars, ...altVars, ...cssVars })
+  for (const [k, n] of docsRefs) if (!varRefs.has(k) && docsOnly.has(k)) varRefs.set(k, 0)   // reach 0: it answers last
 
   /* The page, its ink and its edge — declared first, counted where nothing was
    * declared. Per role rather than all-or-nothing: a repo can name its page and
@@ -1301,6 +1397,10 @@ export function auditFiles(files, opts = {}) {
         counts: { ...expressible },
       },
       vocabVersion,
+      // Where the colour behind a Tailwind NAME came from: 'installed' (that
+      // repo's node_modules), 'tailwind v4 defaults (…)' (shipped, generated) or
+      // 'none'. A default is honest only when it is labelled one.
+      palette: paletteSource,
       nearDupeMetric: { color: METRIC, threshold: NEAR_DUPE_THRESHOLD, length: 'px', lengthThreshold: 1, shadow: 'blur-px', shadowThreshold: 2 },
     },
     score: score === null ? null : round(score, 0),
@@ -1399,7 +1499,7 @@ export function auditFiles(files, opts = {}) {
     flags: smokingGuns(files, opts.pkg, events),
     // Emitted but unused in PR 1 — it is the hinge to the configurator (PR 4),
     // and computing it now is cheaper than a second pass later.
-    inferredConfig: inferConfig(dimensions, palette, cssVars, varRefs, projectName),
+    inferredConfig: inferConfig(dimensions, palette, cssVars, varRefs, projectName, docsOnly),
   }
 
   // The second headline, given equal billing rather than a footnote.
@@ -1561,6 +1661,15 @@ export function renderTerminal(r, { reportPath = null } = {}) {
   if (kf.length) {
     L.push(`  Builds       ${kf.length} of ${Object.keys(r.kinds).length} component kinds · ${kf.slice(0, 6).map(([k]) => k).join(' · ')}`)
   }
+  // The brand, with its provenance — so the one line a reader can check against
+  // their own screen in five seconds says where it came from and how sure we
+  // are. A counted colour resolved through shipped Tailwind defaults says so.
+  const ic = r.inferredConfig
+  if (ic?.values?.brandHex) {
+    const conf = ic.confidence?.colorTheme
+    const via = /^tailwind /.test(r.meta.palette || '') ? ` · names via ${r.meta.palette}` : ''
+    L.push(`  Brand        ${ic.values.brandHex}${ic.values.colorTheme ? ` (${ic.values.colorTheme})` : ''} · ${ic.confidence?.colorThemeSource || 'inferred'}${conf != null && conf < 1 ? `, confidence ${conf}` : ''}${via}`)
+  }
   L.push('')
 
   for (const dim of DIMENSIONS) {
@@ -1619,9 +1728,12 @@ export function renderTerminal(r, { reportPath = null } = {}) {
  * audit. Node-only, best-effort: a repo with no dependencies installed simply
  * gets fewer resolved colours, and the report says so rather than pretending.
  *
- * We read the INSTALLED copy rather than shipping our own table, so the numbers
- * are that repo's real palette — including its version — and so a hand-typed
- * table can never silently drift from what the project actually renders.
+ * We read the INSTALLED copy first, so the numbers are that repo's real
+ * palette — including its version. When nothing is installed (a shallow clone,
+ * a browser drop, a Phoenix app whose Tailwind is a standalone binary) the
+ * engine falls back to the defaults Tailwind SHIPS for the generation the CSS
+ * declares — src/tw-palette.mjs, GENERATED from Tailwind's published files by
+ * scripts/gen-tw-palette.mjs, never typed — and says so in meta.palette.
  */
 async function loadInstalledPalette(fs, pathMod, dir) {
   const roots = [dir, '.']
