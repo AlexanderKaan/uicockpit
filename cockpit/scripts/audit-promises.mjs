@@ -166,8 +166,16 @@ function ariaTokens(list) {
      * requirements. The bug was mine, not the source's — which is why fixing
      * this is gate work rather than anchor work. */
     const conditional = /\b(when|if|only|optional|unless|while|instead|either|otherwise)\b/i.test(line)
-    for (const m of line.matchAll(/role="([\w-]+)"/g)) (conditional ? advisory : roles).add(m[1])
-    for (const m of line.matchAll(/\b(aria-[a-z]+)/g)) (conditional ? advisory : attrs).add(m[1])
+    /* ⚠️ " or " IS A DISJUNCTION AND THE GATE WAS READING IT AS A LIST.
+     * `select-trigger` says "aria-activedescendant OR roving tabindex" — APG has
+     * two focus models for a listbox and we implement the second one. Harvesting
+     * both tokens as requirements demanded a component satisfy two mutually
+     * exclusive patterns at once. The separator carries the meaning: `·` joins,
+     * " or " chooses. */
+    const disjunction = /\bor\b/i.test(line)
+    const bucket = conditional || disjunction ? advisory : null
+    for (const m of line.matchAll(/role="([\w-]+)"/g)) (bucket ?? roles).add(m[1])
+    for (const m of line.matchAll(/\b(aria-[a-z]+)/g)) (bucket ?? attrs).add(m[1])
   }
   return { roles: [...roles], attrs: [...attrs], advisory: [...advisory] }
 }
@@ -193,12 +201,37 @@ const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 1400 } })
 await page.goto('http://localhost:5173/app', { waitUntil: 'networkidle' })
 await page.waitForTimeout(800)
-await page.evaluate(() => {
-  for (const el of document.querySelectorAll('[aria-expanded="false"], details:not([open])')) {
-    try { el.tagName === 'DETAILS' ? (el.open = true) : el.click() } catch { /* a trigger that refuses is not a finding */ }
+/* ---- OPEN EVERYTHING THAT OPENS, AND VERIFY THAT IT DID ---------------------
+ * The three remaining findings were all the same shape: markup that only exists
+ * while a component is OPEN. `select-trigger`'s listbox, the `calendar`'s cells
+ * inside a closed popover, `popover`'s aria-controls on a trigger the gate never
+ * looked at. A gate that only sees the resting page is blind to the most common
+ * interactive pattern in the kit, and "unverifiable" for that many components is
+ * too large a hole to leave.
+ *
+ * ⚠️ SO IT DRIVES — AND IT CHECKS THAT DRIVING WORKED. A click that silently
+ * fails to open anything would turn into a false "missing role=listbox", which
+ * is exactly the class of wrong report this file spent the afternoon removing.
+ * Each trigger is clicked, its aria-expanded is re-read, and the ones that
+ * refused are recorded so a finding on that component can be reported as
+ * unverifiable instead of missing. */
+const opening = await page.evaluate(async () => {
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms))
+  const refused = []
+  let opened = 0
+  const triggers = [...document.querySelectorAll('[aria-expanded="false"], details:not([open]), [aria-haspopup]')]
+  for (const el of triggers) {
+    try {
+      if (el.tagName === 'DETAILS') { el.open = true; opened++; continue }
+      el.click()
+      await wait(20)
+      if (el.getAttribute('aria-expanded') === 'true' || el.getAttribute('aria-expanded') === null) opened++
+      else refused.push(el.className || el.tagName)
+    } catch { refused.push(el.className || el.tagName) }
   }
+  return { opened, refused: [...new Set(refused)].slice(0, 12), triggers: triggers.length }
 })
-await page.waitForTimeout(400)
+await page.waitForTimeout(500)
 
 const findings = []
 const checked = { aria: 0, keys: 0, absent: 0 }
@@ -231,11 +264,27 @@ for (const t of targets) {
       const scope = page.locator('.' + t.cls).first()
       const inside = await scope.getByRole(r, { includeHidden: true }).count().catch(() => 0)
       const isSelf = await scope.and(page.getByRole(r, { includeHidden: true })).count().catch(() => 0)
-      const onAncestor = inside || isSelf ? 0 : await page.evaluate(({ cls, role }) => {
-        const el = document.querySelector('.' + cls)
-        return el && el.closest(`[role="${role}"]`) ? 1 : 0
+      /* Ancestors, and whatever the component OWNS via aria-controls — the same
+       * two escapes the attribute check needed. A role check scoped to the
+       * trigger's subtree cannot see the listbox it opens. */
+      /* EVERY instance, not the first — the same rule the attribute check already
+       * follows, and the two disagreeing is how `select-trigger` kept reporting
+       * a missing listbox: there are two of them, only the second names what it
+       * opens, and `querySelector` returns the first. Two checks in one file
+       * with two different ideas of what the subject is will always drift. */
+      const elsewhere = inside || isSelf ? 0 : await page.evaluate(({ cls, role }) => {
+        for (const el of document.querySelectorAll('.' + cls)) {
+          if (el.closest(`[role="${role}"]`)) return 1
+          const owns = el.getAttribute('aria-controls') || el.querySelector('[aria-controls]')?.getAttribute('aria-controls')
+          for (const id of (owns ?? '').split(/\s+/).filter(Boolean)) {
+            const target = document.getElementById(id)
+            if (!target) continue
+            if (target.matches(`[role="${role}"]`) || target.querySelector(`[role="${role}"]`)) return 1
+          }
+        }
+        return 0
       }, { cls: t.cls, role: r }).catch(() => 0)
-      if (!inside && !isSelf && !onAncestor) missingRoles.push(r)
+      if (!inside && !isSelf && !elsewhere) missingRoles.push(r)
     }
     /* Same correction, one family further: aria-valuenow / -valuemin / -valuemax
      * are EXPOSED, not written, when the element is <input type="number" min
@@ -301,10 +350,37 @@ for (const t of targets) {
        * carry it correctly. The gallery is a demonstration surface: one correct
        * example IS the demonstration, and demanding it of every instance would
        * demand aria-pressed on a label. */
+      /* ⚠️ AND FOLLOW WHAT THE COMPONENT OWNS. A listbox is a SIBLING of its
+       * trigger, not a child, so scoping to the component's own subtree can
+       * never see role="listbox" or its options — the gate reported four
+       * missing attributes on a select that demonstrates all of them a few DOM
+       * nodes away.
+       *
+       * The link is aria-controls, and requiring it is not a workaround: APG
+       * says a trigger must name what it opens. If the popup cannot be found
+       * because nothing points at it, THAT is the defect, and it is the same
+       * defect either way — so the gate follows the pointer and reports its
+       * absence honestly rather than guessing at the nearest overlay. */
       const roots = [...document.querySelectorAll('.' + cls)]
+      for (const r of [...roots]) {
+        const owns = r.getAttribute('aria-controls') || r.querySelector('[aria-controls]')?.getAttribute('aria-controls')
+        if (!owns) continue
+        for (const id of owns.split(/\s+/)) {
+          const target = document.getElementById(id)
+          if (target) roots.push(target)
+        }
+      }
       const scope = roots.flatMap((r) => [r, ...r.querySelectorAll('*'),
         ...(function () { const up = []; let n = r.parentElement; while (n && up.length < 4) { up.push(n); n = n.parentElement } return up })()])
-      const has = (a) => scope.some((n) => {
+      /* ⚠️ AND OWNERSHIP RUNS BOTH WAYS. For `select-trigger` the component IS the
+       * trigger and the listbox is elsewhere; for `popover` the component IS the
+       * panel and the TRIGGER is elsewhere — a sibling, which no amount of
+       * walking up or down from the panel will reach. So an attribute is also
+       * satisfied when something in the document points AT this element by id.
+       * Exact, not heuristic: it follows a real reference rather than guessing
+       * at the nearest button. */
+      const controlledBy = roots.some((r) => r.id && document.querySelector(`[aria-controls~="${r.id}"]`))
+      const has = (a) => (a === 'aria-controls' && controlledBy) || scope.some((n) => {
         if (n.hasAttribute(a)) return true
         const native = IMPLIED[a]
         if (!native) return false
@@ -401,6 +477,7 @@ await browser.close()
 
 if (JSON_OUT) { console.log(JSON.stringify({ checked, findings }, null, 2)); process.exit(0) }
 
+console.log(`  drove ${opening.opened} of ${opening.triggers} disclosures open` + (opening.refused.length ? ` — ${opening.refused.length} refused: ${opening.refused.join(' · ')}` : ' — none refused') + '\n')
 console.log(`audit:promises — ${targets.length} recipes declare an APG pattern; ${checked.aria} ARIA claims and ${checked.keys} key claims executed`)
 console.log('Not a review of the components. An execution of the claims they publish.\n')
 

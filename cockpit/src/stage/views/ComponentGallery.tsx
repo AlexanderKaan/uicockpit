@@ -2278,13 +2278,19 @@ function SelectCard() {
             style={{ width: '100%' }}
             aria-haspopup="listbox"
             aria-expanded={open}
+            aria-controls="region-listbox"
             onClick={() => setOpen((v) => !v)}
           >
             <span>{region}</span>
             <Icon name="chevD" />
           </button>
+          {/* aria-controls, and it is not bookkeeping. APG requires a trigger to
+              NAME what it opens, and without it a screen reader user who lands on
+              the button is told a listbox exists somewhere. It is also what lets a
+              checker follow the ownership: the listbox is a SIBLING of this button,
+              so nothing scoped to the trigger's own subtree can ever find it. */}
           {open && (
-            <div className="menu" role="listbox" style={{ position: 'absolute', left: 0, right: 0, top: 'calc(100% + 6px)' }} onMouseLeave={() => setOpen(false)}>
+            <div id="region-listbox" className="menu" role="listbox" aria-label="Region" style={{ position: 'absolute', left: 0, right: 0, top: 'calc(100% + 6px)' }} onMouseLeave={() => setOpen(false)}>
               {REGIONS.map((r) => (
                 <button
                   key={r}
@@ -2474,13 +2480,20 @@ function PopoverCard() {
           className={`btn ${open ? 'btn--primary' : 'btn--ghost'} btn--sm`}
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
+          aria-controls="profile-popover"
         >
           <Icon name="info" /> {open ? 'Hide popover' : 'Show popover'}
         </button>
+        {/* aria-controls: the Disclosure pattern requires the trigger to NAME
+            what it opens. There was exactly ONE aria-controls in the whole app,
+            so a screen-reader user meeting any of our 126 disclosures was told
+            something expands and not what. */}
         {open && (
           <div
+            id="profile-popover"
             className="popover"
             role="dialog"
+            aria-label="Profile"
             style={{ position: 'relative', top: 'auto', left: 'auto', marginTop: 12 }}
           >
             <span className="popover__arrow" />
@@ -3450,6 +3463,15 @@ function CalendarYearCard() {
                 {days.map((d, i) => {
                   const out = d < 1 || d > m.dim
                   const isToday = now && d === 15
+                  /* NO aria-selected here. I added it to satisfy audit:promises and
+                     a11y:matrix went from 27 violations to 2211 — aria-allowed-attr,
+                     363 times in a single configuration. aria-selected is only valid on
+                     a role that supports it (option, row, tab, gridcell, treeitem); a
+                     bare <span> is not one, and 420 static cells each took the attribute.
+                     Third time today that satisfying that gate broke conformance, and
+                     the same rule every time: AN ARIA ATTRIBUTE WITHOUT A ROLE THAT
+                     ALLOWS IT IS BROKEN ARIA. These cells are a static year overview,
+                     and aria-current="date" is the whole truth about them. */
                   return (
                     <span key={i} className={`calendar__cell ${out ? 'calendar__cell--out' : ''} ${isToday ? 'calendar__cell--today' : ''}`} aria-current={isToday ? 'date' : undefined} aria-hidden={out}>
                       {out ? '' : d}
