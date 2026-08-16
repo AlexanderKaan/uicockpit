@@ -14,6 +14,7 @@
  */
 import { chromium } from '@playwright/test'
 import { deriveTargets, NOT_A_TARGET } from './lib/interactive-targets.mjs'
+import { setDensity, setRow, DENSITY_WITNESS } from './lib/drive-panel.mjs'
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 const SCALES = ['compact', 'default', 'comfortable']
@@ -25,16 +26,14 @@ await page.waitForSelector('.cockpit-preview', { timeout: 20000 })
 await page.waitForTimeout(1200)
 await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
 
-const setScale = (i) => page.evaluate((idx) => {
-  const row = [...document.querySelectorAll('.fmrow')].find((r) => r.textContent.includes('Scale'))
-  const inp = row?.querySelector('input[type="range"]')
-  if (!inp) return false
-  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
-  setter.call(inp, String(idx))
-  inp.dispatchEvent(new Event('input', { bubbles: true }))
-  inp.dispatchEvent(new Event('change', { bubbles: true }))
-  return true
-}, i)
+/* 🚨 THIS USED TO WRITE TO `.fmrow input[type="range"]`, and that input stopped
+ * existing when the panel was refactored to one row shape. The setter returned
+ * false, nothing read it, and this script printed three density lines while
+ * measuring ONE density three times — so "0 violations across 6 configurations",
+ * the headline of the conformance report, was 0 across two. The driver now lives
+ * in lib/drive-panel.mjs, throws when it cannot drive, and verifies that the
+ * density token actually moved before it lets the scan continue. */
+const setScale = (name) => setDensity(page, name)
 
 const toggleMode = () => page.evaluate(() => {
   const b = [...document.querySelectorAll('button')].find((x) => /Switch to (dark|light) mode/.test(x.getAttribute('aria-label') || ''))
@@ -80,8 +79,8 @@ const scan = () => page.evaluate(async (tags) => {
 const results = []
 for (const mode of ['light', 'dark']) {
   for (let i = 0; i < SCALES.length; i++) {
-    await setScale(i)
-    await page.waitForTimeout(500)
+    await setScale(SCALES[i])
+    await page.waitForTimeout(400)
     await page.addScriptTag({ url: 'https://cdn.jsdelivr.net/npm/axe-core@4.10.2/axe.min.js' })
     const rows = await scan()
     results.push({ mode, scale: SCALES[i], rows })
@@ -114,11 +113,10 @@ const targets = () => page.evaluate(deriveTargets, {
   rootSel: '.cockpit-preview', exclude: NOT_A_TARGET, floor: 44,
 })
 
-const setConformance = (want) => page.evaluate((w) => {
-  const row = [...document.querySelectorAll('.fmrow')].find((r) => r.textContent.includes('Conformance'))
-  const btn = [...(row?.querySelectorAll('button') || [])].find((b) => (w === 'aaa' ? /AAA/ : /AA$|WCAG AA/).test(b.textContent.trim()))
-  btn?.click(); return !!btn
-}, want)
+// Same treatment: a row driver that throws rather than a click nobody checks.
+const setConformance = (want) => setRow(page, 'Conformance', want === 'aaa' ? 'AAA' : 'AA$', {
+  witness: () => getComputedStyle(document.querySelector('.cockpit-preview')).getPropertyValue('--k-hit-min').trim(),
+})
 
 await setConformance('aaa')
 await page.waitForTimeout(900)

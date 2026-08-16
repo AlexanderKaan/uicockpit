@@ -2596,6 +2596,75 @@
   color: var(--mkt-fg-muted);
 }
 .cmpdoc__spec-list li { margin-bottom: 4px; }
+
+/* === Evidence — the measured half of the specification ======================
+   The numbers are the point, so they are the only thing on the page allowed to
+   be tabular: a definition list with the measurement in the kit's own ink and
+   the caveat beside it in muted. Nothing here is decorated — an auditor reading
+   a contrast ratio does not need a badge, and a green tick over a number invites
+   the reader to trust the tick instead of the number.
+
+   Sized in --k-s-* rather than literals: the marketing surfaces get the default
+   kit's tokens (see injectKit), so this block reads the same ladder the
+   components do, and audit:craft is what made that non-optional. */
+.cmpdoc__ev {
+  margin: 0 0 var(--k-s-10);
+  display: grid;
+  gap: 1px;
+  background: var(--mkt-border);
+  border: 1px solid var(--mkt-border);
+  border-radius: var(--k-radius-md);
+  overflow: hidden;
+}
+.cmpdoc__ev > div {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: 2px var(--k-s-16);
+  padding: var(--k-s-8) var(--k-s-12);
+  background: var(--mkt-bg);
+}
+.cmpdoc__ev dt {
+  font-size: var(--k-type-small);
+  font-weight: var(--k-weight-semibold);
+  color: var(--mkt-fg);
+  min-width: 0;
+}
+.cmpdoc__ev dd {
+  margin: 0;
+  font-size: var(--k-type-small);
+  line-height: 1.55;
+  color: var(--mkt-fg-muted);
+  min-width: 0;
+  /* A ratio, a pixel count and a rule name share this cell; long content wraps
+     rather than pushing the grid wider than the column it sits in. */
+  overflow-wrap: anywhere;
+}
+.cmpdoc__ev dd strong {
+  color: var(--mkt-fg);
+  font-variant-numeric: tabular-nums;
+}
+/* The absence has its own treatment, and deliberately NOT a red one: "we did not
+   look" is not a failure, and colouring it like one would make the honest state
+   the ugly state — which is how honest states quietly disappear from pages. */
+.cmpdoc__ev-none {
+  padding: var(--k-s-10) var(--k-s-12);
+  border: 1px dashed var(--mkt-border);
+  border-radius: var(--k-radius-md);
+  background: transparent;
+}
+.cmpdoc__ev-how { margin-top: var(--k-s-10); }
+.cmpdoc__ev-how summary {
+  font-size: var(--k-type-small);
+  color: var(--mkt-fg-muted);
+  cursor: pointer;
+  padding: var(--k-s-4) 0;
+}
+.cmpdoc__ev-how summary:hover { color: var(--mkt-fg); }
+.cmpdoc__ev-how > * + * { margin-top: var(--k-s-8); }
+
+@media (max-width: 560px) {
+  .cmpdoc__ev > div { grid-template-columns: minmax(0, 1fr); }
+}
 .cmpdoc__spec-classes {
   margin: 0;
   display: flex;
