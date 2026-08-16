@@ -3,8 +3,6 @@ import type { KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import { Icon } from '../../icons/Icon'
 import type { IconName } from '../../icons/concepts'
 import { useDropdown, InteractiveSlider, StatusBadge, DatePicker, MenuButton, useModal, ImgAvatar, Menubar, Resizable, Toggle } from './apps/AppHelpers'
-import { ChartFrame } from './ChartFrame'
-import type { ChartType } from './ChartFrame'
 import { popGalleryJump } from '../../state/galleryJump'
 import { RECIPES } from '../../kit'
 
@@ -16,7 +14,7 @@ const labelOf = (fn: () => ReactElement): string =>
 // Per-card search index: the VISIBLE title (what the user reads on the card)
 // plus type synonyms, so search matches the heading and common alternate names —
 // not only the function label. The in-context heading often diverges from the
-// type (StatGroupCard reads "Overview", CodeBlockCard reads "Quick start"), which
+// type (CodeBlockCard reads "Quick start"), which
 // is why title search was failing. Keyed by fn.name; titles mirror each card's
 // <Card title>. Keep an entry in sync when you rename a heading; a missing entry
 // degrades gracefully to the label alone.
@@ -89,10 +87,8 @@ const CARD_KEYWORDS: Record<string, string> = {
   AlertsCard: 'Activity alerts inline messages',
   ProgressCard: 'Storage progress bar',
   SpinnerCard: 'Workspace spinner loader loading',
-  SkeletonCard: 'Activity feed skeleton loading placeholder',
   ToastStackCard: 'Toast notification snackbar',
   EmptyStateCard: 'Projects empty state zero blank',
-  StatusPageCard: 'System status uptime incidents health',
   NotificationCenterCard: 'Notification center inbox bell',
   // — Data & content —
   TableCard: 'System health table rows',
@@ -111,15 +107,9 @@ const CARD_KEYWORDS: Record<string, string> = {
   SettingsRowCard: 'Website settings row toggle preference',
   InteractiveCardCard: 'Workspaces interactive card selectable',
   AvatarCard: 'Avatar profile picture user',
-  StatCard: 'Recurring revenue MRR stat metric KPI sparkline',
-  StatGroupCard: 'Overview metrics KPIs summary numbers',
-  TrendCard: 'Revenue trend chart sparkline delta',
-  ChartCard: 'Traffic by source chart graph analytics',
   UsageMeterCard: 'Monthly quota usage meter limit',
   FileGridCard: 'Files file grid thumbnails',
   TreeViewCard: 'Explorer tree view folders files',
-  KanbanCard: 'Sprint board kanban columns cards',
-  TimelineCard: 'Release progress timeline activity history',
   InfoCardCard: 'Hosting details info card definition',
   // — Blocks / composed —
   FormPanelCard: 'Form panel labeled fields validation action bar',
@@ -226,21 +216,21 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     // chart, timeline, danger-zone, auth card, stat tile…) are 'component'.
     [PageHeadCard, 'section'], [SectionCard, 'section'], [EntityCardCard, 'component'], [PresentationCardCard, 'component'], [CanvasCard, 'component'], [ScrubberCard, 'component'], [ActionPanelCard, 'component'],
     [MusicPlayerCard, 'component'], [WeatherCard, 'component'], [CheckoutCard, 'component'], [ProductCardCard, 'component'],
-    [FormCard, 'atom'], [ValidationCard, 'atom'], [StatCard, 'component'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
-    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [ChartCard, 'component'], [DateCard, 'component'],
+    [FormCard, 'atom'], [ValidationCard, 'atom'], [SwitchCard, 'atom'], [SelectionCard, 'atom'], [TableCard, 'atom'],
+    [SliderCard, 'atom'], [SearchInputCard, 'atom'], [RadioCardCard, 'atom'], [DateCard, 'component'],
     [CalendarWeekCard, 'section'], [CalendarMonthCard, 'section'], [CalendarYearCard, 'section'], [CalendarRangeCard, 'component'],
     [GroupedTableCard, 'atom'], [ResponsiveTableCard, 'atom'], [CardTableCard, 'atom'], [FrozenColumnTableCard, 'atom'], [HorizontalFormCard, 'section'], [InputAddonsCard, 'atom'], [HeaderVariantsCard, 'section'], [EmptyTemplatesCard, 'section'], [TwoColumnListCard, 'atom'], [ColorPickerCard, 'atom'],
     [PasswordInputCard, 'atom'], [BannerCard, 'atom'], [PopoverCard, 'atom'], [NumberInputCard, 'atom'], [DataTableProCard, 'section'], [FormPanelCard, 'section'], [FilterBarCard, 'component'],
-    [ComboboxCard, 'atom'], [DialogCard, 'component'], [KanbanCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
+    [ComboboxCard, 'atom'], [DialogCard, 'component'], [PhoneInputCard, 'atom'], [SelectCard, 'atom'], [SlotPickerCard, 'component'],
     [TagInputCard, 'atom'], [ChipsCard, 'atom'], [AvatarCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'component'], [SheetCard, 'component'], [InputOtpCard, 'atom'], [DescriptionListCard, 'atom'], [HoverCardCard, 'atom'],
-    [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], [TrendCard, 'component'],
+    [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], 
     [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ToolCallCard, 'atom'], [ReasoningCard, 'atom'], [ProseCard, 'component'], [ActivityFeedCard, 'component'],
-    [LoginCard, 'component'], [StatGroupCard, 'section'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [TimelineCard, 'component'], [NavMenuCard, 'atom'],
+    [LoginCard, 'component'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
     [BreadcrumbCard, 'atom'], [SkipLinkCard, 'atom'], [TaskListCard, 'component'], [CharacterCountCard, 'atom'], [MemorableDateCard, 'component'], [InPageNavCard, 'component'], [SiteFooterCard, 'section'], [RequirementsCard, 'component'], [ProcessListCard, 'component'], [IdentifierCard, 'component'], [ToggletipCard, 'atom'], [LanguageNavCard, 'atom'], [FieldsetCard, 'atom'], [ErrorSummaryCard, 'component'], [ProgressCard, 'atom'], [UsageMeterCard, 'component'], [InteractiveCardCard, 'atom'], [MenubarCard, 'component'], [ResizableCard, 'component'],
-    [StatusPageCard, 'component'], [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], [SkeletonCard, 'atom'],
+    [InboxFilterCard, 'component'], [SpinnerCard, 'atom'], [ToolbarRecipeCard, 'atom'], 
     [EmptyStateCard, 'section'], [InfoCardCard, 'component'], [ToastStackCard, 'component'], [LightboxCard, 'component'],
     [WizardStepperCard, 'component'], [FaqCard, 'component'], [TwoColumnLayoutCard, 'component'],
     [StepperCard, 'atom'], [ButtonGroupCard, 'atom'], 
@@ -346,7 +336,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Actions & menus', [ButtonsCard, ButtonGroupCard, ToolbarCard, ToolbarRecipeCard, DropdownMenuCard, ContextMenuCard]],
   ['Navigation', [TabsCard, NavMenuCard, BreadcrumbCard, SkipLinkCard, LanguageNavCard, PaginationCard, StepperCard, TaskListCard]],
   ['Overlays & disclosure', [PopoverCard, TooltipCard, ToggletipCard, HoverCardCard, AccordionCard]],
-  ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard, SkeletonCard]],
+  ['Feedback & status', [ValidationCard, ErrorSummaryCard, BannerCard, AlertsCard, ProgressCard, SpinnerCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
   ['AI thread', [ToolCallCard, ReasoningCard]],
   ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, InteractiveCardCard, AvatarCard]],
@@ -1402,21 +1392,6 @@ function ProgressCard() {
 /* Skeleton shown as a loading list — avatar circle + two text lines per row,
  * the exact shape it stands in for while a feed loads. Previews the component
  * in its real placeholder context. (Mini-interface recompose — #200.) */
-function SkeletonCard() {
-  return (
-    <Card title="Activity feed" desc="Loading the latest updates…">
-      {[0, 1, 2].map((i) => (
-        <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div className="sk" style={{ width: 32, height: 32, borderRadius: '50%', flex: '0 0 auto' }} />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div className="sk" style={{ height: 10, width: '55%' }} />
-            <div className="sk" style={{ height: 9, width: '85%' }} />
-          </div>
-        </div>
-      ))}
-    </Card>
-  )
-}
 
 function DialogCard() {
   const [open, setOpen] = useState(true)
@@ -1558,36 +1533,6 @@ function PaginationCard() {
 }
 
 
-function ChartCard() {
-  // ChartFrame — one presentational component, five render modes, all on the
-  // derived chart palette (--k-chart-1..6). The switcher proves the palette
-  // reads across every shape a real dashboard ships.
-  const [type, setType] = useState<ChartType>('area')
-  const [view, setView] = useState<'chart' | 'empty' | 'loading'>('chart')
-  const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  const series =
-    type === 'donut'
-      ? [{ name: 'Sources', values: [48, 30, 14, 8] }]
-      : [
-          { name: 'Sessions', values: [42, 55, 48, 64, 58, 72] },
-          { name: 'Signups', values: [20, 28, 24, 33, 30, 38] },
-        ]
-  const donutLabels = ['Direct', 'Search', 'Social', 'Referral']
-  return (
-    <Card wide docId="chart" title="Traffic by source" desc="One ChartFrame, six render modes — gridlines, axes, hover tooltips.">
-      <div className="segctrl" role="radiogroup" aria-label="Chart type" style={{ marginBottom: 10, flexWrap: 'wrap' }}>
-        {([['line', 'Line'], ['area', 'Area'], ['bar', 'Bar'], ['stacked', 'Stacked'], ['stackedArea', 'Stacked area'], ['donut', 'Donut']] as const).map(([t, lbl]) => (
-          <button key={t} role="radio" aria-checked={view === 'chart' && type === t} className={`segctrl__btn ${view === 'chart' && type === t ? 'segctrl__btn--on' : ''}`} onClick={() => { setType(t); setView('chart') }}>
-            {lbl}
-          </button>
-        ))}
-        <button role="radio" aria-checked={view === 'loading'} className={`segctrl__btn ${view === 'loading' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('loading')}>Loading</button>
-        <button className={`segctrl__btn ${view === 'empty' ? 'segctrl__btn--on' : ''}`} onClick={() => setView('empty')}>Empty</button>
-      </div>
-      <ChartFrame type={type} height={140} labels={type === 'donut' ? donutLabels : labels} series={series} empty={view === 'empty'} loading={view === 'loading'} />
-    </Card>
-  )
-}
 
 // Breakdown — a share-bar category list, the analytical companion beside a
 // chart ("made of what?"). Each row's marker + bar colour comes from the
@@ -1643,36 +1588,6 @@ function FaqCard() {
 
 // Revenue trend — a SEGMENTED CONTROL (Day/Week/Month) swapping the headline
 // figure + bar chart below. Doubles as a showcase for the bar-hover tooltips.
-function TrendCard() {
-  const [range, setRange] = useState<'Day' | 'Week' | 'Month'>('Week')
-  const data = {
-    Day: { total: '$1.2K', delta: '+4.1%', bars: [['9a', 40], ['12p', 62], ['3p', 55], ['6p', 78], ['9p', 66]] as [string, number][] },
-    Week: { total: '$8.4K', delta: '+12.6%', bars: [['Mon', 55], ['Tue', 68], ['Wed', 42], ['Thu', 80], ['Fri', 51], ['Sat', 73], ['Sun', 90]] as [string, number][] },
-    Month: { total: '$34.2K', delta: '+8.3%', bars: [['W1', 60], ['W2', 72], ['W3', 54], ['W4', 88]] as [string, number][] },
-  }[range]
-  return (
-    <Card title="Revenue" desc="Net volume over time.">
-      <div className="segctrl" role="radiogroup" aria-label="Time range" style={{ marginBottom: 14 }}>
-        {(['Day', 'Week', 'Month'] as const).map((r) => (
-          <button key={r} className={`segctrl__btn ${range === r ? 'segctrl__btn--on' : ''}`} role="radio" aria-checked={range === r} onClick={() => setRange(r)}>
-            {r}
-          </button>
-        ))}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12 }}>
-        <span style={{ fontSize: 'var(--k-type-h2)', fontWeight: 700 }}>{data.total}</span>
-        <span className="badge badge--success">{data.delta}</span>
-      </div>
-      <div className="barchart" style={{ height: 90 }}>
-        {data.bars.map(([d, v], i) => (
-          <div key={i} className="barchart__bar" style={{ height: `${v}%` }} tabIndex={0} role="img" aria-label={`${d}: ${v}`}>
-            <span className="barchart__tip">{d} · {v}</span>
-          </div>
-        ))}
-      </div>
-    </Card>
-  )
-}
 
 // Inbox — a SEGMENTED CONTROL (All/Unread/Archived) filtering the list below.
 // Reuses the .list__row interactive-row recipe + an empty state when a filter is dry.
@@ -2029,9 +1944,6 @@ function TreeViewCard() {
   )
 }
 
-// ---- Kanban ----
-type BoardCard = { t: string; b: string; tag: string; tagColor: string; pts: number; prio: string }
-const PRIO: Record<string, string> = { high: 'var(--k-danger-soft-fg)', med: 'var(--k-warning-soft-fg)', low: 'var(--k-info-soft-fg)' }
 function ToolbarRecipeCard() {
   // Composition primitive: every control sits at ONE height because .toolbar
   // forces it — even though the row mixes a search input, a ghost filter, a
@@ -2069,91 +1981,8 @@ function ToolbarRecipeCard() {
   )
 }
 
-function KanbanCard() {
-  const cols: { name: string; cards: BoardCard[] }[] = [
-    { name: 'Todo', cards: [
-      { t: 'Spec OTP login flow', b: 'NW-412', tag: 'Auth', tagColor: 'var(--k-chart-1)', pts: 3, prio: 'high' },
-      { t: 'Audit color tokens', b: 'NW-418', tag: 'Design', tagColor: 'var(--k-chart-2)', pts: 2, prio: 'low' },
-    ] },
-    { name: 'In progress', cards: [
-      { t: 'Sidebar rail collapse', b: 'NW-420', tag: 'Web', tagColor: 'var(--k-chart-3)', pts: 5, prio: 'med' },
-    ] },
-    { name: 'Done', cards: [
-      { t: 'Chart palette refresh', b: 'NW-401', tag: 'Design', tagColor: 'var(--k-chart-2)', pts: 2, prio: 'med' },
-      { t: 'Bulk archive action', b: 'NW-399', tag: 'Data', tagColor: 'var(--k-chart-4)', pts: 8, prio: 'high' },
-    ] },
-  ]
-  const avatars = ['AB', 'CD', 'EF']
-  return (
-    <Card wide title="Sprint board" desc="Issue cards with epic tag, key, points, priority & assignee.">
-      <div className="kanban">
-        {cols.map((c) => (
-          <div key={c.name} className="kanban__col">
-            <div className="kanban__col-head">{c.name}<span className="kanban__count">{c.cards.length}</span></div>
-            {c.cards.map((card, i) => (
-              <button type="button" key={card.b} className="kanban__card" aria-label={`${card.t} · ${card.b}`}>
-                <span className="kanban__card-title">{card.t}</span>
-                {/* H4 usage pass: the tag wears the recipe's accent container — no per-card hex. */}
-                <span className="kanban__tag">{card.tag}</span>
-                <div className="kanban__card-foot">
-                  <span className="kanban__stats">
-                    <span className="kanban__key"><Icon name="file" size={14} /> {card.b}</span>
-                    <span className="kanban__pts">{card.pts}</span>
-                    <span className="kanban__prio" style={{ color: PRIO[card.prio] }} aria-label={`${card.prio} priority`}>
-                      <i /><i /><i />
-                    </span>
-                  </span>
-                  <span className="avatar avatar--sm" style={{ width: 22, height: 22, fontSize: 9 }}>{avatars[i % 3]}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
-    </Card>
-  )
-}
 
 // ---- StatusPage ----
-function StatusBars({ pattern }: { pattern: string }) {
-  const total = pattern.length
-  return (
-    <div className="statuspage__bars">
-      {pattern.split('').map((c, i) => {
-        const status = c === 'w' ? 'Degraded' : c === 'd' ? 'Outage' : 'Operational'
-        return (
-          <span
-            key={i}
-            className={`statuspage__tick ${c === 'w' ? 'statuspage__tick--warn' : c === 'd' ? 'statuspage__tick--down' : ''}`}
-            title={`${total - i} day${total - i === 1 ? '' : 's'} ago — ${status}`}
-          />
-        )
-      })}
-    </div>
-  )
-}
-function StatusPageCard() {
-  const rows = [
-    { name: 'API', pct: '99.98%', p: 'oooooooooooooooooooooo' },
-    { name: 'Dashboard', pct: '99.91%', p: 'ooooooooowoooooooooooo' },
-    { name: 'Webhooks', pct: '98.40%', p: 'ooooooddoooowwooooooooo' },
-    { name: 'CDN', pct: '100%', p: 'oooooooooooooooooooooo' },
-  ]
-  return (
-    <Card wide title="System status" desc="90-day uptime by service.">
-      <div className="statuspage">
-        <div className="statuspage__banner"><Icon name="check" /> All systems operational</div>
-        {rows.map((r) => (
-          <div key={r.name} className="statuspage__row">
-            <span className="statuspage__name">{r.name}</span>
-            <StatusBars pattern={r.p} />
-            <span className="statuspage__pct">{r.pct}</span>
-          </div>
-        ))}
-      </div>
-    </Card>
-  )
-}
 
 // ---- NotificationCenter ----
 function NotificationCenterCard() {
@@ -2328,108 +2157,6 @@ function ToolbarCard() {
  * draws in over 600ms with ease-out so it reads as "freshly loaded data".
  *
  * Two tiles in one card to demo the success + danger delta variants. */
-function StatTile({
-  label, value, delta, sparkPath, positive, good = positive, accent, clickable, hero,
-}: {
-  label: string
-  value: string
-  delta: string
-  sparkPath: string
-  /** Hero KPI — the one focal metric on the surface: renders its value at the
-   *  display tier and spans the full grid (the confident-pro bento move). */
-  hero?: boolean
-  /** Arrow DIRECTION — did the number go up or down? */
-  positive: boolean
-  /** SENTIMENT — is that movement good for the business? Drives the colour.
-   *  Decoupled from direction so e.g. a DROP in churn reads green, not red.
-   *  Defaults to `positive` (up = good), the common case. */
-  good?: boolean
-  accent: 'primary' | 'accent'
-  /** Clickable KPI — adds the drill affordance (hover-lift + trailing chevron),
-   *  the same `.stat-tile--clickable` variant the app's drill-down tiles use. */
-  clickable?: boolean
-}) {
-  const tone = good ? 'var(--k-success)' : 'var(--k-danger)'
-  return (
-    <div
-      className={'stat-tile' + (hero ? ' stat-tile--hero' : '') + (clickable ? ' stat-tile--clickable' : '')}
-      role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : undefined}
-    >
-      <div className="stat-tile__head">
-        <span className="stat-tile__label">{label}</span>
-        {clickable ? (
-          <span className="stat-tile__drill" aria-hidden="true"><Icon name="chevR" size={13} /></span>
-        ) : (
-          <span className={'stat-tile__icon stat-tile__icon--' + accent}>
-            <Icon name={good ? 'chart' : 'bell'} />
-          </span>
-        )}
-      </div>
-      <div className="stat-tile__value">{value}</div>
-      <div className="stat-tile__foot">
-        {/* The kit's own .sparkline, not a second one. This used to be a bare
-            <svg> with stroke and stroke-width set inline, which is how the kit
-            ended up shipping two sparklines — and how the one with a recipe
-            ended up rendering nowhere any instrument could see it. The tile
-            supplies the SLOT class; the recipe supplies the drawing. */}
-        <svg
-          className={`sparkline stat-tile__spark sparkline--${good ? 'good' : 'bad'}`}
-          viewBox="0 0 80 24"
-          preserveAspectRatio="none"
-          aria-hidden
-        >
-          <path className="sparkline__path" d={sparkPath} />
-        </svg>
-        {/* colour follows SENTIMENT (good/bad); arrow follows DIRECTION (up/down) */}
-        <span className={'stat-tile__delta stat-tile__delta--' + (good ? 'up' : 'down')}>
-          <svg width="9" height="9" viewBox="0 0 10 10" aria-hidden>
-            <path d={positive ? 'M5 1 L9 7 L1 7 Z' : 'M5 9 L9 3 L1 3 Z'} fill={tone} />
-          </svg>
-          {delta}
-        </span>
-      </div>
-    </div>
-  )
-}
-function StatCard() {
-  return (
-    <Card wide title="Recurring revenue" desc="This month at a glance.">
-      <div className="stat-tile-grid">
-        <StatTile
-          label="Monthly recurring"
-          value="$48,210"
-          delta="12.4%"
-          positive
-          accent="primary"
-          hero
-          sparkPath="M0 18 L10 16 L20 14 L30 15 L40 11 L50 9 L60 6 L70 7 L80 3"
-        />
-        <StatTile
-          label="Active users"
-          value="8,431"
-          delta="4.1%"
-          positive
-          accent="primary"
-          clickable
-          sparkPath="M0 19 L10 17 L20 16 L30 13 L40 12 L50 10 L60 8 L70 6 L80 4"
-        />
-        <StatTile
-          label="Churn rate"
-          value="2.8%"
-          delta="0.6%"
-          positive={false}
-          good
-          accent="accent"
-          sparkPath="M0 6 L10 7 L20 9 L30 8 L40 11 L50 13 L60 14 L70 17 L80 20"
-        />
-      </div>
-      <button className="btn btn--outline btn--block">
-        <Icon name="chart" /> View full report
-      </button>
-    </Card>
-  )
-}
 
 function PopoverCard() {
   const [open, setOpen] = useState(true)
@@ -4206,6 +3933,15 @@ function SlotPickerCard() {
 function DescriptionListCard() {
   return (
     <Card title="Subscription" desc="Your current plan and usage.">
+      {/* --band: the same pairs read ACROSS — the "state at a glance" strip above
+          a list screen. It replaced a separate .stat-tile-strip component that
+          could not name a source; a band of label→value pairs is a description
+          list, and this one inherits GOV.UK's Summary list provenance. */}
+      <dl className="dl dl--band" style={{ marginBottom: 'var(--k-s-16)' }}>
+        <div><dt>Seats</dt><dd>24</dd></div>
+        <div><dt>Storage</dt><dd>14.2 GB</dd></div>
+        <div><dt>This month</dt><dd>$48</dd></div>
+      </dl>
       <dl className="dl">
         <dt>Plan</dt>
         <dd>Team — $48/mo</dd>
@@ -4916,42 +4652,6 @@ function ProseCard() {
  * complete, ringed when current, hollow when future. Each event has
  * a time, title, optional description. Activity feeds, build history,
  * version logs. */
-function TimelineCard() {
-  return (
-    <Card title="Release progress" desc="Where v2.4.0 is in the pipeline.">
-      <ol className="timeline">
-        <li className="timeline__item timeline__item--done">
-          <span className="timeline__dot"><Icon name="check" /></span>
-          <div className="timeline__body">
-            <div className="timeline__head"><span className="timeline__title">v2.4.0 deployed</span><span className="timeline__time">2 min ago</span></div>
-            <div className="timeline__desc">Production · 12 services updated</div>
-          </div>
-        </li>
-        <li className="timeline__item timeline__item--current">
-          <span className="timeline__dot"><span className="timeline__pulse" /></span>
-          <div className="timeline__body">
-            <div className="timeline__head"><span className="timeline__title">Running tests</span><span className="timeline__time">in progress</span></div>
-            <div className="timeline__desc">348 / 412 passed</div>
-          </div>
-        </li>
-        <li className="timeline__item timeline__item--upcoming">
-          <span className="timeline__dot" />
-          <div className="timeline__body">
-            <div className="timeline__head"><span className="timeline__title">Build artifacts</span></div>
-            <div className="timeline__desc">Pending — waits on test pass</div>
-          </div>
-        </li>
-        <li className="timeline__item">
-          <span className="timeline__dot" />
-          <div className="timeline__body">
-            <div className="timeline__head"><span className="timeline__title">Notify subscribers</span></div>
-          </div>
-        </li>
-      </ol>
-      <button className="btn btn--outline btn--block">View full pipeline</button>
-    </Card>
-  )
-}
 
 /* === CodeBlock (Tier 4 #18) ==========================================
  * Multi-line code with line numbers + horizontal scroll. Header has
@@ -5298,67 +4998,6 @@ function ActionPanelCard() {
 /* === StatGroup (Tier 4 #14) — composed demo ===
  * Multi-metric horizontale strip — 4 metrics naast elkaar met dividers.
  * Pakt grote nummers + kleine labels. Vaak een hero stat-strip. */
-function StatGroupCard() {
-  return (
-    <Card wide title="Overview" desc="Key numbers for this month.">
-      <div className="stat-tile-strip">
-        <div className="stat-tile-strip__cell">
-          <div className="stat-tile__value">12.4K</div>
-          <div className="stat-tile__label">Active users</div>
-        </div>
-        <div className="stat-tile-strip__cell">
-          <div className="stat-tile__value">$48.2K</div>
-          <div className="stat-tile__label">MRR</div>
-        </div>
-        <div className="stat-tile-strip__cell">
-          <div className="stat-tile__value">96%</div>
-          <div className="stat-tile__label">Uptime</div>
-        </div>
-        <div className="stat-tile-strip__cell">
-          <div className="stat-tile__value">2.4s</div>
-          <div className="stat-tile__label">Median TTFB</div>
-        </div>
-      </div>
-      {/* --fill: the summary-band variant — cells wear the tactical --k-surface-fill
-          wash (label + delta on a row, value below). The "state at a glance" strip. */}
-      <div className="stat-tile-strip stat-tile-strip--fill" style={{ marginTop: 12 }}>
-        <div className="stat-tile-strip__cell">
-          <div className="card__row" style={{ justifyContent: 'space-between', gap: 8 }}>
-            <span className="stat-tile__label">Revenue</span>
-            <span className="stat-tile__delta stat-tile__delta--up">+4.8%</span>
-          </div>
-          <div className="stat-tile__value">$405K</div>
-        </div>
-        <div className="stat-tile-strip__cell">
-          <div className="card__row" style={{ justifyContent: 'space-between', gap: 8 }}>
-            <span className="stat-tile__label">Overdue</span>
-            <span className="stat-tile__delta stat-tile__delta--down">+54%</span>
-          </div>
-          <div className="stat-tile__value">$12.7K</div>
-        </div>
-        <div className="stat-tile-strip__cell">
-          <div className="card__row" style={{ justifyContent: 'space-between', gap: 8 }}>
-            <span className="stat-tile__label">Paid this month</span>
-            <span className="stat-tile__delta stat-tile__delta--up">+8.1%</span>
-          </div>
-          <div className="stat-tile__value">$148K</div>
-        </div>
-      </div>
-      <div className="card__row" style={{ alignItems: 'center', gap: 8, marginTop: 8 }}>
-        <span className="avatar-group">
-          <span className="avatar avatar--sm">AB</span>
-          <span className="avatar avatar--sm">CD</span>
-          <span className="avatar avatar--sm">EF</span>
-          <span className="avatar-group__more">+3</span>
-        </span>
-        <span style={{ fontSize: 11, color: 'var(--k-fg-muted)' }}>6 collaborators</span>
-      </div>
-      <button className="btn btn--primary btn--block">
-        <Icon name="grid" /> Open dashboard
-      </button>
-    </Card>
-  )
-}
 
 /* === FeatureTrio (Tier 4 #15) — composed demo ===
  * 3-column feature blocks: icon (in soft tile) + heading + body. The
@@ -5493,11 +5132,8 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   // Data & display
   { slug: 'table', name: 'Table', group: 'Data display', recipeId: 'table', blurb: 'The base data table — header, rows, numeric alignment, hover and zebra.', Preview: TableCard },
   { slug: 'data-table', name: 'Data Table', group: 'Data display', recipeId: 'data-table', blurb: 'The flagship data surface — toolbar, selection, sticky header, pagination and every state.', Preview: DataTableProCard },
-  { slug: 'chart', name: 'Chart', group: 'Data display', recipeId: 'chart', blurb: 'Line / area / bar / stacked / donut on the kit’s derived 6-series palette.', Preview: ChartCard },
-  { slug: 'stat-tile', name: 'Stat Tile', group: 'Data display', recipeId: 'stat-tile', blurb: 'A KPI tile — big number, label, delta and an optional sparkline.', Preview: StatCard },
   { slug: 'list', name: 'List', group: 'Data display', recipeId: 'list', blurb: 'Rows of items with lead media, meta and trailing actions or badges.', Preview: ListCard },
   { slug: 'description-list', name: 'Description List', group: 'Data display', recipeId: 'description-list', blurb: 'Key–value pairs — account info, plan details, a spec sheet.', Preview: DescriptionListCard },
-  { slug: 'timeline', name: 'Timeline', group: 'Data display', recipeId: 'timeline', blurb: 'Vertical events with state dots — activity feeds, build history, version logs.', Preview: TimelineCard },
   { slug: 'avatar', name: 'Avatar', group: 'Data display', recipeId: 'avatar', blurb: 'A user image or initials, with sizes and a status dot.', Preview: AvatarCard },
   { slug: 'badge', name: 'Badge & Chip', group: 'Data display', recipeId: 'chip', blurb: 'Compact status pills and removable chips in the toned status colours.', Preview: ChipsCard },
   { slug: 'entity-card', name: 'Entity Card', group: 'Data display', recipeId: 'entity-card', blurb: 'An identity + a few key facts — mark, name, a kebab menu and meta rows.', Preview: EntityCardCard },
@@ -5509,7 +5145,6 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'banner', name: 'Banner', group: 'Feedback', recipeId: 'banner', blurb: 'A full-width page-level notice with an action and a dismiss.', Preview: BannerCard },
   { slug: 'toast', name: 'Toast', group: 'Feedback', recipeId: 'toast-stack', blurb: 'Transient confirmations — the toned variants and the actionable snackbar.', Preview: ToastStackCard },
   { slug: 'progress', name: 'Progress', group: 'Feedback', recipeId: 'progress', blurb: 'A determinate progress bar, heavier than the slider to read as ongoing work.', Preview: ProgressCard },
-  { slug: 'skeleton', name: 'Skeleton', group: 'Feedback', recipeId: 'skeleton', blurb: 'Loading placeholders that match the shape of what’s coming.', Preview: SkeletonCard },
   { slug: 'spinner', name: 'Spinner', group: 'Feedback', recipeId: 'spinner', blurb: 'An indeterminate loading indicator at the control-height scale.', Preview: SpinnerCard },
   { slug: 'empty-state', name: 'Empty State', group: 'Feedback', recipeId: 'empty-state', blurb: 'The zero-data screen — an icon, a line of guidance and one action.', Preview: EmptyStateCard },
 

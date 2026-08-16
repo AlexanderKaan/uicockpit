@@ -176,7 +176,9 @@ describe('design.md documents the kit it ships with', () => {
     const sections = [...new Set(RECIPES.map((r) => r.section).filter(Boolean))] as string[]
     const missing = sections.filter((s) => !brief.includes(s))
     expect(missing, `kit sections absent from design.md: ${missing.join(', ')}`).toEqual([])
-    expect(sections.length).toBeGreaterThan(100)
+    // A floor, not a count: 97 recipes after the four-layer cut, and it only
+    // proves the set is real rather than empty.
+    expect(sections.length).toBeGreaterThan(80)
   })
 
   it('documents no component the kit does not ship', () => {

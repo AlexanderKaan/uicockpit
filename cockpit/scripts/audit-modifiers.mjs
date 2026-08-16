@@ -36,7 +36,6 @@ const DEF_FILES = ['src/kit/recipes/index.ts', 'src/styles/preview-only.css', 's
 // through (same set parity treats as "on the page").
 const GALLERY_FILES = [
   'src/stage/views/ComponentGallery.tsx',
-  'src/stage/views/ChartFrame.tsx',
   'src/stage/views/apps/AppHelpers.tsx',
 ]
 // App = the manifest-driven showcase renderer (H3c — SupaDash retired); sections.tsx

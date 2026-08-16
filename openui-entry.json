@@ -62,11 +62,6 @@
       "definition": "A live remaining-characters readout that is actually announced, and never truncates a paste."
     },
     {
-      "name": "Chart",
-      "url": "https://uicockpit.com/components/chart",
-      "definition": "Line / area / bar / stacked / donut on the kit’s derived 6-series palette."
-    },
-    {
       "name": "Checkbox & Radio",
       "url": "https://uicockpit.com/components/checkbox-radio",
       "definition": "Multi- and single-select controls, including the richer selectable card variant.",
@@ -272,11 +267,6 @@
       "definition": "A slide-in panel from an edge — a longer flow than a dialog holds."
     },
     {
-      "name": "Skeleton",
-      "url": "https://uicockpit.com/components/skeleton",
-      "definition": "Loading placeholders that match the shape of what’s coming."
-    },
-    {
       "name": "Slider",
       "url": "https://uicockpit.com/components/slider",
       "definition": "A drag-to-set value control on a stroke-3 track with a precise handle."
@@ -285,11 +275,6 @@
       "name": "Spinner",
       "url": "https://uicockpit.com/components/spinner",
       "definition": "An indeterminate loading indicator at the control-height scale."
-    },
-    {
-      "name": "Stat Tile",
-      "url": "https://uicockpit.com/components/stat-tile",
-      "definition": "A KPI tile — big number, label, delta and an optional sparkline."
     },
     {
       "name": "Stepper",
@@ -315,11 +300,6 @@
       "name": "Tag Input",
       "url": "https://uicockpit.com/components/tag-input",
       "definition": "Enter and remove tokens inline — labels, recipients, filters."
-    },
-    {
-      "name": "Timeline",
-      "url": "https://uicockpit.com/components/timeline",
-      "definition": "Vertical events with state dots — activity feeds, build history, version logs."
     },
     {
       "name": "Toast",

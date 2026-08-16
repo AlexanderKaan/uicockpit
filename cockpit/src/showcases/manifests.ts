@@ -23,11 +23,6 @@ export type SectionSpec =
   // The screen-level header — the kit's `.page-head` recipe (title · sub · a
   // trailing actions cluster). Prepend one so every screen opens the same way.
   | { kind: 'pageHead'; seed: { title: string; sub?: string; actions?: Array<{ label: string; icon?: IconName; primary?: boolean }> } }
-  | { kind: 'stats'; seed: { items: Array<{ label: string; value: string; delta?: string; up?: boolean; hero?: boolean; spark?: number[] }> } }
-  | { kind: 'chart'; seed: { title: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> } }
-  // Tabbed chart — a real .tabs strip switching between named chart views (each a
-  // ChartFrame with its own data). The Reports screen's metric switcher.
-  | { kind: 'chartTabs'; seed: { tabs: Array<{ label: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> }> } }
   | { kind: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
   | { kind: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[]; greeting?: string } }
   | { kind: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[]; badgeToneByValue?: Record<string, 'success' | 'warning' | 'danger' | 'info'>; avatarCols?: number[] } }
@@ -38,10 +33,7 @@ export type SectionSpec =
   | { kind: 'prose'; seed: { title: string; kicker?: string; paragraphs: string[]; hero?: boolean; ctas?: string[] } }
   | { kind: 'dl'; seed: { title?: string; pairs: Array<[string, string]> } }
   | { kind: 'chips'; seed: { label: string; options: string[]; active: number } }
-  // H3c harvest — rich patterns lifted out of SupaDash into the manifest model.
-  | { kind: 'kanban'; seed: { columns: Array<{ name: string; cards: Array<{ title: string; tag?: string; key?: string; pts?: string; avatar?: string }> }> } }
   | { kind: 'tree'; seed: { label?: string; groups: Array<{ name: string; items: Array<{ title: string; on?: boolean }> }> } }
-  | { kind: 'timeline'; seed: { events: Array<{ title: string; time: string; desc?: string; state?: 'done' | 'current' }> } }
   | { kind: 'settings'; seed: { title?: string; rows: Array<{ title: string; sub: string; on: boolean }> } }
   | { kind: 'wizard'; seed: { steps: string[]; active: number; title: string; sub?: string } }
   | { kind: 'dropzone'; seed: { title: string; hint: string } }
@@ -364,24 +356,8 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { label: 'Export', icon: 'upload' },
             { label: 'New invoice', icon: 'plus', primary: true },
           ] } },
-          { kind: 'stats', seed: { items: [
-            { label: 'Net revenue', value: '$405,091.00', delta: '+4.75%', up: true, hero: true, spark: [186, 204, 198, 241, 273, 312] },
-            { label: 'Collected (Mar)', value: '$148,316.00', delta: '+8.10%', up: true, spark: [120, 132, 128, 140, 137, 148] },
-            { label: 'Avg. days to pay', value: '19 days', delta: '−2 days', up: true, spark: [27, 26, 24, 23, 21, 19] },
-            { label: 'Active clients', value: '18', delta: '+3 qtr', up: true, spark: [12, 13, 14, 15, 17, 18] },
-          ] } },
-          { kind: 'chartTabs', seed: { tabs: [
-            { label: 'Cashflow', type: 'area', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
-              { name: 'Invoiced', values: [186, 204, 198, 241, 273, 312] },
-              { name: 'Collected', values: [142, 188, 176, 214, 248, 286] },
-            ] },
-            { label: 'Expenses', type: 'bar', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], series: [
-              { name: 'Spend', values: [22, 26, 30, 24, 28, 31] },
-            ] },
-            { label: 'Aging', type: 'bar', labels: ['Current', '1–30', '31–60', '61–90', '90+'], series: [
-              { name: 'Outstanding', values: [148, 56, 24, 12, 6] },
-            ] },
-          ] } },
+          
+          
           
           { kind: 'list', seed: { title: 'Recent activity', items: [
             { icon: 'check', title: 'Payment received — SavvyCal', sub: 'Invoice #00010 · $14,000.00', trail: '2m', badge: 'success' },
@@ -459,11 +435,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
           { kind: 'pageHead', seed: { title: 'Plans & billing', sub: 'Your subscription, billing details and notifications.', actions: [
             { label: 'Manage billing', icon: 'card' },
           ] } },
-          { kind: 'stats', seed: { items: [
-            { label: 'Current plan', value: 'Scale · annual', hero: true },
-            { label: 'Seats', value: '4 of 5 used' },
-            { label: 'Renews', value: 'Jul 1, 2026' },
-          ] } },
+          
           { kind: 'form', seed: { title: 'Billing details', intro: 'These appear on every invoice you send.', fields: [
             { label: 'Legal name', value: 'Acme, Inc.' },
             { label: 'VAT number', placeholder: 'EU123456789' },
@@ -498,11 +470,7 @@ export const SHOWCASES: ShowcaseManifest[] = [
             { label: 'Export', icon: 'upload' },
             { label: 'New invoice', icon: 'plus', primary: true },
           ] } },
-          { kind: 'stats', seed: { items: [
-            { label: 'Due this week', value: '$34,560.00', delta: '4 invoices', up: false },
-            { label: 'Scheduled', value: '12 items' },
-            { label: 'Overdue', value: '$12,787.00', delta: '3 invoices', up: false },
-          ] } },
+          
           { kind: 'chips', seed: { label: 'Filter', options: ['All', 'Invoices', 'Payments', 'Reminders'], active: 0 } },
           { kind: 'calendar', seed: { title: 'March 2026', firstDow: 6, days: 31, today: 9, selected: 16, events: [3, 6, 12, 16, 20, 24, 27] } },
           { kind: 'list', seed: { title: 'Upcoming', items: [

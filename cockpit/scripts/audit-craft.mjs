@@ -54,7 +54,7 @@ const REPORT_ONLY = process.argv.slice(2).includes('--report')
    counted values that sit on the spacing scale; the gate counts every literal.
    Estimating and measuring disagreed by a factor of two, again. */
 const TARGETS = [
-  { src: 'src/kit/recipes/index.ts', baseline: 147, what: 'the kit' },
+  { src: 'src/kit/recipes/index.ts', baseline: 119, what: 'the kit' },
   { src: 'src/styles/panel.css',      baseline: 169,  what: 'the panel' },
   { src: 'src/styles/stage.css',      baseline: 189,  what: 'the stage + topbar' },
   { src: 'src/styles/chrome.css',     baseline: 53,  what: 'the app shell' },

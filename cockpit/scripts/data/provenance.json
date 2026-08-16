@@ -634,6 +634,14 @@
         "url": "https://open-ui.org/research/component-matrix"
       }
     ],
+    "treeview": [
+      {
+        "layer": 2,
+        "source": "APG · Treeview",
+        "because": "WAI-ARIA APG names the Treeview pattern and specifies its behaviour.",
+        "url": "https://www.w3.org/WAI/ARIA/apg/treeview/"
+      }
+    ],
     "usage-meter": [
       {
         "layer": 2,
@@ -1079,21 +1087,9 @@
   },
   "unassigned": [
     "composition",
-    "rating",
     "section",
-    "aspect-ratio",
-    "scroll-area",
-    "skeleton",
     "empty-state",
-    "danger-zone",
-    "chart",
-    "breakdown",
-    "sparkline",
     "roll-down-item-stagger",
-    "stat-tile",
-    "attachment-chip-family",
-    "inline-status-meta-micro-components",
-    "timeline",
     "twocolumnlayout",
     "layout-primitives",
     "pane"

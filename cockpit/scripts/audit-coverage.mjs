@@ -57,13 +57,13 @@ const REPORT = process.argv.includes('--report')
 
 /* The composition fixture. sections.tsx maps SectionSpec → kit recipes,
  * shell.tsx carries the section tier (scaffold + panes) that the deleted loupe
- * used to be the only consumer of, extras.ts defines the pane/window class
- * constants those apply through, and ChartFrame is the chart presenter the
- * blocks compose. See the note in cockpit/CLAUDE.md: this directory is not dead
- * code, it is what six auditors read from disk. */
+ * used to be the only consumer of, and extras.ts defines the pane/window class
+ * constants those apply through. (ChartFrame was the fourth file here until the
+ * four-layer cut took the chart recipe and the presenter with it.) See the note
+ * in cockpit/CLAUDE.md: this directory is not dead code, it is what six auditors
+ * read from disk. */
 const SHOWCASES = resolve(ROOT, 'src/showcases')
 const FILES = [
-  resolve(ROOT, 'src/stage/views/ChartFrame.tsx'),
   resolve(ROOT, 'src/tokens/extras.ts'),
   ...readdirSync(SHOWCASES).filter((f) => /\.tsx?$/.test(f)).map((f) => resolve(SHOWCASES, f)),
 ]
@@ -102,7 +102,7 @@ for (const r of kit.recipes) {
 /* The ratchet. It may fall; it may not rise. Do NOT raise it to make a build
  * pass — if the number went DOWN the gate fails on purpose until the win is
  * locked in, same contract as audit:apg and audit:structural-inline. */
-const CEILING = 53
+const CEILING = 52
 
 const line = (s = '') => console.log(s)
 line('=== audit:coverage — does anything COMPOSE this recipe into a page? ===')

@@ -35,7 +35,6 @@ const DEF_FILES = ['src/kit/recipes/index.ts', 'src/styles/preview-only.css', 's
  * via one of these is "on the page" even if the markup lives in the helper. */
 const PAGE_FILES = [
   'src/stage/views/ComponentGallery.tsx',
-  'src/stage/views/ChartFrame.tsx',
   'src/stage/views/apps/AppHelpers.tsx',
 ]
 /* APP = the manifest-driven showcase renderer (H3c — SupaDash retired). sections.tsx

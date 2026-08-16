@@ -119,9 +119,7 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   auth: ['form-primitives', 'passwordinput', 'buttons', 'card'], // the sign-in form card
   calendar: ['buttons'], // the month-grid date picker
   'calendar-range': ['calendar', 'buttons'], // the double-month range picker
-  'stat-tile': ['card', 'sparkline', 'badges-pills'], // a single metric tile
-  chart: ['card'], // a chart widget (lives in a card)
-  timeline: ['avatar', 'badges-pills'], // an event list
+  treeview: [],
   'activity-feed': ['avatar', 'badges-pills', 'list'], // a feed list
 }
 
@@ -149,7 +147,7 @@ export const STANDALONE_ATOMS: readonly string[] = [
   // a rich-text container — styles raw semantic tags; no single host (Fase J-8)
   'prose',
   // loading & layout utilities
-  'skeleton', 'spinner',
+  'spinner',
   // data-display primitives
   'description-list',
   /* Accessibility primitives (the design-system study, 2026-08-14). All three

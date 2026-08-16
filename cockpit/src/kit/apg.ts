@@ -82,6 +82,28 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
     aria: ['role="dialog"', 'aria-modal="true" when it IS modal — showModal() sets it, and a docked <dialog open> must not claim it', 'aria-labelledby or aria-label', 'Focus moves INTO the dialog on open and RETURNS to the trigger on close'],
     free: '<dialog> + showModal() gives all of it except the return-focus-to-trigger, which the browser does too when the dialog is closed properly.',
   },
+  /* Split out of the chart recipe (2026-08-16), and the split is what made this
+   * findable: a disclosure tree spent its life inside an entry labelled "Chart",
+   * so the derivation kept asking which design system ships a Chart and never
+   * asked about a Treeview — which APG has named and specified all along. */
+  treeview: {
+    pattern: 'Treeview',
+    url: `${APG}/treeview/`,
+    keys: [
+      ['Up / Down', 'Move to the previous / next visible node'],
+      ['Right', 'Open a closed node, or move to its first child when already open'],
+      ['Left', 'Close an open node, or move to its parent when already closed'],
+      ['Home / End', 'First / last visible node'],
+      ['Enter / Space', 'Activate the node'],
+    ],
+    aria: [
+      'role="tree" on the container, role="treeitem" on every node',
+      'role="group" on a nested list of children',
+      'aria-expanded on any node that has children — absent means it has none',
+      'aria-selected on the selected node',
+      'roving tabindex: the tree is ONE tab stop',
+    ],
+  },
   tabs: {
     pattern: 'Tabs',
     url: `${APG}/tabs/`,
@@ -529,7 +551,6 @@ export const APG_PATTERNS: Record<string, ApgPattern> = {
 export const APG_NOT_APPLICABLE: Record<string, string> = {
   card: 'A card is a visual container, not an interaction pattern. APG has none, and inventing roles for it is how a div ends up announced as a widget.',
   'badges-pills': 'Static text with a tone. Its meaning must be in the words, which is WCAG 1.4.1, not an APG pattern.',
-  skeleton: 'A loading placeholder. It should be aria-hidden and the region should carry aria-busy instead.',
   prose: 'Long-form content — HTML semantics, not a widget.',
   identifier: 'Institutional furniture. Landmarks apply; there is no interaction pattern.',
   charcount: 'A live region attached to a field. The pattern is the live region, covered under the field, not a widget of its own.',
@@ -548,11 +569,9 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   fieldset: '<fieldset>/<legend> IS the grouping mechanism; APG has no pattern because HTML already has the element. The failure mode is not using it: a set of radios without a legend has options with no question.',
   'entity-card': 'A card describing a thing. If the whole card is clickable it is one link with one name, not a card full of separate targets — that is the only real decision here.',
   infocard: 'A compact information tile. Label/value pairs; a description list if the pairs are data.',
-  'stat-tile': 'A number with a label. The label must be part of the accessible name — a screen reader reading "1,284" alone has been told nothing.',
   'file-grid': 'A grid of file tiles. Visually a grid, semantically a list — role="grid" here would promise arrow-key navigation between cells that no file browser actually wants.',
   list: 'A list. <ul>/<li>, and the row semantics come from what is in the row.',
   'description-list': 'Term and definition pairs. <dl>/<dt>/<dd> is the pattern, and it is HTML.',
-  timeline: 'An ordered list of events with times. <ol> plus <time> — a role would add nothing a screen reader does not already get.',
   processlist: 'Numbered steps that carry content. An <ol>, where the number is the list, not a painted circle.',
   stepper: 'A read-only progress indicator through a wizard. Not a widget — an <ol> with aria-current="step". The current step must be in TEXT ("Step 2 of 4"), because a filled dot is not available to a screen reader.',
   wizardstepper: 'Same as the stepper: an indicator, not a control. aria-current="step" and the position said in words.',
@@ -561,8 +580,6 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   avatar: 'An image or initials. Decorative beside a name (aria-hidden), and named when it stands alone — a photo whose alt text is the file name is the classic failure.',
   spinner: 'A busy indicator. aria-busy on the region it belongs to, and a live region announcing the outcome. Never a spinner that announces itself forever.',
   'empty-state': 'A message and usually one action. The message is text; there is nothing to specify.',
-  chart: 'No APG pattern, and the largest text-alternative obligation in the kit: a chart is unreadable to a screen reader unless the same information exists as text or a table. Colour alone cannot carry a series (WCAG 1.4.1), which is why the legend uses markers as well.',
-  sparkline: 'A trend glyph. It needs the trend in words beside it ("up 12% this week"); on its own it is decoration and takes aria-hidden.',
   kbd: 'A key name. <kbd>. The trap is symbols — "⌘K" needs to be readable, not a glyph a screen reader spells out or skips.',
   codeblock: 'A code block. <pre><code>, with a language label as text. The copy button is a plain button that must confirm what it did in a live region. And the <pre> itself needs tabindex="0" with a role and a name: it scrolls sideways whenever the code is wider than the box, and a scroll container with no focusable content cannot be reached by keyboard at all (WCAG 2.1.1, Level A). Found here for real — and only at widths where the code overflows, which a scan pinned at one viewport never reaches.',
   'roll-down-item-stagger': 'An entrance animation. It must respect prefers-reduced-motion, which is WCAG 2.3.3 and a media query, not a role.',

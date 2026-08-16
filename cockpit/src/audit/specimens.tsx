@@ -237,21 +237,7 @@ export const SPECIMENS: Record<string, Specimen> = {
     ),
   },
 
-  chart: {
-    label: 'Chart',
-    render: () => (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 190 }}>
-        <div className="barchart" style={{ height: 72 }}>
-          {[38, 62, 44, 81, 55, 70, 48].map((v, i) => (
-            <div key={i} className="barchart__bar" style={{ height: `${v}%` }} />
-          ))}
-        </div>
-        <div className="chart-legend">
-          <span className="chart-legend__item"><span className="chart-legend__dot" />Revenue</span>
-        </div>
-      </div>
-    ),
-  },
+
 
   calendar: {
     label: 'Calendar',

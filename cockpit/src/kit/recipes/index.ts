@@ -2012,18 +2012,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 }`,
   },
   {
-    id: 'skeleton',
-    section: "Skeleton",
-    css: `/* === Skeleton === */
-.sk {
-  background: linear-gradient(90deg, var(--k-surface-2) 0%, var(--k-surface-raised) 50%, var(--k-surface-2) 100%);
-  background-size: 200% 100%;
-  border-radius: var(--k-radius-md);
-  animation: sk 1.5s ease-in-out infinite;
-}
-@keyframes sk { 0% { background-position: 0 0; } 100% { background-position: -200% 0; } }`,
-  },
-  {
     id: 'empty-state',
     section: "Empty state",
     css: `/* === Empty state ===
@@ -3628,154 +3616,15 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .breadcrumb [aria-current="page"] { color: var(--k-fg); font-weight: var(--k-weight-medium); }`,
   },
   {
-    id: 'chart',
-    section: "Chart",
-    doc: {
-      dos: [
-        "Series colours come from the derived --k-chart-1..6 palette \u2014 every kit ships a harmonised set that survives re-theming.",
-        "Give every chart an insight header (title + the delta that matters), not just axes.",
-        "Use the recipe's legend and keep axis labels in caption type.",
-      ],
-      donts: [
-        "Don't introduce colours outside the chart palette \u2014 they break theming and dark mode.",
-        "Don't plot more than six series in one frame; split the story instead.",
-      ],
-    },
-    css: `/* === Chart ===
-   Data-viz elements (bars, sparklines) deliberately do NOT scale with the
-   theme's radius — a pill-shaped bar reads as a pill, not as data. A small
-   fixed radius keeps the chart legible across all 5 radius choices.
-   The accent color (not primary) sits here on purpose: a chart is where
-   the user's brand accent earns its keep in a SaaS dashboard.
-
-   Bar sizing follows shadcn/Recharts convention: bars 16-30px with ~2:1
-   bar-to-gap ratio. flex:1 gave fat bars filling the row — slimmer + more
-   breathing room reads as data rather than blocks. */
-.barchart {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--k-s-8);
-  height: 80px;
-}
-.barchart__bar {
-  flex: 1 1 0;
-  min-width: 14px;
-  max-width: 30px;
-  position: relative;
-  background: var(--k-accent);
-  /* Bar-top follows the system radius but stays CAPPED: a chart bar should
-   * read square-ish, never a pill. Couples to the (scaling) inner radius so a
-   * square Style → square tops, but min()-clamps at 4px so round Styles don't
-   * give lozenge-topped bars (bad charting practice). Same idiom as
-   * --k-row-radius. Was a hardcoded 3px, decoupled from the Radius control. */
-  border-radius: min(4px, var(--k-radius-sm)) min(4px, var(--k-radius-sm)) 0 0;
-  opacity: 0.9;
-  transform-origin: bottom;
-  /* Easing follows the theme's --k-ease-out so Playful gives the bars a soft overshoot too */
-  animation: bar-rise 700ms var(--k-ease-out, cubic-bezier(.2, .8, .2, 1)) backwards;
-  /* Hover lifts the bar to full opacity — pairs with the value tooltip below. */
-  transition: opacity var(--k-dur-fast, 120ms) var(--k-ease, ease);
-}
-@keyframes bar-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-/* Hover/focus value tooltip — CSS-only so it survives the framework-neutral
-   export (no JS runtime); same dark-pill look as .tooltip__pop. Bars carry
-   tabindex + aria-label, so the global :focus-visible ring plus this tip make
-   the data keyboard-reachable, not just hover-only. */
-.barchart__bar:hover,
-.barchart__bar:focus-visible { opacity: 1; }
-.barchart__tip {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%) translateY(3px);
-  background: var(--k-fg);
-  color: var(--k-bg);
-  font-size: var(--k-type-eyebrow);
-  font-weight: var(--k-weight-semibold);
-  line-height: 1;
-  padding-block: var(--k-s-4);
-  padding-inline: var(--k-s-6);
-  border-radius: var(--k-radius-sm);
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--k-dur-fast, 120ms) var(--k-ease, ease),
-              transform var(--k-dur-fast, 120ms) var(--k-ease, ease);
-  z-index: var(--k-z-tooltip);
-}
-.barchart__bar:hover .barchart__tip,
-.barchart__bar:focus-visible .barchart__tip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-/* Stagger up to 7 bars — covers gallery card (7) and dashboard 7-day chart */
-.barchart__bar:nth-child(1) { animation-delay: 0ms; }
-.barchart__bar:nth-child(2) { animation-delay: 60ms; }
-.barchart__bar:nth-child(3) { animation-delay: 120ms; }
-.barchart__bar:nth-child(4) { animation-delay: 180ms; }
-.barchart__bar:nth-child(5) { animation-delay: 240ms; }
-.barchart__bar:nth-child(6) { animation-delay: 300ms; }
-.barchart__bar:nth-child(7) { animation-delay: 360ms; }
-/* Categorical variant — each bar is a distinct series, colored from the
- * derived chart palette (chart-1..6). For by-category breakdowns; the default
- * single-series time chart above stays one accent color. */
-.barchart--series .barchart__bar { opacity: 1; }
-.barchart--series .barchart__bar:nth-child(1) { background: var(--k-chart-1); }
-.barchart--series .barchart__bar:nth-child(2) { background: var(--k-chart-2); }
-.barchart--series .barchart__bar:nth-child(3) { background: var(--k-chart-3); }
-.barchart--series .barchart__bar:nth-child(4) { background: var(--k-chart-4); }
-.barchart--series .barchart__bar:nth-child(5) { background: var(--k-chart-5); }
-.barchart--series .barchart__bar:nth-child(6) { background: var(--k-chart-6); }
-/* Legend — series swatch + label row under a categorical chart */
-.chart-legend { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); margin-top: var(--k-s-12); }
-.chart-legend__item { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
-.chart-legend__dot { width: var(--k-marker); height: var(--k-marker); border-radius: 2px; flex: none; }
-
-/* ChartFrame — presentational chart family on the --k-chart-1..6 palette.
- * One container, five render modes (line / area / bar / stacked / donut).
- * The SVG fills its frame; series colours come straight from the palette. */
-.chart { display: flex; flex-direction: column; gap: var(--k-s-2); }
-.chart__canvas { width: 100%; position: relative; }
-/* No-data state — a centred placeholder filling the plot area, not a blank box. */
-.chart__empty {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: var(--k-s-8); padding: var(--k-s-16);
-  color: var(--k-fg-faint); font-size: var(--k-type-small); text-align: center;
-}
-.chart__empty svg { width: 1.75rem; height: 1.75rem; opacity: 0.55; }
-/* Loading state — skeleton bars (reuse .sk shimmer) while data fetches. */
-.chart__loading { display: flex; align-items: flex-end; gap: var(--k-s-8); padding: var(--k-s-8) 0; }
-.chart__loading-bar { flex: 1; min-width: 0; border-radius: var(--k-radius-sm) var(--k-radius-sm) 0 0; }
-.chart__svg { width: 100%; height: 100%; display: block; }
-.chart__svg--donut { max-width: 220px; margin: 0 auto; }
-.chart__axis { stroke: var(--k-border); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.chart__donut-num { font-size: var(--k-type-h3); font-weight: var(--k-weight-bold); fill: var(--k-fg); font-family: var(--k-font-display); font-variant-numeric: tabular-nums; }
-.chart__donut-cap { font-size: var(--k-type-caption); fill: var(--k-fg-faint); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); }
-.chart__legend { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); margin-top: var(--k-s-10); }
-.chart__legend-item { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); }
-.chart__swatch { width: var(--k-marker); height: var(--k-marker); border-radius: 2px; flex: none; }
-/* Gridlines — faint horizontal guides behind the marks. Baseline reuses
- * .chart__axis (stronger). Both are non-scaling so they stay 1px under the
- * stretched (preserveAspectRatio:none) viewBox. */
-.chart__grid { stroke: var(--k-border); stroke-width: 1; opacity: 0.5; vector-effect: non-scaling-stroke; }
-/* y-axis ticks — crisp HTML overlay (SVG text would stretch). Sits in the
- * top-left, three labels spread top→bottom matching the gridlines. */
-.chart__yaxis { position: absolute; inset: 0 auto 0 0; display: flex; flex-direction: column; justify-content: space-between; padding: 0 var(--k-s-4) 0 0; pointer-events: none; z-index: 1; }
-.chart__ytick { font-size: var(--k-type-caption); color: var(--k-fg-faint); font-variant-numeric: tabular-nums; line-height: 1; background: var(--k-surface); padding: 0 var(--k-s-2) 0 0; border-radius: 2px; }
-/* x-axis labels — evenly distributed under the canvas. */
-.chart__xlabels { display: flex; justify-content: space-between; margin-top: var(--k-s-4); }
-.chart__xlabel { font-size: var(--k-type-caption); color: var(--k-fg-faint); font-variant-numeric: tabular-nums; transition: color var(--k-dur-fast, 140ms) var(--k-ease, ease); }
-.chart__xlabel--on { color: var(--k-fg); font-weight: var(--k-weight-semibold); }
-/* Tracking cursor — vertical hairline at the hovered column. */
-.chart__cursor { stroke: var(--k-fg-faint); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; opacity: 0.7; pointer-events: none; }
-/* Hover tooltip — floats above the hovered column, centred + clamped inside. */
-.chart__tip { position: absolute; top: var(--k-s-2); transform: translateX(-50%); min-width: 116px; max-width: 180px; padding: var(--k-s-6) var(--k-s-8); background: var(--k-surface-overlay, var(--k-surface-raised)); border: var(--k-hairline, 1px solid var(--k-border)); border-radius: var(--k-radius-sm); box-shadow: var(--k-shadow-md); font-size: var(--k-type-caption); pointer-events: none; z-index: 3; }
-.chart__tip-label { font-weight: var(--k-weight-semibold); color: var(--k-fg); margin-bottom: var(--k-s-4); }
-.chart__tip-row { display: flex; align-items: center; gap: var(--k-s-4); line-height: 1.5; }
-.chart__tip-dot { width: var(--k-marker); height: var(--k-marker); border-radius: 2px; flex: none; }
-.chart__tip-name { color: var(--k-fg-muted); }
-.chart__tip-val { margin-left: auto; font-weight: var(--k-weight-semibold); color: var(--k-fg); font-variant-numeric: tabular-nums; }
-
+    id: 'treeview',
+    section: "Tree view",
+    css: `/* ----- TreeView (.tree) — SPLIT OUT OF THE CHART RECIPE (2026-08-16).
+ * It lived inside the entry labelled "Chart" together with the kanban board and
+ * the status page: four components under one id, so every gate that reports per
+ * recipe reported them as chart, and the provenance derivation asked "which
+ * design system ships Chart" about a disclosure tree. WAI-ARIA APG names the
+ * Treeview pattern — the source was there the whole time and the mis-scoping hid
+ * it. */
 /* ----- TreeView (.tree) -----
  * Disclosure tree — rows with a rotating chevron; nested .tree__group is
  * indented with a guide-line. Selected row follows the selection accent. */
@@ -3787,101 +3636,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 .tree__chev--leaf { visibility: hidden; }
 .tree__row[aria-expanded='true'] .tree__chev { transform: rotate(90deg); }
 .tree__icon { display: inline-flex; color: var(--k-fg-faint); flex: none; }
-.tree__group { margin-left: var(--k-s-12); border-left: var(--k-divider); padding-left: var(--k-s-6); }
-
-/* ----- StatusPage (.statuspage) -----
- * Service status board — overall banner + per-service 90-day uptime ticks.
- * Tick tone uses the semantic colours (success / warning / danger). */
-.statuspage { display: flex; flex-direction: column; gap: var(--k-s-12); }
-.statuspage__banner { display: flex; align-items: center; gap: var(--k-s-8); padding: var(--k-s-10) var(--k-s-12); border-radius: var(--k-radius-md); background: var(--k-success-soft); color: var(--k-success-soft-fg); font-weight: var(--k-weight-semibold); font-size: var(--k-type-small); }
-.statuspage__row { display: flex; align-items: center; gap: var(--k-s-10); }
-.statuspage__name { font-size: var(--k-type-small); width: 116px; flex: none; }
-.statuspage__bars { display: flex; gap: var(--k-s-2); flex: 1; min-width: 0; }
-.statuspage__tick { flex: 1; height: 22px; border-radius: 2px; background: var(--k-success); }
-.statuspage__tick--warn { background: var(--k-warning); }
-.statuspage__tick--down { background: var(--k-danger); }
-.statuspage__pct { font-size: var(--k-type-eyebrow); color: var(--k-fg-muted); width: 46px; text-align: right; flex: none; }
-
-/* NotificationCenter — now just the LIST system: \`.list .list--flush\` rows with
- * \`.list__lead--icon-muted\` + \`.list__title--lg\` + \`.list__sub\` + a trailing
- * \`.list__dot\` (unread). No separate .notif-item/.notif-center family. */
-
-/* ----- Kanban (.kanban) -----
- * Presentational board — equal-width sunken columns with a header count and
- * stacked draggable-looking cards. (No DnD — the layout is the deliverable.) */
-/* Columns keep a 220px floor and the board scrolls horizontally rather than
- * crushing 4 columns into a phone width (the standard kanban-on-mobile pattern);
- * on wide screens 1fr lets them share the space. */
-.kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(min(220px, 100%), 1fr); gap: var(--k-s-10); overflow-x: auto; }
-.kanban__col { background: var(--k-surface-sunken); border-radius: var(--k-radius-md); padding: var(--k-stack-gap, 8px); display: flex; flex-direction: column; gap: var(--k-stack-gap, 8px); }
-.kanban__col-head { display: flex; align-items: center; justify-content: space-between; font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); padding: var(--k-s-2) var(--k-s-4); }
-.kanban__count { background: var(--k-surface); border-radius: 999px; padding: 1px var(--k-s-6); font-size: var(--k-type-caption); }
-/* Real <button> issue card — focusable + keyboard-activatable. The resets make
- * it read like the old div; hover/active use the shared discrete-card system
- * (border + lift) so it matches .stat-tile--clickable / .quickact__tile. */
-.kanban__card { width: 100%; text-align: left; font-family: inherit; color: inherit; appearance: none; -webkit-appearance: none; background: var(--k-surface); border: 1px solid var(--k-border); border-radius: var(--k-radius-sm, 6px); padding: var(--k-space, 16px); font-size: var(--k-type-small); display: flex; flex-direction: column; gap: var(--k-stack-gap, 8px); box-shadow: var(--k-shadow-sm); cursor: pointer; transition: border-color var(--k-dur-fast, 140ms) var(--k-ease, ease), box-shadow var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease); }
-.kanban__card:hover { border-color: var(--k-state-border, var(--k-border)); box-shadow: var(--k-shadow-md); transform: translateY(-1px); }
-.kanban__card:active { transform: translateY(0); }
-/* Title is CONTENT, so it rides --k-type-body (scales with the Text-size
- * control: 14→16 S→XL) — NOT --k-type-small, which is reserved for the
- * meta/labels below it. The card base stays small so key/points/tag default
- * small; only the title is lifted to the content tier. */
-.kanban__card-title { font-size: var(--k-type-body); font-weight: var(--k-weight-medium); line-height: 1.35; }
-.kanban__card-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-8); }
-/* Rich board-card parts (issue-tracker style): epic tag, issue key + type
- * glyph, story-point pill, inline meta glyphs, assignee avatar. */
-/* Epic/category tag — the ACCENT container (H4 usage pass): a tag is quiet
-   metadata, not an action, so it wears accent-soft instead of shouting in
-   solid primary (consumers were overriding it with hardcoded hexes — gone). */
-.kanban__tag { align-self: flex-start; max-width: 100%; font-size: var(--k-type-caption); font-weight: var(--k-weight-bold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; padding: var(--k-s-2) var(--k-s-6); border-radius: var(--k-radius-sm, 4px); background: var(--k-accent-soft); color: var(--k-accent-soft-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.kanban__stats { display: inline-flex; align-items: center; gap: var(--k-s-6); min-width: 0; }
-.kanban__key { display: inline-flex; align-items: center; gap: var(--k-s-4); font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); white-space: nowrap; }
-.kanban__key svg, .kanban__icons svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; }
-.kanban__pts { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 var(--k-s-4); border-radius: 999px; background: var(--k-surface-sunken); font-size: var(--k-type-caption); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); }
-.kanban__icons { display: inline-flex; align-items: center; gap: var(--k-s-6); color: var(--k-fg-faint); }
-.kanban__prio { display: inline-flex; flex-direction: column; gap: 1.5px; width: 11px; color: var(--k-fg-faint); }
-.kanban__prio i { height: 1.5px; border-radius: 1px; background: currentColor; }`,
-  },
-  {
-    id: 'sparkline',
-    section: "Sparkline",
-    css: `/* === Sparkline ===
-   The inline trend hint: a micro-chart that reads as a hint, not a chart.
-
-   🔑 IT IS THE ONLY ONE. The stat tile used to draw its own — a bare <svg> with
-   stroke and stroke-width set inline in JSX — so the kit shipped two sparklines
-   and the one with a recipe rendered nowhere a checker could see it. The tile
-   composes this now and contributes only what it owns: the SLOT (how big the
-   hint is inside that particular tile) and the draw-in animation.
-
-   Which is why the dimensions and the ink are hooks rather than values. A host
-   that needs a different size sets --k-spark-w/-h, and a host that needs a
-   different colour sets --k-spark-ink — it does NOT out-specify .sparkline or
-   re-declare the stroke, because that is how the second version started. */
-.sparkline {
-  display: block;
-  inline-size: var(--k-spark-w, 100%);
-  block-size: var(--k-spark-h, 30px);
-  margin-top: var(--k-s-6);
-  overflow: visible;
-}
-.sparkline__path {
-  fill: none;
-  stroke: var(--k-spark-ink, var(--k-primary));
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-/* SENTIMENT, not direction. A fall in churn is good news and must not be red,
-   so the modifier says whether the movement is good — the arrow beside it says
-   which way it went. Same split the stat tile's delta already makes. */
-.sparkline--good { --k-spark-ink: var(--k-success); }
-.sparkline--bad { --k-spark-ink: var(--k-danger); }
-.sparkline__area {
-  fill: var(--k-spark-ink, var(--k-primary));
-  opacity: 0.12;
-  stroke: none;
-}`,
+.tree__group { margin-left: var(--k-s-12); border-left: var(--k-divider); padding-left: var(--k-s-6); }`,
   },
   {
     id: 'usage-meter',
@@ -4729,7 +4484,38 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   font-size: var(--k-type-small);
   color: var(--k-fg);
   margin: 0;
-}`,
+}
+/* --band: the same pairs read ACROSS instead of down — the "state at a glance"
+   strip above a list screen. It is a presentation of a description list, which
+   is why it lives here as a modifier rather than as the separate .stat-tile-strip
+   component it used to be: that one carried no provenance and this one inherits
+   GOV.UK's Summary list. Auto-fit rather than a fixed column count, so three KPIs
+   and six both look deliberate and neither overflows a phone. */
+.dl--band {
+  /* ⚠️ ONE ROW, scrolling when it must — NOT auto-fit wrapping. Auto-fit puts
+     three cells into two columns and leaves a visible hole in the third, which
+     is the ghost-cell the old .stat-tile-strip had to grow a container-query
+     ladder to solve. A summary band with a gap in it reads as a missing number.
+     Same call the kanban board made before it left: scroll rather than crush. */
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(min(9rem, 100%), 1fr);
+  grid-template-columns: none;
+  overflow-x: auto;
+  gap: 0;
+  border: var(--k-bw) solid var(--k-border);
+  border-radius: var(--k-radius-md);
+  overflow: hidden;
+}
+.dl--band > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-s-4);
+  padding: var(--k-s-12) var(--k-s-14);
+  background: var(--k-surface-fill, var(--k-surface));
+  border-inline-start: var(--k-bw) solid var(--k-border);
+}
+.dl--band > div:first-child { border-inline-start: 0; }
+.dl--band dd { font-size: var(--k-type-h3); font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: var(--k-s-8); }`,
   },
   {
     id: 'banner',
@@ -4836,168 +4622,6 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
   font-size: var(--k-type-h3);
   margin: 0 var(--k-s-2);
 }`,
-  },
-  {
-    id: 'stat-tile',
-    section: "Stat tile",
-    css: `/* === Stat tile (#111) ====================================================
- * Premium metric tile pattern. Two tiles fit in one gallery card; each tile
- * stacks: eyebrow label + icon box (top row) → big tabular number → sparkline
- * + delta pill (foot row). Sparkline draws in on mount via stroke-dasharray. */
-.stat-tile-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--k-s-10);
-}
-.stat-tile {
-  display: flex;
-  flex-direction: column;
-  gap: var(--k-s-8);
-  padding: var(--k-space, 16px);
-  background: var(--k-surface-2);
-  border-radius: var(--k-radius-md);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  box-shadow: var(--k-shadow-tactile);
-  min-width: 0;
-}
-.stat-tile__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--k-s-6);
-}
-.stat-tile__label {
-  font-size: var(--k-type-caption);
-  font-weight: var(--k-weight-medium);
-  letter-spacing: var(--k-track-eyebrow);
-  text-transform: uppercase;
-  color: var(--k-fg-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.stat-tile__icon {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--k-radius-sm);
-}
-.stat-tile__icon--primary { background: var(--k-primary-soft); color: var(--k-primary-soft-fg); }
-.stat-tile__icon--accent { background: var(--k-secondary-soft); color: var(--k-secondary-soft-fg); }
-.stat-tile__icon svg { width: 12px; height: 12px; }
-.stat-tile__value {
-  font-size: var(--k-type-h2);
-  font-weight: var(--k-weight-semibold);
-  font-family: var(--k-font-display);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--k-track-display);
-  line-height: var(--k-leading-tight);
-  color: var(--k-fg);
-}
-/* CP3 — the HERO stat (confident-pro gap #1: one focal point per surface). The
- * lead KPI spans the full grid and renders its value at the display tier (~48px),
- * so a dashboard reads as a bento with one feature metric instead of a uniform
- * 2×2 of equals. The number earns its focus through SIZE, not colour — accent
- * stays reserved for the one action (CP2). The Linear/Stripe insight move. */
-.stat-tile--hero { grid-column: 1 / -1; }
-.stat-tile--hero .stat-tile__value {
-  font-size: var(--k-type-display);
-  letter-spacing: -0.03em;
-  line-height: 1;
-  /* CP6 — deploy the dormant CP1 entrance: the hero KPI rises + fades + settles
-     on mount (the "the number arrives" Linear/Stripe beat). --k-anim-rise is
-     'none' at Motion=None and the global reduced-motion guard snaps it instant
-     (k-rise uses both-fill, so it lands on the visible end-state, never stuck). It
-     replays only on remount / Motion change, not on every config tweak. */
-  animation: var(--k-anim-rise);
-}
-.stat-tile__foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--k-s-8);
-}
-/* The SLOT, and nothing else. It sizes the hint for this tile through the
-   sparkline's own hooks rather than out-specifying it, and adds the draw-in that
-   belongs to the tile's entrance rather than to the chart. */
-.stat-tile__spark {
-  --k-spark-w: 60%;
-  --k-spark-h: 22px;
-  max-width: 80px;
-  margin-top: 0;
-  flex-shrink: 1;
-}
-.stat-tile__spark path {
-  stroke-dasharray: 200;
-  stroke-dashoffset: 200;
-  animation: stat-spark-draw 600ms cubic-bezier(.05, .7, .1, 1) both;
-  animation-delay: 240ms;
-}
-@keyframes stat-spark-draw {
-  to { stroke-dashoffset: 0; }
-}
-.stat-tile__delta {
-  display: inline-flex;
-  align-self: flex-start; /* hug content — don't stretch to the column's full width */
-  align-items: center;
-  gap: var(--k-s-2);
-  padding: var(--k-s-2) var(--k-s-6);
-  border-radius: 999px;
-  font-size: var(--k-type-eyebrow);
-  font-weight: var(--k-weight-semibold);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.stat-tile__delta svg { flex-shrink: 0; }
-/* Delta tone modifiers — avoid per-instance inline colours. */
-/* A SOLID is a fill, not an ink. Both of these put the solid status colour on
- * its own soft tint — success landed at 2.03:1, which is not a near miss, it is
- * illegible. The --soft-fg tokens exist for exactly this pairing and are
- * derived through aaInk against the tint they sit on. */
-.stat-tile__delta--up { color: var(--k-success-soft-fg); background: var(--k-success-soft); }
-.stat-tile__delta--down { color: var(--k-danger-soft-fg); background: var(--k-danger-soft); }
-/* Clickable KPI tile — drills into a detail view (hover lift + a trailing
- * chevron that nudges right, "there's more behind this number"). */
-.stat-tile--clickable { cursor: pointer; transition: border-color var(--k-dur-fast, 140ms) var(--k-ease, ease), box-shadow var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease); }
-.stat-tile--clickable:hover { border-color: var(--k-state-border); box-shadow: var(--k-shadow-sm); transform: translateY(-1px); }
-.stat-tile--clickable:focus-visible { outline: 2px solid var(--k-ring, var(--k-primary)); outline-offset: 2px; }
-.stat-tile__drill { margin-left: auto; display: inline-flex; color: var(--k-fg-faint); transition: transform var(--k-dur-fast, 140ms) var(--k-ease, ease); }
-.stat-tile--clickable:hover .stat-tile__drill { transform: translateX(2px); color: var(--k-fg-muted); }
-@media (prefers-reduced-motion: reduce) { .stat-tile--clickable, .stat-tile__drill { transition: none; } }
-/* Bare metric strip — joined cells in one box with internal hairlines (was
- * .statgrp). Reuses .stat-tile__value / .stat-tile__label; no per-cell card. */
-.stat-tile-strip {
-  /* Responsive: FLEX-wrap on a CONTAINER-QUERY ladder keyed to the strip's OWN
-   * width (so it adapts at any embedded size — the loupe, a narrow pane — not
-   * the viewport). Cells grow to fill their row, so a count that doesn't divide
-   * the row (4 → 2+2, or 3 → 2+1) never leaves an orphan grid cell showing the
-   * fill as a grey ghost block. The ladder: 1-up (narrow) → 2-up (medium, so a
-   * 4-metric band lands on a clean 2×2) → the full row (wide). The gap shows the
-   * container line as the internal hairline — dividers need no nth-child math. */
-  container-type: inline-size;
-  container-name: statstrip;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--k-bw, 1px);
-  background: var(--k-border);
-  border: var(--k-hairline, 1px solid var(--k-border));
-  border-radius: var(--k-radius-md);
-  overflow: hidden;
-}
-/* 1-up by default (narrow); the ladder widens the basis as the strip grows. */
-.stat-tile-strip__cell { flex: 1 1 100%; min-width: 0; padding: var(--k-space, 16px); background: var(--k-surface); display: flex; flex-direction: column; gap: var(--k-s-2); }
-/* Medium — two balanced columns (a 4-up KPI band becomes a 2×2; an odd trailing
-   cell keeps flex-grow so it fills its row instead of orphaning). */
-@container statstrip (min-width: 28rem) { .stat-tile-strip__cell { flex-basis: 40%; } }
-/* Wide — the full metric row: as many equal cells as fit, last row fills. */
-@container statstrip (min-width: 40rem) { .stat-tile-strip__cell { flex-basis: 9rem; } }
-/* Summary-band Fill — the ONE focal "state at a glance" strip per screen wears
- * the tactical wash (flagship doctrine): cells take --k-surface-fill, the grid
- * gap stays the hairline. White (default) Background ⇒ fill resolves to plain
- * --k-surface, so the modifier is a no-op until a tint is chosen. */
-.stat-tile-strip--fill .stat-tile-strip__cell { background: var(--k-surface-fill); }`,
   },
   {
     id: 'carousel',
@@ -5784,98 +5408,6 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    (Tailwind "stacked list with sticky headings"). Put the list in a scroll
    container; the heading gets a surface fill so rows don't show through it. */
 .list--sticky .list__section { position: sticky; top: 0; z-index: 1; background: var(--k-surface); }`,
-  },
-  {
-    id: 'timeline',
-    section: "Timeline",
-    css: `/* === Timeline (Tier 4 #17) ===========================================
- * Verticale events met dots + connecting line. De line is een ::before
- * pseudo-element die door alle items loopt; eindigt op het laatste item.
- * Dots: filled (done), pulse-ring (current), hollow (future). */
-.timeline {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: relative;
-}
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 10px;
-  top: 10px;
-  bottom: 10px;
-  width: 1.5px;
-  background: var(--k-border);
-}
-.timeline__item {
-  position: relative;
-  display: flex;
-  gap: var(--k-s-14);
-  padding: var(--k-s-6) 0;
-  z-index: 1;
-}
-.timeline__dot {
-  flex-shrink: 0;
-  width: calc(var(--k-in-h-default) - 0.875rem);
-  height: calc(var(--k-in-h-default) - 0.875rem);
-  border-radius: 50%;
-  background: var(--k-surface);
-  border: max(1.5px, var(--k-bw)) solid var(--k-border);
-  display: grid;
-  place-items: center;
-  color: var(--k-fg-muted);
-  margin-top: 1px;
-}
-.timeline__dot svg { width: var(--k-icon-xs); height: var(--k-icon-xs); }
-.timeline__item--done .timeline__dot {
-  background: var(--k-primary);
-  border-color: transparent;
-  color: var(--k-primary-fg);
-}
-.timeline__item--current .timeline__dot {
-  background: var(--k-surface);
-  border-color: var(--k-primary);
-  position: relative;
-}
-/* The not-yet / future state (the 3rd checklist step beside --done / --current),
-   so a status tracker reads done › current › upcoming without hand-rolled greys. */
-.timeline__item--upcoming .timeline__title { color: var(--k-fg-muted); }
-.timeline__item--upcoming .timeline__dot { color: var(--k-fg-faint); }
-.timeline__pulse {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--k-primary);
-  position: relative;
-}
-.timeline__pulse::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: var(--k-primary);
-  opacity: 0.25;
-  animation: timeline-pulse 1.6s ease-in-out infinite;
-}
-@keyframes timeline-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.25; }
-  50% { transform: scale(1.6); opacity: 0; }
-}
-.timeline__body { flex: 1; min-width: 0; padding-bottom: var(--k-s-4); }
-.timeline__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--k-s-8);
-}
-.timeline__title { font-size: var(--k-type-body); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
-.timeline__time {
-  font-size: var(--k-type-caption);
-  color: var(--k-fg-faint);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.timeline__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); margin-top: var(--k-s-2); }`,
   },
   {
     id: 'codeblock',

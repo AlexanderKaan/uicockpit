@@ -1,6 +1,5 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { Icon } from '../icons/Icon'
-import { ChartFrame } from '../stage/views/ChartFrame'
 import { useModal, useDropdown, Toggle, MenuButton } from '../stage/views/apps/AppHelpers'
 import type { SectionSpec } from './manifests'
 import { BrandLogo } from './logos'
@@ -174,39 +173,7 @@ function FilterTable<T extends { status: string }>({
   )
 }
 
-/** Inline trend hint — the real `.sparkline` recipe. A normalized polyline (the
- *  line) + a closed polygon (the tinted area), stretched to the tile width. */
-function Sparkline({ data }: { data: number[] }) {
-  const n = data.length
-  const min = Math.min(...data)
-  const span = Math.max(...data) - min || 1
-  const pts = data.map((v, i) => `${(i / (n - 1)) * 100},${29 - ((v - min) / span) * 27}`).join(' ')
-  return (
-    <svg className="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
-      <polygon className="sparkline__area" points={`${pts} 100,30 0,30`} />
-      <polyline className="sparkline__path" points={pts} />
-    </svg>
-  )
-}
 
-/** Tabbed chart — a real `.tabs` strip switching between named ChartFrame views.
- *  The ChartFrame is keyed by the active tab so its draw-in animation replays. */
-function ChartTabs({ tabs }: { tabs: Array<{ label: string; type: 'bar' | 'area' | 'line' | 'stacked'; labels: string[]; series: Array<{ name: string; values: number[] }> }> }) {
-  const [active, setActive] = useState(0)
-  const t = tabs[active]!
-  return (
-    <div className="card">
-      <div className="card__head">
-        <div className="tabs" role="tablist" aria-label="Report view">
-          {tabs.map((tab, i) => (
-            <button key={tab.label} type="button" role="tab" aria-selected={i === active} className={`tab ${i === active ? 'tab--on' : ''}`} onClick={() => setActive(i)}>{tab.label}</button>
-          ))}
-        </div>
-      </div>
-      <ChartFrame key={active} type={t.type} labels={t.labels} series={t.series} />
-    </div>
-  )
-}
 
 /** Plan comparison — the real `.plan-compare` tier × feature matrix. One column
  *  (the featured/current plan) is highlighted by a band behind its cells. */
@@ -232,24 +199,26 @@ function PhotoAvatar({ url, name, sm }: { url: string; name: string; sm?: boolea
   )
 }
 
-/** The summary band — the kit's .stat-tile-strip with the --fill modifier (cells
- *  take var(--k-surface-fill)). The ONE focal "state at a glance" zone per Ledger
- *  screen (flagship doctrine). Shared by every list screen so the band is ONE
- *  thing, never re-rolled. Label + delta on a row, value below — canonical
- *  .stat-tile sub-parts. */
+/** The summary band — the ONE focal "state at a glance" zone per screen.
+ *
+ * It was built on .stat-tile-strip, which left with the stat-tile recipe on the
+ * four-layer cut. Rebuilt on .dl, and the rebuild is better than the original:
+ * a band of label→value pairs IS a description list, GOV.UK ships exactly this
+ * as "Summary list", and .dl carries that provenance while .stat-tile-strip
+ * carried none. The thing that left was a presentation of a list, not a list. */
 function SummaryBand({ items }: { items: Array<{ label: string; value: string; delta?: string; up?: boolean }> }) {
   return (
-    <div className="stat-tile-strip stat-tile-strip--fill">
+    <dl className="dl dl--band">
       {items.map((k) => (
-        <div className="stat-tile-strip__cell" key={k.label}>
-          <div className="l-cluster" style={{ justifyContent: 'space-between', '--l-gap': 'var(--k-s-8)' } as CSSProperties}>
-            <span className="stat-tile__label">{k.label}</span>
-            {k.delta && <span className={`stat-tile__delta ${k.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{k.delta}</span>}
-          </div>
-          <span className="stat-tile__value">{k.value}</span>
+        <div key={k.label}>
+          <dt>{k.label}</dt>
+          <dd>
+            <span className="num">{k.value}</span>
+            {k.delta && <span className={`badge badge--${k.up ? 'success' : 'danger'}`}>{k.delta}</span>}
+          </dd>
         </div>
       ))}
-    </div>
+    </dl>
   )
 }
 
@@ -281,32 +250,6 @@ function PageHead({ title, sub, actions }: { title: string; sub?: string; action
  */
 export function renderSection(spec: SectionSpec, key: number) {
   switch (spec.kind) {
-    case 'stats':
-      return (
-        <div className="stat-tile-grid" key={key}>
-          {spec.seed.items.map((s) => (
-            <div className={'stat-tile' + (s.hero ? ' stat-tile--hero' : '')} key={s.label}>
-              <div className="stat-tile__label">{s.label}</div>
-              <div className="stat-tile__value">{s.value}</div>
-              {s.delta && (
-                <div className="stat-tile__foot">
-                  <span className={`stat-tile__delta ${s.up ? 'stat-tile__delta--up' : 'stat-tile__delta--down'}`}>{s.delta}</span>
-                </div>
-              )}
-              {s.spark && <Sparkline data={s.spark} />}
-            </div>
-          ))}
-        </div>
-      )
-    case 'chart':
-      return (
-        <div className="card" key={key}>
-          <div className="card__head"><span className="card__title">{spec.seed.title}</span></div>
-          <ChartFrame type={spec.seed.type} labels={spec.seed.labels} series={spec.seed.series} />
-        </div>
-      )
-    case 'chartTabs':
-      return <ChartTabs key={key} tabs={spec.seed.tabs} />
     case 'pageHead': {
       const a = spec.seed.actions
       return (
@@ -520,20 +463,18 @@ export function renderSection(spec: SectionSpec, key: number) {
 
               <div className="card">
                 <div className="card__head"><span className="card__title">Activity</span></div>
-                <ol className="timeline">
+                <ul className="activity">
                   {s.activity.map((a, i) => (
-                    <li className="timeline__item" key={i}>
-                      <span className="timeline__dot" style={{ padding: 0, overflow: 'hidden' }}><PhotoAvatar url={a.avatar} name={a.name} sm /></span>
-                      <div className="timeline__body">
-                        <div className="timeline__head">
-                          <span className="timeline__title"><strong>{a.name}</strong> <span style={muted}>{a.action}</span></span>
-                          <span className="timeline__time">{a.time}</span>
-                        </div>
-                        {a.comment && <div className="timeline__desc" style={{ marginTop: 'var(--k-s-6)', background: 'var(--k-surface-sunken)', padding: 'var(--k-s-10) var(--k-s-12)', borderRadius: 'var(--k-radius-md)' }}>{a.comment}</div>}
+                    <li className="activity__item" key={i}>
+                      <span className="activity__dot" aria-hidden="true" />
+                      <div>
+                        <span><strong>{a.name}</strong> <span style={muted}>{a.action}</span></span>
+                        {a.comment && <div style={muted}>{a.comment}</div>}
                       </div>
+                      <span className="activity__meta">{a.time}</span>
                     </li>
                   ))}
-                </ol>
+                </ul>
                 <div className="toolbar" style={{ marginTop: 'var(--k-s-8)' }}>
                   <PhotoAvatar url={s.meAvatar} name="You" sm />
                   <input className="in" placeholder="Add your comment…" aria-label="Add a comment" style={{ flex: 1 }} />
@@ -927,29 +868,6 @@ export function renderSection(spec: SectionSpec, key: number) {
           ))}
         </div>
       )
-    case 'kanban':
-      return (
-        <div className="kanban" key={key}>
-          {spec.seed.columns.map((col) => (
-            <div className="kanban__col" key={col.name}>
-              <div className="kanban__col-head">{col.name}<span className="kanban__count">{col.cards.length}</span></div>
-              {col.cards.map((c) => (
-                <div className="kanban__card" key={c.title}>
-                  <span className="kanban__card-title">{c.title}</span>
-                  {c.tag && <span className="kanban__tag">{c.tag}</span>}
-                  <div className="kanban__card-foot">
-                    <span className="kanban__stats">
-                      {c.key && <span className="kanban__key"><Icon name="file" size={14} /> {c.key}</span>}
-                      {c.pts && <span className="kanban__pts">{c.pts}</span>}
-                    </span>
-                    {c.avatar && <span className="avatar avatar--sm" style={{ width: 22, height: 22, fontSize: 9 }}>{c.avatar}</span>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      )
     case 'tree':
       return (
         <div className="card" key={key}>
@@ -973,22 +891,6 @@ export function renderSection(spec: SectionSpec, key: number) {
               </div>
             ))}
           </div>
-        </div>
-      )
-    case 'timeline':
-      return (
-        <div className="card" key={key}>
-          <ol className="timeline">
-            {spec.seed.events.map((e) => (
-              <li className={`timeline__item ${e.state ? `timeline__item--${e.state}` : ''}`} key={e.title}>
-                <span className="timeline__dot">{e.state === 'current' ? <span className="timeline__pulse" /> : <Icon name="check" />}</span>
-                <div className="timeline__body">
-                  <div className="timeline__head"><span className="timeline__title">{e.title}</span><span className="timeline__time">{e.time}</span></div>
-                  {e.desc && <div className="timeline__desc">{e.desc}</div>}
-                </div>
-              </li>
-            ))}
-          </ol>
         </div>
       )
     case 'settings':
