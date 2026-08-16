@@ -130,8 +130,18 @@ const SURFACE = {
 const PROPS = [
   'fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'color',
   'backgroundColor', 'backgroundImage', 'borderTopWidth', 'borderTopColor', 'borderTopStyle',
+  'borderBottomWidth', 'borderBottomColor', 'borderInlineStartWidth',
   'borderRadius', 'boxShadow', 'paddingTop', 'paddingLeft', 'marginTop', 'marginBottom',
   'appearance', 'outlineColor', 'textDecorationLine', 'minHeight',
+  /* ⚠️ THE DEFENSIVE PROPERTIES, and leaving them out was measuring the wrong
+   * thing for this product. `max-width: 100%` on an image and `overflow-wrap`
+   * on a paragraph are the treatments that decide whether a bank account number
+   * breaks the page — they are the FIRST thing our floor sets and the gate could
+   * not see any of them, so a dozen elements we had just fixed reported as
+   * untouched. A meter that cannot see the product's main promise is measuring
+   * decoration. */
+  'maxWidth', 'minWidth', 'overflowWrap', 'overflowX', 'verticalAlign', 'fontVariantNumeric',
+  'borderCollapse', 'textAlign', 'accentColor', 'resize', 'cursor',
 ]
 
 const browser = await chromium.launch()
@@ -177,17 +187,24 @@ const result = await page.evaluate(async ({ SURFACE, PROPS }) => {
    * mirror is how every meter here has gone wrong), measure a control we
    * certainly do not style — a bare <div> and <span> — and subtract whatever
    * THEY differ on. What remains is addressed to the element itself. */
-  const ambient = new Set()
-  for (const t of ['div', 'span']) {
+  /* ⚠️ AND THE AMBIENT IS SUBTRACTED BY VALUE, NOT BY PROPERTY NAME. The first
+   * fix dropped whole properties — fontSize among them — so an <h1> that sets
+   * its own display size was masked by the same rule that was meant to hide a
+   * <div> inheriting the body font. Half the floor reported as untouched.
+   *
+   * A property is ambient only when the element's value EQUALS what an unstyled
+   * <div> gets. Different value, same property: that is a treatment. */
+  const ambient = {}
+  {
     clear(fdoc.body); clear(stage)
-    const a = build(fdoc, fdoc.body, [], t, {}, 'x')
-    const b = build(document, stage, [], t, {}, 'x')
+    const a = build(fdoc, fdoc.body, [], 'div', {}, 'x')
+    const b = build(document, stage, [], 'div', {}, 'x')
     const ca = fdoc.defaultView.getComputedStyle(a)
     const cb = getComputedStyle(b)
-    for (const p of PROPS) if (ca[p] !== cb[p]) ambient.add(p)
+    for (const p of PROPS) if (ca[p] !== cb[p]) ambient[p] = cb[p]
   }
 
-  const out = { _ambient: [...ambient] }
+  const out = { _ambient: Object.keys(ambient) }
   for (const [group, items] of Object.entries(SURFACE)) {
     out[group] = []
     for (const [label, chain, tag, attrs, text] of items) {
@@ -197,7 +214,7 @@ const result = await page.evaluate(async ({ SURFACE, PROPS }) => {
       const ca = fdoc.defaultView.getComputedStyle(a)
       const cb = getComputedStyle(b)
       const all = PROPS.filter((p) => ca[p] !== cb[p])
-      const changed = all.filter((p) => !ambient.has(p))
+      const changed = all.filter((p) => !(p in ambient) || cb[p] !== ambient[p])
       out[group].push({ tag: label, styled: changed.length > 0, changed, ambientOnly: all.length > 0 && changed.length === 0 })
     }
   }

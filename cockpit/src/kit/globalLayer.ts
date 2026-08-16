@@ -553,3 +553,218 @@ ${s}.visually-hidden {
   }
 }`
 }
+
+/**
+ * THE PLATFORM FLOOR — every HTML element the platform gives us, styled once,
+ * at ZERO specificity.
+ *
+ * The position this belongs to: we are not for people shopping for a nicer
+ * button. We are for a civil servant who wants defensive CSS and HTML and has to
+ * ship a solid tax form. For that person "beautiful" has a testable meaning —
+ * IT NEVER SURPRISES ME. Nothing clipped, nothing overlapping, nothing broken by
+ * a forty-character surname or a bank account number that cannot wrap.
+ *
+ * So they write plain semantic HTML and get a page that holds:
+ *
+ *     <link rel="stylesheet" href="ui.css">
+ *     <h1>Aangifte inkomstenbelasting</h1>
+ *     <label for="iban">Rekeningnummer</label>
+ *     <input id="iban" type="text">
+ *
+ * No wrapper class, no vocabulary. That is also why an AI writing UI gets a
+ * correct result with ZERO instructions: semantic HTML is a model's default
+ * output, while a class vocabulary is something it has to be told, correctly,
+ * every time — which is the drift `check` exists to catch.
+ *
+ * 🔑 EVERY RULE IS WRAPPED IN :where(), SO ITS SPECIFICITY IS 0,0,0. Measured
+ * rather than assumed: a `:where()` rule loses to a single class, to a bare tag
+ * selector, and even to an author rule declared EARLIER in the cascade. That is
+ * what makes it a floor rather than an opinion — it cannot fight anything, it
+ * only fills in where nobody else spoke. It is why this needs no scope class:
+ * scope was the wrong instrument for "do not break markup you do not control".
+ * Specificity is the right one.
+ *
+ * ⚠️ DEFENSIVE FIRST, DECORATIVE SECOND. `check:components` over 11 conditions
+ * put `unbreakable` — a string that cannot wrap — as our WORST condition at 82
+ * content-lost findings, ahead of 200% zoom and 320px. An unbreakable string is
+ * what a government form is made of: an IBAN, a reference number, a case number,
+ * a BSN. So the first block below is not decoration; it is the reason this file
+ * exists, and the decoration follows it.
+ *
+ * ⚠️ AND NOT EVERY ELEMENT GETS A LOOK. `<main>`, `<section>` and `<article>`
+ * are structure; giving them a visual treatment would be inventing an opinion to
+ * satisfy a counter, which is the same failure as a back-fitted provenance. They
+ * get defensive rules and nothing else.
+ */
+export function platformFloor({ scope = '' }: { scope?: string } = {}): string {
+  const s = scope ? scope.trim() + ' ' : ''
+  const w = (sel: string) => sel.split(',').map((x) => `${s}:where(${x.trim()})`).join(',\n')
+
+  return `
+/* ============================================================================
+   THE PLATFORM FLOOR — :where(), so anything you write wins over it.
+   ============================================================================ */
+
+/* ---- 1 · DEFENSIVE. The rules that stop content being lost. ---------------
+   These are the whole reason a public body can trust generated or translated
+   content. They are listed first because they matter most, not because they
+   are the tidiest. */
+
+/* Media can never be wider than its column. The single most load-bearing
+   defensive rule in CSS, and the reason <img> came back as "browser default"
+   in our own kit. */
+${w('img, svg, video, canvas, audio, iframe, embed, object')} {
+  max-width: 100%;
+}
+${w('img, video')} { height: auto; }
+
+/* An IBAN, a reference number, a case number. Value anywhere, not
+   break-word, so it also shrinks the element's min-content size — without
+   that, a long token still forces a scrollbar on the container. */
+${w('p, li, dd, dt, td, th, caption, figcaption, blockquote, label, legend, summary, h1, h2, h3, h4, h5, h6')} {
+  overflow-wrap: anywhere;
+}
+
+/* Code and preformatted text keep their line breaks, so they scroll rather
+   than push the page sideways. */
+${w('pre')} { overflow-x: auto; max-width: 100%; }
+
+/* A grid/flex child is never narrower than its content unless told. This is
+   the "min-width: 0 law" from the recipes, applied to the elements that most often sit
+   in a form row. */
+${w('input, select, textarea, button, fieldset')} { min-width: 0; }
+
+/* A fieldset defaults to min-width:min-content, which makes it refuse to
+   shrink and overflow its parent — a 25-year-old UA quirk that breaks every
+   responsive form built from correct markup. */
+${w('fieldset')} { min-inline-size: 0; }
+
+/* sub/sup raise the line box and make a paragraph's leading jump. */
+${w('sub, sup')} { line-height: 0; position: relative; vertical-align: baseline; font-size: 75%; }
+${w('sup')} { top: -0.5em; }
+${w('sub')} { bottom: -0.25em; }
+
+/* ---- 2 · RUNNING TEXT ------------------------------------------------------ */
+
+${w('h1')} { font-family: var(--k-font-display); font-size: var(--k-type-display); font-weight: var(--k-weight-display); line-height: var(--k-leading-tight); letter-spacing: var(--k-track-display); margin: 0 0 var(--k-s-16); }
+${w('h2')} { font-family: var(--k-font-display); font-size: var(--k-type-h1); font-weight: var(--k-weight-semibold); line-height: var(--k-leading-tight); letter-spacing: var(--k-track-tight); margin: var(--k-s-32) 0 var(--k-s-12); }
+${w('h3')} { font-family: var(--k-font-display); font-size: var(--k-type-h2); font-weight: var(--k-weight-semibold); line-height: var(--k-leading-snug); margin: var(--k-s-24) 0 var(--k-s-8); }
+${w('h4, h5, h6')} { font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); line-height: var(--k-leading-snug); margin: var(--k-s-20) 0 var(--k-s-8); }
+
+${w('p')} { margin: 0 0 var(--k-s-12); line-height: var(--k-leading-normal); }
+${w('blockquote')} { margin: var(--k-s-16) 0; padding-inline-start: var(--k-s-16); border-inline-start: var(--k-s-2) solid var(--k-border); color: var(--k-fg-muted); }
+${w('hr')} { border: 0; block-size: var(--k-bw); background: var(--k-border); margin: var(--k-s-24) 0; }
+
+${w('ul, ol')} { margin: 0 0 var(--k-s-12); padding-inline-start: var(--k-s-24); }
+${w('li')} { margin-block-end: var(--k-s-4); line-height: var(--k-leading-normal); }
+${w('dl')} { margin: 0 0 var(--k-s-12); }
+${w('dt')} { font-weight: var(--k-weight-semibold); }
+${w('dd')} { margin: 0 0 var(--k-s-8); color: var(--k-fg-muted); }
+
+/* ---- 3 · INLINE SEMANTICS -------------------------------------------------- */
+
+${w('a')} { color: var(--k-primary-text); text-underline-offset: 0.15em; }
+${w('a:hover')} { color: var(--k-primary-text-hover); }
+
+${w('code, samp, var, kbd')} { font-family: var(--k-font-mono); font-size: 0.9em; }
+${w('code, samp')} { background: var(--k-surface-sunken); padding: 0.1em 0.35em; border-radius: var(--k-radius-sm); }
+${w('var')} { font-style: normal; color: var(--k-fg-muted); }
+${w('pre')} { font-family: var(--k-font-mono); font-size: var(--k-type-small); background: var(--k-surface-sunken); padding: var(--k-s-12); border-radius: var(--k-radius-md); margin: 0 0 var(--k-s-12); }
+${w('pre code, pre samp')} { background: none; padding: 0; }
+${w('kbd')} { border: var(--k-hairline, 1px solid var(--k-border)); border-block-end-width: var(--k-s-2); border-radius: var(--k-radius-sm); padding: 0.1em 0.4em; background: var(--k-surface); }
+
+${w('mark')} { background: var(--k-primary-soft); color: var(--k-primary-soft-fg); padding: 0 0.15em; border-radius: var(--k-radius-sm); }
+${w('small')} { font-size: var(--k-type-caption); color: var(--k-fg-muted); }
+${w('abbr[title]')} { text-decoration: underline dotted; cursor: help; text-decoration-thickness: var(--k-bw); }
+${w('cite')} { font-style: normal; color: var(--k-fg-muted); }
+${w('s, del')} { text-decoration-line: line-through; color: var(--k-fg-muted); }
+${w('strong, b')} { font-weight: var(--k-weight-semibold); }
+${w('time')} { font-variant-numeric: tabular-nums; }
+${w('figure')} { margin: var(--k-s-16) 0; }
+${w('figcaption')} { font-size: var(--k-type-caption); color: var(--k-fg-muted); margin-block-start: var(--k-s-6); }
+
+/* ---- 4 · TABLES ------------------------------------------------------------ */
+
+${w('table')} { border-collapse: collapse; inline-size: 100%; font-size: var(--k-type-small); }
+${w('caption')} { text-align: start; font-size: var(--k-type-caption); color: var(--k-fg-muted); padding-block-end: var(--k-s-8); }
+${w('th, td')} { padding: var(--k-s-8) var(--k-s-10); text-align: start; border-block-end: var(--k-hairline, 1px solid var(--k-border)); }
+${w('th')} { font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); }
+
+/* ---- 5 · FORMS. The reason a service exists. ------------------------------- */
+
+${w('label')} { display: inline-block; font-size: var(--k-type-small); font-weight: var(--k-ui-weight, 500); margin-block-end: var(--k-s-6); }
+${w('fieldset')} { border: 0; padding: 0; margin: 0 0 var(--k-s-16); }
+${w('legend')} { padding: 0; font-size: var(--k-type-h3); font-weight: var(--k-weight-semibold); margin-block-end: var(--k-s-4); }
+
+/* The field. Same tokens the .in recipe reads, so a bare <input> and an
+   <input class="in"> are the same field — one of them just does not need to
+   be told. */
+${w('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]), textarea, select')} {
+  display: block;
+  inline-size: 100%;
+  min-block-size: var(--k-in-h-default, 40px);
+  padding-inline: max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
+  border-radius: var(--k-in-radius, var(--k-field-radius));
+  background: var(--k-in-bg, var(--k-field-bg));
+  border: var(--k-bw, 1px) solid var(--k-field-border-color);
+  border-block-end-color: var(--k-field-underline-color);
+  color: var(--k-fg);
+  font-family: var(--k-font-body);
+  font-size: max(var(--k-type-small), var(--k-type-input-min));
+}
+${w('textarea')} { padding-block: var(--k-s-8); min-block-size: calc(var(--k-in-h-default, 40px) * 2); resize: vertical; }
+${w('select')} { appearance: none; -webkit-appearance: none; padding-inline-end: var(--k-s-28, 28px); }
+${w('input::placeholder, textarea::placeholder')} { color: var(--k-fg-faint); }
+
+/* A neutral button, NOT a primary one. The floor gives the shape and the hit
+   target; .btn--primary adds the fill. A floor that painted every button
+   brand-coloured would be an opinion, not a floor. */
+${w('button, input[type="submit"], input[type="button"], input[type="reset"]')} {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--k-s-6);
+  min-block-size: var(--k-in-h-default, 40px);
+  min-inline-size: var(--k-hit-min, 24px);
+  padding-inline: var(--k-s-14, 14px);
+  border-radius: var(--k-radius-button, var(--k-radius-md));
+  border: var(--k-bw, 1px) solid var(--k-border);
+  background: var(--k-surface);
+  color: var(--k-fg);
+  font: inherit;
+  font-size: var(--k-type-small);
+  font-weight: var(--k-ui-weight, 500);
+  cursor: pointer;
+}
+${w('button:hover:not(:disabled)')} { background: var(--k-state-hover); }
+
+${w('input[type="checkbox"], input[type="radio"]')} {
+  inline-size: var(--k-s-16); block-size: var(--k-s-16);
+  accent-color: var(--k-primary);
+  margin: 0;
+}
+${w('input[type="range"]')} { accent-color: var(--k-primary); inline-size: 100%; }
+${w('input[type="file"]')} { font-size: var(--k-type-small); }
+
+${w('output')} { font-variant-numeric: tabular-nums; font-weight: var(--k-weight-semibold); }
+${w('progress, meter')} { inline-size: 100%; block-size: var(--k-stroke-progress, 6px); }
+
+/* ---- 6 · INTERACTIVE ------------------------------------------------------- */
+
+${w('details')} { border-block-end: var(--k-hairline, 1px solid var(--k-border)); }
+${w('summary')} { padding: var(--k-s-10) 0; cursor: pointer; font-weight: var(--k-ui-weight, 500); min-block-size: var(--k-hit-min, 24px); }
+${w('summary::marker')} { color: var(--k-fg-muted); }
+
+${w('dialog')} {
+  border: var(--k-hairline, 1px solid var(--k-border));
+  border-radius: var(--k-radius-lg);
+  background: var(--k-surface-raised, var(--k-surface));
+  color: var(--k-fg);
+  padding: var(--k-s-20, 20px);
+  box-shadow: var(--k-shadow-lg);
+  max-inline-size: min(90vw, 32rem);
+}
+${w('dialog::backdrop')} { background: var(--k-scrim, rgb(0 0 0 / 0.4)); }
+
+/* ---- 7 · STRUCTURE gets defence and nothing else. -------------------------- */
+${w('header, footer, main, nav, aside, section, article')} { min-inline-size: 0; }
+`
+}

@@ -1,4 +1,4 @@
-import { assembleKitCss, globalLayer } from './index'
+import { assembleKitCss, globalLayer, platformFloor } from './index'
 import { buildTokens } from '../tokens/buildTokens'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
 
@@ -73,6 +73,9 @@ export function injectKit(): void {
    * already reads (--k-card-pad, --k-overlay-min, …) rather than out-specifying
    * it. That is composition working as designed — see .fmenu, .kits-pop and
    * .mkt__ver-menu for the shape. */
-  style.textContent = `${globalLayer({ scope: '.cockpit-preview' })}\n\n${assembleKitCss()}\n\n${mktTokens}`
+  /* The platform floor goes FIRST: it is :where(), so it loses to everything
+   after it by specificity rather than by source order — but putting it first
+   states the layering for anyone reading the emitted sheet. */
+  style.textContent = `${platformFloor({ scope: '.cockpit-preview' })}\n\n${globalLayer({ scope: '.cockpit-preview' })}\n\n${assembleKitCss()}\n\n${mktTokens}`
   document.head.appendChild(style)
 }

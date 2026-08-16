@@ -15,7 +15,7 @@ import { RECIPES } from './recipes'
 import { idsByTier } from './segments'
 
 export type { Recipe } from './types'
-export { globalLayer } from './globalLayer'
+export { globalLayer, platformFloor } from './globalLayer'
 export { RECIPES } from './recipes'
 
 /**
