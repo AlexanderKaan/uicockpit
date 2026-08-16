@@ -136,6 +136,7 @@ function DocsShell({ current, navigate, children }: { current?: string; navigate
 export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => void }) {
   const [q, setQ] = useState('')
   const query = q.trim().toLowerCase()
+  const narrow = useNarrow()
   useEffect(() => {
     const prev = document.title
     document.title = `Components — ${COMPONENT_PAGES.length} accessible, framework-neutral components, each with a source — UIcockpit`
@@ -196,9 +197,17 @@ export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => vo
         </section>
       )}
       {visibleGroups.length === 0 && !verdict && <p className="cmpdoc__idx-empty">Nothing in the list matches “{q}”.</p>}
+      {/* Desktop: every group open, name + blurb, three columns. Phone: each
+        * group is a fold (closed until tapped, open while you search) holding
+        * NAMES ONLY in two columns — the blurb belongs to the detail page there.
+        * One DOM for both; the <details> is always open on desktop and its
+        * summary hidden, so the desktop reads exactly as before. */}
       {visibleGroups.map(([g, cs]) => (
-        <section className="cmpdoc__idx-section" key={g}>
-          <h2 className="cmpdoc__idx-head">{g}</h2>
+        <details className="cmpdoc__idx-fold" key={g} open={!narrow || !!query}>
+          <summary className="cmpdoc__idx-summary">
+            <h2 className="cmpdoc__idx-head">{g}</h2>
+            <span className="cmpdoc__idx-n">{cs.length}</span>
+          </summary>
           <div className="cmpdoc__idx-grid">
             {cs.map((c) => (
               <a
@@ -209,7 +218,7 @@ export function ComponentsIndexPage({ navigate }: { navigate: (to: string) => vo
               >{c.name}<span className="cmpdoc__idx-blurb">{c.blurb}</span></a>
             ))}
           </div>
-        </section>
+        </details>
       ))}
 
       <aside className="cmpdoc__forge">

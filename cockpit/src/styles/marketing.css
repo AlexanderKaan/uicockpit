@@ -1786,6 +1786,28 @@
 .cmpdoc__idx-blurb { display: block; font-size: var(--k-type-caption); font-weight: 400; color: var(--mkt-fg-muted); line-height: var(--k-leading-snug); margin-top: var(--k-s-2);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .cmpdoc__idx-empty { color: var(--mkt-fg-muted); font-size: var(--k-type-small); }
+/* The group fold: invisible on desktop (display: contents, summary hidden), a
+ * tappable head on phones. */
+.cmpdoc__idx-fold { display: contents; }
+.cmpdoc__idx-summary { display: block; list-style: none; cursor: default; margin-bottom: var(--k-s-32); }
+.cmpdoc__idx-summary::-webkit-details-marker { display: none; }
+.cmpdoc__idx-summary .cmpdoc__idx-head { margin-bottom: 0; }
+.cmpdoc__idx-n { display: none; }
+.cmpdoc__idx-fold > .cmpdoc__idx-grid { margin-top: calc(-1 * var(--k-s-32) + var(--k-s-12)); margin-bottom: var(--k-s-32); }
+@media (max-width: 860px) {
+  .cmpdoc__idx-fold { display: block; border-top: 1px solid var(--mkt-border); }
+  .cmpdoc__idx-fold:last-of-type { border-bottom: 1px solid var(--mkt-border); }
+  .cmpdoc__idx-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--k-s-12); cursor: pointer;
+    padding: var(--k-s-14) 0; margin: 0; }
+  .cmpdoc__idx-summary .cmpdoc__idx-head { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); text-transform: none; letter-spacing: 0; color: var(--mkt-fg); margin: 0; }
+  .cmpdoc__idx-n { display: inline-block; font-size: var(--k-type-caption); color: var(--mkt-fg-faint); margin-left: auto; }
+  .cmpdoc__idx-summary::after { content: '+'; color: var(--mkt-fg-faint); font-size: var(--k-type-body); line-height: 1; }
+  .cmpdoc__idx-fold[open] > .cmpdoc__idx-summary::after { content: '−'; }
+  .cmpdoc__idx-fold > .cmpdoc__idx-grid { grid-template-columns: 1fr 1fr; gap: 0 var(--k-s-12); margin: 0 0 var(--k-s-12); }
+  .cmpdoc__idx-link { margin-left: 0; padding: var(--k-s-8) var(--k-s-6); font-size: var(--k-type-small); }
+  .cmpdoc__idx-blurb { display: none; }
+  .cmpdoc__lead { font-size: var(--k-type-small); }
+}
 
 /* Detail: the large live preview + composition + best practices + recipe CSS. */
 .cmpdoc__stage { border: var(--k-bw) solid var(--k-border); border-radius: var(--k-radius-lg); background: var(--k-bg); padding: 32px; margin-bottom: 20px; }
