@@ -6589,7 +6589,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 /* --- Action grid (Tailwind "empty state with templates / starting points") ---
    A grid of "starting point" cards below the empty copy — pick a template instead
    of facing a blank canvas. Pair with .card--interactive tiles. */
-.empty__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--k-s-10); width: 100%; margin-top: var(--k-s-6); }
+.empty__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); gap: var(--k-s-10); width: 100%; margin-top: var(--k-s-6); }
 
 /* === Select trigger === */
 .select-trigger {
@@ -7296,7 +7296,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
  * recipe wholesale; this is the wrapper + the small-cell override + the
  * current-month lift. Anatomy: .calendar-year > .calendar-year__month
  *   (.calendar-year__title + .calendar). */
-.calendar-year { display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: var(--k-s-20); }
+.calendar-year { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr)); gap: var(--k-s-20); }
 .calendar-year__month { --k-cal-cell: 1.5rem; display: flex; flex-direction: column; gap: var(--k-s-6); }
 .calendar-year__title { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
 .calendar-year__month .calendar { font-size: var(--k-type-caption); gap: 0; }
@@ -7360,9 +7360,17 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
  * same thing said twice. Link groups get their own heading so the landmark has
  * internal structure rather than being one long list of forty links. */
 .footer { border-top: 1px solid var(--k-border); background: var(--k-surface-sunken); padding: var(--k-s-32) 0 var(--k-s-20); }
+/* ⚠️ minmax(min(12rem, 100%), 1fr), NOT minmax(12rem, 1fr). A minmax track does
+   not shrink below its minimum, and rem SCALES WITH ZOOM — at 200% (WCAG 1.4.4)
+   a 12rem floor becomes 384px, wider than the column holding it, and the footer
+   hung 121px outside its card. min(…, 100%) lets the track collapse to whatever
+   space actually exists.
+   This was already the shape five other grids in this kit used. The right answer
+   existed and was applied inconsistently, which is the shape of nearly every
+   defect found this week. */
 .footer__cols {
   display: grid; gap: var(--k-s-24);
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
   padding: 0 var(--k-pad);
 }
 .footer__group-title {
@@ -10739,7 +10747,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 /* ----- Slot picker (.slotpicker / .slot) -----
  * A grid of selectable time/option pills — booking & scheduling screens.
  * Selection follows the kit convention: soft brand fill + ring border. */
-.slotpicker { display: grid; grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); gap: var(--k-stack-gap, 8px); }
+.slotpicker { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(82px, 100%), 1fr)); gap: var(--k-stack-gap, 8px); }
 .slot {
   display: flex; align-items: center; justify-content: center;
   min-height: var(--k-row-h-md, 38px); padding: 0 var(--k-s-10);
@@ -11232,7 +11240,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    feed rule — columns live inside panes, min-width-driven). */
 .pane__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
   gap: var(--k-gap, var(--k-s-8));
 }
 
@@ -14627,7 +14635,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
 /* --- Action grid (Tailwind "empty state with templates / starting points") ---
    A grid of "starting point" cards below the empty copy — pick a template instead
    of facing a blank canvas. Pair with .card--interactive tiles. */
-.empty__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--k-s-10); width: 100%; margin-top: var(--k-s-6); }
+.empty__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); gap: var(--k-s-10); width: 100%; margin-top: var(--k-s-6); }
 
 /* === Select trigger === */
 .select-trigger {
@@ -15334,7 +15342,7 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
  * recipe wholesale; this is the wrapper + the small-cell override + the
  * current-month lift. Anatomy: .calendar-year > .calendar-year__month
  *   (.calendar-year__title + .calendar). */
-.calendar-year { display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: var(--k-s-20); }
+.calendar-year { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr)); gap: var(--k-s-20); }
 .calendar-year__month { --k-cal-cell: 1.5rem; display: flex; flex-direction: column; gap: var(--k-s-6); }
 .calendar-year__title { font-size: var(--k-type-small); font-weight: var(--k-weight-semibold); color: var(--k-fg); }
 .calendar-year__month .calendar { font-size: var(--k-type-caption); gap: 0; }
@@ -15398,9 +15406,17 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
  * same thing said twice. Link groups get their own heading so the landmark has
  * internal structure rather than being one long list of forty links. */
 .footer { border-top: 1px solid var(--k-border); background: var(--k-surface-sunken); padding: var(--k-s-32) 0 var(--k-s-20); }
+/* ⚠️ minmax(min(12rem, 100%), 1fr), NOT minmax(12rem, 1fr). A minmax track does
+   not shrink below its minimum, and rem SCALES WITH ZOOM — at 200% (WCAG 1.4.4)
+   a 12rem floor becomes 384px, wider than the column holding it, and the footer
+   hung 121px outside its card. min(…, 100%) lets the track collapse to whatever
+   space actually exists.
+   This was already the shape five other grids in this kit used. The right answer
+   existed and was applied inconsistently, which is the shape of nearly every
+   defect found this week. */
 .footer__cols {
   display: grid; gap: var(--k-s-24);
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
   padding: 0 var(--k-pad);
 }
 .footer__group-title {
@@ -18777,7 +18793,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
 /* ----- Slot picker (.slotpicker / .slot) -----
  * A grid of selectable time/option pills — booking & scheduling screens.
  * Selection follows the kit convention: soft brand fill + ring border. */
-.slotpicker { display: grid; grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); gap: var(--k-stack-gap, 8px); }
+.slotpicker { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(82px, 100%), 1fr)); gap: var(--k-stack-gap, 8px); }
 .slot {
   display: flex; align-items: center; justify-content: center;
   min-height: var(--k-row-h-md, 38px); padding: 0 var(--k-s-10);
@@ -19270,7 +19286,7 @@ button.list__item, a.list__item, .list__item:has(input, button, a, [role="button
    feed rule — columns live inside panes, min-width-driven). */
 .pane__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
   gap: var(--k-gap, var(--k-s-8));
 }
 
