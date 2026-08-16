@@ -35,13 +35,37 @@
  *                       allow-list: a class is an orphan only when its own BEM
  *                       family IS styled — `.fmopt__viz` has rules, `.fmopt` has
  *                       none. Derived suspicion beats a list of exceptions.
+ *   C4 says-nothing     an element that looks chosen with no ARIA that says so.
+ *   C5 control row      every control in a `.toolbar` renders at one height —
+ *                       invariant I1, measured instead of read (was control-h).
  *
  * It runs over the WHOLE app — chrome included — because the chrome is 6177
  * lines and 1047 classes and not one existing gate reads it, which is where
  * every one of today's defects lived.
+ *
+ * IT GATES, since 2026-08-16 (Sprint K): exit 1 on any C1–C4 disagreement. It
+ * printed for as long as the list was being worked through; the list is empty.
+ *
+ * AND C1 IS MEASURED TWICE — at the default configuration and at the WORST one
+ * the panel can produce for a selected state: Background=White (surface and page
+ * become the same white, so a neutral wash paints nothing), Border=Faint (a
+ * border-based cue at its palest) and Elevation=Flat (no shadow to lean on). A
+ * selected state that is only distinguishable because the default happens to
+ * have a tinted page is not distinguishable — it is lucky. This is the claim
+ * that audit:state-edge (invariant I2) used to make by reading the SOURCE for a
+ * `--on` rule with a neutral background and no edge token; the rendered version
+ * measures the thing itself, under the configuration where it would fail, on
+ * every selectable including ones the source pattern could not see. Proven by
+ * mutation before the switch: drop var(--k-selected-edge) from .segctrl__btn--on
+ * → C1 at the worst configuration reports it and the gate exits 1.
+ *
+ * The panel is DRIVEN through lib/drive-panel.mjs, which throws when a control
+ * cannot be moved and verifies its witness token actually changed — the
+ * instrument that once measured one density three times is not coming back.
  */
 import { chromium } from '@playwright/test'
 import { APP } from './lib/base.mjs'
+import { setRow } from './lib/drive-panel.mjs'
 
 const URL = process.argv.find((a) => a.startsWith('--url='))?.slice(6) ?? APP
 const JSON_OUT = process.argv.includes('--json')
@@ -53,21 +77,28 @@ await page.waitForTimeout(600)
 
 /* Open every disclosure we can reach, so menus and flyouts are in the DOM. A
  * gate that only sees the resting page cannot see a dropdown, and a dropdown is
- * exactly where selection lives. */
-const opened = await page.evaluate(() => {
-  let n = 0
-  for (const el of document.querySelectorAll('[aria-expanded="false"], details:not([open])')) {
-    try {
-      if (el.tagName === 'DETAILS') el.open = true
-      else el.click()
-      n++
-    } catch { /* a trigger that refuses is not a finding here */ }
-  }
+ * exactly where selection lives. Run once per measurement, on a fresh page —
+ * the second measurement reloads first, because the panel is driven through
+ * its own flyouts and a flyout this pass had already opened would be toggled
+ * shut by the driver's click. */
+const openDisclosures = async () => {
+  const n = await page.evaluate(() => {
+    let n = 0
+    for (const el of document.querySelectorAll('[aria-expanded="false"], details:not([open])')) {
+      try {
+        if (el.tagName === 'DETAILS') el.open = true
+        else el.click()
+        n++
+      } catch { /* a trigger that refuses is not a finding here */ }
+    }
+    return n
+  })
+  await page.waitForTimeout(400)
   return n
-})
-await page.waitForTimeout(400)
+}
+const opened = await openDisclosures()
 
-const report = await page.evaluate(() => {
+const measure = () => page.evaluate(() => {
   const cs = (el) => getComputedStyle(el)
   const vis = (el) => {
     const r = el.getBoundingClientRect()
@@ -96,6 +127,44 @@ const report = await page.evaluate(() => {
    * kit is allowed to use for a state. */
   const CHANNELS = ['backgroundColor', 'color', 'borderColor', 'borderWidth', 'boxShadow', 'fontWeight', 'outlineColor', 'textDecorationLine']
 
+  /* ⚠️ THE BACKGROUND IS COMPARED AS PAINTED, NOT AS COMPUTED. A selected row
+   * with `background: var(--k-bg)` on a white card and its transparent sibling
+   * are `rgb(255,255,255)` and `rgba(0,0,0,0)` in getComputedStyle — different
+   * strings, identical pixels. The first version compared the strings and called
+   * a selected state that painted NOTHING "distinguishable"; the mutation that
+   * proved it (navmenu selected = the page wash only, at Background=White) went
+   * straight through. So every background in the signature is composited down
+   * the ancestor chain through a canvas — same ground truth the contrast
+   * verifier uses — and two elements that paint the same pixels compare equal. */
+  const canvas = document.createElement('canvas'); canvas.width = canvas.height = 1
+  const cctx = canvas.getContext('2d', { willReadFrequently: true })
+  const paintedBg = (n) => {
+    const chain = []
+    for (let e = n; e && e.nodeType === 1; e = e.parentElement) chain.push(cs(e).backgroundColor)
+    cctx.clearRect(0, 0, 1, 1)
+    cctx.fillStyle = '#fff'; cctx.fillRect(0, 0, 1, 1)
+    for (let i = chain.length - 1; i >= 0; i--) {
+      if (!chain[i] || chain[i] === 'rgba(0, 0, 0, 0)' || chain[i] === 'transparent') continue
+      cctx.fillStyle = chain[i]; cctx.fillRect(0, 0, 1, 1)
+    }
+    const d = cctx.getImageData(0, 0, 1, 1).data
+    return [d[0], d[1], d[2]]
+  }
+  /* And "the same pixels" is a PERCEPTUAL statement, not an equality of bytes.
+   * At Background=White the page is oklch(0.995) and a card is oklch(1): one
+   * rgb unit apart, a painted contrast of ~1.005:1, and nobody has ever seen
+   * the difference. Measured on this kit: its own quietest deliberate cues are
+   * the one-step neutral surface (1.058:1) and the hover overlay (1.10:1); the
+   * selected tint is 1.20:1. So two fills below 1.05:1 are ONE colour here —
+   * under that line the kit itself never asks anyone to see a difference. */
+  const lum = ([r, g, b]) => { const f = (v) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4 }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b) }
+  const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)]; return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) }
+  const SAME_FILL = 1.05
+  /* The fill enters the signature as a BUCKET: its painted contrast against the
+   * page white, quantised so that two fills within SAME_FILL land in one bucket. */
+  const fillKey = (n) => `fill~${Math.round(Math.log(contrast(paintedBg(n), [255, 255, 255])) / Math.log(SAME_FILL))}`
+  const channel = (n, c, p) => (p === 'backgroundColor' ? fillKey(n) : c[p])
+
   /* AND THE CUE IS ALLOWED TO LIVE IN A CHILD. A sorted table header marks
    * itself by colouring its chevron, not the <th> — comparing only the element
    * reported it as indistinguishable while it is perfectly clear on screen. So
@@ -106,7 +175,7 @@ const report = await page.evaluate(() => {
     const parts = []
     const one = (n) => {
       const c = cs(n)
-      parts.push(CHANNELS.map((p) => c[p]).join('|') + '|' + c.transform + '|' + c.opacity)
+      parts.push(CHANNELS.map((p) => channel(n, c, p)).join('|') + '|' + c.transform + '|' + c.opacity)
       for (const pseudo of ['::before', '::after']) {
         const pc = getComputedStyle(n, pseudo)
         parts.push(pseudo + pc.content + pc.backgroundColor + pc.color + pc.width + pc.height)
@@ -160,7 +229,7 @@ const report = await page.evaluate(() => {
       // carries an edge, a weight change or a marked-up child stays readable
       // under the cursor. Compared on the ELEMENT's own channels (the subtree
       // signature above answers a different question and cannot be indexed).
-      const own = (n) => CHANNELS.map((p) => cs(n)[p])
+      const own = (n) => CHANNELS.map((p) => channel(n, cs(n), p))
       const a = own(el), b = own(sib)
       const onlyFillDiffers = a.every((v, i) => i === 0 || v === b[i]) && sig(el).replace(a[0], '') === sig(sib).replace(b[0], '')
       if (resolved === cs(el).backgroundColor && onlyFillDiffers) {
@@ -271,12 +340,55 @@ const report = await page.evaluate(() => {
     if (familyStyled) c3.push({ concept: 'orphan-class', el: '.' + cls, count, note: `its BEM family (${base}) is styled — this member is not` })
   }
 
+  /* ---- C5 · ONE HEIGHT PER CONTROL ROW -----------------------------------
+   * Invariant I1, folded in from audit:control-h (2026-08-16). That gate read the
+   * source for a hand-written CONTROL_FAMILY of six class names and checked each
+   * was in the toolbar's height selector — a list, and the kit had already made
+   * the invariant default-on (`.toolbar > * { min-height: var(--tb-h) }`), so it
+   * was a list checking a list. The concept, measured: every interactive child
+   * of a control row renders at ONE height. Subjects are derived — the rows are
+   * the kit's own `.toolbar` (and role="toolbar", the platform name) and the
+   * members are whichever direct children are or contain a control. Text and
+   * spacers are not controls and are not subjects, without naming them. */
+  const c5 = []
+  const INTERACTIVE = 'button, input, select, textarea, a[href], [role="button"], [role="combobox"], [role="listbox"], [role="textbox"], [role="searchbox"], [role="group"], [role="radiogroup"], [tabindex]:not([tabindex="-1"])'
+  const isControl = (el) => { try { return el.matches(INTERACTIVE) || !!el.querySelector(INTERACTIVE) } catch { return false } }
+  for (const bar of document.querySelectorAll('.toolbar, [role="toolbar"]')) {
+    if (!vis(bar)) continue
+    const members = [...bar.children].flatMap((ch) => (ch.classList.contains('toolbar__group') ? [...ch.children] : [ch]))
+      .filter((ch) => vis(ch) && isControl(ch))
+    if (members.length < 2) continue
+    const heights = members.map((m) => Math.round(m.getBoundingClientRect().height))
+    const spread = Math.max(...heights) - Math.min(...heights)
+    if (spread > 1) {
+      const rows = members.map((m, i) => `${name(m)} ${heights[i]}px`)
+      c5.push({ concept: 'control-row-height', el: name(bar), note: `${members.length} controls at ${[...new Set(heights)].sort((a, b) => a - b).join('/')}px — ${rows.filter((r, i) => heights[i] !== heights[0]).slice(0, 3).join(', ')}` })
+    }
+  }
+
   return {
-    counts: { selectedEls: selectedEls.length, canonical: canonical.length, scrollers: c2.length, rendered: rendered.size },
-    c1, c2, c3, c4,
+    counts: { selectedEls: selectedEls.length, canonical: canonical.length, scrollers: c2.length, rendered: rendered.size, toolbars: document.querySelectorAll('.toolbar, [role="toolbar"]').length },
+    c1, c2, c3, c4, c5,
     treatments: [...treatments.entries()].map(([k, v]) => ({ treatment: k, count: v.length, examples: [...new Set(v)].slice(0, 6) })),
   }
 })
+
+const report = await measure()
+
+/* The WORST configuration for a selected state — see the header. Each setter
+ * throws if the row is missing or the witness token does not move. */
+await page.reload({ waitUntil: 'networkidle' })
+await page.waitForTimeout(600)
+/* Witness functions are serialised into the page, so no closure over the token
+ * name — a `token(name)` factory read `getPropertyValue(undefined)` and the
+ * driver (correctly) refused to believe the control had moved. */
+await setRow(page, 'Background', '^White$', { witness: () => getComputedStyle(document.querySelector('.cockpit-preview')).getPropertyValue('--k-bg').trim() })
+await setRow(page, 'Border', '^Faint$', { witness: () => getComputedStyle(document.querySelector('.cockpit-preview')).getPropertyValue('--k-border').trim() })
+await setRow(page, 'Elevation', '^Flat$', { witness: () => getComputedStyle(document.querySelector('.cockpit-preview')).getPropertyValue('--k-shadow-sm').trim() })
+await openDisclosures()
+const worst = await measure()
+report.c1worst = worst.c1
+report.worstConfig = 'Background=White · Border=Faint · Elevation=Flat'
 
 await browser.close()
 
@@ -298,17 +410,19 @@ const section = (title, rows, fmt) => {
 }
 
 section('C1 · a selected state must be distinguishable', report.c1, (r) => `${r.el}  →  ${r.problems.join(' + ')}`)
+section(`C1 · …and still at the worst configuration (${report.worstConfig})`, report.c1worst, (r) => `${r.el}  →  ${r.problems.join(' + ')}`)
 section('C2 · every scroll rail carries the kit treatment', report.c2, (r) => `${r.el}  →  ${r.reserved} of OS rail (${r.note})`)
 section('C3 · no rendered class without CSS while its family has it', report.c3, (r) => `${r.el} ×${r.count}  →  ${r.note}`)
 section('C4 · looks chosen but says nothing in ARIA', report.c4, (r) => `${r.el}  →  visual --on with no aria-selected/checked`)
+section(`C5 · every control in a control row shares one height (${report.counts.toolbars} rows)`, report.c5, (r) => `${r.el}  →  ${r.note}`)
 
 line(`  Selected-state treatments across the ${report.counts.canonical} ARIA-declared selectables: ${report.treatments.length}` +
   (report.treatments.length > 1 ? '  ← they should agree' : '  ← uniform'))
 for (const t of report.treatments) line(`      ${String(t.count).padStart(3)} × ${t.treatment}\n            ${t.examples.join(' · ')}`)
 
-const failures = report.c1.length + report.c2.length + report.c3.length + report.c4.length
+const failures = report.c1.length + report.c1worst.length + report.c2.length + report.c3.length + report.c4.length + report.c5.length
 line()
 line(failures
-  ? `audit:uniformity — ${failures} disagreement(s). These are not component bugs; they are the same bug in N places.`
-  : 'audit:uniformity — every instance agrees.')
-process.exit(0)
+  ? `FAIL: audit:uniformity — ${failures} disagreement(s). These are not component bugs; they are the same bug in N places.`
+  : 'audit:uniformity — every instance agrees, at the default and at the worst configuration.')
+process.exit(failures ? 1 : 0)

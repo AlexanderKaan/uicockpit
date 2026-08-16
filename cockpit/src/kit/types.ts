@@ -30,7 +30,7 @@ export interface RecipeDoc {
 }
 
 export interface Recipe {
-  /** Stable id, used by the gates (`audit:provenance`, modifiers). e.g. 'button'. */
+  /** Stable id, used by the gates (`audit:surfaces`, `audit:derivation`). e.g. 'button'. */
   id: string
   /** Human banner emitted as a `/* === … === *\/` comment above the block. */
   section: string

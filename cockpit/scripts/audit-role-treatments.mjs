@@ -2,10 +2,12 @@
 /**
  * audit-role-treatments.mjs — the Role Canvas ENFORCE rail (the treatment gates).
  *
- * audit:contract verifies the contract DATA is consistent + complete. This gate
+ * The contract DATA (src/kit/contracts.ts) is typed — Record<Role, string> and
+ * Part.role: Role — so tsc holds it consistent; audit:contract, which re-checked
+ * that and then compared it to a CLASS_MAP that existed only to be read by it,
+ * was retired in Sprint K (2026-08-16). This gate is the one that matters: it
  * verifies the kit actually DELIVERS each role's ROLE_GUARANTEE — so "the role
- * guarantees its treatment" is true, not aspirational. It closes the worklist
- * audit:contract prints (the declared-not-yet-enforced roles):
+ * guarantees its treatment" is true, not aspirational:
  *
  *   selectable  → the generative binding exists: one zero-specificity :where()
  *                 floor in globalLayer.ts binds --k-selected-edge to the ARIA
@@ -56,7 +58,7 @@ const fails = []
 // Each role's treatment must be bound ONCE, globally, in a zero-specificity
 // :where() floor — so UNKNOWN markup that tags the role (via ARIA state and/or a
 // thin [data-role]) inherits the treatment and no component has to re-roll it.
-// (Per-recipe legibility is a separate gate: audit:state-edge / Invariant I2.)
+// (Per-recipe legibility is measured by audit:uniformity C1 — Invariant I2, at the worst configuration.)
 const whereFloors = [...globalLayerSrc.matchAll(/:where\(([\s\S]*?)\)\s*\{([\s\S]*?)\}/g)].map(
   (m) => ({ sel: m[1], body: m[2] }),
 )

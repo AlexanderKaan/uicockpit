@@ -19,10 +19,9 @@ import { renderSection } from './sections'
  * the screen it happened to live in.
  *
  * It sits beside `sections.tsx` in exactly the same status: a CONFORMANCE
- * FIXTURE. `audit:coverage`, `audit:parity`, `audit:provenance`,
- * `audit:modifiers`, `audit:layout` and `audit:structural-inline` read this
+ * FIXTURE. `audit:surfaces` (six axes, one read) and `audit:values` read this
  * directory from disk and hold the kit to it. Nothing imports it at runtime, so
- * it costs the bundle nothing — but delete it and six auditors quietly stop
+ * it costs the bundle nothing — but delete it and the auditors quietly stop
  * proving anything about the section tier.
  *
  * Kit classes only. No preview chrome (`shc__*`), no inspect affordances, no

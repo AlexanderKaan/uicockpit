@@ -338,8 +338,37 @@ line(`  the set on paper: ${stays.length} stay · ${leaves.length} leave · ${l2
 if (GATE) {
   const breaches = []
   for (const l of leaves) breaches.push(`${l.id} — ${l.why}`)
+
+  /* ── absorbed from audit:apg (2026-08-16) ─────────────────────────────────
+   * Two claims the derivation did NOT make and that were about to be lost when
+   * the plan called audit:apg "layer 2 wearing a second name". It is not: the
+   * derivation asks whether a recipe may EXIST (a line from APG or a service);
+   * audit:apg asked whether every recipe answers the BEHAVIOUR question — a
+   * pattern, or a written reason for having none — including the recipes that
+   * are core through layer 4 alone. The written reasons are where the real
+   * obligations live ("a chart needs a text alternative", "a scroll area needs
+   * tabindex=0"), and a recipe could otherwise ship silent. And a declaration
+   * for a recipe that no longer exists reads as coverage. Same substrate as the
+   * rest of this file (apg.ts × the recipe list), so it lives here now. */
+  const apgSrc = readFileSync(join(HERE, '../src/kit/apg.ts'), 'utf8')
+  const keysIn = (marker) => {
+    const start = apgSrc.indexOf(marker)
+    if (start < 0) return new Set()
+    const body = apgSrc.slice(start, apgSrc.indexOf('\n}', start))
+    return new Set([...body.matchAll(/^ {2}'?([a-z][a-z0-9-]*)'?:/gm)].map((m) => m[1]))
+  }
+  const declared = new Set([...keysIn('export const APG_PATTERNS'), ...keysIn('export const APG_NOT_APPLICABLE')])
+  const recipeIds = Object.keys(prov.tiers ?? {})
+  for (const id of recipeIds) if (!declared.has(id)) breaches.push(`${id} — declares neither an APG pattern nor a reason for having none (apg.ts). Say what it implements, or what it owes instead — a name, a live region, a text alternative.`)
+  for (const id of declared) if (!recipeIds.includes(id)) breaches.push(`apg.ts declares "${id}", which is not a recipe — a behaviour contract pointing at nothing reads as coverage`)
   for (const r of l2m) breaches.push(`APG · ${r.name} — a named pattern with a spec, and nothing in the kit implements it`)
   for (const r of l4m) breaches.push(`${r.system} · ${r.name} — a public service ships it, and nothing in the kit covers it`)
+  /* The FLOOR is part of the verdict too (Sprint K): layer 1 is read statically
+   * off the w() arguments in globalLayer.ts, so "every rendering element the
+   * platform has is styled" is a claim this mode CAN hold — and it is the claim
+   * the whole four-layer thesis rests on. 76 of 76 today; an element that leaves
+   * the floor, or a new one in the catalogue nobody styled, fails here. */
+  for (const r of l1.missing) breaches.push(`HTML · ${r.name} — a rendering element of the platform, and the floor does not style it (globalLayer.ts)`)
   if (breaches.length) {
     line()
     line(`  ✗ derive:coverage --gate — the set is not exact: ${breaches.length} breach(es).`)
@@ -350,6 +379,6 @@ if (GATE) {
     line('  in DECIDED — never a hole. Layer 3 is a check and does not count.')
     process.exit(1)
   }
-  line('\n  ✓ derive:coverage --gate — the set is exact: every recipe has a core line, every core entry is covered.')
+  line(`\n  ✓ derive:coverage --gate — the set is exact: every recipe has a core line, every core entry is covered, the floor styles all ${l1.covered.length} rendering elements.`)
 }
 process.exit(0)

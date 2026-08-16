@@ -67,10 +67,10 @@ function blockOf(css: string): string | null {
 function testsFor(css: string, hasApg: boolean): string[] {
   const t = [
     'audit:values — no raw spacing, font-size, font-family or transition literal; magic px and structural inline held by ratchets',
-    'audit:modifiers — every variant is defined in CSS and demonstrated in the gallery',
+    'audit:surfaces — every variant is defined in CSS, demonstrated in the gallery, and composes into a page',
     'npm run a11y:matrix — axe over the rendered component, 3 densities x 2 modes',
   ]
-  if (/:focus-visible|--k-ring/.test(css)) t.push('audit:focus — the focus treatment is present and not overridden')
+  if (/:focus-visible|--k-ring/.test(css)) t.push('check:components — every stop of a Tab walk shows a focus indicator, measured before and after focus')
   if (/--k-hit-min|--k-touch-target|--k-row-h|--k-btn-h|--k-in-h/.test(css)) {
     t.push('a11y:matrix target-size pass — rendered geometry on both axes at the AAA setting')
   }

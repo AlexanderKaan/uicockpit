@@ -179,7 +179,8 @@ if (gone.length || added.length) {
 
 const failures = reshaped.length + moved.length
 line(failures
-  ? `audit:shape — ${failures} box(es) moved. Either the change was meant and the baseline\n` +
-    '              should be updated in the same commit that explains it, or it was not.'
+  ? `FAIL: audit:shape — ${failures} box(es) moved. Either the change was meant and the baseline\n` +
+    '              should be updated (npm run audit:shape -- --update) in the same commit that\n' +
+    '              explains it, or it was not. Since Sprint K this is an exit code, not a remark.'
   : 'audit:shape — every component kept its own dimensions.')
-process.exit(0)
+process.exit(failures ? 1 : 0)

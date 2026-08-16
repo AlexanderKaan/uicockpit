@@ -167,7 +167,12 @@ console.log('\n5. SKIP LINK — first stop, and does it land?')
 // ── 6. reading order vs visual order ──────────────────────────────────────
 console.log('\n6. READING ORDER vs VISUAL ORDER')
 {
-  const jumps = await page.$$eval('.cockpit-preview .card', (cards) => {
+  /* Subjects = the gallery's own cards, by the identity every gate uses
+   * (data-recipe / data-card) — NOT every `.card` on the wall. A `.card` used as
+   * a SPECIMEN inside a tall card at the bottom of the right masonry column has
+   * a larger y than the next real card at the top of the left column, and that
+   * read as "a backward jump" for as long as this line said `.card`. */
+  const jumps = await page.$$eval('.cockpit-preview [data-recipe], .cockpit-preview [data-card]', (cards) => {
     const seen = cards.map((c) => { const r = c.getBoundingClientRect(); return { y: r.top, x: r.left } })
     const out = []
     for (let i = 1; i < seen.length; i++) {

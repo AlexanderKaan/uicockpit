@@ -726,6 +726,54 @@
     return { rows: out, collisions: collisions }
   }
 
+  /**
+   * PAINTED CONTRAST — the one place axe's colour-contrast verdict is verified.
+   *
+   * axe parses the computed oklch() string with its own colour code, and for a
+   * saturated colour that lands somewhere the browser never paints: it read a
+   * calendar chip as #2e87d5 / 3.32:1 where the screen shows #016ccb / 4.60:1 —
+   * a PASS reported as a failure. The error grows with chroma, so a token system
+   * that emits OKLCH gets systematically wrong answers on exactly its most
+   * saturated pairs. Ground truth is what the compositor paints: rasterise both
+   * colours through a canvas and recompute. The opacity chain is composited
+   * first, or the check produces false negatives (.slot--off is near-black at
+   * opacity 0.4, and axe read the composited grey correctly).
+   *
+   * Lived inline in a11y-matrix (and a11y-scan before it) until check:components
+   * needed the same verification for its own axe rows — a second copy would have
+   * been a second definition of "what contrast IS", and the two would drift.
+   * Returns null when the element cannot be measured (caller decides); otherwise
+   * { painted, need, pass } — pass=true means axe's row is an ARTIFACT and must
+   * be discounted, never acted on.
+   */
+  window.__uicPaintedContrast = function (el, need) {
+    if (!el || el.nodeType !== 1) return null
+    var c = document.createElement('canvas'); c.width = c.height = 1
+    var ctx = c.getContext('2d', { willReadFrequently: true })
+    var px = function (v) {
+      ctx.clearRect(0, 0, 1, 1); ctx.fillStyle = v; ctx.fillRect(0, 0, 1, 1)
+      var d = ctx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2]]
+    }
+    var lum = function (rgb) {
+      var f = function (v) { var x = v / 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4) }
+      return 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2])
+    }
+    var cs = getComputedStyle(el)
+    var fg = px(cs.color)
+    var bgEl = el, bgc = cs.backgroundColor
+    while (bgEl && (bgc === 'rgba(0, 0, 0, 0)' || bgc === 'transparent')) {
+      bgEl = bgEl.parentElement; if (!bgEl) break; bgc = getComputedStyle(bgEl).backgroundColor
+    }
+    var bg = px(bgc || '#ffffff')
+    var a = 1
+    for (var p = el; p; p = p.parentElement) a *= Number(getComputedStyle(p).opacity || 1)
+    if (a < 1) fg = fg.map(function (x, i) { return Math.round(x * a + bg[i] * (1 - a)) })
+    var x = lum(fg), y = lum(bg)
+    var painted = (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)
+    var req = Number(String(need == null ? '4.5' : need).replace(':1', '')) || 4.5
+    return { painted: painted, need: req, pass: painted >= req }
+  }
+
   window.__uicRules = rules
   window.__uicRun = function (rootSel, ctx) {
     var root = document.querySelector(rootSel)

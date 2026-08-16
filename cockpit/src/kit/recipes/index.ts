@@ -1986,7 +1986,14 @@ progress.progress::-moz-progress-bar { background: var(--k-fill, var(--k-primary
  * border, height) and tracks the box/input radius like every other field.
  * Buttons keep their independent --k-radius-button on purpose (#75). */
 .cockpit-preview select.select {
-  min-height: var(--k-in-h-default, 40px);
+  /* Reads the control-row height FIRST. This selector is (0,2,1) and the
+     toolbar's one-height rule is (0,2,0), so a native select in a .toolbar--sm
+     rendered 36px in a 32px row — found by audit:uniformity C5 the first time
+     the invariant was measured instead of read. The bar sets --tb-h on itself
+     and the select inherits it; outside a bar it is undefined and the field
+     height applies. Composed through a token the recipe reads, not by
+     out-specifying the toolbar. */
+  min-height: var(--tb-h, var(--k-in-h-default, 40px));
   padding: 0 var(--k-s-28) 0 max(var(--k-s-12), calc(var(--k-radius-md) * 0.6));
   background-color: var(--k-field-bg);
   border: var(--k-bw, 1px) solid var(--k-field-border-color); border-bottom-color: var(--k-field-underline-color);

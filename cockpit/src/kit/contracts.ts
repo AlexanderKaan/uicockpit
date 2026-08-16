@@ -1,9 +1,12 @@
 // === The Role Canvas — declarative layer (the first brick) ==================
 // A small CLOSED set of ROLES, each carrying a guaranteed perceptual TREATMENT.
 // A component's CONTRACT lists which role each of its parts wears. This is the
-// data the loupe's contract card reads — and the truth a future audit/ENFORCE
-// rail will check. See ROLE-CANVAS.md for the thesis (role → treatment, on one
-// canvas; bind to ARIA states + data-slot). Keyed by CLASS_MAP ids.
+// data the (retired) loupe's contract card read; what remains live is the
+// ENFORCE rail — audit:role-treatments verifies the kit delivers each
+// ROLE_GUARANTEE through a generative :where() floor in globalLayer.ts. The
+// types below hold this file consistent (tsc); no runtime consumer imports it.
+// See ROLE-CANVAS.md for the thesis (role → treatment, on one canvas; bind to
+// ARIA states + data-slot). Keyed by recipe-ish component ids.
 
 export type Role =
   | 'control' // interactive: a button, field, toggle, row-action
@@ -25,8 +28,7 @@ export const ROLE_GUARANTEE: Record<Role, string> = {
 
 export type Part = { part: string; role: Role }
 
-/** component-type → its parts and the role each part plays. The breadth mirrors
- *  what CLASS_MAP enumerates (the pickable types). */
+/** component-type → its parts and the role each part plays. */
 export const CONTRACT: Record<string, Part[]> = {
   button: [{ part: 'Button', role: 'control' }, { part: 'Label', role: 'text-slot' }],
   input: [{ part: 'Field', role: 'control' }, { part: 'Label', role: 'text-slot' }],

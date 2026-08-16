@@ -169,6 +169,7 @@ export async function runHarness({
   await page.evaluate((classes) => { window.__uicKitClasses = new Set(classes) }, kitClasses)
 
   const findings = []
+  const discounted = []   // axe contrast rows whose painted pixels pass — reported, never counted
   let baseline = null
 
   for (const v of variations) {
@@ -208,13 +209,21 @@ export async function runHarness({
 
     if (withAxe) {
       await page.addScriptTag({ url: AXE }).catch(() => {})
-      const axeRows = await page.evaluate(async ({ sel, tags }) => {
+      /* axe's contrast verdicts go through the SAME painted-pixel verifier the
+       * a11y matrix uses (window.__uicPaintedContrast, in rules.browser.js).
+       * Before this, the harness reported one "breach" on every run — a calendar
+       * chip axe read as 4.36:1 that the screen paints at ≥4.5 — and a gate that
+       * always shows one breach is a gate people learn to read past. Discounted
+       * rows are returned as artifacts and PRINTED, never silently dropped. */
+      const { rows: axeRows, artifacts } = await page.evaluate(async ({ sel, tags }) => {
         // eslint-disable-next-line no-undef
         const res = await axe.run({ include: [[sel]] }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })
-        return res.violations.flatMap((vi) => vi.nodes.map((n) => {
+        const rows = []
+        const artifacts = []
+        for (const vi of res.violations) for (const n of vi.nodes) {
           const el = document.querySelector(n.target[0])
           const card = el?.closest('[data-recipe], [data-card]')
-          return {
+          const row = {
             component: card?.getAttribute('data-recipe') || card?.getAttribute('data-card') || '(unattributed)',
             el: String(n.target[0]).slice(0, 44),
             detail: (n.any[0]?.message || vi.help || '').slice(0, 90),
@@ -222,16 +231,26 @@ export async function runHarness({
             dimension: 'A/B/C',
             wcag: (vi.tags.find((t) => /^wcag\d{3}$/.test(t)) || '').replace(/^wcag(\d)(\d)(\d)$/, '$1.$2.$3'),
           }
-        }))
+          if (vi.id === 'color-contrast' && window.__uicPaintedContrast) {
+            const verdict = window.__uicPaintedContrast(el, n.any?.[0]?.data?.expectedContrastRatio)
+            if (verdict) {
+              row.detail = `painted ${verdict.painted.toFixed(2)}:1, needs ${verdict.need}:1 (axe read ${n.any?.[0]?.data?.contrastRatio})`
+              if (verdict.pass) { artifacts.push({ ...row, axe: n.any?.[0]?.data?.contrastRatio, painted: verdict.painted.toFixed(2) }); continue }
+            }
+          }
+          rows.push(row)
+        }
+        return { rows, artifacts }
       }, { sel: rootSel, tags: AXE_TAGS })
       for (const r of axeRows) findings.push({ ...r, variation: v.id })
+      for (const a of artifacts) discounted.push({ ...a, variation: v.id })
     }
 
     if (styleHandle) await page.evaluate((h) => h.remove(), styleHandle)
   }
 
   await browser.close()
-  return { findings, meta, variations }
+  return { findings, discounted, meta, variations }
 }
 
 /**

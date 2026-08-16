@@ -100,6 +100,9 @@ await page.waitForSelector('.cockpit-preview', { timeout: 20000 })
 await page.waitForTimeout(1200)
 await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' })
 await page.evaluate((map) => { window.__owner = map }, classOwner)
+// The painted-contrast verifier lives in rules.browser.js so that this file and
+// the component harness measure contrast the SAME way — one definition.
+await page.addScriptTag({ path: join(HERE, 'lib', 'rules.browser.js') })
 
 /* 🚨 THIS USED TO WRITE TO `.fmrow input[type="range"]`, and that input stopped
  * existing when the panel was refactored to one row shape. The setter returned
@@ -117,29 +120,16 @@ const toggleMode = () => page.evaluate(() => {
 })
 
 /* ── axe's CONTRAST verdicts are VERIFIED against painted pixels, never trusted.
- * (Ported from a11y-scan when it folded into this file.) axe parses the computed
- * oklch() string with its own colour code, and for a saturated colour that lands
- * somewhere the browser never paints: it read a calendar chip as #2e87d5 / 3.32:1
- * where the screen shows #016ccb / 4.60:1 — a PASS reported as a failure. The
- * error grows with chroma, so a token system that emits OKLCH gets systematically
- * wrong answers on exactly its most saturated pairs. Ground truth is what the
- * compositor paints: rasterise both colours through a canvas and recompute. A
- * flagged pair that survives is real; one that does not is the tool's arithmetic,
- * and it is DISCOUNTED and printed as such — acting on it would mean changing a
- * design to satisfy a bug. The opacity chain is composited first, or the check
- * produces false negatives (.slot--off is near-black at opacity 0.4, and axe read
- * the composited grey correctly). */
+ * The verifier itself is window.__uicPaintedContrast in lib/rules.browser.js —
+ * the WHY (axe's oklch arithmetic reads #016ccb as #2e87d5) is documented there,
+ * once. What this scan owns is the consequence: a flagged pair whose pixels pass
+ * is DISCOUNTED and printed as such — acting on it would mean changing a design
+ * to satisfy a bug. */
 const scan = (include = '.cockpit-preview', exclude = null) => page.evaluate(async ({ tags, include, exclude }) => {
   const ctx0 = { include: [[include]] }
   if (exclude) ctx0.exclude = [[exclude]]
   // eslint-disable-next-line no-undef
   const r = await axe.run(ctx0, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })
-  const c = document.createElement('canvas'); c.width = c.height = 1
-  const ctx = c.getContext('2d', { willReadFrequently: true })
-  const px = (v) => { ctx.clearRect(0,0,1,1); ctx.fillStyle = v; ctx.fillRect(0,0,1,1)
-    const d = ctx.getImageData(0,0,1,1).data; return [d[0],d[1],d[2]] }
-  const lum = ([r2,g,b]) => { const f=(v)=>{const x=v/255;return x<=0.03928?x/12.92:((x+0.055)/1.055)**2.4}
-    return 0.2126*f(r2)+0.7152*f(g)+0.0722*f(b) }
   /* The recipe a node belongs to — its OWN classes, nearest first, read with
    * getAttribute (on an SVG element className is an SVGAnimatedString and
    * String()-ing it yields "[object SVGAnimatedString]"; 740 SVG nodes on the
@@ -157,24 +147,13 @@ const scan = (include = '.cockpit-preview', exclude = null) => page.evaluate(asy
     let detail = ''
     if (v.id === 'color-contrast') {
       const el = document.querySelector(n.target[0])
-      if (el) {
-        const cs = getComputedStyle(el)
-        let fg = px(cs.color)
-        let bgEl = el, bgc = cs.backgroundColor
-        while (bgEl && (bgc === 'rgba(0, 0, 0, 0)' || bgc === 'transparent')) {
-          bgEl = bgEl.parentElement; if (!bgEl) break; bgc = getComputedStyle(bgEl).backgroundColor
-        }
-        const bg = px(bgc || '#ffffff')
-        let a = 1
-        for (let p = el; p; p = p.parentElement) a *= Number(getComputedStyle(p).opacity || 1)
-        if (a < 1) fg = fg.map((x, i) => Math.round(x * a + bg[i] * (1 - a)))
-        const [x, y] = [lum(fg), lum(bg)]
-        const painted = (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)
-        const need = Number(String(n.any?.[0]?.data?.expectedContrastRatio ?? '4.5').replace(':1', '')) || 4.5
-        detail = `${painted.toFixed(2)}:1`
-        if (painted >= need) {
+      const need = n.any?.[0]?.data?.expectedContrastRatio
+      const verdict = window.__uicPaintedContrast(el, need)
+      if (verdict) {
+        detail = `${verdict.painted.toFixed(2)}:1`
+        if (verdict.pass) {
           // The pixels pass; axe's oklch arithmetic did not. Discount, and say so.
-          artifacts.push({ sel: n.target[0]?.toString().slice(0, 56), axe: n.any?.[0]?.data?.contrastRatio, painted: painted.toFixed(2), need })
+          artifacts.push({ sel: n.target[0]?.toString().slice(0, 56), axe: n.any?.[0]?.data?.contrastRatio, painted: verdict.painted.toFixed(2), need: verdict.need })
           continue
         }
       }

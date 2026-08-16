@@ -9,13 +9,29 @@
  * "Slider: four findings, two of them only below 480px" — and that inversion is
  * the entire point of this file.
  *
- * It is deliberately NOT a build gate yet. It needs a dev server, it is new, and
- * a gate that fails for reasons nobody has triaged is a gate people learn to
- * skip. It prints; the ratchet comes once the list has been worked through.
+ * IT GATES ON THE BREACH BAND, since 2026-08-16 (Sprint K). It stayed a report
+ * for as long as the list was untriaged — a gate that fails for reasons nobody
+ * has looked at is a gate people learn to skip. The list has been worked
+ * through: the tab walk is clean over 544 stops and the one recurring "breach"
+ * turned out to be axe's oklch arithmetic, which is now verified against painted
+ * pixels and discounted (printed, never dropped). So `--gate` exits 1 on any
+ * BREACH — a keyboard trap, an unreachable control, a stop with no focus
+ * indicator, an obscured focus, or a real axe violation under any condition —
+ * and stays silent on CONTENT LOST and measurement, which remain a review.
+ *
+ * WHAT THIS RETIRED. audit:focus read the SOURCE for a focusable selector that
+ * suppressed its outline without a replacement. That is a proxy for the thing
+ * this walk measures directly: B4 focuses every stop and compares the painted
+ * state before and after (see __uicProbeIndicator) — no assumption about how or
+ * where a ring is drawn, so it also holds for a ring the source gate could not
+ * see (a :focus-within wrapper, a knob). Proven by mutation before the switch:
+ * `.btn:focus-visible { outline: none; box-shadow: none }` → this walk reports
+ * B-no-focus-indicator on every button and exits 1.
  */
 import { runHarness, driveTabWalk, byComponent } from './lib/harness.mjs'
 
-const { findings, variations } = await runHarness()
+const GATE = process.argv.includes('--gate')
+const { findings, discounted, variations } = await runHarness()
 
 /* Dimension B needs the page DRIVEN rather than rendered, so it is its own pass
  * with its own browser. One tab walk, four checks — reachable, no trap, focus
@@ -47,6 +63,10 @@ const groups = byComponent(findings)
     const worst = (rows) => Math.min(...rows.map((r) => r.sev))
     return worst(a[1]) - worst(b[1]) || b[1].length - a[1].length
   })
+if (discounted.length) {
+  const ex = discounted[0]
+  console.log(`(${discounted.length} axe contrast row(s) discounted — painted pixels pass: e.g. ${ex.el} axe ${ex.axe} painted ${ex.painted})\n`)
+}
 if (groups.length === 0) {
   console.log('✓ nothing found under any condition')
   process.exit(0)
@@ -92,4 +112,14 @@ console.log(`${tally[0]} breach · ${tally[1]} content-lost · ${tally[2]} measu
   `   across ${comps} component(s), over ${variations.length} conditions`)
 console.log(`${chrome} of those are marked ·chrome — the gallery's own wrappers, not the kit.`)
 console.log('A measurement is not a verdict: WCAG 2.5.8 permits a small target with enough')
-console.log('space around it, and axe owns that call. Not a gate yet — triage first.')
+console.log('space around it, and axe owns that call.')
+
+/* The gate. Breaches only — see the header. Printed AFTER the review so the
+ * failure is never a bare exit code. */
+if (tally[0] > 0) {
+  const breaches = findings.filter((f) => f.sev === 0)
+  console.log(`\n${GATE ? 'FAIL' : 'would FAIL under --gate'}: ${breaches.length} breach(es) — ` +
+    [...new Set(breaches.map((f) => f.rule))].join(', '))
+  if (GATE) process.exit(1)
+}
+console.log(GATE ? '\nOK: no breach under any condition.' : '')
