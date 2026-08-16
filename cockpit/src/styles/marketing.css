@@ -2887,3 +2887,19 @@
 .cmpdoc__answer-say { color: var(--mkt-fg-muted); }
 .cmpdoc__answer-say a { color: var(--mkt-fg); text-decoration: underline; text-decoration-color: var(--mkt-border); text-underline-offset: .2em; }
 .cmpdoc__answer-page { display: inline-block; margin-left: var(--k-s-8); color: var(--mkt-accent) !important; text-decoration: none !important; font-weight: var(--k-weight-semibold); }
+/* Detail page on a phone: the component first, then where it comes from —
+ * and the provenance without the sentence per source (three of them stood
+ * between the title and the specimen). Flex order only; the DOM (and the
+ * reading order for a screen reader) stays: title · provenance · stage. */
+@media (max-width: 860px) {
+  .cmpdoc__main { display: flex; flex-direction: column; }
+  .cmpdoc__main > * { order: 6; }
+  .cmpdoc__crumbs { order: 1; }
+  .cmpdoc__head { order: 2; }
+  .cmpdoc__stage { order: 3; }
+  .cmpdoc__copybar { order: 4; }
+  .cmpdoc__prov { order: 5; margin-top: 0; }
+  .cmpdoc__prov-why { display: none; }
+  .cmpdoc__prov-list { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); }
+  .cmpdoc__prov-list li { gap: var(--k-s-6); }
+}
