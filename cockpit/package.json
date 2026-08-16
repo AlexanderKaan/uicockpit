@@ -51,7 +51,8 @@
     "derive:provenance": "node scripts/derive-provenance.mjs",
     "audit:platform-floor": "node scripts/audit-platform-floor.mjs",
     "audit:shape": "node scripts/audit-shape.mjs",
-    "gen:evidence": "node scripts/gen-evidence.mjs"
+    "gen:evidence": "node scripts/gen-evidence.mjs",
+    "derive:coverage": "node scripts/derive-coverage.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

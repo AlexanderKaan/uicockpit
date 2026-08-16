@@ -290,6 +290,7 @@ const violations = []
 for (const r of RECIPES) {
   const dom = r.cls ? measured[r.cls] : null
   const sources = []
+  const covers = {}
 
   /* Two different statements, and the first version conflated them: NAMING a
    * platform element is the provenance (why this exists at all); RENDERING it is
@@ -328,6 +329,27 @@ for (const r of RECIPES) {
   const words = [...forms(r.id), ...forms(r.section),
     ...String(r.section).split(/[^A-Za-z]+/).filter(Boolean).flatMap(forms),
     ...String(r.id).split('-').flatMap(forms)]
+  /* ⚠️ ALL the matches, not just the first — and the difference only shows up
+   * when the derivation is read BACKWARDS. Forward, one source is enough to
+   * justify a recipe, so `find` was fine. Backwards, derive-coverage asks which
+   * catalogue entries are covered, and a recipe that satisfies "Pagination" AND
+   * "Breadcrumbs" claiming only the first makes the second look like a gap. The
+   * REPORT still shows one source per layer; `covers` carries the rest. */
+  covers.openui = [...new Set(words.map((w) => OPENUI[w]).filter(Boolean).map((h) => h.spelled ?? h.concept))]
+  covers.service = []
+  for (const [system, svs] of Object.entries(services.systems)) {
+    for (const kind of ['components', 'patterns']) {
+      for (const name of Object.keys(svs[kind] ?? {})) {
+        const aliased = (SERVICE_ALIAS[r.id] ?? []).some((a) => forms(a).some((f) => forms(name).includes(f)))
+        /* The SAME word list the Open UI matcher builds, compound ids split.
+         * `checkbox-radio` normalises to "checkboxradio", which meets neither
+         * "Checkbox" nor "Radios" — so a kit that plainly ships both reported
+         * two gaps. A compound name is two names. */
+        const direct = words.some((f) => forms(name).includes(f))
+        if (aliased || direct) covers.service.push(`${system} · ${name}`)
+      }
+    }
+  }
   const hit = words.map((w) => OPENUI[w]).find(Boolean)
   if (hit) {
     sources.push({ layer: 3, source: `Open UI · ${hit.spelled}`, because: `${hit.systems} of 27 surveyed design systems ship this independently (${hit.pct}%).`, url: openui._source })
@@ -337,7 +359,7 @@ for (const r of RECIPES) {
     sources.push({ layer: 4, source: `${sv.system} · ${sv.name}`, because: `${sv.system} ships this as a ${sv.kind === 'patterns' ? 'pattern' : 'component'} because a public service needs it.`, url: sv.url })
   }
 
-  if (sources.length) assigned.push({ ...r, sources })
+  if (sources.length) assigned.push({ ...r, sources, covers })
   else unassigned.push({ ...r, renders: dom ? dom.tag : 'NOT ON THE WALL' })
 
   /* 🚨 THE LAYER-1 VIOLATION. The rule is "if the platform has it, we style it,
