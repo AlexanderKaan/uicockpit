@@ -4,7 +4,8 @@ import { MktFooter } from './MktFooter'
 import { IconProvider } from '../icons/Icon'
 import { buildTokens } from '../tokens/buildTokens'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
-import type { Mode, Scale } from '../tokens/types'
+import type { Config, Mode, Scale } from '../tokens/types'
+import { useSavedKits } from '../state/savedKits'
 import { admit, typesUsed, GEN_CATALOG, GEN_TYPES, LIMITS, type Admitted, type Issue } from '../genui/spec'
 import { GenTree } from '../genui/render'
 import { PRESETS } from '../genui/presets'
@@ -65,7 +66,14 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
    * is against what an assistant does today. */
   const [kitMode, setKitMode] = useState<Mode>('light')
   const [kitScale, setKitScale] = useState<Scale>('default')
-  const answerTokens = useMemo(() => buildTokens({ ...DEFAULT_CONFIG, mode: kitMode, scale: kitScale }).vars as CSSProperties, [kitMode, kitScale])
+  /* And YOUR kit: the three slots the configurator saves in this browser. A
+   * municipality's own brand under a generative answer is the real test — the
+   * default kit is ours, theirs is what would ship. Absent slots → no group. */
+  const saved = useSavedKits()
+  const savedSlots = saved.slots.filter((sl) => sl.cfg)
+  const [kitBase, setKitBase] = useState<'default' | number>('default')
+  const baseCfg: Config = useMemo(() => (kitBase === 'default' ? DEFAULT_CONFIG : (savedSlots.find((sl) => sl.id === kitBase)?.cfg ?? DEFAULT_CONFIG)), [kitBase, savedSlots])
+  const answerTokens = useMemo(() => buildTokens({ ...baseCfg, mode: kitMode, scale: kitScale }).vars as CSSProperties, [baseCfg, kitMode, kitScale])
   const answerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState<'link' | 'html' | null>(null)
   const copy = async (what: 'link' | 'html') => {
@@ -189,6 +197,16 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
               * up on a consumer's configuration; what breaks is a finding. */}
             <div className="gen__chat">
               <div className="gen__kit" aria-label="The kit the answer renders on">
+                {savedSlots.length > 0 && (
+                  <div className="gen__seg" role="group" aria-label="Kit">
+                    <button type="button" className="gen__seg-btn" aria-pressed={kitBase === 'default'} onClick={() => setKitBase('default')}>Default kit</button>
+                    {savedSlots.map((sl, i) => (
+                      <button key={sl.id} type="button" className="gen__seg-btn" aria-pressed={kitBase === sl.id} onClick={() => setKitBase(sl.id)} title="A kit you saved in the configurator">
+                        <span className="gen__swatch" style={{ background: sl.swatches?.[0] }} aria-hidden="true" /> Saved {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className="gen__seg" role="group" aria-label="Mode">
                   {(['light', 'dark'] as Mode[]).map((m) => (
                     <button key={m} type="button" className="gen__seg-btn" aria-pressed={kitMode === m} onClick={() => setKitMode(m)}>{m === 'light' ? 'Light' : 'Dark'}</button>

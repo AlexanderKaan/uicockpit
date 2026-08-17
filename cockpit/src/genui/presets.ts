@@ -160,14 +160,15 @@ export const PRESETS: Preset[] = [
   {
     id: 'refusals',
     name: 'What gets refused',
-    prompt: 'Show my cases as a kanban board with a carousel of photos and a card inside each card',
+    prompt: 'Show my cases as a kanban board with a carousel of photos, a card inside each card, and a summary list',
     prose: [
-      'This preset exists to show the sandbox refusing. An assistant that can paint UI must not be able to invent it: a kanban board is named by no layer of the derivation, a carousel exists in the kit but is not admitted to generative output, and the card recipe forbids a card inside a card. Each refusal renders in place, with the reason, so the answer shows exactly where the assistant reached past the components.',
+      'This preset exists to show the sandbox refusing — and reading. An assistant that can paint UI must not be able to invent it: a kanban board is named by no layer of the derivation, a carousel exists in the kit but is not admitted to generative output, and the card recipe forbids a card inside a card. Each refusal renders in place, with the reason, so the answer shows exactly where the assistant reached past the components. And a name that is not ours but IS our component — "summary list", GOV.UK’s word for the description list — is read through the forge and rendered, with a note that says so.',
     ],
     spec: {
       title: 'Refusals',
       blocks: [
-        { type: 'heading', text: 'Your cases', sub: 'Three of the four things asked for are refused below — on purpose.' },
+        { type: 'heading', text: 'Your cases', sub: 'Three of the five things asked for are refused below — on purpose; one is read through the forge.' },
+        { type: 'summary list', items: [{ label: 'Open cases', value: '3' }, { label: 'Oldest', value: '2026-02207 · terrace licence' }] } as never,
         { type: 'kanban', columns: ['Open', 'Waiting', 'Done'] } as never,
         { type: 'carousel', items: ['photo 1', 'photo 2'] } as never,
         { type: 'card', title: 'Case 2026-04471', desc: 'Dormer window', children: [

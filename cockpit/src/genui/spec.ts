@@ -21,6 +21,8 @@
  * tested and reused by the CLI/MCP later.
  */
 
+import { SAMPLES } from './samples'
+
 export type Tone = 'neutral' | 'primary' | 'success' | 'warn' | 'danger' | 'info'
 export type IconName = 'check' | 'chevR' | 'info' | 'cal' | 'store' | 'home' | 'chart' | 'card' | 'feed' | 'chat' | 'spark' | 'bell' | 'cog' | 'search' | 'file' | 'grid' | 'plus' | 'edit' | 'upload' | 'refresh'
 
@@ -31,7 +33,8 @@ export type GenNode =
   | { type: 'heading'; text: string; sub?: string; eyebrow?: string; level?: 2 | 3 }
   | { type: 'text'; text: string }
   | { type: 'link'; text: string; href: string; external?: boolean }
-  | { type: 'stack' | 'cluster' | 'grid'; children: GenNode[]; min?: string }
+  | { type: 'stack' | 'cluster'; children: GenNode[] }
+  | { type: 'grid'; children: GenNode[]; min?: string }
   | { type: 'card'; title?: string; desc?: string; media?: { alt: string; label?: string }; badge?: Badge; children?: GenNode[]; actions?: GenNode[]; well?: boolean }
   | { type: 'button'; text: string; variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'link' | 'danger'; size?: 'sm'; href?: string; icon?: IconName }
   | { type: 'badge' } & Badge
@@ -82,8 +85,8 @@ export const GEN_CATALOG: Record<GenType, { recipe: string; label: string; note?
   button:       { recipe: 'buttons',              label: 'Button', note: 'a plain button is the platform\'s; the manifest\'s "script" comes from the wall\'s toggle / menu / loading specimens (aria-pressed · aria-expanded · aria-busy)' },
   badge:        { recipe: 'badges-pills',         label: 'Badge' },
   metric:       { recipe: 'composition',          label: 'Metric' },
-  metrics:      { recipe: 'description-list',     label: 'Metric band (dl--band)' },
   facts:        { recipe: 'description-list',     label: 'Description list' },
+  metrics:      { recipe: 'description-list',     label: 'Metric band (dl--band)' },
   list:         { recipe: 'list',                 label: 'List' },
   table:        { recipe: 'table',                label: 'Table' },
   alert:        { recipe: 'alert',                label: 'Alert' },
@@ -105,6 +108,29 @@ export const GEN_CATALOG: Record<GenType, { recipe: string; label: string; note?
 export const GEN_TYPES = Object.keys(GEN_CATALOG) as GenType[]
 export const isGenType = (t: unknown): t is GenType => typeof t === 'string' && Object.prototype.hasOwnProperty.call(GEN_CATALOG, t)
 
+/* The first catalogue type per recipe — where a name the forge resolves lands
+ * (a "summary list" is the description list → `facts`; "buttons" → `button`;
+ * a "row"-ish layout word → the layout primitives → `stack`). Order in
+ * GEN_CATALOG decides, so keep the canonical type first per recipe. */
+export const TYPE_BY_RECIPE: Record<string, GenType> = {}
+for (const t of GEN_TYPES) if (!TYPE_BY_RECIPE[GEN_CATALOG[t].recipe]) TYPE_BY_RECIPE[GEN_CATALOG[t].recipe] = t
+
+/* Names a model is likely to write for a type that IS in the catalogue but
+ * that the forge cannot map (layout words no catalogue names; the platform's
+ * own words, which the forge answers "platform" for). Small on purpose — the
+ * A2UI adapter (step 2) owns Google's names; the forge owns component names. */
+const ALIASES: Record<string, GenType> = {
+  row: 'cluster', column: 'stack', col: 'stack', paragraph: 'text', p: 'text', a: 'link', anchor: 'link',
+  textfield: 'input', textinput: 'input', field: 'input', radiogroup: 'choice', radios: 'choice',
+}
+/** lower-case, camelCase/snake_case → words: "TextField" → "text field", "summary_list" → "summary list". */
+export const normType = (t: string) => t.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').trim().toLowerCase()
+
+/* The fields each type knows — the keys of its (maximal) sample. An unknown
+ * field is warned about, never silently dropped: `titel` on a card is a typo a
+ * model will make, and a card that renders empty says nothing about why. */
+export const KNOWN_KEYS: Record<GenType, Set<string>> = Object.fromEntries(GEN_TYPES.map((t) => [t, new Set(Object.keys(SAMPLES[t]))])) as Record<GenType, Set<string>>
+
 /* ── admission ──────────────────────────────────────────────────────────── */
 
 export type Issue = {
@@ -121,7 +147,7 @@ export type Admitted =
   | { ok: true; node: GenNode; path: string; children?: Admitted[]; actions?: Admitted[] }
   | { ok: false; path: string; type: string; issue: Issue }
 
-export type Verdict = { verdict: string; say: string; page?: string | null }
+export type Verdict = { verdict: string; say: string; page?: string | null; recipe?: { id: string; page?: { slug: string; name: string } | null } }
 export type Resolver = { resolve: (text: string) => Verdict }
 
 /** Budgets: generative output for a chat surface, not a dashboard. Past these
@@ -165,18 +191,44 @@ export function admit(spec: unknown, forge?: Resolver): { title: string | null; 
   const walk = (raw: unknown, path: string, depth: number, inCard: boolean): Admitted => {
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return refuse(path, typeof raw, 'A node must be an object with a `type`.')
     const n = raw as Record<string, unknown>
-    const type = n.type
+    let type = n.type
     if (typeof type !== 'string') return refuse(path, '?', 'A node needs a string `type`.')
     if (!isGenType(type)) {
-      const v = forge ? forge.resolve(type) : null
-      const why = v
-        ? v.verdict === 'exists'
-          ? `"${type}" exists in the kit but is not admitted to generative output yet.`
-          : v.verdict === 'platform'
-            ? `"${type}" is a platform element — the assistant does not paint raw elements; ask for a component that carries it.`
-            : v.say.startsWith(`"${type}"`) ? v.say : `"${type}" — ${v.say}`
-        : `"${type}" is not in the generative catalogue.`
-      return refuse(path, type, why, v ? { forge: { verdict: v.verdict, say: v.say, page: v.page ?? null } } : undefined)
+      /* Not our name — but maybe our component. Three readings before a
+       * refusal: the exact type in another case ("Card"), a layout/platform
+       * alias ("row", "TextField"), and the FORGE: if the phrase resolves to a
+       * recipe the catalogue renders ("summary list" → description list →
+       * `facts`), the node is admitted as that type and the panel says so. A
+       * model that writes "task list" gets the task list, not a refusal. */
+      const key = normType(type)
+      const compact = key.replace(/\s+/g, '')
+      let mapped: GenType | null = isGenType(compact) ? compact : ALIASES[compact] ?? null
+      let via = mapped ? (isGenType(compact) ? 'case' : 'alias') : ''
+      let v: Verdict | null = null
+      if (!mapped && forge) {
+        v = forge.resolve(key)
+        if (v.verdict === 'exists' && v.recipe?.id && TYPE_BY_RECIPE[v.recipe.id]) { mapped = TYPE_BY_RECIPE[v.recipe.id]!; via = `the forge — ${v.recipe.page?.name ?? v.recipe.id}` }
+      }
+      if (mapped) {
+        warn(path, `\`${type}\` read as \`${mapped}\` (${GEN_CATALOG[mapped].label}) — via ${via}.`)
+        n.type = mapped
+        type = mapped
+      } else {
+        v = v ?? (forge ? forge.resolve(key) : null)
+        const why = v
+          ? v.verdict === 'exists'
+            ? `"${type}" exists in the kit but is not admitted to generative output yet.`
+            : v.verdict === 'platform'
+              ? `"${type}" is a platform element — the assistant does not paint raw elements; ask for a component that carries it.`
+              : v.say.startsWith(`"${type}"`) || v.say.startsWith(`"${key}"`) ? v.say : `"${type}" — ${v.say}`
+          : `"${type}" is not in the generative catalogue.`
+        return refuse(path, type, why, v ? { forge: { verdict: v.verdict, say: v.say, page: v.page ?? null } } : undefined)
+      }
+    }
+    if (!isGenType(type)) return refuse(path, String(type), 'unreachable')
+    for (const key of Object.keys(n)) {
+      if (key === 'type' || KNOWN_KEYS[type].has(key)) continue
+      warn(path, `unknown field \`${key}\` on \`${type}\` — ignored (its fields: ${[...KNOWN_KEYS[type]].filter((k) => k !== 'type').join(', ')}).`)
     }
     if (depth > LIMITS.depth) return refuse(path, type, `Nested deeper than ${LIMITS.depth} — an answer this deep is a page, not a reply.`)
     if (type === 'card' && inCard) return refuse(path, type, 'A card inside a card — the card recipe says: use rows or a plain group instead.')

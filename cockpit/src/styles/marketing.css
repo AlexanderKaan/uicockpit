@@ -2864,6 +2864,7 @@
 .gen__seg-btn { font: inherit; font-size: var(--k-type-eyebrow); letter-spacing: .04em; text-transform: uppercase; color: var(--mkt-fg-muted); background: transparent; border: 0; border-radius: 999px; padding: var(--k-s-4) var(--k-s-10); cursor: pointer; }
 .gen__seg-btn[aria-pressed="true"] { background: var(--mkt-fg); color: var(--mkt-bg, #fff); }
 .gen__seg-btn:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 1px; }
+.gen__swatch { display: inline-block; width: 0.6em; height: 0.6em; border-radius: 50%; margin-right: 0.35em; vertical-align: 0; box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset; }
 @media (max-width: 860px) { .gen__kit { justify-content: flex-start; } }
 .gen__answer.cockpit-preview { min-height: 12rem; box-shadow: none; }
 .gen__answer .prose h2 { margin-top: 0; }

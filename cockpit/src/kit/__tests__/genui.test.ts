@@ -131,18 +131,48 @@ describe('generative UI — admission refuses what the components do not admit',
     expect(msgs.some((m) => /buttons only/.test(m))).toBe(true)
   })
 
+  it('a name that is not ours but IS our component is read through the forge — and says so', () => {
+    /* "Card" (case), "row" (an alias), "summary list" / "task list" / "buttons"
+     * (the forge: the phrase resolves to a recipe the catalogue renders). A
+     * model that writes those gets the component, with a warning that names the
+     * reading; a word that resolves to nothing the catalogue has stays refused. */
+    const a = admit({ blocks: [
+      { type: 'Card', title: 'c' },
+      { type: 'row', children: [{ type: 'badge', text: 'x' }] },
+      { type: 'summary list', items: [{ label: 'l', value: 'v' }] },
+      { type: 'task list', items: [{ name: 'n', status: { text: 's' } }] },
+      { type: 'buttons', text: 'b' },
+      { type: 'kanban' },
+    ] }, forge)
+    expect(a.tree.map((t) => (t.ok ? t.node.type : `refused:${t.type}`))).toEqual(['card', 'cluster', 'facts', 'tasks', 'button', 'refused:kanban'])
+    const w = a.issues.filter((i) => i.level === 'warning').map((i) => i.message)
+    expect(w.some((m) => /`Card` read as `card`/.test(m))).toBe(true)
+    expect(w.some((m) => /`summary list` read as `facts` \(Description list\) — via the forge/.test(m))).toBe(true)
+    expect(a.issues.filter((i) => i.level === 'refused').map((i) => i.path)).toEqual(['$.blocks[5]'])
+  })
+
+  it('an unknown field is warned about, never silently dropped', () => {
+    const a = admit({ blocks: [{ type: 'card', titel: 'typo', title: 'ok' }] }, forge)
+    const w = a.issues.filter((i) => i.level === 'warning').map((i) => i.message)
+    expect(w).toHaveLength(1)
+    expect(w[0]).toMatch(/unknown field `titel` on `card` — ignored \(its fields: title, desc/)
+    expect(a.tree[0]).toMatchObject({ ok: true })
+  })
+
   it('missing required fields refuse; budgets trim and say so', () => {
     const a = admit({ blocks: [{ type: 'alert', tone: 'info' }, { type: 'facts', items: Array.from({ length: LIMITS.items + 5 }, (_, i) => ({ label: `l${i}`, value: 'v' })) }] }, forge)
     expect(a.issues.find((i) => i.level === 'refused')?.message).toMatch(/`alert` needs `text`/)
     expect(a.issues.find((i) => i.level === 'warning')?.message).toMatch(new RegExp(`the first ${LIMITS.items} render`))
   })
 
-  it('the refusals preset refuses exactly what it says: kanban, carousel, a card in a card — and renders the rest', () => {
+  it('the refusals preset refuses exactly what it says: kanban, carousel, a card in a card — reads "summary list" as facts — and renders the rest', () => {
     const p = PRESETS.find((x) => x.id === 'refusals')!
     const a = admit(JSON.parse(JSON.stringify(p.spec)), forge)
     const refused = a.issues.filter((i) => i.level === 'refused')
-    expect(refused.map((i) => i.path)).toEqual(['$.blocks[1]', '$.blocks[2]', '$.blocks[3].children[0]'])
-    expect(a.tree.filter((t) => t.ok).length).toBe(3)                    // heading · card · table
+    expect(refused.map((i) => i.path)).toEqual(['$.blocks[2]', '$.blocks[3]', '$.blocks[4].children[0]'])
+    expect(a.tree.filter((t) => t.ok).length).toBe(4)                    // heading · summary list→facts · card · table
+    expect(a.tree[1]).toMatchObject({ ok: true, node: { type: 'facts' } })
+    expect(a.issues.some((i) => i.level === 'warning' && /`summary list` read as `facts`/.test(i.message))).toBe(true)
     const foreign = [...classesIn(html(p.spec))].filter((c) => !shipped(c))
     expect(foreign).toEqual([])                                            // even the refusal renders in kit classes (.alert)
   })
