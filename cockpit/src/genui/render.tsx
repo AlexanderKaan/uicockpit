@@ -41,7 +41,7 @@ function CellEl({ c }: { c: Cell }) {
 function Media({ alt, label }: { alt: string; label?: string }) {
   return (
     <div className="card__media">
-      <svg viewBox="0 0 320 160" role="img" aria-label={alt} style={{ display: 'block', width: '100%', height: 'auto' }}>
+      <svg viewBox="0 0 320 160" role="img" aria-label={alt} preserveAspectRatio="xMidYMid slice" style={{ display: 'block', width: '100%', height: 'auto', maxHeight: '10rem' }}>
         <defs>
           <linearGradient id="gen-media-g" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0" stopColor="var(--k-primary)" stopOpacity="0.55" />
@@ -82,22 +82,36 @@ export function GenNodeEl({ a }: { a: Admitted }) {
   if (!a.ok) return <Refusal a={a} />
   const n = a.node
   switch (n.type) {
-    case 'heading': {
-      const H = n.level === 3 ? 'h3' : 'h2'
+    case 'heading':
+      /* Level 2 = the answer's own head (page-head: eyebrow · title · sub).
+       * Level 3 = a heading INSIDE the answer, set in the prose's h3 — lighter,
+       * the way a section heading sits inside flowing content. */
+      if (n.level === 3) {
+        return (
+          <div className="prose">
+            {n.eyebrow && <div className="prose__kicker">{n.eyebrow}</div>}
+            <h3>{n.text}</h3>
+            {n.sub && <p>{n.sub}</p>}
+          </div>
+        )
+      }
       return (
         <div className="page-head">
           <div className="page-head__titles">
             {n.eyebrow && <span className="eyebrow">{n.eyebrow}</span>}
-            <H className="page-head__title">{n.text}</H>
+            <h2 className="page-head__title">{n.text}</h2>
             {n.sub && <p className="page-head__sub">{n.sub}</p>}
           </div>
         </div>
       )
-    }
     case 'text':
       // Flowing text takes the kit's prose typography — the same recipe the
       // "without" column is set in, so the two columns differ in STRUCTURE only.
       return <div className="prose"><p>{n.text}</p></div>
+    case 'link':
+      // A standalone link is prose too — the prose recipe owns link colour and
+      // underline; an external one says so for a screen reader.
+      return <div className="prose"><p><a href={n.href} {...(n.external ? { target: '_blank', rel: 'noreferrer' } : {})}>{n.text}{n.external ? ' ↗' : ' →'}</a></p></div>
     case 'stack':
       return <div className="l-stack"><Children list={a.children} /></div>
     case 'cluster':

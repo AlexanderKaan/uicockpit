@@ -8,6 +8,7 @@ import { DEFAULT_CONFIG } from '../../tokens/defaults'
 import { admit, typesUsed, GEN_CATALOG, GEN_TYPES, LIMITS } from '../../genui/spec'
 import { GenTree } from '../../genui/render'
 import { PRESETS } from '../../genui/presets'
+import { SAMPLES } from '../../genui/samples'
 import MANIFEST from '../manifest.json'
 // @ts-expect-error — the kit model is the single .mjs parser the gates read
 import { parseKit } from '../../../scripts/lib/kit-model.mjs'
@@ -90,50 +91,23 @@ describe('generative UI — the renderer writes kit classes only', () => {
     })
   }
 
-  it('every catalogue type is exercised by at least one preset — or the sandbox is not showing it', () => {
+  it('every catalogue type has a SAMPLE that admits and renders in kit classes — the reference the sandbox offers', () => {
+    /* samples.ts is what the page's "What you can ask for" inserts. Every type
+     * must have one, every one must admit clean, every one must render in the
+     * kit's classes — so what the reference offers is what the renderer paints. */
+    const missing = GEN_TYPES.filter((t) => !SAMPLES[t])
+    expect(missing, `catalogue types without a sample: ${missing.join(', ')}`).toEqual([])
+    for (const t of GEN_TYPES) {
+      const spec = { blocks: [SAMPLES[t]] }
+      const a = admit(JSON.parse(JSON.stringify(spec)), forge)
+      expect(a.issues.filter((i) => i.level === 'refused').map((i) => i.message), `sample ${t} must admit`).toEqual([])
+      const foreign = [...classesIn(html(spec))].filter((c) => !shipped(c))
+      expect(foreign, `classes the kit does not ship, rendering the ${t} sample:\n  ${foreign.join('\n  ')}`).toEqual([])
+    }
+    // and the presets between them exercise most of the catalogue — the page shows the vocabulary, not a corner of it
     const seen = new Set<string>()
     for (const p of PRESETS) for (const t of typesUsed(admit(JSON.parse(JSON.stringify(p.spec)), forge).tree)) seen.add(t)
-    const idle = GEN_TYPES.filter((t) => !seen.has(t))
-    // Not every type must appear on the page — but each one has to RENDER in kit
-    // classes; a synthetic node per idle type keeps the renderer honest for them.
-    const synth: Record<string, unknown> = {
-      badge: { type: 'badge', text: 'x', tone: 'warn' },
-      metric: { type: 'metric', label: 'L', value: '1', sub: 's', icon: 'chart' },
-      metrics: { type: 'metrics', items: [{ label: 'a', value: '1' }, { label: 'b', value: '2', sub: 'x' }] },
-      list: { type: 'list', section: 'S', items: [{ title: 't', sub: 's', icon: 'home', trail: 'x' }, { title: 't', initials: 'AK', trail: { badge: { text: 'b' } }, href: '#' }] },
-      banner: { type: 'banner', text: 't', strong: 's', link: { text: 'l' }, warn: true },
-      progress: { type: 'progress', label: 'l', value: 3, max: 10, hint: 'h', warn: true },
-      tabs: { type: 'tabs', items: ['a', 'b'], selected: 1 },
-      tasks: { type: 'tasks', items: [{ name: 'a', status: { text: 's', tone: 'success' } }, { name: 'b', status: { text: 'x' }, hint: 'h', locked: true }] },
-      steps: { type: 'steps', items: [{ title: 't', body: 'b' }] },
-      stepper: { type: 'stepper', steps: ['a', 'b'], current: 1 },
-      activity: { type: 'activity', items: [{ text: 't', meta: 'm', time: '1' }] },
-      requirements: { type: 'requirements', items: [{ text: 't', met: true }, { text: 'u', met: false }] },
-      facts: { type: 'facts', items: [{ label: 'l', value: 'v', href: '#' }, { label: 'l', value: 'v', badge: { text: 'b' } }] },
-      alert: { type: 'alert', tone: 'success', title: 't', text: 'x' },
-      card: { type: 'card', title: 't', desc: 'd', well: true, media: { alt: 'a' }, badge: { text: 'b' }, children: [{ type: 'text', text: 'x' }], actions: [{ type: 'button', text: 'b', size: 'sm' }] },
-      heading: { type: 'heading', text: 't', sub: 's', eyebrow: 'e', level: 3 },
-      text: { type: 'text', text: 'x' },
-      grid: { type: 'grid', min: '10rem', children: [{ type: 'badge', text: 'x' }] },
-      accordion: { type: 'accordion', items: [{ summary: 's', body: 'b' }], open: 0 },
-      divider: { type: 'divider' },
-      cluster: { type: 'cluster', children: [{ type: 'badge', text: 'x' }] },
-      stack: { type: 'stack', children: [{ type: 'text', text: 'x' }] },
-      table: { type: 'table', columns: ['a'], rows: [[{ num: '1' }]] },
-      warning: { type: 'warning', text: 'w' },
-      choice: { type: 'choice', label: 'l', options: [{ title: 'a' }], selected: 0 },
-      input: { type: 'input', label: 'l', kind: 'email', hint: 'h', required: true },
-      button: { type: 'button', text: 'b', variant: 'ghost', href: '#', icon: 'chevR' },
-    }
-    const missing = idle.filter((t) => !synth[t])
-    expect(missing, `catalogue types no preset uses and no synthetic node covers: ${missing.join(', ')}`).toEqual([])
-    for (const [t, node] of Object.entries(synth)) {
-      const spec = { blocks: [node] }
-      const a = admit(JSON.parse(JSON.stringify(spec)), forge)
-      expect(a.issues.filter((i) => i.level === 'refused').map((i) => i.message), `synthetic ${t} must admit`).toEqual([])
-      const foreign = [...classesIn(html(spec))].filter((c) => !shipped(c))
-      expect(foreign, `classes the kit does not ship, rendering ${t}:\n  ${foreign.join('\n  ')}`).toEqual([])
-    }
+    expect(seen.size, 'presets should exercise at least half of the catalogue').toBeGreaterThanOrEqual(Math.ceil(GEN_TYPES.length / 2))
   })
 })
 

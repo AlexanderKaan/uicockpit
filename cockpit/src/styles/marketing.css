@@ -2907,6 +2907,21 @@
 .gen__badge--warning { background: #fff1d6; color: #8a5a00; }
 .gen__path { font-size: var(--k-type-caption); color: var(--mkt-fg-muted); }
 
+/* the reference — every type, its label, an insertable sample */
+.gen__ref { margin-top: calc(var(--k-s-32) * 2); }
+.gen__ref h2 { font-size: var(--k-type-h3); letter-spacing: -.02em; margin: 0 0 var(--k-s-16); }
+.gen__types { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: var(--k-s-10); }
+.gen__type { border: 1px solid var(--mkt-border); border-radius: var(--k-radius-md); padding: var(--k-s-10) var(--k-s-12); display: grid; gap: var(--k-s-6); align-content: start; min-width: 0; }
+.gen__type-head { display: flex; align-items: center; gap: var(--k-s-8); min-width: 0; }
+.gen__type-head code { font-size: var(--k-type-caption); padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); flex: none; }
+.gen__type-label { font-size: var(--k-type-caption); color: var(--mkt-fg-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1 1 auto; }
+.gen__insert { font: inherit; font-size: var(--k-type-caption); font-weight: var(--k-weight-medium); color: var(--mkt-fg); background: transparent; border: 1px solid var(--mkt-border); border-radius: 999px; padding: 2px var(--k-s-10); cursor: pointer; flex: none; }
+.gen__insert:hover { background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); }
+.gen__insert:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 1px; }
+.gen__type-more summary { font-size: var(--k-type-caption); color: var(--mkt-fg-muted); cursor: pointer; }
+.gen__type-more summary a { color: var(--mkt-fg-muted); text-decoration: underline; text-decoration-color: var(--mkt-border); }
+.gen__type-more pre { margin: var(--k-s-6) 0 0; padding: var(--k-s-8) var(--k-s-10); border-radius: var(--k-radius-sm); background: color-mix(in oklab, var(--mkt-fg) 4%, transparent); font-size: var(--k-type-caption); line-height: 1.45; overflow: auto; max-height: 14rem; }
+
 .gen__how { max-width: 46rem; margin-top: calc(var(--k-s-32) * 2); }
 .gen__legend { display: grid; grid-template-columns: max-content 1fr; gap: var(--k-s-10) var(--k-s-20); margin: 0; font-size: var(--k-type-small); line-height: var(--k-leading-normal); }
 .gen__legend dt { font-weight: var(--k-weight-semibold); white-space: nowrap; }

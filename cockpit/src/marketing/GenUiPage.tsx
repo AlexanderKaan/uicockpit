@@ -8,6 +8,7 @@ import type { Mode, Scale } from '../tokens/types'
 import { admit, typesUsed, GEN_CATALOG, GEN_TYPES, LIMITS, type Admitted, type Issue } from '../genui/spec'
 import { GenTree } from '../genui/render'
 import { PRESETS } from '../genui/presets'
+import { SAMPLES } from '../genui/samples'
 import MANIFEST from '../kit/manifest.json'
 // @ts-expect-error — the forge core is the cli package's zero-dep module (one source, no types on purpose)
 import { createForge } from '../../../cli/src/forge.mjs'
@@ -70,7 +71,7 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
   const copy = async (what: 'link' | 'html') => {
     try {
       const payload = what === 'link'
-        ? `${location.origin}/genui?spec=${encodeSpec(JSON.stringify(spec))}`
+        ? `${location.origin}/genui?spec=${encodeSpec(JSON.stringify(spec))}${kitMode !== 'light' ? `&mode=${kitMode}` : ''}${kitScale !== 'default' ? `&scale=${kitScale}` : ''}`
         : (answerRef.current?.innerHTML ?? '')
       await navigator.clipboard.writeText(payload)
       setCopied(what)
@@ -95,6 +96,9 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
   }
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
+    const mode = q.get('mode'), scale = q.get('scale')
+    if (mode === 'dark' || mode === 'light') setKitMode(mode)
+    if (scale && SCALES.some((x) => x.id === scale)) setKitScale(scale as Scale)
     const shared = q.get('spec')
     if (shared) {
       try {
@@ -110,6 +114,21 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
     if (p && PRESETS.some((x) => x.id === p)) choose(p)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  /* "What you can ask for" → Insert: append the type's sample to the current
+   * spec's blocks. Works from the editor's text when it parses, else from the
+   * last good spec, so an insert never silently overwrites an edit in progress. */
+  const insertSample = (t: keyof typeof SAMPLES) => {
+    let base: { blocks?: unknown[] } & Record<string, unknown>
+    try { base = JSON.parse(text) } catch { base = (spec && typeof spec === 'object' ? spec : { blocks: [] }) as typeof base }
+    const blocks = Array.isArray(base.blocks) ? base.blocks : []
+    const next = { ...base, blocks: [...blocks, SAMPLES[t]] }
+    const json = JSON.stringify(next, null, 2)
+    setText(json)
+    setSpec(next)
+    setParseError(null)
+    document.getElementById('gen-editor')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }
 
   const onEdit = (v: string) => {
     setText(v)
@@ -197,6 +216,7 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
           <div className="gen__editorwrap">
             <h2>The spec <span className="gen__muted">— edit it; the right column follows</span></h2>
             <textarea
+              id="gen-editor"
               className="gen__editor"
               value={text}
               onChange={(e) => onEdit(e.target.value)}
@@ -252,6 +272,29 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
               </>
             )}
           </div>
+        </section>
+
+        <section className="gen__ref" aria-labelledby="gen-ref-h">
+          <h2 id="gen-ref-h">What you can ask for <span className="gen__muted">— the {GEN_TYPES.length} types, each with a sample you can insert</span></h2>
+          <ul className="gen__types">
+            {GEN_TYPES.map((t) => {
+              const entry = GEN_CATALOG[t]
+              const r = RECIPE_BY_ID.get(entry.recipe)
+              return (
+                <li key={t} className="gen__type">
+                  <div className="gen__type-head">
+                    <code>{t}</code>
+                    <span className="gen__type-label">{entry.label}</span>
+                    <button type="button" className="gen__insert" onClick={() => insertSample(t)} aria-label={`Insert a ${t} sample into the spec`}>Insert</button>
+                  </div>
+                  <details className="gen__type-more">
+                    <summary>example · {r?.page ? <a href={`/components/${r.page.slug}`} onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/components/${r.page!.slug}`) }}>{r.page.name}</a> : entry.recipe}</summary>
+                    <pre><code>{JSON.stringify(SAMPLES[t], null, 2)}</code></pre>
+                  </details>
+                </li>
+              )
+            })}
+          </ul>
         </section>
 
         <section className="gen__how">
