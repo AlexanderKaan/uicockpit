@@ -2831,6 +2831,82 @@
 .frg__foot { font-size: var(--k-type-small); color: var(--mkt-fg-muted); margin: var(--k-s-24) 0 0; line-height: 1.6; }
 .frg__foot code { font-size: var(--k-type-caption); padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); }
 
+/* ── /genui — the generative-UI sandbox (Sprint P). Page chrome only: the ANSWER
+ * on the right is the kit, in kit classes, inside .cockpit-preview; the answer on
+ * the left is the kit's .prose. Sized through the kit's tokens like .frg. */
+.gen { padding-block: calc(var(--k-s-32) + var(--k-s-8)) calc(var(--k-s-32) * 3); }
+.gen__head { max-width: 46rem; margin-bottom: var(--k-s-28); }
+.gen__eyebrow { font-size: var(--k-type-eyebrow); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; font-weight: var(--k-weight-semibold); color: var(--mkt-fg-muted); margin: 0 0 var(--k-s-12); }
+.gen__tag { display: inline-block; padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); background: #efe9fb; color: #5b3aa8; letter-spacing: .06em; }
+.gen__head h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); line-height: 1.06; letter-spacing: -.03em; margin: 0 0 var(--k-s-16); }
+.gen__lede { font-size: var(--k-type-body); color: var(--mkt-fg-muted); margin: 0; line-height: 1.6; }
+.gen__lede em { font-style: normal; color: var(--mkt-fg); }
+
+.gen__presets { display: flex; flex-wrap: wrap; gap: var(--k-s-6); margin-bottom: var(--k-s-20); }
+.gen__chip { font: inherit; font-size: var(--k-type-caption); color: var(--mkt-fg-muted); background: transparent; border: 1px solid var(--mkt-border); border-radius: 999px; padding: var(--k-s-6) var(--k-s-12); cursor: pointer; }
+.gen__chip:hover { color: var(--mkt-fg); background: color-mix(in oklab, var(--mkt-fg) 5%, transparent); }
+.gen__chip--on { color: var(--mkt-fg); border-color: var(--mkt-fg); }
+.gen__chip:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 1px; }
+
+/* The split. Two chat frames side by side; the tag sits on the frame's top edge
+ * the way the OpenUI comparison labels its two halves. */
+.gen__split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--k-s-20); align-items: start; }
+@media (max-width: 860px) { .gen__split { grid-template-columns: 1fr; } }
+.gen__pane { position: relative; padding-top: var(--k-s-12); }
+.gen__pane-tag { position: absolute; top: 0; left: var(--k-s-16); z-index: 1; font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: .08em; text-transform: uppercase; padding: var(--k-s-4) var(--k-s-10); border-radius: 999px; background: var(--mkt-fg); color: var(--mkt-bg, #fff); }
+.gen__pane-tag--with { background: #1f6b3a; }
+.gen__chat { border: 1px solid var(--mkt-border); border-radius: var(--k-radius-lg); background: var(--k-surface-sunken, #f3f4f6); padding: var(--k-s-16); display: grid; gap: var(--k-s-12); box-shadow: var(--k-shadow-md); }
+.gen__prompt { font-size: var(--k-type-small); color: var(--mkt-fg-muted); padding: var(--k-s-10) var(--k-s-14); border-radius: var(--k-radius-md); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); justify-self: end; max-width: 80%; }
+.gen__answer { border-radius: var(--k-radius-md); background: var(--k-bg, #fff); padding: var(--k-s-20); min-height: 12rem; overflow: auto; max-height: 44rem; }
+.gen__answer.cockpit-preview { min-height: 12rem; box-shadow: none; }
+.gen__answer .prose h2 { margin-top: 0; }
+/* a chat surface is narrow: cards in the grid keep to a sane minimum */
+.gen__answer .l-grid { --l-min: 13rem; }
+
+.gen__work { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--k-s-24); margin-top: var(--k-s-32); align-items: start; }
+@media (max-width: 860px) { .gen__work { grid-template-columns: 1fr; } }
+.gen__work h2, .gen__how h2 { font-size: var(--k-type-h3); letter-spacing: -.02em; margin: 0 0 var(--k-s-12); }
+.gen__muted { color: var(--mkt-fg-muted); font-weight: var(--k-weight-regular, 400); font-size: var(--k-type-small); }
+.gen__editor { width: 100%; min-height: 26rem; resize: vertical; font-family: var(--k-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: var(--k-type-caption); line-height: 1.5; padding: var(--k-s-14) var(--k-s-16); border: 1px solid var(--mkt-border); border-radius: var(--k-radius-md); background: color-mix(in oklab, var(--mkt-fg) 3%, transparent); color: var(--mkt-fg); tab-size: 2; }
+.gen__editor:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 1px; }
+.gen__editor[aria-invalid="true"] { border-color: #a23a1e; }
+.gen__status { font-size: var(--k-type-caption); color: var(--mkt-fg-muted); margin: var(--k-s-8) 0 0; display: flex; gap: var(--k-s-10); flex-wrap: wrap; align-items: center; }
+.gen__status--bad { color: #a23a1e; }
+.gen__reset, .gen__inline { font: inherit; font-size: inherit; color: var(--mkt-accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+
+.gen__sources { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-s-10); }
+.gen__sources li { padding-bottom: var(--k-s-10); border-bottom: 1px solid var(--mkt-border); }
+.gen__source-head { display: flex; align-items: center; gap: var(--k-s-8); flex-wrap: wrap; font-size: var(--k-type-small); }
+.gen__source-head code { font-size: var(--k-type-caption); padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); }
+.gen__source-head a { color: var(--mkt-fg); text-decoration: underline; text-decoration-color: var(--mkt-border); }
+.gen__source-head a:hover { text-decoration-color: var(--mkt-fg); }
+.gen__arrow { color: var(--mkt-fg-faint); }
+.gen__beh { margin-left: auto; font-size: var(--k-type-eyebrow); letter-spacing: .06em; text-transform: uppercase; padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); background: #f1f1f4; color: #66666e; }
+.gen__beh--platform { background: #e6effc; color: #1d4f9c; }
+.gen__beh--script { background: #fff1d6; color: #8a5a00; }
+.gen__source-line { display: flex; flex-wrap: wrap; gap: var(--k-s-6) var(--k-s-12); margin-top: var(--k-s-6); font-size: var(--k-type-caption); color: var(--mkt-fg-muted); }
+.gen__source-line a { color: inherit; text-decoration: underline; text-decoration-color: var(--mkt-border); }
+.gen__source-note { margin-top: var(--k-s-4); font-size: var(--k-type-caption); color: #8a5a00; }
+.gen__layer { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: .04em; padding: 0 var(--k-s-4); border-radius: var(--k-radius-sm); margin-right: var(--k-s-4); }
+.gen__layer--1 { background: #e6effc; color: #1d4f9c; }
+.gen__layer--2 { background: #e3f4ea; color: #1f6b3a; }
+.gen__layer--4 { background: #fff1d6; color: #8a5a00; }
+
+.gen__issues { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-s-8); }
+.gen__issue { display: flex; flex-wrap: wrap; gap: var(--k-s-8); align-items: baseline; font-size: var(--k-type-small); line-height: 1.5; }
+.gen__issue a { color: var(--mkt-accent); }
+.gen__badge { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: .06em; text-transform: uppercase; padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); }
+.gen__badge--refused { background: #fbe7e2; color: #a23a1e; }
+.gen__badge--warning { background: #fff1d6; color: #8a5a00; }
+.gen__path { font-size: var(--k-type-caption); color: var(--mkt-fg-muted); }
+
+.gen__how { max-width: 46rem; margin-top: calc(var(--k-s-32) * 2); }
+.gen__legend { display: grid; grid-template-columns: max-content 1fr; gap: var(--k-s-10) var(--k-s-20); margin: 0; font-size: var(--k-type-small); line-height: var(--k-leading-normal); }
+.gen__legend dt { font-weight: var(--k-weight-semibold); white-space: nowrap; }
+.gen__legend dd { margin: 0; color: var(--mkt-fg-muted); }
+.gen__legend code { font-size: var(--k-type-caption); padding: 1px var(--k-s-6); border-radius: var(--k-radius-sm); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); }
+@media (max-width: 600px) { .gen__legend { grid-template-columns: 1fr; gap: var(--k-s-4); } .gen__legend dd { margin-bottom: var(--k-s-8); } }
+
 /* ── component page additions (Sprint M·1): provenance · copy · usage · forge CTA.
  * Sized through the kit's tokens (DocsShell sets them on .cmpdoc); colours --mkt-*. */
 .cmpdoc__prov { margin: 0 0 var(--k-s-20); padding: var(--k-s-14) var(--k-s-16); border: 1px solid var(--mkt-border); border-radius: var(--k-radius-md);
@@ -2923,9 +2999,8 @@
 .mkt__fork--4 { grid-template-columns: repeat(4, 1fr); max-width: 72rem; }
 @media (max-width: 1100px) { .mkt__fork--4 { grid-template-columns: 1fr 1fr; max-width: 46rem; } }
 @media (max-width: 720px) { .mkt__fork--4 { grid-template-columns: 1fr; } }
-.mkt__door--next { border-style: dashed; cursor: default; background: transparent; }
-.mkt__door--next:hover, .mkt__door--next:focus-visible { transform: none; box-shadow: none; }
-.mkt__door--next .mkt__door-tag { color: var(--mkt-fg-faint); }
+.mkt__door--next { border-style: dashed; background: transparent; }
+.mkt__door--next .mkt__door-tag { color: #5b3aa8; }
 .mkt__door--next .mkt__door-h { color: var(--mkt-fg-muted); }
 /* the manifest's parts table on the component page */
 .cmpdoc__parts th[scope="col"] { font-size: var(--k-type-eyebrow); letter-spacing: .06em; text-transform: uppercase; color: var(--mkt-fg-faint); font-weight: var(--k-weight-semibold); text-align: left; padding-bottom: var(--k-s-6); }

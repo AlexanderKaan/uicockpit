@@ -11,6 +11,7 @@ import { componentPageBySlug } from './stage/views/ComponentGallery'
 import { findEntry } from './marketing/seo/seoData'
 import { AuditPage } from './marketing/AuditPage'
 import { ForgePage } from './marketing/ForgePage'
+import { GenUiPage } from './marketing/GenUiPage'
 import { ConformancePage } from './audit/conformance'
 import './styles/marketing.css'
 
@@ -80,6 +81,9 @@ export function App() {
 
   // The forge — describe a component; the derivation says whether it may exist.
   if (path.startsWith('/forge')) return <ForgePage navigate={navigate} />
+
+  // Generative UI — the sandbox: one prompt, answered as prose and as a spec on the components.
+  if (path.startsWith('/genui')) return <GenUiPage navigate={navigate} />
 
   // The social-preview / OG card (1280×640) — not linked; screenshotted to a PNG.
   if (path === '/og') return <OgCard />

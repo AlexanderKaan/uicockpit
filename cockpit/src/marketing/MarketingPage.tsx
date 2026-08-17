@@ -192,15 +192,19 @@ export function MarketingPage({ onLaunch, navigate }: MarketingPageProps) {
               <span className="mkt__door-meta">a citation, not an opinion</span>
             </button>
 
-            <div className="mkt__door mkt__door--next" aria-label="Generative UI — next">
-              <span className="mkt__door-tag">Generative UI · next</span>
+            <button
+              type="button"
+              className="mkt__door mkt__door--next"
+              onClick={() => { ping('door', 'genui'); navigate('/genui') }}
+            >
+              <span className="mkt__door-tag">Generative UI · sandbox</span>
               <span className="mkt__door-h">The same components, spoken by a model.</span>
               <span className="mkt__door-p">
                 A closed, measured vocabulary for AI-generated interfaces: the model can only ask for what exists,
-                in the shape it exists — and every word in it is accessible.
+                in the shape it exists — and every word in it is accessible. See the answer, as interface.
               </span>
-              <span className="mkt__door-meta">for public services that have to be sure</span>
-            </div>
+              <span className="mkt__door-meta">for public services that have to be sure · a sandbox, no model behind it</span>
+            </button>
           </div>
         </div>
       </section>
