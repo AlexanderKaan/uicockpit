@@ -538,6 +538,7 @@ export const APG_NOT_APPLICABLE: Record<string, string> = {
   card: 'A card is a visual container, not an interaction pattern. APG has none, and inventing roles for it is how a div ends up announced as a widget.',
   'badges-pills': 'Static text with a tone. Its meaning must be in the words, which is WCAG 1.4.1, not an APG pattern.',
   prose: 'Long-form content — HTML semantics, not a widget.',
+  figure: 'A figure with a caption — static content; the platform\'s <figure> and <figcaption> carry the semantics. What sits in the frame (an image, an embedded map, a video) brings its own controls and its own text alternative; the recipe owns the frame and the caption only. An empty frame is a slot, and says what belongs there in its aria-label.',
   identifier: 'Institutional furniture. Landmarks apply; there is no interaction pattern.',
   charcount: 'A live region attached to a field. The pattern is the live region, covered under the field, not a widget of its own.',
 

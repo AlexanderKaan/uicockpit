@@ -4285,6 +4285,11 @@ select.select:focus-visible {
    GOV.UK's Summary list. Auto-fit rather than a fixed column count, so three KPIs
    and six both look deliberate and neither overflows a phone. */
 .dl--band {
+  /* BECAUSE it scrolls (below), give it tabindex="0" and a name
+     (aria-label="…, scrollable" — NOT a role: role="group" on the <dl> breaks
+     the dt/dd containment axe checks as dlitem): a scrollable region must be
+     reachable by keyboard (WCAG 2.1.1) — axe's scrollable-region-focusable,
+     found the day the wall re-flowed and the specimen got narrower. */
   /* ⚠️ ONE ROW, scrolling when it must — NOT auto-fit wrapping. Auto-fit puts
      three cells into two columns and leaves a visible hole in the third, which
      is the ghost-cell the old .stat-tile-strip had to grow a container-query
@@ -4383,8 +4388,27 @@ select.select:focus-visible {
     section: "Carousel",
     css: `/* === Carousel (.carousel) — shadcn gap filler ========================
  * Sliding track of equal-width slides + absolute prev/next arrows. Dots
- * reuse the existing .cdots component. Radius follows the Box token. */
+ * reuse the existing .cdots component. Radius follows the Box token.
+ *
+ * .carousel--strip — the SCROLL-SNAP form: a row of cards you scroll or swipe,
+ * the platform's overflow scrolling as the whole mechanism (no script, no
+ * arrows needed; the dots and arrows stay optional on top). For a set of
+ * locations, results, offers: each slide is a card at a readable width, the
+ * next one peeking. Slide width = --strip-slide (default 16rem); the track's
+ * gap is the kit's space step. The card inside stretches to the row's height,
+ * so a strip of cards reads as one row, not a skyline. */
 .carousel { display: flex; flex-direction: column; gap: var(--k-s-12); }
+.carousel--strip .carousel__viewport {
+  overflow-x: auto; overflow-y: hidden; border-radius: 0;
+  scroll-snap-type: x mandatory; scroll-padding-inline: var(--k-s-4);
+  scrollbar-width: thin; padding-block-end: var(--k-s-6);
+}
+.carousel--strip .carousel__track { gap: var(--k-s-12); transition: none; align-items: stretch; }
+.carousel--strip .carousel__slide {
+  flex: 0 0 var(--strip-slide, 16rem); aspect-ratio: auto; padding: 0; color: inherit;
+  display: flex; scroll-snap-align: start;
+}
+.carousel--strip .carousel__slide > .card { flex: 1 1 auto; }
 .carousel__viewport { position: relative; overflow: hidden; border-radius: var(--k-radius-lg); }
 .carousel__track { display: flex; transition: transform var(--k-dur, 280ms) var(--k-ease, ease); }
 .carousel__slide {
@@ -4504,6 +4528,67 @@ select.select:focus-visible {
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
 }`,
+  },
+  {
+    id: 'figure',
+    section: "Figure",
+    doc: {
+      dos: [
+        "Put the image, the static-map image, the embedded map or the video INSIDE .figure__media; the frame keeps the ratio and clips — the content never sets its own size.",
+        "Give the caption the words a reader needs without the picture: the address, the date, the source. For a map, put the action (Open in Maps) in the caption as a link.",
+        "Leave the frame EMPTY while the tiles or the image load, or when there is nothing to show yet: an empty slot still holds its shape, and a card built on it does not jump.",
+      ],
+      donts: [
+        "Don't stretch a figure to fill a card body — it is a slot inside content, not the card's layout. Inside .card__media it bleeds to the card's edges by itself.",
+        "Don't put text on top of the media as the only carrier of information; the caption carries it.",
+      ],
+    },
+    css: `/* === Figure — the media SLOT ============================================
+ * A framed image, map or embed with a caption. The platform's <figure> and
+ * <figcaption> carry the semantics; the recipe owns the FRAME — its ratio
+ * (--figure-ratio, default 16 / 9), its clipping and radius, and what an EMPTY
+ * frame looks like — and the caption's type. Anything visual can sit in the
+ * frame: <img>, <picture>, <iframe> (an embedded map), <video>, an inline
+ * <svg>. Nothing inside sets its own size; the frame does.
+ *
+ * .figure--map — the map treatment: before the tiles arrive (or when a static
+ * map is not loaded) the field reads as a map — a faint grid and a pin at the
+ * centre — so a location card holds its shape and says what belongs there.
+ * The caption carries the address and, as a link, the action (Open in Maps).
+ *
+ * Inside .card__media the figure drops its own radius and gap: the card's
+ * media frame already bleeds and rounds; the caption, if any, is the card's. */
+.figure { margin: 0; display: flex; flex-direction: column; gap: var(--k-s-6); min-width: 0; }
+.figure__media {
+  position: relative; aspect-ratio: var(--figure-ratio, 16 / 9); overflow: hidden;
+  border-radius: var(--k-radius-md); background: var(--k-surface-2);
+}
+.figure__media > img, .figure__media > picture, .figure__media > video, .figure__media > iframe, .figure__media > svg, .figure__media > canvas {
+  display: block; width: 100%; height: 100%; object-fit: cover; border: 0;
+}
+.figure__caption {
+  display: flex; align-items: baseline; gap: var(--k-s-8); flex-wrap: wrap;
+  font-size: var(--k-type-caption); color: var(--k-fg-muted); line-height: 1.4;
+}
+.figure__caption a { color: var(--k-primary-text); text-decoration: underline; text-decoration-color: color-mix(in oklab, currentColor 40%, transparent); margin-inline-start: auto; white-space: nowrap; }
+.figure__caption a:hover { text-decoration-color: currentColor; }
+/* --map: a faint grid on the field, a pin at the centre — a map before the map */
+.figure--map .figure__media {
+  background-color: var(--k-surface-2);
+  background-image: linear-gradient(var(--k-border) 1px, transparent 1px), linear-gradient(90deg, var(--k-border) 1px, transparent 1px);
+  background-size: var(--k-s-24) var(--k-s-24);
+  background-position: center;
+}
+.figure--map .figure__media::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: var(--k-icon-md); height: var(--k-icon-md); border-radius: 50%;
+  background: var(--k-primary); border: var(--k-s-2) solid var(--k-surface);
+  box-shadow: var(--k-shadow-sm);
+  transform: translate(-50%, -50%);
+}
+/* composed into a card's media frame: the card bleeds and rounds; the figure stops doing both */
+.card__media .figure { gap: 0; }
+.card__media .figure__media { border-radius: 0; }`,
   },
   {
     id: 'navigation-menu',

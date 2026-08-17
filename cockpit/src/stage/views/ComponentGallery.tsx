@@ -118,7 +118,8 @@ const CARD_KEYWORDS: Record<string, string> = {
   LoginCard: 'Log in sign in auth credentials',
   SignupCard: 'Sign up register create account auth',
   WizardStepperCard: 'Set up workspace wizard onboarding steps',
-  CarouselCard: 'Carousel slider swipe dots',
+  CarouselCard: 'Carousel slider swipe dots strip scroll-snap cards row',
+  FigureCard: 'Figure media slot image map static map embed caption location pin',
   LightboxCard: 'Gallery lightbox images photos viewer',
   DropzoneCard: 'Upload files dropzone drag drop',
   FaqCard: 'Help centre FAQ questions accordion',
@@ -220,7 +221,7 @@ export function ComponentGallery({ limit, tier }: { limit?: number; tier?: 'atom
     [TagInputCard, 'atom'], [TabsCard, 'atom'], [DropzoneCard, 'component'], [TooltipCard, 'atom'],
     [CodeBlockCard, 'component'], [SheetCard, 'component'], [DescriptionListCard, 'atom'], 
     [DateFieldCard, 'atom'], [ToolbarCard, 'atom'], [AlertDialogCard, 'component'], 
-    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [ListCard, 'atom'], [ProseCard, 'component'], [ActivityFeedCard, 'component'],
+    [CmdPaletteCard, 'component'], [DropdownMenuCard, 'atom'], [CarouselCard, 'component'], [FigureCard, 'atom'], [ListCard, 'atom'], [ProseCard, 'component'], [ActivityFeedCard, 'component'],
     [LoginCard, 'component'], [ContextMenuCard, 'atom'], [SignupCard, 'component'], [NavMenuCard, 'atom'],
     [PaginationCard, 'atom'], [TreeViewCard, 'component'], [NotificationCenterCard, 'component'], [NavCard, 'section'], [AppBarCard, 'section'],
     [FileGridCard, 'section'], [AccordionCard, 'atom'], [SettingsRowCard, 'atom'], [AlertsCard, 'atom'],
@@ -333,7 +334,7 @@ const ATOM_GROUPS: ReadonlyArray<readonly [string, ReadonlyArray<() => ReactElem
   ['Overlays & disclosure', [TooltipCard, ToggletipCard, AccordionCard]],
   ['Feedback & status', [ValidationCard, ErrorSummaryCard, WarningTextCard, CookieBannerCard, BannerCard, AlertsCard, ProgressCard]],
   // LP6 — the AI-thread furniture tier: tool receipts, thinking lines, source chips
-  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, InteractiveCardCard]],
+  ['Data & content', [TableCard, GroupedTableCard, ResponsiveTableCard, CardTableCard, FrozenColumnTableCard, ListCard, TwoColumnListCard, DescriptionListCard, SettingsRowCard, InteractiveCardCard, FigureCard]],
 ]
 
 /* ── Promoted dashboard widgets — formerly app-only (SupaDash), now first-class
@@ -937,8 +938,42 @@ function CarouselCard() {
   const slides = [1, 2, 3, 4]
   const [i, setI] = useState(0)
   const go = (d: number) => setI((p) => (p + d + slides.length) % slides.length)
+  const stops = [
+    { name: 'Afvalscheidingsstation Tractieweg', where: 'Tractieweg 2 · 2.1 km', when: 'Open now', tone: 'success' },
+    { name: 'Afvalscheidingsstation Lage Weide', where: 'Sophialaan 5 · 4.8 km', when: 'Closes 17:00', tone: 'warn' },
+    { name: 'Milieustraat Nieuwegein', where: 'Ambachtsweg 26 · 5.9 km', when: 'Residents only', tone: 'neutral' },
+    { name: 'Milieupark Zeist', where: 'Fornhese 2 · 8.4 km', when: 'Closed today', tone: 'neutral' },
+  ] as const
   return (
-    <Card title="Carousel" desc="Sliding panels with prev/next and dot pagination." wide>
+    <Card docId="carousel" title="Carousel" desc="Sliding panels with prev/next and dot pagination — and the strip: a scroll-snap row of cards, the platform's scrolling as the mechanism." wide>
+      {/* --strip: no script, no arrows — overflow scrolling + scroll-snap. Each
+          slide is a card; the map figure inside is the kit's own media slot. */}
+      <div className="carousel carousel--strip" aria-label="Recycling centres near you">
+        <div className="carousel__viewport">
+          <div className="carousel__track">
+            {stops.map((st) => (
+              <div key={st.name} className="carousel__slide">
+                <div className="card">
+                  <div className="card__media">
+                    <figure className="figure figure--map"><div className="figure__media" role="img" aria-label={`Map — ${st.where}`} /></figure>
+                  </div>
+                  <div className="card__head">
+                    <span className={`badge badge--${st.tone}`}><span className="badge__dot" />{st.when}</span>
+                    <span className="card__title">{st.name}</span>
+                    <span className="card__desc">{st.where}</span>
+                  </div>
+                  <div className="card__foot">
+                    <div className="card__row card__row--spread">
+                      <button type="button" className="btn btn--primary btn--sm">Route <Icon name="chevR" /></button>
+                      <button type="button" className="btn btn--ghost btn--sm">Hours</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="carousel">
         <div className="carousel__viewport">
           <div className="carousel__track" style={{ transform: `translateX(-${i * 100}%)` }}>
@@ -957,6 +992,29 @@ function CarouselCard() {
           ))}
         </div>
       </div>
+    </Card>
+  )
+}
+
+function FigureCard() {
+  // The media SLOT: a framed image, map or embed with a caption. The frame owns
+  // the ratio and the clipping; whatever sits inside — an <img>, an <iframe>
+  // with an embedded map, an inline <svg> — never sets its own size. Shown here
+  // EMPTY on purpose: the point of a slot is that it holds its shape before the
+  // tiles or the picture arrive, and the map form says what belongs there.
+  return (
+    <Card docId="figure" title="Figure" desc="The media slot — image, map or embed, framed and captioned. NL Design System Figure; the platform's <figure>.">
+      <figure className="figure figure--map">
+        <div className="figure__media" role="img" aria-label="Map — Tractieweg 2, Utrecht" />
+        <figcaption className="figure__caption">
+          <span>Afvalscheidingsstation Tractieweg — Tractieweg 2, Utrecht</span>
+          <a href="#">Open in Maps</a>
+        </figcaption>
+      </figure>
+      <figure className="figure" style={{ '--figure-ratio': '3 / 1' } as CSSProperties}>
+        <div className="figure__media" role="img" aria-label="Rear elevation drawing, dormer 2.4 m wide" />
+        <figcaption className="figure__caption"><span>Rear elevation — dormer 2.4 m wide, received 11 Aug 2026</span></figcaption>
+      </figure>
     </Card>
   )
 }
@@ -3892,7 +3950,11 @@ function DescriptionListCard() {
           a list screen. It replaced a separate .stat-tile-strip component that
           could not name a source; a band of label→value pairs is a description
           list, and this one inherits GOV.UK's Summary list provenance. */}
-      <dl className="dl dl--band" style={{ marginBottom: 'var(--k-s-16)' }}>
+      {/* The band SCROLLS when it must (one row, never a hole) — so it is a
+          scrollable region, and WCAG 2.1.1 wants it reachable by keyboard:
+          tabIndex=0 + a name, like the codeblock's <pre>. Found by the a11y
+          matrix the day the wall re-flowed and this card got narrower. */}
+      <dl className="dl dl--band" style={{ marginBottom: 'var(--k-s-16)' }} tabIndex={0} aria-label="Plan summary, scrollable">
         <div><dt>Seats</dt><dd>24</dd></div>
         <div><dt>Storage</dt><dd>14.2 GB</dd></div>
         <div><dt>This month</dt><dd>$48</dd></div>
@@ -4923,7 +4985,8 @@ export const COMPONENT_PAGES: ComponentPage[] = [
   { slug: 'lightbox', name: 'Lightbox', group: 'Overlays', recipeId: 'lightbox', blurb: 'A full-screen media viewer with prev/next and a caption.', Preview: LightboxCard },
 
   // Layout
-  { slug: 'carousel', name: 'Carousel', group: 'Layout', recipeId: 'carousel', blurb: 'Sliding panels with prev/next and dot pagination.', Preview: CarouselCard },
+  { slug: 'carousel', name: 'Carousel', group: 'Layout', recipeId: 'carousel', blurb: 'Sliding panels with prev/next and dot pagination — and the strip: a scroll-snap row of cards with the platform’s scrolling as the whole mechanism.', Preview: CarouselCard },
+  { slug: 'figure', name: 'Figure', group: 'Content', recipeId: 'figure', blurb: 'The media slot — a framed image, static map, embedded map or video with a caption; an empty frame still holds its shape — NL Design System Figure, the platform’s <figure>.', Preview: FigureCard },
   { slug: 'footer', name: 'Footer', group: 'Layout', recipeId: 'sitefooter', blurb: 'The contentinfo landmark — accessibility statement, privacy, contact, the body responsible.', Preview: SiteFooterCard },
   { slug: 'identifier', name: 'Identifier', group: 'Layout', recipeId: 'identifier', blurb: 'Who operates this service, and the statements a person is entitled to find.', Preview: IdentifierCard },
   { slug: 'resizable', name: 'Resizable', group: 'Layout', recipeId: 'resizable', blurb: 'Drag-to-resize split panes with a grabbable handle.', Preview: ResizableCard },

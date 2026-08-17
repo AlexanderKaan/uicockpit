@@ -35,7 +35,9 @@ export type GenNode =
   | { type: 'link'; text: string; href: string; external?: boolean }
   | { type: 'stack' | 'cluster'; children: GenNode[] }
   | { type: 'grid'; children: GenNode[]; min?: string }
-  | { type: 'card'; title?: string; desc?: string; media?: { alt: string; label?: string }; badge?: Badge; children?: GenNode[]; actions?: GenNode[]; well?: boolean }
+  | { type: 'strip'; children: GenNode[]; slide?: string; label?: string }
+  | { type: 'figure'; alt: string; caption?: string; map?: boolean; action?: { text: string; href: string }; ratio?: string }
+  | { type: 'card'; title?: string; desc?: string; media?: { alt: string; map?: boolean }; badge?: Badge; children?: GenNode[]; actions?: GenNode[]; well?: boolean }
   | { type: 'button'; text: string; variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'link' | 'danger'; size?: 'sm'; href?: string; icon?: IconName }
   | { type: 'badge' } & Badge
   | { type: 'metric'; label: string; value: string; sub?: string; icon?: IconName }
@@ -73,7 +75,9 @@ export type GenType = GenNode['type']
  *   carousel · dialog · sheet · command palette · combobox · calendar
  *                 behaviour = script or a surface an assistant should not open on
  *                 its own; the behaviour module comes first;
- *   images        no image component in the kit; a card carries a media slot. */
+ *   images        a `figure` is the media slot (an image, a map, an embed); the
+ *                 sandbox paints no pictures — the slot renders empty, as the
+ *                 kit's own specimen does, and the caption carries the words. */
 export const GEN_CATALOG: Record<GenType, { recipe: string; label: string; note?: string }> = {
   heading:      { recipe: 'page-head',            label: 'Page head' },
   text:         { recipe: 'prose',                label: 'Prose' },
@@ -81,6 +85,8 @@ export const GEN_CATALOG: Record<GenType, { recipe: string; label: string; note?
   stack:        { recipe: 'layout-primitives',    label: 'Stack (l-stack)' },
   cluster:      { recipe: 'layout-primitives',    label: 'Cluster (l-cluster)' },
   grid:         { recipe: 'layout-primitives',    label: 'Grid (l-grid)' },
+  strip:        { recipe: 'carousel',             label: 'Card strip (carousel--strip)', note: 'the scroll-snap form — the platform scrolls, no script; the classic carousel\'s arrows and dots are not part of the strip' },
+  figure:       { recipe: 'figure',               label: 'Figure — the media slot (image · map · embed)' },
   card:         { recipe: 'card',                 label: 'Card' },
   button:       { recipe: 'buttons',              label: 'Button', note: 'a plain button is the platform\'s; the manifest\'s "script" comes from the wall\'s toggle / menu / loading specimens (aria-pressed · aria-expanded · aria-busy)' },
   badge:        { recipe: 'badges-pills',         label: 'Badge' },
@@ -155,13 +161,13 @@ export type Resolver = { resolve: (text: string) => Verdict }
 export const LIMITS = { depth: 6, items: 12, blocks: 24, text: 600 }
 
 const REQUIRED: Partial<Record<GenType, string[]>> = {
-  heading: ['text'], text: ['text'], link: ['text', 'href'], stack: ['children'], cluster: ['children'], grid: ['children'],
+  heading: ['text'], text: ['text'], link: ['text', 'href'], stack: ['children'], strip: ['children'], figure: ['alt'], cluster: ['children'], grid: ['children'],
   button: ['text'], badge: ['text'], metric: ['label', 'value'], metrics: ['items'], facts: ['items'], list: ['items'],
   table: ['columns', 'rows'], alert: ['tone', 'text'], banner: ['text'], warning: ['text'], steps: ['items'], tasks: ['items'],
   progress: ['label', 'value'], stepper: ['steps', 'current'], accordion: ['items'], tabs: ['items'],
   activity: ['items'], requirements: ['items'], choice: ['label', 'options'], input: ['label'],
 }
-const CONTAINERS = new Set<GenType>(['stack', 'cluster', 'grid', 'card'])
+const CONTAINERS = new Set<GenType>(['stack', 'cluster', 'grid', 'strip', 'card'])
 
 /**
  * Admit a spec: every node is checked against the catalogue (unknown → the

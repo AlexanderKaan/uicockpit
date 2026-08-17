@@ -1511,6 +1511,22 @@
         "service": []
       }
     },
+    "figure": {
+      "sources": [
+        {
+          "layer": 4,
+          "source": "NL Design System · Figure",
+          "because": "NL Design System ships this as a component because a public service needs it.",
+          "url": "https://nldesignsystem.nl/figure"
+        }
+      ],
+      "covers": {
+        "openui": [],
+        "service": [
+          "NL Design System · Figure"
+        ]
+      }
+    },
     "navigation-menu": {
       "sources": [
         {

@@ -1883,6 +1883,42 @@
     ],
     "expandable rows": [
       "Treegrid"
+    ],
+    "map": [
+      "figure"
+    ],
+    "map slot": [
+      "figure"
+    ],
+    "static map": [
+      "figure"
+    ],
+    "location map": [
+      "figure"
+    ],
+    "media slot": [
+      "figure"
+    ],
+    "embedded map": [
+      "figure"
+    ],
+    "card strip": [
+      "carousel"
+    ],
+    "strip": [
+      "carousel"
+    ],
+    "scroller": [
+      "carousel"
+    ],
+    "horizontal scroll": [
+      "carousel"
+    ],
+    "scroll snap": [
+      "carousel"
+    ],
+    "swipe row": [
+      "carousel"
     ]
   },
   "_deliberately_empty": "Entries with an empty list are words we RECOGNISE and can say NO to precisely: the concept exists in the wider field but no layer names it — no HTML element, no APG pattern, no public-service component. They resolve to NONE with a message that names the word, so the refusal is about the component and not about the vocabulary. Most of them are things the four-layer cut removed on purpose (kanban, chart, rating, stat tile, otp)."

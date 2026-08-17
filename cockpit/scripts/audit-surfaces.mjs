@@ -29,7 +29,7 @@
  *   COMPOSED      the other direction — every recipe is put on a page next to
  *                 other components at least once. A ratchet, exact in both
  *                 directions: overlays legitimately compose into nothing, so the
- *                 bar is "no worse than 41", and a win must be locked in.
+ *                 bar is "no worse than 40", and a win must be locked in.
  *   LAYOUT        the fixture composes the layout primitives (.bento / .l-*)
  *                 and never authors grid tracks inline.
  *   LIVE          a <button> that renders the down-chevron opens something — a
@@ -278,8 +278,10 @@ const axis = (name, rows, { ok, fix, ratchet = null }) => axes.push({ name, rows
   })
 }
 
-/* COMPOSED — the ratchet */
-const CEILING = 41
+/* COMPOSED — the ratchet. 41 → 40 (2026-08-17): the carousel now composes
+ * (its --strip form carries the Schedule screen's site-visit cards) and the
+ * figure arrived composed (the map slot inside those cards). */
+const CEILING = 40
 {
   const alone = []
   for (const r of kit.recipes) {

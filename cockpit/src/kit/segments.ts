@@ -108,7 +108,9 @@ export const COMPONENT_USES: Readonly<Record<string, readonly string[]>> = {
   infocard: ['card', 'buttons'],
   exitpage: ['buttons'], // GOV.UK Exit this page — a large danger button that stays on screen
   cookiebanner: ['buttons'], // GOV.UK Cookie banner — accept / reject + a link
-  carousel: ['buttons'],
+  // The carousel's strip form (P·7) is a scroll-snap row of CARDS whose media
+  // slot is the FIGURE — the two atoms it composes besides its arrow buttons.
+  carousel: ['buttons', 'card', 'figure'],
   codeblock: ['buttons'],
   menubar: ['dropdown-menu', 'buttons'],
   resizable: [],

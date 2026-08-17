@@ -117,11 +117,11 @@ describe('generative UI — the renderer writes kit classes only', () => {
 
 describe('generative UI — admission refuses what the components do not admit', () => {
   it('an unknown type is refused with the forge\'s verdict, in place', () => {
-    const a = admit({ blocks: [{ type: 'kanban' }, { type: 'carousel', items: [] }, { type: 'text', text: 'ok' }] }, forge)
+    const a = admit({ blocks: [{ type: 'kanban' }, { type: 'lightbox', items: [] }, { type: 'text', text: 'ok' }] }, forge)
     const refused = a.issues.filter((i) => i.level === 'refused')
     expect(refused.map((i) => i.path)).toEqual(['$.blocks[0]', '$.blocks[1]'])
     expect(refused[0]!.forge?.verdict).toBe('none')                       // no layer names a kanban board
-    expect(refused[1]!.forge?.verdict).toBe('exists')                     // the kit has a carousel — not admitted to generative output
+    expect(refused[1]!.forge?.verdict).toBe('exists')                     // the kit has a lightbox — an overlay, not admitted to generative output
     expect(refused[1]!.message).toMatch(/not admitted to generative output/)
     const markup = html({ blocks: [{ type: 'kanban' }] })
     expect(markup).toContain('data-genui-refused="kanban"')
@@ -169,7 +169,7 @@ describe('generative UI — admission refuses what the components do not admit',
     expect(a.issues.find((i) => i.level === 'warning')?.message).toMatch(new RegExp(`the first ${LIMITS.items} render`))
   })
 
-  it('the refusals preset refuses exactly what it says: kanban, carousel, a card in a card — reads "summary list" as facts — and renders the rest', () => {
+  it('the refusals preset refuses exactly what it says: kanban, lightbox, a card in a card — reads "summary list" as facts — and renders the rest', () => {
     const p = PRESETS.find((x) => x.id === 'refusals')!
     const a = admit(JSON.parse(JSON.stringify(p.spec)), forge)
     const refused = a.issues.filter((i) => i.level === 'refused')

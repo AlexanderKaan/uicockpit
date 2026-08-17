@@ -35,24 +35,18 @@ function CellEl({ c }: { c: Cell }) {
   return <span className="num">{c.num}</span>
 }
 
-/* A media SLOT, not a photograph: the sandbox paints no external images and
- * fakes no hotel façades. An inline SVG under the card's own media frame,
- * tinted by the kit's primary — the shape the real image would take. */
-function Media({ alt, label }: { alt: string; label?: string }) {
+/* A media SLOT, not a photograph: the kit's own `.figure` — the frame that
+ * holds an image, a static map or an embed and keeps its shape while empty.
+ * The sandbox paints no pictures (no external images, no invented façades);
+ * the slot renders as the kit's specimen does — the map form with its grid
+ * and pin, or the plain field — and the words travel in alt and caption. This
+ * used to be an inline SVG drawn here; the house rule put the recipe in the
+ * kit first (Sprint P·7), and this file lost the drawing. */
+function Media({ alt, map, ratio }: { alt: string; map?: boolean; ratio?: string }) {
   return (
-    <div className="card__media">
-      <svg viewBox="0 0 320 160" role="img" aria-label={alt} preserveAspectRatio="xMidYMid slice" style={{ display: 'block', width: '100%', height: 'auto', maxHeight: '10rem' }}>
-        <defs>
-          <linearGradient id="gen-media-g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="var(--k-primary)" stopOpacity="0.55" />
-            <stop offset="1" stopColor="var(--k-primary)" stopOpacity="0.15" />
-          </linearGradient>
-        </defs>
-        <rect width="320" height="160" fill="url(#gen-media-g)" />
-        <path d="M0 132 L48 96 L96 120 L150 70 L204 108 L252 84 L320 118 L320 160 L0 160 Z" fill="var(--k-primary)" fillOpacity="0.35" />
-        {label && <text x="16" y="146" fontSize="12" fill="var(--k-primary-fg)" fillOpacity="0.9" fontFamily="var(--k-font-body)">{label}</text>}
-      </svg>
-    </div>
+    <figure className={`figure${map ? ' figure--map' : ''}`} style={ratio ? ({ '--figure-ratio': ratio } as React.CSSProperties) : undefined}>
+      <div className="figure__media" role="img" aria-label={alt} />
+    </figure>
   )
 }
 
@@ -118,10 +112,33 @@ export function GenNodeEl({ a }: { a: Admitted }) {
       return <div className="l-cluster"><Children list={a.children} /></div>
     case 'grid':
       return <div className="l-grid" style={n.min ? ({ '--l-min': n.min } as React.CSSProperties) : undefined}><Children list={a.children} /></div>
+    case 'strip':
+      // the carousel's scroll-snap form: each child is a slide; the platform scrolls
+      return (
+        <div className="carousel carousel--strip" aria-label={n.label} style={n.slide ? ({ '--strip-slide': n.slide } as React.CSSProperties) : undefined}>
+          <div className="carousel__viewport">
+            <div className="carousel__track">
+              {(a.children ?? []).map((c) => <div key={c.path} className="carousel__slide"><GenNodeEl a={c} /></div>)}
+            </div>
+          </div>
+        </div>
+      )
+    case 'figure':
+      return (
+        <figure className={`figure${n.map ? ' figure--map' : ''}`} style={n.ratio ? ({ '--figure-ratio': n.ratio } as React.CSSProperties) : undefined}>
+          <div className="figure__media" role="img" aria-label={n.alt} />
+          {(n.caption || n.action) && (
+            <figcaption className="figure__caption">
+              {n.caption && <span>{n.caption}</span>}
+              {n.action && <a href={n.action.href}>{n.action.text}</a>}
+            </figcaption>
+          )}
+        </figure>
+      )
     case 'card':
       return (
         <div className={`card${n.well ? ' card--well' : ''}`}>
-          {n.media && <Media alt={n.media.alt} label={n.media.label} />}
+          {n.media && <div className="card__media"><Media alt={n.media.alt} map={n.media.map} /></div>}
           {(n.badge || n.title || n.desc) && (
             <div className="card__head">
               {n.badge && <div><BadgeEl b={n.badge} /></div>}
@@ -150,8 +167,9 @@ export function GenNodeEl({ a }: { a: Admitted }) {
         </div>
       )
     case 'metrics':
+      // the band scrolls when it must — a scrollable region is reachable by keyboard (WCAG 2.1.1)
       return (
-        <dl className="dl dl--band">
+        <dl className="dl dl--band" tabIndex={0} aria-label={`${n.items.map((it) => it.label).join(', ')} — scrollable`}>
           {n.items.map((it, i) => (
             <div key={i}>
               <dt>{it.label}</dt>

@@ -31,15 +31,17 @@ export const PRESETS: Preset[] = [
     spec: {
       title: 'Recycling centres near Overvecht',
       blocks: [
-        { type: 'heading', text: 'Recycling centres near Overvecht', sub: '3 locations within 6 km · 2 open now · paint and electronics accepted at all three' },
-        { type: 'metrics', items: [{ label: 'Nearest', value: '2.1 km', sub: 'Tractieweg' }, { label: 'Open now', value: '2 of 3' }, { label: 'Free visits left', value: '6', sub: 'of 8 this year' }] },
+        { type: 'heading', text: 'Recycling centres near Overvecht', sub: '4 locations within 9 km · 2 open now · paint and electronics accepted at all of them' },
+        { type: 'metrics', items: [{ label: 'Nearest', value: '2.1 km', sub: 'Tractieweg' }, { label: 'Open now', value: '2 of 4' }, { label: 'Free visits left', value: '6', sub: 'of 8 this year' }] },
         {
-          type: 'grid', min: '12rem', children: [
-            { type: 'card', media: { alt: 'Map of Afvalscheidingsstation Tractieweg', label: 'Tractieweg 2' }, badge: { text: 'Open now · until 17:00', tone: 'success' }, title: 'Afvalscheidingsstation Tractieweg', desc: '2.1 km · Mon–Sat 08:00–17:00 · car and bike access.', actions: [{ type: 'button', text: 'Route', variant: 'primary', size: 'sm', icon: 'chevR' }, { type: 'button', text: 'Hours', variant: 'ghost', size: 'sm' }] },
-            { type: 'card', media: { alt: 'Map of Afvalscheidingsstation Lage Weide', label: 'Sophialaan 5' }, badge: { text: 'Open now · until 17:00', tone: 'success' }, title: 'Afvalscheidingsstation Lage Weide', desc: '4.8 km · Mon–Sat 08:00–17:00 · also accepts wrapped asbestos.', actions: [{ type: 'button', text: 'Route', variant: 'primary', size: 'sm', icon: 'chevR' }, { type: 'button', text: 'Hours', variant: 'ghost', size: 'sm' }] },
-            { type: 'card', media: { alt: 'Map of Milieustraat Nieuwegein', label: 'Ambachtsweg 26' }, badge: { text: 'Nieuwegein residents only', tone: 'neutral' }, title: 'Milieustraat Nieuwegein', desc: '5.9 km · Tue–Sat 09:00–16:30 · proof of a Nieuwegein address required.', actions: [{ type: 'button', text: 'Route', variant: 'ghost', size: 'sm' }] },
+          type: 'strip', label: 'Recycling centres, nearest first', slide: '15rem', children: [
+            { type: 'card', media: { alt: 'Map — Tractieweg 2, Utrecht', map: true }, badge: { text: 'Open now · until 17:00', tone: 'success' }, title: 'Afvalscheidingsstation Tractieweg', desc: '2.1 km · Mon–Sat 08:00–17:00 · car and bike access.', actions: [{ type: 'button', text: 'Route', variant: 'primary', size: 'sm', icon: 'chevR' }, { type: 'button', text: 'Hours', variant: 'ghost', size: 'sm' }] },
+            { type: 'card', media: { alt: 'Map — Sophialaan 5, Utrecht', map: true }, badge: { text: 'Open now · until 17:00', tone: 'success' }, title: 'Afvalscheidingsstation Lage Weide', desc: '4.8 km · Mon–Sat 08:00–17:00 · also accepts wrapped asbestos.', actions: [{ type: 'button', text: 'Route', variant: 'primary', size: 'sm', icon: 'chevR' }, { type: 'button', text: 'Hours', variant: 'ghost', size: 'sm' }] },
+            { type: 'card', media: { alt: 'Map — Ambachtsweg 26, Nieuwegein', map: true }, badge: { text: 'Nieuwegein residents only', tone: 'neutral' }, title: 'Milieustraat Nieuwegein', desc: '5.9 km · Tue–Sat 09:00–16:30 · proof of a Nieuwegein address required.', actions: [{ type: 'button', text: 'Route', variant: 'ghost', size: 'sm' }] },
+            { type: 'card', media: { alt: 'Map — Fornhese 2, Zeist', map: true }, badge: { text: 'Closed today', tone: 'neutral' }, title: 'Milieupark Zeist', desc: '8.4 km · Tue–Sat 08:30–16:00 · Zeist and Bunnik residents.', actions: [{ type: 'button', text: 'Route', variant: 'ghost', size: 'sm' }] },
           ],
         },
+        { type: 'figure', alt: 'Map — Tractieweg 2, Utrecht, the nearest centre', map: true, caption: 'Nearest: Afvalscheidingsstation Tractieweg — Tractieweg 2, Utrecht', action: { text: 'Open in Maps', href: '#' }, ratio: '21 / 9' },
         { type: 'facts', items: [
           { label: 'Paint and solvents', value: 'Yes — in the original packaging' },
           { label: 'Television', value: 'Yes — electronics container, free of charge' },
@@ -254,9 +256,9 @@ export const PRESETS: Preset[] = [
   {
     id: 'refusals',
     name: 'What gets refused',
-    prompt: 'Show my cases as a kanban board with a carousel of photos, a card inside each card, and a summary list',
+    prompt: 'Show my cases as a kanban board with a lightbox of photos, a card inside each card, and a summary list',
     prose: [
-      'This preset exists to show the sandbox refusing — and reading. An assistant that can paint UI must not be able to invent it: a kanban board is named by no layer of the derivation, a carousel exists in the kit but is not admitted to generative output, and the card recipe forbids a card inside a card. Each refusal renders in place, with the reason, so the answer shows exactly where the assistant reached past the components. And a name that is not ours but IS our component — "summary list", GOV.UK’s word for the description list — is read through the forge and rendered, with a note that says so.',
+      'This preset exists to show the sandbox refusing — and reading. An assistant that can paint UI must not be able to invent it: a kanban board is named by no layer of the derivation, a lightbox exists in the kit but is not admitted to generative output (an assistant does not open an overlay on its own), and the card recipe forbids a card inside a card. Each refusal renders in place, with the reason, so the answer shows exactly where the assistant reached past the components. And a name that is not ours but IS our component — "summary list", GOV.UK’s word for the description list — is read through the forge and rendered, with a note that says so.',
     ],
     spec: {
       title: 'Refusals',
@@ -264,7 +266,7 @@ export const PRESETS: Preset[] = [
         { type: 'heading', text: 'Your cases', sub: 'Three of the five things asked for are refused below — on purpose; one is read through the forge.' },
         { type: 'summary list', items: [{ label: 'Open cases', value: '3' }, { label: 'Oldest', value: '2026-02207 · terrace licence' }] } as never,
         { type: 'kanban', columns: ['Open', 'Waiting', 'Done'] } as never,
-        { type: 'carousel', items: ['photo 1', 'photo 2'] } as never,
+        { type: 'lightbox', items: ['photo 1', 'photo 2'] } as never,
         { type: 'card', title: 'Case 2026-04471', desc: 'Dormer window', children: [
           { type: 'card', title: 'A card inside a card' },
           { type: 'badge', text: 'Under review', tone: 'info' },

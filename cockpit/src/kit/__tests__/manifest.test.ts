@@ -60,8 +60,10 @@ describe('the manifest describes the kit that ships', () => {
      * state part (`combobox__empty`), a part rendered outside its block
      * (`tasklist__count` sits above the <ol>), or a plain gap. The number may go
      * DOWN when a card demonstrates a part — then lower it here, in the same
-     * commit — and may not go up: a new recipe arrives with its parts shown. */
-    const CEILING = 45
+     * commit — and may not go up: a new recipe arrives with its parts shown.
+     * 45 → 43 (2026-08-17): the figure arrived with both parts shown and the
+     * carousel's strip demo rendered two parts the classic specimen never had. */
+    const CEILING = 43
     const unrendered: string[] = []
     for (const [id, e] of Object.entries(components)) {
       for (const [name, p] of Object.entries(e.parts)) if (p.cssDeclared && !p.rendered) unrendered.push(`${id} .${e.block}__${name}`)

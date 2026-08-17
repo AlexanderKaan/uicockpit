@@ -1,9 +1,9 @@
 {
  "_generated": "scripts/gen-manifest.mjs — read off the rendered wall; regenerate with `npm run dev && npm run gen:manifest` after anything that changes how a component renders. Not typed by hand.",
- "commit": "712fa2d",
- "measuredOn": "2026-08-16",
- "blocks": 83,
- "recipes": 87,
+ "commit": "95ddef5",
+ "measuredOn": "2026-08-17",
+ "blocks": 84,
+ "recipes": 88,
  "components": {
   "accordion": {
    "block": "accordion",
@@ -487,9 +487,9 @@
   },
   "badges-pills": {
    "block": "badge",
-   "instances": 48,
+   "instances": 52,
    "elements": {
-    "span": 48
+    "span": 52
    },
    "root": {
     "attrs": {}
@@ -497,7 +497,7 @@
    "rootRoles": [],
    "parts": {
     "dot": {
-     "in": 20,
+     "in": 24,
      "repeatable": false,
      "aria": {},
      "cssDeclared": true,
@@ -593,14 +593,14 @@
   },
   "button-finish": {
    "block": "btn",
-   "instances": 109,
+   "instances": 117,
    "elements": {
-    "button": 108,
+    "button": 116,
     "a": 1
    },
    "root": {
     "attrs": {
-     "type=button": 32,
+     "type=button": 40,
      "aria-busy": 1,
      "aria-expanded": 5,
      "role=button": 1,
@@ -655,14 +655,14 @@
   },
   "button-group": {
    "block": "btn",
-   "instances": 109,
+   "instances": 117,
    "elements": {
-    "button": 108,
+    "button": 116,
     "a": 1
    },
    "root": {
     "attrs": {
-     "type=button": 32,
+     "type=button": 40,
      "aria-busy": 1,
      "aria-expanded": 5,
      "role=button": 1,
@@ -717,14 +717,14 @@
   },
   "buttons": {
    "block": "btn",
-   "instances": 109,
+   "instances": 117,
    "elements": {
-    "button": 108,
+    "button": 116,
     "a": 1
    },
    "root": {
     "attrs": {
-     "type=button": 32,
+     "type=button": 40,
      "aria-busy": 1,
      "aria-expanded": 5,
      "role=button": 1,
@@ -1276,9 +1276,9 @@
   },
   "card": {
    "block": "card",
-   "instances": 17,
+   "instances": 21,
    "elements": {
-    "div": 12,
+    "div": 16,
     "button": 5
    },
    "root": {
@@ -1289,7 +1289,7 @@
    "rootRoles": [],
    "parts": {
     "head": {
-     "in": 2,
+     "in": 6,
      "repeatable": false,
      "aria": {},
      "cssDeclared": true,
@@ -1299,7 +1299,7 @@
      "parent": "block"
     },
     "title": {
-     "in": 4,
+     "in": 8,
      "repeatable": false,
      "aria": {},
      "cssDeclared": true,
@@ -1309,14 +1309,14 @@
      "parent": "head"
     },
     "desc": {
-     "in": 3,
+     "in": 7,
      "repeatable": false,
      "aria": {},
      "cssDeclared": true,
      "required": false,
      "rendered": true,
-     "element": "div",
-     "parent": "block"
+     "element": "span",
+     "parent": "head"
     },
     "col": {
      "in": 1,
@@ -1329,17 +1329,17 @@
      "parent": "block"
     },
     "row": {
-     "in": 2,
+     "in": 6,
      "repeatable": true,
      "aria": {},
      "cssDeclared": true,
      "required": false,
      "rendered": true,
      "element": "div",
-     "parent": "col"
+     "parent": "foot"
     },
     "foot": {
-     "in": 1,
+     "in": 5,
      "repeatable": false,
      "aria": {},
      "cssDeclared": true,
@@ -1349,7 +1349,7 @@
      "parent": "block"
     },
     "media": {
-     "in": 1,
+     "in": 5,
      "repeatable": false,
      "aria": {},
      "cssDeclared": true,
@@ -1375,83 +1375,103 @@
     "badges-pills",
     "button-group",
     "composition",
+    "figure",
     "form-primitives",
     "passwordinput",
     "switch-toggle"
    ],
-   "skeleton": "<div class=\"card\">\n  <div class=\"card__head\">\n    <div class=\"card__title\">Title</div>\n  </div>\n  <div class=\"card__col\">\n    <div class=\"card__row card__row--spread\">\n      <span>Text</span>\n      <span class=\"num\">Text</span>\n    </div>\n    <!-- ×3 -->\n  </div>\n  <div class=\"card__row card__row--spread\">\n    <span>Text</span>\n    <span class=\"num\">Text</span>\n  </div>\n  <div class=\"card__foot\">\n    <button class=\"btn btn--primary\">Action</button>\n  </div>\n</div>",
+   "skeleton": "<div class=\"card\">\n  <div class=\"card__media\">\n    <figure class=\"figure figure--map\">\n      <div class=\"figure__media\" role=\"img\" aria-label=\"Map — Tractieweg 2 · 2.1 km\"></div>\n    </figure>\n  </div>\n  <div class=\"card__head\">\n    <span class=\"badge badge--success\">\n      <span class=\"badge__dot\"></span>\n      Text\n    </span>\n    <span class=\"card__title\">Title</span>\n    <span class=\"card__desc\">Desc</span>\n  </div>\n  <div class=\"card__foot\">\n    <div class=\"card__row card__row--spread\">\n      <button class=\"btn btn--primary btn--sm\" type=\"button\">\n        Action\n        <svg aria-hidden=\"true\"><!-- icon --></svg>\n      </button>\n      <button class=\"btn btn--ghost btn--sm\" type=\"button\">Action</button>\n    </div>\n  </div>\n</div>",
    "container": null,
    "element": "div",
    "behaviour": "css"
   },
   "carousel": {
-   "block": "cdots",
-   "instances": 1,
+   "block": "carousel",
+   "instances": 2,
    "elements": {
-    "div": 1
+    "div": 2
    },
    "root": {
-    "attrs": {
-     "role=tablist": 1
-    }
+    "attrs": {}
    },
-   "rootRoles": [
-    "tablist"
-   ],
+   "rootRoles": [],
    "parts": {
-    "dot": {
-     "in": 1,
-     "repeatable": true,
-     "aria": {
-      "role": [
-       "tab"
-      ],
-      "aria-selected": [
-       "false",
-       "true"
-      ],
-      "aria-label": [
-       "Go to slide 1",
-       "Go to slide 2",
-       "Go to slide 3",
-       "Go to slide 4"
-      ]
-     },
+    "viewport": {
+     "in": 2,
+     "repeatable": false,
+     "aria": {},
      "cssDeclared": true,
      "required": true,
      "rendered": true,
-     "element": "button",
+     "element": "div",
      "parent": "block"
     },
-    "num": {
-     "in": 0,
+    "track": {
+     "in": 2,
      "repeatable": false,
      "aria": {},
      "cssDeclared": true,
-     "rendered": false,
-     "element": null,
-     "parent": null
+     "required": true,
+     "rendered": true,
+     "element": "div",
+     "parent": "viewport"
     },
-    "bar": {
-     "in": 0,
+    "slide": {
+     "in": 2,
+     "repeatable": true,
+     "aria": {},
+     "cssDeclared": true,
+     "required": true,
+     "rendered": true,
+     "element": "div",
+     "parent": "track"
+    },
+    "caption": {
+     "in": 1,
      "repeatable": false,
      "aria": {},
      "cssDeclared": true,
-     "rendered": false,
-     "element": null,
-     "parent": null
+     "required": false,
+     "rendered": true,
+     "element": "span",
+     "parent": "slide"
+    },
+    "arrow": {
+     "in": 1,
+     "repeatable": true,
+     "aria": {
+      "aria-label": [
+       "Next slide",
+       "Previous slide"
+      ]
+     },
+     "cssDeclared": true,
+     "required": false,
+     "rendered": true,
+     "element": "button",
+     "parent": "viewport"
     }
    },
    "states": {
-    "modifiers": [],
-    "partModifiers": [],
+    "modifiers": [
+     "--strip"
+    ],
+    "partModifiers": [
+     "__arrow--next",
+     "__arrow--prev"
+    ],
     "aria": {}
    },
-   "composes": [],
+   "composes": [
+    "badges-pills",
+    "button-group",
+    "card",
+    "figure"
+   ],
    "skeleton": "<div class=\"carousel\">\n  <div class=\"carousel__viewport\">\n    <div class=\"carousel__track\">\n      <div class=\"carousel__slide\">\n        <span class=\"carousel__caption\">Caption</span>\n      </div>\n      <!-- ×4 -->\n    </div>\n    <button class=\"carousel__arrow carousel__arrow--prev\" aria-label=\"Previous slide\">\n      <svg aria-hidden=\"true\"><!-- icon --></svg>\n    </button>\n    <button class=\"carousel__arrow carousel__arrow--next\" aria-label=\"Next slide\">\n      <svg aria-hidden=\"true\"><!-- icon --></svg>\n    </button>\n  </div>\n  <div class=\"cdots\" role=\"tablist\" aria-label=\"Slide\">\n    <button class=\"cdots__dot is-on\" role=\"tab\" aria-selected=\"true\" aria-label=\"Go to slide 1\"></button>\n    <button class=\"cdots__dot\" role=\"tab\" aria-selected=\"false\" aria-label=\"Go to slide 2\"></button>\n    <button class=\"cdots__dot\" role=\"tab\" aria-selected=\"false\" aria-label=\"Go to slide 3\"></button>\n    <button class=\"cdots__dot\" role=\"tab\" aria-selected=\"false\" aria-label=\"Go to slide 4\"></button>\n  </div>\n</div>",
-   "container": "carousel",
+   "container": null,
    "element": "div",
-   "behaviour": "script"
+   "behaviour": "css"
   },
   "charcount": {
    "block": "charcount",
@@ -2524,6 +2544,63 @@
    "container": null,
    "element": "fieldset",
    "behaviour": "platform"
+  },
+  "figure": {
+   "block": "figure",
+   "instances": 6,
+   "elements": {
+    "figure": 6
+   },
+   "root": {
+    "attrs": {}
+   },
+   "rootRoles": [],
+   "parts": {
+    "media": {
+     "in": 6,
+     "repeatable": false,
+     "aria": {
+      "role": [
+       "img"
+      ],
+      "aria-label": [
+       "Map — Ambachtsweg 26 · 5.9 km",
+       "Map — Fornhese 2 · 8.4 km",
+       "Map — Sophialaan 5 · 4.8 km",
+       "Map — Tractieweg 2 · 2.1 km",
+       "Map — Tractieweg 2, Utrecht",
+       "Rear elevation drawing, dormer 2.4 m wid"
+      ]
+     },
+     "cssDeclared": true,
+     "required": true,
+     "rendered": true,
+     "element": "div",
+     "parent": "block"
+    },
+    "caption": {
+     "in": 2,
+     "repeatable": false,
+     "aria": {},
+     "cssDeclared": true,
+     "required": false,
+     "rendered": true,
+     "element": "figcaption",
+     "parent": "block"
+    }
+   },
+   "states": {
+    "modifiers": [
+     "--map"
+    ],
+    "partModifiers": [],
+    "aria": {}
+   },
+   "composes": [],
+   "skeleton": "<figure class=\"figure\">\n  <div class=\"figure__media\" role=\"img\" aria-label=\"Rear elevation drawing, dormer 2.4 m wide\"></div>\n  <figcaption class=\"figure__caption\">\n    <span>Text</span>\n  </figcaption>\n</figure>",
+   "container": null,
+   "element": "figure",
+   "behaviour": "css"
   },
   "file-grid": {
    "block": "filegrid",

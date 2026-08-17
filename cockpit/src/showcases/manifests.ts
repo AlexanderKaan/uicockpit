@@ -24,6 +24,10 @@ export type SectionSpec =
   // trailing actions cluster). Prepend one so every screen opens the same way.
   | { kind: 'pageHead'; seed: { title: string; sub?: string; actions?: Array<{ label: string; icon?: IconName; primary?: boolean }> } }
   | { kind: 'list'; seed: { title?: string; items: Array<{ icon?: IconName; title: string; sub?: string; trail?: string; badge?: 'success' | 'warning' | 'danger' | 'info' }> } }
+  // A STRIP of location cards — the real `.carousel--strip` (scroll-snap, the
+  // platform's scrolling) of `.card`s whose media is the real `.figure--map`
+  // slot: where the visits are, one row you scroll.
+  | { kind: 'strip'; seed: { title: string; sub?: string; items: Array<{ name: string; where: string; when: string; tone?: 'success' | 'warning' | 'info' | 'neutral' }> } }
   | { kind: 'composer'; seed: { placeholder: string; hero?: boolean; suggestions?: string[]; greeting?: string } }
   | { kind: 'table'; seed: { title?: string; columns: string[]; rows: string[][]; numericCols?: number[]; badgeCols?: number[]; sortableCols?: number[]; badgeToneByValue?: Record<string, 'success' | 'warning' | 'danger' | 'info'>; avatarCols?: number[] } }
   /* `errors` renders the error summary ABOVE the fields — GOV.UK and NL Design
@@ -472,6 +476,12 @@ export const SHOWCASES: ShowcaseManifest[] = [
           ] } },
           
           { kind: 'chips', seed: { label: 'Filter', options: ['All', 'Invoices', 'Payments', 'Reminders'], active: 0 } },
+          { kind: 'strip', seed: { title: 'Site visits this week', sub: 'Where the on-site hours are booked — scroll for the rest of the week.', items: [
+            { name: 'Vantage — kickoff', where: 'Keizersgracht 123, Amsterdam', when: 'Tue 10:00', tone: 'info' },
+            { name: 'Loomis Studio — review', where: 'Sophialaan 5, Utrecht', when: 'Wed 14:00', tone: 'success' },
+            { name: 'Tuple, Inc — overdue call', where: 'Weena 505, Rotterdam', when: 'Thu 09:30', tone: 'warning' },
+            { name: 'SavvyCal — handover', where: 'Stationsplein 8, Eindhoven', when: 'Fri 11:00', tone: 'neutral' },
+          ] } },
           { kind: 'calendar', seed: { title: 'March 2026', firstDow: 6, days: 31, today: 9, selected: 16, events: [3, 6, 12, 16, 20, 24, 27] } },
           { kind: 'list', seed: { title: 'Upcoming', items: [
             { icon: 'file', title: 'Invoice #00013 due — Vantage', sub: '$21,400.00', trail: 'Mar 12', badge: 'warning' },

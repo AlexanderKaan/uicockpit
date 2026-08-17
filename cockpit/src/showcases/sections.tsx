@@ -195,7 +195,7 @@ function PhotoAvatar({ url, name, sm }: { url: string; name: string; sm?: boolea
  * carried none. The thing that left was a presentation of a list, not a list. */
 function SummaryBand({ items }: { items: Array<{ label: string; value: string; delta?: string; up?: boolean }> }) {
   return (
-    <dl className="dl dl--band">
+    <dl className="dl dl--band" tabIndex={0} aria-label="Summary, scrollable">
       {items.map((k) => (
         <div key={k.label}>
           <dt>{k.label}</dt>
@@ -964,6 +964,49 @@ export function renderSection(spec: SectionSpec, key: number) {
           <input type="file" hidden multiple aria-label={spec.seed.title} />
         </label>
       )
+    case 'strip': {
+      /* The real `.carousel--strip` — the platform scrolls, CSS snaps, no
+         script — of `.card`s whose media is the real `.figure--map` slot. */
+      const tone = (t?: string) => (t === 'warning' ? 'warn' : t ?? 'neutral')
+      return (
+        <div className="section" key={key} aria-label={spec.seed.title}>
+          <div className="section__head">
+            <div className="section__titles">
+              <h3 className="section__title">{spec.seed.title}</h3>
+              {spec.seed.sub && <p className="section__sub">{spec.seed.sub}</p>}
+            </div>
+          </div>
+          <div className="section__body">
+            <div className="carousel carousel--strip" aria-label={spec.seed.title}>
+              <div className="carousel__viewport">
+                <div className="carousel__track">
+                  {spec.seed.items.map((it) => (
+                    <div className="carousel__slide" key={it.name}>
+                      <div className="card">
+                        <div className="card__media">
+                          <figure className="figure figure--map"><div className="figure__media" role="img" aria-label={`Map — ${it.where}`} /></figure>
+                        </div>
+                        <div className="card__head">
+                          <span className={`badge badge--${tone(it.tone)}`}><span className="badge__dot" />{it.when}</span>
+                          <span className="card__title">{it.name}</span>
+                          <span className="card__desc">{it.where}</span>
+                        </div>
+                        <div className="card__foot">
+                          <div className="card__row card__row--spread">
+                            <button type="button" className="btn btn--primary btn--sm">Route <Icon name="chevR" /></button>
+                            <button type="button" className="btn btn--ghost btn--sm">Reschedule</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
     case 'media':
       return (
         <div className="card" key={key}>

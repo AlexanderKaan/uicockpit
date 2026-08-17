@@ -73,7 +73,7 @@
     {
       "name": "Carousel",
       "url": "https://uicockpit.com/components/carousel",
-      "definition": "Sliding panels with prev/next and dot pagination."
+      "definition": "Sliding panels with prev/next and dot pagination — and the strip: a scroll-snap row of cards with the platform’s scrolling as the whole mechanism."
     },
     {
       "name": "Character Count",
@@ -163,6 +163,11 @@
       "name": "Fieldset",
       "url": "https://uicockpit.com/components/fieldset",
       "definition": "A group of related fields with a legend that names the question — the platform’s own grouping, styled (GOV.UK Fieldset)."
+    },
+    {
+      "name": "Figure",
+      "url": "https://uicockpit.com/components/figure",
+      "definition": "The media slot — a framed image, static map, embedded map or video with a caption; an empty frame still holds its shape — NL Design System Figure, the platform’s <figure>."
     },
     {
       "name": "File Grid",
