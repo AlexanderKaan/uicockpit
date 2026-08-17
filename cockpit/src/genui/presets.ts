@@ -8,46 +8,47 @@ import type { GenSpec } from './spec'
  * structural — the same information as interface, made only of components
  * that have a source.
  *
- * Three of the four are public-service situations (a benefit, a permit, an
- * appointment) because that is where the fourth service is aimed: an
- * assistant a municipality or ministry would let paint UI. The first is the
- * OpenUI hotel example, kept so the two can be compared side by side.
+ * All six are PUBLIC-SERVICE situations — where to bring hazardous waste, a
+ * benefit, a permit, an appointment, today's air quality, a tax return —
+ * because that is where the fourth service is aimed: an assistant a
+ * municipality, an environmental service or the tax administration would let
+ * paint UI. Dutch institutions, English copy. Between them the six exercise
+ * EVERY type in the catalogue (genui.test.ts holds that), so the sandbox shows
+ * the whole vocabulary in use, not a corner of it. The seventh preset shows
+ * what gets refused — and read.
  */
 export type Preset = { id: string; name: string; prompt: string; prose: string[]; spec: GenSpec }
 
 export const PRESETS: Preset[] = [
   {
-    id: 'hotels',
-    name: 'Hotels in Paris',
-    prompt: 'I need a hotel with a modern design in Paris',
+    id: 'waste',
+    name: 'Recycling centres near you',
+    prompt: 'Where can I bring old paint and a broken TV? I live in Utrecht Overvecht.',
     prose: [
-      'Paris offers a wide selection of modern-design hotels that blend contemporary architecture, thoughtful interiors and premium hospitality. Many of these properties are located in central neighbourhoods close to major landmarks, shopping districts and cultural sites, making them convenient bases for both first-time visitors and returning travellers. Modern hotels in the city often emphasise clean lines, natural materials, curated lighting and spacious layouts, while still preserving elements of Parisian elegance.',
-      '• Hotel Plaza Athénée — situated near the Champs-Élysées, this property combines classic Parisian prestige with refined modern upgrades. Guests often choose it for its courtyard dining spaces, luxury spa and polished service.',
-      '• Four Seasons Hotel George V — a historic landmark that has been carefully modernised, offering spacious rooms, world-class dining and extensive wellness offerings.',
-      '• Le Bristol Paris — a palace hotel with a rooftop pool and a garden courtyard, quietly updated behind its 1925 façade.',
-      'Across the Paris hospitality market, occupancy rates in upscale hotels have remained relatively consistent in recent months, indicating stable demand rather than sharp seasonal swings. Visitors planning a stay should keep in mind that the local currency is the euro, that everyday experiences often include sampling classic Parisian foods such as macarons and crêpes, and that the public transport system — the metro, buses and suburban trains — is extensive and efficient. Spring is popular for its mild weather; October is quieter.',
+      'Paint, solvents, batteries and small electrical appliances such as a television count as household hazardous or electronic waste and cannot go in the regular bins; you bring them to a municipal recycling centre (afvalscheidingsstation). From Overvecht the nearest is Afvalscheidingsstation Tractieweg (Tractieweg 2), about 2 kilometres away, open Monday to Saturday from 08:00 to 17:00 and reachable by car and by bike. Afvalscheidingsstation Lage Weide (Sophialaan 5), about 5 kilometres away, has the same hours and is the only Utrecht location that also accepts wrapped asbestos, up to 35 square metres per visit. The Milieustraat in Nieuwegein (Ambachtsweg 26) is close as well but serves Nieuwegein residents only.',
+      'Households may make eight free visits per year with a car; after that a fee applies. Bring proof of address, because a drop-off without it is refused. Paint and solvents go in the chemical-waste container in their original packaging; batteries and lamps can also be handed in at most supermarkets; a television goes to the electronics container and is recycled free of charge under the producer scheme. Medicines are not accepted at the recycling centre — return those to a pharmacy. If you cannot get there yourself, the municipality collects bulky waste and appliances at home by appointment.',
     ],
     spec: {
-      title: 'Modern Hotels in Paris',
+      title: 'Recycling centres near Overvecht',
       blocks: [
-        { type: 'heading', text: 'Modern Hotels in Paris', sub: 'Showing 3 results' },
+        { type: 'heading', text: 'Recycling centres near Overvecht', sub: '3 locations within 6 km · 2 open now · paint and electronics accepted at all three' },
+        { type: 'metrics', items: [{ label: 'Nearest', value: '2.1 km', sub: 'Tractieweg' }, { label: 'Open now', value: '2 of 3' }, { label: 'Free visits left', value: '6', sub: 'of 8 this year' }] },
         {
           type: 'grid', min: '12rem', children: [
-            { type: 'card', media: { alt: 'Hotel Plaza Athénée, façade at dusk', label: 'Avenue Montaigne' }, badge: { text: 'Free Wi-Fi', tone: 'success' }, title: 'Hotel Plaza Athénée', desc: 'Haute-couture suites, courtyard dining, Dior spa — near the Champs-Élysées.', actions: [{ type: 'button', text: 'Book', variant: 'primary', size: 'sm', icon: 'chevR' }] },
-            { type: 'card', media: { alt: 'Four Seasons George V, illuminated windows', label: 'Avenue George V' }, badge: { text: 'Family-friendly', tone: 'info' }, title: 'Four Seasons George V', desc: 'Landmark hotel with opulent rooms, Michelin dining and a lavish spa.', actions: [{ type: 'button', text: 'Book', variant: 'primary', size: 'sm', icon: 'chevR' }] },
-            { type: 'card', media: { alt: 'Le Bristol Paris, rooftop pool', label: 'Rue du Faubourg Saint-Honoré' }, badge: { text: 'Rooftop pool', tone: 'primary' }, title: 'Le Bristol Paris', desc: 'A palace hotel with a garden courtyard, quietly updated behind its 1925 façade.', actions: [{ type: 'button', text: 'Book', variant: 'primary', size: 'sm', icon: 'chevR' }] },
+            { type: 'card', media: { alt: 'Map of Afvalscheidingsstation Tractieweg', label: 'Tractieweg 2' }, badge: { text: 'Open now · until 17:00', tone: 'success' }, title: 'Afvalscheidingsstation Tractieweg', desc: '2.1 km · Mon–Sat 08:00–17:00 · car and bike access.', actions: [{ type: 'button', text: 'Route', variant: 'primary', size: 'sm', icon: 'chevR' }, { type: 'button', text: 'Hours', variant: 'ghost', size: 'sm' }] },
+            { type: 'card', media: { alt: 'Map of Afvalscheidingsstation Lage Weide', label: 'Sophialaan 5' }, badge: { text: 'Open now · until 17:00', tone: 'success' }, title: 'Afvalscheidingsstation Lage Weide', desc: '4.8 km · Mon–Sat 08:00–17:00 · also accepts wrapped asbestos.', actions: [{ type: 'button', text: 'Route', variant: 'primary', size: 'sm', icon: 'chevR' }, { type: 'button', text: 'Hours', variant: 'ghost', size: 'sm' }] },
+            { type: 'card', media: { alt: 'Map of Milieustraat Nieuwegein', label: 'Ambachtsweg 26' }, badge: { text: 'Nieuwegein residents only', tone: 'neutral' }, title: 'Milieustraat Nieuwegein', desc: '5.9 km · Tue–Sat 09:00–16:30 · proof of a Nieuwegein address required.', actions: [{ type: 'button', text: 'Route', variant: 'ghost', size: 'sm' }] },
           ],
         },
-        { type: 'text', text: 'The occupancy rate has remained stable over the past three months, indicating consistent demand.' },
-        { type: 'heading', text: 'Highlights', level: 3 },
-        {
-          type: 'facts', items: [
-            { label: 'Currency', value: 'Euro (€)' },
-            { label: 'Local cuisine', value: 'Macarons, crêpes' },
-            { label: 'Getting around', value: 'Metro, bus, RER' },
-            { label: 'Best time to visit', value: 'April to October' },
-          ],
-        },
+        { type: 'facts', items: [
+          { label: 'Paint and solvents', value: 'Yes — in the original packaging' },
+          { label: 'Television', value: 'Yes — electronics container, free of charge' },
+          { label: 'Batteries and lamps', value: 'Yes — or at most supermarkets' },
+          { label: 'Asbestos', value: 'Lage Weide only, wrapped, max 35 m²', badge: { text: 'Lage Weide only', tone: 'warn' } },
+          { label: 'Medicines', value: 'No — return them to a pharmacy' },
+        ] },
+        { type: 'warning', text: 'Bring proof of address. A drop-off without it is refused, and the eight free visits count per household per year.' },
+        { type: 'link', text: 'Cannot get there? Book a home collection for bulky waste and appliances', href: '#' },
       ],
     },
   },
@@ -105,10 +106,10 @@ export const PRESETS: Preset[] = [
           { label: 'Case officer', value: 'Building control, Gemeente Utrecht' },
         ] },
         { type: 'activity', items: [
-          { text: 'Substantive review started', meta: 'building control + welfare committee', time: '12 Aug' },
-          { text: 'Rear elevation drawing received', time: '11 Aug' },
-          { text: 'Additional document requested', meta: 'rear elevation with dimensions', time: '5 Aug' },
-          { text: 'Application received', time: '3 Aug' },
+          { text: 'Substantive review started', meta: 'building control + welfare committee', time: '12 Aug', tone: 'info' },
+          { text: 'Rear elevation drawing received', time: '11 Aug', tone: 'success' },
+          { text: 'Additional document requested', meta: 'rear elevation with dimensions', time: '5 Aug', tone: 'warn' },
+          { text: 'Application received', time: '3 Aug', tone: 'neutral' },
         ] },
         { type: 'alert', tone: 'success', title: 'Nothing to do right now', text: 'The municipality may extend the period once, by six weeks at most — you would be told in writing. There is no indication of that today.' },
         { type: 'cluster', children: [
@@ -154,6 +155,99 @@ export const PRESETS: Preset[] = [
           { label: 'Change or cancel', value: 'With the code in your confirmation e-mail' },
         ] },
         { type: 'input', label: 'E-mail for the confirmation', kind: 'email', placeholder: 'name@example.nl', required: true, hint: 'Only used to send the confirmation and the change code.' },
+      ],
+    },
+  },
+  {
+    id: 'air',
+    name: 'Air quality today',
+    prompt: 'Is the air quality in Hoogvliet OK today? My son has asthma.',
+    prose: [
+      'DCMR Milieudienst Rijnmond, the environmental service for the Rotterdam-Rijnmond region, measures air quality hourly at stations across the area, including Hoogvliet. As of 08:00 this morning the Hoogvliet station reads 12 micrograms per cubic metre of fine particulate matter (PM2.5), 28 micrograms of nitrogen dioxide (NO₂) and 61 micrograms of ozone; on the Dutch air-quality index (1–11) that is a 4, "moderate". The WHO guideline for a 24-hour PM2.5 average is 15 micrograms, so today\'s value is under it, but nitrogen dioxide is somewhat elevated because of the morning traffic on the A15 and the wind from the industrial area to the west. Neighbouring stations show similar values: Rotterdam-Zwartewaalstraat 14 and 31, Maassluis 9 and 19, Schiedam 13 and 27.',
+      'For someone with asthma "moderate" means: normal activity is fine, but keep the reliever inhaler at hand and prefer the morning or late evening for sport, when ozone and traffic are lower; if symptoms increase, reduce exertion outdoors. DCMR expects the values to fall in the afternoon as the wind turns north. Fine particulate matter is dust smaller than 2.5 micrometres that penetrates deep into the lungs; nitrogen dioxide comes mostly from traffic and irritates the airways. You can report odour, noise or dust nuisance to the DCMR complaints line, which is staffed 24 hours a day, and you can set an alert in the app for the "unhealthy" level.',
+    ],
+    spec: {
+      title: 'Air quality in Hoogvliet',
+      blocks: [
+        { type: 'heading', eyebrow: 'DCMR Milieudienst Rijnmond', text: 'Air quality in Hoogvliet', sub: 'Measured at 08:00 · updated hourly · station Hoogvliet' },
+        { type: 'cluster', children: [
+          { type: 'badge', text: 'Live', tone: 'success', dot: true },
+          { type: 'badge', text: 'Index 4 · moderate', tone: 'warn' },
+          { type: 'badge', text: 'Wind W 3 Bft', tone: 'neutral', dot: false },
+        ] },
+        { type: 'tabs', label: 'What is measured', items: ['Air', 'Noise', 'Odour'], selected: 0 },
+        { type: 'alert', tone: 'warning', title: 'Moderate — fine for normal activity', text: 'With asthma: keep the reliever inhaler at hand and prefer the morning or late evening for sport, when ozone and traffic are lower.' },
+        { type: 'metrics', items: [
+          { label: 'PM2.5 · µg/m³', value: '12', sub: 'WHO guideline 15' },
+          { label: 'NO₂ · µg/m³', value: '28', sub: 'elevated · A15' },
+          { label: 'Ozone · µg/m³', value: '61', sub: 'falls this afternoon' },
+        ] },
+        { type: 'grid', min: '13rem', children: [
+          { type: 'card', title: 'Right now, at your station', children: [
+            { type: 'stack', children: [
+              { type: 'metric', label: 'Air quality index', value: '4', sub: 'Moderate — on a scale of 1 to 11', icon: 'chart' },
+              { type: 'text', text: 'Values are expected to fall this afternoon as the wind turns north.' },
+            ] },
+          ], actions: [{ type: 'button', text: 'Set an alert for “unhealthy”', variant: 'primary', size: 'sm', icon: 'bell' }] },
+          { type: 'card', title: 'Nearby stations', children: [
+            { type: 'list', items: [
+              { title: 'Rotterdam-Zwartewaalstraat', sub: 'PM2.5 14 · NO₂ 31', icon: 'chart', trail: '4.2 km', href: '#' },
+              { title: 'Schiedam', sub: 'PM2.5 13 · NO₂ 27', icon: 'chart', trail: '6.8 km', href: '#' },
+              { title: 'Maassluis', sub: 'PM2.5 9 · NO₂ 19', icon: 'chart', trail: '9.1 km', href: '#' },
+            ] },
+          ] },
+        ] },
+        { type: 'table', caption: 'Stations in the region, last hour', columns: ['Station', 'PM2.5', 'NO₂', 'Index'], rows: [
+          ['Hoogvliet', { num: '12' }, { num: '28' }, { badge: { text: 'Moderate', tone: 'warn' } }],
+          ['Rotterdam-Zwartewaalstraat', { num: '14' }, { num: '31' }, { badge: { text: 'Moderate', tone: 'warn' } }],
+          ['Schiedam', { num: '13' }, { num: '27' }, { badge: { text: 'Moderate', tone: 'warn' } }],
+          ['Maassluis', { num: '9' }, { num: '19' }, { badge: { text: 'Good', tone: 'success' } }],
+        ] },
+        { type: 'accordion', open: 0, items: [
+          { summary: 'What is PM2.5?', body: 'Dust smaller than 2.5 micrometres — small enough to penetrate deep into the lungs. It comes from traffic, industry, wood burning and from far away.' },
+          { summary: 'What does “moderate” mean for asthma?', body: 'Normal activity is fine. Keep the reliever inhaler at hand, and if symptoms increase, reduce exertion outdoors until the values fall.' },
+        ] },
+        { type: 'banner', strong: 'Nuisance?', text: 'Odour, noise or dust — the DCMR complaints line is staffed 24 hours a day.', link: { text: 'Report a nuisance', href: '#' } },
+      ],
+    },
+  },
+  {
+    id: 'tax',
+    name: 'Income tax return 2025',
+    prompt: 'What do I still need to do for my 2025 income tax return?',
+    prose: [
+      'Your 2025 income tax return (aangifte inkomstenbelasting) has to be filed before 1 May 2026, unless you request an extension before that date, in which case you have until 1 September. Two of the six sections are done: your personal details and your income, for which the employer statement (jaaropgaaf) was prefilled and confirmed. The section on your own home is incomplete because the WOZ value for 2025 is missing — the reference date is 1 January 2024 and the value is on the assessment your municipality sent in February, or in MijnOverheid. Deductions — healthcare costs above the threshold and gifts to registered charities — have not been started. Your partner\'s income cannot be entered until your partner logs in with their own DigiD, and the final check-and-sign step opens only when every section is complete.',
+      'Everything you enter is saved as you go, so you can stop and come back later. Most figures are prefilled from your employer, your bank and your municipality; you must check them, and you are responsible for what you file. If you file before 1 April, the Tax Administration usually sends the assessment before 1 July; a refund is normally paid within a few weeks of the assessment. If you notice a mistake after sending, you can simply file again — the latest return counts.',
+    ],
+    spec: {
+      title: 'Your 2025 income tax return',
+      blocks: [
+        { type: 'heading', eyebrow: 'Belastingdienst', text: 'Your 2025 income tax return', sub: 'File before 1 May 2026 — 2 of 6 sections done, about 25 minutes to go' },
+        { type: 'progress', label: 'Sections completed', value: 2, max: 6, unit: 'sections', hint: '4 to go — everything you enter is saved as you go' },
+        { type: 'tasks', items: [
+          { name: 'Personal details', status: { text: 'Completed', tone: 'success' }, href: '#' },
+          { name: 'Income and employer statement', status: { text: 'Completed', tone: 'success' }, hint: 'prefilled from your employer — confirmed', href: '#' },
+          { name: 'Your own home', status: { text: 'Incomplete', tone: 'warn' }, hint: 'WOZ value 2025 missing — on the municipal assessment or in MijnOverheid', href: '#' },
+          { name: 'Deductions — healthcare costs, gifts', status: { text: 'Not started', tone: 'neutral' }, href: '#' },
+          { name: 'Your partner’s income', status: { text: 'Cannot start yet' }, hint: 'your partner logs in with their own DigiD', locked: true },
+          { name: 'Check and sign', status: { text: 'Cannot start yet' }, hint: 'opens when every section is complete', locked: true },
+        ] },
+        { type: 'divider' },
+        { type: 'facts', items: [
+          { label: 'Deadline', value: '1 May 2026' },
+          { label: 'Extension', value: 'Until 1 September — request it before 1 May' },
+          { label: 'Prefilled', value: 'Employer, bank, WOZ — check them; you are responsible for what you file' },
+          { label: 'Assessment', value: 'Usually before 1 July if you file before 1 April' },
+        ] },
+        { type: 'accordion', items: [
+          { summary: 'My employer statement is missing — what now?', body: 'Ask your employer for the jaaropgaaf 2025; you can also read the totals from your December payslip. The prefilled figure is what your employer reported to us.' },
+          { summary: 'Can I change my return after sending?', body: 'Yes — file again. The latest return counts, also after the deadline.' },
+        ] },
+        { type: 'text', text: 'You can stop at any point and return with DigiD; nothing is sent until you sign.' },
+        { type: 'cluster', children: [
+          { type: 'button', text: 'Continue where you left off', variant: 'primary', href: '#', icon: 'chevR' },
+          { type: 'button', text: 'Request an extension', variant: 'ghost', href: '#' },
+        ] },
       ],
     },
   },

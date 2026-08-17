@@ -82,7 +82,8 @@ describe('generative UI — the renderer writes kit classes only', () => {
   for (const p of PRESETS.filter((x) => x.id !== 'refusals')) {
     it(`preset "${p.name}" admits clean and renders in the kit's classes`, () => {
       const a = admit(JSON.parse(JSON.stringify(p.spec)), forge)
-      expect(a.issues.filter((i) => i.level === 'refused'), `refusals in a clean preset:\n${a.issues.map((i) => `${i.path} ${i.message}`).join('\n')}`).toEqual([])
+      // clean = no refusals AND no warnings (a preset with a typo'd field or a translated type is not a fair demo)
+      expect(a.issues, `issues in a clean preset:\n${a.issues.map((i) => `${i.level} ${i.path} ${i.message}`).join('\n')}`).toEqual([])
       expect(a.count).toBeGreaterThan(2)
       const markup = html(p.spec)
       const foreign = [...classesIn(markup)].filter((c) => !shipped(c))
@@ -104,10 +105,13 @@ describe('generative UI — the renderer writes kit classes only', () => {
       const foreign = [...classesIn(html(spec))].filter((c) => !shipped(c))
       expect(foreign, `classes the kit does not ship, rendering the ${t} sample:\n  ${foreign.join('\n  ')}`).toEqual([])
     }
-    // and the presets between them exercise most of the catalogue — the page shows the vocabulary, not a corner of it
+    /* And the PRESETS between them exercise the WHOLE catalogue — Alexander:
+     * "laat zo veel mogelijk van onze blokken in actie zien". A type no
+     * public-service preset uses is a type the sandbox is not showing. */
     const seen = new Set<string>()
-    for (const p of PRESETS) for (const t of typesUsed(admit(JSON.parse(JSON.stringify(p.spec)), forge).tree)) seen.add(t)
-    expect(seen.size, 'presets should exercise at least half of the catalogue').toBeGreaterThanOrEqual(Math.ceil(GEN_TYPES.length / 2))
+    for (const p of PRESETS.filter((x) => x.id !== 'refusals')) for (const t of typesUsed(admit(JSON.parse(JSON.stringify(p.spec)), forge).tree)) seen.add(t)
+    const unseen = GEN_TYPES.filter((t) => !seen.has(t))
+    expect(unseen, `catalogue types no preset shows in action: ${unseen.join(', ')}`).toEqual([])
   })
 })
 
