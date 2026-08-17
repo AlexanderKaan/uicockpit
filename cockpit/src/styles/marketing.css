@@ -2873,6 +2873,8 @@
 .gen__status { font-size: var(--k-type-caption); color: var(--mkt-fg-muted); margin: var(--k-s-8) 0 0; display: flex; gap: var(--k-s-10); flex-wrap: wrap; align-items: center; }
 .gen__status--bad { color: #a23a1e; }
 .gen__reset, .gen__inline { font: inherit; font-size: inherit; color: var(--mkt-accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.gen__loop { font-size: var(--k-type-small); color: var(--mkt-fg-muted); line-height: 1.55; margin: 0 0 var(--k-s-10); padding: var(--k-s-10) var(--k-s-12); border: 1px dashed var(--mkt-border); border-radius: var(--k-radius-md); }
+.gen__loop strong { color: var(--mkt-fg); }
 
 .gen__sources { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-s-10); }
 .gen__sources li { padding-bottom: var(--k-s-10); border-bottom: 1px solid var(--mkt-border); }

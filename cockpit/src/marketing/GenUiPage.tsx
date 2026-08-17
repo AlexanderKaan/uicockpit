@@ -8,6 +8,7 @@ import { admit, typesUsed, GEN_CATALOG, GEN_TYPES, LIMITS, type Admitted, type I
 import { GenTree } from '../genui/render'
 import { PRESETS } from '../genui/presets'
 import { SAMPLES } from '../genui/samples'
+import { parseLoose, renderContract } from '../genui/contract'
 import MANIFEST from '../kit/manifest.json'
 // @ts-expect-error — the forge core is the cli package's zero-dep module (one source, no types on purpose)
 import { createForge } from '../../../cli/src/forge.mjs'
@@ -61,12 +62,14 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
    * call: "gewoon alles default"). The a11y matrix is where configurations are
    * swept; the sandbox is where the SPEC is tried. */
   const answerRef = useRef<HTMLDivElement>(null)
-  const [copied, setCopied] = useState<'link' | 'html' | null>(null)
-  const copy = async (what: 'link' | 'html') => {
+  const [copied, setCopied] = useState<'link' | 'html' | 'contract' | null>(null)
+  const copy = async (what: 'link' | 'html' | 'contract') => {
     try {
       const payload = what === 'link'
         ? `${location.origin}/genui?spec=${encodeSpec(JSON.stringify(spec))}`
-        : (answerRef.current?.innerHTML ?? '')
+        : what === 'contract'
+          ? renderContract()
+          : (answerRef.current?.innerHTML ?? '')
       await navigator.clipboard.writeText(payload)
       setCopied(what)
       setTimeout(() => setCopied(null), 1600)
@@ -121,10 +124,12 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
     document.getElementById('gen-editor')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }
 
+  /* Loose on purpose: what a model returns is a bare object, or a fenced
+   * block, or prose around it — the editor takes the outermost object. */
   const onEdit = (v: string) => {
     setText(v)
     try {
-      const parsed = JSON.parse(v)
+      const parsed = parseLoose(v)
       setSpec(parsed)
       setParseError(null)
     } catch (e) {
@@ -194,6 +199,12 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
         <section className="gen__work">
           <div className="gen__editorwrap">
             <h2>The spec <span className="gen__muted">— edit it; the right column follows</span></h2>
+            {/* The loop with a real model. No model behind this page — put one
+              * beside it: the contract is everything admission enforces, as
+              * text; the editor reads back whatever the model returns. */}
+            <p className="gen__loop">
+              <strong>Try it with a real model:</strong> <button type="button" className="gen__inline" onClick={() => copy('contract')}>{copied === 'contract' ? 'Contract copied' : 'copy the contract'}</button>, paste it into any assistant with your question, and paste its answer here — a fenced block or prose around the JSON is fine. What renders is what the components admit; what is refused says why.
+            </p>
             <textarea
               id="gen-editor"
               className="gen__editor"

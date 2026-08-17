@@ -101,7 +101,9 @@ export function GenNodeEl({ a }: { a: Admitted }) {
     case 'text':
       // Flowing text takes the kit's prose typography — the same recipe the
       // "without" column is set in, so the two columns differ in STRUCTURE only.
-      return <div className="prose"><p>{n.text}</p></div>
+      // A model writes a little markdown into text; the two marks that matter
+      // (**strong**, *em*) render, and a blank line breaks a paragraph.
+      return <div className="prose">{paragraphs(n.text).map((para, i) => <p key={i}>{inline(para)}</p>)}</div>
     case 'link':
       // A standalone link is prose too — the prose recipe owns link colour and
       // underline; an external one says so for a screen reader.
@@ -374,6 +376,23 @@ export function GenNodeEl({ a }: { a: Admitted }) {
   return null
 }
 
+/* The two inline marks a model reaches for — nothing else: no headings, no
+ * lists, no links inside text (a link is a `link` node, a list a `list`). */
+const paragraphs = (t: string) => t.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
+function inline(t: string): ReactNode[] {
+  const out: ReactNode[] = []
+  const re = /\*\*([^*]+)\*\*|(?<![\w*])\*([^*\n]+)\*(?![\w*])|(?<![\w])_([^_\n]+)_(?![\w])/g
+  let last = 0, m: RegExpExecArray | null, k = 0
+  while ((m = re.exec(t))) {
+    if (m.index > last) out.push(t.slice(last, m.index))
+    if (m[1] !== undefined) out.push(<strong key={k++}>{m[1]}</strong>)
+    else out.push(<em key={k++}>{m[2] ?? m[3]}</em>)
+    last = m.index + m[0].length
+  }
+  if (last < t.length) out.push(t.slice(last))
+  return out
+}
+
 function FactRow({ label, value, href, badge }: { label: string; value: string; href?: string; badge?: BadgeSpec }) {
   return (
     <>
@@ -383,9 +402,4 @@ function FactRow({ label, value, href, badge }: { label: string; value: string; 
   )
 }
 
-/** For the CLI/MCP later, and for the tests now: the icon names the catalogue
- *  may use are the kit's own concepts, so no renderer can ask for an icon the
- *  adapters do not ship. */
-export const GEN_ICONS: IconName[] = ['check', 'chevR', 'info', 'cal', 'store', 'home', 'chart', 'card', 'feed', 'chat', 'spark', 'bell', 'cog', 'search', 'file', 'grid', 'plus', 'edit', 'upload', 'refresh']
-
-export type { GenNode, ReactNode }
+export type { GenNode, ReactNode, IconName }

@@ -23,8 +23,10 @@
 
 import { SAMPLES } from './samples'
 
-export type Tone = 'neutral' | 'primary' | 'success' | 'warn' | 'danger' | 'info'
-export type IconName = 'check' | 'chevR' | 'info' | 'cal' | 'store' | 'home' | 'chart' | 'card' | 'feed' | 'chat' | 'spark' | 'bell' | 'cog' | 'search' | 'file' | 'grid' | 'plus' | 'edit' | 'upload' | 'refresh'
+export const TONES = ['neutral', 'primary', 'success', 'warn', 'danger', 'info'] as const
+export type Tone = (typeof TONES)[number]
+export const ICONS = ['check', 'chevR', 'info', 'cal', 'store', 'home', 'chart', 'card', 'feed', 'chat', 'spark', 'bell', 'cog', 'search', 'file', 'grid', 'plus', 'edit', 'upload', 'refresh'] as const
+export type IconName = (typeof ICONS)[number]
 
 export type Badge = { text: string; tone?: Tone; dot?: boolean }
 export type Cell = string | { badge: Badge } | { num: string }
@@ -160,7 +162,7 @@ export type Resolver = { resolve: (text: string) => Verdict }
  *  the answer is a page, and a page is not what an assistant should paint. */
 export const LIMITS = { depth: 6, items: 12, blocks: 24, text: 600 }
 
-const REQUIRED: Partial<Record<GenType, string[]>> = {
+export const REQUIRED: Partial<Record<GenType, string[]>> = {
   heading: ['text'], text: ['text'], link: ['text', 'href'], stack: ['children'], strip: ['children'], figure: ['alt'], cluster: ['children'], grid: ['children'],
   button: ['text'], badge: ['text'], metric: ['label', 'value'], metrics: ['items'], facts: ['items'], list: ['items'],
   table: ['columns', 'rows'], alert: ['tone', 'text'], banner: ['text'], warning: ['text'], steps: ['items'], tasks: ['items'],

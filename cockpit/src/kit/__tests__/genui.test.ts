@@ -9,6 +9,7 @@ import { admit, typesUsed, GEN_CATALOG, GEN_TYPES, LIMITS } from '../../genui/sp
 import { GenTree } from '../../genui/render'
 import { PRESETS } from '../../genui/presets'
 import { SAMPLES } from '../../genui/samples'
+import { parseLoose, renderContract } from '../../genui/contract'
 import MANIFEST from '../manifest.json'
 // @ts-expect-error — the kit model is the single .mjs parser the gates read
 import { parseKit } from '../../../scripts/lib/kit-model.mjs'
@@ -112,6 +113,37 @@ describe('generative UI — the renderer writes kit classes only', () => {
     for (const p of PRESETS.filter((x) => x.id !== 'refusals')) for (const t of typesUsed(admit(JSON.parse(JSON.stringify(p.spec)), forge).tree)) seen.add(t)
     const unseen = GEN_TYPES.filter((t) => !seen.has(t))
     expect(unseen, `catalogue types no preset shows in action: ${unseen.join(', ')}`).toEqual([])
+  })
+})
+
+describe('generative UI — the contract a model writes against', () => {
+  it('names every type, its required fields, the budgets and the enums — and every example it shows admits clean', () => {
+    const c = renderContract()
+    for (const t of GEN_TYPES) expect(c, `contract lacks type ${t}`).toContain(`### \`${t}\``)
+    expect(c).toContain(`At most ${LIMITS.blocks} components`)
+    expect(c).toMatch(/Tones: `neutral`/)
+    // every fenced example in the contract is a node (or the envelope) that admission takes without a refusal or a warning
+    const blocks = [...c.matchAll(/```json\n([\s\S]*?)```/g)].map((m) => JSON.parse(m[1]!))
+    expect(blocks.length).toBe(GEN_TYPES.length + 1)
+    for (const b of blocks.slice(1)) {
+      const a = admit({ blocks: [b] }, forge)
+      expect(a.issues, `contract example for ${(b as { type: string }).type} does not admit clean:\n${a.issues.map((i) => i.message).join('\n')}`).toEqual([])
+    }
+  })
+
+  it('reads what a model returns: bare JSON, a fenced block, prose around the object', () => {
+    const spec = { blocks: [{ type: 'text', text: 'hi' }] }
+    expect(parseLoose(JSON.stringify(spec))).toEqual(spec)
+    expect(parseLoose('Here you go:\n```json\n' + JSON.stringify(spec, null, 2) + '\n```\nHope this helps!')).toEqual(spec)
+    expect(parseLoose('Sure — ' + JSON.stringify(spec) + ' — let me know.')).toEqual(spec)
+    expect(() => parseLoose('no json here')).toThrow()
+  })
+
+  it('text renders the two inline marks a model reaches for, and breaks paragraphs on a blank line', () => {
+    const markup = html({ blocks: [{ type: 'text', text: 'Bring **proof of address** and a *recent* photo.\n\nSecond paragraph.' }] })
+    expect(markup).toContain('<strong>proof of address</strong>')
+    expect(markup).toContain('<em>recent</em>')
+    expect((markup.match(/<p>/g) ?? []).length).toBe(2)
   })
 })
 
