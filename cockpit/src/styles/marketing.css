@@ -2857,15 +2857,7 @@
 .gen__chat { border: 1px solid var(--mkt-border); border-radius: var(--k-radius-lg); background: var(--k-surface-sunken, #f3f4f6); padding: var(--k-s-16); display: grid; gap: var(--k-s-12); box-shadow: var(--k-shadow-md); }
 .gen__prompt { font-size: var(--k-type-small); color: var(--mkt-fg-muted); padding: var(--k-s-10) var(--k-s-14); border-radius: var(--k-radius-md); background: color-mix(in oklab, var(--mkt-fg) 6%, transparent); justify-self: end; max-width: 80%; }
 .gen__answer { border-radius: var(--k-radius-md); background: var(--k-bg, #fff); color: var(--k-fg); padding: var(--k-s-20); min-height: 12rem; overflow: auto; max-height: 44rem; }
-.gen__answer--dark { color-scheme: dark; }
-/* mode × density under the right pane — small segmented groups, page chrome */
-.gen__kit { display: flex; flex-wrap: wrap; gap: var(--k-s-8); justify-content: flex-end; margin: 0; }
-.gen__seg { display: inline-flex; border: 1px solid var(--mkt-border); border-radius: 999px; padding: 2px; background: var(--mkt-bg, #fff); }
-.gen__seg-btn { font: inherit; font-size: var(--k-type-eyebrow); letter-spacing: .04em; text-transform: uppercase; color: var(--mkt-fg-muted); background: transparent; border: 0; border-radius: 999px; padding: var(--k-s-4) var(--k-s-10); cursor: pointer; }
-.gen__seg-btn[aria-pressed="true"] { background: var(--mkt-fg); color: var(--mkt-bg, #fff); }
-.gen__seg-btn:focus-visible { outline: 2px solid var(--mkt-accent); outline-offset: 1px; }
-.gen__swatch { display: inline-block; width: 0.6em; height: 0.6em; border-radius: 50%; margin-right: 0.35em; vertical-align: 0; box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset; }
-@media (max-width: 860px) { .gen__kit { justify-content: flex-start; } }
+
 .gen__answer.cockpit-preview { min-height: 12rem; box-shadow: none; }
 .gen__answer .prose h2 { margin-top: 0; }
 /* a chat surface is narrow: cards in the grid keep to a sane minimum */

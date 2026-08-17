@@ -4,8 +4,6 @@ import { MktFooter } from './MktFooter'
 import { IconProvider } from '../icons/Icon'
 import { buildTokens } from '../tokens/buildTokens'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
-import type { Config, Mode, Scale } from '../tokens/types'
-import { useSavedKits } from '../state/savedKits'
 import { admit, typesUsed, GEN_CATALOG, GEN_TYPES, LIMITS, type Admitted, type Issue } from '../genui/spec'
 import { GenTree } from '../genui/render'
 import { PRESETS } from '../genui/presets'
@@ -49,7 +47,6 @@ const decodeSpec = (b64: string) => {
   const bin = atob(s + '='.repeat((4 - (s.length % 4)) % 4))
   return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)))
 }
-const SCALES: { id: Scale; label: string }[] = [{ id: 'compact', label: 'Compact' }, { id: 'default', label: 'Default' }, { id: 'comfortable', label: 'Comfortable' }]
 
 export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
   const forge = useMemo(() => createForge(FORGE_DATA), [])
@@ -59,27 +56,16 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
   const [text, setText] = useState(() => JSON.stringify(PRESETS[0]!.spec, null, 2))
   const [parseError, setParseError] = useState<string | null>(null)
   const [spec, setSpec] = useState<unknown>(PRESETS[0]!.spec)
-  /* The kit the answer renders on. A generative answer has to hold up on every
-   * configuration a consumer may run — the sandbox lets you flip mode and
-   * density on the RIGHT pane and see whether it does. Same buildTokens the
-   * a11y matrix drives; the left pane stays on the default so the comparison
-   * is against what an assistant does today. */
-  const [kitMode, setKitMode] = useState<Mode>('light')
-  const [kitScale, setKitScale] = useState<Scale>('default')
-  /* And YOUR kit: the three slots the configurator saves in this browser. A
-   * municipality's own brand under a generative answer is the real test — the
-   * default kit is ours, theirs is what would ship. Absent slots → no group. */
-  const saved = useSavedKits()
-  const savedSlots = saved.slots.filter((sl) => sl.cfg)
-  const [kitBase, setKitBase] = useState<'default' | number>('default')
-  const baseCfg: Config = useMemo(() => (kitBase === 'default' ? DEFAULT_CONFIG : (savedSlots.find((sl) => sl.id === kitBase)?.cfg ?? DEFAULT_CONFIG)), [kitBase, savedSlots])
-  const answerTokens = useMemo(() => buildTokens({ ...baseCfg, mode: kitMode, scale: kitScale }).vars as CSSProperties, [baseCfg, kitMode, kitScale])
+  /* The answer renders on the DEFAULT kit, as the rest of the page does — no
+   * mode/density/kit switches here (tried in P·2–P·4, removed on Alexander's
+   * call: "gewoon alles default"). The a11y matrix is where configurations are
+   * swept; the sandbox is where the SPEC is tried. */
   const answerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState<'link' | 'html' | null>(null)
   const copy = async (what: 'link' | 'html') => {
     try {
       const payload = what === 'link'
-        ? `${location.origin}/genui?spec=${encodeSpec(JSON.stringify(spec))}${kitMode !== 'light' ? `&mode=${kitMode}` : ''}${kitScale !== 'default' ? `&scale=${kitScale}` : ''}`
+        ? `${location.origin}/genui?spec=${encodeSpec(JSON.stringify(spec))}`
         : (answerRef.current?.innerHTML ?? '')
       await navigator.clipboard.writeText(payload)
       setCopied(what)
@@ -104,9 +90,6 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
   }
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
-    const mode = q.get('mode'), scale = q.get('scale')
-    if (mode === 'dark' || mode === 'light') setKitMode(mode)
-    if (scale && SCALES.some((x) => x.id === scale)) setKitScale(scale as Scale)
     const shared = q.get('spec')
     if (shared) {
       try {
@@ -196,30 +179,8 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
             {/* The kit under the answer: mode × density. What holds up here holds
               * up on a consumer's configuration; what breaks is a finding. */}
             <div className="gen__chat">
-              <div className="gen__kit" aria-label="The kit the answer renders on">
-                {savedSlots.length > 0 && (
-                  <div className="gen__seg" role="group" aria-label="Kit">
-                    <button type="button" className="gen__seg-btn" aria-pressed={kitBase === 'default'} onClick={() => setKitBase('default')}>Default kit</button>
-                    {savedSlots.map((sl, i) => (
-                      <button key={sl.id} type="button" className="gen__seg-btn" aria-pressed={kitBase === sl.id} onClick={() => setKitBase(sl.id)} title="A kit you saved in the configurator">
-                        <span className="gen__swatch" style={{ background: sl.swatches?.[0] }} aria-hidden="true" /> Saved {i + 1}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <div className="gen__seg" role="group" aria-label="Mode">
-                  {(['light', 'dark'] as Mode[]).map((m) => (
-                    <button key={m} type="button" className="gen__seg-btn" aria-pressed={kitMode === m} onClick={() => setKitMode(m)}>{m === 'light' ? 'Light' : 'Dark'}</button>
-                  ))}
-                </div>
-                <div className="gen__seg" role="group" aria-label="Density">
-                  {SCALES.map((sc) => (
-                    <button key={sc.id} type="button" className="gen__seg-btn" aria-pressed={kitScale === sc.id} onClick={() => setKitScale(sc.id)}>{sc.label}</button>
-                  ))}
-                </div>
-              </div>
               <div className="gen__prompt">{preset.prompt}</div>
-              <div className={`gen__answer cockpit-preview${kitMode === 'dark' ? ' gen__answer--dark' : ''}`} style={answerTokens} ref={answerRef}>
+              <div className="gen__answer cockpit-preview" ref={answerRef}>
                 <IconProvider set={DEFAULT_CONFIG.iconSet}>
                   <div className="l-stack">
                     <GenTree tree={admitted.tree} />
