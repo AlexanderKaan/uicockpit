@@ -19,6 +19,10 @@ const ExportModal = lazy(() =>
 interface CockpitAppProps {
   /** Called when user clicks the brand — sends them back to /. */
   onHome?: () => void
+  /** Client-side navigate — the topbar renders the site's nav (SITE_NAV) so
+   *  every tool is one click from every other; without it the configurator's
+   *  only way out was its logo. */
+  onNavigate?: (to: string) => void
   /** Back to the full report — the evidence behind the audit view. */
   onAudit?: () => void
 }
@@ -29,7 +33,7 @@ interface CockpitAppProps {
  *  Layout: a full-width top bar (brand · view switcher · actions) runs across
  *  the whole app; below it the stage fills the width and the control menu
  *  *floats* over the top-left (absolute), never reserving a column. */
-export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
+export function CockpitApp({ onHome, onAudit, onNavigate }: CockpitAppProps = {}) {
   const { cfg, tokens, dispatch, undo, redo, canUndo, canRedo } = useConfig()
   // Default closed on phones — there the panel becomes an overlay drawer, so the
   // stage gets the full width; open inline as a column on desktop.
@@ -242,6 +246,7 @@ export function CockpitApp({ onHome, onAudit }: CockpitAppProps = {}) {
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen((v) => !v)}
         onHome={onHome}
+        onNavigate={onNavigate}
         onUndo={undo}
         onRedo={redo}
         canUndo={canUndo}

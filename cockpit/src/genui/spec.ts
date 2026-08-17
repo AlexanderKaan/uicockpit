@@ -48,7 +48,7 @@ export type GenNode =
   | { type: 'stepper'; steps: string[]; current: number; label?: string }
   | { type: 'accordion'; items: { summary: string; body: string }[]; open?: number }
   | { type: 'tabs'; items: string[]; selected?: number; label?: string }
-  | { type: 'activity'; items: { text: string; meta?: string; time?: string }[] }
+  | { type: 'activity'; items: { text: string; meta?: string; time?: string; tone?: Tone }[] }
   | { type: 'requirements'; items: { text: string; met: boolean }[] }
   | { type: 'choice'; label: string; options: { title: string; desc?: string; meta?: string }[]; selected?: number }
   | { type: 'input'; label: string; kind?: 'text' | 'email' | 'date' | 'number' | 'tel' | 'search'; hint?: string; placeholder?: string; required?: boolean }

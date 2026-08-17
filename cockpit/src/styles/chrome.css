@@ -162,6 +162,16 @@
   .topbar .kits-pop-wrap,
   .topbar .topbar__icon-btn--hist,
   .topbar .topbar__btn--with-icon { display: none; }
+  /* The site nav's row needs the room; below it the row folds into the menu
+   * (same list), and the wordmark still leads home. */
+  .topbar .topbar__nav { display: none; }
+  .topbar .topbar__navmenu { display: block; }
+}
+/* With an audit loaded the "Your app | Full catalogue" switch joins the left
+ * group, and on a laptop the row and the switch cannot both fit: fold early. */
+@media (max-width: 1280px) {
+  .topbar:has(.modesw) .topbar__nav { display: none; }
+  .topbar:has(.modesw) .topbar__navmenu { display: block; }
 }
 
 /* Desktop/base: the drag grabber is a phone-only affordance. */
@@ -236,6 +246,10 @@
      drop the redundant control-toggle (Customize in the bottom bar opens the sheet);
      and collapse the wide wordmark to the circular mark (it overran its 1fr track). */
   .topbar .topbar__icon-btn--menu { display: none; }
+  /* The folded site nav keeps its chevron only: with the audit's mode switch in
+   * the row, the word "Configure" pushed Use kit off the phone. */
+  .topbar .topbar__navmenu-label { display: none; }
+  .topbar .topbar__navmenu-btn { padding-inline: var(--k-s-8); }
   .topbar .view-toggle__lbl { display: none; }
   .topbar .view-toggle__btn { padding: 6px 10px; }
   .topbar .topbar__wordmark--full { display: none; }

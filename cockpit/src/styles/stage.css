@@ -9,7 +9,11 @@
 
 .topbar {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  /* auto · 1fr · auto (was 1fr auto 1fr): the left group now carries the site
+     nav after the brand and must size to its content; the middle track takes
+     the slack. Symmetry mattered when a view switch sat in the centre; it is
+     empty now. */
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   padding: 10px 18px;
   background: var(--app-surface);
@@ -73,6 +77,25 @@
   align-items: center;
   gap: 10px;
 }
+/* The site's nav in the topbar centre — SITE_NAV, the same list as the
+ * marketing bar, so the four tools read as one group everywhere. Styled as the
+ * doc-link (the topbar's text-link idiom), sized to the shared control height. */
+.topbar__nav { display: inline-flex; align-items: center; gap: var(--k-s-2); }
+.topbar__nav-link {
+  display: inline-flex; align-items: center; height: var(--topbar-ctrl-h);
+  padding: 0 var(--k-s-10); font-size: var(--k-type-small); font-weight: 500; color: var(--app-fg-muted);
+  border-radius: var(--k-radius-sm); text-decoration: none; white-space: nowrap;
+  transition: background var(--app-dur) var(--app-ease), color var(--app-dur) var(--app-ease);
+}
+.topbar__nav-link:hover { color: var(--app-fg); background: var(--app-hover); }
+.topbar__nav-link[aria-current="page"] { color: var(--app-fg); font-weight: 600; }
+.topbar__nav-link--first { margin-right: var(--k-s-6); padding-right: var(--k-s-12); border-right: 1px solid var(--app-border); border-radius: var(--k-radius-sm) 0 0 var(--k-radius-sm); }
+/* The folded form: one button carrying the current page, a .menu with the list. */
+.topbar__navmenu { position: relative; display: none; }
+.topbar__navmenu-btn { height: var(--topbar-ctrl-h); font-size: var(--k-type-small); gap: var(--k-s-4); }
+/* z like .kits-pop: the topbar's overlays stack above the shell (the panel is 40, its open rows 50). */
+.topbar__navmenu-pop { position: absolute; top: calc(100% + var(--k-s-6)); left: 0; z-index: 1100; min-width: 12rem; }
+.menu__item--current { font-weight: 600; }
 
 .viewtoggle {
   display: inline-flex;

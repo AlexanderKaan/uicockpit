@@ -16,6 +16,9 @@ import type { Admitted, Badge as BadgeSpec, Cell, GenNode, IconName, Tone } from
  */
 
 const toneClass = (t: Tone | undefined, prefix: string) => (t && t !== 'primary' ? `${prefix}--${t}` : t === 'primary' ? `${prefix}--primary` : `${prefix}--neutral`)
+/* The activity feed's dot colour is the consumer's to set (the recipe says so),
+ * through a status TOKEN — never a literal. */
+const TONE_TOKEN: Record<Tone, string> = { neutral: 'var(--k-fg-faint)', primary: 'var(--k-primary)', success: 'var(--k-success)', warn: 'var(--k-warning)', danger: 'var(--k-danger)', info: 'var(--k-info)' }
 
 function BadgeEl({ b }: { b: BadgeSpec }) {
   return (
@@ -291,7 +294,7 @@ export function GenNodeEl({ a }: { a: Admitted }) {
         <ul className="activity">
           {n.items.map((it, i) => (
             <li key={i} className="activity__item">
-              <span className="activity__dot" aria-hidden="true" />
+              <span className="activity__dot" style={{ background: TONE_TOKEN[it.tone ?? 'neutral'] }} aria-hidden="true" />
               <span>{it.text}{it.meta && <> <span className="activity__meta">{it.meta}</span></>}</span>
               {it.time && <time className="activity__meta">{it.time}</time>}
             </li>
@@ -314,7 +317,8 @@ export function GenNodeEl({ a }: { a: Admitted }) {
         <div className="radio-cards" role="radiogroup" aria-label={n.label}>
           {n.options.map((o, i) => (
             <label key={i} className={`radio-card${i === n.selected ? ' radio-card--on' : ''}`}>
-              <span className="radio" />
+              {/* the control is the platform's radio, as the kit's own specimen writes it */}
+              <span className="radio"><input type="radio" name={`genui-${a.path.replace(/[^a-z0-9]+/gi, '-')}`} checked={i === n.selected} readOnly /></span>
               <span className="radio-card__body">
                 <span className="radio-card__title">{o.title}</span>
                 {o.desc && <span className="radio-card__desc">{o.desc}</span>}

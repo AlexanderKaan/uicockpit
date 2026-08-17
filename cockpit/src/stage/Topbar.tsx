@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Check, Code, Heart, Moon, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
+import { Check, ChevronDown, Code, Heart, Moon, PanelLeft, Redo2, ShieldCheck, Sun, Undo2 } from 'lucide-react'
 import type { Config, Tokens } from '../tokens/types'
 import { auditContrast } from '../tokens/extras'
 import { SavedKits } from '../panel/SavedKits'
 import { useSavedKits } from '../state/savedKits'
 import { Wordmark } from '../Wordmark'
+import { SITE_NAV } from '../marketing/siteNav'
+import { ping } from '../analytics/beacon'
 
 interface TopbarProps {
   mode: 'light' | 'dark'
@@ -19,6 +21,10 @@ interface TopbarProps {
   onToggleMenu: () => void
   /** Brand click → back to the marketing home. */
   onHome?: () => void
+  /** The site's nav, in the topbar's centre — the same SITE_NAV the marketing
+   *  nav renders, so the four tools are in line and every one is a click away
+   *  from inside the configurator. Absent (no router, e.g. tests) → no row. */
+  onNavigate?: (to: string) => void
   /** Present only when an audit is loaded — drives the stage's two modes. */
   stageMode?: 'catalogue' | 'audit'
   onStageMode?: (m: 'catalogue' | 'audit') => void
@@ -29,8 +35,9 @@ interface TopbarProps {
   canRedo: boolean
 }
 
-export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
+export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, tokens, cfg, onLoadKit, menuOpen, onToggleMenu, onHome, onNavigate, onUndo, onRedo, canUndo, canRedo }: TopbarProps) {
   const [kitsOpen, setKitsOpen] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
   // Shared saved-kits instance — the heart's count badge and the dropdown grid
   // read the same state, so saving a kit lights the heart immediately.
   const kits = useSavedKits()
@@ -64,6 +71,53 @@ export function Topbar({ stageMode, onStageMode, mode, onToggleMode, onExport, t
             <Wordmark height={22} className="topbar__wordmark topbar__wordmark--full" />
             <Wordmark height={24} markOnly className="topbar__wordmark topbar__wordmark--mark" />
           </span>
+        )}
+        {/* The site's nav, in line with the marketing bar: Components · the four
+         *  services · Docs — SITE_NAV, right after the brand (site chrome first,
+         *  the instrument's controls after it). "Configure" is this page. When
+         *  the row cannot fit (narrow screens, or the audit's mode switch on a
+         *  laptop) it folds into a menu with the same list; the wordmark leads
+         *  home either way. */}
+        {onNavigate && (
+          <>
+            <nav className="topbar__nav" aria-label="Site">
+              {SITE_NAV.map((n) => (
+                <a
+                  key={n.id}
+                  href={n.to}
+                  className={`topbar__nav-link${n.group === 'ground' ? ' topbar__nav-link--first' : ''}`}
+                  {...(n.id === 'configure' ? { 'aria-current': 'page' as const } : {})}
+                  onClick={(e) => { e.preventDefault(); if (n.id !== 'configure') { if (n.group === 'service') ping('door', n.id); onNavigate(n.to) } }}
+                >{n.label}</a>
+              ))}
+            </nav>
+            <div className="topbar__navmenu">
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm topbar__navmenu-btn"
+                onClick={() => setNavOpen((v) => !v)}
+                aria-expanded={navOpen}
+                aria-haspopup="menu"
+                aria-label="Site navigation"
+              >
+                <span className="topbar__navmenu-label">Configure</span> <ChevronDown size={13} strokeWidth={2.25} aria-hidden="true" />
+              </button>
+              {navOpen && (
+                <div className="menu topbar__navmenu-pop" role="menu" aria-label="Site" onMouseLeave={() => setNavOpen(false)}>
+                  {SITE_NAV.map((n) => (
+                    <a
+                      key={n.id}
+                      href={n.to}
+                      role="menuitem"
+                      className={`menu__item${n.id === 'configure' ? ' menu__item--current' : ''}`}
+                      {...(n.id === 'configure' ? { 'aria-current': 'page' as const } : {})}
+                      onClick={(e) => { e.preventDefault(); setNavOpen(false); if (n.id !== 'configure') { if (n.group === 'service') ping('door', n.id); onNavigate(n.to) } }}
+                    >{n.label}</a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
         {/* Toggle the floating control menu. */}
         <button

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { MktNav } from './MktNav'
 import { MktFooter } from './MktFooter'
 import { IconProvider } from '../icons/Icon'
 import { buildTokens } from '../tokens/buildTokens'
 import { DEFAULT_CONFIG } from '../tokens/defaults'
+import type { Mode, Scale } from '../tokens/types'
 import { admit, typesUsed, GEN_CATALOG, GEN_TYPES, LIMITS, type Admitted, type Issue } from '../genui/spec'
 import { GenTree } from '../genui/render'
 import { PRESETS } from '../genui/presets'
@@ -38,6 +39,16 @@ const LAYER: Record<number, string> = { 1: 'L1 · HTML', 2: 'L2 · APG', 3: 'L3 
 /* The two recipes that are the kit's grammar rather than components — see genui.test.ts. */
 const GRAMMAR = new Set(['layout-primitives', 'composition'])
 
+/* A shared spec travels in the URL: ?spec=<base64url of the JSON>. Presets
+ * travel as ?p=<id>. Unicode-safe both ways. */
+const encodeSpec = (json: string) => btoa(String.fromCharCode(...new TextEncoder().encode(json))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+const decodeSpec = (b64: string) => {
+  const s = b64.replace(/-/g, '+').replace(/_/g, '/')
+  const bin = atob(s + '='.repeat((4 - (s.length % 4)) % 4))
+  return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)))
+}
+const SCALES: { id: Scale; label: string }[] = [{ id: 'compact', label: 'Compact' }, { id: 'default', label: 'Default' }, { id: 'comfortable', label: 'Comfortable' }]
+
 export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
   const forge = useMemo(() => createForge(FORGE_DATA), [])
   const tokens = useMemo(() => buildTokens(DEFAULT_CONFIG).vars as CSSProperties, [])
@@ -46,6 +57,26 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
   const [text, setText] = useState(() => JSON.stringify(PRESETS[0]!.spec, null, 2))
   const [parseError, setParseError] = useState<string | null>(null)
   const [spec, setSpec] = useState<unknown>(PRESETS[0]!.spec)
+  /* The kit the answer renders on. A generative answer has to hold up on every
+   * configuration a consumer may run — the sandbox lets you flip mode and
+   * density on the RIGHT pane and see whether it does. Same buildTokens the
+   * a11y matrix drives; the left pane stays on the default so the comparison
+   * is against what an assistant does today. */
+  const [kitMode, setKitMode] = useState<Mode>('light')
+  const [kitScale, setKitScale] = useState<Scale>('default')
+  const answerTokens = useMemo(() => buildTokens({ ...DEFAULT_CONFIG, mode: kitMode, scale: kitScale }).vars as CSSProperties, [kitMode, kitScale])
+  const answerRef = useRef<HTMLDivElement>(null)
+  const [copied, setCopied] = useState<'link' | 'html' | null>(null)
+  const copy = async (what: 'link' | 'html') => {
+    try {
+      const payload = what === 'link'
+        ? `${location.origin}/genui?spec=${encodeSpec(JSON.stringify(spec))}`
+        : (answerRef.current?.innerHTML ?? '')
+      await navigator.clipboard.writeText(payload)
+      setCopied(what)
+      setTimeout(() => setCopied(null), 1600)
+    } catch { /* clipboard refused — nothing to say */ }
+  }
 
   useEffect(() => {
     const prev = document.title
@@ -63,7 +94,19 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
     if (typeof history !== 'undefined') history.replaceState({}, '', `/genui?p=${id}`)
   }
   useEffect(() => {
-    const p = new URLSearchParams(window.location.search).get('p')
+    const q = new URLSearchParams(window.location.search)
+    const shared = q.get('spec')
+    if (shared) {
+      try {
+        const json = decodeSpec(shared)
+        const parsed = JSON.parse(json)
+        setText(JSON.stringify(parsed, null, 2))
+        setSpec(parsed)
+        setParseError(null)
+        return
+      } catch { /* a bad share falls through to the preset */ }
+    }
+    const p = q.get('p')
     if (p && PRESETS.some((x) => x.id === p)) choose(p)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -88,7 +131,7 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
 
   return (
     <div className="mkt">
-      <MktNav navigate={navigate} />
+      <MktNav navigate={navigate} current="genui" />
       <main className="mkt__container gen" style={tokens}>
         <header className="gen__head">
           <p className="gen__eyebrow">A service on the components · Generative UI · <span className="gen__tag">sandbox</span></p>
@@ -102,9 +145,9 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
           </p>
         </header>
 
-        <div className="gen__presets" role="tablist" aria-label="Examples">
+        <div className="gen__presets" aria-label="Examples">
           {PRESETS.map((p) => (
-            <button key={p.id} type="button" role="tab" aria-selected={p.id === presetId} className={`gen__chip${p.id === presetId ? ' gen__chip--on' : ''}`} onClick={() => choose(p.id)}>{p.name}</button>
+            <button key={p.id} type="button" aria-pressed={p.id === presetId} className={`gen__chip${p.id === presetId ? ' gen__chip--on' : ''}`} onClick={() => choose(p.id)}>{p.name}</button>
           ))}
         </div>
 
@@ -123,9 +166,23 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
           </div>
           <div className="gen__pane">
             <span className="gen__pane-tag gen__pane-tag--with">With the components</span>
+            {/* The kit under the answer: mode × density. What holds up here holds
+              * up on a consumer's configuration; what breaks is a finding. */}
             <div className="gen__chat">
+              <div className="gen__kit" aria-label="The kit the answer renders on">
+                <div className="gen__seg" role="group" aria-label="Mode">
+                  {(['light', 'dark'] as Mode[]).map((m) => (
+                    <button key={m} type="button" className="gen__seg-btn" aria-pressed={kitMode === m} onClick={() => setKitMode(m)}>{m === 'light' ? 'Light' : 'Dark'}</button>
+                  ))}
+                </div>
+                <div className="gen__seg" role="group" aria-label="Density">
+                  {SCALES.map((sc) => (
+                    <button key={sc.id} type="button" className="gen__seg-btn" aria-pressed={kitScale === sc.id} onClick={() => setKitScale(sc.id)}>{sc.label}</button>
+                  ))}
+                </div>
+              </div>
               <div className="gen__prompt">{preset.prompt}</div>
-              <div className="gen__answer cockpit-preview" aria-live="polite">
+              <div className={`gen__answer cockpit-preview${kitMode === 'dark' ? ' gen__answer--dark' : ''}`} style={answerTokens} ref={answerRef}>
                 <IconProvider set={DEFAULT_CONFIG.iconSet}>
                   <div className="l-stack">
                     <GenTree tree={admitted.tree} />
@@ -147,9 +204,11 @@ export function GenUiPage({ navigate }: { navigate: (to: string) => void }) {
               aria-label="The UI spec, as JSON"
               aria-invalid={parseError ? true : undefined}
             />
-            <p className={`gen__status${parseError ? ' gen__status--bad' : ''}`}>
+            <p className={`gen__status${parseError ? ' gen__status--bad' : ''}`} role="status">
               {parseError ? `Not valid JSON — the last good spec is shown. ${parseError}` : `${admitted.count} component${admitted.count === 1 ? '' : 's'} admitted · ${refused.length} refused · ${warnings.length} warning${warnings.length === 1 ? '' : 's'}`}
               {' '}<button type="button" className="gen__reset" onClick={() => choose(presetId)}>Reset to the preset</button>
+              {' '}<button type="button" className="gen__reset" onClick={() => copy('link')}>{copied === 'link' ? 'Link copied' : 'Copy a link to this spec'}</button>
+              {' '}<button type="button" className="gen__reset" onClick={() => copy('html')}>{copied === 'html' ? 'HTML copied' : 'Copy the rendered HTML'}</button>
             </p>
           </div>
 

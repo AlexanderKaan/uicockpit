@@ -3,6 +3,7 @@ import { ChevronDown, Menu, X } from 'lucide-react'
 import { Wordmark } from '../Wordmark'
 import { ping } from '../analytics/beacon'
 import { MCP_VERSION } from './versions'
+import { SITE_NAV, type SiteNavId } from './siteNav'
 
 /** The published npm package version (`uicockpit` CLI) — the public number. */
 // Derived from cli/package.json at build time (see vite.config.ts) — auto-syncs
@@ -23,7 +24,7 @@ interface MktNavProps {
   /** Client-side navigate (App's pushState router). */
   navigate: (to: string) => void
   /** Which page we're on — drives aria-current on the matching destination. */
-  current?: 'manifesto' | 'docs' | 'audit' | 'components' | 'changelog' | 'forge' | 'configure'
+  current?: SiteNavId | 'manifesto' | 'changelog'
 }
 
 /**
@@ -56,17 +57,23 @@ export function MktNav({ navigate, current }: MktNavProps) {
     setMenu(false)
     navigate(to)
   }
-  const door = (to: string, kind: 'audit' | 'configure') => (e?: React.MouseEvent) => {
+  /* One handler for every destination in SITE_NAV. The services are DOORS
+   * (counted); from inside the audit, "Configure" is the bridge, not a door —
+   * counting it as a door would undercount the crossing we want to measure. */
+  const goTo = (item: (typeof SITE_NAV)[number]) => (e?: React.MouseEvent) => {
     e?.preventDefault()
     setMenu(false)
-    // From inside the audit, "Build my UI kit" IS the bridge, not a door —
-    // counting it as a door would undercount the crossing we want to measure.
-    if (kind === 'configure' && current === 'audit') ping('audit', 'bridge')
-    else ping('door', kind)
-    navigate(to)
+    if (item.group === 'service') {
+      if (item.id === 'configure' && current === 'audit') ping('audit', 'bridge')
+      else ping('door', item.id)
+    }
+    navigate(item.to)
   }
   const ariaCurrent = (page: MktNavProps['current']) =>
     current === page ? ({ 'aria-current': 'page' as const }) : {}
+  const ground = SITE_NAV.filter((n) => n.group === 'ground')
+  const services = SITE_NAV.filter((n) => n.group === 'service')
+  const guide = SITE_NAV.filter((n) => n.group === 'guide')
 
   return (
     <header className="mkt__nav">
@@ -75,17 +82,21 @@ export function MktNav({ navigate, current }: MktNavProps) {
           <Wordmark height={24} className="mkt__brand-mark" />
         </a>
 
-        {/* Components first — they are the ground; the three services stand on
-            them and read as a group; the guide last. One primary action on the
-            right: use the components. */}
-        <nav className="mkt__nav-links">
-          <a href="/components" className="mkt__nav-link mkt__nav-link--first" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
+        {/* Components first — they are the ground; the four services stand on
+            them and read as one group; the guide last. The list is SITE_NAV —
+            the same list the phone sheet and the configurator's topbar render. */}
+        <nav className="mkt__nav-links" aria-label="Site">
+          {ground.map((n) => (
+            <a key={n.id} href={n.to} className="mkt__nav-link mkt__nav-link--first" {...ariaCurrent(n.id)} onClick={goTo(n)}>{n.label}</a>
+          ))}
           <span className="mkt__nav-sep" aria-hidden="true" />
-          <a href="/app" className="mkt__nav-link" {...ariaCurrent('configure')} onClick={door('/app', 'configure')}>Configure</a>
-          <a href="/audit" className="mkt__nav-link" {...ariaCurrent('audit')} onClick={door('/audit', 'audit')}>Audit</a>
-          <a href="/forge" className="mkt__nav-link" {...ariaCurrent('forge')} onClick={(e) => go(e, '/forge')}>Forge</a>
+          {services.map((n) => (
+            <a key={n.id} href={n.to} className="mkt__nav-link" {...ariaCurrent(n.id)} onClick={goTo(n)}>{n.label}</a>
+          ))}
           <span className="mkt__nav-sep" aria-hidden="true" />
-          <a href="/docs" className="mkt__nav-link" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
+          {guide.map((n) => (
+            <a key={n.id} href={n.to} className="mkt__nav-link" {...ariaCurrent(n.id)} onClick={goTo(n)}>{n.label}</a>
+          ))}
         </nav>
 
         <div className="mkt__nav-tools">
@@ -119,13 +130,9 @@ export function MktNav({ navigate, current }: MktNavProps) {
             <GithubMark />
           </a>
 
-          {/* One primary action: use the components (the guide — install, copy,
-              hand to your agent). The services are links in the row; they used
-              to be two competing buttons here, which read as a two-door product
-              with the components as a menu item. */}
-          <button className="btn btn--primary btn--lg mkt__nav-use" onClick={() => { setMenu(false); ping('door', 'use'); navigate('/docs') }}>
-            Use the components
-          </button>
+          {/* No primary button here — see siteNav.ts. With four tools in the
+              row a fifth call that pointed at the Docs link beside it read as
+              noise; the actions live in the tools and in the homepage hero. */}
 
           {/* Below 700px the row cannot hold two equal doors plus the links, and
               the old answer was to hide whichever fitted worst — which happened
@@ -152,14 +159,12 @@ export function MktNav({ navigate, current }: MktNavProps) {
               Browse the components
             </button>
 
-            <nav className="mkt__sheet-links">
-              <a href="/components" {...ariaCurrent('components')} onClick={(e) => go(e, '/components')}>Components</a>
+            <nav className="mkt__sheet-links" aria-label="Site">
+              {ground.map((n) => <a key={n.id} href={n.to} {...ariaCurrent(n.id)} onClick={goTo(n)}>{n.label}</a>)}
               <span className="mkt__sheet-head">Services</span>
-              <a href="/app" {...ariaCurrent('configure')} onClick={door('/app', 'configure')}>Configure</a>
-              <a href="/audit" {...ariaCurrent('audit')} onClick={door('/audit', 'audit')}>Audit</a>
-              <a href="/forge" {...ariaCurrent('forge')} onClick={(e) => go(e, '/forge')}>Forge</a>
+              {services.map((n) => <a key={n.id} href={n.to} {...ariaCurrent(n.id)} onClick={goTo(n)}>{n.label}</a>)}
               <span className="mkt__sheet-head">More</span>
-              <a href="/docs" {...ariaCurrent('docs')} onClick={(e) => go(e, '/docs')}>Docs</a>
+              {guide.map((n) => <a key={n.id} href={n.to} {...ariaCurrent(n.id)} onClick={goTo(n)}>{n.label}</a>)}
               <a href="/manifesto" {...ariaCurrent('manifesto')} onClick={(e) => go(e, '/manifesto')}>Manifesto</a>
               <a href="/changelog" {...ariaCurrent('changelog')} onClick={(e) => go(e, '/changelog')}>What&rsquo;s new</a>
             </nav>
