@@ -26,10 +26,17 @@ if (process.argv.includes('--html')) {
  * generated, never assumed. No certificate → the verdict says "unverified". */
 import { existsSync } from 'node:fs'
 const cert = existsSync('binding.json') ? JSON.parse(readFileSync('binding.json', 'utf8')) : { binding: 'unknown', certified: false }
-const report = check(tree, { binding: { id: cert.binding, certified: cert.certified, cert } })
-const mark = { fail: '✗', 'needs-review': '·', unverified: '?', AA: '✓' }[report.verdict]
+/* The catalog travels with the answer: check() reads the semantics IT declares
+ * (x-a11y), plus a sidecar for a catalog we do not own. --a11y=<file> supplies
+ * one; --catalog=<file> checks a foreign catalog entirely. */
+const catalogFile = process.argv.find((a) => a.startsWith('--catalog='))?.slice(10) ?? 'catalog.json'
+const sidecarFile = process.argv.find((a) => a.startsWith('--a11y='))?.slice(7)
+const catalog = JSON.parse(readFileSync(catalogFile, 'utf8'))
+const a11y = sidecarFile ? JSON.parse(readFileSync(sidecarFile, 'utf8')) : null
+const report = check(tree, { catalog, a11y, binding: { id: cert.binding, certified: cert.certified, cert } })
+const mark = { fail: '✗', 'needs-review': '·', unverified: '?', partial: '◐', AA: '✓' }[report.verdict]
 console.log(`\n  ${mark}  ${report.verdict.toUpperCase()} — ${report.why}`)
-console.log(`     ${report.counted.nodes} components · ${report.counted.rules} rules`)
+console.log(`     ${report.counted.nodes} components (${report.counted.annotated} carry semantics) · ${report.counted.rules} rules`)
 if (cert.certified) console.log(`     binding ${cert.binding}: ${cert.pairsChecked} contrast pairs over ${cert.combinations} configurations, all above the floor\n`)
 else console.log('')
 for (const f of report.findings) {
@@ -38,5 +45,7 @@ for (const f of report.findings) {
   console.log(`            ${f.message}`)
 }
 if (!report.findings.length) console.log('     no findings')
+if (report.refused.length) console.log(`\n     refused by the catalog (rendered as a refusal, not an accessibility gap): ${report.refused.join(', ')}`)
+if (report.unannotated.length) console.log(`\n     rendered but NOT checkable — no x-a11y in the catalog: ${report.unannotated.join(', ')}`)
 console.log(`\n     not checked here (never counted as passing):`)
 for (const u of report.unchecked) console.log(`       ${u.sc.padEnd(6)} ${u.what}`)

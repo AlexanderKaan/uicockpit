@@ -1,0 +1,205 @@
+{
+  "catalogId": "https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json",
+  "_stub": "Component names only, from the A2UI v1.0 Basic Catalog. Property schemas are not copied; the URL above is the authority. This exists so check() can distinguish a component the catalog does not have (refused) from one it has but never gave semantics to (unannotated).",
+  "components": {
+    "Text": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Text"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Image": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Image"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Icon": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Icon"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Video": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Video"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "AudioPlayer": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "AudioPlayer"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Row": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Row"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Column": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Column"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "List": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "List"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Card": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Card"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Tabs": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Tabs"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Divider": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Divider"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Modal": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Modal"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Button": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Button"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "CheckBox": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "CheckBox"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "TextField": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "TextField"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "DateTimeInput": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "DateTimeInput"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "ChoicePicker": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "ChoicePicker"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "Slider": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "const": "Slider"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    }
+  },
+  "functions": {}
+}

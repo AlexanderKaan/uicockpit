@@ -6,7 +6,19 @@ const strip = (s) => s
   .replace(/^import[^\n]*from '[^']+'\n/gm, '')
   .replace(/^export (const|function|class|let) /gm, '$1 ')
   .replace(/^export \{[^}]*\}[^\n]*\n/gm, '')
-const mods = ['core.mjs', 'check.mjs', 'bindings.mjs'].map((f) => `/* ── ${f} ─────────────── */\n` + strip(readFileSync(f, 'utf8'))).join('\n\n')
+const files = ['core.mjs', 'check.mjs', 'bindings.mjs']
+const parts = files.map((f) => [f, strip(readFileSync(f, 'utf8'))])
+/* Concatenating modules means their top-level names share one scope, and a
+ * collision makes the browser throw a SyntaxError before anything runs — a page
+ * that renders nothing, with an empty console. check.mjs and bindings.mjs both
+ * declared `list` once, and it cost twenty minutes. So: fail here, loudly. */
+const seen = new Map()
+for (const [f, src] of parts) for (const m of src.matchAll(/^(?:const|let|function|class)\s+([A-Za-z_$][\w$]*)/gm)) {
+  const prev = seen.get(m[1])
+  if (prev && prev !== f) { console.error(`build: "${m[1]}" is declared in both ${prev} and ${f} — the bundle shares one scope, so rename one.`); process.exit(1) }
+  seen.set(m[1], f)
+}
+const mods = parts.map(([f, src]) => `/* ── ${f} ─────────────── */\n` + src).join('\n\n')
 const page = readFileSync('builder.template.html', 'utf8')
   .replace('/*MODULES*/', mods)
   .replace('/*CATALOG*/', readFileSync('catalog.json', 'utf8'))

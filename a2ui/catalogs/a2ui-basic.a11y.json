@@ -1,0 +1,84 @@
+{
+  "_for": "https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json",
+  "_what": "Accessibility semantics for the A2UI Basic Catalog. The catalog itself declares none — this file is our reading of it, and it is a stated assumption, not an inference. Every component listed here is checkable; anything else in that catalog is reported as unannotated rather than passed.",
+  "components": {
+    "Text": {
+      "role": "text",
+      "name": "text"
+    },
+    "Image": {
+      "role": "image",
+      "name": "alt"
+    },
+    "Icon": {
+      "role": "image",
+      "name": "name",
+      "decorativeWhen": "decorative"
+    },
+    "Video": {
+      "role": "image",
+      "name": "alt"
+    },
+    "AudioPlayer": {
+      "role": "control",
+      "name": "label"
+    },
+    "Row": {
+      "role": "layout"
+    },
+    "Column": {
+      "role": "layout"
+    },
+    "List": {
+      "role": "layout"
+    },
+    "Card": {
+      "role": "layout"
+    },
+    "Tabs": {
+      "role": "control",
+      "name": "label"
+    },
+    "Divider": {
+      "role": "layout"
+    },
+    "Modal": {
+      "role": "control",
+      "name": "label"
+    },
+    "Button": {
+      "role": "control",
+      "name": "label",
+      "emphasis": {
+        "prop": "style",
+        "primary": "primary"
+      }
+    },
+    "CheckBox": {
+      "role": "control",
+      "name": "label",
+      "input": true
+    },
+    "TextField": {
+      "role": "control",
+      "name": "label",
+      "input": true
+    },
+    "DateTimeInput": {
+      "role": "control",
+      "name": "label",
+      "input": true
+    },
+    "ChoicePicker": {
+      "role": "control",
+      "name": "label",
+      "input": true,
+      "items": "options"
+    },
+    "Slider": {
+      "role": "control",
+      "name": "label",
+      "input": true
+    }
+  }
+}

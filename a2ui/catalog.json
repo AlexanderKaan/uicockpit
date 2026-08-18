@@ -29,7 +29,12 @@
       "required": [
         "component",
         "text"
-      ]
+      ],
+      "x-a11y": {
+        "role": "heading",
+        "name": "text",
+        "level": "level"
+      }
     },
     "Text": {
       "type": "object",
@@ -46,7 +51,11 @@
       "required": [
         "component",
         "text"
-      ]
+      ],
+      "x-a11y": {
+        "role": "text",
+        "name": "text"
+      }
     },
     "Badge": {
       "type": "object",
@@ -73,7 +82,12 @@
       "required": [
         "component",
         "text"
-      ]
+      ],
+      "x-a11y": {
+        "role": "status",
+        "name": "text",
+        "tone": "tone"
+      }
     },
     "Button": {
       "type": "object",
@@ -102,7 +116,15 @@
       "required": [
         "component",
         "label"
-      ]
+      ],
+      "x-a11y": {
+        "role": "control",
+        "name": "label",
+        "emphasis": {
+          "prop": "variant",
+          "primary": "primary"
+        }
+      }
     },
     "Callout": {
       "type": "object",
@@ -132,7 +154,12 @@
       "required": [
         "component",
         "text"
-      ]
+      ],
+      "x-a11y": {
+        "role": "status",
+        "name": "text",
+        "tone": "tone"
+      }
     },
     "SummaryList": {
       "type": "object",
@@ -149,7 +176,12 @@
       "required": [
         "component",
         "items"
-      ]
+      ],
+      "x-a11y": {
+        "role": "list",
+        "items": "items",
+        "itemName": "label"
+      }
     },
     "TaskList": {
       "type": "object",
@@ -170,7 +202,14 @@
       "required": [
         "component",
         "items"
-      ]
+      ],
+      "x-a11y": {
+        "role": "list",
+        "items": "items",
+        "itemName": "name",
+        "itemStatus": "status",
+        "itemTone": "tone"
+      }
     },
     "Steps": {
       "type": "object",
@@ -187,7 +226,12 @@
       "required": [
         "component",
         "items"
-      ]
+      ],
+      "x-a11y": {
+        "role": "list",
+        "items": "items",
+        "itemName": "title"
+      }
     },
     "Table": {
       "type": "object",
@@ -212,7 +256,12 @@
         "component",
         "columns",
         "rows"
-      ]
+      ],
+      "x-a11y": {
+        "role": "table",
+        "columns": "columns",
+        "items": "rows"
+      }
     },
     "Card": {
       "type": "object",
@@ -228,7 +277,10 @@
       "required": [
         "component",
         "child"
-      ]
+      ],
+      "x-a11y": {
+        "role": "layout"
+      }
     },
     "Column": {
       "type": "object",
@@ -247,7 +299,10 @@
       "required": [
         "component",
         "children"
-      ]
+      ],
+      "x-a11y": {
+        "role": "layout"
+      }
     },
     "Row": {
       "type": "object",
@@ -266,7 +321,10 @@
       "required": [
         "component",
         "children"
-      ]
+      ],
+      "x-a11y": {
+        "role": "layout"
+      }
     }
   },
   "functions": {

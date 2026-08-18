@@ -33,7 +33,7 @@ section>h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var
 .verdict{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px}
 .verdict[data-v=AA]{background:var(--okbg);color:var(--ok)}
 .verdict[data-v=fail]{background:var(--badbg);color:var(--bad)}
-.verdict[data-v=needs-review],.verdict[data-v=unverified]{background:var(--warnbg);color:var(--warn)}
+.verdict[data-v=needs-review],.verdict[data-v=unverified],.verdict[data-v=partial]{background:var(--warnbg);color:var(--warn)}
 .stage__surface{padding:28px;background:var(--bg);border-radius:0 0 12px 12px;min-height:320px}
 .preview{max-width:640px;margin:0 auto}
 .findings{padding:0 16px 14px;font-size:12px;color:var(--mut)}
@@ -109,9 +109,9 @@ function draw() {
   const hydrated = (function h(n) { const o = { ...n }
     if (n.items) o.resolvedItems = resolve(n.items, surface.model, null, FUNCTIONS)
     o.kids = (n.kids ?? []).map(h); return o })(tree)
-  const rep = check(hydrated, { binding: { id: b.id, certified: b.id === 'kit' } })
+  const rep = check(hydrated, { catalog: CATALOG, binding: { id: b.id, certified: b.id === 'kit' } })
   const v = $('.verdict'); v.dataset.v = rep.verdict
-  v.textContent = { AA: '✓ AA', fail: '✗ fails', 'needs-review': '· needs review', unverified: '? unverified' }[rep.verdict]
+  v.textContent = { AA: '✓ AA', fail: '✗ fails', 'needs-review': '· needs review', unverified: '? unverified', partial: '◐ partial' }[rep.verdict]
   $('.findings').innerHTML = rep.findings.length
     ? rep.findings.map((f) => `<div><code>${f.sc ?? 'craft'}</code> ${f.message}</div>`).join('')
     : `<div>${rep.why}. ${rep.unchecked.length} things this check never claims — see the report.</div>`

@@ -45,6 +45,9 @@ node probe.mjs broken.jsonl bad   # …and on a deliberately broken one
 - **A verdict per answer** — eight rules on the answer itself (heading order,
   a control without a name, a table without headers, a status carried by colour
   alone…), plus the binding's CI certificate. And six things it refuses to claim.
+  The rules read semantics the catalog *declares*, never component names, so they
+  work on a catalog you did not write — including Google's Basic Catalog, through
+  a sidecar that states the reading instead of guessing it.
 
 ## The split that makes the guarantee honest
 
@@ -86,12 +89,13 @@ harness issued.
       core.mjs          the A2UI core — stream, data model, dynamic values, tree
       catalog.json      12 components, each with the source it comes from
       bindings.mjs      four bindings, as tables
-      check.mjs         the verdict: 8 rules, and 6 things it will not claim
+      check.mjs         the verdict: 8 schema-driven rules, and 6 things it will not claim
+      catalogs/         how to check a catalog you do not own
       kit/              the kit binding's stylesheet — plain CSS, yours to edit
       binding.json      the certificate: 1200 contrast pairs over 60 configurations
       builder.*         the palette → one self-contained page (node build.mjs)
 
-About 1 500 lines, no dependencies, no build step for anything that runs.
+About 1 700 lines, no dependencies, no build step for anything that runs.
 
 ## Status
 

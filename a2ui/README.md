@@ -30,7 +30,8 @@ Runs on plain node, no build, no dependencies.
 | `bindings.mjs` | **four bindings as TABLES**: our kit · Tailwind · daisyUI · shadcn/ui. `h()` renders the preview, `emit()` writes the artefact you own | 175 |
 | `builder.template.html` + `build.mjs` | the clickable palette → one self-contained `builder.html` (no toolchain, mail it to someone) | 230 |
 | `demos.json` | one demo node per component — **bound by JSON Pointer**, with its data-model fragment beside it, so the generated code reads `read(data, '/facts')` instead of baking content in | 60 |
-| `check.mjs` | the per-answer conformance verdict: 8 rules, 6 things explicitly NOT claimed | 100 |
+| `check.mjs` | the per-answer verdict, **schema-driven**: 8 rules that read declared semantics, never component names · 6 criteria it refuses to claim | 175 |
+| `catalogs/` | how to check a catalog you do NOT own: a sidecar stating our reading of Google's Basic Catalog, plus a stub of its names and an example stream | 100 |
 | `binding.json` | the CI certificate: 1200 contrast pairs over 60 configurations | — |
 | `certify.ts` | generates that certificate from real measurement (`auditContrast` × 60 configs) | 30 |
 | `preview.ts` | renders the output into a standalone page with the real tokens + kit CSS | 22 |
@@ -64,6 +65,40 @@ tell the reader something untrue, so `Steps` stays an ordered list. Matching on
 the name alone is exactly the mistake a machine makes. The tone vocabulary
 differs too — `warn`/`danger` here, `warning`/`error` there — and translating
 that is the binding's job, never the agent's.
+
+## A rule may not know a component's name
+
+A rule that looks for `"Button"` works on our catalog and nothing else — and
+A2UI exists precisely so that everyone defines their own. But you cannot derive
+meaning from a JSON Schema either: a schema describes SHAPE. So the catalog
+declares meaning, in a twelve-key vocabulary:
+
+```jsonc
+"TaskList": {
+  "x-a11y": { "role": "list", "items": "items",
+              "itemName": "name", "itemStatus": "status", "itemTone": "tone" },
+  "properties": { … }
+}
+```
+
+For a catalog you do not own, you state your reading in a **sidecar** rather
+than guessing at runtime — `catalogs/a2ui-basic.a11y.json` is ours for Google's
+Basic Catalog, which declares no accessibility semantics at all:
+
+```bash
+node probe.mjs catalogs/a2ui-basic.example.jsonl basic   --catalog=catalogs/a2ui-basic.catalog.json --a11y=catalogs/a2ui-basic.a11y.json
+```
+
+Different component names, a different property for emphasis (`style`, not
+`variant`) — and the same eight rules find the missing alt text, the field with
+only a placeholder, the unnamed control and the two primary actions. No rule
+changed.
+
+**And silence is never a pass.** A component the catalog does not have was
+*refused* — the renderer showed a refusal, nothing was painted, and that is no
+accessibility gap. A component the catalog HAS but never gave semantics to was
+painted and could not be checked: it is returned as `unannotated`, by name, and
+the verdict drops to `partial`.
 
 ## The split that makes the claim honest
 
