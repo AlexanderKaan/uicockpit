@@ -27,7 +27,7 @@ Runs on plain node, no build, no dependencies.
 | `catalog.json` | 2 components (GOV.UK Task list, Summary list) + 1 function + the `instructions` block | 19 |
 | `bind-kit.mjs` | binding A — our kit, plain HTML. Renders the refusal in place | 62 |
 | `bind-shadcn.tsx` | binding B — shadcn/ui. The artefact the builder would generate; you own it | 63 |
-| `bindings.mjs` | **three bindings as TABLES**: our kit · Tailwind · shadcn/ui. `h()` renders the preview, `emit()` writes the artefact you own | 120 |
+| `bindings.mjs` | **four bindings as TABLES**: our kit · Tailwind · daisyUI · shadcn/ui. `h()` renders the preview, `emit()` writes the artefact you own | 175 |
 | `builder.template.html` + `build.mjs` | the clickable palette → one self-contained `builder.html` (no toolchain, mail it to someone) | 230 |
 | `demos.json` | one demo node per component — **bound by JSON Pointer**, with its data-model fragment beside it, so the generated code reads `read(data, '/facts')` instead of baking content in | 60 |
 | `check.mjs` | the per-answer conformance verdict: 8 rules, 6 things explicitly NOT claimed | 100 |
@@ -50,10 +50,20 @@ means adding a mapping, not writing a renderer. The three here are ~40 lines eac
 |---|---|
 | **UIcockpit kit** | plain CSS classes — works in any renderer, and it is the one binding with a CI certificate |
 | **Tailwind CSS** | utility classes only, no component library |
+| **daisyUI** | semantic classes on Tailwind, zero JS, 35 themes — any framework |
 | **shadcn/ui** | a real `.tsx` file importing your own components, reading the data model by pointer |
 
-Add a fourth by adding a table. MUI, Ant, Chakra, Mantine, daisyUI, Bootstrap,
-GOV.UK Frontend, NL Design System — the class-based ones are an afternoon each.
+Add a fifth by adding a table. MUI, Ant, Chakra, Mantine, Bootstrap, GOV.UK
+Frontend, NL Design System — the class-based ones are an afternoon each.
+
+**What a table has to encode, and a generator gets wrong.** daisyUI ships a
+component called `steps`. This binding does not use it for our `Steps`: theirs
+is a progress indicator (where you are in a flow), ours is GOV.UK's *step by
+step* (what to do, in order). Rendering instructions as a progress bar would
+tell the reader something untrue, so `Steps` stays an ordered list. Matching on
+the name alone is exactly the mistake a machine makes. The tone vocabulary
+differs too — `warn`/`danger` here, `warning`/`error` there — and translating
+that is the binding's job, never the agent's.
 
 ## The split that makes the claim honest
 
