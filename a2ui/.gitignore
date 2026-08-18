@@ -1,7 +1,4 @@
-# Generated. Rebuild with `node build.mjs` (builder) or, from ../cockpit:
-#   npx vite-node ../a2ui-probe/kitcss.ts     → kit.css
-#   npx vite-node ../a2ui-probe/certify.ts    → binding.json
-#   npx vite-node ../a2ui-probe/preview.ts    → preview.html
+# Generated. Rebuild with `node build.mjs`; the certificate with
+#   cd ../cockpit && npx vite-node ../a2ui/certify.ts   (until the engine moves in)
 builder.html
 preview.html
-kit.css

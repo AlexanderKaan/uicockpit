@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
-import { applyStream, buildTree, resolve, FUNCTIONS } from './core.mjs'
-import { render } from './bind-kit.mjs'
+import { applyStream, buildTree, resolve, walk, FUNCTIONS } from './core.mjs'
+import { BINDINGS } from './bindings.mjs'
 import { check } from './check.mjs'
 
 /** Resolve data-bound lists onto the node, so check() sees the ANSWER, not the pointer. */
@@ -16,7 +16,11 @@ const surfaceId = process.argv[3] ?? 'permit_1'
 const s = applyStream(readFileSync(file, 'utf8').trim().split('\n')).get(surfaceId)
 const tree = hydrate(buildTree(s.components), s.model)
 
-if (process.argv.includes('--html')) { console.log(render(tree, { model: s.model, scope: null })); process.exit(0) }
+if (process.argv.includes('--html')) {
+  const b = BINDINGS[process.argv.find((a) => a.startsWith('--bind='))?.slice(7) ?? 'kit']
+  console.log(walk(tree, (n, k, r) => b.h(n, k, r) ?? `<!-- ${n.component}: not in this binding -->`, s.model))
+  process.exit(0)
+}
 
 /* The binding's certificate travels WITH the verdict — read from the artefact CI
  * generated, never assumed. No certificate → the verdict says "unverified". */

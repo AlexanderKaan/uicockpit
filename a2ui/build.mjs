@@ -12,7 +12,11 @@ const page = readFileSync('builder.template.html', 'utf8')
   .replace('/*CATALOG*/', readFileSync('catalog.json', 'utf8'))
   .replace('/*DEMOS*/', readFileSync('demos.json', 'utf8'))
   .replace('<!--BODY-->', readFileSync('builder.body.html', 'utf8'))
-  .replace('/*KITCSS*/', readFileSync('kit.css', 'utf8'))
+  .replace('/*KITCSS*/', `${readFileSync('kit/tokens.css', 'utf8')}
+@scope (.b-kit) {
+${readFileSync('kit/global.css', 'utf8')}
+${readFileSync('kit/kit.css', 'utf8')}
+}`)
   .replace('/*TWCSS*/', readFileSync('tw.css', 'utf8'))
 writeFileSync('builder.html', page)
 console.log(`builder.html — ${(page.length / 1024).toFixed(0)} kB, self-contained`)

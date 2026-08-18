@@ -73,16 +73,30 @@ product's screen, an accessibility matrix at zero violations across six
 configurations, a component forge, a CLI and an MCP server. 57 000 lines.
 
 It did too many things, and the part worth keeping turned out to be the smallest
-one. That work is preserved at the tag
-[`archive/cockpit-2026-08-17`](../../tree/archive/cockpit-2026-08-17); three
-pieces of it live on here — the token engine, ~26 component recipes, and the
-accessibility harness that issues the certificate.
+one. All of it is preserved at the tag
+[`archive/cockpit-2026-08-17`](../../tree/archive/cockpit-2026-08-17) — nothing
+was lost, and every measurement above stays citable. What travelled here is the
+kit binding's stylesheet (151 rules extracted from 88 components, down to what
+these bindings actually render) and the certificate that library's accessibility
+harness issued.
+
+## The repository
+
+    a2ui/
+      core.mjs          the A2UI core — stream, data model, dynamic values, tree
+      catalog.json      12 components, each with the source it comes from
+      bindings.mjs      three bindings, as tables
+      check.mjs         the verdict: 8 rules, and 6 things it will not claim
+      kit/              the kit binding's stylesheet — plain CSS, yours to edit
+      binding.json      the certificate: 1200 contrast pairs over 60 configurations
+      builder.*         the palette → one self-contained page (node build.mjs)
+
+About 1 300 lines, no dependencies, no build step for anything that runs.
 
 ## Status
 
 Early, and honest about it. The builder runs, the verdict is real, the generated
-renderer compiles. Not published to npm, no hosted version, no stable API.
-`cockpit/`, `cli/` and `mcp/` still hold the previous project and are being
-archived.
+renderer compiles. Not published to npm, no hosted version, no stable API, and
+the catalog is 12 components rather than a set anyone should call complete.
 
 MIT.
