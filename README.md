@@ -1,235 +1,88 @@
 <div align="center">
 
-# UIcockpit
+# A2UI Cockpit
 
-### The open-source design system generator — AI fluent, drift-proof.
+### Pick the blocks your agent may render. Pick your stack. Copy the catalog and the renderer.
 
-**Not another design system — the machine that makes yours.** And two ways in,
-because most people are not at the start of an app:
+**A2UI keeps the catalog and the renderer apart on purpose** — *"the catalog is
+schema-only… each renderer SDK independently maps catalog component types to
+native widgets."* So everyone who defines their own catalog has to build the
+renderer too, in every framework they target, by hand. There is no tooling for
+it, no gallery of catalogs, and the protocol says nothing at all about
+accessibility.
 
-**→ Already have a codebase?** `npx uicockpit audit` reads the values your code
-actually uses, derives the design system it already implies, and measures how far
-the code has drifted from its own. Runs entirely on your machine.
-
-**→ Starting fresh?** Dial in your design language visually instead.
-
-Either way you get the same thing: `--k-*` tokens + 100+ accessible components
-(real recipes with state contracts) with a built-in WCAG audit of *your* kit,
-framework-neutral, behind one link that stays up to date — then hand it to your
-coding agent and `uicockpit check` makes sure it *stays* on it. Delivered as a
-hosted `<link>`, a download, or natively inside your agent (CLI + MCP).
-
-**Free · no account · paste it anywhere.**
-
-[**Audit my code →** uicockpit.com/audit](https://uicockpit.com/audit) · [**Build a kit →** uicockpit.com](https://uicockpit.com) · [Docs](https://uicockpit.com/docs) · [What's new](https://uicockpit.com/changelog)
+This is that tooling.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![npm: uicockpit](https://img.shields.io/badge/npm-uicockpit-cb3837?logo=npm&logoColor=white)](https://www.npmjs.com/package/uicockpit)
-[![npm: uicockpit-mcp](https://img.shields.io/badge/MCP-uicockpit--mcp-111?logo=npm&logoColor=white)](https://www.npmjs.com/package/uicockpit-mcp)
-[![Live kit CDN](https://img.shields.io/badge/CDN-kit.uicockpit.com-f38020?logo=cloudflare&logoColor=white)](https://kit.uicockpit.com)
-![Price](https://img.shields.io/badge/price-%240%20forever-1ca85a)
-
-![UIcockpit — ship AI apps that look designed, not generated: one design language, real components](docs/preview.png)
+![Status](https://img.shields.io/badge/status-early-f59e0b)
 
 </div>
 
 ---
 
-## Why I made this 👋
-
-If you've ever vibe-coded an app, you know the feeling. You're moving fast, the AI is
-reaching for the same components for the twentieth time, and somewhere along the way you
-lose the thread. The radii drift. The greys don't quite agree. There's always *one*
-button that's just… a little off. It all works — but none of it feels like *yours*.
-
-I built UIcockpit to get out of that: a calm place to make the design decisions **once**,
-hand them to your agent as a real contract, and have a one-command **check** that catches
-the drift before it ships. No spreadsheet of tokens, no hand-tuning forty little things —
-a coherent system that survives contact with an AI that builds faster than you can review.
-
-Framework-neutral (plain HTML, Vue, Svelte, React — whatever you're in), free, no account,
-no lock-in. — **Alexander**
-
----
-
-## Where it sits in the stack
-
-A design system hands you someone else's taste, themed — a **generator** ships your own.
-Tailwind is *how* you style. shadcn is *what* you assemble. **UIcockpit is the design
-language that makes it yours** — and the only layer that *keeps* it coherent as your app
-(and your AI) grow. It sits above them, framework-neutral.
-
-| You already have… | which is… | so UIcockpit is… |
-|---|---|---|
-| **Tailwind / CSS** | *how* you write styles | the **decisions** those styles encode — the layer above |
-| **shadcn / Radix** | the **components** (+ behaviour) | the **design language** that makes any components look like one product |
-| **Figma / design tokens** | the design **source** (authoring) | the same language, but **executable**, framework-neutral, and **self-enforcing** |
-
-The loop it lives in: **Define** your language → your AI **applies** it →
-`uicockpit check` **verifies** it. Not a one-off asset — a layer in the build loop.
-
-→ The thinking behind this: [`VISION.md`](./VISION.md).
-
----
-
-## 1. Pick a starting point, make it yours
-
-Open [uicockpit.com](https://uicockpit.com), pick one of **7 named styles** grounded in
-the best modern apps, then tweak with 19 clear controls:
-
-| Style | Grounded in | Feel |
-|---|---|---|
-| **Clean** | shadcn / Linear | the balanced default |
-| **Precision** | Linear / Figma | crisp, flat, cool |
-| **Minimal** | Vercel | mono headings, stark |
-| **Refined** | Stripe | ultralight headlines |
-| **Calm** | Notion | system font, seamless |
-| **Soft** | — | rounded and warm |
-| **Editorial** | — | serif headings |
-
-Your brand colour rides through every style. And the engine **keeps it coherent**: pick
-any combination of the controls and it straightens the corners that would otherwise look
-wrong — a dense layout never gets giant headings, a card always stays visible against the
-page, the selected tab is always legible. *Make whatever you want; we straighten it.*
-
----
-
-## 2. Ship it — two tracks
-
-### 🤖 Agent-native — the check loop (best for AI builds)
-
-Give your coding agent the system **and** the guardrail, no copy-paste:
+## Try it
 
 ```bash
-npx uicockpit init <kit-hash>   # writes tokens.css + contract.json + AGENTS.md
-#  → your agent builds with the --k-* tokens and the house rules
-npx uicockpit check --strict    # fails on any drift from the contract — the moat
+cd a2ui && node build.mjs && open builder.html
 ```
 
-Or run it as an **MCP server** (Claude Code, Cursor, Windsurf, Claude Desktop):
-
-```json
-{ "mcpServers": { "uicockpit": { "command": "npx", "args": ["-y", "uicockpit-mcp"] } } }
-```
-
-Four tools: **`create_kit`** (generate a kit from a brief — brand, radius, density) ·
-**`install_kit`** (pull it into the project) · **`get_design_context`** (the kit's
-*grammar* — tokens + component anatomy + composition rules + intent routing) ·
-**`check_conformance`** (verify the output). The agent can spin up your language, build on
-it, and check itself.
-
-→ [`uicockpit` CLI](./cli/README.md) · [`uicockpit-mcp`](./mcp/README.md)
-
-### 🎨 Web / paste
-
-- **One hosted `<link>`** — the whole kit (tokens + component recipes with real
-  hover/focus/disabled states) served from the edge:
-  ```html
-  <link rel="stylesheet" href="https://kit.uicockpit.com/k/<your-kit-key>.css">
-  ```
-- **Own the files** — download `tokens.css`, `tokens.json`, a Tailwind v4 `@theme`
-  block, or shadcn/ui `globals.css`. No runtime, no dependency.
-- **Quick-paste** into v0, Lovable, bolt, … via the in-app **"Use in [your tool]"** router.
-
----
-
-## What's in the box
-
-- **250+ design tokens** — OKLCH colour ramps (contrast-clamped to WCAG), a type scale
-  with weight + label-case control, spacing grid, radii, shadows, a 3-tier motion system,
-  a brand-harmonised multi-hue chart/avatar palette.
-- **100+ components** — real per-component recipes, all token-driven, all with full
-  hover/focus/disabled state contracts, shipped in `tokens.css` and over the CDN.
-- **Coherence guarantees** — the foundation self-corrects incoherent control combinations
-  (height harmony, surface separation, type-density contrast) and a WCAG contrast check is
-  baked in, so the kit you configure is always shippable.
-- **Many outputs from one config** — `tokens.css`, `tokens.json`, a Tailwind v4 `@theme`
-  block, shadcn/ui `globals.css`, plus the machine-readable `contract.json`, agent rules,
-  and a full `design.md` — with a live preview on a real app and a full component gallery:
-  change one control, watch the whole thing move.
-
----
-
-## How it works
-
-One configuration → **one single source** → every surface:
-
-```
-19 visual controls ──▶ --k-* tokens ──▶ ┌─ live preview (gallery + a real app that dogfoods the export)
-   (Style · Brand · Type ·              ├─ tokens.css / json / Tailwind / shadcn / design.md / AGENTS.md / contract.json
-    Shape · Surface · Motion)           ├─ hosted kit: kit.uicockpit.com/k/<key>.css
-                                        └─ npx uicockpit init/check · the MCP server
-```
-
-The CDN runs the exact same function the download uses, so the hosted link is
-byte-identical to the file you'd export, and the contract `check` reads always agrees with
-the CSS. The demo app renders from the kit alone — if the kit ever breaks, the app breaks
-too, and we catch it.
-
----
-
-## Not a component library — a coherence compiler
-
-A catalog of components is always finite; the agent building your app isn't. Sooner or
-later it needs a component you never drew — and it guesses, and the guess drifts off your
-language.
-
-So the real product isn't 100 components, or 200. It's the **grammar** underneath them —
-the parts and composition rules every component is quietly made of — handed to the agent
-through `get_design_context`, with `uicockpit check` making sure that whatever it
-assembles, even a screen nobody drew, is built only from *your* language.
-
-A finite kit can, at best, be "complete." A grammar plus a verifier is *generative* — it
-covers the screens nobody drew. That's the north star, and the spine is already live:
-**configure → CDN → CLI/MCP → check.**
-
-The mechanism has a name: the **Role Canvas**. A small, closed set of roles — *control ·
-selectable · surface · tone-bearer · text-slot · overlay* — each guarantees one perceptual
-treatment (a height, a selected edge, a legible tint, a truncation…). Any element that tags
-a role — through a thin `data-role`, or simply the ARIA state that already names it
-(`aria-selected`, `role="menu"`) — **inherits that treatment for free**, so even a component
-we never built comes out coherent. It's a set of zero-specificity CSS floors, enforced in
-the build, and you can flip it on and off live in the app's loupe.
-
-→ The full thinking lives in [`VISION.md`](./VISION.md).
-
----
-
-## Run it locally
+One self-contained page. No install, no server, no CDN. Tick the blocks your
+agent may use, switch between **UIcockpit kit · Tailwind · shadcn/ui**, and copy
+three things: the `catalog.json`, the renderer for your stack, and the A2UI
+stream that produced what you see.
 
 ```bash
-git clone https://github.com/AlexanderKaan/uicockpit.git
-cd uicockpit/cockpit
-npm install
-npm run dev          # configurator at http://localhost:5173
-npm run build        # the build gate (icon-verify → audits → tsc → vite build)
-npx vitest run       # tests
+node probe.mjs                    # the conformance verdict on a clean answer
+node probe.mjs broken.jsonl bad   # …and on a deliberately broken one
 ```
 
-Vite + React 19 + TypeScript (strict). The CLI (`cli/`) and MCP server (`mcp/`) are
-separate zero-dependency packages.
+## What it is
 
----
+- **A catalog** — 12 components, each carrying the source it comes from: GOV.UK,
+  USWDS, NL Design System, WAI-ARIA or the HTML spec. Not "because we liked it".
+- **Bindings, as tables** — a binding is a mapping, not a program, so adding a
+  library is an afternoon rather than a rewrite. Three ship today.
+- **A verdict per answer** — eight rules on the answer itself (heading order,
+  a control without a name, a table without headers, a status carried by colour
+  alone…), plus the binding's CI certificate. And six things it refuses to claim.
 
-## Contributing
+## The split that makes the guarantee honest
 
-Come on in. A new named style, a missing component recipe, an export adapter (Style
-Dictionary, Figma variables), a framework adapter, an accessibility fix — all welcome.
-Start with [`CONTRIBUTING.md`](./CONTRIBUTING.md) and the
-[`Code of Conduct`](./CODE_OF_CONDUCT.md), then open an issue or a discussion.
+Accessibility of a generated answer has two halves, and only one is per-answer.
 
-See [`docs/roadmap.md`](./docs/roadmap.md) for what's shipped, in progress, and next — the
-gaps you hit while using it are the best input we get.
+**The binding is certified once, in CI.** Contrast, target size, focus ring —
+properties of the implementation and its tokens, not of what the agent asked for.
+Measuring them per answer is waste; claiming them without measuring is a lie.
+The certificate is generated from real measurement (1200 contrast pairs over 60
+theme × mode × density combinations) and travels with the verdict.
 
----
+**The answer is checked every time**, on the component tree rather than the
+markup — so the same rules hold for shadcn, Tailwind, Flutter or SwiftUI.
+No certificate → the verdict reads `unverified`, never `AA`.
 
-## Thanks 🙏
+And what a machine cannot judge is returned **by name**, never counted as
+passing: whether the alt text describes the image, whether a heading describes
+its section, whether an error says how to fix it.
 
-If UIcockpit is useful to you, a ⭐ genuinely makes my day and helps other makers find it.
+## Where this came from
 
-<div align="center">
+This repository was a design-system configurator: 88 components with a
+four-layer provenance line each, a code audit that reads 97–99 % of sixteen real
+repositories and identified 8 of 8 brands correctly against the running
+product's screen, an accessibility matrix at zero violations across six
+configurations, a component forge, a CLI and an MCP server. 57 000 lines.
 
-Made with care by **[Alexander Kaan](https://github.com/alexanderkaan)** at **[Pageminds](https://pageminds.com)** ·
-[MIT](./LICENSE), free forever.
+It did too many things, and the part worth keeping turned out to be the smallest
+one. That work is preserved at the tag
+[`archive/cockpit-2026-08-17`](../../tree/archive/cockpit-2026-08-17); three
+pieces of it live on here — the token engine, ~26 component recipes, and the
+accessibility harness that issues the certificate.
 
-</div>
+## Status
+
+Early, and honest about it. The builder runs, the verdict is real, the generated
+renderer compiles. Not published to npm, no hosted version, no stable API.
+`cockpit/`, `cli/` and `mcp/` still hold the previous project and are being
+archived.
+
+MIT.

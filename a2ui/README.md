@@ -1,4 +1,17 @@
-# A2UI probe — the whole pipe, and a builder you can open
+# A2UI Cockpit
+
+**Pick the blocks your agent may render. Pick your stack. Copy the catalog and the
+renderer — you own both.**
+
+A2UI keeps the catalog (schema) and the renderer (implementation) apart on
+purpose: *"the catalog is schema-only… each renderer SDK independently maps
+catalog component types to native widgets."* So everyone who defines a catalog
+has to build the renderer too, in every framework they target, by hand. There is
+no tooling for it, no gallery of catalogs, and the protocol says nothing at all
+about accessibility.
+
+This is that tooling — and every answer it renders comes back with a verdict
+that says where the guarantee stops.
 
 One real A2UI stream → a custom catalog → a renderer → a conformance verdict.
 Runs on plain node, no build, no dependencies.
@@ -24,8 +37,8 @@ Runs on plain node, no build, no dependencies.
 
 Both generators run from the cockpit (they import its token engine):
 
-    cd ../cockpit && npx vite-node ../a2ui-probe/certify.ts   # → binding.json
-    cd ../cockpit && npx vite-node ../a2ui-probe/preview.ts   # → preview.html (gitignored)
+    cd ../cockpit && npx vite-node ../a2ui/certify.ts   # → binding.json
+    cd ../cockpit && npx vite-node ../a2ui/preview.ts   # → preview.html (gitignored)
 
 ## A binding is a TABLE, not a program
 
