@@ -77,7 +77,53 @@ const tw = {
   },
 }
 
-/* ── binding 3 · shadcn/ui ───────────────────────────────────────────────── */
+/* ── binding 3 · daisyUI ─────────────────────────────────────────────────── */
+/* Class names verified against daisyUI 5.7 docs, not from memory. Two things a
+ * table has to encode and a generator gets wrong:
+ *
+ *  · the tone VOCABULARY differs — daisyUI says `warning`/`error` where we say
+ *    `warn`/`danger`, so the mapping is the binding's job, not the agent's;
+ *  · daisyUI HAS a `steps` component, and we deliberately do not use it for our
+ *    Steps. Theirs is a progress indicator (where you are in a flow); ours is
+ *    GOV.UK's "step by step" (what to do, in order). Rendering instructions as
+ *    a progress bar would tell the reader something untrue, so Steps stays an
+ *    <ol>. Reaching for the same-named component is exactly the mistake a
+ *    machine makes on names alone. */
+const DAISY_TONE = { info: 'info', success: 'success', warn: 'warning', danger: 'error', neutral: 'neutral' }
+const daisy = {
+  id: 'daisyui', label: 'daisyUI', note: 'semantic classes on Tailwind, zero JS — 35 built-in themes, any framework',
+  h(n, k, r) {
+    switch (n.component) {
+      case 'Card':   return `<div class="card card-border bg-base-100"><div class="card-body">${k}</div></div>`
+      case 'Column': return `<div class="flex flex-col gap-4">${k}</div>`
+      case 'Row':    return `<div class="flex flex-wrap items-center gap-2">${k}</div>`
+      case 'Heading':return n.level === 3
+        ? `<h3 class="card-title text-base">${esc(r(n.text))}</h3>`
+        : `<div><h2 class="card-title">${esc(r(n.text))}</h2>${n.sub ? `<p class="text-sm opacity-60">${esc(r(n.sub))}</p>` : ''}</div>`
+      case 'Text':   return `<p class="text-sm leading-relaxed">${md(r(n.text))}</p>`
+      case 'Badge':  return `<span class="badge badge-soft badge-${DAISY_TONE[n.tone] ?? 'neutral'}">${esc(r(n.text))}</span>`
+      case 'Button': return `<button class="btn btn-${n.variant === 'ghost' ? 'ghost' : n.variant === 'secondary' ? 'secondary' : 'primary'}">${esc(r(n.label))}</button>`
+      case 'Callout':return `<div role="alert" class="alert alert-soft alert-${DAISY_TONE[n.tone] ?? 'info'}"><span>${
+        n.title ? `<strong class="block">${esc(r(n.title))}</strong>` : ''}${esc(r(n.text))}</span></div>`
+      /* A <dl> and not daisyUI's `list`: label/value pairs are a description
+         list, and the library's idiom is only worth taking when it costs no
+         semantics. The look comes from utilities either way. */
+      case 'SummaryList': return `<dl class="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm">${
+        list(r(n.items)).map((it) => `<dt class="opacity-60">${esc(it.label)}</dt><dd class="font-medium">${esc(it.value)}</dd>`).join('')}</dl>`
+      case 'TaskList': return `<ul class="list bg-base-100 rounded-box">${
+        list(r(n.items)).map((it) => `<li class="list-row"><div>${
+        it.locked ? `<span class="opacity-50">${esc(it.name)}</span>` : `<a class="link link-hover font-medium">${esc(it.name)}</a>`}${
+        it.hint ? `<div class="text-xs opacity-60">${esc(it.hint)}</div>` : ''}</div><span class="badge badge-soft badge-${DAISY_TONE[it.tone] ?? 'neutral'}">${esc(it.status)}</span></li>`).join('')}</ul>`
+      case 'Steps':  return `<ol class="flex flex-col gap-4 list-decimal pl-5 marker:opacity-60 marker:font-semibold">${
+        list(r(n.items)).map((it) => `<li><h3 class="font-semibold text-sm">${esc(it.title)}</h3>${it.body ? `<p class="text-sm opacity-70">${esc(it.body)}</p>` : ''}</li>`).join('')}</ol>`
+      case 'Table':  return `<div class="overflow-x-auto"><table class="table table-zebra"><thead><tr>${
+        list(n.columns).map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${
+        list(r(n.rows)).map((row) => `<tr>${list(row).map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
+    }
+  },
+}
+
+/* ── binding 4 · shadcn/ui ───────────────────────────────────────────────── */
 const SC_BADGE = { info: 'secondary', success: 'default', warn: 'outline', danger: 'destructive', neutral: 'secondary' }
 const shadcn = {
   id: 'shadcn', label: 'shadcn/ui', note: 'your own components, copied into your repo — the generated file imports them',
@@ -112,7 +158,7 @@ function v(val) {
   return JSON.stringify(val)
 }
 
-export const BINDINGS = { kit, tailwind: tw, shadcn }
+export const BINDINGS = { kit, tailwind: tw, daisyui: daisy, shadcn }
 
 /** The artefact you copy. For shadcn: a real component file. For the rest: markup. */
 export function emit(binding, tree, walk) {

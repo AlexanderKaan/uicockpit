@@ -17,6 +17,6 @@ const page = readFileSync('builder.template.html', 'utf8')
 ${readFileSync('kit/global.css', 'utf8')}
 ${readFileSync('kit/kit.css', 'utf8')}
 }`)
-  .replace('/*TWCSS*/', readFileSync('tw.css', 'utf8'))
+  .replace('/*TWCSS*/', readFileSync('tw.css', 'utf8') + '\n' + readFileSync('daisy.css', 'utf8'))
 writeFileSync('builder.html', page)
 console.log(`builder.html — ${(page.length / 1024).toFixed(0)} kB, self-contained`)

@@ -1,0 +1,56 @@
+/* The daisyUI classes this binding emits, written by hand for the PREVIEW only —
+ * so the page keeps its promise of no build and no CDN. In your project these
+ * come from daisyUI itself (`@plugin "daisyui"`), and the class names here are
+ * the real ones (verified against the 5.7 docs), so what you copy is what you
+ * get. Values approximate daisyUI's default "light" theme. */
+.b-daisy{font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1f2937;
+  --p:#605dff;--pc:#fff;--b1:#fff;--b2:#f2f4f7;--bc:#1f2937;--rb:1rem;--rf:.5rem;
+  --info:#00b3f0;--success:#00a96e;--warning:#ffbe00;--error:#ff5861}
+.b-daisy .card{display:flex;flex-direction:column;border-radius:var(--rb);background:var(--b1)}
+.b-daisy .card-border{border:1px solid rgba(0,0,0,.1)}
+.b-daisy .bg-base-100{background:var(--b1)}
+.b-daisy .card-body{display:flex;flex-direction:column;gap:.5rem;padding:1.5rem}
+.b-daisy .card-title{font-size:1.125rem;font-weight:600;line-height:1.4;margin:0}
+.b-daisy .card-title.text-base{font-size:1rem}
+.b-daisy .btn{display:inline-flex;align-items:center;justify-content:center;height:3rem;padding-inline:1rem;
+  border-radius:var(--rf);font-weight:600;font-size:.875rem;border:1px solid transparent;cursor:pointer;background:var(--b2);color:var(--bc)}
+.b-daisy .btn-primary{background:var(--p);color:var(--pc)}
+.b-daisy .btn-secondary{background:#f43098;color:#fff}
+.b-daisy .btn-ghost{background:transparent;border-color:transparent}
+.b-daisy .badge{display:inline-flex;align-items:center;height:1.5rem;padding-inline:.6rem;border-radius:var(--rf);
+  font-size:.75rem;font-weight:600;border:1px solid transparent;background:var(--b2)}
+.b-daisy .badge-soft.badge-info{background:color-mix(in oklab,var(--info) 12%,#fff);color:color-mix(in oklab,var(--info) 75%,#000);border-color:color-mix(in oklab,var(--info) 30%,#fff)}
+.b-daisy .badge-soft.badge-success{background:color-mix(in oklab,var(--success) 12%,#fff);color:color-mix(in oklab,var(--success) 75%,#000);border-color:color-mix(in oklab,var(--success) 30%,#fff)}
+.b-daisy .badge-soft.badge-warning{background:color-mix(in oklab,var(--warning) 18%,#fff);color:color-mix(in oklab,var(--warning) 80%,#000);border-color:color-mix(in oklab,var(--warning) 35%,#fff)}
+.b-daisy .badge-soft.badge-error{background:color-mix(in oklab,var(--error) 12%,#fff);color:color-mix(in oklab,var(--error) 70%,#000);border-color:color-mix(in oklab,var(--error) 30%,#fff)}
+.b-daisy .badge-soft.badge-neutral{background:var(--b2);color:#4b5563;border-color:rgba(0,0,0,.08)}
+.b-daisy .alert{display:flex;gap:.75rem;align-items:flex-start;padding:1rem;border-radius:var(--rb);
+  border:1px solid transparent;font-size:.875rem;background:var(--b2)}
+.b-daisy .alert-soft.alert-info{background:color-mix(in oklab,var(--info) 10%,#fff);color:color-mix(in oklab,var(--info) 75%,#000);border-color:color-mix(in oklab,var(--info) 25%,#fff)}
+.b-daisy .alert-soft.alert-success{background:color-mix(in oklab,var(--success) 10%,#fff);color:color-mix(in oklab,var(--success) 75%,#000);border-color:color-mix(in oklab,var(--success) 25%,#fff)}
+.b-daisy .alert-soft.alert-warning{background:color-mix(in oklab,var(--warning) 16%,#fff);color:color-mix(in oklab,var(--warning) 80%,#000);border-color:color-mix(in oklab,var(--warning) 32%,#fff)}
+.b-daisy .alert-soft.alert-error{background:color-mix(in oklab,var(--error) 10%,#fff);color:color-mix(in oklab,var(--error) 70%,#000);border-color:color-mix(in oklab,var(--error) 25%,#fff)}
+.b-daisy .list{display:flex;flex-direction:column;border-radius:var(--rb);border:1px solid rgba(0,0,0,.08)}
+.b-daisy .list-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:1rem;padding:.75rem 1rem}
+.b-daisy .list-row + .list-row{border-top:1px solid rgba(0,0,0,.06)}
+.b-daisy .rounded-box{border-radius:var(--rb)}
+.b-daisy .link{text-decoration:underline;text-underline-offset:3px;color:inherit}
+.b-daisy .link-hover{text-decoration:underline}
+.b-daisy .table{width:100%;border-collapse:collapse;font-size:.875rem;text-align:left}
+.b-daisy .table th{font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;opacity:.6;padding:.75rem;font-weight:600}
+.b-daisy .table td{padding:.75rem;border-top:1px solid rgba(0,0,0,.06)}
+.b-daisy .table-zebra tbody tr:nth-child(even){background:var(--b2)}
+.b-daisy .divider{height:1px;background:rgba(0,0,0,.1);margin-block:.5rem}
+.b-daisy .overflow-x-auto{overflow-x:auto}
+.b-daisy .flex{display:flex}.b-daisy .flex-col{flex-direction:column}.b-daisy .flex-wrap{flex-wrap:wrap}
+.b-daisy .items-center{align-items:center}.b-daisy .gap-2{gap:.5rem}.b-daisy .gap-4{gap:1rem}
+.b-daisy .text-xs{font-size:.75rem}.b-daisy .text-sm{font-size:.875rem}.b-daisy .text-base{font-size:1rem}
+.b-daisy .font-medium{font-weight:500}.b-daisy .font-semibold{font-weight:600}
+.b-daisy .opacity-50{opacity:.5}.b-daisy .opacity-60{opacity:.6}.b-daisy .opacity-70{opacity:.7}
+.b-daisy .leading-relaxed{line-height:1.625}.b-daisy .block{display:block}
+.b-daisy .grid{display:grid}.b-daisy .grid-cols-\[max-content_1fr\]{grid-template-columns:max-content 1fr}
+.b-daisy .gap-x-6{column-gap:1.5rem}.b-daisy .gap-y-2{row-gap:.5rem}
+.b-daisy .list-decimal{list-style:decimal}.b-daisy .pl-5{padding-left:1.25rem}
+.b-daisy .marker\:opacity-60::marker{opacity:.6}.b-daisy .marker\:font-semibold::marker{font-weight:600}
+.b-daisy h2,.b-daisy h3,.b-daisy p,.b-daisy dl,.b-daisy dd,.b-daisy ol,.b-daisy ul{margin:0}
+.b-daisy ul.list{list-style:none;padding:0}

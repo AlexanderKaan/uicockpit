@@ -27,7 +27,7 @@ cd a2ui && node build.mjs && open builder.html
 ```
 
 One self-contained page. No install, no server, no CDN. Tick the blocks your
-agent may use, switch between **UIcockpit kit · Tailwind · shadcn/ui**, and copy
+agent may use, switch between **UIcockpit kit · Tailwind · daisyUI · shadcn/ui**, and copy
 three things: the `catalog.json`, the renderer for your stack, and the A2UI
 stream that produced what you see.
 
@@ -41,7 +41,7 @@ node probe.mjs broken.jsonl bad   # …and on a deliberately broken one
 - **A catalog** — 12 components, each carrying the source it comes from: GOV.UK,
   USWDS, NL Design System, WAI-ARIA or the HTML spec. Not "because we liked it".
 - **Bindings, as tables** — a binding is a mapping, not a program, so adding a
-  library is an afternoon rather than a rewrite. Three ship today.
+  library is an afternoon rather than a rewrite. Four ship today.
 - **A verdict per answer** — eight rules on the answer itself (heading order,
   a control without a name, a table without headers, a status carried by colour
   alone…), plus the binding's CI certificate. And six things it refuses to claim.
@@ -85,13 +85,13 @@ harness issued.
     a2ui/
       core.mjs          the A2UI core — stream, data model, dynamic values, tree
       catalog.json      12 components, each with the source it comes from
-      bindings.mjs      three bindings, as tables
+      bindings.mjs      four bindings, as tables
       check.mjs         the verdict: 8 rules, and 6 things it will not claim
       kit/              the kit binding's stylesheet — plain CSS, yours to edit
       binding.json      the certificate: 1200 contrast pairs over 60 configurations
       builder.*         the palette → one self-contained page (node build.mjs)
 
-About 1 300 lines, no dependencies, no build step for anything that runs.
+About 1 500 lines, no dependencies, no build step for anything that runs.
 
 ## Status
 

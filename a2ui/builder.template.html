@@ -102,7 +102,7 @@ function draw() {
   /* preview — every stack renders to HTML so they can be compared without a build */
   const html = walk(tree, (n, k, r) => b.h(n, k, r) ?? `<div style="padding:8px;border:1px dashed #d4d4d8;border-radius:8px;color:#71717a;font-size:12px">${n.component} — not in this binding</div>`, surface.model)
   const pv = $('.preview')
-  pv.className = 'preview ' + (state.stack === 'kit' ? 'b-kit' : 'b-tw')
+  pv.className = 'preview ' + { kit: 'b-kit', daisyui: 'b-daisy' }[state.stack] ?? 'b-tw'
   pv.innerHTML = html
 
   /* verdict — the same check() the CLI runs, on the same tree */
