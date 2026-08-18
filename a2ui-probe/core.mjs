@@ -78,3 +78,12 @@ export function buildTree(components, id = 'root', seen = new Set()) {
   const kids = node.children ?? (node.child ? [node.child] : [])
   return { ...node, kids: kids.map((k) => buildTree(components, k, new Set(seen))) }
 }
+
+/** Render a tree with a per-node function: fn(node, renderedKids, resolveValue). */
+export function walk(tree, fn, model = {}, functions = FUNCTIONS) {
+  const one = (n) => {
+    const kids = (n.kids ?? []).map(one).join('\n')
+    return fn(n, kids, (val) => resolve(val, model, null, functions))
+  }
+  return one(tree)
+}

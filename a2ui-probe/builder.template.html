@@ -1,0 +1,152 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build your A2UI catalog</title>
+<style>
+:root{--bg:#fafafa;--fg:#18181b;--mut:#71717a;--line:#e4e4e7;--surf:#fff;--acc:#18181b;
+      --ok:#166534;--okbg:#f0fdf4;--warn:#854d0e;--warnbg:#fefce8;--bad:#991b1b;--badbg:#fef2f2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+     font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;
+     padding:28px 32px 20px;border-bottom:1px solid var(--line);background:var(--surf)}
+h1{font-size:20px;letter-spacing:-.02em;margin:0 0 4px}
+.top p{margin:0;color:var(--mut);max-width:52ch}
+.stacks{display:flex;gap:6px;background:var(--bg);padding:4px;border-radius:999px;border:1px solid var(--line)}
+.stacks button{font:inherit;font-size:13px;padding:6px 14px;border-radius:999px;border:0;background:transparent;color:var(--mut);cursor:pointer}
+.stacks button[aria-checked=true]{background:var(--acc);color:#fff}
+main{display:grid;grid-template-columns:230px minmax(0,1fr) minmax(0,420px);gap:20px;padding:20px 32px 40px;align-items:start}
+@media(max-width:1100px){main{grid-template-columns:1fr}}
+section{background:var(--surf);border:1px solid var(--line);border-radius:12px}
+/* section > h2, never bare h2 — the preview renders headings of its own, and a
+   bare selector here reached inside it (found by measuring, not by reading). */
+section>h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:0;padding:14px 16px;display:flex;justify-content:space-between}
+.count{color:var(--mut);letter-spacing:0}
+.blocks{list-style:none;margin:0;padding:0 8px 8px}
+.blocks li{margin:0}
+.blocks label{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer}
+.blocks label:hover{background:var(--bg)}
+.blocks input{accent-color:var(--acc);width:15px;height:15px}
+.blocks .nm{font-weight:500}
+.hint{font-size:12px;color:var(--mut);margin:0;padding:10px 16px 16px;border-top:1px solid var(--line)}
+.stage__bar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.stage__label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.verdict{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px}
+.verdict[data-v=AA]{background:var(--okbg);color:var(--ok)}
+.verdict[data-v=fail]{background:var(--badbg);color:var(--bad)}
+.verdict[data-v=needs-review],.verdict[data-v=unverified]{background:var(--warnbg);color:var(--warn)}
+.stage__surface{padding:28px;background:var(--bg);border-radius:0 0 12px 12px;min-height:320px}
+.preview{max-width:640px;margin:0 auto}
+.findings{padding:0 16px 14px;font-size:12px;color:var(--mut)}
+.findings div{padding:6px 0;border-top:1px solid var(--line)}
+.findings code{background:var(--bg);padding:1px 5px;border-radius:4px}
+.tabs{display:flex;gap:2px;padding:10px 10px 0}
+.tabs button{font:inherit;font-size:12px;padding:6px 12px;border:0;border-radius:8px 8px 0 0;background:transparent;color:var(--mut);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--fg);color:#fff}
+.code{margin:0;padding:14px 16px;background:var(--fg);color:#e4e4e7;border-radius:0 0 12px 12px;
+      font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;max-height:520px;white-space:pre}
+.out{position:relative}
+.copy{position:absolute;top:14px;right:14px;font:inherit;font-size:11px;padding:5px 11px;border-radius:7px;
+      border:1px solid #3f3f46;background:#27272a;color:#e4e4e7;cursor:pointer}
+.copy:hover{background:#3f3f46}
+/*KITCSS*/
+/*TWCSS*/
+</style>
+<!--BODY-->
+<script type="module">
+/*MODULES*/
+const CATALOG = /*CATALOG*/;
+const DEMOS = /*DEMOS*/;
+
+const $ = (s) => document.querySelector(s)
+const state = { stack: 'kit', picked: new Set(['Heading', 'SummaryList', 'TaskList', 'Callout', 'Button']), tab: 'catalog' }
+const NAMES = Object.keys(CATALOG.components)
+const LAYOUT = new Set(['Card', 'Column', 'Row'])
+const SOURCE = { TaskList: 'GOV.UK · Task list', SummaryList: 'GOV.UK · Summary list', Steps: 'GOV.UK · Step by step',
+  Callout: 'USWDS · Alert', Table: 'HTML · <table> · GOV.UK · Table', Badge: 'NL Design System · Badge',
+  Button: 'HTML · <button> · APG · Button', Heading: 'NL Design System · Page header', Text: 'USWDS · Prose',
+  Card: 'USWDS · Card', Column: 'layout', Row: 'layout' }
+
+/* The demo answer: one Column of the picked blocks, inside a Card. This is a real
+   A2UI surface — flat components, ids, a data model — not a mock. */
+function buildStream() {
+  const picked = NAMES.filter((n) => state.picked.has(n) && !LAYOUT.has(n))
+  /* Structure and DATA travel apart, as A2UI intends: the components bind by
+     JSON Pointer, the data model arrives in its own message. */
+  const dataModel = {}
+  for (const n of picked) for (const [k, v] of Object.entries(DEMOS[n].data)) {
+    dataModel[k] = (v && typeof v === 'object' && !Array.isArray(v)) ? { ...(dataModel[k] ?? {}), ...v } : v
+  }
+  const components = [
+    { id: 'root', component: 'Card', child: 'body' },
+    { id: 'body', component: 'Column', children: picked.map((n) => 'n_' + n) },
+    ...picked.map((n) => ({ id: 'n_' + n, ...structuredClone(DEMOS[n].node) })),
+  ]
+  return [
+    { version: 'v1.0', createSurface: { surfaceId: 's', catalogId: CATALOG.catalogId, dataModel } },
+    { version: 'v1.0', updateComponents: { surfaceId: 's', components } },
+  ]
+}
+
+function subsetCatalog() {
+  const keep = [...state.picked]
+  const needed = keep.length ? [...new Set([...keep, 'Card', 'Column'])] : []
+  return { ...CATALOG, components: Object.fromEntries(needed.filter((n) => CATALOG.components[n]).map((n) => [n, CATALOG.components[n]])) }
+}
+
+function draw() {
+  const stream = buildStream()
+  const surface = applyStream(stream.map((m) => JSON.stringify(m))).get('s')
+  const tree = buildTree(surface.components)
+  const b = BINDINGS[state.stack]
+
+  /* preview — every stack renders to HTML so they can be compared without a build */
+  const html = walk(tree, (n, k, r) => b.h(n, k, r) ?? `<div style="padding:8px;border:1px dashed #d4d4d8;border-radius:8px;color:#71717a;font-size:12px">${n.component} — not in this binding</div>`, surface.model)
+  const pv = $('.preview')
+  pv.className = 'preview ' + (state.stack === 'kit' ? 'b-kit' : 'b-tw')
+  pv.innerHTML = html
+
+  /* verdict — the same check() the CLI runs, on the same tree */
+  const hydrated = (function h(n) { const o = { ...n }
+    if (n.items) o.resolvedItems = resolve(n.items, surface.model, null, FUNCTIONS)
+    o.kids = (n.kids ?? []).map(h); return o })(tree)
+  const rep = check(hydrated, { binding: { id: b.id, certified: b.id === 'kit' } })
+  const v = $('.verdict'); v.dataset.v = rep.verdict
+  v.textContent = { AA: '✓ AA', fail: '✗ fails', 'needs-review': '· needs review', unverified: '? unverified' }[rep.verdict]
+  $('.findings').innerHTML = rep.findings.length
+    ? rep.findings.map((f) => `<div><code>${f.sc ?? 'craft'}</code> ${f.message}</div>`).join('')
+    : `<div>${rep.why}. ${rep.unchecked.length} things this check never claims — see the report.</div>`
+
+  const code = { catalog: JSON.stringify(subsetCatalog(), null, 2),
+    binding: emit(b, tree, (t, fn) => walk(t, fn, surface.model)),
+    stream: stream.map((m) => JSON.stringify(m)).join('\n') }
+  $('.code code').textContent = code[state.tab]
+  $('.count').textContent = `${state.picked.size} of ${NAMES.length}`
+}
+
+/* palette */
+$('.blocks').innerHTML = NAMES.map((n) => `<li><label title="${SOURCE[n] ?? ''}">
+  <input type="checkbox" value="${n}" ${state.picked.has(n) ? 'checked' : ''}${LAYOUT.has(n) ? ' disabled' : ''}>
+  <span class="nm">${n}</span></label></li>`).join('')
+$('.blocks').addEventListener('change', (e) => {
+  e.target.checked ? state.picked.add(e.target.value) : state.picked.delete(e.target.value); draw()
+})
+/* stacks */
+$('.stacks').innerHTML = Object.values(BINDINGS).map((b) =>
+  `<button role="radio" data-s="${b.id}" aria-checked="${b.id === state.stack}" title="${b.note}">${b.label}</button>`).join('')
+$('.stacks').addEventListener('click', (e) => {
+  const btn = e.target.closest('button'); if (!btn) return
+  state.stack = btn.dataset.s
+  ;[...$('.stacks').children].forEach((c) => c.setAttribute('aria-checked', c === btn)); draw()
+})
+/* tabs + copy */
+$('.tabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('button'); if (!btn) return
+  state.tab = btn.dataset.tab
+  ;[...$('.tabs').children].forEach((c) => c.setAttribute('aria-selected', c === btn)); draw()
+})
+$('.copy').addEventListener('click', async () => {
+  await navigator.clipboard.writeText($('.code code').textContent)
+  $('.copy').textContent = 'Copied'; setTimeout(() => ($('.copy').textContent = 'Copy'), 1400)
+})
+draw()
+</script>

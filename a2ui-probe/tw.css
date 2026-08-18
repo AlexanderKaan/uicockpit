@@ -1,0 +1,36 @@
+/* The exact Tailwind utilities the tailwind/shadcn bindings emit, written by
+ * hand — for the PREVIEW only, so this page has no build step and no CDN. In
+ * your project these come from your own Tailwind build; the class names are the
+ * real ones, so what you copy is what you get. */
+.b-tw{font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#111827}
+.b-tw .flex{display:flex}.b-tw .inline-flex{display:inline-flex}.b-tw .grid{display:grid}.b-tw .block{display:block}
+.b-tw .flex-col{flex-direction:column}.b-tw .flex-wrap{flex-wrap:wrap}
+.b-tw .items-center{align-items:center}.b-tw .justify-between{justify-content:space-between}
+.b-tw .gap-1{gap:.25rem}.b-tw .gap-2{gap:.5rem}.b-tw .gap-4{gap:1rem}.b-tw .gap-x-6{column-gap:1.5rem}.b-tw .gap-y-2{row-gap:.5rem}
+.b-tw .grid-cols-\[max-content_1fr\]{grid-template-columns:max-content 1fr}.b-tw .contents{display:contents}
+.b-tw .w-full{width:100%}.b-tw .h-9{height:2.25rem}
+.b-tw .p-4{padding:1rem}.b-tw .p-6{padding:1.5rem}.b-tw .px-2{padding-inline:.5rem}.b-tw .px-4{padding-inline:1rem}
+.b-tw .py-0\.5{padding-block:.125rem}.b-tw .py-2{padding-block:.5rem}.b-tw .py-3{padding-block:.75rem}
+.b-tw .pr-4{padding-right:1rem}.b-tw .pl-5{padding-left:1.25rem}.b-tw .mb-1{margin-bottom:.25rem}
+.b-tw .rounded-md{border-radius:.375rem}.b-tw .rounded-lg{border-radius:.5rem}.b-tw .rounded-xl{border-radius:.75rem}.b-tw .rounded-full{border-radius:9999px}
+.b-tw .border{border:1px solid #e5e7eb}.b-tw .border-gray-200{border-color:#e5e7eb}
+.b-tw .border-b{border-bottom:1px solid #e5e7eb}.b-tw .border-l-2{border-left:2px solid #e5e7eb}
+.b-tw .divide-y>*+*{border-top:1px solid #e5e7eb}.b-tw .divide-gray-200>*+*{border-color:#e5e7eb}.b-tw .divide-gray-100>*+*{border-color:#f3f4f6}
+.b-tw .shadow-sm{box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.b-tw .bg-white{background:#fff}.b-tw .bg-gray-100{background:#f3f4f6}.b-tw .bg-gray-900{background:#111827}
+.b-tw .text-white{color:#fff}.b-tw .text-gray-400{color:#9ca3af}.b-tw .text-gray-500{color:#6b7280}
+.b-tw .text-gray-700{color:#374151}.b-tw .text-gray-900{color:#111827}.b-tw .text-muted-foreground{color:#6b7280}
+.b-tw .text-xs{font-size:.75rem;line-height:1rem}.b-tw .text-sm{font-size:.875rem;line-height:1.25rem}
+.b-tw .text-base{font-size:1rem;line-height:1.5rem}.b-tw .text-xl{font-size:1.25rem;line-height:1.75rem}
+.b-tw .font-medium{font-weight:500}.b-tw .font-semibold{font-weight:600}
+.b-tw .tracking-tight{letter-spacing:-.015em}.b-tw .tracking-wide{letter-spacing:.025em}
+.b-tw .uppercase{text-transform:uppercase}.b-tw .leading-relaxed{line-height:1.625}
+.b-tw .text-left{text-align:left}.b-tw .underline{text-decoration:underline}.b-tw .underline-offset-4{text-underline-offset:4px}
+.b-tw .ring-1{box-shadow:inset 0 0 0 1px var(--tw-ring,#e5e7eb)}.b-tw .ring-inset{}
+.b-tw .bg-blue-50{background:#eff6ff}.b-tw .text-blue-900{color:#1e3a8a}.b-tw .ring-blue-200{--tw-ring:#bfdbfe}
+.b-tw .bg-green-50{background:#f0fdf4}.b-tw .text-green-900{color:#14532d}.b-tw .ring-green-200{--tw-ring:#bbf7d0}
+.b-tw .bg-amber-50{background:#fffbeb}.b-tw .text-amber-900{color:#78350f}.b-tw .ring-amber-200{--tw-ring:#fde68a}
+.b-tw .bg-red-50{background:#fef2f2}.b-tw .text-red-900{color:#7f1d1d}.b-tw .ring-red-200{--tw-ring:#fecaca}
+.b-tw .ring-gray-200{--tw-ring:#e5e7eb}.b-tw .bg-card{background:#fff}
+.b-tw table{border-collapse:collapse}.b-tw h2,.b-tw h3,.b-tw p,.b-tw dl,.b-tw dd,.b-tw ol{margin:0}
+.b-tw ol{list-style:none;padding:0}.b-tw button{font:inherit;cursor:pointer;border:0}

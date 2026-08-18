@@ -1,8 +1,9 @@
-# A2UI probe — the whole pipe, 344 lines
+# A2UI probe — the whole pipe, and a builder you can open
 
 One real A2UI stream → a custom catalog → a renderer → a conformance verdict.
 Runs on plain node, no build, no dependencies.
 
+    node build.mjs && open builder.html     # THE BUILDER: pick blocks, pick your stack, copy both
     node probe.mjs                          # the verdict on a clean answer
     node probe.mjs broken.jsonl bad         # the verdict on a broken one
     node probe.mjs message.jsonl permit_1 --html > out.html
@@ -13,6 +14,9 @@ Runs on plain node, no build, no dependencies.
 | `catalog.json` | 2 components (GOV.UK Task list, Summary list) + 1 function + the `instructions` block | 19 |
 | `bind-kit.mjs` | binding A — our kit, plain HTML. Renders the refusal in place | 62 |
 | `bind-shadcn.tsx` | binding B — shadcn/ui. The artefact the builder would generate; you own it | 63 |
+| `bindings.mjs` | **three bindings as TABLES**: our kit · Tailwind · shadcn/ui. `h()` renders the preview, `emit()` writes the artefact you own | 120 |
+| `builder.template.html` + `build.mjs` | the clickable palette → one self-contained `builder.html` (no toolchain, mail it to someone) | 230 |
+| `demos.json` | one demo node per component — **bound by JSON Pointer**, with its data-model fragment beside it, so the generated code reads `read(data, '/facts')` instead of baking content in | 60 |
 | `check.mjs` | the per-answer conformance verdict: 8 rules, 6 things explicitly NOT claimed | 100 |
 | `binding.json` | the CI certificate: 1200 contrast pairs over 60 configurations | — |
 | `certify.ts` | generates that certificate from real measurement (`auditContrast` × 60 configs) | 30 |
@@ -22,6 +26,21 @@ Both generators run from the cockpit (they import its token engine):
 
     cd ../cockpit && npx vite-node ../a2ui-probe/certify.ts   # → binding.json
     cd ../cockpit && npx vite-node ../a2ui-probe/preview.ts   # → preview.html (gitignored)
+
+## A binding is a TABLE, not a program
+
+That is the whole reason a builder is possible. A2UI keeps the catalog (schema)
+and the renderer (implementation) apart on purpose, so "support another library"
+means adding a mapping, not writing a renderer. The three here are ~40 lines each:
+
+| stack | what it emits |
+|---|---|
+| **UIcockpit kit** | plain CSS classes — works in any renderer, and it is the one binding with a CI certificate |
+| **Tailwind CSS** | utility classes only, no component library |
+| **shadcn/ui** | a real `.tsx` file importing your own components, reading the data model by pointer |
+
+Add a fourth by adding a table. MUI, Ant, Chakra, Mantine, daisyUI, Bootstrap,
+GOV.UK Frontend, NL Design System — the class-based ones are an afternoon each.
 
 ## The split that makes the claim honest
 

@@ -1,12 +1,163 @@
 {
   "catalogId": "https://uicockpit.com/a2ui/v1/public-service/catalog.json",
-  "instructions": "# Public-service catalog\n\nUse **TaskList** for a multi-step service where each step has a status: it is the GOV.UK Task list pattern, and it tells the user what is done, what is next and what cannot start yet. Never simulate it with a bullet list.\n\nUse **SummaryList** for the facts of a case (dates, reference numbers, status): label/value pairs, the GOV.UK Summary list. Never use a table for two columns of facts.\n\nOne primary Button per surface. Status words travel in text, never in colour alone.",
+  "instructions": "# Public-service catalog\n\nPrefer a component to prose. A list of facts is **SummaryList**, the steps of a service are **TaskList** (with a status per step) or **Steps** (what to do, in order), a thing the reader must not miss is **Callout**, rows of the same shape are a **Table** — and a Table always declares its `columns`.\n\nRules: one primary **Button** per answer · headings go 2 then 3, never skip · a status word travels in text, never in colour alone · never a Card inside a Card.",
   "components": {
+    "Heading": {
+      "type": "object",
+      "description": "A section heading. Level 2 opens an answer; 3 divides it.",
+      "properties": {
+        "component": {
+          "const": "Heading"
+        },
+        "text": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicString",
+          "description": "The heading."
+        },
+        "level": {
+          "type": "integer",
+          "enum": [
+            2,
+            3
+          ],
+          "description": "2 or 3 — never skip a level."
+        },
+        "sub": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicString",
+          "description": "One line under it."
+        }
+      },
+      "required": [
+        "component",
+        "text"
+      ]
+    },
+    "Text": {
+      "type": "object",
+      "description": "A paragraph. Supports **bold** and *italic*.",
+      "properties": {
+        "component": {
+          "const": "Text"
+        },
+        "text": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicString",
+          "description": "The text."
+        }
+      },
+      "required": [
+        "component",
+        "text"
+      ]
+    },
+    "Badge": {
+      "type": "object",
+      "description": "A short status word. The word carries the meaning, never the colour alone.",
+      "properties": {
+        "component": {
+          "const": "Badge"
+        },
+        "text": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicString",
+          "description": "The status word."
+        },
+        "tone": {
+          "type": "string",
+          "enum": [
+            "neutral",
+            "info",
+            "success",
+            "warn",
+            "danger"
+          ]
+        }
+      },
+      "required": [
+        "component",
+        "text"
+      ]
+    },
+    "Button": {
+      "type": "object",
+      "description": "One primary action per answer.",
+      "properties": {
+        "component": {
+          "const": "Button"
+        },
+        "label": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicString",
+          "description": "What it does."
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "ghost"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "description": "Action name dispatched to the agent."
+        }
+      },
+      "required": [
+        "component",
+        "label"
+      ]
+    },
+    "Callout": {
+      "type": "object",
+      "description": "A short aside the reader must not miss. GOV.UK Warning text / USWDS Alert.",
+      "properties": {
+        "component": {
+          "const": "Callout"
+        },
+        "text": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicString",
+          "description": "The message."
+        },
+        "title": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicString",
+          "description": "Optional heading."
+        },
+        "tone": {
+          "type": "string",
+          "enum": [
+            "info",
+            "success",
+            "warn",
+            "danger"
+          ]
+        }
+      },
+      "required": [
+        "component",
+        "text"
+      ]
+    },
+    "SummaryList": {
+      "type": "object",
+      "description": "Label/value pairs describing one case or record. GOV.UK Summary list.",
+      "properties": {
+        "component": {
+          "const": "SummaryList"
+        },
+        "items": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicList",
+          "description": "Path to a list of { label, value } objects."
+        }
+      },
+      "required": [
+        "component",
+        "items"
+      ]
+    },
     "TaskList": {
       "type": "object",
       "description": "A list of the steps of a service, each with a status. GOV.UK Task list.",
       "properties": {
-        "component": { "const": "TaskList" },
+        "component": {
+          "const": "TaskList"
+        },
         "items": {
           "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicList",
           "description": "Path to a list of { name, status, hint?, locked? } objects."
@@ -16,19 +167,106 @@
           "description": "Accessible name for the list."
         }
       },
-      "required": ["component", "items"]
+      "required": [
+        "component",
+        "items"
+      ]
     },
-    "SummaryList": {
+    "Steps": {
       "type": "object",
-      "description": "Label/value pairs describing one case or record. GOV.UK Summary list.",
+      "description": "What to do, in order. GOV.UK Step by step.",
       "properties": {
-        "component": { "const": "SummaryList" },
+        "component": {
+          "const": "Steps"
+        },
         "items": {
           "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicList",
-          "description": "Path to a list of { label, value } objects."
+          "description": "List of { title, body? }."
         }
       },
-      "required": ["component", "items"]
+      "required": [
+        "component",
+        "items"
+      ]
+    },
+    "Table": {
+      "type": "object",
+      "description": "Rows of the same shape. Always declares its column headers.",
+      "properties": {
+        "component": {
+          "const": "Table"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Column headers — required, a table without them is unreadable to a screen reader."
+        },
+        "rows": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicList",
+          "description": "List of row arrays."
+        }
+      },
+      "required": [
+        "component",
+        "columns",
+        "rows"
+      ]
+    },
+    "Card": {
+      "type": "object",
+      "description": "A surface that groups one thing. Never a card inside a card.",
+      "properties": {
+        "component": {
+          "const": "Card"
+        },
+        "child": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "component",
+        "child"
+      ]
+    },
+    "Column": {
+      "type": "object",
+      "description": "A vertical container.",
+      "properties": {
+        "component": {
+          "const": "Column"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "component",
+        "children"
+      ]
+    },
+    "Row": {
+      "type": "object",
+      "description": "A horizontal container that wraps.",
+      "properties": {
+        "component": {
+          "const": "Row"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "component",
+        "children"
+      ]
     }
   },
   "functions": {
@@ -38,14 +276,25 @@
       "returnType": "string",
       "allowedCallers": "rendererOnly",
       "properties": {
-        "call": { "const": "formatString" },
+        "call": {
+          "const": "formatString"
+        },
         "args": {
           "type": "object",
-          "properties": { "value": { "type": "string" } },
-          "required": ["value"]
+          "properties": {
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value"
+          ]
         }
       },
-      "required": ["call", "args"]
+      "required": [
+        "call",
+        "args"
+      ]
     }
   }
 }

@@ -1,0 +1,34 @@
+<header class="top">
+  <div>
+    <h1>Build your A2UI catalog</h1>
+    <p>Pick the blocks your agent may render. Pick your stack. Copy the catalog and the renderer — you own both.</p>
+  </div>
+  <div class="stacks" role="radiogroup" aria-label="Your stack"></div>
+</header>
+
+<main>
+  <section class="palette" aria-label="Blocks">
+    <h2>Blocks <span class="count"></span></h2>
+    <ul class="blocks"></ul>
+    <p class="hint">Every block carries a source — GOV.UK, USWDS, NL Design System or WAI-ARIA. Hover a name to see it.</p>
+  </section>
+
+  <section class="stage" aria-label="Preview">
+    <div class="stage__bar">
+      <span class="stage__label">Preview</span>
+      <span class="verdict" role="status"></span>
+    </div>
+    <div class="stage__surface"><div class="preview"></div></div>
+    <div class="findings"></div>
+  </section>
+
+  <section class="out" aria-label="Output">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="catalog" aria-selected="true">catalog.json</button>
+      <button role="tab" data-tab="binding" aria-selected="false">renderer</button>
+      <button role="tab" data-tab="stream" aria-selected="false">A2UI stream</button>
+    </div>
+    <pre class="code"><code></code></pre>
+    <button class="copy">Copy</button>
+  </section>
+</main>
