@@ -1,11 +1,31 @@
 {
   "binding": "kit@0.1",
-  "generated": "2026-08-17",
-  "method": "buildTokens × auditContrast over every theme × mode × density; WCAG 1.4.3 / 1.4.11 floors",
+  "generated": "2026-08-18",
+  "method": "buildTokens × auditContrast + the A2UI non-text pairs, over every theme × mode × density; WCAG 1.4.3 / 1.4.11 floors",
   "combinations": 60,
-  "pairsChecked": 1200,
-  "certified": true,
-  "failures": [],
+  "certifiedCombinations": 54,
+  "pairsChecked": 1500,
+  "certified": false,
+  "defaultConfiguration": "cobalt/light",
+  "defaultPasses": true,
+  "failures": [
+    "indigo/dark/compact: Selected tab indicator on surface 1.61:1 < 3",
+    "indigo/dark/compact: Checked checkbox/radio on surface 1.61:1 < 3",
+    "indigo/dark/default: Selected tab indicator on surface 1.61:1 < 3",
+    "indigo/dark/default: Checked checkbox/radio on surface 1.61:1 < 3",
+    "indigo/dark/comfortable: Selected tab indicator on surface 1.61:1 < 3",
+    "indigo/dark/comfortable: Checked checkbox/radio on surface 1.61:1 < 3",
+    "violet/dark/compact: Selected tab indicator on surface 1.81:1 < 3",
+    "violet/dark/compact: Checked checkbox/radio on surface 1.81:1 < 3",
+    "violet/dark/default: Selected tab indicator on surface 1.81:1 < 3",
+    "violet/dark/default: Checked checkbox/radio on surface 1.81:1 < 3",
+    "violet/dark/comfortable: Selected tab indicator on surface 1.81:1 < 3",
+    "violet/dark/comfortable: Checked checkbox/radio on surface 1.81:1 < 3"
+  ],
+  "measuredNotRequired": {
+    "Divider against surface": "1.09:1 – 1.39:1 (1.4.11 exempts decoration)",
+    "Divider against background": "1.22:1 – 1.31:1 (1.4.11 exempts decoration)"
+  },
   "alsoMeasuredInCI": [
     "2.5.8 target size (axe, rendered, 3 widths)",
     "2.4.7 focus visible (measured before/after focus)",

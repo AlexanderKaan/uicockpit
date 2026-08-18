@@ -54,3 +54,29 @@
 .b-daisy .marker\:opacity-60::marker{opacity:.6}.b-daisy .marker\:font-semibold::marker{font-weight:600}
 .b-daisy h2,.b-daisy h3,.b-daisy p,.b-daisy dl,.b-daisy dd,.b-daisy ol,.b-daisy ul{margin:0}
 .b-daisy ul.list{list-style:none;padding:0}
+/* — added for the A2UI Basic Catalog: daisyUI's own idioms for the components
+     the Basic Catalog adds (collapse, modal, input, checkbox, radio, range) — */
+.b-daisy .btn-link{background:transparent;border-color:transparent;color:var(--p);text-decoration:underline;height:auto;padding-inline:0}
+.b-daisy .collapse{border-radius:var(--rb);overflow:hidden}
+.b-daisy .collapse.border{border:1px solid rgba(0,0,0,.1)}
+.b-daisy .collapse-title{padding:1rem;cursor:pointer;list-style:none}
+.b-daisy .collapse-arrow .collapse-title::after{content:"▾";float:right;opacity:.5}
+.b-daisy details[open].collapse-arrow .collapse-title::after{content:"▴"}
+.b-daisy .collapse-content{padding:0 1rem 1rem}
+.b-daisy .modal{border:0;padding:0;background:transparent;max-width:100%}
+.b-daisy .modal::backdrop{background:rgba(0,0,0,.4)}
+.b-daisy .modal-box{background:var(--b1);border-radius:var(--rb);padding:1.5rem;max-width:32rem;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.b-daisy .modal-action{display:flex;justify-content:flex-end;margin-top:.5rem}
+.b-daisy .input,.b-daisy .textarea{border:1px solid rgba(0,0,0,.2);border-radius:var(--rf);background:var(--b1);
+  padding:.5rem .75rem;font:inherit;color:inherit;min-height:3rem}
+.b-daisy .textarea{min-height:auto}
+.b-daisy .fieldset{display:flex;flex-direction:column;gap:.5rem;border:0;margin:0;padding:0}
+.b-daisy .fieldset-legend{font-size:.875rem;font-weight:600;padding:0}
+.b-daisy .label{display:inline-flex;align-items:center;gap:.5rem;font-size:.875rem;cursor:pointer}
+.b-daisy .checkbox,.b-daisy .radio{width:1.25rem;height:1.25rem;accent-color:var(--p)}
+.b-daisy .radio{border-radius:50%}
+.b-daisy .range{width:100%;accent-color:var(--p)}
+.b-daisy .divider-horizontal{width:1px;height:auto;align-self:stretch;margin-inline:.5rem;margin-block:0}
+.b-daisy .w-full{width:100%}.b-daisy .rounded-box img,.b-daisy .rounded-box video{border-radius:var(--rb)}
+.b-daisy audio,.b-daisy video,.b-daisy img{display:block;max-width:100%}
+.b-daisy figure{margin:0}

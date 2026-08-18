@@ -34,7 +34,8 @@
         "role": "heading",
         "name": "text",
         "level": "level"
-      }
+      },
+      "x-source": "NL Design System · Page header"
     },
     "Text": {
       "type": "object",
@@ -55,7 +56,8 @@
       "x-a11y": {
         "role": "text",
         "name": "text"
-      }
+      },
+      "x-source": "USWDS · Prose"
     },
     "Badge": {
       "type": "object",
@@ -87,7 +89,8 @@
         "role": "status",
         "name": "text",
         "tone": "tone"
-      }
+      },
+      "x-source": "NL Design System · Badge"
     },
     "Button": {
       "type": "object",
@@ -124,7 +127,8 @@
           "prop": "variant",
           "primary": "primary"
         }
-      }
+      },
+      "x-source": "HTML · <button> · WAI-ARIA APG · Button"
     },
     "Callout": {
       "type": "object",
@@ -159,7 +163,8 @@
         "role": "status",
         "name": "text",
         "tone": "tone"
-      }
+      },
+      "x-source": "USWDS · Alert"
     },
     "SummaryList": {
       "type": "object",
@@ -181,7 +186,8 @@
         "role": "list",
         "items": "items",
         "itemName": "label"
-      }
+      },
+      "x-source": "GOV.UK · Summary list"
     },
     "TaskList": {
       "type": "object",
@@ -209,7 +215,8 @@
         "itemName": "name",
         "itemStatus": "status",
         "itemTone": "tone"
-      }
+      },
+      "x-source": "GOV.UK · Task list"
     },
     "Steps": {
       "type": "object",
@@ -231,7 +238,8 @@
         "role": "list",
         "items": "items",
         "itemName": "title"
-      }
+      },
+      "x-source": "GOV.UK · Step by step"
     },
     "Table": {
       "type": "object",
@@ -261,7 +269,8 @@
         "role": "table",
         "columns": "columns",
         "items": "rows"
-      }
+      },
+      "x-source": "HTML · <table> · GOV.UK · Table"
     },
     "Card": {
       "type": "object",
@@ -280,7 +289,8 @@
       ],
       "x-a11y": {
         "role": "layout"
-      }
+      },
+      "x-source": "USWDS · Card"
     },
     "Column": {
       "type": "object",
@@ -302,7 +312,8 @@
       ],
       "x-a11y": {
         "role": "layout"
-      }
+      },
+      "x-source": "CSS · flex column"
     },
     "Row": {
       "type": "object",
@@ -324,7 +335,8 @@
       ],
       "x-a11y": {
         "role": "layout"
-      }
+      },
+      "x-source": "CSS · flex row"
     }
   },
   "functions": {

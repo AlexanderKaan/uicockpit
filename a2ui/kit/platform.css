@@ -1,0 +1,31 @@
+/* The platform elements the A2UI Basic Catalog needs and the component library
+ * never had a recipe for. Binding to someone else's catalog is what surfaced
+ * them: the library had no Divider at all (nothing in it ever drew a rule), and
+ * a bare <hr> in a flex column collapses to nothing.
+ *
+ * Hand-written, unlike kit.css — but written the house way: every value comes
+ * from a token the kit already publishes, so theming still happens in one place. */
+hr {
+  border: 0;
+  border-top: var(--k-divider, 1px solid var(--k-border));
+  align-self: stretch;
+  /* the UA stylesheet sets margin-inline:auto, and auto margins in a flex
+     column eat every pixel of free space — the rule measured 0 wide until this
+     line existed */
+  margin: var(--k-s-8, .5rem) 0;
+}
+[role="separator"][aria-orientation="vertical"] {
+  border-inline-start: var(--k-divider, 1px solid var(--k-border));
+  align-self: stretch;
+  inline-size: 0;
+}
+img, video, audio, svg { max-inline-size: 100% }
+audio { inline-size: 100% }
+figure { margin: 0 }
+
+/* A2UI puts every child of a Column on its own row, so an inline thing lands
+ * directly in a flex column and stretches to the full width — a badge came out
+ * 339px wide, reading as a bar. The kit never hit this because its own layouts
+ * wrap inline items in a cluster first. Composition, not the recipe: the badge
+ * keeps its size, and this says so where a Column is the parent. */
+.l-stack > .badge { align-self: start }

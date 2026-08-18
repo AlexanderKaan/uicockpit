@@ -1,0 +1,287 @@
+{
+ "_what": "One demo per component of the A2UI Basic Catalog, in the shape the published schema actually specifies — Button names itself from a child Text, Image carries `description`, Tabs holds `tabs[].child`, Modal holds `trigger`/`content`, and List uses a TEMPLATE over a collection so relative paths resolve inside each item. `extra` are the additional flat components a demo needs; A2UI has no inline children.",
+ "demos": {
+  "Text": {
+   "node": {
+    "component": "Text",
+    "text": {
+     "path": "/intro"
+    }
+   },
+   "data": {
+    "intro": "Households may bring waste **free of charge** twice a month. Book a 30-minute slot below; bring proof of address."
+   }
+  },
+  "Image": {
+   "node": {
+    "component": "Image",
+    "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23e8eae6'/%3E%3Cpath d='M0 132 L400 108' stroke='%23c9cdc6' stroke-width='10' fill='none'/%3E%3Cpath d='M148 0 L172 200' stroke='%23c9cdc6' stroke-width='8' fill='none'/%3E%3Cpath d='M0 60 Q120 44 400 72' stroke='%23a8c4d8' stroke-width='16' fill='none'/%3E%3Cg fill='%23b23c3c'%3E%3Ccircle cx='110' cy='96' r='9'/%3E%3Ccircle cx='232' cy='140' r='9'/%3E%3Ccircle cx='312' cy='84' r='9'/%3E%3Ccircle cx='60' cy='158' r='9'/%3E%3C/g%3E%3C/svg%3E",
+    "description": "Map of the Rijnmond area with the four recycling centres marked",
+    "variant": "mediumFeature",
+    "fit": "cover"
+   },
+   "data": {}
+  },
+  "Icon": {
+   "node": {
+    "component": "Icon",
+    "name": "locationOn"
+   },
+   "data": {}
+  },
+  "Video": {
+   "node": {
+    "component": "Video",
+    "url": "https://example.org/sorting-your-waste.mp4",
+    "posterUrl": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'%3E%3Crect width='400' height='225' fill='%232f3437'/%3E%3Ccircle cx='200' cy='112' r='34' fill='none' stroke='%23ffffff' stroke-width='3' opacity='.8'/%3E%3Cpath d='M190 96 L216 112 L190 128 Z' fill='%23ffffff' opacity='.9'/%3E%3C/svg%3E"
+   },
+   "data": {}
+  },
+  "AudioPlayer": {
+   "node": {
+    "component": "AudioPlayer",
+    "url": "https://example.org/conditions.mp3",
+    "description": "Spoken summary of the conditions, 2 minutes"
+   },
+   "data": {}
+  },
+  "List": {
+   "node": {
+    "component": "List",
+    "children": {
+     "path": "/centres",
+     "componentId": "centreLine"
+    },
+    "direction": "vertical"
+   },
+   "extra": [
+    {
+     "id": "centreLine",
+     "component": "Text",
+     "text": {
+      "call": "formatString",
+      "args": {
+       "value": "${name} — ${hours}"
+      }
+     }
+    }
+   ],
+   "data": {
+    "centres": [
+     {
+      "name": "Kralingen",
+      "hours": "Mon–Sat, 08:00–17:00"
+     },
+     {
+      "name": "Hoogvliet",
+      "hours": "Tue–Sat, 09:00–16:30"
+     },
+     {
+      "name": "Bospolder",
+      "hours": "Mon–Fri, 08:00–15:00"
+     }
+    ]
+   }
+  },
+  "Divider": {
+   "node": {
+    "component": "Divider",
+    "axis": "horizontal"
+   },
+   "data": {}
+  },
+  "Tabs": {
+   "node": {
+    "component": "Tabs",
+    "tabs": [
+     {
+      "title": "What you can bring",
+      "child": "tabA"
+     },
+     {
+      "title": "What we refuse",
+      "child": "tabB"
+     }
+    ]
+   },
+   "extra": [
+    {
+     "id": "tabA",
+     "component": "Text",
+     "text": "Garden waste, untreated wood, metal, rubble, paper, glass and small appliances."
+    },
+    {
+     "id": "tabB",
+     "component": "Text",
+     "text": "Asbestos, gas bottles, fireworks and car tyres. These go to the chemical depot on Keilestraat."
+    }
+   ],
+   "data": {}
+  },
+  "Modal": {
+   "node": {
+    "component": "Modal",
+    "trigger": "modalBtn",
+    "content": "modalBody"
+   },
+   "extra": [
+    {
+     "id": "modalBtn",
+     "component": "Button",
+     "child": "modalBtnText",
+     "variant": "borderless"
+    },
+    {
+     "id": "modalBtnText",
+     "component": "Text",
+     "text": "Read the full conditions"
+    },
+    {
+     "id": "modalBody",
+     "component": "Text",
+     "text": "Proof of address is checked at the barrier. Loads over 2 m³ are charged at the commercial rate. Trailers are counted separately."
+    }
+   ],
+   "data": {}
+  },
+  "Button": {
+   "node": {
+    "component": "Button",
+    "child": "bookText",
+    "variant": "primary"
+   },
+   "extra": [
+    {
+     "id": "bookText",
+     "component": "Text",
+     "text": "Book this slot"
+    }
+   ],
+   "data": {}
+  },
+  "TextField": {
+   "node": {
+    "component": "TextField",
+    "label": "Postcode",
+    "value": {
+     "path": "/form/postcode"
+    },
+    "placeholder": "3011 AA",
+    "variant": "shortText"
+   },
+   "data": {
+    "form": {
+     "postcode": "3011 AA"
+    }
+   }
+  },
+  "DateTimeInput": {
+   "node": {
+    "component": "DateTimeInput",
+    "label": "Preferred date",
+    "value": {
+     "path": "/form/date"
+    },
+    "enableDate": true,
+    "min": "2026-08-18"
+   },
+   "data": {
+    "form": {
+     "date": "2026-08-24"
+    }
+   }
+  },
+  "ChoicePicker": {
+   "node": {
+    "component": "ChoicePicker",
+    "label": "What are you bringing?",
+    "variant": "multipleSelection",
+    "displayStyle": "checkbox",
+    "options": [
+     {
+      "label": "Garden waste",
+      "value": "garden"
+     },
+     {
+      "label": "Wood",
+      "value": "wood"
+     },
+     {
+      "label": "Rubble",
+      "value": "rubble"
+     },
+     {
+      "label": "Metal",
+      "value": "metal"
+     }
+    ],
+    "value": {
+     "path": "/form/waste"
+    }
+   },
+   "data": {
+    "form": {
+     "waste": [
+      "garden",
+      "wood"
+     ]
+    }
+   }
+  },
+  "Slider": {
+   "node": {
+    "component": "Slider",
+    "label": "Estimated volume in cubic metres",
+    "min": 0,
+    "max": 6,
+    "steps": 6,
+    "value": {
+     "path": "/form/volume"
+    }
+   },
+   "data": {
+    "form": {
+     "volume": 2
+    }
+   }
+  },
+  "CheckBox": {
+   "node": {
+    "component": "CheckBox",
+    "label": "This waste comes from my own household",
+    "value": {
+     "path": "/form/own"
+    }
+   },
+   "data": {
+    "form": {
+     "own": true
+    }
+   }
+  },
+  "Card": {
+   "node": {
+    "component": "Card",
+    "child": "—"
+   },
+   "data": {},
+   "layout": true
+  },
+  "Row": {
+   "node": {
+    "component": "Row",
+    "children": []
+   },
+   "data": {},
+   "layout": true
+  },
+  "Column": {
+   "node": {
+    "component": "Column",
+    "children": []
+   },
+   "data": {},
+   "layout": true
+  }
+ }
+}

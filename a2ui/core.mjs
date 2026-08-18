@@ -69,21 +69,74 @@ function writePath(model, path, value) {
   cur[parts.at(-1)] = value
 }
 
-/** Flat map + root → a tree the binding can walk. Cycles and gaps are errors, not silence. */
-export function buildTree(components, id = 'root', seen = new Set()) {
+/* Which properties carry component ids — READ FROM THE CATALOG, never hardcoded.
+ * The Basic Catalog scatters them: `child` (Card, Button), `children` (Row,
+ * Column, List), `trigger` and `content` (Modal), and one nested inside an
+ * array at `tabs[].child`. Guessing those names is how a renderer silently
+ * loses half a tree. A JSON Schema marks every one of them with $defs/Child or
+ * $defs/ChildList, so a catalog nobody has seen before still gives up its tree. */
+const CHILD = /\/\$defs\/Child$/
+const CHILDLIST = /\/\$defs\/ChildList$/
+const propsOf = (def) => Object.assign({}, ...(def.allOf ?? []).map((p) => p.properties ?? {}), def.properties ?? {})
+
+export function childRefs(catalog) {
+  const map = new Map()
+  for (const [name, def] of Object.entries(catalog?.components ?? {})) {
+    const refs = []
+    for (const [prop, s] of Object.entries(propsOf(def))) {
+      if (CHILD.test(s.$ref ?? '')) refs.push({ prop })
+      else if (CHILDLIST.test(s.$ref ?? '')) refs.push({ prop, many: true })
+      else for (const [k, sub] of Object.entries(s.items?.properties ?? {})) if (CHILD.test(sub.$ref ?? '')) refs.push({ prop, item: k })
+    }
+    if (refs.length) map.set(name, refs)
+  }
+  return map
+}
+
+/** What our own catalog uses, so a tree still builds with no schema in hand. */
+const DEFAULT_REFS = [{ prop: 'children', many: true }, { prop: 'child' }]
+
+/**
+ * Flat map + root → a tree the binding can walk. Cycles and gaps are errors,
+ * not silence.
+ *
+ * A ChildList is either an array of ids or a TEMPLATE — `{path, componentId}` —
+ * which renders one copy per item in the collection, with relative paths
+ * resolving inside that item. That scope travels down the whole subtree, so it
+ * is carried on the node rather than recomputed.
+ */
+export function buildTree(components, id = 'root', opts = {}) {
+  const { refs, model = {}, scope = null, seen = new Set() } = opts
   const node = components.get(id)
   if (!node) throw new Error(`A2UI: component "${id}" referenced but never sent`)
   if (seen.has(id)) throw new Error(`A2UI: cycle at "${id}"`)
-  seen.add(id)
-  const kids = node.children ?? (node.child ? [node.child] : [])
-  return { ...node, kids: kids.map((k) => buildTree(components, k, new Set(seen))) }
+  const next = new Set(seen).add(id)
+  const sub = (kidId, kidScope = scope) => buildTree(components, kidId, { refs, model, scope: kidScope, seen: next })
+
+  const kids = []
+  for (const ref of refs?.get(node.component) ?? DEFAULT_REFS) {
+    const val = node[ref.prop]
+    if (val == null) continue
+    if (ref.item) { for (const entry of val) if (entry?.[ref.item]) kids.push(sub(entry[ref.item])) ; continue }
+    if (typeof val === 'string') { kids.push(sub(val)); continue }
+    if (Array.isArray(val)) { for (const kidId of val) kids.push(sub(kidId)); continue }
+    if (val.componentId) {                                   // a template over a collection
+      const items = readPath(model, val.path, scope) ?? []
+      const base = val.path.startsWith('/') ? val.path.slice(1).split('/') : [...(scope?.path ?? []), ...val.path.split('/')]
+      items.forEach((_, i) => kids.push(sub(val.componentId, { path: [...base, String(i)] })))
+    }
+  }
+  return { ...node, scope, kids }
 }
 
 /** Render a tree with a per-node function: fn(node, renderedKids, resolveValue). */
 export function walk(tree, fn, model = {}, functions = FUNCTIONS) {
   const one = (n) => {
-    const kids = (n.kids ?? []).map(one).join('\n')
-    return fn(n, kids, (val) => resolve(val, model, null, functions))
+    /* the kids ARRAY as well as the joined string: Tabs pairs each child with a
+       title, Modal keeps trigger and content apart, and neither can be done
+       from one concatenated blob */
+    const kids = (n.kids ?? []).map(one)
+    return fn(n, kids.join('\n'), (val) => resolve(val, model, n.scope ?? null, functions), kids)
   }
   return one(tree)
 }

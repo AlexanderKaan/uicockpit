@@ -1,192 +1,195 @@
 {
-  "Heading": {
-    "node": {
-      "component": "Heading",
-      "level": 2,
-      "text": {
-        "path": "/case/title"
-      },
-      "sub": {
-        "path": "/case/sub"
-      }
-    },
-    "data": {
-      "case": {
-        "title": "Case 2026-04471",
-        "sub": "Dormer window · under review since 12 August"
-      }
-    }
+ "Heading": {
+  "node": {
+   "component": "Heading",
+   "level": 2,
+   "text": {
+    "path": "/case/title"
+   },
+   "sub": {
+    "path": "/case/sub"
+   }
   },
-  "Text": {
-    "node": {
-      "component": "Text",
-      "text": {
-        "path": "/note"
-      }
-    },
-    "data": {
-      "note": "The municipality may extend the period **once**, by six weeks at most — you would be told in writing."
-    }
-  },
-  "Badge": {
-    "node": {
-      "component": "Badge",
-      "text": {
-        "path": "/case/status"
-      },
-      "tone": "info"
-    },
-    "data": {
-      "case": {
-        "status": "Under review"
-      }
-    }
-  },
-  "Button": {
-    "node": {
-      "component": "Button",
-      "label": "Open the case",
-      "variant": "primary",
-      "action": "open_case"
-    },
-    "data": {}
-  },
-  "Callout": {
-    "node": {
-      "component": "Callout",
-      "tone": "warn",
-      "title": "Nothing to do right now",
-      "text": {
-        "path": "/callout"
-      }
-    },
-    "data": {
-      "callout": "You may not start work until the objection period has passed."
-    }
-  },
-  "SummaryList": {
-    "node": {
-      "component": "SummaryList",
-      "items": {
-        "path": "/facts"
-      }
-    },
-    "data": {
-      "facts": [
-        {
-          "label": "Received",
-          "value": "3 August 2026"
-        },
-        {
-          "label": "Decision due",
-          "value": "28 September 2026"
-        },
-        {
-          "label": "Procedure",
-          "value": "Regular (8 weeks)"
-        }
-      ]
-    }
-  },
-  "TaskList": {
-    "node": {
-      "component": "TaskList",
-      "items": {
-        "path": "/steps"
-      }
-    },
-    "data": {
-      "steps": [
-        {
-          "name": "Personal details",
-          "status": "Completed",
-          "tone": "success"
-        },
-        {
-          "name": "Upload drawings",
-          "status": "Incomplete",
-          "tone": "warn",
-          "hint": "2 of 3 files"
-        },
-        {
-          "name": "Pay the fee",
-          "status": "Cannot start yet",
-          "tone": "neutral",
-          "locked": true
-        }
-      ]
-    }
-  },
-  "Steps": {
-    "node": {
-      "component": "Steps",
-      "items": {
-        "path": "/howto"
-      }
-    },
-    "data": {
-      "howto": [
-        {
-          "title": "Check the zoning plan",
-          "body": "Is a dormer allowed on your street?"
-        },
-        {
-          "title": "Apply",
-          "body": "With drawings and a description."
-        },
-        {
-          "title": "Wait for the decision",
-          "body": "Eight weeks, extendable once."
-        }
-      ]
-    }
-  },
-  "Table": {
-    "node": {
-      "component": "Table",
-      "columns": [
-        "Case",
-        "Subject",
-        "Status"
-      ],
-      "rows": {
-        "path": "/cases"
-      }
-    },
-    "data": {
-      "cases": [
-        [
-          "2026-04471",
-          "Dormer window",
-          "Under review"
-        ],
-        [
-          "2026-03918",
-          "Tree felling",
-          "Granted"
-        ]
-      ]
-    }
-  },
-  "Card": {
-    "node": {
-      "component": "Card",
-      "child": "__child"
-    },
-    "data": {}
-  },
-  "Column": {
-    "node": {
-      "component": "Column",
-      "children": []
-    },
-    "data": {}
-  },
-  "Row": {
-    "node": {
-      "component": "Row",
-      "children": []
-    },
-    "data": {}
+  "data": {
+   "case": {
+    "title": "Case 2026-04471",
+    "sub": "Dormer window · under review since 12 August"
+   }
   }
+ },
+ "Text": {
+  "node": {
+   "component": "Text",
+   "text": {
+    "path": "/note"
+   }
+  },
+  "data": {
+   "note": "The municipality may extend the period **once**, by six weeks at most — you would be told in writing."
+  }
+ },
+ "Badge": {
+  "node": {
+   "component": "Badge",
+   "text": {
+    "path": "/case/status"
+   },
+   "tone": "info"
+  },
+  "data": {
+   "case": {
+    "status": "Under review"
+   }
+  }
+ },
+ "Button": {
+  "node": {
+   "component": "Button",
+   "label": "Open the case",
+   "variant": "primary",
+   "action": "open_case"
+  },
+  "data": {}
+ },
+ "Callout": {
+  "node": {
+   "component": "Callout",
+   "tone": "warn",
+   "title": "Nothing to do right now",
+   "text": {
+    "path": "/callout"
+   }
+  },
+  "data": {
+   "callout": "You may not start work until the objection period has passed."
+  }
+ },
+ "SummaryList": {
+  "node": {
+   "component": "SummaryList",
+   "items": {
+    "path": "/facts"
+   }
+  },
+  "data": {
+   "facts": [
+    {
+     "label": "Received",
+     "value": "3 August 2026"
+    },
+    {
+     "label": "Decision due",
+     "value": "28 September 2026"
+    },
+    {
+     "label": "Procedure",
+     "value": "Regular (8 weeks)"
+    }
+   ]
+  }
+ },
+ "TaskList": {
+  "node": {
+   "component": "TaskList",
+   "items": {
+    "path": "/steps"
+   }
+  },
+  "data": {
+   "steps": [
+    {
+     "name": "Personal details",
+     "status": "Completed",
+     "tone": "success"
+    },
+    {
+     "name": "Upload drawings",
+     "status": "Incomplete",
+     "tone": "warn",
+     "hint": "2 of 3 files"
+    },
+    {
+     "name": "Pay the fee",
+     "status": "Cannot start yet",
+     "tone": "neutral",
+     "locked": true
+    }
+   ]
+  }
+ },
+ "Steps": {
+  "node": {
+   "component": "Steps",
+   "items": {
+    "path": "/howto"
+   }
+  },
+  "data": {
+   "howto": [
+    {
+     "title": "Check the zoning plan",
+     "body": "Is a dormer allowed on your street?"
+    },
+    {
+     "title": "Apply",
+     "body": "With drawings and a description."
+    },
+    {
+     "title": "Wait for the decision",
+     "body": "Eight weeks, extendable once."
+    }
+   ]
+  }
+ },
+ "Table": {
+  "node": {
+   "component": "Table",
+   "columns": [
+    "Case",
+    "Subject",
+    "Status"
+   ],
+   "rows": {
+    "path": "/cases"
+   }
+  },
+  "data": {
+   "cases": [
+    [
+     "2026-04471",
+     "Dormer window",
+     "Under review"
+    ],
+    [
+     "2026-03918",
+     "Tree felling",
+     "Granted"
+    ]
+   ]
+  }
+ },
+ "Card": {
+  "node": {
+   "component": "Card",
+   "child": "__child"
+  },
+  "data": {},
+  "layout": true
+ },
+ "Column": {
+  "node": {
+   "component": "Column",
+   "children": []
+  },
+  "data": {},
+  "layout": true
+ },
+ "Row": {
+  "node": {
+   "component": "Row",
+   "children": []
+  },
+  "data": {},
+  "layout": true
+ }
 }

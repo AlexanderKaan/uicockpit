@@ -2,7 +2,7 @@
 
 # A2UI Cockpit
 
-### Pick the blocks your agent may render. Pick your stack. Copy the catalog and the renderer.
+### Take a standard A2UI component. Point a library at it. Copy the catalog and the renderer.
 
 **A2UI keeps the catalog and the renderer apart on purpose** — *"the catalog is
 schema-only… each renderer SDK independently maps catalog component types to
@@ -26,28 +26,69 @@ This is that tooling.
 cd a2ui && node build.mjs && open builder.html
 ```
 
-One self-contained page. No install, no server, no CDN. Tick the blocks your
-agent may use, switch between **UIcockpit kit · Tailwind · daisyUI · shadcn/ui**, and copy
-three things: the `catalog.json`, the renderer for your stack, and the A2UI
-stream that produced what you see.
+One self-contained page. No install, no server, no CDN. You land on **Google's
+A2UI Basic Catalog** — the 18 components every A2UI renderer is expected to
+know. Tick the ones your agent may use, switch between **UIcockpit kit ·
+Tailwind · daisyUI · shadcn/ui**, and copy three things: the `catalog.json`, the
+renderer for your stack, and the A2UI stream that produced what you see.
+
+The second tab is our own **public-service extension** — the components a
+form-and-status service needs that the Basic Catalog has no name for (a task
+list, a summary list, a step-by-step, a status badge). Same bindings, same
+verdict, one switch.
 
 ```bash
 node probe.mjs                    # the conformance verdict on a clean answer
 node probe.mjs broken.jsonl bad   # …and on a deliberately broken one
+node --test test.mjs              # the meter: 14 tests over both catalogs
 ```
 
 ## What it is
 
-- **A catalog** — 12 components, each carrying the source it comes from: GOV.UK,
-  USWDS, NL Design System, WAI-ARIA or the HTML spec. Not "because we liked it".
+- **Two catalogs** — Google's Basic Catalog as it is published, and our
+  public-service extension: 12 components, each carrying the source it comes
+  from (GOV.UK, USWDS, NL Design System, WAI-ARIA, the HTML spec), never
+  "because we liked it".
 - **Bindings, as tables** — a binding is a mapping, not a program, so adding a
-  library is an afternoon rather than a rewrite. Four ship today.
+  library is an afternoon rather than a rewrite. Four ship today, and each one
+  covers both catalogs: the same component name renders the same way, and where
+  the two differ in shape the table absorbs it (our Button carries a `label`,
+  A2UI's takes a child `Text`, one case handles either).
 - **A verdict per answer** — eight rules on the answer itself (heading order,
   a control without a name, a table without headers, a status carried by colour
   alone…), plus the binding's CI certificate. And six things it refuses to claim.
   The rules read semantics the catalog *declares*, never component names, so they
   work on a catalog you did not write — including Google's Basic Catalog, through
   a sidecar that states the reading instead of guessing it.
+
+## What the check found, in Google's catalog and in our own
+
+Running the verdict over the Basic Catalog reports three things no renderer and
+no agent can fix, because the vocabulary to fix them is not in the schema:
+
+| | |
+|---|---|
+| `Video` | `url` and `posterUrl`, and nothing else — there is no property that can carry a text alternative, so 1.1.1 cannot be met |
+| `Modal` | `trigger` and `content` — the dialog has no name for 4.1.2 |
+| *no heading* | `Text` offers `caption` and `body` and no level, so nothing rendered from this catalog has structure to navigate by (1.3.1) |
+
+These are reported apart from findings about the answer, because they are not
+the answer's fault. A gap the answer actually *runs into* caps the verdict at
+`partial` and names the catalog; a gap sitting unused is listed and nothing more.
+This is meant as a contribution to a young protocol, not a scoreboard — the
+`instructions` field and the sidecar together are enough to close all three.
+
+It found things in **our own** work too, which is the point of owning a meter:
+
+- extending the certificate to the controls this catalog made us render found a
+  checked checkbox at **1.61:1** against its surface in two dark themes — below
+  the 3:1 that 1.4.11 asks of a state indicator. It is in `binding.json`, by
+  name, and the certificate says 54 of 60 rather than rounding up;
+- the kit turned out to have **two tone vocabularies** (`badge--warn` but
+  `alert--warning`), so a Callout with tone `warn` had been rendering with no
+  tone at all;
+- the kit had **no divider recipe** at all, and a bare `<hr>` in a flex column
+  collapses to nothing.
 
 ## The split that makes the guarantee honest
 
@@ -56,8 +97,11 @@ Accessibility of a generated answer has two halves, and only one is per-answer.
 **The binding is certified once, in CI.** Contrast, target size, focus ring —
 properties of the implementation and its tokens, not of what the agent asked for.
 Measuring them per answer is waste; claiming them without measuring is a lie.
-The certificate is generated from real measurement (1200 contrast pairs over 60
-theme × mode × density combinations) and travels with the verdict.
+The certificate is generated from real measurement — 1500 contrast pairs over 60
+theme × mode × density combinations — and travels with the verdict, including
+the part that failed: 54 of those 60 configurations are clean, the other six are
+named. A certificate that rounded that up would be the thing it exists to
+prevent.
 
 **The answer is checked every time**, on the component tree rather than the
 markup — so the same rules hold for shadcn, Tailwind, Flutter or SwiftUI.
@@ -87,20 +131,24 @@ harness issued.
 
     a2ui/
       core.mjs          the A2UI core — stream, data model, dynamic values, tree
-      catalog.json      12 components, each with the source it comes from
-      bindings.mjs      four bindings, as tables
+      catalogs/         Google's Basic Catalog, its demos, and the a11y sidecar
+      catalog.json      our public-service extension, each with its source
+      bindings.mjs      four bindings, as tables, over both catalogs
       check.mjs         the verdict: 8 schema-driven rules, and 6 things it will not claim
-      catalogs/         how to check a catalog you do not own
       kit/              the kit binding's stylesheet — plain CSS, yours to edit
-      binding.json      the certificate: 1200 contrast pairs over 60 configurations
+      binding.json      the certificate: 1500 contrast pairs, 54 of 60 clean
+      test.mjs          the meter (node --test)
       builder.*         the palette → one self-contained page (node build.mjs)
 
-About 1 700 lines, no dependencies, no build step for anything that runs.
+About 2 300 lines, no dependencies, no build step for anything that runs.
 
 ## Status
 
 Early, and honest about it. The builder runs, the verdict is real, the generated
-renderer compiles. Not published to npm, no hosted version, no stable API, and
-the catalog is 12 components rather than a set anyone should call complete.
+renderer compiles, and 14 tests hold both catalogs against all four bindings.
+Not published to npm, no hosted version, no stable API. Tabs render as
+disclosures in the class-based bindings rather than as a scripted tab widget,
+and only the kit binding has a certificate — the other three read `unverified`,
+which is what they are.
 
 MIT.

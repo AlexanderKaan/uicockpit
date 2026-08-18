@@ -1,16 +1,17 @@
 <header class="top">
   <div>
     <h1>Build your A2UI catalog</h1>
-    <p>Pick the blocks your agent may render. Pick your stack. Copy the catalog and the renderer — you own both.</p>
+    <p>Pick the components your agent may render. Pick your stack. Copy the catalog and the renderer — you own both.</p>
+    <div class="cats" role="radiogroup" aria-label="Catalog"></div>
   </div>
   <div class="stacks" role="radiogroup" aria-label="Your stack"></div>
 </header>
 
 <main>
-  <section class="palette" aria-label="Blocks">
-    <h2>Blocks <span class="count"></span></h2>
+  <section class="palette" aria-label="Components">
+    <h2>Components <span class="count"></span></h2>
     <ul class="blocks"></ul>
-    <p class="hint">Every block carries a source — GOV.UK, USWDS, NL Design System or WAI-ARIA. Hover a name to see it.</p>
+    <p class="hint"></p>
   </section>
 
   <section class="stage" aria-label="Preview">
@@ -20,6 +21,7 @@
     </div>
     <div class="stage__surface"><div class="preview"></div></div>
     <div class="findings"></div>
+    <p class="proof"></p>
   </section>
 
   <section class="out" aria-label="Output">

@@ -18,16 +18,30 @@ for (const [f, src] of parts) for (const m of src.matchAll(/^(?:const|let|functi
   if (prev && prev !== f) { console.error(`build: "${m[1]}" is declared in both ${prev} and ${f} — the bundle shares one scope, so rename one.`); process.exit(1) }
   seen.set(m[1], f)
 }
+/* Two catalogs travel with the page: Google's standard one is the palette you
+ * land on, ours is the extension. Same shape, same bindings, one switch. */
+const json = (f) => JSON.parse(readFileSync(f, 'utf8'))
+const CATALOGS = {
+  basic: { label: 'A2UI Basic Catalog', note: "Google's 18 standard components — the ones every A2UI renderer is expected to know",
+    catalog: json('catalogs/a2ui-basic.catalog.json'), demos: json('catalogs/a2ui-basic.demos.json').demos,
+    a11y: json('catalogs/a2ui-basic.a11y.json'),
+    defaults: ['Text', 'Image', 'List', 'ChoicePicker', 'DateTimeInput', 'Button'] },
+  service: { label: 'Public-service extension', note: 'components a form-and-status service needs that the Basic Catalog has no name for',
+    catalog: json('catalog.json'), demos: json('demos.json'), a11y: null,
+    defaults: ['Heading', 'SummaryList', 'TaskList', 'Callout', 'Button'] },
+}
+
 const mods = parts.map(([f, src]) => `/* ── ${f} ─────────────── */\n` + src).join('\n\n')
 const page = readFileSync('builder.template.html', 'utf8')
   .replace('/*MODULES*/', mods)
-  .replace('/*CATALOG*/', readFileSync('catalog.json', 'utf8'))
-  .replace('/*DEMOS*/', readFileSync('demos.json', 'utf8'))
+  .replace('/*CATALOGS*/', JSON.stringify(CATALOGS))
+  .replace('/*CERT*/', readFileSync('binding.json', 'utf8'))
   .replace('<!--BODY-->', readFileSync('builder.body.html', 'utf8'))
   .replace('/*KITCSS*/', `${readFileSync('kit/tokens.css', 'utf8')}
 @scope (.b-kit) {
 ${readFileSync('kit/global.css', 'utf8')}
 ${readFileSync('kit/kit.css', 'utf8')}
+${readFileSync('kit/platform.css', 'utf8')}
 }`)
   .replace('/*TWCSS*/', readFileSync('tw.css', 'utf8') + '\n' + readFileSync('daisy.css', 'utf8'))
 writeFileSync('builder.html', page)

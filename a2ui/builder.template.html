@@ -14,6 +14,9 @@ h1{font-size:20px;letter-spacing:-.02em;margin:0 0 4px}
 .stacks{display:flex;gap:6px;background:var(--bg);padding:4px;border-radius:999px;border:1px solid var(--line)}
 .stacks button{font:inherit;font-size:13px;padding:6px 14px;border-radius:999px;border:0;background:transparent;color:var(--mut);cursor:pointer}
 .stacks button[aria-checked=true]{background:var(--acc);color:#fff}
+.cats{display:flex;gap:16px;margin-top:12px}
+.cats button{font:inherit;font-size:13px;padding:0 0 6px;border:0;border-bottom:2px solid transparent;background:0;color:var(--mut);cursor:pointer}
+.cats button[aria-checked=true]{color:var(--fg);border-bottom-color:var(--acc);font-weight:500}
 main{display:grid;grid-template-columns:230px minmax(0,1fr) minmax(0,420px);gap:20px;padding:20px 32px 40px;align-items:start}
 @media(max-width:1100px){main{grid-template-columns:1fr}}
 section{background:var(--surf);border:1px solid var(--line);border-radius:12px}
@@ -39,6 +42,11 @@ section>h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var
 .findings{padding:0 16px 14px;font-size:12px;color:var(--mut)}
 .findings div{padding:6px 0;border-top:1px solid var(--line)}
 .findings code{background:var(--bg);padding:1px 5px;border-radius:4px}
+/* a gap is not a finding about the ANSWER — it is the catalog running out of
+   vocabulary, and no renderer or agent can close it. Marked apart on purpose. */
+.findings .gap{color:var(--warn)}
+.findings .gap code{background:var(--warnbg)}
+.proof{margin:0;padding:10px 16px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}
 .tabs{display:flex;gap:2px;padding:10px 10px 0}
 .tabs button{font:inherit;font-size:12px;padding:6px 12px;border:0;border-radius:8px 8px 0 0;background:transparent;color:var(--mut);cursor:pointer}
 .tabs button[aria-selected=true]{background:var(--fg);color:#fff}
@@ -54,81 +62,119 @@ section>h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var
 <!--BODY-->
 <script type="module">
 /*MODULES*/
-const CATALOG = /*CATALOG*/;
-const DEMOS = /*DEMOS*/;
+const CATALOGS = /*CATALOGS*/;
+const CERT = /*CERT*/;
 
 const $ = (s) => document.querySelector(s)
-const state = { stack: 'kit', picked: new Set(['Heading', 'SummaryList', 'TaskList', 'Callout', 'Button']), tab: 'catalog' }
-const NAMES = Object.keys(CATALOG.components)
-const LAYOUT = new Set(['Card', 'Column', 'Row'])
-const SOURCE = { TaskList: 'GOV.UK · Task list', SummaryList: 'GOV.UK · Summary list', Steps: 'GOV.UK · Step by step',
-  Callout: 'USWDS · Alert', Table: 'HTML · <table> · GOV.UK · Table', Badge: 'NL Design System · Badge',
-  Button: 'HTML · <button> · APG · Button', Heading: 'NL Design System · Page header', Text: 'USWDS · Prose',
-  Card: 'USWDS · Card', Column: 'layout', Row: 'layout' }
+const state = { cat: 'basic', stack: 'kit', tab: 'catalog', picked: {} }
+for (const [id, c] of Object.entries(CATALOGS)) state.picked[id] = new Set(c.defaults)
+
+const cur = () => CATALOGS[state.cat]
+const names = () => Object.keys(cur().catalog.components)
+/* Layout components are not a choice: something has to hold the answer. */
+const isLayout = (n) => !!cur().demos[n]?.layout
+const sourceOf = (n) => cur().catalog.components[n]?.['x-source'] ?? cur().catalog.title ?? ''
 
 /* The demo answer: one Column of the picked blocks, inside a Card. This is a real
    A2UI surface — flat components, ids, a data model — not a mock. */
 function buildStream() {
-  const picked = NAMES.filter((n) => state.picked.has(n) && !LAYOUT.has(n))
+  const c = cur()
+  const picked = names().filter((n) => state.picked[state.cat].has(n) && !isLayout(n) && c.demos[n])
   /* Structure and DATA travel apart, as A2UI intends: the components bind by
      JSON Pointer, the data model arrives in its own message. */
   const dataModel = {}
-  for (const n of picked) for (const [k, v] of Object.entries(DEMOS[n].data)) {
-    dataModel[k] = (v && typeof v === 'object' && !Array.isArray(v)) ? { ...(dataModel[k] ?? {}), ...v } : v
+  for (const n of picked) for (const [k, val] of Object.entries(c.demos[n].data ?? {})) {
+    dataModel[k] = (val && typeof val === 'object' && !Array.isArray(val)) ? { ...(dataModel[k] ?? {}), ...val } : val
   }
   const components = [
     { id: 'root', component: 'Card', child: 'body' },
     { id: 'body', component: 'Column', children: picked.map((n) => 'n_' + n) },
-    ...picked.map((n) => ({ id: 'n_' + n, ...structuredClone(DEMOS[n].node) })),
+    /* A2UI has no inline children: a Button's label, a tab's panel and a modal's
+       body are separate top-level components, referred to by id. */
+    ...picked.flatMap((n) => [{ id: 'n_' + n, ...structuredClone(c.demos[n].node) }, ...structuredClone(c.demos[n].extra ?? [])]),
   ]
   return [
-    { version: 'v1.0', createSurface: { surfaceId: 's', catalogId: CATALOG.catalogId, dataModel } },
+    { version: 'v1.0', createSurface: { surfaceId: 's', catalogId: c.catalog.catalogId, dataModel } },
     { version: 'v1.0', updateComponents: { surfaceId: 's', components } },
   ]
 }
 
 function subsetCatalog() {
-  const keep = [...state.picked]
+  const c = cur(), keep = [...state.picked[state.cat]]
   const needed = keep.length ? [...new Set([...keep, 'Card', 'Column'])] : []
-  return { ...CATALOG, components: Object.fromEntries(needed.filter((n) => CATALOG.components[n]).map((n) => [n, CATALOG.components[n]])) }
+  return { ...c.catalog, components: Object.fromEntries(needed.filter((n) => c.catalog.components[n]).map((n) => [n, c.catalog.components[n]])) }
 }
 
+/* A throw used to leave the last good render on screen, so the page looked
+   fine and lied — that is how a broken demo passed a browser check earlier
+   today. Failures are shown where the answer belongs. */
 function draw() {
+  try { render() } catch (err) {
+    $('.preview').innerHTML = `<pre style="white-space:pre-wrap;color:#991b1b;font:12px/1.5 ui-monospace,monospace">${err.message}</pre>`
+    $('.verdict').dataset.v = 'fail'; $('.verdict').textContent = '✗ error'
+    $('.findings').textContent = ''; $('.proof').textContent = ''
+    throw err
+  }
+}
+
+function render() {
+  const c = cur()
   const stream = buildStream()
   const surface = applyStream(stream.map((m) => JSON.stringify(m))).get('s')
-  const tree = buildTree(surface.components)
+  /* which properties hold child ids is READ FROM THE SCHEMA — Tabs hides one in
+     tabs[].child and Modal calls them trigger/content */
+  const tree = buildTree(surface.components, 'root', { refs: childRefs(c.catalog), model: surface.model })
   const b = BINDINGS[state.stack]
 
   /* preview — every stack renders to HTML so they can be compared without a build */
-  const html = walk(tree, (n, k, r) => b.h(n, k, r) ?? `<div style="padding:8px;border:1px dashed #d4d4d8;border-radius:8px;color:#71717a;font-size:12px">${n.component} — not in this binding</div>`, surface.model)
+  const html = walk(tree, (n, k, r, ka) => b.h(n, k, r, ka) ?? `<div style="padding:8px;border:1px dashed #d4d4d8;border-radius:8px;color:#71717a;font-size:12px">${n.component} — not in this binding</div>`, surface.model)
   const pv = $('.preview')
-  pv.className = 'preview ' + { kit: 'b-kit', daisyui: 'b-daisy' }[state.stack] ?? 'b-tw'
+  pv.className = 'preview ' + ({ kit: 'b-kit', daisyui: 'b-daisy' }[state.stack] ?? 'b-tw')
   pv.innerHTML = html
 
   /* verdict — the same check() the CLI runs, on the same tree */
   const hydrated = (function h(n) { const o = { ...n }
-    if (n.items) o.resolvedItems = resolve(n.items, surface.model, null, FUNCTIONS)
+    if (n.items) o.resolvedItems = resolve(n.items, surface.model, n.scope ?? null, FUNCTIONS)
     o.kids = (n.kids ?? []).map(h); return o })(tree)
-  const rep = check(hydrated, { catalog: CATALOG, binding: { id: b.id, certified: b.id === 'kit' } })
+  /* only the kit binding has a certificate; the others render, and say so */
+  const proof = b.id === 'kit' ? describeBinding(CERT) : describeBinding(null)
+  const rep = check(hydrated, { catalog: c.catalog, a11y: c.a11y, binding: { id: b.id, ...proof } })
+  $('.proof').textContent = `${b.label}: ${proof.line}`
   const v = $('.verdict'); v.dataset.v = rep.verdict
   v.textContent = { AA: '✓ AA', fail: '✗ fails', 'needs-review': '· needs review', unverified: '? unverified', partial: '◐ partial' }[rep.verdict]
-  $('.findings').innerHTML = rep.findings.length
+  /* the gaps this answer RUNS INTO first, then the rest of the catalog's */
+  const used = new Set(rep.gapsUsed)
+  const gaps = [...rep.catalogGaps].sort((a, b) => used.has(b) - used.has(a))
+    .map((g) => `<div class="gap"><code>${g.sc}</code> ${used.has(g) ? '<b>in this answer</b> — ' : ''}${g.message}</div>`).join('')
+  $('.findings').innerHTML = (rep.findings.length
     ? rep.findings.map((f) => `<div><code>${f.sc ?? 'craft'}</code> ${f.message}</div>`).join('')
-    : `<div>${rep.why}. ${rep.unchecked.length} things this check never claims — see the report.</div>`
+    : `<div>${rep.why}. ${rep.unchecked.length} things this check never claims — see the report.</div>`) + gaps
 
   const code = { catalog: JSON.stringify(subsetCatalog(), null, 2),
     binding: emit(b, tree, (t, fn) => walk(t, fn, surface.model)),
     stream: stream.map((m) => JSON.stringify(m)).join('\n') }
   $('.code code').textContent = code[state.tab]
-  $('.count').textContent = `${state.picked.size} of ${NAMES.length}`
+  $('.count').textContent = `${[...state.picked[state.cat]].filter((n) => !isLayout(n)).length} of ${names().filter((n) => !isLayout(n)).length}`
 }
 
-/* palette */
-$('.blocks').innerHTML = NAMES.map((n) => `<li><label title="${SOURCE[n] ?? ''}">
-  <input type="checkbox" value="${n}" ${state.picked.has(n) ? 'checked' : ''}${LAYOUT.has(n) ? ' disabled' : ''}>
-  <span class="nm">${n}</span></label></li>`).join('')
+/* palette — redrawn on every catalog switch, because the blocks ARE the catalog */
+function palette() {
+  $('.blocks').innerHTML = names().map((n) => `<li><label title="${sourceOf(n)}">
+    <input type="checkbox" value="${n}" ${state.picked[state.cat].has(n) ? 'checked' : ''}${isLayout(n) ? ' disabled' : ''}>
+    <span class="nm">${n}</span></label></li>`).join('')
+  $('.hint').textContent = cur().note
+}
 $('.blocks').addEventListener('change', (e) => {
-  e.target.checked ? state.picked.add(e.target.value) : state.picked.delete(e.target.value); draw()
+  e.target.checked ? state.picked[state.cat].add(e.target.value) : state.picked[state.cat].delete(e.target.value); draw()
+})
+/* catalogs */
+$('.cats').innerHTML = Object.entries(CATALOGS).map(([id, c]) =>
+  `<button role="radio" data-c="${id}" aria-checked="${id === state.cat}">${c.label}</button>`).join('')
+$('.cats').addEventListener('click', (e) => {
+  const btn = e.target.closest('button'); if (!btn) return
+  state.cat = btn.dataset.c
+  ;[...$('.cats').children].forEach((el) => el.setAttribute('aria-checked', el === btn))
+  palette(); draw()
 })
 /* stacks */
 $('.stacks').innerHTML = Object.values(BINDINGS).map((b) =>
@@ -136,17 +182,17 @@ $('.stacks').innerHTML = Object.values(BINDINGS).map((b) =>
 $('.stacks').addEventListener('click', (e) => {
   const btn = e.target.closest('button'); if (!btn) return
   state.stack = btn.dataset.s
-  ;[...$('.stacks').children].forEach((c) => c.setAttribute('aria-checked', c === btn)); draw()
+  ;[...$('.stacks').children].forEach((el) => el.setAttribute('aria-checked', el === btn)); draw()
 })
 /* tabs + copy */
 $('.tabs').addEventListener('click', (e) => {
   const btn = e.target.closest('button'); if (!btn) return
   state.tab = btn.dataset.tab
-  ;[...$('.tabs').children].forEach((c) => c.setAttribute('aria-selected', c === btn)); draw()
+  ;[...$('.tabs').children].forEach((el) => el.setAttribute('aria-selected', el === btn)); draw()
 })
 $('.copy').addEventListener('click', async () => {
   await navigator.clipboard.writeText($('.code code').textContent)
   $('.copy').textContent = 'Copied'; setTimeout(() => ($('.copy').textContent = 'Copy'), 1400)
 })
-draw()
+palette(); draw()
 </script>
