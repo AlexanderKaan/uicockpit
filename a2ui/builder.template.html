@@ -2,68 +2,156 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>A2UI, rendered and checked</title>
 <style>
-:root{--bg:#fafafa;--fg:#18181b;--mut:#71717a;--line:#e4e4e7;--surf:#fff;--acc:#18181b;
-      --ok:#166534;--okbg:#f0fdf4;--warn:#854d0e;--warnbg:#fefce8;--bad:#991b1b;--badbg:#fef2f2}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);
-     font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;
-     padding:28px 32px 20px;border-bottom:1px solid var(--line);background:var(--surf)}
-h1{font-size:20px;letter-spacing:-.02em;margin:0 0 4px}
-.top p{margin:0;color:var(--mut);max-width:52ch}
-.stacks{display:flex;gap:6px;background:var(--bg);padding:4px;border-radius:999px;border:1px solid var(--line)}
-.stacks button{font:inherit;font-size:13px;padding:6px 14px;border-radius:999px;border:0;background:transparent;color:var(--mut);cursor:pointer}
-.stacks button[aria-checked=true]{background:var(--acc);color:#fff}
-.cats{display:flex;gap:16px;margin-top:12px}
-.cats button{font:inherit;font-size:13px;padding:0 0 6px;border:0;border-bottom:2px solid transparent;background:0;color:var(--mut);cursor:pointer}
-.cats button[aria-checked=true]{color:var(--fg);border-bottom-color:var(--acc);font-weight:500}
-main{display:grid;grid-template-columns:210px minmax(0,1fr) minmax(0,1fr);gap:20px;padding:20px 32px 40px;align-items:start}
-@media(max-width:1100px){main{grid-template-columns:1fr}}
-section{background:var(--surf);border:1px solid var(--line);border-radius:12px}
-/* section > h2, never bare h2 — the preview renders headings of its own, and a
-   bare selector here reached inside it (found by measuring, not by reading). */
-section>h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:0;padding:14px 16px;display:flex;justify-content:space-between}
-.count{color:var(--mut);letter-spacing:0}
-.blocks{list-style:none;margin:0;padding:0 8px 8px}
-.blocks li{margin:0}
-.blocks label{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer}
-.blocks label:hover{background:var(--bg)}
-.blocks input{accent-color:var(--acc);width:15px;height:15px}
-.blocks .nm{font-weight:500}
-.hint{font-size:12px;color:var(--mut);margin:0;padding:10px 16px 16px;border-top:1px solid var(--line)}
-.stage__bar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
-.stage__label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
-.verdict{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px}
-.verdict[data-v=AA]{background:var(--okbg);color:var(--ok)}
-.verdict[data-v=fail]{background:var(--badbg);color:var(--bad)}
-.verdict[data-v=needs-review],.verdict[data-v=unverified],.verdict[data-v=partial]{background:var(--warnbg);color:var(--warn)}
-.stage__surface{padding:28px;background:var(--bg);border-radius:0 0 12px 12px;min-height:320px}
-.preview{max-width:640px;margin:0 auto}
-.findings{padding:0 16px 14px;font-size:12px;color:var(--mut)}
-.findings div{padding:6px 0;border-top:1px solid var(--line)}
-.findings code{background:var(--bg);padding:1px 5px;border-radius:4px}
-/* a gap is not a finding about the ANSWER — it is the catalog running out of
-   vocabulary, and no renderer or agent can close it. Marked apart on purpose. */
-.findings .gap{color:var(--warn)}
-.findings .gap code{background:var(--warnbg)}
-.proof{margin:0;padding:10px 16px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}
-.oops{margin:0;white-space:pre-wrap;color:var(--bad);background:var(--badbg);border:1px solid #fecaca;
-      border-radius:10px;padding:14px 16px;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
-.tabs{display:flex;gap:2px;padding:10px 10px 0}
-.tabs button{font:inherit;font-size:12px;padding:6px 12px;border:0;border-radius:8px 8px 0 0;background:transparent;color:var(--mut);cursor:pointer}
-.tabs button[aria-selected=true]{background:var(--fg);color:#fff}
-.code{display:block;width:100%;margin:0;padding:14px 16px;background:var(--fg);color:#e4e4e7;border:0;border-radius:0;
-      font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;height:520px;white-space:pre;resize:vertical}
-textarea.code{tab-size:2;white-space:pre-wrap;word-break:break-word}
-textarea.code:focus-visible{outline:2px solid #6366f1;outline-offset:-2px}
-.outbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;
-        background:var(--fg);border-radius:0 0 12px 12px}
-.outnote{font-size:11px;color:#a1a1aa}
-.outbtns{display:flex;gap:6px;flex:none}
-.outbar button{font:inherit;font-size:11px;padding:5px 11px;border-radius:7px;
-      border:1px solid #3f3f46;background:#27272a;color:#e4e4e7;cursor:pointer}
-.outbar button:hover{background:#3f3f46}
 /*KITCSS*/
+
+/* ── the page chrome ──────────────────────────────────────────────────────
+ * Direction B: the tool is built out of the kit it ships. Everything below is
+ * layout — the surfaces, controls, tabs and alerts come from the kit's own
+ * recipes, and every value here is a kit token. Nothing hard-codes a colour, a
+ * radius or a type size, so editing tokens.css restyles the page as well as the
+ * preview. That is the dogfood test, running on every load.
+ *
+ * The block is inside the same scope limit the kit CSS uses: it cannot reach
+ * .preview. What the agent sent is dressed by the BINDING and by nothing else.
+ */
+*{box-sizing:border-box}
+body{margin:0;background:var(--k-bg);color:var(--k-fg);font-size:var(--k-type-body);line-height:1.5}
+/* --k-font-body reads 'Inter', sans-serif — it falls straight through to the
+   generic family, so a machine without Inter gets Helvetica rather than the
+   system face, and the kit ships no font files (no CDN, deliberately). The
+   chain the token cannot carry is stated here, once, for the page AND the
+   preview so the two never diverge on type. */
+body, .b-kit, .b-tw, .b-daisy{
+  font-family:'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif}
+
+@scope (.chrome) to (.preview) {
+  .top{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--k-s-24);flex-wrap:wrap;
+       padding:var(--k-s-24) var(--k-s-32,2rem) var(--k-s-16);background:var(--k-surface)}
+  .wordmark{display:flex;align-items:center;gap:var(--k-s-8);margin:0 0 var(--k-s-6);
+            font-size:var(--k-type-eyebrow);letter-spacing:var(--k-track-eyebrow);text-transform:uppercase;
+            font-weight:var(--k-weight-semibold);color:var(--k-fg-muted)}
+  .wordmark svg{color:var(--k-primary)}
+  h1{font-size:var(--k-type-h2);font-weight:var(--k-weight-semibold);letter-spacing:var(--k-track-tight);margin:0}
+  .standfirst{margin:var(--k-s-4) 0 0;color:var(--k-fg-muted);max-width:64ch}
+  .top__stack{display:flex;flex-direction:column;align-items:flex-end;gap:var(--k-s-8)}
+  .eyebrow{font-size:var(--k-type-eyebrow);letter-spacing:var(--k-track-eyebrow);text-transform:uppercase;color:var(--k-fg-faint)}
+
+  .cats{padding:0 var(--k-s-32,2rem);background:var(--k-surface);border-bottom:var(--k-divider)}
+  .cats .tab{background:transparent}
+
+  main{display:grid;grid-template-columns:196px minmax(0,1fr) 28px minmax(0,1fr);
+       gap:var(--k-s-16);padding:var(--k-s-20,1.25rem) var(--k-s-32,2rem) var(--k-s-16);align-items:start}
+  /* aligned with the two pane heads, so it reads as 1 → 2 rather than floating
+     halfway down a card whose height the answer decides */
+  .flow{display:grid;place-items:center;align-self:start;block-size:var(--k-hit-min,44px);color:var(--k-fg-faint)}
+  @media (max-width:1180px){
+    main{grid-template-columns:1fr}
+    .flow{display:none}
+    /* on one column the palette is fifteen rows in front of the thing you came
+       for, so the answer and the stream go first and the palette follows */
+    .palette{order:3}
+  }
+  @media (max-width:680px){
+    .top,.cats,main,.dogfood{padding-inline:var(--k-s-16)}
+    .top__stack{align-items:stretch;inline-size:100%}
+    /* four stacks are wider than a phone: scroll them rather than let the page
+       scroll sideways */
+    .stacks{max-inline-size:100%;overflow-x:auto;scrollbar-width:none}
+    .stacks::-webkit-scrollbar{display:none}
+    .cats{overflow-x:auto;scrollbar-width:none}
+    .code{height:20rem}
+    .pane__head{flex-wrap:wrap}
+    .pane__head .tabs{margin-left:0;inline-size:100%}
+  }
+
+  section.card{padding:0;overflow:hidden;gap:0}
+
+  /* the numbered heads make the direction of the page explicit */
+  .pane__head{display:flex;align-items:center;gap:var(--k-s-8);padding:var(--k-s-10,.625rem) var(--k-s-12);
+              border-bottom:var(--k-divider);min-height:var(--k-hit-min,44px)}
+  .pane__no{inline-size:1.25rem;block-size:1.25rem;border-radius:50%;flex:none;display:grid;place-items:center;
+            background:var(--k-primary-soft);color:var(--k-primary-soft-fg);
+            font-size:var(--k-type-eyebrow);font-weight:var(--k-weight-bold)}
+  .pane__head h2{font-size:var(--k-type-body);font-weight:var(--k-weight-semibold);margin:0}
+  .pane__head .tabs{margin-left:auto;border-bottom:0;gap:var(--k-s-2,2px)}
+  .pane__head .tab{min-height:1.75rem;font-size:var(--k-type-small);border-bottom-width:2px}
+
+  .palette>h2{font-size:var(--k-type-eyebrow);letter-spacing:var(--k-track-eyebrow);text-transform:uppercase;
+              color:var(--k-fg-muted);font-weight:var(--k-weight-semibold);margin:0;
+              padding:var(--k-s-12) var(--k-s-14,.875rem);border-bottom:var(--k-divider);
+              display:flex;justify-content:space-between;align-items:baseline}
+  .count{letter-spacing:0;color:var(--k-primary-text);font-weight:var(--k-weight-semibold)}
+  .blocks{list-style:none;margin:0;padding:var(--k-s-6)}
+  .blocks li{margin:0}
+  .blocks .checkbox{width:100%;padding:var(--k-s-6) var(--k-s-8);border-radius:var(--k-radius-sm)}
+  .blocks .checkbox:hover{background:var(--k-state-hover)}
+  .blocks input:disabled+.nm{color:var(--k-fg-faint)}
+  .hint{font-size:var(--k-type-small);line-height:1.45;color:var(--k-fg-muted);margin:0;
+        padding:var(--k-s-10,.625rem) var(--k-s-14,.875rem) var(--k-s-14,.875rem);border-top:var(--k-divider)}
+
+  /* what the agent sent — a quiet sunken sheet, not a black slab: the chrome
+     must not out-shout the answer next to it */
+  .code{display:block;width:100%;margin:0;padding:var(--k-s-12) var(--k-s-14,.875rem);
+        background:var(--k-surface-2);color:var(--k-fg);border:0;border-radius:0;
+        font:var(--k-type-small)/1.6 var(--k-font-mono);height:520px;overflow:auto;resize:vertical}
+  textarea.code{white-space:pre-wrap;word-break:break-word;tab-size:2}
+  .outbar{display:flex;align-items:center;justify-content:space-between;gap:var(--k-s-12);
+          padding:var(--k-s-8) var(--k-s-12);border-top:var(--k-divider)}
+  .outnote{font-size:var(--k-type-small);color:var(--k-fg-muted)}
+  .outbtns{display:flex;gap:var(--k-s-6);flex:none}
+
+  .stage__surface{padding:var(--k-s-24);background:var(--k-surface-sunken);min-height:20rem}
+  .verdict{margin-left:auto;font-size:var(--k-type-small);font-weight:var(--k-weight-semibold);
+           padding:2px var(--k-s-8);border-radius:var(--k-radius-sm)}
+  .verdict[data-v=AA]{background:var(--k-success-soft);color:var(--k-success-text)}
+  .verdict[data-v=fail]{background:var(--k-danger-soft);color:var(--k-danger-text)}
+  .verdict[data-v=needs-review],.verdict[data-v=unverified],.verdict[data-v=partial]{
+           background:var(--k-warning-soft);color:var(--k-warning-text)}
+
+  .report{padding:var(--k-s-12);display:flex;flex-direction:column;gap:var(--k-s-8)}
+  .verdict-why{font-size:var(--k-type-small);line-height:1.5;margin-top:2px}
+  .findings{font-size:var(--k-type-small);color:var(--k-fg-muted);display:flex;flex-direction:column}
+  .findings div{padding:var(--k-s-6) 0;border-top:var(--k-divider)}
+  .findings code{background:var(--k-surface-2);padding:1px var(--k-s-4);border-radius:var(--k-radius-sm);
+                 font-family:var(--k-font-mono)}
+  /* a gap is not a finding about the ANSWER — it is the catalog running out of
+     vocabulary, and no renderer or agent can close it. Marked apart on purpose. */
+  .findings .gap{color:var(--k-warning-text)}
+  .findings .gap code{background:var(--k-warning-soft)}
+  .proof{margin:0;font-size:var(--k-type-caption);line-height:1.5;color:var(--k-fg-faint)}
+
+  .dogfood{display:flex;align-items:flex-start;gap:var(--k-s-8);margin:0;
+           padding:0 var(--k-s-32,2rem) var(--k-s-32,2rem);max-width:96ch;
+           font-size:var(--k-type-small);line-height:1.5;color:var(--k-fg-faint)}
+  .dogfood svg{flex:none;margin-top:2px}
+}
+
+/* .preview sits OUTSIDE the chrome scope by construction, so its own frame is
+   declared here — the one place the page is allowed to touch it. */
+.preview{max-width:40rem;margin:0 auto}
+.oops{margin:0;white-space:pre-wrap;color:var(--k-danger-text);background:var(--k-danger-soft);
+      border:1px solid var(--k-danger);border-radius:var(--k-radius-md);padding:var(--k-s-14,.875rem);
+      font:var(--k-type-small)/1.6 var(--k-font-mono)}
+
+/* ── the stack switch, animated ───────────────────────────────────────────
+ * Re-skinning the same answer with a different library is the most convincing
+ * thing this page does, and it used to happen as a flicker. A view transition
+ * gives the answer a real cross-fade, and naming the segmented control's ON
+ * button makes the pill SLIDE to the stack you picked — one declaration, and
+ * the two moving parts stay in step because the browser owns the timing.
+ */
+.preview{view-transition-name:answer}
+.segctrl__btn--on{view-transition-name:stack-pill}
+::view-transition-old(answer),::view-transition-new(answer){
+  animation-duration:var(--k-dur,220ms);animation-timing-function:var(--k-ease,ease)}
+::view-transition-old(answer){animation-name:a2ui-out}
+::view-transition-new(answer){animation-name:a2ui-in}
+@keyframes a2ui-out{to{opacity:0;transform:translateY(-4px) scale(.985)}}
+@keyframes a2ui-in{from{opacity:0;transform:translateY(6px) scale(.99)}}
+@media (prefers-reduced-motion:reduce){
+  .preview,.segctrl__btn--on{view-transition-name:none}
+}
+
 /*TWCSS*/
 </style>
 <!--BODY-->
@@ -133,7 +221,7 @@ function render() {
      than checking someone's answer against the wrong vocabulary. */
   const declared = stream.find((m) => m.createSurface)?.createSurface?.catalogId
   const match = declared && Object.keys(CATALOGS).find((id) => CATALOGS[id].catalog.catalogId === declared)
-  if (match && match !== state.cat) { state.cat = match; syncRadio('.cats', 'c', match); palette() }
+  if (match && match !== state.cat) { state.cat = match; syncRadio('.cats', 'c', match, 'tab--on'); palette() }
 
   const c = cur()
   const surfaces = applyStream(stream.map((m) => JSON.stringify(m)))
@@ -159,14 +247,22 @@ function render() {
   const rep = check(hydrated, { catalog: c.catalog, a11y: c.a11y, binding: { id: b.id, ...proof } })
   $('.proof').textContent = `${b.label}: ${proof.line}`
   const v = $('.verdict'); v.dataset.v = rep.verdict
-  v.textContent = { AA: '✓ AA', fail: '✗ fails', 'needs-review': '· needs review', unverified: '? unverified', partial: '◐ partial' }[rep.verdict]
+  const said = { AA: ['✓ AA', 'success', 'AA — answer clean'],
+    fail: ['✗ fails', 'danger', `Fails — ${rep.findings.filter((f) => f.severity === 'fail').length} of them`],
+    partial: ['◐ partial', 'warning', 'Partial — the catalog runs out of vocabulary here'],
+    'needs-review': ['· needs review', 'warning', 'Needs a person to look'],
+    unverified: ['? unverified', 'warning', 'Unverified — this binding has no certificate'] }[rep.verdict]
+  v.textContent = said[0]
+  /* alert--warning, never alert--warn: the kit says `warn` on a badge and
+     `warning` on an alert, and getting that wrong renders with no tone at all. */
+  $('.verdict-alert').className = `alert alert--${said[1]} verdict-alert`
+  $('.verdict-title').textContent = said[2]
+  $('.verdict-why').textContent = `${rep.why}. ${rep.counted.rules} rules ran; ${rep.unchecked.length} things this check never claims.`
   /* the gaps this answer RUNS INTO first, then the rest of the catalog's */
   const used = new Set(rep.gapsUsed)
   const gaps = [...rep.catalogGaps].sort((a, b) => used.has(b) - used.has(a))
     .map((g) => `<div class="gap"><code>${g.sc}</code> ${used.has(g) ? '<b>in this answer</b> — ' : ''}${g.message}</div>`).join('')
-  $('.findings').innerHTML = (rep.findings.length
-    ? rep.findings.map((f) => `<div><code>${f.sc ?? 'craft'}</code> ${f.message}</div>`).join('')
-    : `<div>${rep.why}. ${rep.unchecked.length} things this check never claims — see the report.</div>`) + gaps
+  $('.findings').innerHTML = rep.findings.map((f) => `<div><code>${f.sc ?? 'craft'}</code> ${f.message}</div>`).join('') + gaps
 
   const code = { catalog: JSON.stringify(subsetCatalog(), null, 2),
     binding: emit(b, tree, (t, fn) => walk(t, fn, surface.model)) }
@@ -186,11 +282,20 @@ function render() {
   $('.count').textContent = `${[...state.picked[state.cat]].filter((n) => !isLayout(n)).length} of ${names().filter((n) => !isLayout(n)).length}`
 }
 
-const syncRadio = (sel, key, val) => [...$(sel).children].forEach((el) => el.setAttribute('aria-checked', el.dataset[key] === val))
+/* The selected treatment comes from the kit's own recipe (`--on`), not from a
+   rule of ours keyed on aria — same reason the page uses .card and .alert: if
+   the recipe changes, this changes with it. aria carries the meaning either way. */
+function syncRadio(sel, key, val, onClass) {
+  for (const el of $(sel).children) {
+    const on = el.dataset[key] === val
+    el.setAttribute('aria-checked', on)
+    el.classList.toggle(onClass, on)
+  }
+}
 
 /* palette — redrawn on every catalog switch, because the blocks ARE the catalog */
 function palette() {
-  $('.blocks').innerHTML = names().map((n) => `<li><label title="${sourceOf(n)}">
+  $('.blocks').innerHTML = names().map((n) => `<li><label class="checkbox" title="${sourceOf(n)}">
     <input type="checkbox" value="${n}" ${state.picked[state.cat].has(n) ? 'checked' : ''}${isLayout(n) ? ' disabled' : ''}>
     <span class="nm">${n}</span></label></li>`).join('')
   $('.hint').textContent = cur().note
@@ -201,19 +306,26 @@ $('.blocks').addEventListener('change', (e) => {
 })
 /* catalogs */
 $('.cats').innerHTML = Object.entries(CATALOGS).map(([id, c]) =>
-  `<button role="radio" data-c="${id}" aria-checked="${id === state.cat}">${c.label}</button>`).join('')
+  `<button class="tab${id === state.cat ? ' tab--on' : ''}" role="radio" data-c="${id}" aria-checked="${id === state.cat}">${c.label}</button>`).join('')
 $('.cats').addEventListener('click', (e) => {
   const btn = e.target.closest('button'); if (!btn) return
   state.cat = btn.dataset.c; state.edited = null
-  syncRadio('.cats', 'c', state.cat); palette(); draw()
+  syncRadio('.cats', 'c', state.cat, 'tab--on'); palette(); draw()
 })
 /* stacks */
 $('.stacks').innerHTML = Object.values(BINDINGS).map((b) =>
-  `<button role="radio" data-s="${b.id}" aria-checked="${b.id === state.stack}" title="${b.note}">${b.label}</button>`).join('')
+  `<button class="segctrl__btn${b.id === state.stack ? ' segctrl__btn--on' : ''}" role="radio" data-s="${b.id}" aria-checked="${b.id === state.stack}" title="${b.note}">${b.label}</button>`).join('')
+/* Re-skinning the same answer is the most convincing thing here and it used to
+   be a flicker. The browser owns the timing, so the answer's cross-fade and the
+   segmented control's sliding pill cannot drift apart. Anything that is not a
+   deliberate stack switch — typing, ticking a component — still renders at once;
+   an animation on every keystroke would be a tax, not a feature. */
+const reduced = matchMedia('(prefers-reduced-motion: reduce)')
 $('.stacks').addEventListener('click', (e) => {
-  const btn = e.target.closest('button'); if (!btn) return
-  state.stack = btn.dataset.s
-  syncRadio('.stacks', 's', state.stack); draw()
+  const btn = e.target.closest('button'); if (!btn || btn.dataset.s === state.stack) return
+  const swap = () => { state.stack = btn.dataset.s; syncRadio('.stacks', 's', state.stack, 'segctrl__btn--on'); draw() }
+  if (reduced.matches || !document.startViewTransition) return swap()
+  document.startViewTransition(swap)
 })
 /* tabs — a roving tabindex and arrow keys, because role="tab" is a promise
    about keyboard behaviour and we would be selling a check we failed */
@@ -223,6 +335,7 @@ function selectTab(btn, focus) {
   for (const el of tabs()) {
     const on = el === btn
     el.setAttribute('aria-selected', on)
+    el.classList.toggle('tab--on', on)
     el.tabIndex = on ? 0 : -1
   }
   if (focus) btn.focus()

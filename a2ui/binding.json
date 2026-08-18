@@ -26,9 +26,7 @@
     "Divider against surface": "1.09:1 – 1.39:1 (1.4.11 exempts decoration)",
     "Divider against background": "1.22:1 – 1.31:1 (1.4.11 exempts decoration)"
   },
-  "alsoMeasuredInCI": [
-    "2.5.8 target size (axe, rendered, 3 widths)",
-    "2.4.7 focus visible (measured before/after focus)",
-    "1.4.10 reflow @320px"
+  "alsoMeasuredElsewhere": [
+    "2.5.8 target size · 2.4.7 focus visible · 1.4.10 reflow — measured by the ARCHIVED library's rendered harness on its own markup, not on what these bindings emit. Measuring what they emit (2026-08-18) found four rows under 24px; those are fixed, but nothing here re-measures on every change."
   ]
 }

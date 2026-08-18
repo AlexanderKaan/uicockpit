@@ -80,7 +80,11 @@ const cert = {
   failures: failed,
   measuredNotRequired: Object.fromEntries(Object.entries(informational)
     .map(([k, v]) => [k, `${Math.min(...v).toFixed(2)}:1 – ${Math.max(...v).toFixed(2)}:1 (1.4.11 exempts decoration)`])),
-  alsoMeasuredInCI: ['2.5.8 target size (axe, rendered, 3 widths)', '2.4.7 focus visible (measured before/after focus)', '1.4.10 reflow @320px'],
+  /* NOT measured here. The archived library's rendered harness measured these on
+   * ITS markup; this project emits different markup, and when that was finally
+   * measured it was failing. Naming the difference is the whole point of a
+   * certificate. */
+  alsoMeasuredElsewhere: ["2.5.8 target size · 2.4.7 focus visible · 1.4.10 reflow — measured by the ARCHIVED library's rendered harness on its own markup, not on what these bindings emit. Measuring what they emit (2026-08-18) found four rows under 24px; those are fixed, but nothing here re-measures on every change."],
 }
 writeFileSync('../a2ui/binding.json', JSON.stringify(cert, null, 2) + '\n')
 console.log(`${combos} configurations (${clean} clean) · ${pairs} contrast pairs · ${failed.length ? '✗ ' + failed.length + ' failures\n  ' + failed.join('\n  ') : '✓ all above the floor'}`)

@@ -56,7 +56,8 @@
 .b-daisy ul.list{list-style:none;padding:0}
 /* — added for the A2UI Basic Catalog: daisyUI's own idioms for the components
      the Basic Catalog adds (collapse, modal, input, checkbox, radio, range) — */
-.b-daisy .btn-link{background:transparent;border-color:transparent;color:var(--p);text-decoration:underline;height:auto;padding-inline:0}
+/* height:auto took this to 20px — under the 24px WCAG 2.5.8 asks of a target */
+.b-daisy .btn-link{background:transparent;border-color:transparent;color:var(--p);text-decoration:underline;height:auto;min-height:1.5rem;padding-inline:0}
 .b-daisy .collapse{border-radius:var(--rb);overflow:hidden}
 .b-daisy .collapse.border{border:1px solid rgba(0,0,0,.1)}
 .b-daisy .collapse-title{padding:1rem;cursor:pointer;list-style:none}
@@ -80,3 +81,4 @@
 .b-daisy .w-full{width:100%}.b-daisy .rounded-box img,.b-daisy .rounded-box video{border-radius:var(--rb)}
 .b-daisy audio,.b-daisy video,.b-daisy img{display:block;max-width:100%}
 .b-daisy figure{margin:0}
+.b-daisy .min-h-6{min-height:1.5rem}

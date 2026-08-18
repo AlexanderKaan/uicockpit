@@ -34,6 +34,11 @@ produced — JSONL, a JSON array, or a single message out of a log — and it
 renders in your stack and gets checked. If the stream names a catalog the page
 knows, it switches to it; if the JSON is broken it tells you which line.
 
+The page itself is built out of the kit it ships — same tokens, same recipes,
+same contrast floors — so a regression in the kit shows up in the tool before it
+shows up in anyone's product. A CSS scope limit keeps that honest: chrome styles
+stop dead at the preview, so nothing the page wears can reach the answer.
+
 Or build a stream by ticking components. You land on **Google's A2UI Basic
 Catalog** — the 18 components every A2UI renderer is expected to know — switch
 between **UIcockpit kit · Tailwind · daisyUI · shadcn/ui**, and copy three
@@ -91,6 +96,16 @@ It found things in **our own** work too, which is the point of owning a meter:
   checked checkbox at **1.61:1** against its surface in two dark themes — below
   the 3:1 that 1.4.11 asks of a state indicator. It is in `binding.json`, by
   name, and the certificate says 54 of 60 rather than rounding up;
+- measuring the built page found target sizes under the 24px WCAG 2.5.8 asks —
+  a checkbox row at **17px** in the kit binding, a disclosure at 20px in
+  Tailwind and shadcn, a range input at 16px everywhere. All fixed. The
+  certificate used to list target size among the things "measured in CI"; that
+  measurement belonged to the archived library's harness and its own markup, so
+  the claim now says exactly that instead;
+- the Role Canvas floor binds the selected treatment to ARIA, and the `tab`
+  recipe has one of its own — so a selected tab wore both an underline and an
+  inset ring. A recipe with its own treatment has to switch the floor off
+  through the token the floor reads;
 - the kit turned out to have **two tone vocabularies** (`badge--warn` but
   `alert--warning`), so a Callout with tone `warn` had been rendering with no
   tone at all;

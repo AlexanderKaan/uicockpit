@@ -177,7 +177,7 @@ const tw = {
       case 'List':   return `<div class="${n.direction === 'horizontal' ? 'flex flex-wrap gap-4' : 'flex flex-col gap-2'}">${k}</div>`
       case 'Divider':return n.axis === 'vertical' ? `<div role="separator" aria-orientation="vertical" class="w-px self-stretch bg-gray-200"></div>` : `<hr class="border-t border-gray-200">`
       case 'Tabs':   return `<div class="flex flex-col gap-2">${list(n.tabs).map((t, i) =>
-        `<details class="rounded-lg border border-gray-200 p-4"${i === 0 ? ' open' : ''}><summary class="cursor-pointer text-sm font-medium text-gray-900">${esc(r(t.title))}</summary><div class="pt-2">${ka[i] ?? ''}</div></details>`).join('')}</div>`
+        `<details class="rounded-lg border border-gray-200 p-4"${i === 0 ? ' open' : ''}><summary class="flex min-h-6 cursor-pointer items-center text-sm font-medium text-gray-900">${esc(r(t.title))}</summary><div class="pt-2">${ka[i] ?? ''}</div></details>`).join('')}</div>`
       case 'Modal':  return `<div class="flex flex-col gap-2">${invoke(ka[0] ?? '', id + '_d', 'inline-flex h-9 items-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-900')}<dialog class="max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm" id="${id}_d"><div class="flex flex-col gap-4">${
         ka[1] ?? ''}<button type="button" class="inline-flex h-9 items-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-900" command="close" commandfor="${id}_d">Close</button></div></dialog></div>`
       case 'TextField': {
@@ -188,14 +188,15 @@ const tw = {
       }
       case 'DateTimeInput': return `<div class="flex flex-col gap-1">${r(n.label) ? `<label class="${TW_LABEL}" for="${id}_i">${esc(r(n.label))}</label>` : ''}<input class="${TW_INPUT}" id="${id}_i" type="${
         dateType(n)}"${attr('value', r(n.value))}${attr('min', n.min)}${attr('max', n.max)}></div>`
-      case 'CheckBox': return `<label class="inline-flex items-center gap-2 text-sm text-gray-900"><input type="checkbox" class="size-4 accent-gray-900"${r(n.value) ? ' checked' : ''}><span>${esc(r(n.label) ?? '')}</span></label>`
+      /* min-h-6 is the 24px WCAG 2.5.8 asks of a target; without it the row is 22 */
+      case 'CheckBox': return `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-gray-900"><input type="checkbox" class="size-4 accent-gray-900"${r(n.value) ? ' checked' : ''}><span>${esc(r(n.label) ?? '')}</span></label>`
       case 'ChoicePicker': {
         const multi = n.variant === 'multipleSelection', sel = new Set(list(r(n.value)))
         return `<fieldset class="flex flex-col gap-2">${r(n.label) ? `<legend class="mb-1 ${TW_LABEL}">${esc(r(n.label))}</legend>` : ''}${
-          list(n.options).map((o) => `<label class="inline-flex items-center gap-2 text-sm text-gray-900"><input type="${multi ? 'checkbox' : 'radio'}" name="${id}" class="size-4 accent-gray-900"${
+          list(n.options).map((o) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-gray-900"><input type="${multi ? 'checkbox' : 'radio'}" name="${id}" class="size-4 accent-gray-900"${
             sel.has(o.value) ? ' checked' : ''}><span>${esc(r(o.label))}</span></label>`).join('')}</fieldset>`
       }
-      case 'Slider': return `<div class="flex flex-col gap-1">${r(n.label) ? `<label class="${TW_LABEL}" for="${id}_i">${esc(r(n.label))}</label>` : ''}<input type="range" class="w-full accent-gray-900" id="${id}_i"${
+      case 'Slider': return `<div class="flex flex-col gap-1">${r(n.label) ? `<label class="${TW_LABEL}" for="${id}_i">${esc(r(n.label))}</label>` : ''}<input type="range" class="min-h-6 w-full accent-gray-900" id="${id}_i"${
         attr('min', n.min ?? 0)}${attr('max', n.max)}${attr('step', n.steps ? (n.max - (n.min ?? 0)) / n.steps : null)}${attr('value', r(n.value))}></div>`
       case 'Heading':return `<div class="flex flex-col gap-1">${n.level === 3
         ? `<h3 class="text-base font-semibold text-gray-900">${esc(r(n.text))}</h3>`
@@ -272,7 +273,7 @@ const daisy = {
           list(n.options).map((o) => `<label class="label"><input type="${multi ? 'checkbox' : 'radio'}" name="${id}" class="${multi ? 'checkbox' : 'radio'}"${
             sel.has(o.value) ? ' checked' : ''}><span>${esc(r(o.label))}</span></label>`).join('')}</fieldset>`
       }
-      case 'Slider': return `<fieldset class="fieldset">${r(n.label) ? `<legend class="fieldset-legend">${esc(r(n.label))}</legend>` : ''}<input type="range" class="range"${
+      case 'Slider': return `<fieldset class="fieldset">${r(n.label) ? `<legend class="fieldset-legend">${esc(r(n.label))}</legend>` : ''}<input type="range" class="range min-h-6"${
         attr('min', n.min ?? 0)}${attr('max', n.max)}${attr('step', n.steps ? (n.max - (n.min ?? 0)) / n.steps : null)}${attr('value', r(n.value))}></fieldset>`
       case 'Heading':return n.level === 3
         ? `<h3 class="card-title text-base">${esc(r(n.text))}</h3>`
@@ -344,10 +345,10 @@ const shadcn = {
     Modal:  (k, n, ka = []) => `<Dialog>\n      <DialogTrigger asChild>${ka[0] ?? ''}</DialogTrigger>\n      <DialogContent>\n        <DialogTitle className="sr-only">{/* A2UI's Modal carries no title — name this dialog */}</DialogTitle>\n        ${ka[1] ?? ''}\n      </DialogContent>\n    </Dialog>`,
     TextField: (k, n) => `<div className="flex flex-col gap-1">\n      <Label htmlFor="${n.id}">{${v(n.label)}}</Label>\n      <Input id="${n.id}" type="${INPUT_TYPE[n.variant] === 'textarea' ? 'text' : INPUT_TYPE[n.variant] ?? 'text'}" defaultValue={${v(n.value)}} placeholder={${v(n.placeholder)}} />\n    </div>`,
     DateTimeInput: (k, n) => `<div className="flex flex-col gap-1">\n      <Label htmlFor="${n.id}">{${v(n.label)}}</Label>\n      <Input id="${n.id}" type="${dateType(n)}" defaultValue={${v(n.value)}} />\n    </div>`,
-    CheckBox: (k, n) => `<div className="flex items-center gap-2">\n      <Checkbox id="${n.id}" defaultChecked={${v(n.value)}} />\n      <Label htmlFor="${n.id}">{${v(n.label)}}</Label>\n    </div>`,
+    CheckBox: (k, n) => `<div className="flex min-h-6 items-center gap-2">\n      <Checkbox id="${n.id}" defaultChecked={${v(n.value)}} />\n      <Label htmlFor="${n.id}">{${v(n.label)}}</Label>\n    </div>`,
     ChoicePicker: (k, n) => n.variant === 'multipleSelection'
-      ? `<fieldset className="flex flex-col gap-2">\n      <legend className="mb-1 text-sm font-medium">{${v(n.label)}}</legend>\n${list(n.options).map((o, i) => `      <div className="flex items-center gap-2"><Checkbox id="${n.id}_${i}" /><Label htmlFor="${n.id}_${i}">{${v(o.label)}}</Label></div>`).join('\n')}\n    </fieldset>`
-      : `<fieldset className="flex flex-col gap-2">\n      <legend className="mb-1 text-sm font-medium">{${v(n.label)}}</legend>\n      <RadioGroup defaultValue={${v(n.value)}}>\n${list(n.options).map((o, i) => `        <div className="flex items-center gap-2"><RadioGroupItem value=${JSON.stringify(String(o.value))} id="${n.id}_${i}" /><Label htmlFor="${n.id}_${i}">{${v(o.label)}}</Label></div>`).join('\n')}\n      </RadioGroup>\n    </fieldset>`,
+      ? `<fieldset className="flex flex-col gap-2">\n      <legend className="mb-1 text-sm font-medium">{${v(n.label)}}</legend>\n${list(n.options).map((o, i) => `      <div className="flex min-h-6 items-center gap-2"><Checkbox id="${n.id}_${i}" /><Label htmlFor="${n.id}_${i}">{${v(o.label)}}</Label></div>`).join('\n')}\n    </fieldset>`
+      : `<fieldset className="flex flex-col gap-2">\n      <legend className="mb-1 text-sm font-medium">{${v(n.label)}}</legend>\n      <RadioGroup defaultValue={${v(n.value)}}>\n${list(n.options).map((o, i) => `        <div className="flex min-h-6 items-center gap-2"><RadioGroupItem value=${JSON.stringify(String(o.value))} id="${n.id}_${i}" /><Label htmlFor="${n.id}_${i}">{${v(o.label)}}</Label></div>`).join('\n')}\n      </RadioGroup>\n    </fieldset>`,
     Slider: (k, n) => `<div className="flex flex-col gap-1">\n      <Label htmlFor="${n.id}">{${v(n.label)}}</Label>\n      <Slider id="${n.id}" min={${n.min ?? 0}} max={${n.max ?? 100}} defaultValue={[${v(n.value)}]} />\n    </div>`,
     Heading:(k, n) => n.level === 3 ? `<h3 className="text-base font-semibold">{${v(n.text)}}</h3>` : `<div><h2 className="text-xl font-semibold tracking-tight">{${v(n.text)}}</h2>${n.sub ? `<p className="text-sm text-muted-foreground">{${v(n.sub)}}</p>` : ''}</div>`,
     Badge:  (k, n) => `<Badge variant="${SC_BADGE[n.tone] ?? 'secondary'}">{${v(n.text)}}</Badge>`,

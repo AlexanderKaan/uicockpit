@@ -1,9 +1,10 @@
 /* The kit binding's stylesheet — extracted from the archived component library
- * (tag archive/cockpit-2026-08-17) down to what the A2UI bindings render:
- * 284 rules from 34 recipes, 271 rules dropped as unreachable.
- * Covers both catalogs: the A2UI Basic Catalog (fields, tabs, dialog, figure)
- * and the public-service extension. Plain CSS, yours to edit, no build. Themed
- * through the custom properties in tokens.css — override those, never these. */
+ * (tag archive/cockpit-2026-08-17) down to what this project renders:
+ * 345 rules from 35 recipes, 231 rules dropped as unreachable.
+ * It serves TWO scopes now — the kit binding's preview, and the page chrome
+ * itself, which is built out of the same recipes. Plain CSS, yours to edit, no
+ * build. Themed through the custom properties in tokens.css — override those,
+ * never these. */
 
 /* ── Composition utilities ───────────────────────────────────── */
 .num { font-variant-numeric: tabular-nums }
@@ -12,9 +13,11 @@
 .toolbar { --tb-h: var(--k-control-h-md); display: flex; align-items: center; gap: var(--k-space, 8px); flex-wrap: wrap }
 .toolbar--sm { --tb-h: var(--k-control-h-sm) }
 .toolbar__group { display: inline-flex; align-items: center; gap: var(--k-gap, var(--k-s-8)) }
+.toolbar__label { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-medium); color: var(--k-fg-muted); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); white-space: nowrap }
 .toolbar > .btn, .toolbar > .in, .toolbar > .searchinput, .toolbar > .select, .toolbar > .select-trigger, .toolbar > .segctrl, .toolbar__group > .btn, .toolbar__group > .in, .toolbar__group > .searchinput, .toolbar__group > .select, .toolbar__group > .select-trigger, .toolbar__group > .segctrl { min-height: var(--tb-h); height: var(--tb-h) }
 .toolbar > *, .toolbar__group > * { min-height: var(--tb-h) }
 .toolbar > .toolbar__label, .toolbar__group > .toolbar__label, .toolbar > .toolbar__spacer { min-height: 0 }
+.toolbar__spacer { flex: 1 1 auto; min-width: 0 }
 
 /* ── Buttons ─────────────────────────────────────────────────── */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--k-s-6); min-height: var(--k-btn-h, var(--k-btn-h-default, 36px)); padding-block: 0; --btn-r: var(--k-btn-radius, var(--k-radius-button, var(--k-radius-md))); padding-inline: max(
@@ -107,6 +110,7 @@
 .card__title, .dialog__title, .sheet__title { font-weight: var(--k-weight-display); font-size: var(--k-type-h3); font-family: var(--k-font-display); color: var(--k-fg); letter-spacing: var(--k-track-tight); line-height: var(--k-leading-snug); margin: 0 }
 .card__desc { font-size: var(--k-type-small); color: var(--k-fg-muted); line-height: 1.4 }
 .card__col { display: flex; flex-direction: column; gap: var(--k-gap, var(--k-s-8)) }
+.card__media { margin: calc(-1 * var(--k-card-pad, var(--k-pad, 24px))) calc(-1 * var(--k-card-pad, var(--k-pad, 24px))) 0; border-top-left-radius: var(--k-card-radius, var(--k-radius-lg)); border-top-right-radius: var(--k-card-radius, var(--k-radius-lg)); overflow: hidden }
 .datatable__foot, .formpanel__foot { border-top: var(--k-divider); background: var(--k-surface-sunken); padding: var(--k-s-12) var(--k-s-16) }
 .card--presentation { background: var(--k-primary); border: 0; box-shadow: var(--k-shadow-lg); color: var(--k-primary-fg) }
 .card--presentation .card__title, .card--presentation .card__desc { color: var(--k-primary-fg) }
@@ -163,6 +167,11 @@ input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webki
 .checkbox input:disabled, .radio input:disabled { opacity: var(--k-disabled-opacity, 0.55); cursor: not-allowed }
 .radio input[type="radio"]:checked { border-color: var(--k-primary) }
 .radio input[type="radio"]:checked::after { content: ''; position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; border-radius: 50%; background: var(--k-primary); transform: translate(-50%, -50%) }
+.in-group { display: flex; align-items: stretch; width: 100%; min-width: 0; flex-wrap: wrap }
+.in-group > * { border-radius: 0 }
+.in-group > *:not(:first-child) { margin-left: -1px }
+.in-group > *:first-child { border-top-left-radius: var(--k-in-radius, var(--k-radius-md)); border-bottom-left-radius: var(--k-in-radius, var(--k-radius-md)) }
+.in-group > *:last-child { border-top-right-radius: var(--k-in-radius, var(--k-radius-md)); border-bottom-right-radius: var(--k-in-radius, var(--k-radius-md)) }
 .in-group > .in { width: auto; flex: 1 }
 .in-group > .in:focus, .in-group > .in:focus-within { position: relative; z-index: 1 }
 
@@ -202,6 +211,7 @@ input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webki
 .tab--on { color: var(--k-fg); border-bottom-color: var(--k-primary) }
 .tab { display: inline-flex; align-items: center; gap: var(--k-s-6); line-height: 1 }
 .tab > svg { flex-shrink: 0; display: block }
+.tab__badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 16px; padding: 0 var(--k-s-4); border-radius: 999px; font-size: var(--k-type-caption); font-weight: var(--k-weight-semibold); background: var(--k-surface-2); color: var(--k-fg-muted) }
 .tab--on .tab__badge { background: var(--k-primary-soft); color: var(--k-primary-soft-fg) }
 
 /* ── Table ───────────────────────────────────────────────────── */
@@ -216,6 +226,7 @@ input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webki
 .table th.is-sortable { cursor: pointer; user-select: none }
 .table th.is-sortable:hover { color: var(--k-fg) }
 .table th.is-sortable:focus-visible { outline: var(--k-focus-ring-width) solid var(--k-ring); outline-offset: -2px }
+.table__sort-chevron { display: inline-flex; color: var(--k-fg-faint); transition: color var(--k-dur-fast, 120ms) var(--k-ease, ease) }
 .is-sortable.is-active .table__sort-chevron { color: var(--k-primary-text) }
 .table th.num, .table td.num { text-align: right; font-variant-numeric: tabular-nums }
 .table tr.table__group > * { background: var(--k-surface-sunken); font-size: var(--k-type-eyebrow); text-transform: uppercase; letter-spacing: var(--k-track-eyebrow); font-weight: var(--k-weight-semibold); color: var(--k-fg-muted); padding-top: var(--k-s-6); padding-bottom: var(--k-s-6) }
@@ -244,6 +255,10 @@ input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webki
 /* ── Data table ──────────────────────────────────────────────── */
 .datatable { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); overflow: hidden; container: datatable / inline-size }
 @@container datatable (max-width: 440px) { .datatable__bar .toolbar { flex-direction: column; align-items: stretch } }
+@@container datatable (max-width: 440px) { .datatable__bar .toolbar__spacer { display: none } }
+.datatable__bar { display: flex; align-items: center; gap: var(--k-s-10); padding: var(--k-s-8) var(--k-s-12); border-bottom: var(--k-divider); background: var(--k-surface-sunken); font-size: var(--k-type-small) }
+.datatable__bar--active { background: var(--k-state-selected-bg, var(--k-primary-soft)); color: var(--k-state-selected-fg, var(--k-fg)) }
+.datatable__body { max-height: 240px; overflow: auto }
 .datatable--page .datatable__body { max-height: none; overflow: visible }
 @@container datatable (max-width: 40rem) { .datatable--page .datatable__body { overflow-x: auto } }
 @@container datatable (max-width: 40rem) { .datatable--page .table { min-width: 34rem } }
@@ -253,6 +268,8 @@ input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webki
 .datatable .table td:first-child, .datatable .table th:first-child { padding-left: var(--k-s-12) }
 .datatable .table td:last-child, .datatable .table th:last-child { padding-right: var(--k-s-12) }
 .datatable--loading .datatable__body { opacity: 0.85 }
+.datatable__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap; font-size: var(--k-type-small); color: var(--k-fg-muted) }
+.datatable__perpage { display: inline-flex; align-items: center; gap: var(--k-s-8); white-space: nowrap }
 .datatable__perpage .select { width: auto; min-height: var(--k-control-h-sm) }
 
 /* ── Select trigger ──────────────────────────────────────────── */
@@ -268,7 +285,20 @@ select.select:focus, select.select:focus-visible { outline: none; border-color: 
 .navrow > svg { width: var(--k-row-icon, 14px); height: var(--k-row-icon, 14px); flex-shrink: 0 }
 .navrow:hover { background: var(--k-state-hover); color: var(--k-fg) }
 .navrow--on { background: var(--k-state-selected-bg, var(--k-primary-soft)); color: var(--k-state-selected-fg, var(--k-primary)); font-weight: var(--k-weight-semibold) }
+.navrow__label { flex: 1; text-align: left; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.navrow__chev { margin-left: auto; display: inline-flex; color: var(--k-fg-faint); transition: transform var(--k-dur-fast, 140ms) var(--k-ease, ease) }
 .navrow[aria-expanded='true'] .navrow__chev { transform: rotate(90deg) }
+.navsub { position: relative; display: flex; flex-direction: column; gap: var(--k-s-2); margin: var(--k-s-2) 0; padding-left: var(--k-s-20) }
+.navsub::before { content: ''; position: absolute; left: 19px; top: 3px; bottom: 3px; width: 1.5px; background: var(--k-border) }
+.nav-group { font-size: var(--k-type-eyebrow); font-weight: var(--k-weight-semibold); letter-spacing: var(--k-track-eyebrow); text-transform: uppercase; color: var(--k-fg-faint); padding: 0 var(--k-row-px, 10px); margin: calc(var(--k-space) * 0.875) 0 var(--k-s-4) }
+.sidenav__brand { display: flex; align-items: center; gap: var(--k-s-8); padding: var(--k-s-6) var(--k-s-10) var(--k-space); font-weight: var(--k-weight-semibold) }
+.sidenav__icon { width: 26px; height: 26px; border-radius: var(--k-radius-sm); background: var(--k-primary); color: var(--k-primary-fg, #fff); display: grid; place-items: center; flex: none; box-shadow: var(--k-shadow-sm) }
+.sidenav__icon > svg { width: var(--k-icon-md); height: var(--k-icon-md) }
+.sidenav__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--k-font-display); letter-spacing: -0.01em }
+.sidenav__toggle { display: inline-grid; place-items: center; width: 24px; height: 24px; flex: none; border: 0; border-radius: var(--k-radius-sm, 6px); background: transparent; color: var(--k-fg-faint); cursor: pointer; transition: background var(--k-dur-fast, 140ms) var(--k-ease, ease), color var(--k-dur-fast, 140ms) }
+.sidenav__toggle:hover { background: var(--k-state-hover); color: var(--k-fg) }
+.sidenav__toggle > svg { width: var(--k-icon-md); height: var(--k-icon-md) }
+.sidenav__foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--k-s-4); padding-top: var(--k-s-6) }
 .sidenav--rail { width: 64px; padding-left: var(--k-s-8); padding-right: var(--k-s-8) }
 .sidenav--rail .sidenav__brand { padding: var(--k-s-6) 0 var(--k-s-16); justify-content: center }
 .sidenav--rail .sidenav__icon, .sidenav--rail .sidenav__name, .sidenav--rail .navrow__label, .sidenav--rail .navrow__chev, .sidenav--rail .navsub { display: none }
@@ -281,10 +311,13 @@ select.select:focus, select.select:focus-visible { outline: none; border-color: 
 .sidenav--rail .navrow[data-tip]::after, .sidenav--rail .sidenav__toggle[data-tip]::after { content: attr(data-tip); position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%) translateX(-4px); background: var(--k-fg); color: var(--k-bg); padding: var(--k-s-4) var(--k-s-8); border-radius: var(--k-radius-sm, 6px); font-size: var(--k-type-small); font-weight: var(--k-weight-medium); white-space: nowrap; opacity: 0; pointer-events: none; box-shadow: var(--k-shadow-md); z-index: var(--k-z-tooltip); transition: opacity var(--k-dur-fast, 140ms) var(--k-ease, ease), transform var(--k-dur-fast, 140ms) var(--k-ease, ease) }
 .sidenav--rail .navrow[data-tip]:hover::after, .sidenav--rail .sidenav__toggle[data-tip]:hover::after { opacity: 1; transform: translateY(-50%) translateX(0) }
 @@media (prefers-reduced-motion: reduce) { .sidenav--rail .navrow[data-tip]::after, .sidenav--rail .sidenav__toggle[data-tip]::after { transition: none } }
+@@container scaffold (max-width: 600px) { .sidenav__brand, .sidenav__foot, .nav-group { display: none } }
+@@container scaffold (max-width: 600px) { .sidenav__name, .navrow__label, .navrow__chev, .navsub { display: none } }
 @@container scaffold (max-width: 600px) { .navrow { flex: 0 0 auto; justify-content: center; gap: 0; padding: var(--k-s-8) var(--k-s-10); position: relative } }
 @@container scaffold (max-width: 600px) { .navrow .badge--count { position: absolute; top: var(--k-s-2); right: var(--k-s-4); min-width: var(--k-s-8); width: var(--k-s-8); height: var(--k-s-8); padding: 0; font-size: 0; border: var(--k-bw) solid var(--k-chrome-bg, var(--k-surface-sunken)) } }
 
 /* ── Calendar ────────────────────────────────────────────────── */
+.timefield { display: inline-flex; align-items: center; gap: var(--k-s-4) }
 .timefield .in { width: calc(var(--k-in-h-default) * 1.4); text-align: center; font-variant-numeric: tabular-nums; padding-inline: var(--k-s-4) }
 .timefield .segctrl { margin-left: var(--k-s-4) }
 
@@ -297,6 +330,7 @@ select.select:focus, select.select:focus-visible { outline: none; border-color: 
 .processlist__body { margin: 0; color: var(--k-fg-muted) }
 
 /* ── Memorable date ──────────────────────────────────────────── */
+.memdate__part { display: flex; flex-direction: column; gap: var(--k-s-6) }
 .memdate__part .in { width: max(calc(4ch + 2 * var(--k-s-12)), var(--k-hit-min)); text-align: center; font-variant-numeric: tabular-nums }
 .memdate__part--year .in { width: max(calc(6ch + 2 * var(--k-s-12)), var(--k-hit-min)) }
 
@@ -329,6 +363,12 @@ select.select:focus, select.select:focus-visible { outline: none; border-color: 
 /* ── Segmented control / Toggle group ────────────────────────── */
 .segctrl { display: inline-flex; background: var(--k-track, var(--k-surface-2)); border-radius: var(--k-radius-md); padding: var(--k-s-2); gap: 0; border: 1px solid var(--k-field-border-color); max-width: 100%; overflow-x: auto; scrollbar-width: none }
 .segctrl::-webkit-scrollbar { display: none }
+.segctrl__btn { flex: 0 0 auto; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; min-height: var(--k-row-h-default, 28px); min-width: var(--k-hit-min); padding: 0 var(--k-s-12); border: 0; background: transparent; font-size: var(--k-type-small); font-weight: var(--k-ui-weight, 500); line-height: 1; text-transform: var(--k-ui-transform, none); letter-spacing: var(--k-ui-tracking, 0); color: var(--k-fg-muted); border-radius: calc(var(--k-radius-md) - 2px); cursor: pointer; transition: color var(--k-dur-fast, 120ms) var(--k-ease, ease); display: inline-flex; align-items: center; gap: var(--k-s-4) }
+.segctrl__btn > svg { flex-shrink: 0; display: block }
+.segctrl__btn:hover { color: var(--k-fg) }
+.segctrl__btn:not(.segctrl__btn--on):not([aria-checked="true"]):not([aria-selected="true"]):active { background: var(--k-state-press) }
+.segctrl__btn:disabled, .segctrl__btn.is-disabled, .segctrl__btn[aria-disabled="true"] { background: transparent !important; color: var(--k-fg-faint) !important; opacity: var(--k-disabled-opacity); cursor: not-allowed }
+.segctrl__btn--on, .segctrl__btn[aria-checked="true"], .segctrl__btn[aria-selected="true"] { background: var(--k-surface); color: var(--k-fg); box-shadow: var(--k-shadow-sm), var(--k-selected-edge) }
 
 /* ── Description list ────────────────────────────────────────── */
 .dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--k-s-10) var(--k-s-24); margin: 0 }
@@ -348,6 +388,8 @@ select.select:focus, select.select:focus-visible { outline: none; border-color: 
 .carousel--strip .carousel__track { gap: var(--k-s-12); transition: none; align-items: stretch }
 .carousel--strip .carousel__slide { flex: 0 0 var(--strip-slide, 16rem); aspect-ratio: auto; padding: 0; color: inherit; display: flex; scroll-snap-align: start }
 .carousel--strip .carousel__slide > .card { flex: 1 1 auto }
+.carousel__viewport { position: relative; overflow: hidden; border-radius: var(--k-radius-lg) }
+.carousel__track { display: flex; transition: transform var(--k-dur, 280ms) var(--k-ease, ease) }
 .carousel__slide { flex: 0 0 100%; aspect-ratio: 16 / 7; display: flex; align-items: flex-end; padding: var(--k-s-16); color: #fff }
 
 /* ── Figure ──────────────────────────────────────────────────── */
@@ -369,15 +411,36 @@ select.select:focus, select.select:focus-visible { outline: none; border-color: 
 .numinput:hover:not(:focus-within), .pwinput:hover:not(:focus-within), .searchinput:hover:not(:focus-within) { border-color: var(--k-state-border, var(--k-fg-faint)) }
 .numinput:focus-within, .pwinput:focus-within, .searchinput:focus-within, .select-trigger:focus, .select-trigger:focus-visible { outline: 2px solid transparent; outline-offset: 2px; border-color: var(--k-ring); box-shadow: 0 0 0 var(--k-ring-w) var(--k-ring-halo) }
 
+/* ── NumberInput ─────────────────────────────────────────────── */
+.numinput { padding: 0 }
+.numinput--with-suffix .numinput__field { text-align: left; padding-right: var(--k-s-4) }
+
 /* ── SearchInput ─────────────────────────────────────────────── */
 .searchinput { padding-left: var(--k-s-12); padding-right: var(--k-s-6); gap: var(--k-s-8); min-width: 0 }
 .searchinput > svg, .in--inline > svg { width: var(--k-icon-sm); height: var(--k-icon-sm); flex: none; color: var(--k-fg-muted); flex-shrink: 0 }
 
 /* ── List ────────────────────────────────────────────────────── */
+.list__item { display: flex; align-items: center; gap: var(--k-row-gap, 10px); position: relative; padding: var(--k-s-8); margin-inline: calc(var(--k-s-8) * -1); border: 0; border-radius: var(--k-radius-sm); background: transparent; text-align: left; font: inherit; color: var(--k-fg); cursor: pointer }
+.list__item::before { content: ''; position: absolute; top: 0; left: var(--k-radius-sm); right: var(--k-radius-sm); height: var(--k-bw, 1px); background: var(--k-border) }
+.list__item:first-of-type::before { content: none }
+.list__item:hover { background: var(--k-state-hover) }
 .list__item[aria-selected="true"], .list__item.is-selected { background: var(--k-state-selected-bg, var(--k-primary-soft)); box-shadow: var(--k-selected-edge) }
 .list__item[aria-selected="true"]:hover, .list__item.is-selected:hover { filter: brightness(0.98) }
+button.list__item, a.list__item, .list__item:has(input, button, a, [role="button"]) { min-block-size: var(--k-hit-min) }
+.list--flush .list__item::before { content: none }
+.list--settings .list__item { border-top: 0; border-bottom: var(--k-divider); padding: var(--k-s-14) 0; margin-inline: 0; border-radius: 0; cursor: default }
+.list--settings .list__item::before { content: none }
+.list--settings .list__item:hover { background: transparent }
+.list--settings .list__item:last-of-type { border-bottom: 0 }
+.list__item--unread .list__title { font-weight: var(--k-weight-bold) }
+.list--cols .list__item { margin-inline: 0 }
 
 /* ── Radio card ──────────────────────────────────────────────── */
+.radio-card { display: flex; align-items: center; gap: var(--k-s-12); padding: var(--k-space, 16px); border: var(--k-bw, 1px) solid var(--k-border); border-radius: var(--k-radius-md); cursor: pointer; transition: border-color var(--k-dur-fast,110ms) var(--k-ease,ease),
+    background var(--k-dur-fast,110ms) var(--k-ease,ease) }
+.radio-card:hover:not(.radio-card--on) { border-color: var(--k-state-border) }
+.radio-card:has(input:focus-visible) { outline: var(--k-ring-w, 2px) solid var(--k-ring); outline-offset: -2px }
+.radio-card--on { border-color: var(--k-ring); background: var(--k-primary-soft) }
 .radio-card > .radio { flex: none }
 
 /* ── Form panel ──────────────────────────────────────────────── */
@@ -386,7 +449,9 @@ select.select:focus, select.select:focus-visible { outline: none; border-color: 
 .formpanel__foot { display: flex; align-items: center; gap: var(--k-s-12); flex-wrap: wrap }
 
 /* ── Filter bar ──────────────────────────────────────────────── */
+.filterbar { border: 1px solid var(--k-border); border-radius: var(--k-radius-md); background: var(--k-surface); padding: var(--k-s-12); display: flex; flex-direction: column; gap: var(--k-s-10); container: filterbar / inline-size }
 @@container filterbar (max-width: 440px) { .filterbar .toolbar { flex-direction: column; align-items: stretch } }
+@@container filterbar (max-width: 440px) { .filterbar .toolbar__spacer { display: none } }
 
 /* ── Layout primitives ───────────────────────────────────────── */
 .l-stack { display: flex; flex-direction: column }
