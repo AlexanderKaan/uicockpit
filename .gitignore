@@ -108,3 +108,7 @@ bench/kit/
 bench/audit-corpus/
 bench/audit-fresh/
 bench/audit-live/
+
+# The pruning plan — internal deliberation, not the public story.
+/PRUNE-PLAN.md
+

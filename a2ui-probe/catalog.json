@@ -1,0 +1,51 @@
+{
+  "catalogId": "https://uicockpit.com/a2ui/v1/public-service/catalog.json",
+  "instructions": "# Public-service catalog\n\nUse **TaskList** for a multi-step service where each step has a status: it is the GOV.UK Task list pattern, and it tells the user what is done, what is next and what cannot start yet. Never simulate it with a bullet list.\n\nUse **SummaryList** for the facts of a case (dates, reference numbers, status): label/value pairs, the GOV.UK Summary list. Never use a table for two columns of facts.\n\nOne primary Button per surface. Status words travel in text, never in colour alone.",
+  "components": {
+    "TaskList": {
+      "type": "object",
+      "description": "A list of the steps of a service, each with a status. GOV.UK Task list.",
+      "properties": {
+        "component": { "const": "TaskList" },
+        "items": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicList",
+          "description": "Path to a list of { name, status, hint?, locked? } objects."
+        },
+        "label": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicString",
+          "description": "Accessible name for the list."
+        }
+      },
+      "required": ["component", "items"]
+    },
+    "SummaryList": {
+      "type": "object",
+      "description": "Label/value pairs describing one case or record. GOV.UK Summary list.",
+      "properties": {
+        "component": { "const": "SummaryList" },
+        "items": {
+          "$ref": "https://a2ui.org/specification/v1_0/common_types.json#/$defs/DynamicList",
+          "description": "Path to a list of { label, value } objects."
+        }
+      },
+      "required": ["component", "items"]
+    }
+  },
+  "functions": {
+    "formatString": {
+      "type": "object",
+      "description": "Interpolates data-model values into a template string.",
+      "returnType": "string",
+      "allowedCallers": "rendererOnly",
+      "properties": {
+        "call": { "const": "formatString" },
+        "args": {
+          "type": "object",
+          "properties": { "value": { "type": "string" } },
+          "required": ["value"]
+        }
+      },
+      "required": ["call", "args"]
+    }
+  }
+}

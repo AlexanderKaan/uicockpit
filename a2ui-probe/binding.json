@@ -1,0 +1,14 @@
+{
+  "binding": "kit@0.1",
+  "generated": "2026-08-17",
+  "method": "buildTokens × auditContrast over every theme × mode × density; WCAG 1.4.3 / 1.4.11 floors",
+  "combinations": 60,
+  "pairsChecked": 1200,
+  "certified": true,
+  "failures": [],
+  "alsoMeasuredInCI": [
+    "2.5.8 target size (axe, rendered, 3 widths)",
+    "2.4.7 focus visible (measured before/after focus)",
+    "1.4.10 reflow @320px"
+  ]
+}
