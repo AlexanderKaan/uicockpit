@@ -39,6 +39,25 @@ export const FUNCTIONS = {
     String(value).replace(/\$\{([^}]+)\}/g, (_, p) => String(readPath(model, p, scope) ?? '')),
 }
 
+/**
+ * Read a pasted stream liberally, then say precisely what is wrong.
+ *
+ * A2UI is JSONL — one message per line — but people paste what they have: a
+ * pretty-printed object out of a log, an array of messages, a single message.
+ * All three are accepted; anything else gets the line number, because "invalid
+ * JSON" on a 60-line paste is not a message that helps anyone.
+ */
+export function parseStream(text) {
+  const t = text.trim()
+  if (!t) return []
+  try { const v = JSON.parse(t); return Array.isArray(v) ? v : [v] } catch { /* not one document — try JSONL */ }
+  return t.split('\n').filter((l) => l.trim()).map((l, i) => {
+    try { return JSON.parse(l) } catch (e) {
+      throw new Error(`Line ${i + 1} is not valid JSON.\n\nA2UI is JSONL: one complete message per line. Paste the whole thing as a JSON array if your messages span several lines.\n\n${e.message}`)
+    }
+  })
+}
+
 /** Apply a JSONL stream to surface state. Six message types; we implement four. */
 export function applyStream(lines) {
   const surfaces = new Map()

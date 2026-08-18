@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { applyStream, buildTree, childRefs, resolve, walk, FUNCTIONS } from './core.mjs'
+import { applyStream, buildTree, childRefs, parseStream, resolve, walk, FUNCTIONS } from './core.mjs'
 import { BINDINGS } from './bindings.mjs'
 import { check, describeBinding } from './check.mjs'
 
@@ -13,8 +13,9 @@ function hydrate(node, model) {
 
 const file = process.argv[2] ?? 'message.jsonl'
 const surfaceId = process.argv[3] ?? 'permit_1'
-const s = applyStream(readFileSync(file, 'utf8').trim().split('\n')).get(surfaceId)
-if (!s) { console.error(`no surface "${surfaceId}" in ${file} — it has: ${[...applyStream(readFileSync(file, 'utf8').trim().split('\n')).keys()].join(', ')}`); process.exit(2) }
+const surfaces = applyStream(parseStream(readFileSync(file, 'utf8')).map((m) => JSON.stringify(m)))
+const s = surfaces.get(surfaceId) ?? (process.argv[3] ? null : [...surfaces.values()][0])
+if (!s) { console.error(`no surface "${surfaceId}" in ${file} — it has: ${[...surfaces.keys()].join(', ')}`); process.exit(2) }
 
 /* The catalog is read BEFORE the tree, because the tree comes out of it: which
  * properties hold component ids is a fact the schema states. */

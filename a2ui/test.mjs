@@ -3,7 +3,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { applyStream, buildTree, childRefs, walk, resolve, FUNCTIONS } from './core.mjs'
+import { applyStream, buildTree, childRefs, parseStream, walk, resolve, FUNCTIONS } from './core.mjs'
 import { BINDINGS, emit } from './bindings.mjs'
 import { check, catalogGaps, describeBinding } from './check.mjs'
 
@@ -148,4 +148,29 @@ test('the certificate is never rounded up', () => {
   assert.equal(cert.certified, cert.failures.length === 0)
   if (!cert.certified) assert.ok(d.partial && d.line.includes(String(cert.failures.length)), 'the failures must be said out loud')
   assert.ok(cert.certifiedCombinations <= cert.combinations)
+})
+
+test('a stream is read in every form someone might paste', () => {
+  const one = { version: 'v1.0', createSurface: { surfaceId: 's' } }
+  const two = { version: 'v1.0', updateComponents: { surfaceId: 's', components: [] } }
+  const jsonl = [one, two].map((m) => JSON.stringify(m)).join('\n')
+  assert.deepEqual(parseStream(jsonl), [one, two], 'JSONL, the form A2UI sends')
+  assert.deepEqual(parseStream(JSON.stringify([one, two], null, 2)), [one, two], 'a pretty-printed array')
+  assert.deepEqual(parseStream(JSON.stringify(one, null, 2)), [one], 'a single message out of a log')
+  assert.deepEqual(parseStream('  \n '), [], 'nothing is not an error')
+  assert.deepEqual(parseStream(jsonl + '\n\n'), [one, two], 'blank lines are not messages')
+})
+
+test('a broken paste names the line, not just "invalid JSON"', () => {
+  const bad = '{"version":"v1.0"}\n{"createSurface": oops}'
+  assert.throws(() => parseStream(bad), /Line 2 is not valid JSON/)
+})
+
+test('the file the probe reads and the page renders are the same stream', () => {
+  const fromFile = parseStream(readFileSync('message.jsonl', 'utf8'))
+  const surfaces = applyStream(fromFile.map((m) => JSON.stringify(m)))
+  const s = surfaces.get('permit_1')
+  const tree = buildTree(s.components, 'root', { refs: childRefs(OURS), model: s.model })
+  const rep = check(tree, { catalog: OURS, binding: { id: 'kit', certified: true } })
+  assert.equal(rep.verdict, 'AA', rep.why)
 })

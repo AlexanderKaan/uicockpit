@@ -26,11 +26,18 @@ This is that tooling.
 cd a2ui && node build.mjs && open builder.html
 ```
 
-One self-contained page. No install, no server, no CDN. You land on **Google's
-A2UI Basic Catalog** — the 18 components every A2UI renderer is expected to
-know. Tick the ones your agent may use, switch between **UIcockpit kit ·
-Tailwind · daisyUI · shadcn/ui**, and copy three things: the `catalog.json`, the
-renderer for your stack, and the A2UI stream that produced what you see.
+One self-contained page, split down the middle: **what your agent sent** on the
+left, **what the reader gets** on the right, with the verdict on it.
+
+The left half is a text box, not an output. Paste the stream your agent
+produced — JSONL, a JSON array, or a single message out of a log — and it
+renders in your stack and gets checked. If the stream names a catalog the page
+knows, it switches to it; if the JSON is broken it tells you which line.
+
+Or build a stream by ticking components. You land on **Google's A2UI Basic
+Catalog** — the 18 components every A2UI renderer is expected to know — switch
+between **UIcockpit kit · Tailwind · daisyUI · shadcn/ui**, and copy three
+things: the A2UI stream, the `catalog.json`, and the renderer for your stack.
 
 The second tab is our own **public-service extension** — the components a
 form-and-status service needs that the Basic Catalog has no name for (a task
@@ -40,7 +47,7 @@ verdict, one switch.
 ```bash
 node probe.mjs                    # the conformance verdict on a clean answer
 node probe.mjs broken.jsonl bad   # …and on a deliberately broken one
-node --test test.mjs              # the meter: 14 tests over both catalogs
+node --test test.mjs              # the meter: 17 tests over both catalogs
 ```
 
 ## What it is
@@ -145,7 +152,7 @@ About 2 300 lines, no dependencies, no build step for anything that runs.
 ## Status
 
 Early, and honest about it. The builder runs, the verdict is real, the generated
-renderer compiles, and 14 tests hold both catalogs against all four bindings.
+renderer compiles, and 17 tests hold both catalogs against all four bindings.
 Not published to npm, no hosted version, no stable API. Tabs render as
 disclosures in the class-based bindings rather than as a scripted tab widget,
 and only the kit binding has a certificate — the other three read `unverified`,

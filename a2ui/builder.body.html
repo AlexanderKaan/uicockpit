@@ -1,7 +1,8 @@
 <header class="top">
   <div>
-    <h1>Build your A2UI catalog</h1>
-    <p>Pick the components your agent may render. Pick your stack. Copy the catalog and the renderer — you own both.</p>
+    <h1>A2UI, rendered and checked</h1>
+    <p>Left: what your agent sent. Right: what the reader gets, in your stack, and whether it holds up.
+       Paste a stream of your own over it — or build one by ticking components.</p>
     <div class="cats" role="radiogroup" aria-label="Catalog"></div>
   </div>
   <div class="stacks" role="radiogroup" aria-label="Your stack"></div>
@@ -14,23 +15,33 @@
     <p class="hint"></p>
   </section>
 
-  <section class="stage" aria-label="Preview">
+  <section class="out" aria-label="What the agent sent">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="stream" aria-selected="true" aria-controls="outpane">A2UI stream</button>
+      <button role="tab" data-tab="catalog" aria-selected="false" aria-controls="outpane" tabindex="-1">catalog.json</button>
+      <button role="tab" data-tab="binding" aria-selected="false" aria-controls="outpane" tabindex="-1">renderer</button>
+    </div>
+    <div id="outpane" role="tabpanel">
+      <textarea class="code code--edit" spellcheck="false" autocapitalize="off" autocorrect="off"
+                aria-label="A2UI stream — edit it, or paste one of your own"></textarea>
+      <pre class="code" hidden><code></code></pre>
+    </div>
+    <div class="outbar">
+      <span class="outnote"></span>
+      <span class="outbtns">
+        <button class="reset" hidden>Back to the palette</button>
+        <button class="copy">Copy</button>
+      </span>
+    </div>
+  </section>
+
+  <section class="stage" aria-label="What the reader gets">
     <div class="stage__bar">
-      <span class="stage__label">Preview</span>
+      <span class="stage__label">Rendered</span>
       <span class="verdict" role="status"></span>
     </div>
     <div class="stage__surface"><div class="preview"></div></div>
     <div class="findings"></div>
     <p class="proof"></p>
-  </section>
-
-  <section class="out" aria-label="Output">
-    <div class="tabs" role="tablist">
-      <button role="tab" data-tab="catalog" aria-selected="true">catalog.json</button>
-      <button role="tab" data-tab="binding" aria-selected="false">renderer</button>
-      <button role="tab" data-tab="stream" aria-selected="false">A2UI stream</button>
-    </div>
-    <pre class="code"><code></code></pre>
-    <button class="copy">Copy</button>
   </section>
 </main>

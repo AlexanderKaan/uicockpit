@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Build your A2UI catalog</title>
+<title>A2UI, rendered and checked</title>
 <style>
 :root{--bg:#fafafa;--fg:#18181b;--mut:#71717a;--line:#e4e4e7;--surf:#fff;--acc:#18181b;
       --ok:#166534;--okbg:#f0fdf4;--warn:#854d0e;--warnbg:#fefce8;--bad:#991b1b;--badbg:#fef2f2}
@@ -17,7 +17,7 @@ h1{font-size:20px;letter-spacing:-.02em;margin:0 0 4px}
 .cats{display:flex;gap:16px;margin-top:12px}
 .cats button{font:inherit;font-size:13px;padding:0 0 6px;border:0;border-bottom:2px solid transparent;background:0;color:var(--mut);cursor:pointer}
 .cats button[aria-checked=true]{color:var(--fg);border-bottom-color:var(--acc);font-weight:500}
-main{display:grid;grid-template-columns:230px minmax(0,1fr) minmax(0,420px);gap:20px;padding:20px 32px 40px;align-items:start}
+main{display:grid;grid-template-columns:210px minmax(0,1fr) minmax(0,1fr);gap:20px;padding:20px 32px 40px;align-items:start}
 @media(max-width:1100px){main{grid-template-columns:1fr}}
 section{background:var(--surf);border:1px solid var(--line);border-radius:12px}
 /* section > h2, never bare h2 — the preview renders headings of its own, and a
@@ -47,15 +47,22 @@ section>h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var
 .findings .gap{color:var(--warn)}
 .findings .gap code{background:var(--warnbg)}
 .proof{margin:0;padding:10px 16px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}
+.oops{margin:0;white-space:pre-wrap;color:var(--bad);background:var(--badbg);border:1px solid #fecaca;
+      border-radius:10px;padding:14px 16px;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
 .tabs{display:flex;gap:2px;padding:10px 10px 0}
 .tabs button{font:inherit;font-size:12px;padding:6px 12px;border:0;border-radius:8px 8px 0 0;background:transparent;color:var(--mut);cursor:pointer}
 .tabs button[aria-selected=true]{background:var(--fg);color:#fff}
-.code{margin:0;padding:14px 16px;background:var(--fg);color:#e4e4e7;border-radius:0 0 12px 12px;
-      font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;max-height:520px;white-space:pre}
-.out{position:relative}
-.copy{position:absolute;top:14px;right:14px;font:inherit;font-size:11px;padding:5px 11px;border-radius:7px;
+.code{display:block;width:100%;margin:0;padding:14px 16px;background:var(--fg);color:#e4e4e7;border:0;border-radius:0;
+      font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;height:520px;white-space:pre;resize:vertical}
+textarea.code{tab-size:2;white-space:pre-wrap;word-break:break-word}
+textarea.code:focus-visible{outline:2px solid #6366f1;outline-offset:-2px}
+.outbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;
+        background:var(--fg);border-radius:0 0 12px 12px}
+.outnote{font-size:11px;color:#a1a1aa}
+.outbtns{display:flex;gap:6px;flex:none}
+.outbar button{font:inherit;font-size:11px;padding:5px 11px;border-radius:7px;
       border:1px solid #3f3f46;background:#27272a;color:#e4e4e7;cursor:pointer}
-.copy:hover{background:#3f3f46}
+.outbar button:hover{background:#3f3f46}
 /*KITCSS*/
 /*TWCSS*/
 </style>
@@ -66,7 +73,10 @@ const CATALOGS = /*CATALOGS*/;
 const CERT = /*CERT*/;
 
 const $ = (s) => document.querySelector(s)
-const state = { cat: 'basic', stack: 'kit', tab: 'catalog', picked: {} }
+/* `edited` holds the stream the visitor typed or pasted. While it is set, the
+   palette no longer describes what is on screen and the page says so — the
+   alternative, silently regenerating over someone's paste, loses their work. */
+const state = { cat: 'basic', stack: 'kit', tab: 'stream', picked: {}, edited: null }
 for (const [id, c] of Object.entries(CATALOGS)) state.picked[id] = new Set(c.defaults)
 
 const cur = () => CATALOGS[state.cat]
@@ -110,17 +120,25 @@ function subsetCatalog() {
    today. Failures are shown where the answer belongs. */
 function draw() {
   try { render() } catch (err) {
-    $('.preview').innerHTML = `<pre style="white-space:pre-wrap;color:#991b1b;font:12px/1.5 ui-monospace,monospace">${err.message}</pre>`
-    $('.verdict').dataset.v = 'fail'; $('.verdict').textContent = '✗ error'
+    $('.preview').innerHTML = `<pre class="oops">${err.message.replace(/[<&]/g, (c) => ({ '<': '&lt;', '&': '&amp;' }[c]))}</pre>`
+    $('.verdict').dataset.v = 'fail'; $('.verdict').textContent = '✗ will not render'
     $('.findings').textContent = ''; $('.proof').textContent = ''
-    throw err
+    if (state.edited == null) throw err      // ours to fix; a paste is theirs
   }
 }
 
 function render() {
+  const stream = state.edited != null ? parseStream(state.edited) : buildStream()
+  /* A pasted stream names its catalog. If it is one of ours, follow it rather
+     than checking someone's answer against the wrong vocabulary. */
+  const declared = stream.find((m) => m.createSurface)?.createSurface?.catalogId
+  const match = declared && Object.keys(CATALOGS).find((id) => CATALOGS[id].catalog.catalogId === declared)
+  if (match && match !== state.cat) { state.cat = match; syncRadio('.cats', 'c', match); palette() }
+
   const c = cur()
-  const stream = buildStream()
-  const surface = applyStream(stream.map((m) => JSON.stringify(m))).get('s')
+  const surfaces = applyStream(stream.map((m) => JSON.stringify(m)))
+  const surface = surfaces.get('s') ?? [...surfaces.values()][0]
+  if (!surface) throw new Error('No surface in this stream.\n\nAn A2UI stream opens with a createSurface message; without one there is nothing to render.')
   /* which properties hold child ids is READ FROM THE SCHEMA — Tabs hides one in
      tabs[].child and Modal calls them trigger/content */
   const tree = buildTree(surface.components, 'root', { refs: childRefs(c.catalog), model: surface.model })
@@ -151,11 +169,24 @@ function render() {
     : `<div>${rep.why}. ${rep.unchecked.length} things this check never claims — see the report.</div>`) + gaps
 
   const code = { catalog: JSON.stringify(subsetCatalog(), null, 2),
-    binding: emit(b, tree, (t, fn) => walk(t, fn, surface.model)),
-    stream: stream.map((m) => JSON.stringify(m)).join('\n') }
-  $('.code code').textContent = code[state.tab]
+    binding: emit(b, tree, (t, fn) => walk(t, fn, surface.model)) }
+  const editing = state.tab === 'stream'
+  $('.code--edit').hidden = !editing
+  $('pre.code').hidden = editing
+  /* never write into the box while someone is typing in it */
+  /* Shown indented, because the left pane is meant to be READ. On the wire A2UI
+     is JSONL — one message per line — and that is what Copy gives you; both
+     forms paste back in, and the note says so rather than leaving it a trap. */
+  if (editing && state.edited == null) $('.code--edit').value = JSON.stringify(stream, null, 2)
+  if (!editing) $('pre.code code').textContent = code[state.tab]
+  $('.reset').hidden = state.edited == null
+  $('.outnote').textContent = state.edited == null
+    ? 'Built from the palette — edit it, or paste a stream of your own. Copy gives you JSONL, the form A2UI sends.'
+    : 'Yours. The palette no longer describes what is on the right.'
   $('.count').textContent = `${[...state.picked[state.cat]].filter((n) => !isLayout(n)).length} of ${names().filter((n) => !isLayout(n)).length}`
 }
+
+const syncRadio = (sel, key, val) => [...$(sel).children].forEach((el) => el.setAttribute('aria-checked', el.dataset[key] === val))
 
 /* palette — redrawn on every catalog switch, because the blocks ARE the catalog */
 function palette() {
@@ -165,16 +196,16 @@ function palette() {
   $('.hint').textContent = cur().note
 }
 $('.blocks').addEventListener('change', (e) => {
-  e.target.checked ? state.picked[state.cat].add(e.target.value) : state.picked[state.cat].delete(e.target.value); draw()
+  e.target.checked ? state.picked[state.cat].add(e.target.value) : state.picked[state.cat].delete(e.target.value)
+  state.edited = null; draw()          // the palette is back in charge, and says so
 })
 /* catalogs */
 $('.cats').innerHTML = Object.entries(CATALOGS).map(([id, c]) =>
   `<button role="radio" data-c="${id}" aria-checked="${id === state.cat}">${c.label}</button>`).join('')
 $('.cats').addEventListener('click', (e) => {
   const btn = e.target.closest('button'); if (!btn) return
-  state.cat = btn.dataset.c
-  ;[...$('.cats').children].forEach((el) => el.setAttribute('aria-checked', el === btn))
-  palette(); draw()
+  state.cat = btn.dataset.c; state.edited = null
+  syncRadio('.cats', 'c', state.cat); palette(); draw()
 })
 /* stacks */
 $('.stacks').innerHTML = Object.values(BINDINGS).map((b) =>
@@ -182,17 +213,44 @@ $('.stacks').innerHTML = Object.values(BINDINGS).map((b) =>
 $('.stacks').addEventListener('click', (e) => {
   const btn = e.target.closest('button'); if (!btn) return
   state.stack = btn.dataset.s
-  ;[...$('.stacks').children].forEach((el) => el.setAttribute('aria-checked', el === btn)); draw()
+  syncRadio('.stacks', 's', state.stack); draw()
 })
-/* tabs + copy */
-$('.tabs').addEventListener('click', (e) => {
-  const btn = e.target.closest('button'); if (!btn) return
+/* tabs — a roving tabindex and arrow keys, because role="tab" is a promise
+   about keyboard behaviour and we would be selling a check we failed */
+const tabs = () => [...$('.tabs').children]
+function selectTab(btn, focus) {
   state.tab = btn.dataset.tab
-  ;[...$('.tabs').children].forEach((el) => el.setAttribute('aria-selected', el === btn)); draw()
+  for (const el of tabs()) {
+    const on = el === btn
+    el.setAttribute('aria-selected', on)
+    el.tabIndex = on ? 0 : -1
+  }
+  if (focus) btn.focus()
+  draw()
+}
+$('.tabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('button'); if (btn) selectTab(btn, false)
+})
+$('.tabs').addEventListener('keydown', (e) => {
+  const step = { ArrowRight: 1, ArrowLeft: -1, Home: 'first', End: 'last' }[e.key]
+  if (!step) return
+  e.preventDefault()
+  const all = tabs(), i = all.indexOf(document.activeElement)
+  selectTab(step === 'first' ? all[0] : step === 'last' ? all.at(-1) : all[(i + step + all.length) % all.length], true)
 })
 $('.copy').addEventListener('click', async () => {
-  await navigator.clipboard.writeText($('.code code').textContent)
+  await navigator.clipboard.writeText(state.tab === 'stream'
+    ? parseStream($('.code--edit').value).map((m) => JSON.stringify(m)).join('\n')
+    : $('pre.code code').textContent)
   $('.copy').textContent = 'Copied'; setTimeout(() => ($('.copy').textContent = 'Copy'), 1400)
 })
+/* the stream is the input, not an output: typing in it re-renders the answer */
+let typing
+$('.code--edit').addEventListener('input', (e) => {
+  state.edited = e.target.value
+  clearTimeout(typing)
+  typing = setTimeout(draw, 250)   // long enough that half-typed JSON does not flash an error
+})
+$('.reset').addEventListener('click', () => { state.edited = null; draw(); $('.code--edit').focus() })
 palette(); draw()
 </script>
