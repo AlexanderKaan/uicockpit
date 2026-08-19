@@ -202,7 +202,9 @@ const tw = {
         ? `<h3 class="text-base font-semibold text-gray-900">${esc(r(n.text))}</h3>`
         : `<h2 class="text-xl font-semibold tracking-tight text-gray-900">${esc(r(n.text))}</h2>`}${
         n.sub ? `<p class="text-sm text-gray-500">${esc(r(n.sub))}</p>` : ''}</div>`
-      case 'Badge':  return `<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TW_TONE[n.tone] ?? TW_TONE.neutral}">${esc(r(n.text))}</span>`
+      /* self-start, or a badge dropped straight into a Column stretches to the
+         full width and reads as a bar — the kit hit the same thing. */
+      case 'Badge':  return `<span class="inline-flex self-start items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${TW_TONE[n.tone] ?? TW_TONE.neutral}">${esc(r(n.text))}</span>`
       case 'Callout':return `<div role="status" class="rounded-lg p-4 text-sm ring-1 ring-inset ${TW_TONE[n.tone] ?? TW_TONE.info}">${
         n.title ? `<strong class="mb-1 block font-semibold">${esc(r(n.title))}</strong>` : ''}${esc(r(n.text))}</div>`
       case 'SummaryList': return `<dl class="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm">${
@@ -278,7 +280,7 @@ const daisy = {
       case 'Heading':return n.level === 3
         ? `<h3 class="card-title text-base">${esc(r(n.text))}</h3>`
         : `<div><h2 class="card-title">${esc(r(n.text))}</h2>${n.sub ? `<p class="text-sm opacity-60">${esc(r(n.sub))}</p>` : ''}</div>`
-      case 'Badge':  return `<span class="badge badge-soft badge-${DAISY_TONE[n.tone] ?? 'neutral'}">${esc(r(n.text))}</span>`
+      case 'Badge':  return `<span class="badge badge-soft self-start badge-${DAISY_TONE[n.tone] ?? 'neutral'}">${esc(r(n.text))}</span>`
       case 'Callout':return `<div role="alert" class="alert alert-soft alert-${DAISY_TONE[n.tone] ?? 'info'}"><span>${
         n.title ? `<strong class="block">${esc(r(n.title))}</strong>` : ''}${esc(r(n.text))}</span></div>`
       /* A <dl> and not daisyUI's `list`: label/value pairs are a description
@@ -351,7 +353,7 @@ const shadcn = {
       : `<fieldset className="flex flex-col gap-2">\n      <legend className="mb-1 text-sm font-medium">{${v(n.label)}}</legend>\n      <RadioGroup defaultValue={${v(n.value)}}>\n${list(n.options).map((o, i) => `        <div className="flex min-h-6 items-center gap-2"><RadioGroupItem value=${JSON.stringify(String(o.value))} id="${n.id}_${i}" /><Label htmlFor="${n.id}_${i}">{${v(o.label)}}</Label></div>`).join('\n')}\n      </RadioGroup>\n    </fieldset>`,
     Slider: (k, n) => `<div className="flex flex-col gap-1">\n      <Label htmlFor="${n.id}">{${v(n.label)}}</Label>\n      <Slider id="${n.id}" min={${n.min ?? 0}} max={${n.max ?? 100}} defaultValue={[${v(n.value)}]} />\n    </div>`,
     Heading:(k, n) => n.level === 3 ? `<h3 className="text-base font-semibold">{${v(n.text)}}</h3>` : `<div><h2 className="text-xl font-semibold tracking-tight">{${v(n.text)}}</h2>${n.sub ? `<p className="text-sm text-muted-foreground">{${v(n.sub)}}</p>` : ''}</div>`,
-    Badge:  (k, n) => `<Badge variant="${SC_BADGE[n.tone] ?? 'secondary'}">{${v(n.text)}}</Badge>`,
+    Badge:  (k, n) => `<Badge className="self-start" variant="${SC_BADGE[n.tone] ?? 'secondary'}">{${v(n.text)}}</Badge>`,
     Callout:(k, n) => `<div role="status" className="rounded-lg border p-4 text-sm">${n.title ? `<strong className="block">{${v(n.title)}}</strong>` : ''}{${v(n.text)}}</div>`,
     SummaryList: (k, n) => `<dl className="grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm">\n      {${v(n.items)}.map((it, i) => (\n        <div key={i} className="contents">\n          <dt className="text-muted-foreground">{it.label}</dt>\n          <dd className="font-medium">{it.value}</dd>\n        </div>\n      ))}\n    </dl>`,
     TaskList: (k, n) => `<ol className="divide-y rounded-lg border">\n      {${v(n.items)}.map((it, i) => (\n        <li key={i} className="flex items-center justify-between gap-4 px-4 py-3">\n          <span className="flex flex-col">\n            <span className={it.locked ? 'text-muted-foreground' : 'font-medium underline underline-offset-4'}>{it.name}</span>\n            {it.hint && <span className="text-xs text-muted-foreground">{it.hint}</span>}\n          </span>\n          <Badge variant="secondary">{it.status}</Badge>\n        </li>\n      ))}\n    </ol>`,

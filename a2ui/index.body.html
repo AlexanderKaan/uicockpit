@@ -8,7 +8,37 @@
   <h1>What can't your agent say?</h1>
   <p class="standfirst">
     The catalog you hand your agent is the ceiling on every screen it will ever draw.
-    You wrote it once, in an afternoon. <strong>Paste yours — or start with Google's.</strong>
+    You wrote it once, in an afternoon, and never read it back.
+  </p>
+  <p class="hero__actions">
+    <a class="btn btn--primary" href="#check">Check your vocabulary</a>
+    <a class="btn btn--secondary" href="./builder.html">Open the builder</a>
+  </p>
+
+  <!-- the app in action: one answer, four libraries, live -->
+  <figure class="demo card">
+    <figcaption class="demo__bar">
+      <span class="demo__label">One answer, rendered four ways</span>
+      <span class="segctrl demo__stacks" role="radiogroup" aria-label="Rendered with"></span>
+      <button class="btn btn--ghost btn--sm demo__toggle" aria-pressed="true">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="demo__pause" d="M9 5v14M15 5v14"/><path class="demo__play" d="M7 5l12 7-12 7z" style="display:none"/></svg>
+        <span class="demo__toggle-t">Pause</span>
+      </button>
+    </figcaption>
+    <div class="stage__surface"><div class="preview demo__preview b-kit"></div></div>
+    <p class="demo__note">
+      Same components, same data, same accessibility rules. Only the binding changed —
+      and a binding is a table, not a renderer you rewrite.
+    </p>
+  </figure>
+</header>
+
+<section class="band" id="check" aria-labelledby="check-h">
+  <h2 id="check-h">Start with a vocabulary you already know</h2>
+  <p class="lede">
+    This is Google's own A2UI catalog — eighteen components, the set every A2UI renderer is
+    expected to support. Nothing here is a bug report; it is what the vocabulary cannot express,
+    which is a different and more permanent thing.
   </p>
 
   <section class="verdict-card card" aria-label="What this vocabulary cannot say">
@@ -21,7 +51,7 @@
       <label class="field">
         <span class="field__label" for="paste">Now paste yours</span>
         <textarea class="code" id="paste" rows="4" spellcheck="false" autocapitalize="off" autocorrect="off"
-                  placeholder="An A2UI catalog, a Zod schema, or a TypeScript union — whichever form yours is in. Nothing leaves this page."></textarea>
+                  placeholder="An A2UI catalog, a Zod schema, or a TypeScript union — whichever form yours is in. It is read in this page; nothing is uploaded."></textarea>
       </label>
       <p class="vc__examples">
         Or look at one of these:
@@ -31,18 +61,55 @@
       </p>
     </div>
   </section>
-</header>
+</section>
+
+<section class="band" aria-labelledby="orient">
+  <h2 id="orient">What this is, and when you would reach for it</h2>
+  <div class="cards3">
+    <div class="card orient">
+      <span class="orient__icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5 12 3.5l8 4v9L12 20.5l-8-4Z"/><path d="M4 7.5 12 11.5l8-4M12 11.5v9"/></svg>
+      </span>
+      <h3>What it is</h3>
+      <p>A builder for the vocabulary your agent draws with — and for the renderers behind it.
+        Pick the components you allow, point a library at them, and copy out three things you
+        then own: the catalog, the renderer for your stack, and the catalog as types.</p>
+      <p class="orient__not">Not a component library with a chat box. No model runs in the render path.</p>
+    </div>
+    <div class="card orient">
+      <span class="orient__icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M16.5 6.5a3 3 0 0 1 0 5.6M18.5 19.5c0-2-.7-3.6-2-4.6"/></svg>
+      </span>
+      <h3>Who it is for</h3>
+      <p>Developers whose product renders UI an agent produced, and who do not want it inventing
+        things — including the ones who have to prove that in writing.</p>
+      <p class="orient__not">Public services under the European Accessibility Act, enforceable since 28 June 2025, and anyone else who would rather find this before an audit does.</p>
+    </div>
+    <div class="card orient">
+      <span class="orient__icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5.2l3.2 2"/></svg>
+      </span>
+      <h3>When you use it</h3>
+      <ul class="orient__when">
+        <li><b>Writing the vocabulary</b> — before an agent ever sees it.</li>
+        <li><b>Adding a stack</b> — one table, not a second renderer.</li>
+        <li><b>Every answer</b> — in your app, or in CI, on the tree.</li>
+      </ul>
+      <p class="orient__not">In the browser, in a terminal, or as a check in your pipeline. Nothing to install to try it.</p>
+    </div>
+  </div>
+</section>
 
 <section class="band" aria-labelledby="seen-said">
   <h2 id="seen-said">It looks fine. That is the problem.</h2>
   <p class="lede">
-    The same answer, twice: what a reader sees, and what the machine is told. A schema
-    checks the first column. Nobody was checking the second.
+    The same answer, twice: what a reader sees, and what the machine is told. A schema checks
+    the first column. Nobody was checking the second.
   </p>
   <div class="split">
     <figure class="card">
       <figcaption>Seen</figcaption>
-      <div class="stage__surface"><div class="preview b-kit"></div></div>
+      <div class="stage__surface"><div class="preview preview--seen b-kit"></div></div>
     </figure>
     <figure class="card">
       <figcaption>Said</figcaption>
