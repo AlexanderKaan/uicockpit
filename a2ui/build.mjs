@@ -6,7 +6,7 @@ const strip = (s) => s
   .replace(/^import[^\n]*from '[^']+'\n/gm, '')
   .replace(/^export (const|function|class|let) /gm, '$1 ')
   .replace(/^export \{[^}]*\}[^\n]*\n/gm, '')
-const files = ['core.mjs', 'check.mjs', 'bindings.mjs']
+const files = ['core.mjs', 'check.mjs', 'bindings.mjs', 'schema.mjs']
 const parts = files.map((f) => [f, strip(readFileSync(f, 'utf8'))])
 /* Concatenating modules means their top-level names share one scope, and a
  * collision makes the browser throw a SyntaxError before anything runs — a page

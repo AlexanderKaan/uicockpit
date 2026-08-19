@@ -34,8 +34,11 @@
  * emphasis  { prop, primary }                 tone     property carrying a colour-only signal
  * itemName · itemStatus · itemTone            fields INSIDE a collection item
  * decorativeWhen  property that marks an image decorative
+ * action    property naming a SIDE EFFECT the application must authorise
  */
-export const VOCABULARY = ['role', 'name', 'nameFromChild', 'level', 'columns', 'items', 'input', 'emphasis', 'tone', 'itemName', 'itemStatus', 'itemTone', 'decorativeWhen']
+import { actionsOf } from './core.mjs'
+
+export const VOCABULARY = ['role', 'name', 'nameFromChild', 'action', 'level', 'columns', 'items', 'input', 'emphasis', 'tone', 'itemName', 'itemStatus', 'itemTone', 'decorativeWhen']
 
 /* Roles that CANNOT be accessible without a name. If a catalog gives such a
  * component no property to carry one, that is a gap in the CATALOG, not a fault
@@ -44,13 +47,23 @@ export const VOCABULARY = ['role', 'name', 'nameFromChild', 'level', 'columns', 
  * 1.1.1 cannot be met) and Modal (trigger + content, so the dialog has no
  * accessible name for 4.1.2). */
 const NEEDS_NAME = new Set(['control', 'image', 'link'])
-export function catalogGaps(ann) {
+export function catalogGaps(ann, catalog) {
   const out = []
   for (const [component, a] of ann) {
     if (!NEEDS_NAME.has(a.role)) continue
     if (a.name || a.nameFromChild || a.itemName) continue
     out.push({ component, kind: 'name', role: a.role, sc: a.role === 'image' ? '1.1.1' : '4.1.2',
       message: `${component} is a ${a.role} and the catalog gives it no property that can carry a name — no renderer can fix that` })
+  }
+  /* The third kind of gap, and the one an accessibility check would never look
+   * for: a control that asks for a SIDE EFFECT the catalog never enumerates.
+   * Rendering is not permission — but a button that names an action nobody can
+   * validate puts the whole question on the application, silently. A2UI's Basic
+   * Catalog REQUIRES every Button to carry one and names not a single action. */
+  for (const { component, prop, values } of actionsOf(catalog).props) {
+    if (values?.length) continue
+    out.push({ component, kind: 'action', sc: 'safety',
+      message: `${component} names a side effect in "${prop}" and the catalog enumerates no actions, so nothing downstream can tell an allowed one from an invented one` })
   }
   /* A catalog with no heading anywhere cannot express document structure: every
    * title is then just text that happens to look bigger, which is 1.3.1 exactly
@@ -174,6 +187,21 @@ export const RULES = [
     },
   },
   {
+    /* Not WCAG — the article that names this pattern calls it separating
+       rendering from execution, and it is the one rule here about trust rather
+       than perception: the answer may only ask for what the catalog declared. */
+    id: 'action-is-declared', sc: 'safety', level: '—', severity: 'fail',
+    describe: 'Every action a control asks for is one the catalog declares.',
+    run(nodes, catalog) {
+      const allowed = new Map(actionsOf(catalog).props.filter((p) => p.values?.length).map((p) => [p.component + '.' + p.prop, new Set(p.values)]))
+      return nodes.filter(({ a }) => a?.action)
+        .map(({ n, a }) => ({ n, a, want: get(n, a.action), set: allowed.get(n.component + '.' + a.action) }))
+        .filter(({ want, set }) => set && typeof want === 'string' && !set.has(want))
+        .map(({ n, want, set }) => ({ id: n.id,
+          message: `asks for "${want}", which this catalog does not declare (it declares ${[...set].join(', ')}) — a rendered control is not permission to run anything` }))
+    },
+  },
+  {
     id: 'one-primary', sc: null, level: 'craft', severity: 'review',
     describe: 'One primary action per answer — a composition rule, not a WCAG criterion.',
     run(nodes) {
@@ -229,7 +257,7 @@ export function check(tree, opts = {}) {
   const ann = annotate(opts.catalog, opts.a11y)
   const nodes = flatten(tree).map((n) => ({ n, a: ann.get(n.component) }))
   const findings = []
-  for (const rule of RULES) for (const hit of rule.run(nodes)) {
+  for (const rule of RULES) for (const hit of rule.run(nodes, opts.catalog)) {
     findings.push({ rule: rule.id, sc: rule.sc, level: rule.level, severity: rule.severity, ...hit })
   }
   /* Two different silences, and conflating them would be dishonest in both
@@ -246,7 +274,7 @@ export function check(tree, opts = {}) {
    * an unlabelled video — so the verdict cannot be AA. But the agent did nothing
    * wrong and no renderer can fix it, so it is not a failure of the answer
    * either: it caps at `partial`, and the message blames the catalog by name. */
-  const gaps = catalogGaps(ann)
+  const gaps = catalogGaps(ann, opts.catalog)
   const present = new Set(nodes.map(({ n }) => n.component))
   const gapsUsed = gaps.filter((g) => g.kind === 'name' && present.has(g.component))
   const fails = findings.filter((f) => f.severity === 'fail')

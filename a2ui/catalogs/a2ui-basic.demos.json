@@ -129,7 +129,8 @@
      "id": "modalBtn",
      "component": "Button",
      "child": "modalBtnText",
-     "variant": "borderless"
+     "variant": "borderless",
+     "action": "open_conditions"
     },
     {
      "id": "modalBtnText",
@@ -148,7 +149,8 @@
    "node": {
     "component": "Button",
     "child": "bookText",
-    "variant": "primary"
+    "variant": "primary",
+    "action": "book_slot"
    },
    "extra": [
     {

@@ -20,6 +20,9 @@ This is that tooling.
 
 ---
 
+**[Why this exists →](./WHY.md)** — the pattern everyone now agrees on, the four
+places it stops, and what is left to build.
+
 ## Try it
 
 ```bash
@@ -42,7 +45,10 @@ stop dead at the preview, so nothing the page wears can reach the answer.
 Or build a stream by ticking components. You land on **Google's A2UI Basic
 Catalog** — the 18 components every A2UI renderer is expected to know — switch
 between **UIcockpit kit · Tailwind · daisyUI · shadcn/ui**, and copy three
-things: the A2UI stream, the `catalog.json`, and the renderer for your stack.
+things you then own: the A2UI stream, the `catalog.json`, the renderer for your
+stack, and — for the union-type-plus-Zod architecture most teams are writing by
+hand — the catalog as a `schema.ts` generated from it, so it cannot drift from
+the vocabulary the agent was actually given.
 
 The second tab is our own **public-service extension** — the components a
 form-and-status service needs that the Basic Catalog has no name for (a task
@@ -52,7 +58,7 @@ verdict, one switch.
 ```bash
 node probe.mjs                    # the conformance verdict on a clean answer
 node probe.mjs broken.jsonl bad   # …and on a deliberately broken one
-node --test test.mjs              # the meter: 17 tests over both catalogs
+node --test test.mjs              # the meter: 22 tests over both catalogs
 ```
 
 ## What it is
@@ -66,9 +72,13 @@ node --test test.mjs              # the meter: 17 tests over both catalogs
   covers both catalogs: the same component name renders the same way, and where
   the two differ in shape the table absorbs it (our Button carries a `label`,
   A2UI's takes a child `Text`, one case handles either).
-- **A verdict per answer** — eight rules on the answer itself (heading order,
+- **The catalog as types** — a `schema.ts` generated from it: the union, the Zod
+  schemas, and a parse that reports what it REFUSED instead of returning an
+  empty array. Generated, so it cannot drift from what the agent was handed.
+- **A verdict per answer** — nine rules on the answer itself (heading order,
   a control without a name, a table without headers, a status carried by colour
-  alone…), plus the binding's CI certificate. And six things it refuses to claim.
+  alone, a control asking for a side effect the catalog never declared…), plus
+  the binding's CI certificate. And six things it refuses to claim.
   The rules read semantics the catalog *declares*, never component names, so they
   work on a catalog you did not write — including Google's Basic Catalog, through
   a sidecar that states the reading instead of guessing it.
@@ -83,6 +93,7 @@ no agent can fix, because the vocabulary to fix them is not in the schema:
 | `Video` | `url` and `posterUrl`, and nothing else — there is no property that can carry a text alternative, so 1.1.1 cannot be met |
 | `Modal` | `trigger` and `content` — the dialog has no name for 4.1.2 |
 | *no heading* | `Text` offers `caption` and `body` and no level, so nothing rendered from this catalog has structure to navigate by (1.3.1) |
+| *no actions* | every `Button` **must** carry an `action` and the catalog enumerates none, so nothing can tell an allowed side effect from an invented one |
 
 These are reported apart from findings about the answer, because they are not
 the answer's fault. A gap the answer actually *runs into* caps the verdict at
@@ -156,7 +167,8 @@ harness issued.
       catalogs/         Google's Basic Catalog, its demos, and the a11y sidecar
       catalog.json      our public-service extension, each with its source
       bindings.mjs      four bindings, as tables, over both catalogs
-      check.mjs         the verdict: 8 schema-driven rules, and 6 things it will not claim
+      check.mjs         the verdict: 9 schema-driven rules, and 6 things it will not claim
+      schema.mjs        the catalog → TypeScript + Zod, refusals reported not dropped
       kit/              the kit binding's stylesheet — plain CSS, yours to edit
       binding.json      the certificate: 1500 contrast pairs, 54 of 60 clean
       test.mjs          the meter (node --test)
@@ -167,7 +179,7 @@ About 2 300 lines, no dependencies, no build step for anything that runs.
 ## Status
 
 Early, and honest about it. The builder runs, the verdict is real, the generated
-renderer compiles, and 17 tests hold both catalogs against all four bindings.
+renderer compiles, and 22 tests hold both catalogs against all four bindings.
 Not published to npm, no hosted version, no stable API. Tabs render as
 disclosures in the class-based bindings rather than as a scripted tab widget,
 and only the kit binding has a certificate — the other three read `unverified`,

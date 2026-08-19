@@ -113,7 +113,15 @@
         },
         "action": {
           "type": "string",
-          "description": "Action name dispatched to the agent."
+          "x-action": true,
+          "description": "The side effect this control asks for, dispatched to the agent. ENUMERATED on purpose: a catalog that leaves this open cannot tell an allowed action from an invented one, and neither can any renderer reading it. Extend the list when you add a capability — and authorise it again on your own side, because a rendered button is not permission to run anything.",
+          "enum": [
+            "open_case",
+            "start_task",
+            "submit",
+            "cancel",
+            "download"
+          ]
         }
       },
       "required": [
@@ -126,7 +134,8 @@
         "emphasis": {
           "prop": "variant",
           "primary": "primary"
-        }
+        },
+        "action": "action"
       },
       "x-source": "HTML · <button> · WAI-ARIA APG · Button"
     },

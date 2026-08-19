@@ -3,9 +3,10 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { applyStream, buildTree, childRefs, parseStream, walk, resolve, FUNCTIONS } from './core.mjs'
+import { applyStream, buildTree, childRefs, parseStream, propsOf, requiredOf, actionsOf, walk, resolve, FUNCTIONS } from './core.mjs'
 import { BINDINGS, emit } from './bindings.mjs'
 import { check, catalogGaps, describeBinding } from './check.mjs'
+import { emitSchema } from './schema.mjs'
 
 const json = (f) => JSON.parse(readFileSync(f, 'utf8'))
 const BASIC = json('catalogs/a2ui-basic.catalog.json')
@@ -173,4 +174,71 @@ test('the file the probe reads and the page renders are the same stream', () => 
   const tree = buildTree(s.components, 'root', { refs: childRefs(OURS), model: s.model })
   const rep = check(tree, { catalog: OURS, binding: { id: 'kit', certified: true } })
   assert.equal(rep.verdict, 'AA', rep.why)
+})
+
+test('every demo carries what the published schema says is required', () => {
+  for (const [label, cat, demos] of [['basic', BASIC, BASIC_DEMOS], ['ours', OURS, OUR_DEMOS]]) {
+    for (const [name, demo] of Object.entries(demos)) {
+      if (demo.layout) continue
+      for (const req of requiredOf(cat.components[name])) {
+        if (req === 'component') continue
+        assert.ok(req in demo.node, `${label}: ${name} demo has no "${req}", which the catalog requires`)
+      }
+    }
+  }
+})
+
+test('the generated schema carries every component and every property', () => {
+  for (const [label, cat] of [['basic', BASIC], ['ours', OURS]]) {
+    const ts = emitSchema(cat)
+    for (const [name, def] of Object.entries(cat.components)) {
+      assert.ok(ts.includes(`z.literal(${JSON.stringify(name)})`), `${label}: ${name} missing from the schema`)
+      for (const prop of Object.keys(propsOf(def))) {
+        if (prop === 'component') continue
+        assert.match(ts, new RegExp(`\\n  ${prop}: `), `${label}: ${name}.${prop} was dropped by the generator`)
+      }
+    }
+    assert.ok(ts.includes('discriminatedUnion'), `${label}: no union`)
+    /* The whole point: it reports what it refused rather than returning an
+       empty array. Checked against the CODE — the first version of this test
+       matched the sentence in the doc comment that says so. */
+    const code = ts.replace(/\/\*[\s\S]*?\*\//g, '')
+    assert.match(code, /refused: Array<\{ index: number/, `${label}: the parse must report refusals`)
+    assert.doesNotMatch(code, /return \[\]/, `${label}: a parse that returns [] makes the answer vanish`)
+  }
+})
+
+test('required in the catalog is required in the schema, and optional is optional', () => {
+  const ts = emitSchema(BASIC)
+  const block = (name) => ts.slice(ts.indexOf(`z.literal(${JSON.stringify(name)})`)).split('\n})')[0]
+  const req = new Set(requiredOf(BASIC.components.Button))
+  for (const prop of Object.keys(propsOf(BASIC.components.Button))) {
+    if (prop === 'component') continue
+    const line = block('Button').split('\n').find((l) => l.trim().startsWith(prop + ':'))
+    assert.ok(line, `Button.${prop} missing`)
+    assert.equal(line.includes('.optional()'), !req.has(prop), `Button.${prop}: optionality does not match the catalog`)
+  }
+})
+
+test('a catalog that enumerates its actions can be checked; one that does not is a gap', () => {
+  const ours = actionsOf(OURS)
+  assert.ok(ours.declared.length, 'our catalog should declare its actions')
+  assert.deepEqual(actionsOf(BASIC).declared, [], "A2UI's Basic Catalog enumerates none")
+  assert.ok(actionsOf(BASIC).props.some((p) => p.component === 'Button'), 'Button carries one all the same')
+
+  const gaps = catalogGaps(new Map(Object.entries(BASIC_A11Y.components)), BASIC)
+  assert.equal(gaps.filter((g) => g.kind === 'action').length, 1)
+  const ourGaps = catalogGaps(new Map(Object.entries(OURS.components).map(([n, d]) => [n, d['x-a11y']])), OURS)
+  assert.deepEqual(ourGaps, [], 'ours declares them, so there is nothing to report')
+})
+
+test('an answer may only ask for a side effect the catalog declares', () => {
+  const one = (action) => {
+    const comps = new Map([['root', { id: 'root', component: 'Button', label: 'Do it', action }]])
+    return check(buildTree(comps, 'root', { refs: childRefs(OURS) }), { catalog: OURS, binding: { id: 'kit', certified: true } })
+  }
+  assert.equal(one('open_case').findings.length, 0)
+  const bad = one('wipe_database')
+  assert.equal(bad.verdict, 'fail')
+  assert.ok(bad.findings.some((f) => f.rule === 'action-is-declared' && /wipe_database/.test(f.message)))
 })

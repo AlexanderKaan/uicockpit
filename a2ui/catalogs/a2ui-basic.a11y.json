@@ -1,7 +1,7 @@
 {
   "_for": "https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json",
   "_what": "Accessibility semantics for the A2UI Basic Catalog. The catalog declares none — the protocol says nothing about accessibility anywhere — so this is OUR reading of it: a stated assumption, not an inference. Property names were read from the published catalog, not guessed.",
-  "_gaps": "Two components cannot carry a text alternative at all, whatever a renderer does: Video (url + posterUrl only, so WCAG 1.1.1 cannot be met) and Modal (trigger + content only, so the dialog has no accessible name for 4.1.2). Both are reported by check() as catalog gaps rather than blamed on the answer.",
+  "_gaps": "Two components cannot carry a text alternative at all, whatever a renderer does: Video (url + posterUrl only, so WCAG 1.1.1 cannot be met) and Modal (trigger + content only, so the dialog has no accessible name for 4.1.2). Both are reported by check() as catalog gaps rather than blamed on the answer. A third kind: Button REQUIRES an action and the catalog never enumerates which actions exist, so no renderer can tell an allowed one from an invented one.",
   "components": {
     "Text": {
       "role": "text",
@@ -51,7 +51,8 @@
       "emphasis": {
         "prop": "variant",
         "primary": "primary"
-      }
+      },
+      "action": "action"
     },
     "CheckBox": {
       "role": "control",

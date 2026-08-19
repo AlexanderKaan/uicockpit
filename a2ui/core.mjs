@@ -96,7 +96,28 @@ function writePath(model, path, value) {
  * $defs/ChildList, so a catalog nobody has seen before still gives up its tree. */
 const CHILD = /\/\$defs\/Child$/
 const CHILDLIST = /\/\$defs\/ChildList$/
-const propsOf = (def) => Object.assign({}, ...(def.allOf ?? []).map((p) => p.properties ?? {}), def.properties ?? {})
+export const propsOf = (def) => Object.assign({}, ...(def.allOf ?? []).map((p) => p.properties ?? {}), def.properties ?? {})
+/** Everything a component MUST carry, wherever the schema chose to say it. */
+export const requiredOf = (def) => [...new Set([...(def?.required ?? []), ...(def?.allOf ?? []).flatMap((p) => p.required ?? [])])]
+
+/* Which properties name a SIDE EFFECT, and which values the catalog admits for
+ * them. A2UI marks them with $defs/Action and our own catalog with x-action —
+ * and in both cases the catalog may or may not go on to say WHICH actions
+ * exist. That difference is the whole point: a button that names an action the
+ * catalog never enumerated is a button no renderer can judge. */
+export function actionsOf(catalog) {
+  const props = [], declared = new Set()
+  for (const [name, def] of Object.entries(catalog?.components ?? {})) {
+    for (const [prop, spec] of Object.entries(propsOf(def))) {
+      const isAction = spec['x-action'] === true || (typeof spec.$ref === 'string' && spec.$ref.endsWith('/Action'))
+      if (!isAction) continue
+      const values = Array.isArray(spec.enum) ? spec.enum : null
+      props.push({ component: name, prop, values })
+      for (const v of values ?? []) declared.add(v)
+    }
+  }
+  return { props, declared: [...declared] }
+}
 
 export function childRefs(catalog) {
   const map = new Map()

@@ -265,7 +265,10 @@ function render() {
   $('.findings').innerHTML = rep.findings.map((f) => `<div><code>${f.sc ?? 'craft'}</code> ${f.message}</div>`).join('') + gaps
 
   const code = { catalog: JSON.stringify(subsetCatalog(), null, 2),
-    binding: emit(b, tree, (t, fn) => walk(t, fn, surface.model)) }
+    binding: emit(b, tree, (t, fn) => walk(t, fn, surface.model)),
+    /* the catalog as types you can validate with — generated, so it cannot
+       drift from the vocabulary the agent was actually handed */
+    schema: emitSchema(subsetCatalog()) }
   const editing = state.tab === 'stream'
   $('.code--edit').hidden = !editing
   $('pre.code').hidden = editing
@@ -329,7 +332,12 @@ $('.stacks').addEventListener('click', (e) => {
 })
 /* tabs — a roving tabindex and arrow keys, because role="tab" is a promise
    about keyboard behaviour and we would be selling a check we failed */
-const tabs = () => [...$('.tabs').children]
+/* `.tabs` is the kit's RECIPE, and the catalog nav wears it too — so a bare
+   $('.tabs') grabbed the wrong element the moment the chrome started using kit
+   classes, and the artefact tabs silently stopped switching. A class that
+   styles is not a class to hook JavaScript on; the container is addressed by
+   where it lives. */
+const tabs = () => [...$('.out .tabs').children]
 function selectTab(btn, focus) {
   state.tab = btn.dataset.tab
   for (const el of tabs()) {
@@ -341,10 +349,10 @@ function selectTab(btn, focus) {
   if (focus) btn.focus()
   draw()
 }
-$('.tabs').addEventListener('click', (e) => {
+$('.out .tabs').addEventListener('click', (e) => {
   const btn = e.target.closest('button'); if (btn) selectTab(btn, false)
 })
-$('.tabs').addEventListener('keydown', (e) => {
+$('.out .tabs').addEventListener('keydown', (e) => {
   const step = { ArrowRight: 1, ArrowLeft: -1, Home: 'first', End: 'last' }[e.key]
   if (!step) return
   e.preventDefault()
