@@ -26,11 +26,16 @@ places it stops, and what is left to build.
 ## Try it
 
 ```bash
-cd a2ui && node build.mjs && open builder.html
+cd a2ui && node build.mjs && open index.html
 ```
 
-One self-contained page, split down the middle: **what your agent sent** on the
-left, **what the reader gets** on the right, with the verdict on it.
+Two pages, both self-contained. **`index.html` is the door**: it runs the check
+over Google's Basic Catalog in front of you and then takes yours — an A2UI
+catalog, a Zod schema or a TypeScript union — and tells you what it cannot say.
+**`builder.html` is the tool.**
+
+The builder is split down the middle: **what your agent sent** on the left,
+**what the reader gets** on the right, with the verdict on it.
 
 The left half is a text box, not an output. Paste the stream your agent
 produced — JSONL, a JSON array, or a single message out of a log — and it
@@ -58,7 +63,7 @@ verdict, one switch.
 ```bash
 node probe.mjs                    # the conformance verdict on a clean answer
 node probe.mjs broken.jsonl bad   # …and on a deliberately broken one
-node --test test.mjs              # the meter: 22 tests over both catalogs
+node --test test.mjs              # the meter: 27 tests over both catalogs
 ```
 
 ## What it is
@@ -171,15 +176,16 @@ harness issued.
       schema.mjs        the catalog → TypeScript + Zod, refusals reported not dropped
       kit/              the kit binding's stylesheet — plain CSS, yours to edit
       binding.json      the certificate: 1500 contrast pairs, 54 of 60 clean
+      vocab.mjs         read a catalog, a Zod schema or a union — and say what it cannot say
       test.mjs          the meter (node --test)
-      builder.*         the palette → one self-contained page (node build.mjs)
+      index.* builder.* the door and the tool → two self-contained pages (node build.mjs)
 
 About 2 300 lines, no dependencies, no build step for anything that runs.
 
 ## Status
 
 Early, and honest about it. The builder runs, the verdict is real, the generated
-renderer compiles, and 22 tests hold both catalogs against all four bindings.
+renderer compiles, and 27 tests hold both catalogs against all four bindings.
 Not published to npm, no hosted version, no stable API. Tabs render as
 disclosures in the class-based bindings rather than as a scripted tab widget,
 and only the kit binding has a certificate — the other three read `unverified`,

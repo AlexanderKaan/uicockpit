@@ -1,0 +1,234 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What can't your agent say?</title>
+<meta name="description" content="The catalog you hand your agent is the ceiling on every screen it will ever draw. Paste yours and see what it cannot say.">
+<style>
+/*KITCSS*/
+
+/* The front door, built out of the same kit as the tool it opens. Layout only —
+   every surface, control and value below comes from the kit's own recipes and
+   tokens, and the scope limit keeps all of it away from .preview. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--k-bg);color:var(--k-fg);font-size:var(--k-type-body);line-height:1.5}
+body,.b-kit{font-family:'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif}
+
+@scope (.chrome) to (.preview) {
+  .hero,.band{max-inline-size:64rem;margin-inline:auto;padding-inline:var(--k-s-24)}
+  .hero{padding-block:var(--k-s-48,3rem) var(--k-s-32,2rem);text-align:center}
+  .wordmark{display:inline-flex;align-items:center;gap:var(--k-s-8);margin:0 0 var(--k-s-16);
+            font-size:var(--k-type-eyebrow);letter-spacing:var(--k-track-eyebrow);text-transform:uppercase;
+            font-weight:var(--k-weight-semibold);color:var(--k-fg-muted)}
+  .wordmark svg{color:var(--k-primary)}
+  h1{font-size:clamp(2rem,5vw,var(--k-type-display));font-weight:var(--k-weight-display-hero);
+     letter-spacing:var(--k-track-display);line-height:1.05;margin:0;text-wrap:balance}
+  .standfirst{margin:var(--k-s-16) auto 0;max-inline-size:44ch;color:var(--k-fg-muted);
+              font-size:1rem;text-wrap:pretty}
+  .standfirst strong{color:var(--k-fg);font-weight:var(--k-weight-medium)}
+
+  /* the verdict IS the hero image */
+  .verdict-card{margin-block-start:var(--k-s-32,2rem);text-align:start;overflow:hidden}
+  .vc__head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--k-s-12);
+            padding:var(--k-s-12) var(--k-s-16);border-bottom:var(--k-divider)}
+  .vc__name{font-weight:var(--k-weight-semibold)}
+  .vc__count{font-size:var(--k-type-small);color:var(--k-fg-muted);font-family:var(--k-font-mono)}
+  .vc__list{list-style:none;margin:0;padding:0}
+  .vc__list li{display:grid;grid-template-columns:1.25rem 5.5rem 1fr;gap:var(--k-s-10,.625rem);
+               align-items:start;padding:var(--k-s-12) var(--k-s-16);border-bottom:var(--k-divider)}
+  .vc__list li + li{border-top:0}
+  .vc__mark{font-weight:var(--k-weight-bold);line-height:1.4}
+  .vc__mark[data-s=gap]{color:var(--k-danger-text)}
+  .vc__mark[data-s=review]{color:var(--k-warning-text)}
+  .vc__mark[data-s=none]{color:var(--k-success-text)}
+  .vc__sc{font-size:var(--k-type-small);font-family:var(--k-font-mono);color:var(--k-fg-faint);
+          line-height:1.6;white-space:nowrap}
+  .vc__t{display:block;font-weight:var(--k-weight-medium)}
+  .vc__d{display:block;color:var(--k-fg-muted);font-size:var(--k-type-small);line-height:1.5;margin-top:3px;text-wrap:pretty}
+  .vc__e{margin-top:var(--k-s-8);display:flex;flex-wrap:wrap;gap:var(--k-s-4)}
+  .vc__e code{font-family:var(--k-font-mono);font-size:var(--k-type-small);
+              background:var(--k-surface-2);border-radius:var(--k-radius-sm);padding:1px var(--k-s-6)}
+  .vc__foot{padding:var(--k-s-16);background:var(--k-surface-2)}
+  .vc__foot .code{height:5.5rem;background:var(--k-surface);border:var(--k-divider);
+                  border-radius:var(--k-radius-md);padding:var(--k-s-10,.625rem) var(--k-s-12);
+                  font:var(--k-type-small)/1.6 var(--k-font-mono);color:var(--k-fg);
+                  inline-size:100%;resize:vertical;white-space:pre-wrap}
+  .vc__examples{margin:var(--k-s-10,.625rem) 0 0;font-size:var(--k-type-small);color:var(--k-fg-muted);
+                display:flex;flex-wrap:wrap;align-items:center;gap:var(--k-s-4)}
+
+  .band{padding-block:var(--k-s-40,2.5rem)}
+  .band h2{font-size:var(--k-type-h2);font-weight:var(--k-weight-semibold);letter-spacing:var(--k-track-tight);margin:0}
+  .lede{margin:var(--k-s-8) 0 var(--k-s-20,1.25rem);color:var(--k-fg-muted);max-inline-size:60ch;text-wrap:pretty}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:var(--k-s-16);align-items:start}
+  .split figure{margin:0;overflow:hidden}
+  .split figcaption{font-size:var(--k-type-eyebrow);letter-spacing:var(--k-track-eyebrow);text-transform:uppercase;
+                    color:var(--k-fg-muted);font-weight:var(--k-weight-semibold);
+                    padding:var(--k-s-10,.625rem) var(--k-s-14,.875rem);border-bottom:var(--k-divider)}
+  .stage__surface{padding:var(--k-s-20,1.25rem);background:var(--k-surface-sunken)}
+  .tree{list-style:none;margin:0;padding:var(--k-s-12) 0;font-family:var(--k-font-mono);font-size:var(--k-type-small)}
+  .tree li{display:grid;grid-template-columns:1.5rem 4.5rem 1fr;gap:var(--k-s-8);
+           padding:var(--k-s-6) var(--k-s-14,.875rem);align-items:baseline}
+  .tree .n{color:var(--k-fg-faint)}
+  .tree .r{color:var(--k-primary-text);font-weight:var(--k-weight-medium)}
+  .tree .v{color:var(--k-fg-muted);overflow-wrap:anywhere}
+  .tree li[data-bad] .v{color:var(--k-danger-text);font-weight:var(--k-weight-medium)}
+  .tree__foot{margin:0;padding:var(--k-s-10,.625rem) var(--k-s-14,.875rem);border-top:var(--k-divider);
+              font-size:var(--k-type-small);color:var(--k-danger-text);font-family:var(--k-font-mono)}
+
+  .layers{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:var(--k-s-16)}
+  .layers li{padding:var(--k-s-16);display:flex;flex-direction:column;gap:var(--k-s-6)}
+  .layers__no{inline-size:1.5rem;block-size:1.5rem;border-radius:50%;display:grid;place-items:center;
+              background:var(--k-primary-soft);color:var(--k-primary-soft-fg);
+              font-size:var(--k-type-small);font-weight:var(--k-weight-bold)}
+  .layers h3{margin:0;font-size:var(--k-type-h3);font-weight:var(--k-weight-semibold)}
+  .layers p{margin:0;color:var(--k-fg-muted);font-size:var(--k-type-small);line-height:1.55}
+
+  /* .cta is a .card, and the card recipe is a flex COLUMN — without resetting
+     the direction the basis below became a height and the button sank to the
+     bottom of a 416px box. Composing with a recipe means inheriting it. */
+  .cta{display:flex;flex-direction:row;align-items:center;justify-content:space-between;
+       gap:var(--k-s-24);padding:var(--k-s-24);flex-wrap:wrap}
+  .cta > div{flex:1 1 26rem}
+  .cta .btn{flex:none}
+  .cta h2{margin:0 0 var(--k-s-4)}
+  .cta p{margin:0;color:var(--k-fg-muted);max-inline-size:58ch}
+
+  .receipts{list-style:none;margin:0;padding:0;display:grid;gap:var(--k-s-8)}
+  .receipts li{display:grid;grid-template-columns:1rem 1fr;gap:var(--k-s-8);
+               font-size:var(--k-type-small);color:var(--k-fg-muted);line-height:1.55}
+  .receipts b{color:var(--k-fg);font-weight:var(--k-weight-medium)}
+  .fine{margin:var(--k-s-16) 0 0;font-size:var(--k-type-small);color:var(--k-fg-faint);max-inline-size:60ch}
+  .band--receipts{padding-block-end:var(--k-s-48,3rem)}
+
+  @media (max-width:820px){
+    .split,.layers{grid-template-columns:1fr}
+    .vc__list li{grid-template-columns:1.25rem 1fr}
+    .vc__sc{grid-column:2;white-space:normal}
+  }
+}
+.preview{margin:0}
+/*TWCSS*/
+</style>
+<!--BODY-->
+<script type="module">
+/*MODULES*/
+const CATALOGS = /*CATALOGS*/;
+const CERT = /*CERT*/;
+const SAMPLE_ZOD = /*ZOD*/;
+
+const $ = (s) => document.querySelector(s)
+
+/* ── the hero: what a vocabulary cannot say ───────────────────────────────── */
+const EXAMPLES = {
+  basic: { label: "A2UI Basic Catalog · Google", text: JSON.stringify(CATALOGS.basic.catalog), a11y: CATALOGS.basic.a11y },
+  service: { label: 'Public-service catalog · ours', text: JSON.stringify(CATALOGS.service.catalog), a11y: null },
+  zod: { label: 'A Zod schema', text: SAMPLE_ZOD, a11y: null },
+}
+
+function show(label, text, a11y) {
+  const vocab = readVocabulary(text)
+  const rep = audit(vocab, a11y)
+  $('.vc__name').textContent = vocab.kind ? label : 'Could not read this'
+  $('.vc__count').textContent = vocab.kind
+    ? `${rep.components} components · ${rep.properties} properties · semantics ${rep.semantics}`
+    : ''
+  if (!vocab.kind) {
+    $('.vc__list').innerHTML = `<li><span class="vc__mark" data-s="review">·</span><span class="vc__sc">—</span>
+      <span><span class="vc__t">${rep.note}</span></span></li>`
+    return
+  }
+  /* A vocabulary with nothing to report says so — a blank panel would read as a
+     failure to run rather than as a pass. */
+  const rows = rep.findings.length ? rep.findings : [{
+    severity: 'none', sc: '—', title: 'Nothing to report',
+    detail: 'Every component can be named, headings exist, names are required, and the side effects are enumerated. That is rarer than it sounds.', evidence: [],
+  }]
+  $('.vc__list').innerHTML = rows.map((f) => `<li>
+    <span class="vc__mark" data-s="${f.severity}">${f.severity === 'gap' ? '✗' : f.severity === 'review' ? '·' : '✓'}</span>
+    <span class="vc__sc">${f.sc}</span>
+    <span><span class="vc__t">${f.title}</span><span class="vc__d">${f.detail}</span>
+      ${f.evidence.length ? `<span class="vc__e">${f.evidence.map((e) => `<code>${e}</code>`).join('')}</span>` : ''}</span>
+  </li>`).join('')
+}
+
+$('.vc__examples').addEventListener('click', (e) => {
+  const btn = e.target.closest('button'); if (!btn) return
+  const ex = EXAMPLES[btn.dataset.example]
+  $('#paste').value = ''
+  show(ex.label, ex.text, ex.a11y)
+})
+let typing
+$('#paste').addEventListener('input', (e) => {
+  clearTimeout(typing)
+  const text = e.target.value
+  typing = setTimeout(() => (text.trim() ? show('Yours', text, null) : show(EXAMPLES.basic.label, EXAMPLES.basic.text, EXAMPLES.basic.a11y)), 300)
+})
+
+/* ── seen / said ──────────────────────────────────────────────────────────── */
+/* A real answer through the real binding, and the same tree as check() reads it.
+   Built from the Basic Catalog on purpose: its title can only be a Text, which
+   is exactly what the right-hand column shows. */
+const DEMO = [
+  { version: 'v1.0', createSurface: { surfaceId: 's', catalogId: CATALOGS.basic.catalog.catalogId, dataModel: { postcode: '3011 AA' } } },
+  { version: 'v1.0', updateComponents: { surfaceId: 's', components: [
+    { id: 'root', component: 'Card', child: 'body' },
+    { id: 'body', component: 'Column', children: ['t1', 't2', 'fld', 'btn'] },
+    { id: 't1', component: 'Text', text: 'Case 2026-04471' },
+    { id: 't2', component: 'Text', variant: 'caption', text: 'Dormer window · under review since 12 August' },
+    { id: 'fld', component: 'TextField', value: { path: '/postcode' }, placeholder: '3011 AA' },
+    { id: 'btnTxt', component: 'Text', text: 'Book this slot' },
+    { id: 'btn', component: 'Button', child: 'btnTxt', variant: 'primary', action: 'book_slot' },
+  ] } },
+]
+const ROLE = { text: 'text', image: 'image', link: 'link', heading: 'heading' }
+function seenAndSaid() {
+  const cat = CATALOGS.basic.catalog, a11y = CATALOGS.basic.a11y
+  const surface = applyStream(DEMO.map((m) => JSON.stringify(m))).get('s')
+  const tree = buildTree(surface.components, 'root', { refs: childRefs(cat), model: surface.model })
+  $('.preview').innerHTML = walk(tree, (n, k, r, ka) => BINDINGS.kit.h(n, k, r, ka) ?? '', surface.model)
+
+  const rep = check(tree, { catalog: cat, a11y, binding: { id: 'kit', certified: true } })
+  const bad = new Map(rep.findings.filter((f) => f.severity === 'fail').map((f) => [f.id, f]))
+  const ann = a11y.components
+  const rows = []
+  const val = (v) => resolve(v, surface.model, null, FUNCTIONS)
+  /* Walked explicitly rather than through walk(): a Text inside a Button IS the
+     button's name, and an accessibility tree does not announce it twice. That
+     needs to know who the parent is, which a bottom-up render walk does not. */
+  ;(function collect(n) {
+    const a = ann[n.component]
+    if (a && a.role !== 'layout') {
+      const role = a.input ? 'field' : a.role === 'control' ? 'button' : ROLE[a.role] ?? a.role
+      const name = a.nameFromChild
+        ? (function text(x) { return x.text != null ? val(x.text) : (x.kids ?? []).map(text).filter(Boolean).join(' ') })(n)
+        : val(n[a.name])
+      rows.push({ role, name, bad: bad.get(n.id) })
+      if (a.nameFromChild) return               // its children are its name, not siblings of it
+    }
+    for (const kid of n.kids ?? []) collect(kid)
+  })(tree)
+
+  $('.tree').innerHTML = rows.map((row, i) => `<li${row.bad ? ' data-bad' : ''}>
+    <span class="n">${i + 1}</span><span class="r">${row.role}</span>
+    <span class="v">${row.bad ? '✗ ' + row.bad.message : row.name ? '“' + row.name + '”' : '—'}</span></li>`).join('')
+  const gaps = rep.catalogGaps.filter((g) => g.kind === 'structure')
+  if (gaps.length) $('.tree').insertAdjacentHTML('afterend',
+    `<p class="tree__foot">✗ ${gaps[0].sc} — ${gaps[0].message}</p>`)
+}
+
+/* ── receipts: read from the certificate, never typed ─────────────────────── */
+function receipts() {
+  const proof = describeBinding(CERT)
+  const items = [
+    [`${CERT.pairsChecked} contrast pairs over ${CERT.combinations} configurations`, proof.partial
+      ? `${CERT.certifiedCombinations} clean. The other ${CERT.combinations - CERT.certifiedCombinations} are named in binding.json — a checked control at 1.61:1 in two dark themes, still open.`
+      : 'all above the floor.'],
+    ['Target size, focus, reflow', 'measured by the archived harness on its own markup, not on what these bindings emit. When this project’s markup was finally measured it was failing; that is fixed, and nothing here re-measures on every change.'],
+    ['Six things the check never claims', 'whether the alt text describes the image, whether a heading describes its section, whether an error says how to fix it — returned by name, never counted as passing.'],
+  ]
+  $('.receipts').innerHTML = items.map(([b, t]) => `<li><span aria-hidden="true">·</span><span><b>${b}</b> — ${t}</span></li>`).join('')
+}
+
+show(EXAMPLES.basic.label, EXAMPLES.basic.text, EXAMPLES.basic.a11y)
+seenAndSaid()
+receipts()
+</script>

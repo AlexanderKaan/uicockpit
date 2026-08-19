@@ -7,6 +7,7 @@ import { applyStream, buildTree, childRefs, parseStream, propsOf, requiredOf, ac
 import { BINDINGS, emit } from './bindings.mjs'
 import { check, catalogGaps, describeBinding } from './check.mjs'
 import { emitSchema } from './schema.mjs'
+import { readVocabulary, audit } from './vocab.mjs'
 
 const json = (f) => JSON.parse(readFileSync(f, 'utf8'))
 const BASIC = json('catalogs/a2ui-basic.catalog.json')
@@ -241,4 +242,53 @@ test('an answer may only ask for a side effect the catalog declares', () => {
   const bad = one('wipe_database')
   assert.equal(bad.verdict, 'fail')
   assert.ok(bad.findings.some((f) => f.rule === 'action-is-declared' && /wipe_database/.test(f.message)))
+})
+
+/* ── the front door's engine: what a vocabulary cannot say ────────────────── */
+const ids = (r) => r.findings.map((f) => f.id).sort()
+
+test('a vocabulary is read in all three shapes it ships in', () => {
+  assert.equal(readVocabulary(JSON.stringify(BASIC)).kind, 'A2UI catalog')
+  assert.equal(readVocabulary(readFileSync('sample.zod.ts', 'utf8')).kind, 'Zod schema')
+  const union = "type UIBlock = | { type: 'cost-summary'; props: { period: string } } | { type: 'confirmation'; props: { message: string; actionId: string } };"
+  const ts = readVocabulary(union)
+  assert.equal(ts.kind, 'TypeScript union')
+  assert.deepEqual(ts.components.map((c) => c.name), ['cost-summary', 'confirmation'])
+})
+
+test('it refuses to pretend it read something it did not', () => {
+  for (const junk of ['hello world', '{ "nope": 1 }', '{ broken', '']) {
+    const v = readVocabulary(junk)
+    assert.equal(v.kind, null, `"${junk.slice(0, 12)}" should not parse as a vocabulary`)
+    assert.ok(v.note, 'and it must say why')
+    assert.deepEqual(v.components, [])
+  }
+})
+
+test("Google's Basic Catalog: the four things it cannot say", () => {
+  const r = audit(readVocabulary(JSON.stringify(BASIC)), BASIC_A11Y)
+  assert.deepEqual(ids(r), ['no-heading', 'no-text', 'open-actions', 'optional-name'])
+  const optional = r.findings.find((f) => f.id === 'optional-name')
+  assert.deepEqual(optional.evidence.sort(),
+    ['AudioPlayer.description', 'ChoicePicker.label', 'DateTimeInput.label', 'Image.description', 'Slider.label'])
+  assert.deepEqual(r.findings.find((f) => f.id === 'open-actions').evidence, ['Button.action'])
+})
+
+test('a container is not mute — holding other components is what it is for', () => {
+  const r = audit(readVocabulary(JSON.stringify(BASIC)), BASIC_A11Y)
+  const mute = r.findings.find((f) => f.id === 'no-text').evidence
+  for (const container of ['Row', 'Column', 'Card', 'List', 'Tabs', 'Modal']) {
+    assert.ok(!mute.includes(container), `${container} holds components; it does not need text of its own`)
+  }
+  assert.ok(mute.includes('Video'), 'Video holds nothing and can say nothing')
+})
+
+test('a vocabulary that states its semantics is believed, including its silences', () => {
+  const r = audit(readVocabulary(JSON.stringify(OURS)))
+  assert.deepEqual(r.findings, [], 'ours declares its names, its actions and a heading')
+  assert.equal(r.semantics, 'stated by the vocabulary')
+  /* and where nothing is stated, the reading is named as a reading */
+  const guessed = audit(readVocabulary(readFileSync('sample.zod.ts', 'utf8')))
+  assert.equal(guessed.semantics, 'read from property names')
+  assert.match(guessed.findings.find((f) => f.id === 'optional-name').detail, /property names/)
 })

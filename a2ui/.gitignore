@@ -2,3 +2,4 @@
 #   cd ../cockpit && npx vite-node ../a2ui/certify.ts   (until the engine moves in)
 builder.html
 preview.html
+index.html

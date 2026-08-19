@@ -6,7 +6,7 @@ const strip = (s) => s
   .replace(/^import[^\n]*from '[^']+'\n/gm, '')
   .replace(/^export (const|function|class|let) /gm, '$1 ')
   .replace(/^export \{[^}]*\}[^\n]*\n/gm, '')
-const files = ['core.mjs', 'check.mjs', 'bindings.mjs', 'schema.mjs']
+const files = ['core.mjs', 'check.mjs', 'bindings.mjs', 'schema.mjs', 'vocab.mjs']
 const parts = files.map((f) => [f, strip(readFileSync(f, 'utf8'))])
 /* Concatenating modules means their top-level names share one scope, and a
  * collision makes the browser throw a SyntaxError before anything runs — a page
@@ -65,12 +65,21 @@ ${kit}
 }
 
 const mods = parts.map(([f, src]) => `/* ── ${f} ─────────────── */\n` + src).join('\n\n')
-const page = readFileSync('builder.template.html', 'utf8')
-  .replace('/*MODULES*/', mods)
-  .replace('/*CATALOGS*/', JSON.stringify(CATALOGS))
-  .replace('/*CERT*/', readFileSync('binding.json', 'utf8'))
-  .replace('<!--BODY-->', readFileSync('builder.body.html', 'utf8'))
-  .replace('/*KITCSS*/', kitCss())
-  .replace('/*TWCSS*/', readFileSync('tw.css', 'utf8') + '\n' + readFileSync('daisy.css', 'utf8'))
-writeFileSync('builder.html', page)
-console.log(`builder.html — ${(page.length / 1024).toFixed(0)} kB, self-contained`)
+/** One page from one template + body pair. Two pages now: the door, and the tool. */
+function page(template, body) {
+  return readFileSync(template, 'utf8')
+    .replace('/*MODULES*/', mods)
+    .replace('/*CATALOGS*/', JSON.stringify(CATALOGS))
+    .replace('/*CERT*/', readFileSync('binding.json', 'utf8'))
+    .replace('/*ZOD*/', JSON.stringify(readFileSync('sample.zod.ts', 'utf8')))
+    .replace('<!--BODY-->', readFileSync(body, 'utf8'))
+    .replace('/*KITCSS*/', kitCss())
+    .replace('/*TWCSS*/', readFileSync('tw.css', 'utf8') + '\n' + readFileSync('daisy.css', 'utf8'))
+}
+
+for (const [out, tpl, body] of [['builder.html', 'builder.template.html', 'builder.body.html'],
+                                ['index.html', 'index.template.html', 'index.body.html']]) {
+  const html = page(tpl, body)
+  writeFileSync(out, html)
+  console.log(`${out.padEnd(13)} ${(html.length / 1024).toFixed(0)} kB, self-contained`)
+}

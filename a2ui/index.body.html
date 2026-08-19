@@ -1,0 +1,95 @@
+<div class="chrome">
+
+<header class="hero">
+  <p class="wordmark">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M8.5 13l2 2-2 2"/></svg>
+    A2UI Cockpit
+  </p>
+  <h1>What can't your agent say?</h1>
+  <p class="standfirst">
+    The catalog you hand your agent is the ceiling on every screen it will ever draw.
+    You wrote it once, in an afternoon. <strong>Paste yours — or start with Google's.</strong>
+  </p>
+
+  <section class="verdict-card card" aria-label="What this vocabulary cannot say">
+    <div class="vc__head">
+      <span class="vc__name"></span>
+      <span class="vc__count"></span>
+    </div>
+    <ul class="vc__list"></ul>
+    <div class="vc__foot">
+      <label class="field">
+        <span class="field__label" for="paste">Now paste yours</span>
+        <textarea class="code" id="paste" rows="4" spellcheck="false" autocapitalize="off" autocorrect="off"
+                  placeholder="An A2UI catalog, a Zod schema, or a TypeScript union — whichever form yours is in. Nothing leaves this page."></textarea>
+      </label>
+      <p class="vc__examples">
+        Or look at one of these:
+        <button class="btn btn--ghost btn--sm" data-example="basic">A2UI Basic Catalog</button>
+        <button class="btn btn--ghost btn--sm" data-example="service">our public-service catalog</button>
+        <button class="btn btn--ghost btn--sm" data-example="zod">a Zod schema</button>
+      </p>
+    </div>
+  </section>
+</header>
+
+<section class="band" aria-labelledby="seen-said">
+  <h2 id="seen-said">It looks fine. That is the problem.</h2>
+  <p class="lede">
+    The same answer, twice: what a reader sees, and what the machine is told. A schema
+    checks the first column. Nobody was checking the second.
+  </p>
+  <div class="split">
+    <figure class="card">
+      <figcaption>Seen</figcaption>
+      <div class="stage__surface"><div class="preview b-kit"></div></div>
+    </figure>
+    <figure class="card">
+      <figcaption>Said</figcaption>
+      <ol class="tree"></ol>
+    </figure>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="layers">
+  <h2 id="layers">You cannot review a screen that is different every time</h2>
+  <p class="lede">So the wrong answer has to be unsayable. Three layers — and only the last one runs per answer.</p>
+  <ol class="layers">
+    <li class="card">
+      <span class="layers__no">1</span>
+      <h3>The catalog</h3>
+      <p>What the agent may ask for. Reviewed <strong>once</strong>, like an API. If it cannot say “heading”, no screen it ever draws has one.</p>
+    </li>
+    <li class="card">
+      <span class="layers__no">2</span>
+      <h3>The binding</h3>
+      <p>How each component becomes markup in your stack. Certified <strong>once</strong>, in CI — contrast, target size, focus. Properties of the implementation, not of the request.</p>
+    </li>
+    <li class="card">
+      <span class="layers__no">3</span>
+      <h3>The answer</h3>
+      <p>What the agent actually sent. Checked <strong>every time</strong>, on the component tree rather than the markup — so the same rules hold for React, Flutter or SwiftUI.</p>
+    </li>
+  </ol>
+</section>
+
+<section class="band band--cta">
+  <div class="card cta">
+    <div>
+      <h2>Now build one that can</h2>
+      <p>Take the standard components, point a library at them, and copy out what you then own: the catalog, the renderer for your stack, and the catalog as types you can validate with.</p>
+    </div>
+    <a class="btn btn--primary" href="./builder.html">Open the builder</a>
+  </div>
+</section>
+
+<section class="band band--receipts">
+  <h2>What we will not claim</h2>
+  <ul class="receipts"></ul>
+  <p class="fine">
+    That is the standard we are asking of a catalog. It would be strange to hold ourselves to a lower one.
+    <a href="../WHY.md">Read why this exists →</a>
+  </p>
+</section>
+
+</div>
