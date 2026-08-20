@@ -3,7 +3,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { generate } from './generate.mjs'
+import { generate, collisions } from './generate.mjs'
 import { MAP } from './roles.mjs'
 
 const ALL = Object.keys(MAP)
@@ -60,4 +60,38 @@ test('nothing in the package is a value we invented', () => {
   for (const m of f['theme.css'].matchAll(/#[0-9a-f]{3,8}\b/gi)) {
     assert.ok(set.has(m[0].toLowerCase()), `${m[0]} is in the package but nobody set it`)
   }
+})
+
+test('a theme block that REPLACES carries the kit\'s own defaults underneath', () => {
+  const css = generate(VALUES, ['daisyui'], KITS)['theme.css']
+  /* --border is daisyUI's border WIDTH, and their checkbox is
+     `border: var(--border) solid …`. Emitting only our routed values dropped it,
+     the width fell to zero, and every checkbox on the wall vanished. */
+  assert.match(css, /--border:/, 'a replacing theme must carry what it does not override')
+  assert.match(css, /--depth:/)
+  assert.match(css, /--color-primary: #0B6E8A/, 'and our value still wins')
+  const theirs = Object.keys(KITS.daisyui.modes.light)
+  for (const v of theirs) assert.ok(css.includes(v + ':'), `${v} went missing from a theme that replaces the theme`)
+})
+
+test('a name two kits both use is reported, not left to load order', () => {
+  const f = generate(VALUES, ['shadcn', 'daisyui'], KITS)
+  const clash = f._collisions.find((c) => c.variable === '--border')
+  assert.ok(clash, 'shadcn writes --border as a colour; daisyUI reads it as a width')
+  assert.equal(clash.written, 'shadcn')
+  assert.equal(clash.read, 'daisyui')
+  assert.match(clash.theirValue, /px|rem/, "daisyUI's --border is a length")
+  assert.match(f['MANIFEST.md'], /Names two kits both use/)
+  assert.match(f['MANIFEST.md'], /Load their stylesheets in separate scopes/)
+})
+
+test('one kit alone has nothing to collide with', () => {
+  assert.deepEqual(generate(VALUES, ['daisyui'], KITS)._collisions, [])
+  assert.doesNotMatch(generate(VALUES, ['daisyui'], KITS)['MANIFEST.md'], /Names two kits/)
+})
+
+test('each kit can be taken on its own, without the others leaking in', () => {
+  const f = generate(VALUES, ['shadcn', 'daisyui'], KITS)
+  assert.doesNotMatch(f._blocks.daisyui, /--primary:/, "shadcn's variables must not be in daisyUI's block")
+  assert.doesNotMatch(f._blocks.shadcn, /@plugin/, "daisyUI's plugin block must not be in shadcn's")
 })

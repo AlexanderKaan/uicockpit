@@ -50,6 +50,7 @@ function cssVars(text) {
 
 const SOURCES = {
   tailwind: {
+    layer: 'utility',
     name: 'Tailwind CSS',
     what: 'utility classes — no components; the theme is CSS variables you can override',
     async read() {
@@ -58,6 +59,7 @@ const SOURCES = {
     },
   },
   daisyui: {
+    layer: 'components',
     name: 'daisyUI',
     what: 'component classes on top of Tailwind — no JavaScript, works in any framework',
     async read() {
@@ -68,6 +70,7 @@ const SOURCES = {
     },
   },
   bootstrap: {
+    layer: 'components', standalone: true,
     name: 'Bootstrap',
     what: 'component classes, no build step needed — the widest-installed CSS framework there is',
     async read() {
@@ -86,6 +89,7 @@ const SOURCES = {
     },
   },
   material: {
+    layer: 'components', standalone: true,
     name: 'Material 3',
     what: 'Google\'s design system — 47 colour roles derived from ONE seed, plus web components',
     async read() {
@@ -104,6 +108,7 @@ const SOURCES = {
     },
   },
   shadcn: {
+    layer: 'components',
     name: 'shadcn/ui',
     what: 'React components copied into your repo — you own the source, it is not a dependency',
     async read() {
@@ -127,7 +132,7 @@ for (const [id, kit] of Object.entries(SOURCES)) {
     console.error(`  nothing written. ${existsSync(`kits/${id}.json`) ? 'The checked-in file is left alone; it may be out of date.' : 'This kit has no values at all.'}`)
     failed++; continue
   }
-  const doc = { id, name: kit.name, what: kit.what, version: read.version, license: read.license ?? null,
+  const doc = { id, name: kit.name, what: kit.what, layer: kit.layer, standalone: kit.standalone ?? false, version: read.version, license: read.license ?? null,
     npm: read.npm ?? null, home: read.home ?? null, source: read.source, modes: read.modes }
   const next = JSON.stringify(doc, null, 2) + '\n'
   const path = `kits/${id}.json`
