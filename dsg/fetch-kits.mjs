@@ -118,8 +118,13 @@ const SOURCES = {
         /* `.radix-themes` is a THIRD block in the same file and it is where the
            font families live; reading only :root and :where(.radix-themes) left
            Radix looking like a kit with no typography at all. */
-        const light = { ...blockOf(base, ':root {'), ...blockOf(base, '.radix-themes') }
-        const dark = { ...light, ...blockOf(base, ':is(.dark, .dark-theme)') }
+        /* the BRACE is part of the selector here. `.radix-themes` as a bare
+           string also matches `::selection`, `:where([data-has-background])`
+           AND the dark block's own `:where(.radix-themes:not(.light))` — so the
+           light set quietly ended up holding Radix's dark values, and light and
+           dark came out identical in all 191 variables. */
+        const light = { ...blockOf(base, ':root {'), ...blockOf(base, ':where(.radix-themes) {'), ...blockOf(base, '.radix-themes {') }
+        const dark = { ...light, ...blockOf(base, ':is(.dark, .dark-theme) :where(.radix-themes:not(.light, .light-theme)) {') }
 
         /* Radix does not take a brand colour. It takes one of its own named
            accents, and every one of them is a hand-built twelve-step scale.

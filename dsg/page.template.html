@@ -152,6 +152,7 @@ const WALLS = /*WALLS*/;
 const SCRIPTS = /*SCRIPTS*/;
 const OWN = /*OWN*/;
 const RENDERS = /*RENDERS*/;
+const DARKSWITCH = /*DARK*/;
 const FONTS = /*FONTS*/;
 const SEEDS = /*SEEDS*/;
 const ICONS = /*ICONS*/;
@@ -190,6 +191,7 @@ const state = {
   on: new Set(['tailwind', 'shadcn']),
   get show() { return showing(stack(this.on, KITS)) },
   rung: 'all',
+  mode: 'light',
   values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
     ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1',
     /* filled in below from whichever kit publishes one */
@@ -237,14 +239,17 @@ const LIVE_BRAND = { tailwind: true, daisyui: true, shadcn: true, bootstrap: fal
 
 function paint() {
   const kits = ORDER.filter((k) => state.on.has(k))
-  const routed = route(state.values, kits, KITS)
+  const routed = darken(route(state.values, kits, KITS), KITS)
   /* A frame shows a STACK, so it carries every layer's variables, bottom-up.
      Giving it only the top layer's meant shadcn's frame never saw Tailwind's
      --font-sans, and the font knobs moved the card and nothing else. A tokens
      layer belongs under all of it, which is what it does in your app. */
   const st = stack(state.on, KITS)
   const below = (id) => st.order.slice(0, st.order.indexOf(id) + 1)
-  const varsOf = (ids) => Object.assign({}, ...ids.map((k) => routed.find((r) => r.kit === k)?.vars ?? {}))
+  const varsOf = (ids, dark) => Object.assign({}, ...ids.map((k) => {
+    const r = routed.find((x) => x.kit === k)
+    return (dark && r?.dark) ? r.dark : r?.vars ?? {}
+  }))
   for (const r of routed) {
     const f = $('#f_' + r.kit)
     if (!f) continue
@@ -254,6 +259,11 @@ function paint() {
        are set on the theme root the way its <Theme> would set them. */
     const root = f.contentDocument.documentElement
     for (const [a, v] of Object.entries(r.attrs ?? {})) root.setAttribute(a, v)
+    /* and the kit's own dark switch, plus colour-scheme so its form controls,
+       scrollbars and default text follow */
+    const wantDark = state.mode === 'dark' && !!DARKSWITCH[r.kit]
+    DARK_ROOT[r.kit]?.(root, wantDark)
+    root.style.colorScheme = wantDark ? 'dark' : 'light'
     /* and its per-element tones, which live in the markup rather than in a
        variable — the wall is built once, so they are re-tuned in place */
     for (const c of r.chosen ?? []) {
@@ -269,7 +279,7 @@ function paint() {
     /* the chosen face has to exist inside the frame too, or the wall shows the
        fallback while the card shows the family */
     for (const role of TYPE) loadFace(f.contentDocument, familyOf(state.values[role.id]))
-    let vars = varsOf(below(r.kit))
+    let vars = varsOf(below(r.kit), state.mode === 'dark')
     /* Material's other 46 roles come from its own generator, pre-derived here
        for the seeds we shipped; an unseen seed keeps the last derived scheme
        and the note says the download will carry the right one.
@@ -277,7 +287,11 @@ function paint() {
        too, and applying the scheme last quietly replaced the danger colour you
        picked with the one M3 computed. Its own API takes a custom error, so the
        knob is allowed to win — and the manifest says it did. */
-    if (r.kit === 'material') vars = { ...DERIVED.light ?? {}, ...vars }
+    /* Material's other 46 roles come from its own generator, which produces a
+       dark scheme as well as a light one. Applying the LIGHT scheme under a
+       dark block left every surface light and every on-colour dark: readable
+       nowhere. Their scheme for the mode you are in, then your values. */
+    if (r.kit === 'material') vars = { ...(state.mode === 'dark' ? DERIVED.dark : DERIVED.light) ?? {}, ...vars }
     /* the same selector the generated file uses — a block only wins if it
        out-specifies the kit's own, which :root does not always do */
     live.textContent = `${scopeOf(r.kit)}{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
@@ -363,6 +377,32 @@ function typoCards() {
   for (const r of TYPE) loadFace(document, familyOf(state.values[r.id]))
 }
 /* ── which rung of the wall ───────────────────────────────────────────────── */
+/* ── light or dark ────────────────────────────────────────────────────────── */
+/* Each kit is switched with ITS OWN mechanism, read from the same table the
+ * generated file uses: shadcn keys on .dark, Bootstrap on data-bs-theme,
+ * Mantine on data-mantine-color-scheme, daisyUI on data-theme, Radix on
+ * .dark-theme. A class of our own would be a dark mode their components never
+ * see — which is precisely the mistake daisyUI's prefersdark taught. */
+const DARK_ROOT = {
+  shadcn: (el, on) => el.classList.toggle('dark', on),
+  radix: (el, on) => { el.classList.toggle('dark', on); el.classList.toggle('light', !on) },
+  bootstrap: (el, on) => el.setAttribute('data-bs-theme', on ? 'dark' : 'light'),
+  mantine: (el, on) => el.setAttribute('data-mantine-color-scheme', on ? 'dark' : 'light'),
+  daisyui: (el, on) => el.setAttribute('data-theme', on ? 'yourkitdark' : 'yourkit'),
+}
+function drawModes() {
+  const kit = state.show
+  const can = !!DARKSWITCH[kit]
+  $('#modes').hidden = !can
+  if (!can) { state.mode = 'light'; return }
+  $('#modes').innerHTML = [['light', 'Light'], ['dark', 'Dark']]
+    .map(([id, label]) => `<button role="radio" data-m="${id}" aria-checked="${id === state.mode}">${label}</button>`).join('')
+}
+$('#modes').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  state.mode = b.dataset.m; drawModes(); paint()
+})
+
 function drawRungs() {
   $('#rungs').innerHTML = RUNGS.map((r) =>
     `<button role="radio" data-g="${r.id}" aria-checked="${r.id === state.rung}">${r.label}</button>`).join('')
@@ -555,6 +595,7 @@ function sync() {
   renderStack()
   typoCards()
   drawRungs()
+  drawModes()
   summaries()
 }
 
@@ -615,7 +656,7 @@ function screensHtml() {
   const id = state.show
   const r = route(state.values, ORDER.filter((k) => state.on.has(k)), KITS).find((x) => x.kit === id)
   const vars = { ...(r?.vars ?? {}) }
-  if (id === 'material') Object.assign(vars, DERIVED.light ?? {})
+  if (id === 'material') Object.assign(vars, DERIVED.light ?? {})   // the file is the light frame
   return `<!doctype html><meta charset="utf-8"><title>${describe(stack(state.on, KITS), KITS)}</title>
 <style>${CSS[id] ?? ''}</style>
 <style>:root{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}</style>

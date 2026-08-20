@@ -89,9 +89,15 @@ const hslA = (h, s, l, a) => {
   const [L, C, H] = hexToOklch(hslToHex(h, Math.max(0, s), Math.max(0, Math.min(100, l))));
   return oklch(L, C, H, a);
 };
+/* CSS allows lightness as a percentage OR as a number from 0 to 1, and kits use
+ * both: daisyUI writes oklch(76% 0.177 163) and shadcn writes
+ * oklch(0.577 0.245 27.325). A regex that demanded the percent sign read every
+ * shadcn colour as #000000 and said nothing about it. */
 const oklchStrToHex = (str) => {
-  const m = str.match(/oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+)/);
-  return m ? oklchToHex(parseFloat(m[1]) / 100, parseFloat(m[2]), parseFloat(m[3])) : "#000000";
+  const m = String(str).match(/oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+)/i);
+  if (!m) return "#000000";
+  const l = m[2] === "%" ? parseFloat(m[1]) / 100 : parseFloat(m[1]);
+  return oklchToHex(l, parseFloat(m[3]), parseFloat(m[4]));
 };
 const SCALE_L_LIGHT = [0.995, 0.98, 0.958, 0.937, 0.916, 0.892, 0.858, 0.8, 0.64, 0.605, 0.503, 0.16];
 const SCALE_L_DARK = [0.176, 0.213, 0.254, 0.285, 0.317, 0.355, 0.423, 0.536, 0.64, 0.693, 0.775, 0.945];

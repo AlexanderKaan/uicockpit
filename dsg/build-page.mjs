@@ -10,6 +10,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { icons, svg } from './icons.mjs'
 import { seedFrom, route } from './roles.mjs'
+import { DARK } from './generate.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render } from './parts.mjs'
@@ -111,6 +112,7 @@ let page = readFileSync('page.template.html', 'utf8')
   /* Measured on the kit's own markup, NOT on wall() — that wrapper adds our
    * section caption, and counting our chrome against the kit reported 97 of 98
    * where the truth is 97 of 97. */
+  .replace('/*DARK*/', () => JSON.stringify(DARK))
   .replace('/*RENDERS*/', () => JSON.stringify(RENDERS))
   .replace('/*SEEDS*/', () => JSON.stringify(SEEDS))
   .replace('/*FONTS*/', () => JSON.stringify({ google: gf.families, stacks: kitFonts(kits) }))

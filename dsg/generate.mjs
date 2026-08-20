@@ -13,7 +13,7 @@
  * And the manifest carries what could NOT be done, by name. A package that
  * quietly leaves out a third of a theme is worse than one that says so.
  */
-import { ROLES, MAP, route, coverage } from './roles.mjs'
+import { ROLES, MAP, route, coverage, darken } from './roles.mjs'
 import { contrast } from './color.mjs'
 
 const stamp = (kit) => `${kit.name}${kit.version ? ' ' + kit.version : ''}`
@@ -47,8 +47,7 @@ ${decl(r.vars)}
       .map((n) => [n.replace(/^--/, '--color-'), `var(${n})`]))
     const radius = all['--radius']
     return `/* ${stamp(kit)} — the variables its components read: its published
-   defaults with your values over them.
-   Dark mode is not generated yet: add a .dark block with your dark values. */
+   defaults with your values over them. The dark half is below. */
 :root {
 ${decl(all)}
 }
@@ -77,10 +76,11 @@ ${decl(bridge)}${radius ? `
   daisyui: (r, kit) => `/* ${stamp(kit)} — a named theme, registered as the default.
    Their published defaults with your values over them: a theme block replaces
    the theme, so anything left out would be missing rather than inherited.
-   SET data-theme="yourkit" ON YOUR <html>. daisyUI registers its own dark theme
-   with prefersdark, which beats default:true the moment a visitor's OS is dark —
-   and then none of the values below apply. Only a light theme is generated so
-   far; a dark one is yours to add as a second block. */
+   SET data-theme="yourkit" ON YOUR <html>. A dark theme is registered below with
+   prefersdark, which is the flag daisyUI's own dark theme uses to beat
+   default:true the moment a visitor's OS is dark. Without one of ours there,
+   theirs won and none of these values applied — which is exactly what happened
+   the first time, and turned the whole wall its factory purple. */
 @plugin "daisyui/theme" {
   name: "yourkit";
   default: true;
@@ -293,6 +293,27 @@ export const SCOPE = {
 }
 export const scopeOf = (id) => SCOPE[id] ?? ':root'
 
+/**
+ * And the switch each kit uses to mean "the lights are off".
+ *
+ * Every one of these is theirs: shadcn keys on .dark, Bootstrap on
+ * data-bs-theme, Mantine on data-mantine-color-scheme, Radix on .dark-theme,
+ * Open Props on the media query. Picking one of our own would mean a dark block
+ * their components never see.
+ *
+ * `null` means the kit publishes no dark mode at all, and we do not invent one.
+ */
+export const DARK = {
+  tailwind: null,
+  daisyui: 'theme',                 // a second registered theme, not a selector
+  shadcn: '.dark, [data-theme="dark"]',
+  bootstrap: '[data-bs-theme="dark"]',
+  material: '@media (prefers-color-scheme: dark)',
+  radix: '.dark, .dark-theme',
+  mantine: ":root[data-mantine-color-scheme='dark'], [data-mantine-color-scheme='dark']",
+  openprops: '@media (prefers-color-scheme: dark)',
+}
+
 export function collisions(routed, kits) {
   const out = []
   for (const r of routed) {
@@ -309,17 +330,58 @@ export function collisions(routed, kits) {
   return out
 }
 
+/**
+ * The dark half of a kit's block, in the kit's OWN switch.
+ *
+ * daisyUI is the odd one and the reason this is not a single template: a theme
+ * there is registered, not selected, so its dark mode is a SECOND @plugin block
+ * with prefersdark — which is also what made the light one lose every time a
+ * visitor's OS was dark, the very first thing this project got wrong.
+ */
+function darkBlock(r, kit) {
+  const at = DARK[r.kit]
+  if (!at || !r.dark) return ''
+  const head = `/* ${kit.name} in the dark — your values through this kit's own
+   published light-to-dark relationship, in the switch it actually reads. */`
+  if (r.kit === 'daisyui') {
+    return `${head}
+@plugin "daisyui/theme" {
+  name: "yourkitdark";
+  prefersdark: true;
+  color-scheme: dark;
+${decl({ ...kit.modes.dark, ...r.dark })}
+}`
+  }
+  if (at.startsWith('@media')) {
+    return `${head}
+${at} {
+  ${scopeOf(r.kit)} {
+${decl(r.dark, '    ')}
+  }
+}`
+  }
+  return `${head}
+${at} {
+${decl(r.dark)}
+}`
+}
+
 export function generate(values, kitIds, kits) {
-  const routed = route(values, kitIds, kits)
+  const routed = darken(route(values, kitIds, kits), kits)
   const files = {}
 
-  const blocks = routed.map((r) => {
+  /* keyed, not indexed: a kit now emits a light block AND a dark one, and
+     zipping two arrays by position handed daisyUI shadcn's dark block. */
+  const byKit = {}
+  const blocks = routed.flatMap((r) => {
     const kit = kits[r.kit]
     if (!kit) throw new Error(`no fetched values for "${r.kit}" — run fetch-kits.mjs`)
     const emit = EMIT[r.kit]
     if (!emit) throw new Error(`no emitter for "${r.kit}" — a kit without one would ship an empty theme`)
     Object.assign(files, EXTRA[r.kit]?.(r, kit, values) ?? {})
-    return emit(r, kit)
+    const pair = [emit(r, kit), darkBlock(r, kit)].filter(Boolean)
+    byKit[r.kit] = pair.join('\n\n')
+    return pair
   })
 
   files['theme.css'] = `/* YOUR DESIGN SYSTEM
@@ -345,7 +407,7 @@ Then import \`theme.css\` after the kits, so your values win.
   files['DESIGN-SYSTEM.md'] = brief(routed, kits, values)
   /* per-kit blocks too: anything showing ONE kit must load only that kit's
      block, or the collision above happens inside your own preview */
-  files._blocks = Object.fromEntries(routed.map((r, i) => [r.kit, blocks[i]]))
+  files._blocks = byKit
   files._collisions = collisions(routed, kits)
   return files
 }
@@ -420,6 +482,8 @@ function manifest(routed, kits, values) {
       const t = MAP[r.kit]?.[role.id]
       if (t?.overrides && values[role.id]) out.push(`- **${k.name} · ${role.id}** — this kit derives that colour itself. Your value replaces ${t.overrides}; everything else in the scheme still comes from the seed.`)
     }
+    if (r.noDarkMode) out.push(`- **${k.name} · dark mode** — this kit publishes no dark values of its own, so none were generated. Anything else would be a palette we invented.`)
+    if (r.greyscale?.length) out.push(`- **${k.name} · dark mode for \`${r.greyscale.join('`, `')}\`** — this kit's own light-to-dark change does not fit your colour: carrying it through would cost more than half its chroma to stay inside sRGB, which washes it out rather than darkening it. ${k.name === 'shadcn/ui' ? 'shadcn ships no brand colour of its own — --primary is part of its neutral ramp and simply inverts — so it has never said what to do with a colour. ' : ''}Left unchanged; check it against the contrast list.`)
     for (const c of r.chosen ?? []) {
       out.push(`- **${k.name} · ${c.role}** — not a value this kit takes. You asked for \`${c.asked}\`; the nearest of its ${c.of} published ${c.attr.replace('data-', '')} settings is **${c.picked}** (\`${c.got}\`). ${c.why}.`)
     }

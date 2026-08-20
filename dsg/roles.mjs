@@ -343,6 +343,12 @@ export function nearestChoice(want, choice) {
 /** Any published colour as OKLCH — kits write hex, oklch() or rgb(). */
 function asOklch(value) {
   const v = String(value ?? '').trim()
+  /* A translucent value is not a colour we can take a relationship out of.
+     shadcn's dark --border is oklch(1 0 0 / 10%) — white at a tenth — and
+     reading it as plain white produced a solid white border in dark mode.
+     Refusing here makes the caller fall back to the kit's own value, which is
+     the right answer for anything we cannot faithfully carry. */
+  if (/\/|rgba?\(|hsla\(|^#(?:[0-9a-f]{4}|[0-9a-f]{8})$/i.test(v)) return null
   const hex = /^#[0-9a-f]{6}$/i.test(v) ? v
     : /^#[0-9a-f]{3}$/i.test(v) ? '#' + v.slice(1).split('').map((c) => c + c).join('')
     : v.startsWith('oklch') ? oklchStrToHex(v) : null
@@ -367,9 +373,34 @@ function relative(want, base, sibling) {
   const w = asOklch(want), b = asOklch(base), s = asOklch(sibling)
   if (!w || !b || !s) return null
   const dL = s[0] - b[0]
-  const cRatio = b[1] > 0.001 ? s[1] / b[1] : 0
+  /* An achromatic pair states nothing about chroma. shadcn's neutral registry
+     has --primary at oklch(0.205 0 0) light and oklch(0.922 0 0) dark: taking
+     0/0 as "remove all chroma" turned a teal brand into grey in dark mode. When
+     they have no chroma to compare, yours is left alone. */
+  const cRatio = b[1] > 0.01 ? s[1] / b[1] : 1
   /* hue follows the value you chose, not the hue their green happened to be */
-  return oklchToHex(Math.min(1, Math.max(0, w[0] + dL)), Math.max(0, w[1] * cRatio), w[2])
+  return inGamut(Math.min(1, Math.max(0, w[0] + dL)), Math.max(0, w[1] * cRatio), w[2])
+}
+
+/**
+ * The same colour, but one sRGB can actually show.
+ *
+ * A teal pushed to shadcn's dark lightness sits outside sRGB, and converting it
+ * anyway clips the channels — which does not dim the colour, it TURNS it: a
+ * 224° teal came back at 196°, a hue nobody asked for. So chroma is walked down
+ * until the colour fits and the hue survives. Lightness and hue are what was
+ * asked for; chroma is the only part with room to give.
+ */
+function inGamut(l, c, h) {
+  for (let i = 0; i <= 24; i++) {
+    const kept = 1 - i / 24
+    const hex = oklchToHex(l, c * kept, h)
+    const back = hexToOklch(hex)
+    let d = Math.abs(back[2] - h) % 360
+    if (d > 180) d = 360 - d
+    if (d < 2 || c * kept < 0.01) return { hex, kept: c < 0.01 ? 1 : kept }
+  }
+  return { hex: oklchToHex(l, 0, h), kept: 0 }
 }
 
 /** "r, g, b" — Bootstrap keeps a second copy in that format for rgba(). */
@@ -396,6 +427,58 @@ export function seedFrom(roleId, kits, ids = Object.keys(kits)) {
     if (hex) return { value: hex, from: kits[id].name, variable: target.var }
   }
   return null
+}
+
+/**
+ * THE SAME VALUES, IN THE DARK.
+ *
+ * Nobody is going to set twenty colours twice, and inventing a dark palette
+ * from a light one is the one thing this tool is not allowed to do. But every
+ * kit here except Tailwind publishes BOTH modes, which means every kit has
+ * already stated, variable by variable, what it does when the lights go out.
+ *
+ * So it is the rule this project keeps arriving at, a third time: read the
+ * kit's own published pair, take the relationship out of it, and put your value
+ * through it. shadcn turns a white --background into oklch(0.145 0 0); your
+ * page colour gets the same treatment. A variable their dark block does not
+ * mention is one they do not change, and it is left alone.
+ *
+ * A kit with no dark mode of its own gets no dark block, and the manifest says
+ * which — guessing on its behalf would be exactly the invention we refuse.
+ */
+export function darken(routed, kits) {
+  return routed.map((r) => {
+    const light = kits[r.kit]?.modes?.light ?? {}
+    const dark = kits[r.kit]?.modes?.dark
+    if (!dark) return { ...r, dark: null, noDarkMode: true }
+    const vars = {}, greyscale = []
+    for (const [name, value] of Object.entries(r.vars)) {
+      /* absent from their dark block = unchanged by them */
+      const theirDark = dark[name]
+      if (theirDark == null || theirDark === light[name]) { vars[name] = value; continue }
+
+      /* A GREYSCALE pair says nothing about a colour.
+       *
+       * shadcn ships no brand colour: --primary is part of its neutral ramp and
+       * simply inverts, oklch(0.205 0 0) to oklch(0.922 0 0). Putting a teal
+       * through that lands past the top of the space, where no chroma survives
+       * and the answer is white. That is not deriving their intent, it is
+       * extrapolating from a statement they never made about colour — so the
+       * value is carried across unchanged and the manifest says why. */
+      const made = relative(value, light[name], theirDark)
+      /* a pair we cannot read as colour — a length, a keyword, a var() chain,
+         anything translucent — is carried across as their own dark value
+         rather than as our guess */
+      if (!made) { vars[name] = theirDark; continue }
+      /* And a relationship that does not FIT: if carrying the colour through it
+         means giving up most of its chroma to stay inside sRGB, the answer is
+         not their intent, it is a washed-out approximation of it. Measured, not
+         guessed at with a threshold on how colourful something looks. */
+      if (made.kept < 0.5) { vars[name] = value; greyscale.push(name); continue }
+      vars[name] = made.hex
+    }
+    return { ...r, dark: vars, unfit: greyscale, greyscale, noDarkMode: false }
+  })
 }
 
 export function route(values, kitIds, kits = {}) {
@@ -470,7 +553,7 @@ export function route(values, kitIds, kits = {}) {
       /* and the relatives, through the kit's own arithmetic */
       for (const name of target.tint ?? []) {
         const made = relative(v, defaults[target.var], defaults[name])
-        if (made) vars[name] = made; else unscaled.push(name)
+        if (made) vars[name] = made.hex; else unscaled.push(name)
       }
 
       const siblings = target.also ?? []

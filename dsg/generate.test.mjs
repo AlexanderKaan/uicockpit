@@ -3,6 +3,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { hexToOklch } from './color.mjs'
 import { generate, collisions } from './generate.mjs'
 import { MAP } from './roles.mjs'
 
@@ -55,10 +56,22 @@ test('a clean run says so rather than printing an empty section', () => {
 test('nothing in the package is a value we invented', () => {
   const f = generate(VALUES, ALL, KITS)
   const set = new Set(Object.values(VALUES).map((v) => v.toLowerCase()))
-  /* every colour literal in theme.css is either one the user set, or a scaled
-     length derived from a published ratio — never a hex of ours */
-  for (const m of f['theme.css'].matchAll(/#[0-9a-f]{3,8}\b/gi)) {
-    assert.ok(set.has(m[0].toLowerCase()), `${m[0]} is in the package but nobody set it`)
+  /* In the LIGHT blocks every colour literal is one the user set. In the dark
+     blocks they are derived, so the check there is that each one still carries
+     the hue of the value it came from — a derived colour, never an invented
+     one. A dark block that quietly introduced a new hue would be us picking a
+     colour, which is the one thing this tool may not do. */
+  const light = f['theme.css'].split(/^[.:@[][^\n]*\bdark\b[^\n]*\{$/m)[0]
+  for (const m of light.matchAll(/#[0-9a-f]{3,8}\b/gi)) {
+    assert.ok(set.has(m[0].toLowerCase()), `${m[0]} is in the light half but nobody set it`)
+  }
+  const hues = [...set].map((v) => hexToOklch(v)[2])
+  for (const m of f['theme.css'].matchAll(/#[0-9a-f]{6}\b/gi)) {
+    if (set.has(m[0].toLowerCase())) continue
+    const [, c, h] = hexToOklch(m[0])
+    if (c < 0.02) continue                       // a grey has no hue to match
+    assert.ok(hues.some((x) => Math.min(Math.abs(x - h), 360 - Math.abs(x - h)) < 12),
+      `${m[0]} is in the package with a hue nobody chose`)
   }
 })
 
