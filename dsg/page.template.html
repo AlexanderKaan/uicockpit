@@ -165,16 +165,24 @@ const TYPE = ROLES.filter((r) => r.kind === 'font')
 const LENGTHS = [
   { id: 'radius', min: 0, max: 24, step: 1, unit: 'px' },
   { id: 'baseText', min: 14, max: 20, step: 1, unit: 'px' },
+  /* Spacing is a MULTIPLE of the kit's own step, not a length: Tailwind's step
+     is 4px and Mantine's is 16px, so one number of ours would mean two very
+     different things. The slider reads as a percentage; the value stored is the
+     ratio each kit applies to what it published. */
+  { id: 'space', min: 80, max: 150, step: 5, unit: '%', ratio: true },
 ]
+const shown = (k, v) => (k.ratio ? `${Math.round(parseFloat(v) * 100)}%` : v)
+const slider = (k, v) => (k.ratio ? Math.round(parseFloat(v) * 100) : parseInt(v))
 
 /* A brief is not a prompt: these words map to numbers a standard already names,
    and the page SHOWS what they moved. No model, nothing to explain away. */
 const BRIEFS = [
   { match: /older|elderly|accessib|readab|low vision/i, label: 'Readable',
-    values: { baseText: '18px', radius: '8px' }, why: 'larger body text, calmer corners' },
+    values: { baseText: '18px', radius: '8px', space: '1.15' }, why: 'larger body text, calmer corners, more room' },
   { match: /round|soft|friendly|playful/i, label: 'Rounder', values: { radius: '18px' }, why: 'more rounded corners' },
   { match: /sharp|serious|bank|legal|formal/i, label: 'Sharper', values: { radius: '2px' }, why: 'almost square corners' },
-  { match: /dense|compact|data|dashboard/i, label: 'Denser', values: { baseText: '14px', radius: '6px' }, why: 'smaller text, tighter corners' },
+  { match: /dense|compact|data|dashboard/i, label: 'Denser', values: { baseText: '14px', radius: '6px', space: '0.85' }, why: 'smaller text, tighter corners, less room' },
+  { match: /roomy|airy|spacious|calm|breath/i, label: 'Roomier', values: { space: '1.3' }, why: 'more room between everything' },
 ]
 
 const state = {
@@ -183,7 +191,7 @@ const state = {
   on: new Set(['tailwind', 'shadcn']),
   get show() { return showing(stack(this.on, KITS)) },
   values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
-    ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px',
+    ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1',
     /* filled in below from whichever kit publishes one */
     success: '', warning: '', danger: '',
     /* seeded from what the base kit publishes, not from a face we like */
@@ -450,13 +458,13 @@ $('#swatches').addEventListener('input', (e) => {
 
 $('#knobs').innerHTML = LENGTHS.map((k) => {
   const role = ROLES.find((r) => r.id === k.id)
-  return `<div class="knob"><label for="k_${k.id}">${role.label}<b data-v="${k.id}">${state.values[k.id]}</b></label>
-    <input id="k_${k.id}" type="range" data-r="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${parseInt(state.values[k.id])}"></div>`
+  return `<div class="knob"><label for="k_${k.id}">${role.label}<b data-v="${k.id}">${shown(k, state.values[k.id])}</b></label>
+    <input id="k_${k.id}" type="range" data-r="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${slider(k, state.values[k.id])}"></div>`
 }).join('')
 $('#knobs').addEventListener('input', (e) => {
   const k = LENGTHS.find((x) => x.id === e.target.dataset.r)
-  state.values[k.id] = e.target.value + k.unit
-  $(`[data-v="${k.id}"]`).textContent = state.values[k.id]
+  state.values[k.id] = k.ratio ? String(Number(e.target.value) / 100) : e.target.value + k.unit
+  $(`[data-v="${k.id}"]`).textContent = shown(k, state.values[k.id])
   paint()
 })
 
@@ -511,8 +519,8 @@ function sync() {
     else { el.value = parseInt(v); $(`[data-v="${el.dataset.r}"]`).textContent = v }
   }
   for (const el of $('#knobs').querySelectorAll('[data-r]')) {
-    const v = state.values[el.dataset.r]
-    el.value = parseInt(v); $(`[data-v="${el.dataset.r}"]`).textContent = v
+    const k = LENGTHS.find((x) => x.id === el.dataset.r), v = state.values[el.dataset.r]
+    el.value = slider(k, v); $(`[data-v="${el.dataset.r}"]`).textContent = shown(k, v)
   }
   renderStack()
   typoCards()

@@ -388,7 +388,12 @@ function manifest(routed, kits, values) {
     const k = kits[r.kit]
     const out = []
     for (const b of r.needsBuild ?? []) out.push(`- **${k.name} · ${b.role}** — not settable at runtime. \`${b.sass}\` is in \`_custom.scss\`; ${b.why}.`)
-    if (r.derived?.length) out.push(`- **${k.name} · ${r.derived.join(', ')}** — computed by the kit from your brand colour. Generate the full scheme with its own tool rather than setting these by hand.`)
+    for (const [from, roles] of Object.entries(Object.groupBy(r.derived ?? [], (d) => d.from))) {
+      const names = roles.map((d) => d.role).join(', ')
+      out.push(from === 'brand'
+        ? `- **${k.name} · ${names}** — computed by the kit from your brand colour. Generate the full scheme with its own tool rather than setting these by hand.`
+        : `- **${k.name} · ${names}** — this kit ties that to \`${from}\`, so the ${from} knob already moved it. There is nothing separate to set.`)
+    }
     if (r.unroutable?.length) out.push(`- **${k.name} · ${r.unroutable.join(', ')}** — this kit has no variable for that job, so the value was not written anywhere.`)
     if (r.unscaled?.length) out.push(`- **${k.name}** — ${r.unscaled.join(', ')} were left at their published values: no ratio could be read from a unitless input.`)
     if (r.added?.length) out.push(`- **${k.name} · ${r.added.join(', ')}** — this kit ships no semantic name for these, so they were ADDED. Reference them yourself (\`bg-brand\`, \`text-ink\`).`)

@@ -91,3 +91,26 @@ test('overriding a colour a kit derives is declared, not silent', () => {
   const md = generate({ ...V, brand: '#0b6e8a' }, ['material'], kits)['MANIFEST.md']
   assert.match(md, /derives that colour itself/, 'Material derives an error role and nothing says we replaced it')
 })
+
+test('spacing is a multiple of the kit\'s own step, never a length of ours', () => {
+  /* Tailwind's step is 4px and Mantine's is 16px. One number of ours written
+     into both would give Tailwind a padding four times too large. */
+  const r = Object.fromEntries(route({ space: '1.25' }, IDS, kits).map((x) => [x.kit, x]))
+  assert.equal(r.tailwind.vars['--spacing'], '0.3125rem', 'Tailwind 0.25rem × 1.25')
+  assert.equal(r.mantine.vars['--mantine-scale'], '1.25', 'Mantine publishes a bare multiplier for exactly this')
+  assert.equal(r.openprops.vars['--size-3'], '1.25rem')
+  assert.equal(r.openprops.vars['--size-1'], '0.3125rem', 'every step of their scale moves together')
+  assert.ok(r.bootstrap.needsBuild.some((b) => b.sass === '$spacer'), 'Bootstrap compiles its spacer')
+  assert.ok(coverage('material').missing.includes('space'), 'M3 publishes no spacing scale at all')
+  assert.deepEqual(r.daisyui.vars, {}, 'daisyUI rides on the base step')
+})
+
+test('a scale published as calc() is still a scale', () => {
+  /* Mantine writes calc(0.5rem * var(--mantine-scale)). A reader that only
+     matched a bare length saw nothing there, so every radius and spacing
+     sibling was left at its published value and reported as unscalable. */
+  const r = route({ radius: '14px' }, ['mantine'], kits)[0]
+  assert.equal(r.vars['--mantine-radius-md'], '14px')
+  assert.equal(r.vars['--mantine-radius-xs'], '3.5px', 'their own published quarter-step ratio')
+  assert.deepEqual(r.unscaled, [])
+})

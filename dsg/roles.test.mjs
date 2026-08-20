@@ -101,7 +101,13 @@ test('a kit that derives its colours takes the seed and nothing else', () => {
   for (const v of ['--md-sys-color-surface', '--md-sys-color-on-surface', '--md-sys-color-outline']) {
     assert.equal(mat.vars[v], undefined, `${v} is computed by M3 from the seed — writing it half-themes the kit`)
   }
-  assert.deepEqual(mat.derived.sort(), ['ink', 'inkMuted', 'line', 'onBrand', 'page', 'surface'])
+  /* and each one says what it is derived FROM — Material from the brand seed,
+     Radix from the size setting. One sentence for both was wrong for one. */
+  assert.deepEqual(mat.derived.map((d) => d.role).sort(), ['ink', 'inkMuted', 'line', 'onBrand', 'page', 'surface'])
+  assert.ok(mat.derived.every((d) => d.from === 'brand'))
+  const [rx] = route({ space: '1.25' }, ['radix'], KITS)
+  assert.ok(rx.derived.some((d) => d.role === 'space' && d.from === 'baseText'),
+    'Radix ties space to its scaling setting, which is the size knob')
   assert.deepEqual(mat.seeds, [{ role: 'brand', by: '@material/material-color-utilities' }])
 })
 

@@ -36,6 +36,7 @@ export const ROLES = [
   { id: 'danger',   label: 'Danger',       kind: 'colour', what: 'the colour that says it failed' },
   { id: 'fontHeading', label: 'Headings', kind: 'font', what: 'the family headings are set in' },
   { id: 'fontBody',    label: 'Body',     kind: 'font', what: 'the family everything else is set in' },
+  { id: 'space',    label: 'Spacing',      kind: 'ratio',  what: 'how much room everything gets, as a multiple of the kit\'s own step' },
   { id: 'radius',   label: 'Corner radius', kind: 'length', what: 'how round a box is' },
   { id: 'baseText', label: 'Base text',    kind: 'length', what: 'the size body text is set at' },
 ]
@@ -61,6 +62,9 @@ export const MAP = {
     success:  { var: '--color-success', new: true },
     warning:  { var: '--color-warning', new: true },
     danger:   { var: '--color-danger', new: true },
+    /* ONE unit. Tailwind computes every spacing utility as
+       calc(var(--spacing) * n), so this single value moves p-4, gap-6, the lot. */
+    space:    { var: '--spacing', scale: true },
   },
   radix: {
     _note: 'Radix does not take values, it takes CHOICES from sets it publishes: named accent scales, named grey scales, five radius settings and five scaling steps. Only the page and panel colours are really variables. Every scale is twelve hand-built steps, so a single step written by hand is eleven steps out of step — the knobs are matched to the nearest published set instead, and the manifest names it.',
@@ -80,6 +84,9 @@ export const MAP = {
     success:  { choice: 'brand', attr: 'tone' },
     warning:  { choice: 'brand', attr: 'tone' },
     danger:   { choice: 'brand', attr: 'tone' },
+    /* Radix scales type and space with ONE setting, so the size choice already
+       moved the space scale — there is nothing separate to set. */
+    space:    { derives: 'baseText' },
   },
   mantine: {
     _note: 'Semantic variables throughout, and all settable at runtime. Its COMPONENT class names are content hashes, which is a separate problem and not this table\'s.',
@@ -97,6 +104,8 @@ export const MAP = {
     success:  { var: '--mantine-color-success' },
     warning:  null,
     danger:   { var: '--mantine-color-error' },
+    /* --mantine-scale is a bare multiplier they publish for exactly this. */
+    space:    { var: '--mantine-scale', scale: true },
   },
   openprops: {
     _note: 'Scales, plus the small semantic layer its normalize ships. Open Props renders nothing itself — it sits under whatever does, so your own CSS agrees with the kit above it.',
@@ -114,6 +123,8 @@ export const MAP = {
     success:  { var: '--success', new: true },
     warning:  { var: '--warning', new: true },
     danger:   { var: '--danger', new: true },
+    space:    { var: '--size-3', scale: true,
+                also: ['--size-1', '--size-2', '--size-4', '--size-5', '--size-6', '--size-7', '--size-8', '--size-9'] },
   },
   shadcn: {
     _note: 'Semantic variables by design, unprefixed. --border here is a COLOUR.',
@@ -136,6 +147,7 @@ export const MAP = {
     success:  null,
     warning:  null,
     danger:   { var: '--destructive' },
+    space:    { inherits: 'the base' },
   },
   bootstrap: {
     _note: 'Runtime-themeable for surface, ink, line, radius and type — --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
@@ -171,6 +183,7 @@ export const MAP = {
                    moves the emphasis text and leaves every component alone */
                 needsBuild: { sass: '$danger', why: 'Bootstrap compiles its component colours; setting --bs-danger alone changes the emphasis text and nothing else' },
                 tint: ['--bs-danger-text-emphasis', '--bs-danger-bg-subtle', '--bs-danger-border-subtle'] },
+    space:    { needsBuild: { sass: '$spacer', why: 'Bootstrap has no spacing variable at runtime; p-3 and gap-4 are compiled from $spacer' } },
   },
   material: {
     _note: 'M3 takes ONE input. Its 47 colour roles — containers, on-colours, inverses, fixed variants — are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
@@ -200,6 +213,8 @@ export const MAP = {
        two never met. */
     danger:   { var: '--md-sys-color-error', overrides: 'the scheme its generator derives from your seed',
                 tint: ['--md-sys-color-on-error', '--md-sys-color-error-container', '--md-sys-color-on-error-container'] },
+    /* M3 publishes colour and shape tokens and no spacing scale at all. */
+    space:    null,
   },
   daisyui: {
     _note: 'Registers into Tailwind\'s --color-* namespace on purpose. --border here is a WIDTH, not a colour.',
@@ -219,6 +234,7 @@ export const MAP = {
     success:  { var: '--color-success', tint: ['--color-success-content'] },
     warning:  { var: '--color-warning', tint: ['--color-warning-content'] },
     danger:   { var: '--color-error', tint: ['--color-error-content'] },
+    space:    { inherits: 'the base' },
   },
 }
 
@@ -234,7 +250,10 @@ export function coverage(kitId) {
   const m = MAP[kitId] ?? {}
   const missing = ROLES.filter((r) => m[r.id] === null).map((r) => r.id)
   const added = ROLES.filter((r) => m[r.id]?.new).map((r) => r.id)
-  const derived = ROLES.filter((r) => m[r.id]?.derives).map((r) => r.id)
+  /* WHAT it is derived from, not just that it is: Material computes its
+     colours from the brand seed, Radix ties its space scale to the size
+     setting. One sentence for both was wrong for one of them. */
+  const derived = ROLES.filter((r) => m[r.id]?.derives).map((r) => ({ role: r.id, from: m[r.id].derives }))
   /* A fourth answer, and the one people most need before they choose a kit:
      the kit CAN take this, but not while the page is running. The export
      carries a build-time line instead of a variable. */
@@ -244,7 +263,17 @@ export function coverage(kitId) {
   return { missing, added, derived, needsBuild, seeds, note: m._note }
 }
 
-const LEN = /^(-?[\d.]+)(rem|em|px)$/
+/**
+ * A length, including the ones a kit wraps in calc().
+ *
+ * Mantine publishes `calc(1rem * var(--mantine-scale))` and Radix
+ * `calc(4px * var(--scaling))` — both are a real length multiplied by a knob
+ * of their own. A regex that only matched a bare length read those as nothing,
+ * so every Mantine radius and spacing sibling was reported as "no ratio could
+ * be read" and left at its published value. The first length in the expression
+ * is the one the ratio lives in; their multiplier stays theirs.
+ */
+const LEN = /^(?:calc\(\s*)?(-?[\d.]+)(rem|em|px)\b/
 const KIND = Object.fromEntries(ROLES.map((r) => [r.id, r.kind]))
 
 /**
@@ -389,6 +418,27 @@ export function route(values, kitIds, kits = {}) {
       /* A role this kit computes for itself is not ours to write. Setting four
          of Material's forty-seven colour roles and calling it themed is exactly
          the half-applied theme this whole file exists to prevent. */
+      /* A RATIO, not a length.
+       *
+       * Spacing is the one knob that cannot be a number of ours: Tailwind's
+       * step is 4px and Mantine's is 16px, so writing 12px into both would give
+       * Tailwind a 48px padding where Mantine gets 12. What every kit here does
+       * publish is a way to scale its OWN step — Mantine and Radix ship a bare
+       * multiplier for exactly this — so the knob is a multiple and each kit
+       * applies it to what it published. */
+      if (target.scale) {
+        const f = parseFloat(v)
+        if (!Number.isFinite(f)) { unroutable.push(role.id); continue }
+        for (const name of [target.var, ...(target.also ?? [])]) {
+          const own = String(defaults[name] ?? '')
+          const len = LEN.exec(own)
+          if (len) { vars[name] = `${Number((Number(len[1]) * f).toFixed(4))}${len[2]}`; continue }
+          const bare = Number(own)
+          if (own.trim() !== '' && Number.isFinite(bare)) { vars[name] = String(Number((bare * f).toFixed(4))); continue }
+          unscaled.push(name)
+        }
+        continue
+      }
       if (target.derives) continue
       /* the layer under this one already answers it — not a gap, and not ours
          to write twice */
