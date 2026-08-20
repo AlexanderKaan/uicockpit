@@ -465,7 +465,7 @@ function manifest(routed, kits, values) {
   const caveats = routed.flatMap((r) => {
     const k = kits[r.kit]
     const out = []
-    for (const b of r.needsBuild ?? []) out.push(`- **${k.name} · ${b.role}** — not settable at runtime. \`${b.sass}\` is in \`_custom.scss\`; ${b.why}.`)
+    for (const b of r.needsBuild ?? []) out.push(`- **${k.name} · ${b.role}** — not settable at runtime. \`${b.sass}\` is in \`${b.where ?? '_custom.scss'}\`; ${b.why}.`)
     for (const [from, roles] of Object.entries(Object.groupBy(r.derived ?? [], (d) => d.from))) {
       const names = roles.map((d) => d.role).join(', ')
       out.push(from === 'brand'

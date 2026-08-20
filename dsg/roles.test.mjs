@@ -34,12 +34,16 @@ test('every variable we write into exists in the kit that publishes it', () => {
 
 test('a role a kit cannot take is named, never silently dropped', () => {
   const daisy = coverage('daisyui')
-  assert.deepEqual(daisy.missing.sort(), ['baseText', 'inkMuted', 'line'],
-    'daisyUI has no muted ink and no border COLOUR — --border there is a width')
+  assert.deepEqual(daisy.missing.sort(), ['baseText', 'elevation', 'focus', 'inkMuted', 'line'],
+    'daisyUI has no muted ink, no border COLOUR (--border there is a width), no focus token, and a 0/1 depth flag rather than a shadow scale')
   /* shadcn ships ONE semantic colour — --destructive — and no success or
      warning at all. Material ships only error, because M3 has no other. Both
      say so rather than growing a name their components do not read. */
   assert.deepEqual(coverage('shadcn').missing.sort(), ['baseText', 'success', 'warning'])
+  /* four of the eight publish no focus token at all — the finding this role
+     exists to make, and the reason it is worth a knob that reaches three kits */
+  const noFocus = ['daisyui', 'material', 'mantine', 'openprops'].filter((k) => coverage(k).missing.includes('focus'))
+  assert.deepEqual(noFocus, ['daisyui', 'material', 'mantine', 'openprops'])
   assert.ok(coverage('material').missing.includes('success'))
   assert.ok(coverage('mantine').missing.includes('warning'), 'Mantine has error and success but no warning')
   assert.ok(coverage('tailwind').added.includes('brand'), 'Tailwind has no semantic brand; we add one')

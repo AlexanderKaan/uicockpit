@@ -230,6 +230,7 @@ const LENGTHS = [
      different things. The slider reads as a percentage; the value stored is the
      ratio each kit applies to what it published. */
   { id: 'space', min: 80, max: 150, step: 5, unit: '%', ratio: true },
+  { id: 'elevation', min: 0, max: 250, step: 10, unit: '%', ratio: true },
 ]
 const shown = (k, v) => (k.ratio ? `${Math.round(parseFloat(v) * 100)}%` : v)
 const slider = (k, v) => (k.ratio ? Math.round(parseFloat(v) * 100) : parseInt(v))
@@ -253,7 +254,7 @@ const state = {
   rung: 'all',
   mode: 'light',
   values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
-    ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1',
+    ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
     /* filled in below from whichever kit publishes one */
     success: '', warning: '', danger: '',
     /* seeded from what the base kit publishes, not from a face we like */
@@ -777,12 +778,20 @@ function receipt(routed) {
           own.theirs < own.used ? ` — ${own.used - own.theirs === 1 ? 'one is' : (own.used - own.theirs) + ' are'} ours` : ''}`
       : `<b>nothing of theirs</b> on this screen at all`
 
+  /* a role the shown kit compiles rather than reads, named while you are
+     turning its knob rather than after you download */
+  /* across the whole stack, not the top layer: it is Tailwind that compiles a
+     shadow, and shadcn — which rides on it — is what you are looking at. */
+  const compiled = routed.flatMap((r) => (r.needsBuild ?? []).map((b) => ({ ...b, kit: r.kit })))
+    .filter((b) => state.values[b.role] != null && b.role === 'elevation')
   const needs = routed.filter((r) => !LIVE_BRAND[r.kit] && state.show === r.kit)
   note(needs.length
     ? `<b>${KITS[state.show].name}</b> — ${state.show === 'bootstrap'
         ? 'its component colours — brand, success, warning and danger — are compiled by Sass, so this frame shows the build we made. Your download carries the Sass lines that change them.'
         : 'it derives its colours from the seed with its own generator, so this frame shows a pre-derived scheme. Your download carries the seed.'}`
-    : '')
+    : compiled.length
+      ? `<b>${KITS[compiled[0].kit].name}</b> — ${compiled.map((b) => b.role).join(', ')} is compiled into its utilities rather than read at runtime, so this frame cannot show the change. Your download carries the value; ${KITS[compiled[0].kit].name}'s own build puts it into the components.`
+      : '')
 }
 
 /* ── the two outputs ──────────────────────────────────────────────────────── */
@@ -872,7 +881,7 @@ $('#sheetx').addEventListener('click', () => $('#sheet').close())
 /* ||=, not ??=: the placeholders above are empty strings, and an empty
    string is neither null nor undefined — the three knobs opened on black. */
 for (const [role, seed] of Object.entries(SEEDS)) state.values[role] ||= seed.value
-for (const role of ['success', 'warning', 'danger']) if (!state.values[role]) delete state.values[role]
+for (const role of ['success', 'warning', 'danger', 'focus']) if (!state.values[role]) delete state.values[role]
 
 for (const role of TYPE) {
   if (state.values[role.id]) continue

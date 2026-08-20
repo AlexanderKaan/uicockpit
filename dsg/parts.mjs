@@ -17,6 +17,7 @@ export const PARTS = [
   'button', 'input', 'select', 'checkbox', 'switch',   // controls
   'badge', 'alert', 'stat', 'table', 'avatar', 'tabs', // display
   'navbar', 'mediacard', 'footer',                     // organisms
+  'elevation',                                         // foundation specimen
 ]
 
 /**

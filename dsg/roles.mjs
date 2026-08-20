@@ -36,6 +36,8 @@ export const ROLES = [
   { id: 'danger',   label: 'Danger',       kind: 'colour', what: 'the colour that says it failed' },
   { id: 'fontHeading', label: 'Headings', kind: 'font', what: 'the family headings are set in' },
   { id: 'fontBody',    label: 'Body',     kind: 'font', what: 'the family everything else is set in' },
+  { id: 'focus',    label: 'Focus ring',   kind: 'colour', what: 'the ring that says where the keyboard is' },
+  { id: 'elevation', label: 'Elevation',   kind: 'ratio',  what: 'how strongly things lift off the page' },
   { id: 'space',    label: 'Spacing',      kind: 'ratio',  what: 'how much room everything gets, as a multiple of the kit\'s own step' },
   { id: 'radius',   label: 'Corner radius', kind: 'length', what: 'how round a box is' },
   { id: 'baseText', label: 'Base text',    kind: 'length', what: 'the size body text is set at' },
@@ -65,6 +67,14 @@ export const MAP = {
     /* ONE unit. Tailwind computes every spacing utility as
        calc(var(--spacing) * n), so this single value moves p-4, gap-6, the lot. */
     space:    { var: '--spacing', scale: true },
+    focus:    { var: '--color-ring', new: true },
+    /* Tailwind INLINES the shadow into the utility at build time:
+       .shadow-sm carries `0 1px 3px 0 var(--tw-shadow-color, #0000001a)` and
+       never reads var(--shadow-sm). So the variable is a build input, the same
+       answer Bootstrap's brand gives, and a running page cannot show it. */
+    elevation: { shadows: ['--shadow-2xs', '--shadow-xs', '--shadow-sm', '--shadow-md', '--shadow-lg', '--shadow-xl', '--shadow-2xl'],
+                 needsBuild: { where: 'theme.css', sass: '--shadow-*',
+                   why: 'Tailwind compiles each shadow utility from the theme, so the new values only appear after its build runs again' } },
   },
   radix: {
     _note: 'Radix does not take values, it takes CHOICES from sets it publishes: named accent scales, named grey scales, five radius settings and five scaling steps. Only the page and panel colours are really variables. Every scale is twelve hand-built steps, so a single step written by hand is eleven steps out of step — the knobs are matched to the nearest published set instead, and the manifest names it.',
@@ -87,6 +97,12 @@ export const MAP = {
     /* Radix scales type and space with ONE setting, so the size choice already
        moved the space scale — there is nothing separate to set. */
     space:    { derives: 'baseText' },
+    /* --focus-1..12 ARE the accent scale: Radix's focus ring follows the accent
+       you chose, so there is nothing separate to set. */
+    focus:    { derives: 'brand' },
+    /* and its shadows are built from --gray-a* and colour-mix(): the alpha
+       lives in a variable, so there is no strength in the string to scale. */
+    elevation: null,
   },
   mantine: {
     _note: 'Semantic variables throughout, and all settable at runtime. Its COMPONENT class names are content hashes, which is a separate problem and not this table\'s.',
@@ -106,6 +122,8 @@ export const MAP = {
     danger:   { var: '--mantine-color-error' },
     /* --mantine-scale is a bare multiplier they publish for exactly this. */
     space:    { var: '--mantine-scale', scale: true },
+    focus:    null,
+    elevation: { shadows: ['--mantine-shadow-xs', '--mantine-shadow-sm', '--mantine-shadow-md', '--mantine-shadow-lg', '--mantine-shadow-xl'] },
   },
   openprops: {
     _note: 'Scales, plus the small semantic layer its normalize ships. Open Props renders nothing itself — it sits under whatever does, so your own CSS agrees with the kit above it.',
@@ -125,6 +143,9 @@ export const MAP = {
     danger:   { var: '--danger', new: true },
     space:    { var: '--size-3', scale: true,
                 also: ['--size-1', '--size-2', '--size-4', '--size-5', '--size-6', '--size-7', '--size-8', '--size-9'] },
+    focus:    null,
+    /* Open Props publishes the knob itself: one strength every shadow reads. */
+    elevation: { shadows: ['--shadow-strength'] },
   },
   shadcn: {
     _note: 'Semantic variables by design, unprefixed. --border here is a COLOUR.',
@@ -148,6 +169,8 @@ export const MAP = {
     warning:  null,
     danger:   { var: '--destructive' },
     space:    { inherits: 'the base' },
+    focus:    { var: '--ring' },
+    elevation: { inherits: 'the base' },
   },
   bootstrap: {
     _note: 'Runtime-themeable for surface, ink, line, radius and type — --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
@@ -184,6 +207,8 @@ export const MAP = {
                 needsBuild: { sass: '$danger', why: 'Bootstrap compiles its component colours; setting --bs-danger alone changes the emphasis text and nothing else' },
                 tint: ['--bs-danger-text-emphasis', '--bs-danger-bg-subtle', '--bs-danger-border-subtle'] },
     space:    { needsBuild: { sass: '$spacer', why: 'Bootstrap has no spacing variable at runtime; p-3 and gap-4 are compiled from $spacer' } },
+    focus:    { var: '--bs-focus-ring-color', alphaFrom: '--bs-focus-ring-opacity' },
+    elevation: { shadows: ['--bs-box-shadow', '--bs-box-shadow-sm', '--bs-box-shadow-lg', '--bs-box-shadow-inset'] },
   },
   material: {
     _note: 'M3 takes ONE input. Its 47 colour roles — containers, on-colours, inverses, fixed variants — are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
@@ -215,6 +240,8 @@ export const MAP = {
                 tint: ['--md-sys-color-on-error', '--md-sys-color-error-container', '--md-sys-color-on-error-container'] },
     /* M3 publishes colour and shape tokens and no spacing scale at all. */
     space:    null,
+    focus:    null,
+    elevation: null,
   },
   daisyui: {
     _note: 'Registers into Tailwind\'s --color-* namespace on purpose. --border here is a WIDTH, not a colour.',
@@ -235,6 +262,9 @@ export const MAP = {
     warning:  { var: '--color-warning', tint: ['--color-warning-content'] },
     danger:   { var: '--color-error', tint: ['--color-error-content'] },
     space:    { inherits: 'the base' },
+    focus:    null,
+    /* daisyUI publishes --depth, a 0/1 flag, not a shadow scale. */
+    elevation: null,
   },
 }
 
@@ -403,6 +433,9 @@ function inGamut(l, c, h) {
   return { hex: oklchToHex(l, 0, h), kept: 0 }
 }
 
+/** an alpha, scaled and kept inside the range it has to live in */
+const alpha = (n, f) => String(Number(Math.min(1, Math.max(0, Number(n) * f)).toFixed(4)))
+
 /** "r, g, b" — Bootstrap keeps a second copy in that format for rgba(). */
 function asRgbTriple(value) {
   const hex = /^#[0-9a-f]{6}$/i.test(String(value)) ? String(value)
@@ -509,6 +542,28 @@ export function route(values, kitIds, kits = {}) {
        * publish is a way to scale its OWN step — Mantine and Radix ship a bare
        * multiplier for exactly this — so the knob is a multiple and each kit
        * applies it to what it published. */
+      /* A SHADOW is a composite string and no kit publishes a single number
+       * for it. What every published shadow does have is a strength — the alpha
+       * of its colour — so the knob is a multiple applied to the alphas in
+       * their OWN string. Their shadow, your strength.
+       *
+       * Radix builds its shadows out of --gray-a5 and colour-mix(), where the
+       * alpha lives in a variable rather than in the string; there is nothing
+       * to scale, and that is reported instead of half-done. */
+      if (target.shadows) {
+        const f = parseFloat(v)
+        if (!Number.isFinite(f)) { unroutable.push(role.id); continue }
+        for (const name of target.shadows) {
+          const own = String(defaults[name] ?? '')
+          if (!own) { unscaled.push(name); continue }
+          let touched = 0
+          const made = own
+            .replace(/(rgba?\([^)]*?[,/]\s*)([\d.]+)(\s*\))/gi, (_, a, n, b) => { touched++; return a + alpha(n, f) + b })
+            .replace(/^([\d.]+)%$/, (_, n) => { touched++; return `${Number((Number(n) * f).toFixed(4))}%` })
+          if (touched) vars[name] = made; else unscaled.push(name)
+        }
+        continue
+      }
       if (target.scale) {
         const f = parseFloat(v)
         if (!Number.isFinite(f)) { unroutable.push(role.id); continue }
@@ -542,7 +597,14 @@ export function route(values, kitIds, kits = {}) {
         continue
       }
       if (!target.var) continue            // build-time only; carried in the package, not as a variable
-      vars[target.var] = v
+      /* Some roles are published TRANSLUCENT. Bootstrap's focus ring is its
+         brand at a quarter — writing an opaque hex there gives a solid slab
+         where a soft ring belongs. Their opacity, your colour. */
+      if (target.alphaFrom) {
+        const a = parseFloat(defaults[target.alphaFrom])
+        const t = asRgbTriple(v)
+        vars[target.var] = (Number.isFinite(a) && t) ? `rgba(${t}, ${a})` : v
+      } else vars[target.var] = v
 
       /* the same colour in the format a second variable expects — writing a hex
          into --bs-success-rgb would leave every rgba(var(...), .5) invalid */

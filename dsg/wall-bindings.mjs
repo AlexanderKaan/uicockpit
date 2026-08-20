@@ -62,6 +62,8 @@ const tailwind = {
       list(n.groups).map((g) => `<div class="flex flex-col gap-2"><p class="text-xs font-semibold text-ink">${esc(g.title)}</p>${
         list(g.items).map((t) => `<a href="#" class="text-sm text-ink-muted hover:text-ink">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
     <p class="mt-6 text-sm text-ink-muted">${esc(n.note)}</p></footer>`,
+  elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv) =>
+    `<div class="flex h-16 w-24 items-center justify-center rounded-lg bg-surface text-xs text-ink-muted shadow-${lv}">${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<div class="flex gap-4 border-b border-line text-sm">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'border-b-2 border-brand pb-2 font-medium text-ink' : 'pb-2 text-ink-muted'}">${esc(t)}</span>`).join('')}</div>`,
 }
 
@@ -104,6 +106,8 @@ const daisyui = {
     list(n.groups).map((g) => `<nav><h6 class="footer-title">${esc(g.title)}</h6>${
       list(g.items).map((t) => `<a class="link link-hover">${esc(t)}</a>`).join('')}</nav>`).join('')}
     </footer><footer class="footer footer-center bg-base-200 text-base-content px-8 pb-6"><aside><p>${esc(n.note)}</p></aside></footer>`,
+  elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv) =>
+    `<div class="card bg-base-100 shadow-${lv} h-16 w-24"><div class="card-body items-center justify-center p-0 text-xs opacity-60">${esc(lv)}</div></div>`).join('')}</div>`,
   tabs:    (n) => `<div class="tabs tabs-border">${list(n.items).map((t, i) => `<a class="tab${i === 0 ? ' tab-active' : ''}">${esc(t)}</a>`).join('')}</div>`,
 }
 
@@ -146,6 +150,8 @@ const bootstrap = {
     <div class="row">${list(n.groups).map((g) => `<div class="col"><h6 class="text-body-emphasis">${esc(g.title)}</h6>
       <ul class="nav flex-column">${list(g.items).map((t) => `<li class="nav-item"><a href="#" class="nav-link px-0">${esc(t)}</a></li>`).join('')}</ul></div>`).join('')}</div>
     <p class="text-body-secondary mb-0 mt-3">${esc(n.note)}</p></footer>`,
+  elevation: (n) => `<div class="d-flex flex-wrap align-items-center gap-3">${list(n.levels).map((lv, i) =>
+    `<div class="card ${['shadow-sm', 'shadow', 'shadow-lg'][i] ?? 'shadow'} d-flex align-items-center justify-content-center small text-body-secondary" style="width:6rem;height:4rem">${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<ul class="nav nav-tabs">${list(n.items).map((t, i) => `<li class="nav-item"><a class="nav-link${i === 0 ? ' active' : ''}">${esc(t)}</a></li>`).join('')}</ul>`,
 }
 
@@ -209,6 +215,8 @@ const shadcn = {
       list(n.groups).map((g) => `<div class="flex flex-col gap-2"><div class="text-xs font-semibold">${esc(g.title)}</div>${
         list(g.items).map((t) => `<a href="#" class="text-muted-foreground text-sm">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
     <p class="text-muted-foreground mt-6 text-sm">${esc(n.note)}</p></footer>`,
+  elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv, i) =>
+    `<div class="bg-card text-muted-foreground flex h-16 w-24 items-center justify-center rounded-xl border text-xs ${['shadow-xs', 'shadow-sm', 'shadow-lg'][i] ?? 'shadow-sm'}">${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<div class="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'bg-background text-foreground shadow-sm ' : ''}inline-flex h-[calc(100%-1px)] items-center justify-center rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap">${esc(t)}</span>`).join('')}</div>`,
 }
 
@@ -294,6 +302,10 @@ const material = {
         <p class="md-typescale-label-large" style="margin:0">${esc(g.title)}</p>${
         list(g.items).map((t) => `<a href="#" class="md-typescale-body-medium" style="color:var(--md-sys-color-on-surface-variant);text-decoration:none">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
     <p class="md-typescale-body-small" style="margin:24px 0 0;color:var(--md-sys-color-on-surface-variant)">${esc(n.note)}</p></footer>`,
+  /* M3 has an elevation model; @material/web ships md-elevation as an element
+     and no level tokens, so the specimen is their element at its own levels. */
+  elevation: (n) => `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px">${list(n.levels).map((lv, i) =>
+    `<div style="position:relative;width:96px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:var(--md-sys-shape-corner-md);background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface-variant);font-size:12px"><md-elevation style="--md-elevation-level:${i + 1}"></md-elevation>${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<md-tabs>${list(n.items).map((t, i) => `<md-primary-tab${i === 0 ? ' active' : ''}>${esc(t)}</md-primary-tab>`).join('')}</md-tabs>`,
 }
 
@@ -366,6 +378,8 @@ const radix = {
         <p class="rt-Text rt-r-size-1 rt-Strong">${esc(g.title)}</p>${
         list(g.items).map((t) => `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
     <p class="rt-Text rt-r-size-1" data-accent-color="gray" style="margin-top:var(--space-5)">${esc(n.note)}</p></footer>`,
+  elevation: (n) => `<div class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4)">${list(n.levels).map((lv, i) =>
+    `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-1 rt-variant-surface" style="width:96px;height:64px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-${i + 2})"><span class="rt-Text rt-r-size-1" data-accent-color="gray">${esc(lv)}</span></div>`).join('')}</div>`,
   tabs:    (n) => `<nav class="rt-reset rt-BaseTabList rt-r-size-2">${list(n.items).map((t, i) =>
     `<div class="rt-TabNavItem"><a class="rt-reset rt-BaseTabListTrigger rt-TabNavLink"${i === 0 ? ' data-state="active"' : ''}><span class="rt-BaseTabListTriggerInner">${esc(t)}</span><span class="rt-BaseTabListTriggerInnerHidden">${esc(t)}</span></a></div>`).join('')}</nav>`,
 }
@@ -446,6 +460,8 @@ const mantine = {
         <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);font-weight:600">${esc(g.title)}</p>${
         list(g.items).map((t) => `<a class="${mc('Anchor')}" href="#" style="--anchor-color:var(--mantine-color-dimmed)">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
     <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-sm);--text-color:var(--mantine-color-dimmed);margin-top:var(--mantine-spacing-lg)">${esc(n.note)}</p></footer>`,
+  elevation: (n) => `<div class="${mc('Group')}">${list(n.levels).map((lv) =>
+    `<div class="${cls(mc('Paper'), mc('Card'))}" data-orientation="vertical" style="--paper-shadow:var(--mantine-shadow-${lv});width:96px;height:64px;display:flex;align-items:center;justify-content:center"><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed)">${esc(lv)}</span></div>`).join('')}</div>`,
   tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal"><div class="${mc('Tabs', 'list')}" role="tablist">${
     list(n.items).map((t, i) => `<button class="${mc('Tabs', 'tab')}" role="tab"${i === 0 ? ' data-active="true"' : ''}>${esc(t)}</button>`).join('')}</div></div>`,
 }

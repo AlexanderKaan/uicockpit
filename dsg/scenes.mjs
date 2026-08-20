@@ -114,4 +114,17 @@ export const SCENES = [
         ] },
     ] },
   },
+  {
+    /* The two foundations no component library shows you: how strongly things
+       lift, and where the keyboard is. The focus ring cannot be drawn without
+       focusing something, and a wall that steals focus is worse than one that
+       does not show it — so the specimen asks you to tab into it. */
+    id: 'foundation', rung: 'parts', title: 'Elevation and focus', span: 6,
+    node: { p: 'stack', gap: 4, kids: [
+      { p: 'muted', text: 'Elevation' },
+      { p: 'elevation', levels: ['sm', 'md', 'lg'] },
+      { p: 'muted', text: 'Focus ring — tab into this field to see it' },
+      { p: 'input', placeholder: 'Tab here' },
+    ] },
+  },
 ]

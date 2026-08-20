@@ -29,14 +29,14 @@ import { join } from 'node:path'
 const OUT = process.argv[2] ?? 'index.html'
 const IDS = (process.env.DSG_KITS ?? 'tailwind,daisyui,shadcn,bootstrap,material,radix,mantine,openprops').split(',')
 const SEED = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
-  ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1' }
+  ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(kits.mantine?.classes)
 
 /* The semantic knobs open on a published value, not on a green we picked. The
  * order is the order kits are asked in, and the page says which kit answered. */
 const SEEDS = {}
-for (const role of ['success', 'warning', 'danger']) {
+for (const role of ['success', 'warning', 'danger', 'focus']) {
   const seed = seedFrom(role, kits, ['daisyui', 'bootstrap', 'mantine', 'material', 'shadcn', 'radix'])
   if (seed) { SEED[role] = seed.value; SEEDS[role] = seed }
 }
