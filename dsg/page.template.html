@@ -117,11 +117,12 @@ const DERIVED = /*DERIVED*/;
 const WALLS = /*WALLS*/;
 const SCRIPTS = /*SCRIPTS*/;
 const OWN = /*OWN*/;
+const RENDERS = /*RENDERS*/;
 const ICONS = /*ICONS*/;
 const ico = (n, s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] ?? ''}</svg>`
 
 const $ = (s) => document.querySelector(s)
-const ORDER = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material']
+const ORDER = ['openprops', 'tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material', 'radix', 'mantine']
 const SWATCH = ROLES.filter((r) => r.kind === 'colour')
 const LENGTHS = [
   { id: 'radius', min: 0, max: 24, step: 1, unit: 'px' },
@@ -148,47 +149,66 @@ const state = {
 }
 
 /* ── the frames ───────────────────────────────────────────────────────────── */
-$('#frames').innerHTML = ORDER.map((id) =>
-  `<iframe id="f_${id}" hidden title="${KITS[id].name}" srcdoc="${
-    `<!doctype html><meta charset=utf-8><style>${CSS[id] ?? ''}</style><style id=live></style><body>${WALLS[id] ?? ''}`
-      .replace(/"/g, '&quot;')}"></iframe>`).join('')
+useMantineClasses(KITS.mantine.classes)
 
-/* Material's components are code, not classes, so its frame gets Google's real
- * @material/web bundle. It is injected into the frame's document rather than
- * written into srcdoc: inside an attribute every quote in 260 kB of their code
- * becomes six characters, and the page went from 513 kB to 1.2 MB. */
-for (const id of Object.keys(SCRIPTS)) {
-  const f = $('#f_' + id); if (!f) continue
-  const run = () => {
-    const d = f.contentDocument; if (!d || d.getElementById('kit-elements')) return
-    const s = d.createElement('script')
-    s.type = 'module'; s.id = 'kit-elements'; s.textContent = SCRIPTS[id]
-    d.body.appendChild(s)
+/* Seven kits' real stylesheets is two megabytes of CSS, and Radix alone is
+ * eight hundred kilobytes. Writing every frame's document up front made the
+ * browser parse all of it to show one. A frame is built the first time you
+ * actually look at it. */
+$('#frames').innerHTML = RENDERS.map((id) =>
+  `<iframe id="f_${id}" hidden title="${KITS[id].name}"></iframe>`).join('')
+
+const BUILT = new Set()
+function build(id) {
+  if (BUILT.has(id)) return
+  BUILT.add(id)
+  const f = $('#f_' + id); if (!f) return
+  f.srcdoc = `<!doctype html><meta charset=utf-8><style>${CSS[id] ?? ''}</style><style id=live></style><body>${WALLS[id] ?? ''}`
+  if (SCRIPTS[id]) {
+    /* Material's components are code, injected rather than written into srcdoc:
+     * inside an attribute every quote in 260 kB of their code becomes six
+     * characters, and the page went from 513 kB to 1.2 MB. */
+    const run = () => {
+      const d = f.contentDocument; if (!d || d.getElementById('kit-elements')) return
+      const s = d.createElement('script')
+      s.type = 'module'; s.id = 'kit-elements'; s.textContent = SCRIPTS[id]
+      d.body.appendChild(s)
+    }
+    f.addEventListener('load', run)
   }
-  f.addEventListener('load', run); run()
+  f.addEventListener('load', paint)
 }
 
 /* Only the kits a running page CAN change get changed live. Bootstrap compiles
    its brand and Material derives its scheme, so those two say so instead of
    quietly showing yesterday's build. */
-const LIVE_BRAND = { tailwind: true, daisyui: true, shadcn: true, bootstrap: false, material: false }
+const LIVE_BRAND = { tailwind: true, daisyui: true, shadcn: true, bootstrap: false, material: false,
+  radix: true, mantine: true, openprops: true }
 
 function paint() {
   const kits = ORDER.filter((k) => state.on.has(k))
   const routed = route(state.values, kits, KITS)
+  /* A tokens layer has no frame of its own — its variables belong under
+     whatever is rendering, which is exactly what it does in your app. */
+  const under = Object.assign({}, ...routed.filter((r) => KITS[r.kit].layer === 'tokens').map((r) => r.vars))
   for (const r of routed) {
     const f = $('#f_' + r.kit)
     if (!f) continue
     const live = f.contentDocument?.getElementById('live')
     if (!live) continue
-    let vars = { ...r.vars }
+    /* Radix takes attributes, not values: its accent, grey, radius and scaling
+       are set on the theme root the way its <Theme> would set them. */
+    const root = f.contentDocument.documentElement
+    for (const [a, v] of Object.entries(r.attrs ?? {})) root.setAttribute(a, v)
+    let vars = { ...under, ...r.vars }
     /* Material's other 46 roles come from its own generator, pre-derived here
        for the seeds we shipped; an unseen seed keeps the last derived scheme
        and the note says the download will carry the right one. */
     if (r.kit === 'material') Object.assign(vars, DERIVED.light ?? {})
     live.textContent = `:root{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
   }
-  for (const id of ORDER) $('#f_' + id).hidden = id !== state.show
+  build(state.show)
+  for (const id of RENDERS) $('#f_' + id).hidden = id !== state.show
   receipt(routed)
 }
 

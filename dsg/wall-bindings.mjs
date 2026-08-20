@@ -210,4 +210,111 @@ const material = {
   tabs:    (n) => `<md-tabs>${list(n.items).map((t, i) => `<md-primary-tab${i === 0 ? ' active' : ''}>${esc(t)}</md-primary-tab>`).join('')}</md-tabs>`,
 }
 
-export const WALL = { tailwind, daisyui, bootstrap, shadcn, material }
+/* ── Radix Themes — its own .rt-* classes ────────────────────────────────── */
+/* Radix ships its components as React, but their LOOK is plain classes in
+ * components.css: .rt-Button, .rt-TextFieldRoot, .rt-TableRoot. A real Radix
+ * button is a stack of them — the reset, the base, the size, the variant, the
+ * component — so that is what is written here, in that order.
+ *
+ * Tone is `data-accent-color`, which is how Radix re-tones one element: it
+ * remaps the whole twelve-step accent scale for that subtree. Not a colour of
+ * ours anywhere. */
+const RX_TONE = { neutral: 'gray', brand: '', success: 'grass', warning: 'amber', danger: 'red' }
+const rxAccent = (tone) => (RX_TONE[tone ?? 'neutral'] ? ` data-accent-color="${RX_TONE[tone ?? 'neutral']}"` : '')
+const RX_BTN = { brand: 'solid', secondary: 'soft', ghost: 'ghost', danger: 'solid' }
+const radix = {
+  _id: 'Radix Themes',
+  stack:   (n, k) => `<div class="rt-Flex" style="display:flex;flex-direction:column;gap:var(--space-${Math.min(9, n.gap ?? 3)})">${k}</div>`,
+  row:     (n, k) => `<div class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-${Math.min(9, n.gap ?? 2)})${n.between ? ';justify-content:space-between' : ''}">${k}</div>`,
+  grid:    (n, k) => `<div class="rt-Grid" style="display:grid;gap:var(--space-3);grid-template-columns:repeat(${n.cols ?? 2},minmax(0,1fr))">${k}</div>`,
+  panel:   (n, k) => `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-2 rt-variant-surface">${k}</div>`,
+  divider: () => `<hr class="rt-reset rt-Separator rt-r-size-4">`,
+  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, `rt-Heading rt-r-size-${n.level === 2 ? 6 : 4}`),
+  text:    (n, k) => A(n, k, 'p', 'rt-Text rt-r-size-2'),
+  muted:   (n, k) => A(n, k, 'p', 'rt-Text rt-r-size-2', ' data-accent-color="gray"'),
+  label:   (n, k) => A(n, k, 'label', 'rt-Text rt-r-size-2 rt-Strong'),
+  button:  (n, k) => A(n, k, 'button', `rt-reset rt-BaseButton rt-r-size-2 rt-variant-${RX_BTN[n.tone ?? 'brand']} rt-Button`, rxAccent(n.tone === 'danger' ? 'danger' : n.tone === 'brand' ? 'brand' : n.tone === 'secondary' ? 'brand' : 'brand')),
+  input:   (n) => `<div class="rt-TextFieldRoot rt-r-size-2 rt-variant-surface"><input class="rt-reset rt-TextFieldInput" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}"></div>`,
+  select:  (n) => `<select class="rt-reset rt-SelectTrigger rt-r-size-2 rt-variant-surface" style="width:100%">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
+  /* Radix's checkbox is a button with an indicator inside, not an <input>:
+     rt-reset strips the native appearance, so an input renders as an empty box
+     that never fills in. Their markup, their states. */
+  checkbox: (n) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-BaseCheckboxRoot rt-CheckboxRoot rt-r-size-2 rt-variant-${n.on ? 'solid' : 'surface'}" role="checkbox" aria-checked="${!!n.on}"${n.on ? ' data-state="checked"' : ''}>${n.on ? '<svg class="rt-BaseCheckboxIndicator" viewBox="0 0 9 9" fill="currentColor"><path d="M0,4 L3,7 L9,1 L8,0 L3,5 L1,3 Z"/></svg>' : ''}</button>${esc(n.text ?? '')}</label>`,
+  switch:  (n) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-SwitchRoot rt-r-size-2 rt-variant-surface"${n.on ? ' data-state="checked"' : ''}><span class="rt-SwitchThumb"></span></button>${esc(n.text ?? '')}</label>`,
+  badge:   (n, k) => A(n, k, 'span', 'rt-reset rt-Badge rt-r-size-1 rt-variant-soft', rxAccent(n.tone)),
+  alert:   (n, k) => `<div class="rt-reset rt-BaseCard rt-CalloutRoot rt-r-size-2 rt-variant-soft"${rxAccent(n.tone)}><p class="rt-Text rt-r-size-2">${n.text != null ? esc(n.text) : k}</p></div>`,
+  stat:    (n) => `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-2 rt-variant-surface"><p class="rt-Text rt-r-size-1" data-accent-color="gray">${esc(n.label)}</p><p class="rt-Heading rt-r-size-6">${esc(n.value)}</p></div>`,
+  table:   (n) => `<div class="rt-TableRoot rt-r-size-2 rt-variant-surface"><table class="rt-TableRootTable"><thead class="rt-TableHeader"><tr class="rt-TableRow">${
+    list(n.cols).map((c) => `<th class="rt-TableCell rt-TableColumnHeaderCell">${esc(c)}</th>`).join('')}</tr></thead><tbody class="rt-TableBody">${
+    list(n.rows).map((r) => `<tr class="rt-TableRow">${list(r).map((c) => `<td class="rt-TableCell">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`,
+  avatar:  (n) => `<span class="rt-reset rt-AvatarRoot rt-r-size-2 rt-variant-soft"><span class="rt-AvatarFallback">${esc(n.text)}</span></span>`,
+  /* Radix writes each tab label TWICE: the visible copy is absolutely
+     positioned and a hidden bold copy holds the width open so the row does not
+     shift when a tab is selected. Render only the visible one and every label
+     collapses onto the same point, which is exactly what happened. */
+  tabs:    (n) => `<nav class="rt-reset rt-BaseTabList rt-r-size-2">${list(n.items).map((t, i) =>
+    `<div class="rt-TabNavItem"><a class="rt-reset rt-BaseTabListTrigger rt-TabNavLink"${i === 0 ? ' data-state="active"' : ''}><span class="rt-BaseTabListTriggerInner">${esc(t)}</span><span class="rt-BaseTabListTriggerInnerHidden">${esc(t)}</span></a></div>`).join('')}</nav>`,
+}
+
+/* ── Mantine — the class names read out of its own stylesheets ───────────── */
+/* Mantine's component classes are content hashes: .m_77c9d27d is Button. They
+ * are not a vocabulary anyone can write, so they are not written here — the kit
+ * document carries a name→hash map read from its own styles/<Name>.css, and a
+ * release that rehashes them changes the map, not this file.
+ *
+ * Handed in rather than imported, because this module is also inlined into the
+ * page where there is no filesystem. */
+let MC = {}
+export const useMantineClasses = (map) => { MC = map ?? {} }
+/* component + the part within it, both named by Mantine's own module map. The
+ * first version took the first class in each stylesheet and invented nine names
+ * for parts that have no file of their own. */
+const mc = (name, part = 'root') => MC[name]?.[part] ?? `mantine-missing-${name}-${part}`
+const MN_BTN = {
+  brand: '', secondary: '--button-bg:var(--mantine-color-default);--button-color:var(--mantine-color-text);--button-bd:1px solid var(--mantine-color-default-border)',
+  ghost: '--button-bg:transparent;--button-color:var(--mantine-primary-color-filled)',
+  danger: '--button-bg:var(--mantine-color-red-filled);--button-color:var(--mantine-color-white)',
+}
+const MN_BADGE = { neutral: '--badge-bg:var(--mantine-color-default);--badge-color:var(--mantine-color-text)',
+  brand: '', success: '--badge-bg:var(--mantine-color-green-light);--badge-color:var(--mantine-color-green-light-color)',
+  warning: '--badge-bg:var(--mantine-color-yellow-light);--badge-color:var(--mantine-color-yellow-light-color)',
+  danger: '--badge-bg:var(--mantine-color-red-light);--badge-color:var(--mantine-color-red-light-color)' }
+const mantine = {
+  _id: 'Mantine',
+  stack:   (n, k) => `<div class="${mc('Stack')}" style="--stack-gap:calc(${(n.gap ?? 3) * 0.25}rem * var(--mantine-scale))">${k}</div>`,
+  row:     (n, k) => `<div class="${mc('Group')}" style="--group-gap:calc(${(n.gap ?? 2) * 0.25}rem * var(--mantine-scale))${n.between ? ';--group-justify:space-between' : ''}">${k}</div>`,
+  grid:    (n, k) => `<div style="display:grid;gap:var(--mantine-spacing-md);grid-template-columns:repeat(${n.cols ?? 2},minmax(0,1fr))">${k}</div>`,
+  panel:   (n, k) => `<div class="${cls(mc('Paper'), mc('Card'))}" data-with-border="true" data-orientation="vertical" style="--paper-shadow:var(--mantine-shadow-xs);--card-padding:var(--mantine-spacing-lg)">${k}</div>`,
+  divider: () => `<div class="${mc('Divider')}"></div>`,
+  /* Mantine's Title reads --title-fz/fw/lh, which its React layer fills from
+     the theme's own --mantine-h<n>-* variables. Same variables, set here. */
+  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, mc('Title'), ` data-order="${n.level ?? 3}" style="${
+    ['font-size', 'font-weight', 'line-height'].map((prop, i) =>
+      `--title-${['fz', 'fw', 'lh'][i]}:var(--mantine-h${n.level ?? 3}-${prop})`).join(';')}"`),
+  text:    (n, k) => A(n, k, 'p', mc('Text')),
+  muted:   (n, k) => A(n, k, 'p', mc('Text'), ' style="--text-color:var(--mantine-color-dimmed)"'),
+  label:   (n, k) => A(n, k, 'label', mc('Input', 'label')),
+  button:  (n, k) => A(n, k, 'button', mc('Button'), MN_BTN[n.tone ?? 'brand'] ? ` style="${MN_BTN[n.tone ?? 'brand']}"` : ''),
+  /* wrapper OUTSIDE, input inside: data-variant on the wrapper is what sets
+     --input-bd and --input-bg, and an input without it has `border: 1px solid`
+     with no colour — an invisible field, which is what the first pass shipped. */
+  input:   (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default"><input class="${mc('Input', 'input')}" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}"></div>`,
+  select:  (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default"><select class="${mc('Input', 'input')}">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select></div>`,
+  /* --checkbox-size lives on the ROOT and the input reads it, so an input on
+     its own is a zero-sized box. Their nesting, not ours. */
+  checkbox: (n) => `<label class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)"><span class="${mc('Checkbox')}"><span class="${mc('Checkbox', 'inner')}"><input type="checkbox" class="${mc('Checkbox', 'input')}"${n.on ? ' checked' : ''}></span></span><span class="${mc('Text')}">${esc(n.text ?? '')}</span></label>`,
+  /* the track is a SIBLING of the input, not the same element: Mantine styles
+     it through `input:checked + track`. */
+  switch:  (n) => `<label class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)"><span class="${mc('Switch')}"><input type="checkbox" role="switch" class="${mc('Switch', 'input')}"${n.on ? ' checked' : ''}><span class="${mc('Switch', 'track')}"><span class="${mc('Switch', 'thumb')}"></span></span></span><span class="${mc('Text')}">${esc(n.text ?? '')}</span></label>`,
+  badge:   (n, k) => A(n, k, 'span', mc('Badge'), MN_BADGE[n.tone ?? 'neutral'] ? ` style="${MN_BADGE[n.tone ?? 'neutral']}"` : ''),
+  alert:   (n, k) => `<div class="${mc('Alert')}" style="--alert-bg:var(--mantine-color-${{ danger: 'red', warning: 'yellow', success: 'green' }[n.tone] ?? 'blue'}-light)"><div class="${mc('Text')}">${n.text != null ? esc(n.text) : k}</div></div>`,
+  stat:    (n) => `<div class="${cls(mc('Paper'), mc('Card'))}" data-with-border="true" data-orientation="vertical" style="--card-padding:var(--mantine-spacing-lg)"><p class="${mc('Text')}" style="--text-color:var(--mantine-color-dimmed);--text-fz:var(--mantine-font-size-sm)">${esc(n.label)}</p><p class="${mc('Title')}" data-order="2" style="--title-fz:var(--mantine-h2-font-size);--title-fw:var(--mantine-h2-font-weight);--title-lh:var(--mantine-h2-line-height)">${esc(n.value)}</p></div>`,
+  table:   (n) => `<table class="${mc('Table', 'table')}" data-with-table-border="true" data-with-row-border="true"><thead class="${mc('Table', 'thead')}"><tr class="${mc('Table', 'tr')}">${
+    list(n.cols).map((c) => `<th class="${mc('Table', 'th')}">${esc(c)}</th>`).join('')}</tr></thead><tbody class="${mc('Table', 'tbody')}">${
+    list(n.rows).map((r) => `<tr class="${mc('Table', 'tr')}" data-with-row-border="true">${list(r).map((c) => `<td class="${mc('Table', 'td')}">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
+  avatar:  (n) => `<div class="${mc('Avatar')}"><span class="${mc('Avatar', 'placeholder')}">${esc(n.text)}</span></div>`,
+  tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal"><div class="${mc('Tabs', 'list')}" role="tablist">${
+    list(n.items).map((t, i) => `<button class="${mc('Tabs', 'tab')}" role="tab"${i === 0 ? ' data-active="true"' : ''}>${esc(t)}</button>`).join('')}</div></div>`,
+}
+
+export const WALL = { tailwind, daisyui, bootstrap, shadcn, material, radix, mantine }

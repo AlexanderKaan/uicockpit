@@ -18,87 +18,11 @@
  * If a source cannot be read, this writes NOTHING for that kit and says so.
  * A generator that falls back to yesterday's guess is a generator that lies.
  */
-import { execFileSync } from 'node:child_process'
-import { readFileSync, writeFileSync, mkdtempSync, existsSync, rmSync, readdirSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { openNpm, fromNpm, blockOf, cssVars } from './npm-read.mjs'
 
 const CHECK = process.argv.includes('--check')
 
-/**
- * Unpack an npm tarball once and read as many files out of it as you like.
- * Radix ships one stylesheet per accent colour, so a helper that re-packs the
- * tarball per file would run `npm pack` twenty-five times to answer one
- * question.
- */
-function openNpm(pkg) {
-  const dir = mkdtempSync(join(tmpdir(), 'dsg-'))
-  const tgz = execFileSync('npm', ['pack', pkg, '--silent', '--pack-destination', dir], { encoding: 'utf8' }).trim().split('\n').pop()
-  execFileSync('tar', ['xzf', join(dir, tgz), '-C', dir])
-  const meta = JSON.parse(readFileSync(join(dir, 'package', 'package.json'), 'utf8'))
-  return {
-    version: tgz.replace(/^(.+)-(\d.*)\.tgz$/, '$2'),
-    license: typeof meta.license === 'string' ? meta.license : meta.license?.type ?? null,
-    npm: meta.name, home: meta.homepage ?? null,
-    read: (f) => readFileSync(join(dir, 'package', f), 'utf8'),
-    list: (sub) => readdirSync(join(dir, 'package', sub)),
-    close: () => rmSync(dir, { recursive: true, force: true }),
-  }
-}
-
-/** Pull one file out of an npm tarball, without installing anything. */
-function fromNpm(pkg, file) {
-  const dir = mkdtempSync(join(tmpdir(), 'dsg-'))
-  try {
-    const tgz = execFileSync('npm', ['pack', pkg, '--silent', '--pack-destination', dir], { encoding: 'utf8' }).trim().split('\n').pop()
-    execFileSync('tar', ['xzf', join(dir, tgz), '-C', dir])
-    const version = tgz.replace(/^(.+)-(\d.*)\.tgz$/, '$2')
-    /* the licence comes out of their package.json too — a licence anyone typed
-       from memory is the one thing in a manifest that must never be wrong */
-    const meta = JSON.parse(readFileSync(join(dir, 'package', 'package.json'), 'utf8'))
-    return { text: readFileSync(join(dir, 'package', file), 'utf8'), version,
-      license: typeof meta.license === 'string' ? meta.license : meta.license?.type ?? null,
-      npm: meta.name, home: meta.homepage ?? null }
-  } finally { rmSync(dir, { recursive: true, force: true }) }
-}
-
-/**
- * The declarations of one CSS block, found by its selector.
- * `cssVars` on a whole file would sweep up component-level overrides and make
- * the map look richer than it is; this takes exactly one block.
- */
-function blockOf(text, selector, { first = false } = {}) {
-  /* EVERY block with this selector, merged in source order.
-   *
-   * Two traps, both hit for real while reading Mantine. A literal string misses
-   * `:root,\n:host {`, so the kit read zero variables and still reported
-   * success. And taking only the FIRST match misses it again: Mantine's first
-   * :root,:host carries one declaration and the 224 variables are in a later
-   * one. Reading a kit wrong is worse than not reading it, because nothing
-   * downstream can tell the difference. */
-  const re = new RegExp(selector instanceof RegExp ? selector.source
-    : selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/,\s+/g, ',\\s*'), 'g')
-  const out = {}
-  for (const at of text.matchAll(re)) {
-    const open = text.indexOf('{', at.index)
-    if (open < 0) continue
-    Object.assign(out, cssVars(text.slice(open, text.indexOf('}', open))))
-    if (first) break
-  }
-  return out
-}
-
-/* Merging is the right default and the wrong one exactly once: Radix repeats
- * every colour file's selector inside an @supports block to restate the same
- * scale in display-p3. Merge there and you get color(display-p3 …) where a hex
- * was asked for, which is how the accent list silently went from 31 to 0. */
-
-/** `--name: value;` pairs of a CSS block, in source order. */
-function cssVars(text) {
-  const out = {}
-  for (const m of text.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;}]+)[;}]/gi)) out[m[1]] = m[2].trim()
-  return out
-}
 
 /* A theme is not only custom properties. daisyUI's light theme also declares
  * `color-scheme: light`, and a generated block that replaces theirs without it
@@ -254,17 +178,21 @@ const SOURCES = {
         const dark = { ...root, ...blockOf(css, "[data-mantine-color-scheme='dark']") }
 
         /* Mantine's component class names are content hashes — .m_77c9d27d is
-           Button. They are not a documented vocabulary, but each component's
-           own stylesheet names itself, so they are READ rather than typed and a
-           release that rehashes them is caught the next time this runs. */
+           Button's root. Nothing in the stylesheet says which hash is a table
+           header and which is a cell, and guessing produced nine class names
+           that do not exist. But Mantine PUBLISHES the map: every component
+           ships esm/components/<Name>/<Name>.module.mjs holding exactly
+           { th: 'm_4e7aa4f3', td: 'm_4e7aa4ef', … }. So it is read, and a
+           release that rehashes them changes this map rather than our code. */
         const classes = {}
-        for (const f of p.list('styles')) {
-          if (!f.endsWith('.css') || f.includes('.layer.')) continue
-          const first = /^\.(m_[a-z0-9]+)/m.exec(p.read(`styles/${f}`))
-          if (first) classes[f.replace('.css', '')] = first[1]
+        for (const name of p.list('esm/components')) {
+          let src
+          try { src = p.read(`esm/components/${name}/${name}.module.mjs`) } catch { continue }
+          const map = Object.fromEntries([...src.matchAll(/"([A-Za-z0-9_]+)":\s*"(m_[a-z0-9]+)"/g)].map((m) => [m[1], m[2]]))
+          if (Object.keys(map).length) classes[name] = map
         }
         return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://mantine.dev',
-          source: `npm @mantine/core@${p.version} · styles.css :root + colour-scheme blocks, class names from styles/*.css`,
+          source: `npm @mantine/core@${p.version} · styles.css :root + colour-scheme blocks, class names from esm/components/*/*.module.mjs`,
           classes, modes: { light, dark } }
       } finally { p.close() }
     },

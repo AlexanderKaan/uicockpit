@@ -12,7 +12,7 @@ import { icons, svg } from './icons.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render } from './parts.mjs'
-import { WALL } from './wall-bindings.mjs'
+import { WALL, useMantineClasses } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
 import { ownage } from './fidelity.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
@@ -24,15 +24,18 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const OUT = process.argv[2] ?? 'index.html'
-const IDS = (process.env.DSG_KITS ?? 'tailwind,daisyui,shadcn,bootstrap,material').split(',')
+const IDS = (process.env.DSG_KITS ?? 'tailwind,daisyui,shadcn,bootstrap,material,radix,mantine,openprops').split(',')
 const SEED = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
+useMantineClasses(kits.mantine?.classes)
 
 /* The wrapper a kit needs to be itself. Without data-theme, daisyUI's dark
  * theme wins on a dark OS and the frame shows its factory purple — which is
  * exactly what happened, on a page whose whole claim is that your values won. */
-const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="light"' }
+const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="light"',
+  radix: ' class="radix-themes light"', mantine: ' data-mantine-color-scheme="light"' }
+const RENDERS = IDS.filter((id) => kits[id].layer !== 'tokens')
 const wall = (id) => `<html${ROOT[id] ?? ''}><main>${SCENES.map((s) =>
   `<section style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')}</main>
 <style>body{margin:0;padding:20px;font-family:ui-sans-serif,system-ui,sans-serif}
@@ -86,7 +89,8 @@ let page = readFileSync('page.template.html', 'utf8')
   /* Measured on the kit's own markup, NOT on wall() — that wrapper adds our
    * section caption, and counting our chrome against the kit reported 97 of 98
    * where the truth is 97 of 97. */
-  .replace('/*OWN*/', () => JSON.stringify(Object.fromEntries(IDS.map((id) => {
+  .replace('/*RENDERS*/', () => JSON.stringify(RENDERS))
+  .replace('/*OWN*/', () => JSON.stringify(Object.fromEntries(RENDERS.map((id) => {
     const html = SCENES.map((s) => render(s.node, WALL[id])).join('')
     const { used, theirs, els, elsTheirs } = ownage(html, css[id] ?? '', id === 'material' ? mdw.bundled : null)
     return [id, { used, theirs, els, elsTheirs, unit: id === 'material' ? 'elements' : 'classes',
@@ -100,7 +104,7 @@ let page = readFileSync('page.template.html', 'utf8')
    * shipped a generator with two of everything. It built, it loaded, and
    * nothing said a word. Every placeholder here takes a function now. */
   .replace('/*SCRIPTS*/', () => JSON.stringify({ material: mdw.js.split('</script').join('<\\/script') }))
-  .replace('/*WALLS*/', () => JSON.stringify(Object.fromEntries(IDS.map((id) => [id, wall(id)]))))
+  .replace('/*WALLS*/', () => JSON.stringify(Object.fromEntries(RENDERS.map((id) => [id, wall(id)]))))
   .replace('/*ICONS*/', () => JSON.stringify(lu.icons))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
 page = page.split('<!--MARK-->').join(mark(17))

@@ -16,6 +16,7 @@ import { join } from 'node:path'
 import { generate } from './generate.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { materialElements } from './material-elements.mjs'
+import { openNpm } from './npm-read.mjs'
 
 export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   const dir = mkdtempSync(join(tmpdir(), 'dsg-css-'))
@@ -29,25 +30,28 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   mkdirSync(join(dir, 'src'), { recursive: true })
   writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'p', private: true, type: 'module',
     devDependencies: { '@tailwindcss/cli': `^${kits.tailwind.version}`, tailwindcss: `^${kits.tailwind.version}`, daisyui: `^${kits.daisyui.version}` } }))
-  for (const [id, plugin] of [['tailwind', ''], ['daisyui', '@plugin "daisyui";'], ['shadcn', '']]) {
+  const TW = [['tailwind', ''], ['daisyui', '@plugin "daisyui";'], ['shadcn', '']].filter(([id]) => IDS.includes(id))
+  for (const [id, plugin] of TW) {
     writeFileSync(join(dir, `src/${id}.html`), body(id))
     /* ONLY this kit's block. Loading the whole theme.css put shadcn's --border
        (a colour) into daisyUI's --border (a width) and every checkbox lost its
        outline — the exact collision the manifest now reports. */
     writeFileSync(join(dir, `src/${id}.css`), `@import "tailwindcss";\n${plugin}\n${files._blocks[id]}`)
   }
+  if (TW.length) {
   log('installing the kits the package names…')
   execFileSync('npm', ['install', '--silent', '--no-audit', '--no-fund'], { cwd: dir, stdio: 'pipe' })
-  for (const id of ['tailwind', 'daisyui', 'shadcn']) {
+  for (const [id] of TW) {
     execFileSync('npx', ['@tailwindcss/cli', '-i', `src/${id}.css`, '-o', `${id}.out.css`, '--content', `src/${id}.html`, '--minify'], { cwd: dir, stdio: 'pipe' })
     css[id] = readFileSync(join(dir, `${id}.out.css`), 'utf8')
+  }
   }
 
   /* Bootstrap's brand is compiled, so the preview COMPILES it. Showing the wall
      in Bootstrap's factory blue while the manifest promises your teal would read
      as a broken tool — the wall has to do what the package says it does. */
+  if (IDS.includes('bootstrap')) {
   log('compiling Bootstrap from the Sass entry point the package ships…')
-  if (!IDS.includes('bootstrap')) return css
   execFileSync('npm', ['install', '--silent', '--no-audit', '--no-fund', `bootstrap@${kits.bootstrap.version}`, 'sass'], { cwd: dir, stdio: 'pipe' })
   writeFileSync(join(dir, 'custom.scss'), files['_custom.scss'].replace('bootstrap/scss/bootstrap', 'node_modules/bootstrap/scss/bootstrap'))
   try {
@@ -59,10 +63,13 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
     css.bootstrap = (existsSync(bs) ? readFileSync(bs, 'utf8') : '') + '\n' + files._blocks.bootstrap
   }
 
+  }
+
   /* Material DERIVES its 47 colour roles from the seed. Setting only --primary
      and leaving the other 46 at Material's factory purple is exactly the
      half-applied theme the manifest warns about — so the preview runs their own
      generator, which is what `derives` was always supposed to mean. */
+  if (IDS.includes('material')) {
   log('deriving the Material scheme with its own generator…')
   let mt = Object.entries(kits.material.modes.light).map(([k, v]) => `${k}:${v}`).join(';')
   try {
@@ -78,8 +85,23 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
      classes, so the text on the page is theirs too and not our font sizes. */
   const mdw = materialElements()
   css.material = `:root{${mt}}\n${mdw.typescale}\n` + files._blocks.material
+  }
 
-
+  /* Radix, Mantine and Open Props each ship one finished stylesheet: no build
+   * step, no plugin, no compile. Read it out of the package and put our block
+   * after it, the same shape as everything else here. */
+  const SHIPPED = {
+    radix: ['@radix-ui/themes', ['styles.css']],
+    mantine: ['@mantine/core', ['styles.css']],
+    openprops: ['open-props', ['open-props.min.css', 'normalize.light.min.css']],
+  }
+  for (const [id, [pkg, wanted]] of Object.entries(SHIPPED)) {
+    if (!IDS.includes(id)) continue
+    log(`reading ${kits[id].name}'s own stylesheet…`)
+    const p = openNpm(`${pkg}@${kits[id].version}`)
+    try { css[id] = wanted.map((f) => p.read(f)).join('\n') + '\n' + (files._blocks[id] ?? '') }
+    finally { p.close() }
+  }
 
     return css
   } finally { rmSync(dir, { recursive: true, force: true }) }

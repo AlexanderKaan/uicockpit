@@ -3,10 +3,24 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { PARTS, render, gaps } from './parts.mjs'
-import { WALL } from './wall-bindings.mjs'
+import { WALL, useMantineClasses } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
+import { readFileSync } from 'node:fs'
 
+const mantineKit = JSON.parse(readFileSync('kits/mantine.json', 'utf8'))
+useMantineClasses(mantineKit.classes)
 const KITS = Object.keys(WALL)
+
+/* How each kit gives a control its height — its OWN mechanism, named. None of
+ * these is a number of ours: a size class, a component class, or a custom
+ * element that carries the height in its shadow root. */
+const HEIGHT = {
+  tailwind: /min-h-9|\bh-9\b/, shadcn: /min-h-9|\bh-9\b/,
+  daisyui: /\bbtn\b/, bootstrap: /\bbtn\b/,
+  material: /^<md-[a-z-]*button/,
+  radix: /\brt-r-size-\d/,
+  mantine: new RegExp(mantineKit.classes.Button.root),
+}
 
 test('every kit answers every part — no kit gets to be half a wall', () => {
   for (const id of KITS) assert.deepEqual(gaps(WALL[id]), [], `${id} has no answer for these`)
@@ -61,10 +75,7 @@ test('every control in the wall clears the 24px target floor', () => {
     const buttons = html.match(/<(?:button|md-[a-z-]*button)[^>]*>/g) ?? []
     assert.ok(buttons.length >= 4, `${id} rendered no buttons`)
     for (const b of buttons) {
-      if (b.startsWith('<md-')) continue
-      /* h-9 is shadcn's own shipped height (36px) — a fixed height is a floor
-         too. The list names each kit's real mechanism; nothing here is ours. */
-      assert.ok(/min-h-9|\bh-9\b|min-height:40px|btn/.test(b), `${id}: a button with no height floor — ${b.slice(0, 70)}`)
+      assert.ok(HEIGHT[id].test(b), `${id}: a button with no height floor — ${b.slice(0, 70)}`)
     }
   }
 })
