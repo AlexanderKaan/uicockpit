@@ -31,6 +31,8 @@ export const ROLES = [
   { id: 'ink',      label: 'Ink',          kind: 'colour', what: 'body text' },
   { id: 'inkMuted', label: 'Muted ink',    kind: 'colour', what: 'secondary text' },
   { id: 'line',     label: 'Line',         kind: 'colour', what: 'the border between things' },
+  { id: 'fontHeading', label: 'Headings', kind: 'font', what: 'the family headings are set in' },
+  { id: 'fontBody',    label: 'Body',     kind: 'font', what: 'the family everything else is set in' },
   { id: 'radius',   label: 'Corner radius', kind: 'length', what: 'how round a box is' },
   { id: 'baseText', label: 'Base text',    kind: 'length', what: 'the size body text is set at' },
 ]
@@ -51,6 +53,8 @@ export const MAP = {
     line:     { var: '--color-line', new: true },
     radius:   { var: '--radius-lg', also: ['--radius-md', '--radius-sm'] },
     baseText: { var: '--text-base' },
+    fontBody: { var: '--font-sans' },
+    fontHeading: { var: '--font-heading', new: true },
   },
   radix: {
     _note: 'Radix does not take values, it takes CHOICES from sets it publishes: named accent scales, named grey scales, five radius settings and five scaling steps. Only the page and panel colours are really variables. Every scale is twelve hand-built steps, so a single step written by hand is eleven steps out of step — the knobs are matched to the nearest published set instead, and the manifest names it.',
@@ -63,6 +67,8 @@ export const MAP = {
     line:     { derives: 'ink' },
     radius:   { choice: 'radius' },
     baseText: { choice: 'baseText' },
+    fontBody: { var: '--default-font-family' },
+    fontHeading: { var: '--heading-font-family' },
   },
   mantine: {
     _note: 'Semantic variables throughout, and all settable at runtime. Its COMPONENT class names are content hashes, which is a separate problem and not this table\'s.',
@@ -75,6 +81,8 @@ export const MAP = {
     line:     { var: '--mantine-color-default-border' },
     radius:   { var: '--mantine-radius-default', also: ['--mantine-radius-xs', '--mantine-radius-sm', '--mantine-radius-md', '--mantine-radius-lg', '--mantine-radius-xl'] },
     baseText: { var: '--mantine-font-size-md', also: ['--mantine-font-size-xs', '--mantine-font-size-sm', '--mantine-font-size-lg', '--mantine-font-size-xl'] },
+    fontBody: { var: '--mantine-font-family' },
+    fontHeading: { var: '--mantine-font-family-headings' },
   },
   openprops: {
     _note: 'Scales, plus the small semantic layer its normalize ships. Open Props renders nothing itself — it sits under whatever does, so your own CSS agrees with the kit above it.',
@@ -87,6 +95,8 @@ export const MAP = {
     line:     { var: '--surface-4' },
     radius:   { var: '--radius-2', also: ['--radius-1', '--radius-3'] },
     baseText: { var: '--font-size-1', also: ['--font-size-0', '--font-size-2', '--font-size-3'] },
+    fontBody: { var: '--font-sans' },
+    fontHeading: { var: '--font-heading', new: true },
   },
   shadcn: {
     _note: 'Semantic variables by design, unprefixed. --border here is a COLOUR.',
@@ -99,6 +109,10 @@ export const MAP = {
     line:     { var: '--border', also: ['--input'] },
     radius:   { var: '--radius' },
     baseText: null,     // shadcn inherits type from your Tailwind setup
+    /* rides on Tailwind, so the family is the base's --font-sans; a variable of
+       its own would be a second place for the same answer to live */
+    fontBody: { inherits: 'the base' },
+    fontHeading: { inherits: 'the base' },
   },
   bootstrap: {
     _note: 'Runtime-themeable for surface, ink, line, radius and type — --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
@@ -113,6 +127,9 @@ export const MAP = {
     radius:   { var: '--bs-border-radius',
                 also: ['--bs-border-radius-sm', '--bs-border-radius-lg', '--bs-border-radius-xl', '--bs-border-radius-xxl'] },
     baseText: { var: '--bs-body-font-size' },
+    fontBody: { var: '--bs-body-font-family', also: ['--bs-font-sans-serif'] },
+    fontHeading: { needsBuild: { sass: '$headings-font-family',
+      why: 'Bootstrap has no --bs variable for a heading family; it is compiled from Sass like the brand colour' } },
   },
   material: {
     _note: 'M3 takes ONE input. Its 47 colour roles — containers, on-colours, inverses, fixed variants — are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
@@ -127,6 +144,11 @@ export const MAP = {
                 also: ['--md-sys-shape-corner-xs', '--md-sys-shape-corner-sm', '--md-sys-shape-corner-lg',
                        '--md-sys-shape-corner-xl', '--md-sys-shape-corner-xxl'] },
     baseText: null,
+    /* Material is the one kit that names both halves outright: plain for body,
+       brand for headings. Its typescale reads them, so setting these two moves
+       every one of its fifteen text styles. */
+    fontBody: { var: '--md-ref-typeface-plain' },
+    fontHeading: { var: '--md-ref-typeface-brand' },
   },
   daisyui: {
     _note: 'Registers into Tailwind\'s --color-* namespace on purpose. --border here is a WIDTH, not a colour.',
@@ -139,6 +161,10 @@ export const MAP = {
     line:     null,     // no border COLOUR variable — --border is a width
     radius:   { var: '--radius-box', also: ['--radius-field', '--radius-selector'] },
     baseText: null,
+    /* rides on Tailwind, so the family is the base's --font-sans; a variable of
+       its own would be a second place for the same answer to live */
+    fontBody: { inherits: 'the base' },
+    fontHeading: { inherits: 'the base' },
   },
 }
 
@@ -247,6 +273,9 @@ export function route(values, kitIds, kits = {}) {
          of Material's forty-seven colour roles and calling it themed is exactly
          the half-applied theme this whole file exists to prevent. */
       if (target.derives) continue
+      /* the layer under this one already answers it — not a gap, and not ours
+         to write twice */
+      if (target.inherits) continue
       /* the kit publishes a set for this job; take the nearest of what it has */
       if (target.choice) {
         const set = kits[id]?.choices?.[target.choice]

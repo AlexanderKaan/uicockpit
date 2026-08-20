@@ -18,6 +18,7 @@ import { ownage } from './fidelity.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
 import { mark } from './mark.mjs'
 import { materialElements } from './material-elements.mjs'
+import { googleFonts, kitFonts } from './fonts.mjs'
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -38,7 +39,10 @@ const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="lig
 const RENDERS = IDS.filter((id) => kits[id].layer !== 'tokens')
 const wall = (id) => `<html${ROOT[id] ?? ''}><main>${SCENES.map((s) =>
   `<section style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')}</main>
-<style>body{margin:0;padding:20px;font-family:ui-sans-serif,system-ui,sans-serif}
+<style>/* NO font-family here. The wrapper setting one hard-coded our chrome over
+   every kit's own typography, so the font knobs moved the card and nothing
+   else — the kit's stylesheet decides what this page is set in. */
+body{margin:0;padding:20px}
 main{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:start}
 .cap{margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.45;font-weight:600}</style>`
 
@@ -72,11 +76,14 @@ for (const [f, src] of [...parts.map((f) => [f, strip(readFileSync(f, 'utf8'))])
 }
 const mods = parts.map((f) => `/* ── ${f} ── */\n${strip(readFileSync(f, 'utf8'))}`).join('\n\n')
 
+const gf = await googleFonts()
+console.log(`  ✓ ${gf.read} families from ${gf.source} · ${kitFonts(kits).length} system stacks the kits publish`)
+
 const mdw = materialElements()
 console.log(`  ✓ @material/web ${mdw.version} · ${mdw.license} — ${mdw.bundled.length} real elements, ${(mdw.js.length / 1024).toFixed(0)} kB`)
 
 console.log('reading the icons from lucide…')
-const NAMES = ['sparkles', 'shuffle', 'download', 'circle-alert', 'x', 'check']
+const NAMES = ['sparkles', 'shuffle', 'download', 'circle-alert', 'x', 'check', 'search']
 const lu = icons(NAMES)
 console.log(`  ✓ lucide ${lu.version} · ${lu.license} — ${NAMES.length} icons`)
 
@@ -90,6 +97,7 @@ let page = readFileSync('page.template.html', 'utf8')
    * section caption, and counting our chrome against the kit reported 97 of 98
    * where the truth is 97 of 97. */
   .replace('/*RENDERS*/', () => JSON.stringify(RENDERS))
+  .replace('/*FONTS*/', () => JSON.stringify({ google: gf.families, stacks: kitFonts(kits) }))
   .replace('/*OWN*/', () => JSON.stringify(Object.fromEntries(RENDERS.map((id) => {
     const html = SCENES.map((s) => render(s.node, WALL[id])).join('')
     const { used, theirs, els, elsTheirs } = ownage(html, css[id] ?? '', id === 'material' ? mdw.bundled : null)

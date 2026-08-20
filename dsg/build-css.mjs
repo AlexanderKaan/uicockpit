@@ -84,7 +84,7 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   /* Their typography stylesheet ships in the package: real md-typescale-*
      classes, so the text on the page is theirs too and not our font sizes. */
   const mdw = materialElements()
-  css.material = `:root{${mt}}\n${mdw.typescale}\n` + files._blocks.material
+  css.material = `:root{${mt}}\n${mdw.typeTokens}\n${mdw.typescale}\n` + files._blocks.material
   }
 
   /* Radix, Mantine and Open Props each ship one finished stylesheet: no build

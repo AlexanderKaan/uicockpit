@@ -11,7 +11,7 @@
   "license": "Apache-2.0",
   "npm": "@material/web",
   "home": "https://github.com/material-components/material-web#readme",
-  "source": "npm @material/web@2.5.0 · labs/gb/styles/{color,shape} tokens",
+  "source": "npm @material/web@2.5.0 · labs/gb/styles/{color,shape} tokens + m3.css typefaces",
   "modes": {
     "light": {
       "--md-sys-color-primary": "#6750a4",
@@ -68,7 +68,12 @@
       "--md-sys-shape-corner-xl": "28px",
       "--md-sys-shape-corner-xl-increased": "32px",
       "--md-sys-shape-corner-xxl": "48px",
-      "--md-sys-shape-corner-full": "50cqmin"
+      "--md-sys-shape-corner-full": "50cqmin",
+      "--md-ref-typeface-brand": "var(--md-ref-typeface-plain)",
+      "--md-ref-typeface-plain": "Roboto Flex, Roboto, Noto Sans, system-ui, sans-serif",
+      "--md-ref-typeface-weight-regular": "400",
+      "--md-ref-typeface-weight-medium": "500",
+      "--md-ref-typeface-weight-bold": "700"
     },
     "dark": {
       "--md-sys-color-primary": "#d0bcff",
@@ -125,7 +130,12 @@
       "--md-sys-shape-corner-xl": "28px",
       "--md-sys-shape-corner-xl-increased": "32px",
       "--md-sys-shape-corner-xxl": "48px",
-      "--md-sys-shape-corner-full": "50cqmin"
+      "--md-sys-shape-corner-full": "50cqmin",
+      "--md-ref-typeface-brand": "var(--md-ref-typeface-plain)",
+      "--md-ref-typeface-plain": "Roboto Flex, Roboto, Noto Sans, system-ui, sans-serif",
+      "--md-ref-typeface-weight-regular": "400",
+      "--md-ref-typeface-weight-medium": "500",
+      "--md-ref-typeface-weight-bold": "700"
     }
   }
 }

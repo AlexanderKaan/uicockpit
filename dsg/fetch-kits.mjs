@@ -87,15 +87,20 @@ const SOURCES = {
     async read() {
       const colour = fromNpm('@material/web@latest', 'labs/gb/styles/color/md-color-tokens.css')
       const shape = fromNpm('@material/web@latest', 'labs/gb/styles/shape/md-shape-tokens.css')
+      /* Material splits its typefaces in two — plain for body, brand for
+         headings — which is the same split Radix and Mantine make. */
+      const type = fromNpm('@material/web@latest', 'labs/gb/styles/m3.css')
       /* Material ships both modes in one declaration with CSS light-dark(), so
          the two are split back out here rather than fetched twice. */
       const light = {}, dark = {}
-      for (const [name, raw] of Object.entries({ ...cssVars(colour.text), ...cssVars(shape.text) })) {
+      const typeface = Object.fromEntries(Object.entries(cssVars(type.text))
+        .filter(([n]) => n.startsWith('--md-ref-typeface-')))
+      for (const [name, raw] of Object.entries({ ...cssVars(colour.text), ...cssVars(shape.text), ...typeface })) {
         const pair = /^light-dark\(\s*([^,]+?)\s*,\s*(.+?)\s*\)$/.exec(raw)
         light[name] = pair ? pair[1] : raw
         dark[name] = pair ? pair[2] : raw
       }
-      return { ...colour, source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens`,
+      return { ...colour, source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens + m3.css typefaces`,
         modes: { light, dark } }
     },
   },
@@ -110,7 +115,10 @@ const SOURCES = {
         /* Their semantic colours live on .radix-themes; the scales live on
            :root as calc() over --scaling and --radius-factor, which is exactly
            why radius and text size here are choices and not lengths. */
-        const light = { ...blockOf(base, ':root {'), ...blockOf(base, ':where(.radix-themes)') }
+        /* `.radix-themes` is a THIRD block in the same file and it is where the
+           font families live; reading only :root and :where(.radix-themes) left
+           Radix looking like a kit with no typography at all. */
+        const light = { ...blockOf(base, ':root {'), ...blockOf(base, '.radix-themes') }
         const dark = { ...light, ...blockOf(base, ':is(.dark, .dark-theme)') }
 
         /* Radix does not take a brand colour. It takes one of its own named

@@ -28,6 +28,32 @@ import { join } from 'node:path'
 
 const CACHE = 'kits/material.elements.json'
 
+/**
+ * Material's typography classes read four variables per style —
+ * --md-sys-typescale-body-medium-{font,size,weight,line-height} — and its
+ * package defines none of them: they come out of its theme builder. What it
+ * DOES ship is the same information as a `font` shorthand under a shorter name
+ * (`body-md`). So the four are unpacked from their own shorthand rather than
+ * typed, and `--md-ref-typeface-plain` stays a var() so the font knob still
+ * reaches every one of the fifteen styles.
+ *
+ * Without this, every md-typescale-* class has an invalid font-family and
+ * Material's text renders in the browser's default serif.
+ */
+const SIZE = { sm: 'small', md: 'medium', lg: 'large' }
+function typescaleTokens(css) {
+  const out = []
+  for (const m of css.matchAll(/--md-sys-typescale-([a-z]+)-(sm|md|lg):\s*([^;]+);/g)) {
+    const [, role, size, value] = m
+    const parts = /^(.+?)\s+([\d.]+rem)\/([\d.]+rem)\s+(.+)$/.exec(value.trim())
+    if (!parts) continue
+    const name = `--md-sys-typescale-${role}-${SIZE[size]}`
+    out.push(`${name}-weight:${parts[1]}`, `${name}-size:${parts[2]}`,
+      `${name}-line-height:${parts[3]}`, `${name}-font:${parts[4]}`)
+  }
+  return `:root{${out.join(';')}}`
+}
+
 /* What the wall needs. Each line is a module Google publishes; nothing here is
  * a component of ours, and anything the wall wants that is not on this list is
  * something Material does not ship. */
@@ -77,6 +103,7 @@ export function materialElements({ refresh = false } = {}) {
       source: `npm @material/web@${meta.version} · ${IMPORTS.length} element modules, bundled with esbuild`,
       js: readFileSync(join(dir, 'bundle.js'), 'utf8'),
       typescale: readFileSync(join(pkgDir, 'typography/md-typescale-styles.css'), 'utf8'),
+      typeTokens: typescaleTokens(readFileSync(join(pkgDir, 'labs/gb/styles/typography/md-typography-tokens.css'), 'utf8')),
       declares: [...new Set(declares)].sort(),
       bundled: [...new Set(bundled)].sort(),
     }

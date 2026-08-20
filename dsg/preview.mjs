@@ -43,7 +43,7 @@ const files = generate(VALUES, IDS, kits)
 /* ── one page, five documents ─────────────────────────────────────────────── */
 const frame = (id) => {
   const doc = `<!doctype html><meta charset="utf-8"><style>${css[id] ?? ''}
-    body{margin:0;padding:20px;background:${VALUES.page};font-family:ui-sans-serif,system-ui,sans-serif}
+    body{margin:0;padding:20px;background:${VALUES.page}}
     main{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:start}
     .cap{margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;font-weight:600}
   </style><body><main>${body(id)}</main>${ELEMENTS[id] ? `<script type="module" src="${ELEMENTS[id]}"></` + `script>` : ''}`

@@ -233,6 +233,30 @@ export const COMPONENT_GAPS = {
   ],
 }
 
+/**
+ * A face that has to be fetched, and the line that fetches it.
+ *
+ * The generator writes a webfont as `'Family', <generic>` and a system stack as
+ * the kit published it, so the quote on the first family is the signal — it is
+ * there because we put it there. A theme that names Fraunces and never says
+ * where Fraunces comes from is a theme that renders as Times on the machine it
+ * was not built on.
+ */
+export function webfonts(values) {
+  const out = []
+  for (const [role, value] of Object.entries(values ?? {})) {
+    const m = /^'([^']+)'/.exec(String(value ?? ''))
+    if (!m || out.some((f) => f.family === m[1])) continue
+    out.push({ role, family: m[1] })
+  }
+  return out
+}
+
+export const fontLink = (families) => families.length
+  ? `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?${
+      families.map((f) => `family=${encodeURIComponent(f).replace(/%20/g, '+')}:wght@400;500;600;700`).join('&')}&display=swap">`
+  : ''
+
 export function collisions(routed, kits) {
   const out = []
   for (const r of routed) {
@@ -414,6 +438,15 @@ yours to choose again.
 ${routed.map((r) => `- **${kits[r.kit].name}** ${kits[r.kit].version ?? ''} — see \`install.md\``).join('\n')}
 
 Import \`theme.css\` AFTER the kits, so these values win.
+${(() => { const w = webfonts(values); return w.length ? `
+The type is ${w.map((f) => `**${f.family}**`).join(' and ')}, which ${w.length > 1 ? 'are faces' : 'is a face'}
+that must be fetched. Put this in your \`<head>\`, or the page renders in the
+fallback and none of the spacing below will look right:
+
+\`\`\`html
+${fontLink(w.map((f) => f.family))}
+\`\`\`
+` : '' })()}
 
 ## The values
 

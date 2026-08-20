@@ -23,6 +23,11 @@
       <div class="swatches" id="swatches"></div>
     </section>
     <section>
+      <p class="eyebrow eyebrow--act">Typography
+        <button class="mini" id="typeshuffle" title="Shuffle the type"><!--I:shuffle-->Shuffle</button></p>
+      <div class="typo" id="typo"></div>
+    </section>
+    <section>
       <p class="eyebrow">Shape &amp; size</p>
       <div class="knobs" id="knobs"></div>
     </section>
@@ -45,6 +50,20 @@
     <button class="btn btn--go" id="download"><!--I:download-->Use this kit</button>
   </div>
 </footer>
+
+<dialog id="fontpick"><div class="pick">
+  <header class="pick__top">
+    <div><h2 id="pickrole">Headings</h2><p class="pick__sum" id="picksum"></p></div>
+    <button class="sheet__x" id="pickx" aria-label="Close"><!--I:x--></button>
+  </header>
+  <label class="pick__search"><!--I:search--><input id="picksearch" placeholder="Search" autocomplete="off"></label>
+  <div class="seg" id="picktabs" role="radiogroup" aria-label="Where from"></div>
+  <div class="pick__list" id="picklist"></div>
+  <footer class="pick__foot">
+    <button class="btn" id="pickshuffle"><!--I:shuffle-->Shuffle</button>
+    <p class="pick__now" id="picknow"></p>
+  </footer>
+</div></dialog>
 
 <dialog id="sheet"><div class="sheet">
   <header class="sheet__top">
