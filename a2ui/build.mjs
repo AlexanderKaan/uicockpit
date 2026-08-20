@@ -73,6 +73,9 @@ function page(template, body) {
     .replace('/*CERT*/', readFileSync('binding.json', 'utf8'))
     .replace('/*ZOD*/', JSON.stringify(readFileSync('sample.zod.ts', 'utf8')))
     .replace('<!--BODY-->', readFileSync(body, 'utf8'))
+    /* one notice, one file — two pages cannot drift on what they say about the
+       state of the project */
+    .replace('<!--NOTICE-->', readFileSync('notice.html', 'utf8'))
     .replace('/*KITCSS*/', kitCss())
     .replace('/*TWCSS*/', readFileSync('tw.css', 'utf8') + '\n' + readFileSync('daisy.css', 'utf8'))
 }

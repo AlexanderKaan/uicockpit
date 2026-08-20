@@ -18,6 +18,17 @@ body{margin:0;background:var(--k-bg);color:var(--k-fg);font-size:var(--k-type-bo
 body,.b-kit{font-family:'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif}
 
 @scope (.chrome) to (.preview) {
+
+  /* A maintenance notice is not a popover: something that can be dismissed, or
+     that appears after a beat, is something a visitor can miss. It sits at the
+     top of the document, in the flow, and stays. */
+  .notice{display:flex;gap:var(--k-s-10,.625rem);align-items:flex-start;
+          padding:var(--k-s-12) var(--k-s-16);background:var(--k-warning-soft);
+          border-bottom:1px solid color-mix(in oklab, var(--k-warning-text) 25%, transparent);
+          color:var(--k-warning-soft-fg)}
+  .notice__mark{flex:none;color:var(--k-warning-text);margin-block-start:1px}
+  .notice p{margin:0;font-size:var(--k-type-small);line-height:1.55;max-inline-size:88ch;text-wrap:pretty}
+  .notice b{color:var(--k-fg)}
   .hero,.band{max-inline-size:64rem;margin-inline:auto;padding-inline:var(--k-s-24)}
   .hero{padding-block:var(--k-s-48,3rem) var(--k-s-32,2rem);text-align:center}
   .wordmark{display:inline-flex;align-items:center;gap:var(--k-s-8);margin:0 0 var(--k-s-16);
