@@ -53,7 +53,7 @@ const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="lig
   radix: ' class="radix-themes light"', mantine: ' data-mantine-color-scheme="light"' }
 const RENDERS = IDS.filter((id) => kits[id].layer !== 'tokens')
 const wall = (id) => `<html${ROOT[id] ?? ''}><main>${SCENES.map((s) =>
-  `<section style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')}</main>
+  `<section data-rung="${s.rung}" style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')}</main>
 <style>/* NO font-family here. The wrapper setting one hard-coded our chrome over
    every kit's own typography, so the font knobs moved the card and nothing
    else — the kit's stylesheet decides what this page is set in. */

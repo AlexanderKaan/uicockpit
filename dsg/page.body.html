@@ -1,42 +1,42 @@
 <div class="app">
-<header class="band">
-  <div class="band__top">
-    <a class="mark" href="/" title="UIcockpit — home"><!--MARK--> Design System Generator</a>
-    <label class="brief">
-      <!--I:sparkles-->
-      <input id="brief" placeholder="Describe it — “calm, readable, good for older users” — or just hit Shuffle" autocomplete="off">
-    </label>
-    <div class="band__acts">
-      <span class="chips" id="chips"></span>
-      <button class="btn" id="shuffle"><!--I:shuffle-->Shuffle <kbd>S</kbd></button>
-    </div>
+<aside class="rail">
+  <a class="mark" href="/" title="UIcockpit — home"><!--MARK--> Design System Generator</a>
+
+  <label class="brief">
+    <!--I:sparkles-->
+    <input id="brief" placeholder="Describe it — “calm, readable”" autocomplete="off">
+  </label>
+  <div class="rail__acts">
+    <span class="chips" id="chips"></span>
+    <button class="btn" id="shuffle"><!--I:shuffle-->Shuffle <kbd>S</kbd></button>
   </div>
 
-  <div class="band__kits">
-    <span class="eyebrow">Stack</span>
+  <details class="grp" open>
+    <summary><span class="grp__name">Stack</span><span class="grp__sum" id="sum_stack"></span></summary>
     <div class="stack" id="stack" role="group" aria-label="Your stack"></div>
-  </div>
+  </details>
 
-  <div class="band__knobs">
-    <section>
-      <p class="eyebrow">Colour</p>
-      <div class="swatches" id="swatches"></div>
-    </section>
-    <section>
-      <p class="eyebrow eyebrow--act">Typography
-        <button class="mini" id="typeshuffle" title="Shuffle the type"><!--I:shuffle-->Shuffle</button></p>
-      <div class="typo" id="typo"></div>
-    </section>
-    <section>
-      <p class="eyebrow">Shape &amp; size</p>
-      <div class="knobs" id="knobs"></div>
-    </section>
-  </div>
-</header>
+  <details class="grp" open>
+    <summary><span class="grp__name">Colour</span><span class="grp__sum grp__dots" id="sum_colour"></span></summary>
+    <div class="swatches" id="swatches"></div>
+  </details>
+
+  <details class="grp" open>
+    <summary><span class="grp__name">Typography</span><span class="grp__sum" id="sum_type"></span></summary>
+    <div class="typo" id="typo"></div>
+    <button class="mini" id="typeshuffle" title="Shuffle the type"><!--I:shuffle-->Shuffle the type</button>
+  </details>
+
+  <details class="grp" open>
+    <summary><span class="grp__name">Shape &amp; space</span><span class="grp__sum" id="sum_shape"></span></summary>
+    <div class="knobs" id="knobs"></div>
+  </details>
+</aside>
 
 <main class="wall">
   <div class="wall__bar">
     <p class="eyebrow" id="wallhead">This is what your app will look like</p>
+    <div class="seg" id="rungs" role="radiogroup" aria-label="What to show"></div>
     <p class="wall__count" id="wallcount"></p>
   </div>
   <div class="frames" id="frames"></div>

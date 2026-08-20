@@ -8,10 +8,20 @@
  *
  * A scene is data. It contains no classes, no colours and no kit names: the
  * moment a scene knows which kit it is in, adding a kit stops being a table.
+ *
+ * Each one names its RUNG, because five scenes at once is a wall you scroll
+ * rather than a wall you read: `parts` is the specimen sheet, `screens` are
+ * pieces of a product, `page` is the whole thing with its own chrome.
  */
+export const RUNGS = [
+  { id: 'all', label: 'Everything' },
+  { id: 'parts', label: 'Parts' },
+  { id: 'screens', label: 'Screens' },
+  { id: 'page', label: 'A whole page' },
+]
 export const SCENES = [
   {
-    id: 'dashboard', title: 'A product screen', span: 8,
+    id: 'dashboard', rung: 'screens', title: 'A product screen', span: 8,
     node: { p: 'stack', gap: 4, kids: [
       { p: 'row', between: true, kids: [
         { p: 'heading', level: 2, text: 'Requests' },
@@ -34,7 +44,7 @@ export const SCENES = [
     ] },
   },
   {
-    id: 'form', title: 'A form', span: 4,
+    id: 'form', rung: 'screens', title: 'A form', span: 4,
     node: { p: 'panel', kids: [{ p: 'stack', gap: 3, kids: [
       { p: 'heading', text: 'New request' },
       { p: 'stack', gap: 1, kids: [{ p: 'label', text: 'Reference' }, { p: 'input', value: '2026-04471' }] },
@@ -49,7 +59,7 @@ export const SCENES = [
     ] }] },
   },
   {
-    id: 'feedback', title: 'When something happens', span: 6,
+    id: 'feedback', rung: 'screens', title: 'When something happens', span: 6,
     node: { p: 'stack', gap: 3, kids: [
       { p: 'alert', tone: 'success', text: 'Saved. Your changes are live.' },
       { p: 'alert', tone: 'warning', text: 'Check this. The due date is in the past.' },
@@ -68,7 +78,7 @@ export const SCENES = [
     ] },
   },
   {
-    id: 'controls', title: 'Every control', span: 6,
+    id: 'controls', rung: 'parts', title: 'Every control', span: 6,
     node: { p: 'panel', kids: [{ p: 'stack', gap: 3, kids: [
       { p: 'row', kids: [
         { p: 'button', tone: 'brand', text: 'Primary' },
@@ -84,7 +94,7 @@ export const SCENES = [
     /* The rung the wall was missing: not a panel out of an app but a PAGE, with
        the two things every page has and no component library talks about — the
        bar at the top and the block at the bottom. */
-    id: 'site', title: 'A whole page', span: 12,
+    id: 'site', rung: 'page', title: 'A whole page', span: 12,
     node: { p: 'stack', gap: 0, kids: [
       { p: 'navbar', brand: 'Havenstad', items: ['Requests', 'Decisions', 'Reports'],
         kids: [{ p: 'button', tone: 'secondary', text: 'Sign in' }, { p: 'button', tone: 'brand', text: 'Start a request' }] },
