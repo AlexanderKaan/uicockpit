@@ -8,6 +8,8 @@
     "test": "node --test roles.test.mjs generate.test.mjs wall.test.mjs",
     "proof": "node build-proof.mjs",
     "wall": "node preview.mjs",
-    "page": "node build-page.mjs generator.html"
+    "page": "node build-page.mjs generator.html",
+    "serve": "node serve.mjs",
+    "home": "node build-home.mjs home.html"
   }
 }

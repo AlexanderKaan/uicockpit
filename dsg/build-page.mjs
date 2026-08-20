@@ -25,7 +25,11 @@ const SEED = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 
-const wall = (id) => `<main>${SCENES.map((s) =>
+/* The wrapper a kit needs to be itself. Without data-theme, daisyUI's dark
+ * theme wins on a dark OS and the frame shows its factory purple — which is
+ * exactly what happened, on a page whose whole claim is that your values won. */
+const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="light"' }
+const wall = (id) => `<html${ROOT[id] ?? ''}><main>${SCENES.map((s) =>
   `<section style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')}</main>
 <style>body{margin:0;padding:20px;font-family:ui-sans-serif,system-ui,sans-serif}
 main{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:start}

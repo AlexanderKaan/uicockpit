@@ -72,6 +72,10 @@ test('a theme block that REPLACES carries the kit\'s own defaults underneath', (
   assert.match(css, /--color-primary: #0B6E8A/, 'and our value still wins')
   const theirs = Object.keys(KITS.daisyui.modes.light)
   for (const v of theirs) assert.ok(css.includes(v + ':'), `${v} went missing from a theme that replaces the theme`)
+  /* And not only custom properties. Without color-scheme the browser falls back
+     to its own preference: the hero shot came out dark, wearing daisyUI's
+     factory purple, on a page whose whole claim is that your values won. */
+  assert.match(css, /color-scheme: light;/)
 })
 
 test('a name two kits both use is reported, not left to load order', () => {
@@ -94,4 +98,11 @@ test('each kit can be taken on its own, without the others leaking in', () => {
   const f = generate(VALUES, ['shadcn', 'daisyui'], KITS)
   assert.doesNotMatch(f._blocks.daisyui, /--primary:/, "shadcn's variables must not be in daisyUI's block")
   assert.doesNotMatch(f._blocks.shadcn, /@plugin/, "daisyUI's plugin block must not be in shadcn's")
+})
+
+test('install.md says the one thing that makes daisyUI apply at all', () => {
+  const md = generate(VALUES, ['daisyui'], KITS)['install.md']
+  assert.match(md, /data-theme="yourkit"/, 'without it daisyUI\'s dark theme wins on a dark OS')
+  assert.match(md, /prefersdark/, 'and the reason has to be in the file, not in our heads')
+  assert.match(generate(VALUES, ['daisyui'], KITS)['theme.css'], /SET data-theme/)
 })

@@ -4,6 +4,7 @@
   "what": "component classes, no build step needed — the widest-installed CSS framework there is",
   "layer": "components",
   "standalone": true,
+  "plain": null,
   "version": "5.3.8",
   "license": "MIT",
   "npm": "bootstrap",

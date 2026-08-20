@@ -48,6 +48,21 @@ function cssVars(text) {
   return out
 }
 
+/* A theme is not only custom properties. daisyUI's light theme also declares
+ * `color-scheme: light`, and a generated block that replaces theirs without it
+ * hands the browser back to its own preference — which turned the hero shot
+ * dark with daisyUI's factory purple on it. Third time this lesson has been
+ * paid for: a block that REPLACES must carry everything. */
+const PLAIN = ['color-scheme']
+function cssPlain(text) {
+  const out = {}
+  for (const p of PLAIN) {
+    const m = new RegExp(`(?:^|[;{])\\s*${p}\\s*:\\s*([^;}]+)`, 'i').exec(text)
+    if (m) out[p] = m[1].trim()
+  }
+  return out
+}
+
 const SOURCES = {
   tailwind: {
     layer: 'utility',
@@ -66,7 +81,8 @@ const SOURCES = {
       const light = fromNpm('daisyui@latest', 'theme/light.css')
       const dark = fromNpm('daisyui@latest', 'theme/dark.css')
       return { ...light, source: `npm daisyui@${light.version} · theme/light.css + theme/dark.css`,
-        modes: { light: cssVars(light.text), dark: cssVars(dark.text) } }
+        modes: { light: cssVars(light.text), dark: cssVars(dark.text) },
+        plain: { light: cssPlain(light.text), dark: cssPlain(dark.text) } }
     },
   },
   bootstrap: {
@@ -132,7 +148,8 @@ for (const [id, kit] of Object.entries(SOURCES)) {
     console.error(`  nothing written. ${existsSync(`kits/${id}.json`) ? 'The checked-in file is left alone; it may be out of date.' : 'This kit has no values at all.'}`)
     failed++; continue
   }
-  const doc = { id, name: kit.name, what: kit.what, layer: kit.layer, standalone: kit.standalone ?? false, version: read.version, license: read.license ?? null,
+  const doc = { id, name: kit.name, what: kit.what, layer: kit.layer, standalone: kit.standalone ?? false,
+    plain: read.plain ?? null, version: read.version, license: read.license ?? null,
     npm: read.npm ?? null, home: read.home ?? null, source: read.source, modes: read.modes }
   const next = JSON.stringify(doc, null, 2) + '\n'
   const path = `kits/${id}.json`

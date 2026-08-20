@@ -44,10 +44,15 @@ ${decl(r.vars)}
    * defaults are the base, our values go on top. */
   daisyui: (r, kit) => `/* ${stamp(kit)} — a named theme, registered as the default.
    Their published defaults with your values over them: a theme block replaces
-   the theme, so anything left out would be missing rather than inherited. */
+   the theme, so anything left out would be missing rather than inherited.
+   SET data-theme="yourkit" ON YOUR <html>. daisyUI registers its own dark theme
+   with prefersdark, which beats default:true the moment a visitor's OS is dark —
+   and then none of the values below apply. Only a light theme is generated so
+   far; a dark one is yours to add as a second block. */
 @plugin "daisyui/theme" {
   name: "yourkit";
   default: true;
+${decl(kit.plain?.light ?? {})}
 ${decl({ ...kit.modes.light, ...r.vars })}
 }`,
 
@@ -92,7 +97,11 @@ ${r.needsBuild.map((b) => `${b.sass}: ${values[b.role] ?? '/* set me */'};   // 
 
 const INSTALL = {
   tailwind: (k) => [`npm install ${k.npm}@${k.version}`, `/* then in your CSS: */ @import "tailwindcss";`],
-  daisyui: (k) => [`npm install ${k.npm}@${k.version}`, `/* then in your CSS: */ @plugin "daisyui";`],
+  daisyui: (k) => [`npm install ${k.npm}@${k.version}`, `/* in your CSS: */ @plugin "daisyui";`,
+    `<!-- and on your <html>, or daisyUI's own dark theme wins whenever the -->`,
+    `<!-- visitor's OS is dark: it registers with prefersdark, which beats  -->`,
+    `<!-- our default:true. This is not optional.                          -->`,
+    `<html data-theme="yourkit">`],
   bootstrap: (k) => [`npm install ${k.npm}@${k.version} sass`, `/* build _custom.scss instead of importing bootstrap.css */`],
   material: (k) => [`npm install ${k.npm}@${k.version} @material/material-color-utilities`],
   shadcn: () => [`npx shadcn@latest init`, `npx shadcn@latest add button card input dialog table  # whatever you picked`],

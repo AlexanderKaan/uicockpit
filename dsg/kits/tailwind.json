@@ -4,6 +4,7 @@
   "what": "utility classes — no components; the theme is CSS variables you can override",
   "layer": "utility",
   "standalone": false,
+  "plain": null,
   "version": "4.3.3",
   "license": "MIT",
   "npm": "tailwindcss",

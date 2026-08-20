@@ -4,6 +4,7 @@
   "what": "React components copied into your repo — you own the source, it is not a dependency",
   "layer": "components",
   "standalone": false,
+  "plain": null,
   "version": null,
   "license": "MIT",
   "npm": null,
