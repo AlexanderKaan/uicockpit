@@ -115,6 +115,7 @@ const KITS = /*KITS*/;
 const CSS = /*CSS*/;
 const DERIVED = /*DERIVED*/;
 const WALLS = /*WALLS*/;
+const SCRIPTS = /*SCRIPTS*/;
 const OWN = /*OWN*/;
 const ICONS = /*ICONS*/;
 const ico = (n, s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] ?? ''}</svg>`
@@ -151,6 +152,21 @@ $('#frames').innerHTML = ORDER.map((id) =>
   `<iframe id="f_${id}" hidden title="${KITS[id].name}" srcdoc="${
     `<!doctype html><meta charset=utf-8><style>${CSS[id] ?? ''}</style><style id=live></style><body>${WALLS[id] ?? ''}`
       .replace(/"/g, '&quot;')}"></iframe>`).join('')
+
+/* Material's components are code, not classes, so its frame gets Google's real
+ * @material/web bundle. It is injected into the frame's document rather than
+ * written into srcdoc: inside an attribute every quote in 260 kB of their code
+ * becomes six characters, and the page went from 513 kB to 1.2 MB. */
+for (const id of Object.keys(SCRIPTS)) {
+  const f = $('#f_' + id); if (!f) continue
+  const run = () => {
+    const d = f.contentDocument; if (!d || d.getElementById('kit-elements')) return
+    const s = d.createElement('script')
+    s.type = 'module'; s.id = 'kit-elements'; s.textContent = SCRIPTS[id]
+    d.body.appendChild(s)
+  }
+  f.addEventListener('load', run); run()
+}
 
 /* Only the kits a running page CAN change get changed live. Bootstrap compiles
    its brand and Material derives its scheme, so those two say so instead of
@@ -293,10 +309,14 @@ function receipt(routed) {
      the reader can see it — so it is, and Material's honest zero shows too. */
   const top = state.show, own = OWN[top] ?? {}
   $('#wallhead').textContent = describe(stack(state.on, KITS), KITS)
-  $('#wallcount').innerHTML = own.used
-    ? `<b>${own.theirs} of ${own.used}</b> classes on this screen are ${KITS[top].name}'s own${
-        own.theirs < own.used ? ` — ${own.used - own.theirs === 1 ? 'one is' : (own.used - own.theirs) + ' are'} ours` : ''}`
-    : `<b>no classes</b> — this frame is drawn with ${own.inline ?? 0} inline styles of ours, not ${KITS[top].name}'s components`
+  /* Material's unit is not a class — it ships custom elements, so what counts
+     there is how many of the elements on the screen its own package registers. */
+  $('#wallcount').innerHTML = own.unit === 'elements'
+    ? `<b>${own.elsTheirs} of ${own.els}</b> elements on this screen are ${KITS[top].name}'s own, running their code`
+    : own.used
+      ? `<b>${own.theirs} of ${own.used}</b> classes on this screen are ${KITS[top].name}'s own${
+          own.theirs < own.used ? ` — ${own.used - own.theirs === 1 ? 'one is' : (own.used - own.theirs) + ' are'} ours` : ''}`
+      : `<b>nothing of theirs</b> on this screen at all`
 
   const needs = routed.filter((r) => !LIVE_BRAND[r.kit] && state.show === r.kit)
   note(needs.length

@@ -15,7 +15,9 @@ import { render } from './parts.mjs'
 import { WALL } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
 import { ownage } from './fidelity.mjs'
+import { COMPONENT_GAPS } from './generate.mjs'
 import { mark } from './mark.mjs'
+import { materialElements } from './material-elements.mjs'
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -67,32 +69,52 @@ for (const [f, src] of [...parts.map((f) => [f, strip(readFileSync(f, 'utf8'))])
 }
 const mods = parts.map((f) => `/* ── ${f} ── */\n${strip(readFileSync(f, 'utf8'))}`).join('\n\n')
 
+const mdw = materialElements()
+console.log(`  ✓ @material/web ${mdw.version} · ${mdw.license} — ${mdw.bundled.length} real elements, ${(mdw.js.length / 1024).toFixed(0)} kB`)
+
 console.log('reading the icons from lucide…')
 const NAMES = ['sparkles', 'shuffle', 'download', 'circle-alert', 'x', 'check']
 const lu = icons(NAMES)
 console.log(`  ✓ lucide ${lu.version} · ${lu.license} — ${NAMES.length} icons`)
 
 let page = readFileSync('page.template.html', 'utf8')
-  .replace('<!--BODY-->', readFileSync('page.body.html', 'utf8'))
-  .replace('/*MODULES*/', mods)
-  .replace('/*KITS*/', JSON.stringify(kits))
-  .replace('/*CSS*/', JSON.stringify(css))
-  .replace('/*DERIVED*/', JSON.stringify(derived))
+  .replace('<!--BODY-->', () => readFileSync('page.body.html', 'utf8'))
+  .replace('/*MODULES*/', () => mods)
+  .replace('/*KITS*/', () => JSON.stringify(kits))
+  .replace('/*CSS*/', () => JSON.stringify(css))
+  .replace('/*DERIVED*/', () => JSON.stringify(derived))
   /* Measured on the kit's own markup, NOT on wall() — that wrapper adds our
    * section caption, and counting our chrome against the kit reported 97 of 98
    * where the truth is 97 of 97. */
-  .replace('/*OWN*/', JSON.stringify(Object.fromEntries(IDS.map((id) => {
-    const { used, theirs, inline } = ownage(SCENES.map((s) => render(s.node, WALL[id])).join(''), css[id] ?? '')
-    return [id, { used, theirs, inline }]
+  .replace('/*OWN*/', () => JSON.stringify(Object.fromEntries(IDS.map((id) => {
+    const html = SCENES.map((s) => render(s.node, WALL[id])).join('')
+    const { used, theirs, els, elsTheirs } = ownage(html, css[id] ?? '', id === 'material' ? mdw.bundled : null)
+    return [id, { used, theirs, els, elsTheirs, unit: id === 'material' ? 'elements' : 'classes',
+      gaps: COMPONENT_GAPS[id] ?? [] }]
   }))))
-  .replace('/*WALLS*/', JSON.stringify(Object.fromEntries(IDS.map((id) => [id, wall(id)]))))
-  .replace('/*ICONS*/', JSON.stringify(lu.icons))
+  /* Google's real elements, bundled.
+   *
+   * The replacer is a FUNCTION on purpose. With a string, `$&` and `$'` inside
+   * the replacement are substitution patterns -- and their minified bundle
+   * contains one, so `$'` spliced the entire rest of the page in after it and
+   * shipped a generator with two of everything. It built, it loaded, and
+   * nothing said a word. Every placeholder here takes a function now. */
+  .replace('/*SCRIPTS*/', () => JSON.stringify({ material: mdw.js.split('</script').join('<\\/script') }))
+  .replace('/*WALLS*/', () => JSON.stringify(Object.fromEntries(IDS.map((id) => [id, wall(id)]))))
+  .replace('/*ICONS*/', () => JSON.stringify(lu.icons))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
 page = page.split('<!--MARK-->').join(mark(17))
 /* A placeholder that survives into the output is how a lucide box quietly
  * became the logo for weeks. Nothing silently ships with a hole in it. */
 const left = [...page.matchAll(/<!--(MARK|I:[a-z-]+)-->/g)].map((m) => m[0])
 if (left.length) { console.error(`build: unreplaced ${[...new Set(left)].join(' ')}`); process.exit(1) }
+
+/* And exactly one of each: a substitution pattern in a replacement value once
+ * spliced the whole page in twice, and it still loaded. */
+for (const decl of ['const CSS =', 'const KITS =', 'const SCRIPTS =', 'const WALLS =']) {
+  const n = page.split(decl).length - 1
+  if (n !== 1) { console.error(`build: "${decl}" appears ${n} times — the page is corrupt`); process.exit(1) }
+}
 
 
 writeFileSync(OUT, page)

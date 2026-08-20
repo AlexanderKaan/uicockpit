@@ -15,6 +15,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { generate } from './generate.mjs'
+import { materialElements } from './material-elements.mjs'
 import { buildCss } from './build-css.mjs'
 import { render } from './parts.mjs'
 import { WALL } from './wall-bindings.mjs'
@@ -30,6 +31,13 @@ const body = (id) => SCENES.map((s) =>
   `<section style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')
 
 const css = await buildCss(VALUES, IDS, kits, body)
+
+/* Material's components are code. Written beside the page rather than into the
+ * srcdoc attribute, where every quote in 260 kB of their bundle would become
+ * six characters. A srcdoc frame resolves relative URLs against this page. */
+const mdw = materialElements()
+writeFileSync('wall.elements.js', mdw.js)
+const ELEMENTS = { material: './wall.elements.js' }
 const files = generate(VALUES, IDS, kits)
 
 /* ── one page, five documents ─────────────────────────────────────────────── */
@@ -38,7 +46,7 @@ const frame = (id) => {
     body{margin:0;padding:20px;background:${VALUES.page};font-family:ui-sans-serif,system-ui,sans-serif}
     main{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:start}
     .cap{margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;font-weight:600}
-  </style><body><main>${body(id)}</main>`
+  </style><body><main>${body(id)}</main>${ELEMENTS[id] ? `<script type="module" src="${ELEMENTS[id]}"></` + `script>` : ''}`
   return `<figure class="k"><figcaption>${kits[id].name} <span>${kits[id].version ?? 'live'} · ${kits[id].license ?? ''}</span></figcaption>
     <iframe loading="lazy" srcdoc="${doc.replace(/"/g, '&quot;')}"></iframe></figure>`
 }

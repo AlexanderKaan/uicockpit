@@ -21,6 +21,8 @@ import { buildCss } from './build-css.mjs'
 import { render } from './parts.mjs'
 import { WALL } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
+import { materialElements } from './material-elements.mjs'
+import { COMPONENT_GAPS } from './generate.mjs'
 
 const IDS = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material']
 const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface: '#f7f9fa',
@@ -37,22 +39,34 @@ export const classesOf = (html) => [...new Set([...html.matchAll(/class="([^"]+)
  * "these are really their components" is worth nothing unless it is counted
  * where the reader can see it.
  */
-export function ownage(html, sheet) {
+export const elementsOf = (html) => [...new Set([...html.matchAll(/<([a-z]+-[a-z0-9-]*)/g)].map((m) => m[1]))]
+
+export function ownage(html, sheet, tags = null) {
   const used = classesOf(html)
   const sel = (c) => [...c].map((ch) => (/[A-Za-z0-9_-]/.test(ch) ? ch
     : `\\\\?${ch.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}`)).join('')
   const missing = used.filter((c) => !new RegExp(`\\.${sel(c)}(?=[\\s,{:.>~+\\[)])`).test(sheet))
+  /* A kit whose unit is not a class. Material ships custom elements, so the
+   * question there is not which classes its stylesheet defines but which
+   * elements its package declares AND its bundle really registers — a tag that
+   * is theirs by name but absent from the bundle would render as an unknown
+   * element and look like a hole in their kit. */
+  const els = tags ? elementsOf(html) : []
+  const strangers = els.filter((t) => !tags.includes(t))
   return { used: used.length, theirs: used.length - missing.length, missing,
+    els: els.length, elsTheirs: els.length - strangers.length, strangers,
     inline: (html.match(/style="/g) ?? []).length }
 }
 
 const css = await buildCss(VALUES, IDS, kits, markup, () => {})
+const mdw = materialElements()
+const TAGS = { material: mdw.bundled }
 
 console.log('\n  Every class we emit, looked up in the kit that should define it.\n')
 let worst = 0
 for (const id of IDS) {
   const sheet = css[id] ?? ''
-  const { used: n, theirs, missing, inline } = ownage(markup(id), sheet)
+  const { used: n, theirs, missing, els, elsTheirs, strangers } = ownage(markup(id), sheet, TAGS[id] ?? null)
   const pct = n ? Math.round((theirs / n) * 100) : 100
   worst = Math.max(worst, missing.length)
 
@@ -60,8 +74,18 @@ for (const id of IDS) {
    * reports that as a pass is worse than one that fails. Material renders
    * entirely on inline styles of ours — which is the furthest thing from being
    * its kit, and the number has to say so rather than flatter it. */
+  if (TAGS[id]) {
+    /* two units, both reported: their elements and their typography classes */
+    const pct = els ? Math.round((elsTheirs / els) * 100) : 0
+    console.log(`  ${kits[id].name.padEnd(14)} ${String(pct).padStart(3)}%   ${elsTheirs}/${els} elements are theirs, running their code` +
+      `\n                        ${theirs}/${n} classes are theirs (their md-typescale stylesheet)`)
+    if (strangers.length) { console.log(`                 invented: ${strangers.join(' ')}`); worst = Math.max(worst, strangers.length) }
+    if (!els) worst = Math.max(worst, 1)
+    for (const [part, why] of COMPONENT_GAPS[id] ?? []) console.log(`                 no component: ${part} — ${why}`)
+    continue
+  }
   if (!n) {
-    console.log(`  ${kits[id].name.padEnd(14)}   ——   NO classes of theirs at all — ${inline} inline styles, every one ours`)
+    console.log(`  ${kits[id].name.padEnd(14)}   ——   nothing of theirs on the page at all`)
     worst = Math.max(worst, 1)
     continue
   }
@@ -71,4 +95,4 @@ for (const id of IDS) {
     console.log(`                 invented: ${missing.slice(0, 12).join(' ')}${missing.length > 12 ? ` …and ${missing.length - 12} more` : ''}`)
   }
 }
-console.log(`\n  ${worst ? 'Not 100%. Every class above that is not theirs is one we made up,\n  and a kit rendered on our inline styles is not that kit at all.' : 'Every class comes from the kit that defines it.'}\n`)
+console.log(`\n  ${worst ? 'Not 100%. Everything named above is something we made up.' : 'Every class and every element comes from the kit that defines it.\n  What a kit has no component for is named, not substituted.'}\n`)

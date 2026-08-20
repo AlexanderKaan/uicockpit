@@ -7,9 +7,10 @@
  *   · shadcn/ui is React source over Radix. Its LOOK is Tailwind classes, so
  *     the preview borrows the composition it ships and the package tells you to
  *     run `shadcn add`. Same call the A2UI bindings made, same reason.
- *   · Material Web is custom elements — <md-filled-button> renders nothing
- *     without its JavaScript, and this page loads none. So the preview is
- *     M3-token-styled markup, and the package installs the real components.
+ *   · Material Web is custom elements, not classes. The frame loads Google's
+ *     real @material/web bundle, so <md-filled-button> below IS their button
+ *     running their code — see material-elements.mjs. What Material has no
+ *     component for at all is listed in COMPONENT_GAPS (generate.mjs).
  *
  * Everything else here is the kit's own classes, verbatim.
  */
@@ -144,36 +145,69 @@ const shadcn = {
   tabs:    (n) => `<div class="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'bg-background text-foreground shadow-sm ' : ''}inline-flex h-[calc(100%-1px)] items-center justify-center rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap">${esc(t)}</span>`).join('')}</div>`,
 }
 
-/* ── Material 3 — its tokens, previewed; the package installs the elements ── */
-const MD_TONE = { neutral: 'surface-container-highest;color:var(--md-sys-color-on-surface)', brand: 'primary-container;color:var(--md-sys-color-on-primary-container)',
-  success: 'tertiary-container;color:var(--md-sys-color-on-tertiary-container)', warning: 'secondary-container;color:var(--md-sys-color-on-secondary-container)',
-  danger: 'error-container;color:var(--md-sys-color-on-error-container)' }
-const md = (t) => `background:var(--md-sys-color-${MD_TONE[t ?? 'neutral']})`
+/* ── Material 3 — Google's real custom elements ──────────────────────────── */
+/* The parts Material ships no component for are listed once, in generate.mjs,
+ * because that list has to travel with the download and not only appear under
+ * the preview. */
+/* Not M3-flavoured markup: <md-filled-button> and friends, running the code
+ * from @material/web, with their own md-typescale classes for the text. The
+ * frame loads their bundle; material-elements.mjs proves every tag below is
+ * one their package declares AND one the bundle defines.
+ *
+ * Where a value is set inline it is one of THEIR tokens — a per-instance
+ * component token, which is how Material documents theming. The exception is
+ * spacing: Material publishes colour and shape tokens and no spacing scale, and
+ * ships no layout components, so the gaps between things are ours. That is
+ * declared rather than hidden; see gaps() below. */
+const MD_BTN = { brand: 'md-filled-button', secondary: 'md-filled-tonal-button', ghost: 'md-text-button', danger: 'md-filled-button' }
+const MD_CHIP = { neutral: 'md-assist-chip', brand: 'md-suggestion-chip', success: 'md-assist-chip', warning: 'md-assist-chip', danger: 'md-assist-chip' }
+/* their component tokens, the documented way to re-tone one instance */
+const MD_CHIP_TOK = {
+  success: '--md-assist-chip-label-text-color:var(--md-sys-color-on-tertiary-container);--md-assist-chip-container-shape:var(--md-sys-shape-corner-sm)',
+  warning: '--md-assist-chip-label-text-color:var(--md-sys-color-on-secondary-container)',
+  danger: '--md-assist-chip-label-text-color:var(--md-sys-color-on-error-container);--md-assist-chip-outline-color:var(--md-sys-color-error)',
+}
+const MD_TYPE = { 2: 'md-typescale-headline-small', 3: 'md-typescale-title-medium' }
 const material = {
   _id: 'Material 3',
+  /* layout — Material ships none, so these three are ours and say so */
   stack:   (n, k) => `<div style="display:flex;flex-direction:column;gap:${(n.gap ?? 3) * 4}px">${k}</div>`,
   row:     (n, k) => `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:${(n.gap ?? 2) * 4}px${n.between ? ';justify-content:space-between' : ''}">${k}</div>`,
   grid:    (n, k) => `<div style="display:grid;gap:12px;grid-template-columns:repeat(${n.cols ?? 2},minmax(0,1fr))">${k}</div>`,
-  panel:   (n, k) => `<div style="background:var(--md-sys-color-surface-container-low);border-radius:var(--md-sys-shape-corner-md);padding:16px">${k}</div>`,
-  divider: () => `<hr style="border:0;border-top:1px solid var(--md-sys-color-outline-variant)">`,
-  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, '', ` style="margin:0;font-size:${n.level === 2 ? '22px' : '16px'};font-weight:500;color:var(--md-sys-color-on-surface)"`),
-  text:    (n, k) => A(n, k, 'p', '', ' style="margin:0;font-size:14px;color:var(--md-sys-color-on-surface)"'),
-  muted:   (n, k) => A(n, k, 'p', '', ' style="margin:0;font-size:14px;color:var(--md-sys-color-on-surface-variant)"'),
-  label:   (n, k) => A(n, k, 'label', '', ' style="font-size:12px;color:var(--md-sys-color-on-surface-variant)"'),
-  button:  (n, k) => A(n, k, 'button', '', ` style="border:0;min-height:40px;padding:0 24px;border-radius:var(--md-sys-shape-corner-full);font-size:14px;font-weight:500;${
-    n.tone === 'ghost' ? 'background:transparent;color:var(--md-sys-color-primary)' : n.tone === 'danger' ? 'background:var(--md-sys-color-error);color:var(--md-sys-color-on-error)'
-    : n.tone === 'secondary' ? 'background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container)'
-    : 'background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary)'}"`),
-  input:   (n) => `<input value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}" style="width:100%;min-height:40px;padding:0 16px;border:1px solid var(--md-sys-color-outline);border-radius:var(--md-sys-shape-corner-xs);background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface);font-size:14px">`,
-  select:  (n) => `<select style="width:100%;min-height:40px;padding:0 12px;border:1px solid var(--md-sys-color-outline);border-radius:var(--md-sys-shape-corner-xs);background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface)">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
-  checkbox: (n) => `<label style="display:inline-flex;min-height:24px;align-items:center;gap:8px;font-size:14px;color:var(--md-sys-color-on-surface)"><input type="checkbox" style="accent-color:var(--md-sys-color-primary);width:18px;height:18px"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
-  switch:  (n) => `<label style="display:inline-flex;min-height:24px;align-items:center;gap:8px;font-size:14px;color:var(--md-sys-color-on-surface)"><input type="checkbox" role="switch" style="appearance:none;width:52px;height:32px;border-radius:99px;background:var(--md-sys-color-${n.on ? 'primary' : 'surface-container-highest'})"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
-  badge:   (n, k) => A(n, k, 'span', '', ` style="display:inline-flex;align-items:center;padding:4px 12px;border-radius:var(--md-sys-shape-corner-sm);font-size:12px;font-weight:500;${md(n.tone)}"`),
-  alert:   (n, k) => `<div style="padding:12px 16px;border-radius:var(--md-sys-shape-corner-md);font-size:14px;${md(n.tone)}">${n.text != null ? esc(n.text) : k}</div>`,
-  stat:    (n) => `<div style="background:var(--md-sys-color-surface-container);border-radius:var(--md-sys-shape-corner-md);padding:16px"><div style="font-size:12px;color:var(--md-sys-color-on-surface-variant)">${esc(n.label)}</div><div style="font-size:28px;color:var(--md-sys-color-on-surface)">${esc(n.value)}</div></div>`,
-  table:   (n) => `<table style="width:100%;border-collapse:collapse;font-size:14px;color:var(--md-sys-color-on-surface)"><thead><tr>${list(n.cols).map((c) => `<th style="text-align:left;padding:12px 8px;font-size:12px;color:var(--md-sys-color-on-surface-variant);font-weight:500">${esc(c)}</th>`).join('')}</tr></thead><tbody>${list(n.rows).map((r) => `<tr>${list(r).map((c) => `<td style="padding:12px 8px;border-top:1px solid var(--md-sys-color-outline-variant)">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
-  avatar:  (n) => `<span style="display:inline-grid;place-items:center;width:40px;height:40px;border-radius:99px;background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container);font-size:14px;font-weight:500">${esc(n.text)}</span>`,
-  tabs:    (n) => `<div style="display:flex;gap:0;border-bottom:1px solid var(--md-sys-color-outline-variant)">${list(n.items).map((t, i) => `<span style="padding:14px 16px;font-size:14px;font-weight:500;${i === 0 ? 'color:var(--md-sys-color-primary);box-shadow:inset 0 -3px 0 var(--md-sys-color-primary)' : 'color:var(--md-sys-color-on-surface-variant)'}">${esc(t)}</span>`).join('')}</div>`,
+
+  panel:   (n, k) => `<md-outlined-card style="padding:16px">${k}</md-outlined-card>`,
+  divider: () => `<md-divider></md-divider>`,
+  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, MD_TYPE[n.level ?? 3] ?? MD_TYPE[3], ' style="margin:0"'),
+  text:    (n, k) => A(n, k, 'p', 'md-typescale-body-medium', ' style="margin:0"'),
+  muted:   (n, k) => A(n, k, 'p', 'md-typescale-body-small', ' style="margin:0;color:var(--md-sys-color-on-surface-variant)"'),
+  label:   (n, k) => A(n, k, 'label', 'md-typescale-label-large'),
+  button:  (n, k) => {
+    const tag = MD_BTN[n.tone ?? 'brand']
+    const err = n.tone === 'danger'
+      ? ' style="--md-filled-button-container-color:var(--md-sys-color-error);--md-filled-button-label-text-color:var(--md-sys-color-on-error)"' : ''
+    return `<${tag}${err}>${n.text != null ? esc(n.text) : k}</${tag}>`
+  },
+  input:   (n) => `<md-outlined-text-field style="width:100%" label="${esc(n.placeholder ?? '')}" value="${esc(n.value ?? '')}"></md-outlined-text-field>`,
+  select:  (n) => `<md-outlined-select style="width:100%">${list(n.options).map((o, i) =>
+    `<md-select-option${i === 0 ? ' selected' : ''} value="${esc(o)}"><div slot="headline">${esc(o)}</div></md-select-option>`).join('')}</md-outlined-select>`,
+  checkbox: (n) => `<label class="md-typescale-body-medium" style="display:inline-flex;align-items:center;gap:8px"><md-checkbox${n.on ? ' checked' : ''} touch-target="wrapper"></md-checkbox>${esc(n.text ?? '')}</label>`,
+  switch:  (n) => `<label class="md-typescale-body-medium" style="display:inline-flex;align-items:center;gap:8px"><md-switch${n.on ? ' selected' : ''}></md-switch>${esc(n.text ?? '')}</label>`,
+  badge:   (n, k) => {
+    const tag = MD_CHIP[n.tone ?? 'neutral'], tok = MD_CHIP_TOK[n.tone]
+    return `<md-chip-set><${tag}${tok ? ` style="${tok}"` : ''} label="${esc(n.text ?? '')}"></${tag}></md-chip-set>`
+  },
+  /* Material ships no inline alert or banner, so this is their card re-toned
+     with their own container token — the closest thing their kit really has. */
+  alert:   (n, k) => `<md-filled-card class="md-typescale-body-medium" style="padding:12px 16px;--md-filled-card-container-color:var(--md-sys-color-${
+    { danger: 'error-container', warning: 'secondary-container', success: 'tertiary-container' }[n.tone] ?? 'surface-container-high'})">${n.text != null ? esc(n.text) : k}</md-filled-card>`,
+  stat:    (n) => `<md-outlined-card style="padding:16px"><div class="md-typescale-label-medium" style="color:var(--md-sys-color-on-surface-variant)">${esc(n.label)}</div><div class="md-typescale-headline-medium">${esc(n.value)}</div></md-outlined-card>`,
+  /* Material 3 specifies a data table; @material/web does not ship one. */
+  table:   (n) => `<table class="md-typescale-body-medium" style="width:100%;border-collapse:collapse"><thead><tr>${list(n.cols).map((c) =>
+    `<th class="md-typescale-label-medium" style="text-align:left;padding:12px 8px;color:var(--md-sys-color-on-surface-variant)">${esc(c)}</th>`).join('')}</tr></thead><tbody>${
+    list(n.rows).map((r) => `<tr>${list(r).map((c) => `<td style="padding:12px 8px;border-top:1px solid var(--md-sys-color-outline-variant)">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
+  /* nor an avatar */
+  avatar:  (n) => `<span class="md-typescale-label-large" style="display:inline-grid;place-items:center;width:40px;height:40px;border-radius:var(--md-sys-shape-corner-full);background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container)">${esc(n.text)}</span>`,
+  tabs:    (n) => `<md-tabs>${list(n.items).map((t, i) => `<md-primary-tab${i === 0 ? ' active' : ''}>${esc(t)}</md-primary-tab>`).join('')}</md-tabs>`,
 }
 
 export const WALL = { tailwind, daisyui, bootstrap, shadcn, material }

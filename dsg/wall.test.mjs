@@ -44,7 +44,7 @@ test('each kit renders in its OWN classes, not a shared blob', () => {
   assert.match(render(dash, WALL.bootstrap), /class="table"/)
   assert.match(render(dash, WALL.tailwind), /bg-brand/)
   assert.match(render(dash, WALL.shadcn), /bg-primary text-primary-foreground/)
-  assert.match(render(dash, WALL.material), /--md-sys-color-primary/)
+  assert.match(render(dash, WALL.material), /<md-filled-button>/, 'Material renders its own custom elements')
   /* and the five are genuinely different output, not one table wearing hats */
   const all = KITS.map((id) => render(dash, WALL[id]))
   assert.equal(new Set(all).size, KITS.length, 'two kits produced identical markup')
@@ -52,12 +52,16 @@ test('each kit renders in its OWN classes, not a shared blob', () => {
 
 test('every control in the wall clears the 24px target floor', () => {
   /* 2.5.8 again. The wall is a promise about what you will ship, so a specimen
-     that fails it is a promise we cannot keep. Checked on the markup we emit. */
+     that fails it is a promise we cannot keep. Checked on the markup we emit.
+     Material's buttons are custom elements that carry their own 40px height in
+     their shadow root, so for that kit the check is that we used THEIR element
+     rather than a bare one we would have to size ourselves. */
   for (const id of KITS) {
     const html = render(SCENES[3].node, WALL[id])
-    const buttons = html.match(/<button[^>]*>/g) ?? []
+    const buttons = html.match(/<(?:button|md-[a-z-]*button)[^>]*>/g) ?? []
     assert.ok(buttons.length >= 4, `${id} rendered no buttons`)
     for (const b of buttons) {
+      if (b.startsWith('<md-')) continue
       /* h-9 is shadcn's own shipped height (36px) — a fixed height is a floor
          too. The list names each kit's real mechanism; nothing here is ours. */
       assert.ok(/min-h-9|\bh-9\b|min-height:40px|btn/.test(b), `${id}: a button with no height floor — ${b.slice(0, 70)}`)

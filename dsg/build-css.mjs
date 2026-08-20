@@ -15,6 +15,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { generate } from './generate.mjs'
 import { deriveMaterial } from './derive-material.mjs'
+import { materialElements } from './material-elements.mjs'
 
 export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   const dir = mkdtempSync(join(tmpdir(), 'dsg-css-'))
@@ -73,7 +74,10 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   } catch (e) {
     log(`  ✗ could not run Material's generator (${e.message.split('\n')[0]}) — showing its factory scheme instead`)
   }
-  css.material = `:root{${mt}}\n` + files._blocks.material
+  /* Their typography stylesheet ships in the package: real md-typescale-*
+     classes, so the text on the page is theirs too and not our font sizes. */
+  const mdw = materialElements()
+  css.material = `:root{${mt}}\n${mdw.typescale}\n` + files._blocks.material
 
 
 

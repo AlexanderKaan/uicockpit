@@ -2,3 +2,5 @@ wall.html
 generator.html
 home.html
 node_modules/
+kits/material.elements.json
+wall.elements.js

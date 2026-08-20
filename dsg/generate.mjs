@@ -135,7 +135,13 @@ const INSTALL = {
     `<!-- our default:true. This is not optional.                          -->`,
     `<html data-theme="yourkit">`],
   bootstrap: (k) => [`npm install ${k.npm}@${k.version} sass`, `/* build _custom.scss instead of importing bootstrap.css */`],
-  material: (k) => [`npm install ${k.npm}@${k.version} @material/material-color-utilities`],
+  material: (k) => [`npm install ${k.npm}@${k.version} @material/material-color-utilities`,
+    `<!-- Material's components are custom elements, not classes: import the -->`,
+    `<!-- ones you use, or <md-filled-button> renders as an unknown tag.     -->`,
+    `import '@material/web/button/filled-button.js'`,
+    `import '@material/web/textfield/outlined-text-field.js'  // and so on`,
+    `/* their typography classes ship in the package too: */`,
+    `import { styles } from '@material/web/typography/md-typescale-styles.js'`],
   shadcn: () => [`npx shadcn@latest init`, `npx shadcn@latest add button card input dialog table  # whatever you picked`],
 }
 
@@ -165,6 +171,20 @@ const INSTALL = {
  */
 export const plain = (files) => Object.fromEntries(
   Object.entries(files).filter(([k, v]) => !k.startsWith('_') && typeof v === 'string'))
+
+/**
+ * Parts of a screen a kit ships no component for. Filled in for Material
+ * because it is the one kit here whose components are code: its package is the
+ * authority on what exists, and what is absent from it is absent, full stop.
+ */
+export const COMPONENT_GAPS = {
+  material: [
+    ['layout', 'Material publishes colour and shape tokens but no spacing scale, and ships no layout components — spacing between elements is yours to decide'],
+    ['table', '@material/web ships no data table, though the M3 spec describes one'],
+    ['avatar', '@material/web ships no avatar; compose one from its shape and colour tokens'],
+    ['alert', '@material/web ships no inline alert or banner; the closest is md-filled-card re-toned with its own container token'],
+  ],
+}
 
 export function collisions(routed, kits) {
   const out = []
@@ -281,6 +301,10 @@ function manifest(routed, kits, values) {
     if (r.unroutable?.length) out.push(`- **${k.name} · ${r.unroutable.join(', ')}** — this kit has no variable for that job, so the value was not written anywhere.`)
     if (r.unscaled?.length) out.push(`- **${k.name}** — ${r.unscaled.join(', ')} were left at their published values: no ratio could be read from a unitless input.`)
     if (r.added?.length) out.push(`- **${k.name} · ${r.added.join(', ')}** — this kit ships no semantic name for these, so they were ADDED. Reference them yourself (\`bg-brand\`, \`text-ink\`).`)
+    /* Not every gap is a token that would not take a value. Some are parts of a
+     * screen the kit ships no component for at all, and a theme that stays
+     * silent about those is the reason people find out at build time. */
+    for (const [part, why] of COMPONENT_GAPS[r.kit] ?? []) out.push(`- **${k.name} · ${part}** — ${why}.`)
     return out
   })
 
