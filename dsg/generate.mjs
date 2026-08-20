@@ -114,14 +114,16 @@ ${decl(r.vars)}
      ${attrLine(r) || '(no choices — nothing matched)'}
    Set those there, not here: Radix's accent is a twelve-step scale it ships,
    and one step written by hand is eleven steps out of step. */
-.radix-themes {
+${SCOPE.radix} {
 ${decl(r.vars)}
 }`,
 
   mantine: (r, kit) => `/* ${stamp(kit)} — its variables, all settable at runtime.
    Its COMPONENT class names are content hashes (.m_77c9d27d is Button), so use
-   its React components; these variables are what they read. */
-:root {
+   its React components; these variables are what they read.
+   The selector is theirs, not :root: Mantine's own block is
+   :root[data-mantine-color-scheme='light'] and a plain :root loses the tie. */
+${SCOPE.mantine} {
 ${decl(r.vars)}
 }`,
 
@@ -130,7 +132,7 @@ ${decl(r.vars)}
    * lands on the same values the components use. */
   openprops: (r, kit) => `/* ${stamp(kit)} — variables only; Open Props ships no components.
    Loaded UNDER whatever renders, so your own CSS agrees with it. */
-:where(html) {
+${SCOPE.openprops} {
 ${decl(r.vars)}
 }`,
 }
@@ -257,6 +259,24 @@ export const fontLink = (families) => families.length
       families.map((f) => `family=${encodeURIComponent(f).replace(/%20/g, '+')}:wght@400;500;600;700`).join('&')}&display=swap">`
   : ''
 
+/**
+ * The selector a kit's own values must be beaten with.
+ *
+ * A theme block does not win by being ours; it wins by out-specifying theirs.
+ * Mantine writes :root[data-mantine-color-scheme='light'] — a pseudo-class AND
+ * an attribute — so a plain :root of ours lost every tie and the semantic
+ * colours moved in the file and nowhere on the screen. Radix scopes to its
+ * theme class. This is the third shape of the same lesson daisyUI taught with
+ * data-theme, so it is written down once and used in both places: the file we
+ * generate and the live block the preview injects.
+ */
+export const SCOPE = {
+  mantine: ":root[data-mantine-color-scheme='light'], [data-mantine-color-scheme='light']",
+  radix: '.radix-themes',
+  openprops: ':where(html)',
+}
+export const scopeOf = (id) => SCOPE[id] ?? ':root'
+
 export function collisions(routed, kits) {
   const out = []
   for (const r of routed) {
@@ -375,6 +395,10 @@ function manifest(routed, kits, values) {
     /* Not every gap is a token that would not take a value. Some are parts of a
      * screen the kit ships no component for at all, and a theme that stays
      * silent about those is the reason people find out at build time. */
+    for (const role of ROLES) {
+      const t = MAP[r.kit]?.[role.id]
+      if (t?.overrides && values[role.id]) out.push(`- **${k.name} · ${role.id}** — this kit derives that colour itself. Your value replaces ${t.overrides}; everything else in the scheme still comes from the seed.`)
+    }
     for (const c of r.chosen ?? []) {
       out.push(`- **${k.name} · ${c.role}** — not a value this kit takes. You asked for \`${c.asked}\`; the nearest of its ${c.of} published ${c.attr.replace('data-', '')} settings is **${c.picked}** (\`${c.got}\`). ${c.why}.`)
     }

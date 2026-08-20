@@ -219,8 +219,17 @@ const material = {
  * Tone is `data-accent-color`, which is how Radix re-tones one element: it
  * remaps the whole twelve-step accent scale for that subtree. Not a colour of
  * ours anywhere. */
-const RX_TONE = { neutral: 'gray', brand: '', success: 'grass', warning: 'amber', danger: 'red' }
-const rxAccent = (tone) => (RX_TONE[tone ?? 'neutral'] ? ` data-accent-color="${RX_TONE[tone ?? 'neutral']}"` : '')
+/* Which accent a tone wears is NOT ours to decide. It used to be grass, amber
+ * and red because I typed those; now each is matched from the colour you chose
+ * to the nearest accent Radix publishes, and the element carries a data-tone
+ * hook so a running page can re-tone it without re-rendering the markup. */
+let RX_TONE = { neutral: 'gray' }
+export const useRadixTones = (map) => { RX_TONE = { neutral: 'gray', ...map } }
+const rxAccent = (tone) => {
+  const t = tone ?? 'neutral'
+  const accent = RX_TONE[t]
+  return `${accent ? ` data-accent-color="${accent}"` : ''}${t === 'neutral' || t === 'brand' ? '' : ` data-tone="${t}"`}`
+}
 const RX_BTN = { brand: 'solid', secondary: 'soft', ghost: 'ghost', danger: 'solid' }
 const radix = {
   _id: 'Radix Themes',
@@ -233,7 +242,7 @@ const radix = {
   text:    (n, k) => A(n, k, 'p', 'rt-Text rt-r-size-2'),
   muted:   (n, k) => A(n, k, 'p', 'rt-Text rt-r-size-2', ' data-accent-color="gray"'),
   label:   (n, k) => A(n, k, 'label', 'rt-Text rt-r-size-2 rt-Strong'),
-  button:  (n, k) => A(n, k, 'button', `rt-reset rt-BaseButton rt-r-size-2 rt-variant-${RX_BTN[n.tone ?? 'brand']} rt-Button`, rxAccent(n.tone === 'danger' ? 'danger' : n.tone === 'brand' ? 'brand' : n.tone === 'secondary' ? 'brand' : 'brand')),
+  button:  (n, k) => A(n, k, 'button', `rt-reset rt-BaseButton rt-r-size-2 rt-variant-${RX_BTN[n.tone ?? 'brand']} rt-Button`, rxAccent(n.tone === 'danger' ? 'danger' : 'brand')),
   input:   (n) => `<div class="rt-TextFieldRoot rt-r-size-2 rt-variant-surface"><input class="rt-reset rt-TextFieldInput" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}"></div>`,
   select:  (n) => `<select class="rt-reset rt-SelectTrigger rt-r-size-2 rt-variant-surface" style="width:100%">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
   /* Radix's checkbox is a button with an indicator inside, not an <input>:
@@ -273,12 +282,13 @@ const mc = (name, part = 'root') => MC[name]?.[part] ?? `mantine-missing-${name}
 const MN_BTN = {
   brand: '', secondary: '--button-bg:var(--mantine-color-default);--button-color:var(--mantine-color-text);--button-bd:1px solid var(--mantine-color-default-border)',
   ghost: '--button-bg:transparent;--button-color:var(--mantine-primary-color-filled)',
-  danger: '--button-bg:var(--mantine-color-red-filled);--button-color:var(--mantine-color-white)',
+  /* their semantic name, not a red I picked */
+  danger: '--button-bg:var(--mantine-color-error);--button-color:var(--mantine-color-white)',
 }
 const MN_BADGE = { neutral: '--badge-bg:var(--mantine-color-default);--badge-color:var(--mantine-color-text)',
   brand: '', success: '--badge-bg:var(--mantine-color-green-light);--badge-color:var(--mantine-color-green-light-color)',
   warning: '--badge-bg:var(--mantine-color-yellow-light);--badge-color:var(--mantine-color-yellow-light-color)',
-  danger: '--badge-bg:var(--mantine-color-red-light);--badge-color:var(--mantine-color-red-light-color)' }
+  danger: '--badge-bg:var(--mantine-color-error);--badge-color:var(--mantine-color-white)' }
 const mantine = {
   _id: 'Mantine',
   stack:   (n, k) => `<div class="${mc('Stack')}" style="--stack-gap:calc(${(n.gap ?? 3) * 0.25}rem * var(--mantine-scale))">${k}</div>`,
@@ -307,7 +317,7 @@ const mantine = {
      it through `input:checked + track`. */
   switch:  (n) => `<label class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)"><span class="${mc('Switch')}"><input type="checkbox" role="switch" class="${mc('Switch', 'input')}"${n.on ? ' checked' : ''}><span class="${mc('Switch', 'track')}"><span class="${mc('Switch', 'thumb')}"></span></span></span><span class="${mc('Text')}">${esc(n.text ?? '')}</span></label>`,
   badge:   (n, k) => A(n, k, 'span', mc('Badge'), MN_BADGE[n.tone ?? 'neutral'] ? ` style="${MN_BADGE[n.tone ?? 'neutral']}"` : ''),
-  alert:   (n, k) => `<div class="${mc('Alert')}" style="--alert-bg:var(--mantine-color-${{ danger: 'red', warning: 'yellow', success: 'green' }[n.tone] ?? 'blue'}-light)"><div class="${mc('Text')}">${n.text != null ? esc(n.text) : k}</div></div>`,
+  alert:   (n, k) => `<div class="${mc('Alert')}" style="--alert-bg:var(--mantine-color-${{ danger: 'error', warning: 'yellow-light', success: 'success' }[n.tone] ?? 'blue-light'})"><div class="${mc('Text')}">${n.text != null ? esc(n.text) : k}</div></div>`,
   stat:    (n) => `<div class="${cls(mc('Paper'), mc('Card'))}" data-with-border="true" data-orientation="vertical" style="--card-padding:var(--mantine-spacing-lg)"><p class="${mc('Text')}" style="--text-color:var(--mantine-color-dimmed);--text-fz:var(--mantine-font-size-sm)">${esc(n.label)}</p><p class="${mc('Title')}" data-order="2" style="--title-fz:var(--mantine-h2-font-size);--title-fw:var(--mantine-h2-font-weight);--title-lh:var(--mantine-h2-line-height)">${esc(n.value)}</p></div>`,
   table:   (n) => `<table class="${mc('Table', 'table')}" data-with-table-border="true" data-with-row-border="true"><thead class="${mc('Table', 'thead')}"><tr class="${mc('Table', 'tr')}">${
     list(n.cols).map((c) => `<th class="${mc('Table', 'th')}">${esc(c)}</th>`).join('')}</tr></thead><tbody class="${mc('Table', 'tbody')}">${

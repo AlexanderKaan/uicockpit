@@ -21,7 +21,7 @@
  *     it is marked as such.
  */
 
-import { hexToOklch } from './color.mjs'
+import { hexToOklch, oklchToHex, oklchStrToHex } from './color.mjs'
 
 export const ROLES = [
   { id: 'brand',    label: 'Brand',        kind: 'colour', what: 'the colour a primary action wears' },
@@ -31,6 +31,9 @@ export const ROLES = [
   { id: 'ink',      label: 'Ink',          kind: 'colour', what: 'body text' },
   { id: 'inkMuted', label: 'Muted ink',    kind: 'colour', what: 'secondary text' },
   { id: 'line',     label: 'Line',         kind: 'colour', what: 'the border between things' },
+  { id: 'success',  label: 'Success',      kind: 'colour', what: 'the colour that says it worked' },
+  { id: 'warning',  label: 'Warning',      kind: 'colour', what: 'the colour that says look again' },
+  { id: 'danger',   label: 'Danger',       kind: 'colour', what: 'the colour that says it failed' },
   { id: 'fontHeading', label: 'Headings', kind: 'font', what: 'the family headings are set in' },
   { id: 'fontBody',    label: 'Body',     kind: 'font', what: 'the family everything else is set in' },
   { id: 'radius',   label: 'Corner radius', kind: 'length', what: 'how round a box is' },
@@ -55,6 +58,9 @@ export const MAP = {
     baseText: { var: '--text-base' },
     fontBody: { var: '--font-sans' },
     fontHeading: { var: '--font-heading', new: true },
+    success:  { var: '--color-success', new: true },
+    warning:  { var: '--color-warning', new: true },
+    danger:   { var: '--color-danger', new: true },
   },
   radix: {
     _note: 'Radix does not take values, it takes CHOICES from sets it publishes: named accent scales, named grey scales, five radius settings and five scaling steps. Only the page and panel colours are really variables. Every scale is twelve hand-built steps, so a single step written by hand is eleven steps out of step — the knobs are matched to the nearest published set instead, and the manifest names it.',
@@ -69,6 +75,11 @@ export const MAP = {
     baseText: { choice: 'baseText' },
     fontBody: { var: '--default-font-family' },
     fontHeading: { var: '--heading-font-family' },
+    /* Radix has no semantic variables at all: a green badge is
+       <Badge color="green">, so each tone is another CHOICE from its accents. */
+    success:  { choice: 'brand', attr: 'tone' },
+    warning:  { choice: 'brand', attr: 'tone' },
+    danger:   { choice: 'brand', attr: 'tone' },
   },
   mantine: {
     _note: 'Semantic variables throughout, and all settable at runtime. Its COMPONENT class names are content hashes, which is a separate problem and not this table\'s.',
@@ -83,6 +94,9 @@ export const MAP = {
     baseText: { var: '--mantine-font-size-md', also: ['--mantine-font-size-xs', '--mantine-font-size-sm', '--mantine-font-size-lg', '--mantine-font-size-xl'] },
     fontBody: { var: '--mantine-font-family' },
     fontHeading: { var: '--mantine-font-family-headings' },
+    success:  { var: '--mantine-color-success' },
+    warning:  null,
+    danger:   { var: '--mantine-color-error' },
   },
   openprops: {
     _note: 'Scales, plus the small semantic layer its normalize ships. Open Props renders nothing itself — it sits under whatever does, so your own CSS agrees with the kit above it.',
@@ -97,6 +111,9 @@ export const MAP = {
     baseText: { var: '--font-size-1', also: ['--font-size-0', '--font-size-2', '--font-size-3'] },
     fontBody: { var: '--font-sans' },
     fontHeading: { var: '--font-heading', new: true },
+    success:  { var: '--success', new: true },
+    warning:  { var: '--warning', new: true },
+    danger:   { var: '--danger', new: true },
   },
   shadcn: {
     _note: 'Semantic variables by design, unprefixed. --border here is a COLOUR.',
@@ -113,6 +130,12 @@ export const MAP = {
        its own would be a second place for the same answer to live */
     fontBody: { inherits: 'the base' },
     fontHeading: { inherits: 'the base' },
+    /* shadcn ships ONE semantic colour. There is no success and no warning in
+       its registry, and adding two would be inventing names its components do
+       not read — so it says so instead. */
+    success:  null,
+    warning:  null,
+    danger:   { var: '--destructive' },
   },
   bootstrap: {
     _note: 'Runtime-themeable for surface, ink, line, radius and type — --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
@@ -130,6 +153,24 @@ export const MAP = {
     fontBody: { var: '--bs-body-font-family', also: ['--bs-font-sans-serif'] },
     fontHeading: { needsBuild: { sass: '$headings-font-family',
       why: 'Bootstrap has no --bs variable for a heading family; it is compiled from Sass like the brand colour' } },
+    success:  { var: '--bs-success', rgb: ['--bs-success-rgb'],
+                /* the same answer its brand colour gives: btn-success and
+                   alert-success carry compiled literals, so the variable alone
+                   moves the emphasis text and leaves every component alone */
+                needsBuild: { sass: '$success', why: 'Bootstrap compiles its component colours; setting --bs-success alone changes the emphasis text and nothing else' },
+                tint: ['--bs-success-text-emphasis', '--bs-success-bg-subtle', '--bs-success-border-subtle'] },
+    warning:  { var: '--bs-warning', rgb: ['--bs-warning-rgb'],
+                /* the same answer its brand colour gives: btn-warning and
+                   alert-warning carry compiled literals, so the variable alone
+                   moves the emphasis text and leaves every component alone */
+                needsBuild: { sass: '$warning', why: 'Bootstrap compiles its component colours; setting --bs-warning alone changes the emphasis text and nothing else' },
+                tint: ['--bs-warning-text-emphasis', '--bs-warning-bg-subtle', '--bs-warning-border-subtle'] },
+    danger:   { var: '--bs-danger', rgb: ['--bs-danger-rgb'],
+                /* the same answer its brand colour gives: btn-danger and
+                   alert-danger carry compiled literals, so the variable alone
+                   moves the emphasis text and leaves every component alone */
+                needsBuild: { sass: '$danger', why: 'Bootstrap compiles its component colours; setting --bs-danger alone changes the emphasis text and nothing else' },
+                tint: ['--bs-danger-text-emphasis', '--bs-danger-bg-subtle', '--bs-danger-border-subtle'] },
   },
   material: {
     _note: 'M3 takes ONE input. Its 47 colour roles — containers, on-colours, inverses, fixed variants — are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
@@ -149,6 +190,16 @@ export const MAP = {
        every one of its fifteen text styles. */
     fontBody: { var: '--md-ref-typeface-plain' },
     fontHeading: { var: '--md-ref-typeface-brand' },
+    /* M3 has exactly one semantic colour role. Not an oversight on our part:
+       the specification has error and no success or warning at all. */
+    success:  null,
+    warning:  null,
+    /* M3 derives an error role from the seed like everything else, but its API
+       takes a custom error colour, so this knob is allowed to replace it. The
+       manifest says the derivation was overridden rather than pretending the
+       two never met. */
+    danger:   { var: '--md-sys-color-error', overrides: 'the scheme its generator derives from your seed',
+                tint: ['--md-sys-color-on-error', '--md-sys-color-error-container', '--md-sys-color-on-error-container'] },
   },
   daisyui: {
     _note: 'Registers into Tailwind\'s --color-* namespace on purpose. --border here is a WIDTH, not a colour.',
@@ -165,6 +216,9 @@ export const MAP = {
        its own would be a second place for the same answer to live */
     fontBody: { inherits: 'the base' },
     fontHeading: { inherits: 'the base' },
+    success:  { var: '--color-success', tint: ['--color-success-content'] },
+    warning:  { var: '--color-warning', tint: ['--color-warning-content'] },
+    danger:   { var: '--color-error', tint: ['--color-error-content'] },
   },
 }
 
@@ -257,11 +311,74 @@ export function nearestChoice(want, choice) {
   return best && { ...best, distance: Number(best.d.toFixed(3)) }
 }
 
+/** Any published colour as OKLCH — kits write hex, oklch() or rgb(). */
+function asOklch(value) {
+  const v = String(value ?? '').trim()
+  const hex = /^#[0-9a-f]{6}$/i.test(v) ? v
+    : /^#[0-9a-f]{3}$/i.test(v) ? '#' + v.slice(1).split('').map((c) => c + c).join('')
+    : v.startsWith('oklch') ? oklchStrToHex(v) : null
+  return hex ? hexToOklch(hex) : null
+}
+
+/**
+ * A SIBLING colour, written the way the kit itself relates it to its base.
+ *
+ * Bootstrap does not repeat --bs-success in --bs-success-bg-subtle; it publishes
+ * a much lighter, much less saturated relative of it. daisyUI's -content is a
+ * dark ink of the same hue. Material's error-container is a tonal step. Copy the
+ * base into any of those and the subtle background becomes fully saturated and
+ * the readable ink stops being readable.
+ *
+ * So the same rule the length scale already uses applies to colour: read the
+ * kit's OWN published pair, take the relationship out of it, and put the new
+ * value through it. Nothing here is a shade we invented — it is their shade
+ * arithmetic, applied to your colour.
+ */
+function relative(want, base, sibling) {
+  const w = asOklch(want), b = asOklch(base), s = asOklch(sibling)
+  if (!w || !b || !s) return null
+  const dL = s[0] - b[0]
+  const cRatio = b[1] > 0.001 ? s[1] / b[1] : 0
+  /* hue follows the value you chose, not the hue their green happened to be */
+  return oklchToHex(Math.min(1, Math.max(0, w[0] + dL)), Math.max(0, w[1] * cRatio), w[2])
+}
+
+/** "r, g, b" — Bootstrap keeps a second copy in that format for rgba(). */
+function asRgbTriple(value) {
+  const hex = /^#[0-9a-f]{6}$/i.test(String(value)) ? String(value)
+    : String(value).startsWith('oklch') ? oklchStrToHex(String(value)) : null
+  if (!hex) return null
+  return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')
+}
+
+/**
+ * A starting value for a role, taken from the first kit that publishes one.
+ *
+ * The knobs have to open on something, and "something" must not be a colour we
+ * chose. Every kit that has a success colour publishes it; this returns that
+ * value and the name of the kit it came from, so the page can say so.
+ */
+export function seedFrom(roleId, kits, ids = Object.keys(kits)) {
+  for (const id of ids) {
+    const target = MAP[id]?.[roleId]
+    if (!target?.var) continue
+    const raw = kits[id]?.modes?.light?.[target.var]
+    const hex = raw && (asOklch(raw) ? oklchToHex(...asOklch(raw)) : null)
+    if (hex) return { value: hex, from: kits[id].name, variable: target.var }
+  }
+  return null
+}
+
 export function route(values, kitIds, kits = {}) {
   return kitIds.map((id) => {
     const m = MAP[id]
     if (!m) throw new Error(`no role map for kit "${id}" — add one before listing it`)
-    const defaults = Object.assign({}, ...Object.values(kits[id]?.modes ?? {}))
+    /* LIGHT, not every mode merged. Merging let the dark values win, so
+       Bootstrap's own light→bg-subtle relationship was read off its DARK pair
+       and every subtle background came out nearly black while every emphasis
+       text came out pale — exactly inverted. The preview is light; the
+       relationships have to be read from the same mode. */
+    const defaults = kits[id]?.modes?.light ?? {}
     const vars = {}, unroutable = [], unscaled = [], chosen = [], attrs = {}
 
     for (const role of ROLES) {
@@ -281,13 +398,31 @@ export function route(values, kitIds, kits = {}) {
         const set = kits[id]?.choices?.[target.choice]
         const pick = nearestChoice(v, set)
         if (!pick) { unroutable.push(role.id); continue }
-        attrs[set.attr] = pick.name
-        chosen.push({ role: role.id, attr: set.attr, picked: pick.name, of: Object.keys(set.of).length,
+        /* `tone` means per-element, not per-theme: Radix re-tones one badge
+           with data-accent-color on the badge. Writing all four into the theme
+           root would have left the last one standing and silently replaced the
+           brand accent with the danger one. */
+        if (target.attr !== 'tone') attrs[set.attr] = pick.name
+        chosen.push({ role: role.id, attr: target.attr === 'tone' ? 'tone' : set.attr,
+          picked: pick.name, of: Object.keys(set.of).length,
           asked: v, got: pick.value, distance: pick.distance, why: set.why })
         continue
       }
       if (!target.var) continue            // build-time only; carried in the package, not as a variable
       vars[target.var] = v
+
+      /* the same colour in the format a second variable expects — writing a hex
+         into --bs-success-rgb would leave every rgba(var(...), .5) invalid */
+      for (const name of target.rgb ?? []) {
+        const t = asRgbTriple(v)
+        if (t) vars[name] = t; else unscaled.push(name)
+      }
+      /* and the relatives, through the kit's own arithmetic */
+      for (const name of target.tint ?? []) {
+        const made = relative(v, defaults[target.var], defaults[name])
+        if (made) vars[name] = made; else unscaled.push(name)
+      }
+
       const siblings = target.also ?? []
       if (KIND[role.id] !== 'length') { for (const extra of siblings) vars[extra] = v; continue }
 

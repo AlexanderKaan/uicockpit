@@ -36,7 +36,12 @@ test('a role a kit cannot take is named, never silently dropped', () => {
   const daisy = coverage('daisyui')
   assert.deepEqual(daisy.missing.sort(), ['baseText', 'inkMuted', 'line'],
     'daisyUI has no muted ink and no border COLOUR — --border there is a width')
-  assert.deepEqual(coverage('shadcn').missing, ['baseText'])
+  /* shadcn ships ONE semantic colour — --destructive — and no success or
+     warning at all. Material ships only error, because M3 has no other. Both
+     say so rather than growing a name their components do not read. */
+  assert.deepEqual(coverage('shadcn').missing.sort(), ['baseText', 'success', 'warning'])
+  assert.ok(coverage('material').missing.includes('success'))
+  assert.ok(coverage('mantine').missing.includes('warning'), 'Mantine has error and success but no warning')
   assert.ok(coverage('tailwind').added.includes('brand'), 'Tailwind has no semantic brand; we add one')
 
   const [tw, sh, da] = route({ brand: '#0B6E8A', line: '#DFE2E7' }, ['tailwind', 'shadcn', 'daisyui'], KITS)

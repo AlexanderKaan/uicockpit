@@ -81,7 +81,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:4px;backgro
 .spec__meta{font-size:10.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
 .pick__foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .pick__now{margin:0;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.swatches{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:7px}
+.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:7px}
 .sw{display:flex;flex-direction:column;gap:5px}
 .sw input{-webkit-appearance:none;appearance:none;border:0;padding:0;height:36px;width:100%;border-radius:9px;cursor:pointer;background:0}
 .sw input::-webkit-color-swatch-wrapper{padding:0}
@@ -141,7 +141,7 @@ dialog::backdrop{background:#1c1b1966}
 .sheet ul{margin:0;padding-left:17px}
 .sheet code{font-family:ui-monospace,monospace;font-size:11.5px;background:var(--sunken);padding:1px 5px;border-radius:4px;color:var(--ink)}
 @media(max-width:1100px){.band__knobs{grid-template-columns:1fr 1fr}}
-@media(max-width:900px){.band__knobs{grid-template-columns:1fr}.swatches{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){.band__knobs{grid-template-columns:1fr}.swatches{grid-template-columns:repeat(5,1fr)}}
 </style>
 <!--BODY-->
 <script type="module">
@@ -154,6 +154,7 @@ const SCRIPTS = /*SCRIPTS*/;
 const OWN = /*OWN*/;
 const RENDERS = /*RENDERS*/;
 const FONTS = /*FONTS*/;
+const SEEDS = /*SEEDS*/;
 const ICONS = /*ICONS*/;
 const ico = (n, s = 13) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] ?? ''}</svg>`
 
@@ -183,6 +184,8 @@ const state = {
   get show() { return showing(stack(this.on, KITS)) },
   values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
     ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px',
+    /* filled in below from whichever kit publishes one */
+    success: '', warning: '', danger: '',
     /* seeded from what the base kit publishes, not from a face we like */
     fontHeading: '', fontBody: '' },
 }
@@ -243,15 +246,27 @@ function paint() {
        are set on the theme root the way its <Theme> would set them. */
     const root = f.contentDocument.documentElement
     for (const [a, v] of Object.entries(r.attrs ?? {})) root.setAttribute(a, v)
+    /* and its per-element tones, which live in the markup rather than in a
+       variable — the wall is built once, so they are re-tuned in place */
+    for (const c of r.chosen ?? []) {
+      if (c.attr !== 'tone') continue
+      for (const el of f.contentDocument.querySelectorAll(`[data-tone="${c.role}"]`)) el.setAttribute('data-accent-color', c.picked)
+    }
     /* the chosen face has to exist inside the frame too, or the wall shows the
        fallback while the card shows the family */
     for (const role of TYPE) loadFace(f.contentDocument, familyOf(state.values[role.id]))
     let vars = varsOf(below(r.kit))
     /* Material's other 46 roles come from its own generator, pre-derived here
        for the seeds we shipped; an unseen seed keeps the last derived scheme
-       and the note says the download will carry the right one. */
-    if (r.kit === 'material') Object.assign(vars, DERIVED.light ?? {})
-    live.textContent = `:root{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
+       and the note says the download will carry the right one.
+       UNDER the routed values, not over them: its generator emits an error role
+       too, and applying the scheme last quietly replaced the danger colour you
+       picked with the one M3 computed. Its own API takes a custom error, so the
+       knob is allowed to win — and the manifest says it did. */
+    if (r.kit === 'material') vars = { ...DERIVED.light ?? {}, ...vars }
+    /* the same selector the generated file uses — a block only wins if it
+       out-specifies the kit's own, which :root does not always do */
+    live.textContent = `${scopeOf(r.kit)}{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
   }
   build(state.show)
   for (const id of RENDERS) $('#f_' + id).hidden = id !== state.show
@@ -533,7 +548,7 @@ function receipt(routed) {
   const needs = routed.filter((r) => !LIVE_BRAND[r.kit] && state.show === r.kit)
   note(needs.length
     ? `<b>${KITS[state.show].name}</b> — ${state.show === 'bootstrap'
-        ? 'its brand is compiled by Sass, so this frame shows the build we made. Your download carries the Sass line that changes it.'
+        ? 'its component colours — brand, success, warning and danger — are compiled by Sass, so this frame shows the build we made. Your download carries the Sass lines that change them.'
         : 'it derives its colours from the seed with its own generator, so this frame shows a pre-derived scheme. Your download carries the seed.'}`
     : '')
 }
@@ -616,6 +631,11 @@ $('#sheetx').addEventListener('click', () => $('#sheet').close())
 /* The two font knobs start on whatever the kit under them publishes. Seeding
  * them with a face we like would be the one opinion this tool is not allowed to
  * have — and it would silently overwrite the kit's own default on load. */
+/* ||=, not ??=: the placeholders above are empty strings, and an empty
+   string is neither null nor undefined — the three knobs opened on black. */
+for (const [role, seed] of Object.entries(SEEDS)) state.values[role] ||= seed.value
+for (const role of ['success', 'warning', 'danger']) if (!state.values[role]) delete state.values[role]
+
 for (const role of TYPE) {
   if (state.values[role.id]) continue
   const base = KITS[stack(state.on, KITS).base]?.name

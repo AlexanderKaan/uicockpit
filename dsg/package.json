@@ -5,7 +5,7 @@
   "scripts": {
     "kits": "node fetch-kits.mjs",
     "kits:check": "node fetch-kits.mjs --check",
-    "test": "node --test roles.test.mjs generate.test.mjs wall.test.mjs color.test.mjs stack.test.mjs material.test.mjs type.test.mjs",
+    "test": "node --test roles.test.mjs generate.test.mjs wall.test.mjs color.test.mjs stack.test.mjs material.test.mjs type.test.mjs semantic.test.mjs",
     "proof": "node build-proof.mjs",
     "wall": "node preview.mjs",
     "page": "node build-page.mjs generator.html",

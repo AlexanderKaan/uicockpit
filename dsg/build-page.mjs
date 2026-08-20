@@ -9,10 +9,11 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { icons, svg } from './icons.mjs'
+import { seedFrom, route } from './roles.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render } from './parts.mjs'
-import { WALL, useMantineClasses } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useRadixTones } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
 import { ownage } from './fidelity.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
@@ -30,6 +31,20 @@ const SEED = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(kits.mantine?.classes)
+
+/* The semantic knobs open on a published value, not on a green we picked. The
+ * order is the order kits are asked in, and the page says which kit answered. */
+const SEEDS = {}
+for (const role of ['success', 'warning', 'danger']) {
+  const seed = seedFrom(role, kits, ['daisyui', 'bootstrap', 'mantine', 'material', 'shadcn', 'radix'])
+  if (seed) { SEED[role] = seed.value; SEEDS[role] = seed }
+}
+/* the wall is built once, so Radix's per-element tones are baked from the seed;
+ * the page re-tones them live through the data-tone hook */
+useRadixTones(Object.fromEntries((route(SEED, ['radix'], kits)[0]?.chosen ?? [])
+  .filter((c) => c.attr === 'tone').map((c) => [c.role, c.picked])))
+
+console.log(`  ✓ semantic colours seeded from ${[...new Set(Object.values(SEEDS).map((s) => s.from))].join(', ') || 'nothing — no kit publishes one'}`)
 
 /* The wrapper a kit needs to be itself. Without data-theme, daisyUI's dark
  * theme wins on a dark OS and the frame shows its factory purple — which is
@@ -97,6 +112,7 @@ let page = readFileSync('page.template.html', 'utf8')
    * section caption, and counting our chrome against the kit reported 97 of 98
    * where the truth is 97 of 97. */
   .replace('/*RENDERS*/', () => JSON.stringify(RENDERS))
+  .replace('/*SEEDS*/', () => JSON.stringify(SEEDS))
   .replace('/*FONTS*/', () => JSON.stringify({ google: gf.families, stacks: kitFonts(kits) }))
   .replace('/*OWN*/', () => JSON.stringify(Object.fromEntries(RENDERS.map((id) => {
     const html = SCENES.map((s) => render(s.node, WALL[id])).join('')
