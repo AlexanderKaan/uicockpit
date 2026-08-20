@@ -106,3 +106,15 @@ test('install.md says the one thing that makes daisyUI apply at all', () => {
   assert.match(md, /prefersdark/, 'and the reason has to be in the file, not in our heads')
   assert.match(generate(VALUES, ['daisyui'], KITS)['theme.css'], /SET data-theme/)
 })
+
+test("shadcn's variables are bridged into Tailwind's namespace, or nothing reads them", () => {
+  const css = generate(VALUES, ['shadcn'], KITS)._blocks.shadcn
+  assert.match(css, /@theme inline \{/, 'shadcn needs the bridge its own globals.css ships')
+  assert.match(css, /--color-primary: var\(--primary\)/)
+  assert.match(css, /--color-border: var\(--border\)/)
+  assert.match(css, /--radius-lg: var\(--radius\)/)
+  /* the semantic block is still there too — the bridge is in ADDITION */
+  assert.match(css, /:root \{[\s\S]*--primary: #0B6E8A/)
+  /* and we must not bridge --radius as if it were a colour */
+  assert.doesNotMatch(css, /--color-radius/)
+})

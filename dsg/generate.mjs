@@ -27,11 +27,42 @@ const EMIT = {
 ${decl(r.vars)}
 }`,
 
-  shadcn: (r, kit) => `/* ${stamp(kit)} — the variables its components read.
+  /* Two blocks, and the second one is not optional.
+   *
+   * shadcn's variables are SEMANTIC and unprefixed — --primary, --background,
+   * --border. Tailwind generates utilities from its own --color-* namespace, so
+   * `bg-primary` does not exist unless something bridges the two. shadcn's own
+   * globals.css does it with @theme inline; we did not, and every shadcn
+   * component in the preview rendered completely unstyled. The package had the
+   * same hole, so anyone installing it would have seen the same nothing. */
+  shadcn: (r, kit) => {
+    /* THEIR defaults, ours over them — the same rule daisyUI needed. Our knobs
+     * reach seven of shadcn's variables; its components read seventeen. Writing
+     * only ours left --secondary, --accent and --destructive undefined, so
+     * bg-secondary and hover:bg-accent were never generated and half its
+     * variants rendered as bare text. */
+    const all = { ...kit.modes.light, ...r.vars }
+    const bridge = Object.fromEntries(Object.keys(all)
+      .filter((n) => n !== '--radius')
+      .map((n) => [n.replace(/^--/, '--color-'), `var(${n})`]))
+    const radius = all['--radius']
+    return `/* ${stamp(kit)} — the variables its components read: its published
+   defaults with your values over them.
    Dark mode is not generated yet: add a .dark block with your dark values. */
 :root {
-${decl(r.vars)}
-}`,
+${decl(all)}
+}
+
+/* The bridge into Tailwind's namespace, so bg-primary and border-input exist.
+   Without it the variables above are set and nothing reads them. */
+@theme inline {
+${decl(bridge)}${radius ? `
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);` : ''}
+}`
+  },
 
   /* REPLACES the theme, so it must carry everything the kit needs.
    *

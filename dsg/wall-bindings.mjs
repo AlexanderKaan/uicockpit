@@ -104,22 +104,44 @@ const bootstrap = {
   tabs:    (n) => `<ul class="nav nav-tabs">${list(n.items).map((t, i) => `<li class="nav-item"><a class="nav-link${i === 0 ? ' active' : ''}">${esc(t)}</a></li>`).join('')}</ul>`,
 }
 
-/* ── shadcn/ui — the composition it ships, previewed ─────────────────────── */
-const SC_BTN = { brand: 'bg-primary text-primary-foreground hover:bg-primary/90', secondary: 'bg-secondary text-secondary-foreground',
-  ghost: 'hover:bg-accent hover:text-accent-foreground', danger: 'bg-destructive text-white' }
+/* ── shadcn/ui — its OWN class strings, read from its registry ───────────── */
+/* Not an approximation of shadcn: the exact strings its components ship, taken
+ * from ui.shadcn.com/r/styles/new-york-v4/*.json. The earlier version inherited
+ * the Tailwind table and dragged our semantic names (bg-brand, text-ink) into a
+ * kit that has none — 82% of the classes were theirs and the rest were mine.
+ * A kit we half-write is a kit we cannot claim to ship. */
+const SC_BTN_BASE = 'inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none h-9 px-4 py-2'
+const SC_BTN = {
+  brand: 'bg-primary text-primary-foreground hover:bg-primary/90',
+  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+  ghost: 'hover:bg-accent hover:text-accent-foreground',
+  danger: 'bg-destructive text-white hover:bg-destructive/90',
+}
+const SC_BADGE = { neutral: 'bg-secondary text-secondary-foreground', brand: 'bg-primary text-primary-foreground',
+  success: 'bg-primary text-primary-foreground', warning: 'bg-secondary text-secondary-foreground',
+  danger: 'bg-destructive text-white' }
 const shadcn = {
-  ...tailwind, _id: 'shadcn/ui',
-  panel:   (n, k) => `<div class="rounded-xl border bg-card text-card-foreground shadow-sm p-6">${k}</div>`,
-  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, n.level === 2 ? 'text-2xl font-semibold tracking-tight' : 'text-base font-semibold'),
-  text:    (n, k) => A(n, k, 'p', 'text-sm text-foreground'),
-  muted:   (n, k) => A(n, k, 'p', 'text-sm text-muted-foreground'),
-  label:   (n, k) => A(n, k, 'label', 'text-sm font-medium leading-none'),
-  button:  (n, k) => A(n, k, 'button', cls('inline-flex min-h-9 items-center justify-center rounded-md px-4 text-sm font-medium', SC_BTN[n.tone ?? 'brand'])),
-  input:   (n) => `<input class="flex min-h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}">`,
-  badge:   (n, k) => A(n, k, 'span', cls('inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium',
-    n.tone === 'brand' ? 'bg-primary text-primary-foreground border-transparent' : n.tone === 'danger' ? 'bg-destructive text-white border-transparent' : 'bg-secondary text-secondary-foreground border-transparent')),
-  stat:    (n) => `<div class="rounded-xl border bg-card p-6"><div class="text-sm text-muted-foreground">${esc(n.label)}</div><div class="text-2xl font-semibold">${esc(n.value)}</div></div>`,
-  divider: () => `<hr class="border-border">`,
+  _id: 'shadcn/ui',
+  stack:   (n, k) => `<div class="flex flex-col gap-${n.gap ?? 3}">${k}</div>`,
+  row:     (n, k) => `<div class="flex flex-wrap items-center gap-${n.gap ?? 2}${n.between ? ' justify-between' : ''}">${k}</div>`,
+  grid:    (n, k) => `<div class="grid gap-3" style="grid-template-columns:repeat(${n.cols ?? 2},minmax(0,1fr))">${k}</div>`,
+  panel:   (n, k) => `<div class="flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm"><div class="px-6">${k}</div></div>`,
+  divider: () => `<div class="bg-border h-px w-full"></div>`,
+  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, n.level === 2 ? 'text-2xl leading-none font-semibold' : 'leading-none font-semibold'),
+  text:    (n, k) => A(n, k, 'p', 'text-sm'),
+  muted:   (n, k) => A(n, k, 'p', 'text-muted-foreground text-sm'),
+  label:   (n, k) => A(n, k, 'label', 'flex items-center gap-2 text-sm leading-none font-medium select-none'),
+  button:  (n, k) => A(n, k, 'button', cls(SC_BTN_BASE, SC_BTN[n.tone ?? 'brand'])),
+  input:   (n) => `<input class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}">`,
+  select:  (n) => `<select class="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
+  checkbox: (n) => `<label class="flex items-center gap-2 text-sm leading-none font-medium"><input type="checkbox" class="border-input size-4 shrink-0 rounded-[4px] border shadow-xs accent-primary"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
+  switch:  (n) => `<label class="flex items-center gap-2 text-sm leading-none font-medium"><span class="${n.on ? 'bg-primary' : 'bg-input'} inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs"><span class="bg-background pointer-events-none block size-4 rounded-full ring-0${n.on ? ' translate-x-[calc(100%-2px)]' : ''}"></span></span>${esc(n.text ?? '')}</label>`,
+  badge:   (n, k) => A(n, k, 'span', cls('inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap', SC_BADGE[n.tone ?? 'neutral'])),
+  alert:   (n, k) => `<div class="relative grid w-full items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm ${n.tone === 'danger' ? 'text-destructive bg-card' : 'bg-card text-card-foreground'}">${n.text != null ? esc(n.text) : k}</div>`,
+  stat:    (n) => `<div class="flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm"><div class="px-6"><div class="text-muted-foreground text-sm">${esc(n.label)}</div><div class="text-2xl font-semibold tabular-nums">${esc(n.value)}</div></div></div>`,
+  table:   (n) => `<table class="w-full caption-bottom text-sm"><thead class="[&_tr]:border-b"><tr class="hover:bg-muted/50 border-b transition-colors">${list(n.cols).map((c) => `<th class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap">${esc(c)}</th>`).join('')}</tr></thead><tbody class="[&_tr:last-child]:border-0">${list(n.rows).map((r) => `<tr class="hover:bg-muted/50 border-b transition-colors">${list(r).map((c) => `<td class="p-2 align-middle whitespace-nowrap">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
+  avatar:  (n) => `<span class="relative flex size-8 shrink-0 overflow-hidden rounded-full"><span class="bg-muted flex size-full items-center justify-center rounded-full text-xs">${esc(n.text)}</span></span>`,
+  tabs:    (n) => `<div class="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'bg-background text-foreground shadow-sm ' : ''}inline-flex h-[calc(100%-1px)] items-center justify-center rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap">${esc(t)}</span>`).join('')}</div>`,
 }
 
 /* ── Material 3 — its tokens, previewed; the package installs the elements ── */
