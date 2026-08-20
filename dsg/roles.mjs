@@ -62,6 +62,20 @@ export const MAP = {
     radius:   { var: '--radius' },
     baseText: null,     // shadcn inherits type from your Tailwind setup
   },
+  material: {
+    _note: 'M3 takes ONE input. Its 47 colour roles — containers, on-colours, inverses, fixed variants — are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
+    brand:    { var: '--md-sys-color-primary', seeds: '@material/material-color-utilities' },
+    onBrand:  { derives: 'brand' },
+    page:     { derives: 'brand' },
+    surface:  { derives: 'brand' },
+    ink:      { derives: 'brand' },
+    inkMuted: { derives: 'brand' },
+    line:     { derives: 'brand' },
+    radius:   { var: '--md-sys-shape-corner-md',
+                also: ['--md-sys-shape-corner-xs', '--md-sys-shape-corner-sm', '--md-sys-shape-corner-lg',
+                       '--md-sys-shape-corner-xl', '--md-sys-shape-corner-xxl'] },
+    baseText: null,
+  },
   daisyui: {
     _note: 'Registers into Tailwind\'s --color-* namespace on purpose. --border here is a WIDTH, not a colour.',
     brand:    { var: '--color-primary' },
@@ -76,12 +90,21 @@ export const MAP = {
   },
 }
 
-/** Which roles a kit simply cannot take. Said out loud, never quietly dropped. */
+/**
+ * What each kit can and cannot take, said out loud rather than quietly dropped.
+ *
+ *   missing  the kit has no variable for this job at all
+ *   added    the kit has no semantic name; we add one and the export says so
+ *   derived  the kit COMPUTES this from another role, with its own generator —
+ *            writing it ourselves would be overwritten, or would half-theme it
+ */
 export function coverage(kitId) {
   const m = MAP[kitId] ?? {}
   const missing = ROLES.filter((r) => m[r.id] === null).map((r) => r.id)
   const added = ROLES.filter((r) => m[r.id]?.new).map((r) => r.id)
-  return { missing, added, note: m._note }
+  const derived = ROLES.filter((r) => m[r.id]?.derives).map((r) => r.id)
+  const seeds = Object.entries(m).filter(([, t]) => t?.seeds).map(([id, t]) => ({ role: id, by: t.seeds }))
+  return { missing, added, derived, seeds, note: m._note }
 }
 
 const LEN = /^(-?[\d.]+)(rem|em|px)$/
@@ -112,6 +135,10 @@ export function route(values, kitIds, kits = {}) {
       if (v == null) continue
       const target = m[role.id]
       if (!target) { unroutable.push(role.id); continue }
+      /* A role this kit computes for itself is not ours to write. Setting four
+         of Material's forty-seven colour roles and calling it themed is exactly
+         the half-applied theme this whole file exists to prevent. */
+      if (target.derives) continue
       vars[target.var] = v
       const siblings = target.also ?? []
       if (KIND[role.id] !== 'length') { for (const extra of siblings) vars[extra] = v; continue }

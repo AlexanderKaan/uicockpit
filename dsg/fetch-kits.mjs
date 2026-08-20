@@ -62,6 +62,24 @@ const SOURCES = {
         modes: { light: cssVars(light.text), dark: cssVars(dark.text) } }
     },
   },
+  material: {
+    name: 'Material 3',
+    what: 'Google\'s design system — 47 colour roles derived from ONE seed, plus web components',
+    async read() {
+      const colour = fromNpm('@material/web@latest', 'labs/gb/styles/color/md-color-tokens.css')
+      const shape = fromNpm('@material/web@latest', 'labs/gb/styles/shape/md-shape-tokens.css')
+      /* Material ships both modes in one declaration with CSS light-dark(), so
+         the two are split back out here rather than fetched twice. */
+      const light = {}, dark = {}
+      for (const [name, raw] of Object.entries({ ...cssVars(colour.text), ...cssVars(shape.text) })) {
+        const pair = /^light-dark\(\s*([^,]+?)\s*,\s*(.+?)\s*\)$/.exec(raw)
+        light[name] = pair ? pair[1] : raw
+        dark[name] = pair ? pair[2] : raw
+      }
+      return { version: colour.version, source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens`,
+        modes: { light, dark } }
+    },
+  },
   shadcn: {
     name: 'shadcn/ui',
     what: 'React components copied into your repo — you own the source, it is not a dependency',

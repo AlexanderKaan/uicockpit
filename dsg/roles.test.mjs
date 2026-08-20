@@ -23,6 +23,7 @@ test('every variable we write into exists in the kit that publishes it', () => {
     for (const role of ROLES) {
       const t = m[role.id]
       if (!t || t.new) continue           // `new` is one we add on purpose
+      if (t.derives) continue             // computed by the kit; there is no variable of ours to check
       for (const name of [t.var, ...(t.also ?? [])]) {
         assert.ok(known.has(name), `${id}.${role.id} writes ${name}, which ${id} no longer publishes — the map is stale`)
       }
@@ -85,4 +86,29 @@ test('a ratio we cannot read is left alone and reported', () => {
   const [tw] = route({ radius: '12' }, ['tailwind'], KITS)   // no unit
   assert.deepEqual(tw.unscaled, ['--radius-md', '--radius-sm'])
   assert.equal(tw.vars['--radius-md'], undefined, 'better their value than our guess')
+})
+
+test('a kit that derives its colours takes the seed and nothing else', () => {
+  const [mat] = route({ brand: '#0B6E8A', page: '#fff', ink: '#111', line: '#ddd', radius: '1rem' }, ['material'], KITS)
+
+  assert.equal(mat.vars['--md-sys-color-primary'], '#0B6E8A', 'the seed is ours to set')
+  for (const v of ['--md-sys-color-surface', '--md-sys-color-on-surface', '--md-sys-color-outline']) {
+    assert.equal(mat.vars[v], undefined, `${v} is computed by M3 from the seed — writing it half-themes the kit`)
+  }
+  assert.deepEqual(mat.derived.sort(), ['ink', 'inkMuted', 'line', 'onBrand', 'page', 'surface'])
+  assert.deepEqual(mat.seeds, [{ role: 'brand', by: '@material/material-color-utilities' }])
+})
+
+test("Material's corner ramp keeps M3's own steps", () => {
+  const [mat] = route({ radius: '24px' }, ['material'], KITS)
+  const own = Object.assign({}, ...Object.values(KITS.material.modes))
+  const num = (v) => Number(/^(-?[\d.]+)/.exec(v)[1])
+  /* M3 ships xs 4 · sm 8 · md 12 · lg 16 · xl 28 · xxl 48 — doubling md must
+     double the rest, not flatten six deliberate steps into one. */
+  for (const sib of ['--md-sys-shape-corner-xs', '--md-sys-shape-corner-lg', '--md-sys-shape-corner-xxl']) {
+    const published = num(own[sib]) / num(own['--md-sys-shape-corner-md'])
+    const routed = num(mat.vars[sib]) / num(mat.vars['--md-sys-shape-corner-md'])
+    assert.ok(Math.abs(published - routed) < 1e-6, `${sib}: ${published} became ${routed}`)
+  }
+  assert.equal(mat.vars['--md-sys-shape-corner-md'], '24px')
 })
