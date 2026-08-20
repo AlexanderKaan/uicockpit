@@ -7,7 +7,7 @@ import { icons, svg } from './icons.mjs'
 import { render } from './parts.mjs'
 import { WALL } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
-import { generate } from './generate.mjs'
+import { generate, section } from './generate.mjs'
 
 const OUT = process.argv[2] ?? 'home.html'
 const ALL = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material']
@@ -32,9 +32,8 @@ const shot = `<!doctype html><meta charset=utf-8><style>${css.daisyui}</style><b
 
 /* the caveats on the page are the REAL ones, pulled out of a real manifest */
 const md = generate(VALUES, ALL, kits)['MANIFEST.md']
-const caveats = md.slice(md.indexOf('## What could not be done')).split('\n')
-  .filter((l) => l.startsWith('- ')).slice(0, 5)
-  .map((l) => l.slice(2).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>'))
+const caveats = section(md, '## What could not be done').slice(0, 5)
+  .map((l) => l.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>'))
 
 const NAMES = ['box', 'sparkles', 'download']
 const lu = icons(NAMES)

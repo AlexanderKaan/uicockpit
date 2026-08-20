@@ -50,12 +50,18 @@ try {
 
 /* the pure modules, inlined — the same code the CLI runs */
 const strip = (s) => s.replace(/^import[^\n]*from '[^']+'\n/gm, '').replace(/^export (const|function|class|let) /gm, '$1 ').replace(/^export \{[^}]*\}[^\n]*\n/gm, '')
-const parts = ['parts.mjs', 'roles.mjs', 'generate.mjs', 'wall-bindings.mjs', 'scenes.mjs']
+const parts = ['color.mjs', 'zip.mjs', 'parts.mjs', 'roles.mjs', 'generate.mjs', 'wall-bindings.mjs', 'scenes.mjs']
+/* The page's OWN inline script shares that scope too. Checking only the modules
+ * missed `hsl` being declared in both color.mjs and the page — a SyntaxError
+ * before anything ran, with a blank sheet and nothing in the UI to explain it. */
+const tplScript = readFileSync('page.template.html', 'utf8').split('<script type="module">')[1] ?? ''
 const seen = new Map()
-for (const f of parts) for (const m of strip(readFileSync(f, 'utf8')).matchAll(/^(?:const|let|function|class)\s+([A-Za-z_$][\w$]*)/gm)) {
-  const prev = seen.get(m[1])
-  if (prev && prev !== f) { console.error(`build: "${m[1]}" declared in both ${prev} and ${f} — the bundle shares one scope`); process.exit(1) }
-  seen.set(m[1], f)
+for (const [f, src] of [...parts.map((f) => [f, strip(readFileSync(f, 'utf8'))]), ['page.template.html', tplScript]]) {
+  for (const m of src.matchAll(/^(?:const|let|function|class)\s+([A-Za-z_$][\w$]*)/gm)) {
+    const prev = seen.get(m[1])
+    if (prev && prev !== f) { console.error(`build: "${m[1]}" is declared in both ${prev} and ${f} — the bundle shares one scope, so rename one.`); process.exit(1) }
+    seen.set(m[1], f)
+  }
 }
 const mods = parts.map((f) => `/* ── ${f} ── */\n${strip(readFileSync(f, 'utf8'))}`).join('\n\n')
 

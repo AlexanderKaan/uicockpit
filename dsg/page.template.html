@@ -71,7 +71,27 @@ dialog::backdrop{background:#1c1b1966}
 .sheet{padding:20px 22px;position:relative}
 .sheet__x{position:absolute;top:12px;right:12px;border:0;background:0;cursor:pointer;color:var(--muted);min-height:36px;min-width:36px;border-radius:9px}
 .sheet__x:hover{background:var(--sunken)}
-.sheet h2{margin:0 0 4px;font-size:16px}
+.sheet h2{margin:0;font-size:17px;letter-spacing:-.01em}
+.sheet__top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.sheet__sum{margin:3px 0 0;font-size:12.5px;color:var(--muted)}
+.sheet section{margin-bottom:18px}
+.sheet section .eyebrow{margin-bottom:9px}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.fact{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:6px 10px;border-radius:8px;background:var(--sunken)}
+.fact i{width:11px;height:11px;border-radius:3px;flex:none;font-style:normal;border:1px solid #0000001a}
+.fact b{font-weight:600}
+.dests{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dest{text-align:left;font:inherit;border:1px solid var(--line);background:var(--panel);border-radius:10px;
+      padding:11px 13px;cursor:pointer;min-height:56px;display:flex;flex-direction:column;gap:2px}
+.dest:hover{background:var(--sunken)}
+.dest b{font-size:13px;font-weight:600}
+.dest span{font-size:11.5px;color:var(--muted);line-height:1.4}
+.pairs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:5px 16px}
+.pairs li{display:grid;grid-template-columns:13px 1fr max-content;gap:8px;align-items:baseline;font-size:12px}
+.pairs .ok{color:#1e6b37;font-weight:700}
+.pairs .no{color:#8e2c21;font-weight:700}
+.pairs em{font-style:normal;color:var(--muted);font-family:ui-monospace,monospace;font-size:11.5px}
+.pairs li[data-bad] em{color:#8e2c21;font-weight:600}
 .sheet h3{margin:15px 0 6px;font-size:12.5px}
 .sheet p,.sheet li{font-size:12.5px;line-height:1.55;color:var(--muted)}
 .sheet ul{margin:0;padding-left:17px}
@@ -197,22 +217,23 @@ $('#brief').addEventListener('change', (e) => {
 $('#shuffle').addEventListener('click', shuffle)
 addEventListener('keydown', (e) => { if (e.key === 's' && !/input|textarea/i.test(e.target.tagName)) shuffle() })
 function shuffle() {
-  /* Within the floors, always. A shuffle that can hand you an unreadable
-     combination is a shuffle nobody can trust — which is the difference between
-     ours and a random palette. */
-  const h = Math.floor(Math.random() * 360)
-  const brand = hsl(h, 55 + Math.random() * 20, 28 + Math.random() * 12)
-  Object.assign(state.values, { brand, onBrand: '#ffffff',
-    page: hsl(h, 12, 97), surface: '#ffffff', ink: hsl(h, 14, 10), inkMuted: hsl(h, 8, 42), line: hsl(h, 12, 88),
-    radius: [2, 6, 10, 16][Math.floor(Math.random() * 4)] + 'px' })
+  /* Within the floors, always — and with the SAME maths the export uses, not a
+     hand-rolled HSL twin. A shuffle that can hand you an unreadable combination
+     is a shuffle nobody can trust; that is the whole difference between this and
+     a random palette. */
+  const hue = Math.floor(Math.random() * 360)
+  const brand = oklchToHex(0.42 + Math.random() * 0.16, 0.10 + Math.random() * 0.09, hue)
+  const greys = okNeutralScale(hue, 20 + Math.random() * 40, false, Math.random() < 0.25, 1).map(oklchStrToHex)
+  Object.assign(state.values, {
+    brand, onBrand: readableInk(brand),
+    page: greys[1], surface: greys[0], line: greys[5], inkMuted: greys[10] ?? greys.at(-3), ink: greys.at(-1),
+    radius: [2, 6, 10, 16][Math.floor(Math.random() * 4)] + 'px',
+  })
   sync(); paint()
-  note(`Rolled a new one — contrast floors held, as they always will.`)
-}
-const hsl = (h, s, l) => {
-  const a = s / 100 * Math.min(l / 100, 1 - l / 100)
-  const f = (n) => { const k = (n + h / 30) % 12; const c = l / 100 - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))
-    return Math.round(255 * c).toString(16).padStart(2, '0') }
-  return `#${f(0)}${f(8)}${f(4)}`
+  const bad = auditContrast(state.values).filter((p) => !p.passes)
+  note(bad.length
+    ? `Rolled <b>${nameColor(brand)}</b> — ${bad.length} pair${bad.length > 1 ? 's are' : ' is'} under its floor. Use this kit shows which.`
+    : `Rolled <b>${nameColor(brand)}</b> — every contrast pair clears its floor.`)
 }
 
 function sync() {
@@ -260,25 +281,61 @@ function receipt(routed) {
 
 /* ── the two outputs ──────────────────────────────────────────────────────── */
 const files = () => generate(state.values, ORDER.filter((k) => state.on.has(k)), KITS)
-$('#download').addEventListener('click', () => {
+const grab = (name, body, type = 'text/plain') => {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([body], { type }))
+  a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+}
+
+/* Nothing downloads until you have seen what it is.
+ *
+ * The old sandbox got this right and the first version here threw it away:
+ * pressing Export dropped five files into someone's Downloads folder with no
+ * account of what they were. A package you have not read is a package you do
+ * not trust — and the two things worth reading are the contrast audit and the
+ * list of what this system CANNOT express. */
+const DESTS = [
+  { t: 'Everything', d: 'one .zip — theme, install, manifest, agent brief', go: (f) =>
+      grab('design-system.zip', zip(plain(f)), 'application/zip') },
+  { t: 'Just the theme', d: 'theme.css, to drop in next to your kits', go: (f) => grab('theme.css', f['theme.css']) },
+  { t: 'For a coding agent', d: 'DESIGN-SYSTEM.md — what it is and what not to invent', go: (f) => grab('DESIGN-SYSTEM.md', f['DESIGN-SYSTEM.md']) },
+  { t: 'The manifest', d: 'versions, licences, and what could not be done', go: (f) => grab('MANIFEST.md', f['MANIFEST.md']) },
+]
+const plain = (f) => Object.fromEntries(Object.entries(f).filter(([k, v]) => !k.startsWith('_') && typeof v === 'string'))
+
+function openSheet() {
   const f = files()
-  for (const [name, body] of Object.entries(f)) {
-    if (name.startsWith('_') && typeof body !== 'string') continue
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(new Blob([body], { type: 'text/plain' }))
-    a.download = name.replace(/^_/, ''); a.click(); URL.revokeObjectURL(a.href)
-  }
-})
-$('#manifest').addEventListener('click', () => {
-  const md = files()['MANIFEST.md']
-  $('#sheetbody').innerHTML = md
-    .replace(/^# (.+)$/m, '<h2>$1</h2>').replace(/^## (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^\|.*$/gm, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>').replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
-    .split('\n\n').map((p) => (p.trim().startsWith('<') ? p : `<p>${p}</p>`)).join('')
+  const on = ORDER.filter((k) => state.on.has(k))
+  const audit = auditContrast(state.values)
+  const bad = audit.filter((p) => !p.passes)
+
+  $('#sum').textContent = `${Object.keys(state.values).length} settings · ${on.length} kit${on.length > 1 ? 's' : ''} · ${Object.keys(plain(f)).length} files`
+
+  $('#facts').innerHTML = [
+    ...ROLES.filter((r) => state.values[r.id] != null).map((r) => `<span class="fact">${
+      r.kind === 'colour' ? `<i style="background:${state.values[r.id]}"></i>` : ''}${r.label} <b>${state.values[r.id]}</b></span>`),
+    ...on.map((k) => `<span class="fact">${KITS[k].name} <b>${KITS[k].version ?? 'live'}</b></span>`),
+  ].join('')
+
+  $('#dests').innerHTML = DESTS.map((d, i) => `<button class="dest" data-d="${i}"><b>${d.t}</b><span>${d.d}</span></button>`).join('')
+
+  $('#clabel').textContent = `Contrast — ${audit.length - bad.length} of ${audit.length} pairs clear their floor`
+  $('#pairs').innerHTML = audit.map((p) => `<li${p.passes ? '' : ' data-bad'}>
+    <span class="${p.passes ? 'ok' : 'no'}">${p.passes ? '✓' : '✗'}</span>
+    <span>${p.label}</span><em>${p.ratio}:1</em></li>`).join('')
+
+  const cav = section(f['MANIFEST.md'], '## What could not be done')
+    .map((l) => l.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>'))
+  $('#csection').hidden = !cav.length
+  $('#caveats').innerHTML = cav.map((c) => `<li>${c}</li>`).join('')
   $('#sheet').showModal()
+}
+$('#dests').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  DESTS[Number(b.dataset.d)].go(files())
 })
+$('#download').addEventListener('click', openSheet)
+$('#manifest').addEventListener('click', openSheet)
 $('#sheetx').addEventListener('click', () => $('#sheet').close())
 
 sync()

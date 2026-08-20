@@ -45,9 +45,18 @@
   <div class="dock__what" id="receipt"></div>
   <div class="dock__acts">
     <button class="btn btn--ghost" id="manifest"><!--I:circle-alert-->What could not be done</button>
-    <button class="btn btn--go" id="download"><!--I:download-->Download your design system</button>
+    <button class="btn btn--go" id="download"><!--I:download-->Use this kit</button>
   </div>
 </footer>
 
-<dialog id="sheet"><div class="sheet"><button class="sheet__x" id="sheetx" aria-label="Close"><!--I:x--></button><div id="sheetbody"></div></div></dialog>
+<dialog id="sheet"><div class="sheet">
+  <header class="sheet__top">
+    <div><h2>Use this kit</h2><p class="sheet__sum" id="sum"></p></div>
+    <button class="sheet__x" id="sheetx" aria-label="Close"><!--I:x--></button>
+  </header>
+  <section><p class="eyebrow">In this kit</p><div class="facts" id="facts"></div></section>
+  <section><p class="eyebrow">Where do you want it?</p><div class="dests" id="dests"></div></section>
+  <section><p class="eyebrow" id="clabel">Contrast</p><ul class="pairs" id="pairs"></ul></section>
+  <section id="csection"><p class="eyebrow">What could not be done</p><ul class="caveats" id="caveats"></ul></section>
+</div></dialog>
 </div>

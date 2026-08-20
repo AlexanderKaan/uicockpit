@@ -14,6 +14,7 @@
  * quietly leaves out a third of a theme is worse than one that says so.
  */
 import { ROLES, MAP, route, coverage } from './roles.mjs'
+import { contrast } from './color.mjs'
 
 const stamp = (kit) => `${kit.name}${kit.version ? ' ' + kit.version : ''}`
 const decl = (vars, indent = '  ') => Object.entries(vars).map(([k, v]) => `${indent}${k}: ${v};`).join('\n')
@@ -174,11 +175,55 @@ Then import \`theme.css\` after the kits, so your values win.
 `
 
   files['MANIFEST.md'] = manifest(routed, kits, values)
+  files['DESIGN-SYSTEM.md'] = brief(routed, kits, values)
   /* per-kit blocks too: anything showing ONE kit must load only that kit's
      block, or the collision above happens inside your own preview */
   files._blocks = Object.fromEntries(routed.map((r, i) => [r.kit, blocks[i]]))
   files._collisions = collisions(routed, kits)
   return files
+}
+
+/**
+ * THE CONTRAST AUDIT, on the values someone actually set.
+ *
+ * Every editor in this space lets you build an unreadable theme and says
+ * nothing. We already carry the maths, so the export can show each pair with
+ * its ratio before anyone downloads it — and a pair that fails is named rather
+ * than rounded away.
+ *
+ * Only pairs that REALLY MEET on screen. Auditing ink against a colour nothing
+ * puts it on produces phantom failures, which this project has paid for once
+ * already (a mid-grey on white that no component ever rendered).
+ */
+const PAIRS = [
+  ['Body text on the page', 'ink', 'page', 4.5],
+  ['Body text on a surface', 'ink', 'surface', 4.5],
+  ['Muted text on the page', 'inkMuted', 'page', 4.5],
+  ['Muted text on a surface', 'inkMuted', 'surface', 4.5],
+  ['Button text on the brand', 'onBrand', 'brand', 4.5],
+  ['The brand against the page', 'brand', 'page', 3],
+  ['A line against a surface', 'line', 'surface', 3],
+]
+export function auditContrast(values) {
+  const out = []
+  for (const [label, fg, bg, min] of PAIRS) {
+    const a = values[fg], b = values[bg]
+    if (!a || !b) continue
+    const ratio = contrast(a, b)
+    out.push({ label, fg, bg, ratio: Math.round(ratio * 100) / 100, min, passes: ratio >= min })
+  }
+  return out
+}
+
+/* Between that heading and the NEXT one. Slicing to the end of the file swept
+   the contrast section in with it, so every pair appeared twice — once as a
+   ratio and once as a thing that "could not be done". */
+export const section = (md, heading) => {
+  const from = md.indexOf(heading)
+  if (from < 0) return []
+  const rest = md.slice(from + heading.length)
+  const to = rest.indexOf('\n## ')
+  return (to < 0 ? rest : rest.slice(0, to)).split('\n').filter((l) => l.startsWith('- ')).map((l) => l.slice(2))
 }
 
 /** What you have, where it came from, and — the part nobody else prints — what could not be done. */
@@ -214,6 +259,12 @@ ${ROLES.filter((r) => values[r.id] != null).map((r) => `- \`${r.id}\` — ${valu
 
 ${caveats.length ? caveats.join('\n') : 'Nothing — every value reached every kit you enabled.'}
 
+## Contrast
+
+${(() => { const a = auditContrast(values); const bad = a.filter((p) => !p.passes)
+  return `${a.length - bad.length} of ${a.length} pairs clear their floor.\n\n` +
+    a.map((p) => `- ${p.passes ? '✓' : '✗'} ${p.label} — **${p.ratio}:1**, needs ${p.min}`).join('\n') })()}
+
 ${clash.length ? `## Names two kits both use
 
 These variables mean different things to different kits you enabled. Whichever
@@ -226,5 +277,42 @@ ${clash.map((c) => `- \`${c.variable}\` — written for **${kits[c.written].name
 No value here was invented. Each kit's defaults were read from what it
 publishes, and every variable written belongs to the kit that publishes it. Where
 a kit could not take a value, this file says so rather than the package pretending.
+`
+}
+
+/**
+ * The file you hand a coding agent.
+ *
+ * The consumer of a design system is increasingly not a person clicking a
+ * dashboard but an agent that was asked to build something and has nothing to
+ * reach for. So the package carries a file written FOR that reader: what the
+ * system is, in its own vocabulary, and the two or three things it must not do.
+ */
+function brief(routed, kits, values) {
+  const set = ROLES.filter((r) => values[r.id] != null)
+  return `# The design system for this project
+
+Read this before writing any UI. Everything below is decided; none of it is
+yours to choose again.
+
+## Install
+
+${routed.map((r) => `- **${kits[r.kit].name}** ${kits[r.kit].version ?? ''} — see \`install.md\``).join('\n')}
+
+Import \`theme.css\` AFTER the kits, so these values win.
+
+## The values
+
+${set.map((r) => `- \`${r.id}\` — ${values[r.id]} · ${r.what}`).join('\n')}
+
+## Rules
+
+- Use the components of the kits above. Do not write a new button, card or
+  input; one already exists in every kit here.
+- Never hard-code a colour, a radius or a font size. Every one of them is a
+  variable in \`theme.css\`, in the vocabulary of the kit you are rendering with.
+- ${routed.some((r) => r.needsBuild?.length) ? 'Some values are build-time, not runtime — see MANIFEST.md before changing the brand.' : 'All values above are settable at runtime.'}
+- MANIFEST.md lists what this system CANNOT express. If you need something that
+  is not in it, say so rather than inventing it.
 `
 }
