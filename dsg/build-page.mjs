@@ -8,6 +8,7 @@
  * second implementation of routing that could drift from the first.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
+import { icons, svg } from './icons.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render } from './parts.mjs'
@@ -54,13 +55,20 @@ for (const f of parts) for (const m of strip(readFileSync(f, 'utf8')).matchAll(/
 }
 const mods = parts.map((f) => `/* ── ${f} ── */\n${strip(readFileSync(f, 'utf8'))}`).join('\n\n')
 
-const page = readFileSync('page.template.html', 'utf8')
+console.log('reading the icons from lucide…')
+const NAMES = ['box', 'sparkles', 'shuffle', 'download', 'circle-alert', 'x', 'check']
+const lu = icons(NAMES)
+console.log(`  ✓ lucide ${lu.version} · ${lu.license} — ${NAMES.length} icons`)
+
+let page = readFileSync('page.template.html', 'utf8')
   .replace('<!--BODY-->', readFileSync('page.body.html', 'utf8'))
   .replace('/*MODULES*/', mods)
   .replace('/*KITS*/', JSON.stringify(kits))
   .replace('/*CSS*/', JSON.stringify(css))
   .replace('/*DERIVED*/', JSON.stringify(derived))
   .replace('/*WALLS*/', JSON.stringify(Object.fromEntries(IDS.map((id) => [id, wall(id)]))))
+  .replace('/*ICONS*/', JSON.stringify(lu.icons))
+for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, n === 'box' ? 16 : 14))
 
 writeFileSync(OUT, page)
 console.log(`\n${OUT} — ${(page.length / 1024).toFixed(0)} kB, self-contained`)
