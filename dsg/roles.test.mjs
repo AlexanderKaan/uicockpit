@@ -24,6 +24,7 @@ test('every variable we write into exists in the kit that publishes it', () => {
       const t = m[role.id]
       if (!t || t.new) continue           // `new` is one we add on purpose
       if (t.derives) continue             // computed by the kit; there is no variable of ours to check
+      if (!t.var) continue                // build-time only; nothing runtime to verify
       for (const name of [t.var, ...(t.also ?? [])]) {
         assert.ok(known.has(name), `${id}.${role.id} writes ${name}, which ${id} no longer publishes — the map is stale`)
       }
@@ -111,4 +112,43 @@ test("Material's corner ramp keeps M3's own steps", () => {
     assert.ok(Math.abs(published - routed) < 1e-6, `${sib}: ${published} became ${routed}`)
   }
   assert.equal(mat.vars['--md-sys-shape-corner-md'], '24px')
+})
+
+test('Bootstrap is honest about what a running page can and cannot change', () => {
+  const [bs] = route({ brand: '#0B6E8A', page: '#F7F9FA', ink: '#16181C', line: '#DFE2E7', radius: '0.5rem' }, ['bootstrap'], KITS)
+
+  /* the runtime half really is runtime — these are read 24, 25, 31 and 105
+     times in Bootstrap's own stylesheet */
+  assert.equal(bs.vars['--bs-body-bg'], '#F7F9FA')
+  assert.equal(bs.vars['--bs-body-color'], '#16181C')
+  assert.equal(bs.vars['--bs-border-color'], '#DFE2E7')
+  assert.equal(bs.vars['--bs-border-radius'], '0.5rem')
+
+  /* and the brand half is not: it is carried as a build-time line, by name */
+  const build = bs.needsBuild.map((b) => b.role)
+  assert.ok(build.includes('brand') && build.includes('onBrand'))
+  assert.equal(bs.needsBuild.find((b) => b.role === 'brand').sass, '$primary')
+  assert.match(bs.needsBuild.find((b) => b.role === 'brand').why, /compiled/)
+})
+
+test("Bootstrap's radius ramp is scaled, not flattened", () => {
+  const [bs] = route({ radius: '0.75rem' }, ['bootstrap'], KITS)
+  const own = Object.assign({}, ...Object.values(KITS.bootstrap.modes))
+  const num = (v) => Number(/^(-?[\d.]+)/.exec(v)[1])
+  for (const sib of ['--bs-border-radius-sm', '--bs-border-radius-lg', '--bs-border-radius-xl']) {
+    const published = num(own[sib]) / num(own['--bs-border-radius'])
+    const routed = num(bs.vars[sib]) / num(bs.vars['--bs-border-radius'])
+    assert.ok(Math.abs(published - routed) < 1e-6, `${sib}: ${published} became ${routed}`)
+  }
+})
+
+test('every kit says which of the four answers applies to each role', () => {
+  const seen = new Set()
+  for (const id of Object.keys(MAP)) {
+    const c = coverage(id)
+    for (const k of ['missing', 'added', 'derived', 'needsBuild']) if (c[k].length) seen.add(k)
+    assert.ok(c.note, `${id} has no note explaining its theming contract`)
+  }
+  assert.deepEqual([...seen].sort(), ['added', 'derived', 'missing', 'needsBuild'],
+    'all four kinds of honest answer are in use across the five kits')
 })

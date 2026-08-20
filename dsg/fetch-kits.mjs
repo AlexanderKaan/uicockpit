@@ -62,6 +62,23 @@ const SOURCES = {
         modes: { light: cssVars(light.text), dark: cssVars(dark.text) } }
     },
   },
+  bootstrap: {
+    name: 'Bootstrap 5',
+    what: 'component classes, no build step needed — the widest-installed CSS framework there is',
+    async read() {
+      const { text, version } = fromNpm('bootstrap@latest', 'dist/css/bootstrap.css')
+      /* Only the ROOT blocks. Bootstrap also sets --bs-* inside components
+         (--bs-btn-bg and friends); those are component overrides, not the
+         theme, and hoovering them up would make the map look richer than it is. */
+      const block = (selector) => {
+        const at = text.indexOf(selector)
+        if (at < 0) return {}
+        return cssVars(text.slice(at, text.indexOf('}', at)))
+      }
+      return { version, source: `npm bootstrap@${version} · dist/css/bootstrap.css :root + [data-bs-theme=dark]`,
+        modes: { light: block(':root,'), dark: block('[data-bs-theme=dark]') } }
+    },
+  },
   material: {
     name: 'Material 3',
     what: 'Google\'s design system — 47 colour roles derived from ONE seed, plus web components',

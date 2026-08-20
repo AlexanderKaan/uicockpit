@@ -62,6 +62,20 @@ export const MAP = {
     radius:   { var: '--radius' },
     baseText: null,     // shadcn inherits type from your Tailwind setup
   },
+  bootstrap: {
+    _note: 'Runtime-themeable for surface, ink, line, radius and type — --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
+    brand:    { var: '--bs-link-color', also: ['--bs-primary'],
+                needsBuild: { sass: '$primary', why: 'component colours are compiled; setting --bs-primary alone changes links and nothing else' } },
+    onBrand:  { needsBuild: { sass: '$primary-text-emphasis', why: 'same — compiled into each component' } },
+    page:     { var: '--bs-body-bg', also: ['--bs-secondary-bg'] },
+    surface:  { var: '--bs-tertiary-bg' },
+    ink:      { var: '--bs-body-color', also: ['--bs-emphasis-color'] },
+    inkMuted: { var: '--bs-secondary-color', also: ['--bs-tertiary-color'] },
+    line:     { var: '--bs-border-color' },
+    radius:   { var: '--bs-border-radius',
+                also: ['--bs-border-radius-sm', '--bs-border-radius-lg', '--bs-border-radius-xl', '--bs-border-radius-xxl'] },
+    baseText: { var: '--bs-body-font-size' },
+  },
   material: {
     _note: 'M3 takes ONE input. Its 47 colour roles — containers, on-colours, inverses, fixed variants — are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
     brand:    { var: '--md-sys-color-primary', seeds: '@material/material-color-utilities' },
@@ -103,8 +117,13 @@ export function coverage(kitId) {
   const missing = ROLES.filter((r) => m[r.id] === null).map((r) => r.id)
   const added = ROLES.filter((r) => m[r.id]?.new).map((r) => r.id)
   const derived = ROLES.filter((r) => m[r.id]?.derives).map((r) => r.id)
+  /* A fourth answer, and the one people most need before they choose a kit:
+     the kit CAN take this, but not while the page is running. The export
+     carries a build-time line instead of a variable. */
+  const needsBuild = ROLES.filter((r) => m[r.id]?.needsBuild)
+    .map((r) => ({ role: r.id, ...m[r.id].needsBuild }))
   const seeds = Object.entries(m).filter(([, t]) => t?.seeds).map(([id, t]) => ({ role: id, by: t.seeds }))
-  return { missing, added, derived, seeds, note: m._note }
+  return { missing, added, derived, needsBuild, seeds, note: m._note }
 }
 
 const LEN = /^(-?[\d.]+)(rem|em|px)$/
@@ -139,6 +158,7 @@ export function route(values, kitIds, kits = {}) {
          of Material's forty-seven colour roles and calling it themed is exactly
          the half-applied theme this whole file exists to prevent. */
       if (target.derives) continue
+      if (!target.var) continue            // build-time only; carried in the package, not as a variable
       vars[target.var] = v
       const siblings = target.also ?? []
       if (KIND[role.id] !== 'length') { for (const extra of siblings) vars[extra] = v; continue }
