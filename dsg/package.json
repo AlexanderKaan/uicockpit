@@ -1,0 +1,11 @@
+{
+  "name": "design-system-generator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "kits": "node fetch-kits.mjs",
+    "kits:check": "node fetch-kits.mjs --check",
+    "test": "node --test roles.test.mjs generate.test.mjs",
+    "proof": "node build-proof.mjs"
+  }
+}

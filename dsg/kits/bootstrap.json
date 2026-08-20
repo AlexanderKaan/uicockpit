@@ -1,8 +1,11 @@
 {
   "id": "bootstrap",
-  "name": "Bootstrap 5",
+  "name": "Bootstrap",
   "what": "component classes, no build step needed — the widest-installed CSS framework there is",
   "version": "5.3.8",
+  "license": "MIT",
+  "npm": "bootstrap",
+  "home": "https://getbootstrap.com/",
   "source": "npm bootstrap@5.3.8 · dist/css/bootstrap.css :root + [data-bs-theme=dark]",
   "modes": {
     "light": {

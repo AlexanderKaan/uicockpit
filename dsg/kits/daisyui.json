@@ -3,6 +3,9 @@
   "name": "daisyUI",
   "what": "component classes on top of Tailwind — no JavaScript, works in any framework",
   "version": "5.7.19",
+  "license": "MIT",
+  "npm": "daisyui",
+  "home": "https://daisyui.com",
   "source": "npm daisyui@5.7.19 · theme/light.css + theme/dark.css",
   "modes": {
     "light": {

@@ -3,6 +3,9 @@
   "name": "Tailwind CSS",
   "what": "utility classes — no components; the theme is CSS variables you can override",
   "version": "4.3.3",
+  "license": "MIT",
+  "npm": "tailwindcss",
+  "home": "https://tailwindcss.com",
   "source": "npm tailwindcss@4.3.3 · theme.css",
   "modes": {
     "light": {

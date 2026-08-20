@@ -32,7 +32,12 @@ function fromNpm(pkg, file) {
     const tgz = execFileSync('npm', ['pack', pkg, '--silent', '--pack-destination', dir], { encoding: 'utf8' }).trim().split('\n').pop()
     execFileSync('tar', ['xzf', join(dir, tgz), '-C', dir])
     const version = tgz.replace(/^(.+)-(\d.*)\.tgz$/, '$2')
-    return { text: readFileSync(join(dir, 'package', file), 'utf8'), version }
+    /* the licence comes out of their package.json too — a licence anyone typed
+       from memory is the one thing in a manifest that must never be wrong */
+    const meta = JSON.parse(readFileSync(join(dir, 'package', 'package.json'), 'utf8'))
+    return { text: readFileSync(join(dir, 'package', file), 'utf8'), version,
+      license: typeof meta.license === 'string' ? meta.license : meta.license?.type ?? null,
+      npm: meta.name, home: meta.homepage ?? null }
   } finally { rmSync(dir, { recursive: true, force: true }) }
 }
 
@@ -48,8 +53,8 @@ const SOURCES = {
     name: 'Tailwind CSS',
     what: 'utility classes — no components; the theme is CSS variables you can override',
     async read() {
-      const { text, version } = fromNpm('tailwindcss@latest', 'theme.css')
-      return { version, source: `npm tailwindcss@${version} · theme.css`, modes: { light: cssVars(text) } }
+      const t = fromNpm('tailwindcss@latest', 'theme.css')
+      return { ...t, source: `npm tailwindcss@${t.version} · theme.css`, modes: { light: cssVars(t.text) } }
     },
   },
   daisyui: {
@@ -58,15 +63,16 @@ const SOURCES = {
     async read() {
       const light = fromNpm('daisyui@latest', 'theme/light.css')
       const dark = fromNpm('daisyui@latest', 'theme/dark.css')
-      return { version: light.version, source: `npm daisyui@${light.version} · theme/light.css + theme/dark.css`,
+      return { ...light, source: `npm daisyui@${light.version} · theme/light.css + theme/dark.css`,
         modes: { light: cssVars(light.text), dark: cssVars(dark.text) } }
     },
   },
   bootstrap: {
-    name: 'Bootstrap 5',
+    name: 'Bootstrap',
     what: 'component classes, no build step needed — the widest-installed CSS framework there is',
     async read() {
-      const { text, version } = fromNpm('bootstrap@latest', 'dist/css/bootstrap.css')
+      const pkg = fromNpm('bootstrap@latest', 'dist/css/bootstrap.css')
+      const text = pkg.text
       /* Only the ROOT blocks. Bootstrap also sets --bs-* inside components
          (--bs-btn-bg and friends); those are component overrides, not the
          theme, and hoovering them up would make the map look richer than it is. */
@@ -75,7 +81,7 @@ const SOURCES = {
         if (at < 0) return {}
         return cssVars(text.slice(at, text.indexOf('}', at)))
       }
-      return { version, source: `npm bootstrap@${version} · dist/css/bootstrap.css :root + [data-bs-theme=dark]`,
+      return { ...pkg, source: `npm bootstrap@${pkg.version} · dist/css/bootstrap.css :root + [data-bs-theme=dark]`,
         modes: { light: block(':root,'), dark: block('[data-bs-theme=dark]') } }
     },
   },
@@ -93,7 +99,7 @@ const SOURCES = {
         light[name] = pair ? pair[1] : raw
         dark[name] = pair ? pair[2] : raw
       }
-      return { version: colour.version, source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens`,
+      return { ...colour, source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens`,
         modes: { light, dark } }
     },
   },
@@ -106,7 +112,8 @@ const SOURCES = {
       const d = await r.json()
       const pre = (o) => Object.fromEntries(Object.entries(o ?? {}).map(([k, v]) => ['--' + k, v]))
       if (!d.cssVars?.light) throw new Error('no cssVars.light in the registry answer')
-      return { version: null, source: 'ui.shadcn.com/r/colors/neutral.json · cssVars',
+      return { version: null, license: 'MIT', npm: null, home: 'https://ui.shadcn.com',
+        source: 'ui.shadcn.com/r/colors/neutral.json · cssVars',
         modes: { light: pre(d.cssVars.light), dark: pre(d.cssVars.dark) } }
     },
   },
@@ -120,7 +127,8 @@ for (const [id, kit] of Object.entries(SOURCES)) {
     console.error(`  nothing written. ${existsSync(`kits/${id}.json`) ? 'The checked-in file is left alone; it may be out of date.' : 'This kit has no values at all.'}`)
     failed++; continue
   }
-  const doc = { id, name: kit.name, what: kit.what, version: read.version, source: read.source, modes: read.modes }
+  const doc = { id, name: kit.name, what: kit.what, version: read.version, license: read.license ?? null,
+    npm: read.npm ?? null, home: read.home ?? null, source: read.source, modes: read.modes }
   const next = JSON.stringify(doc, null, 2) + '\n'
   const path = `kits/${id}.json`
   const prev = existsSync(path) ? readFileSync(path, 'utf8') : null
