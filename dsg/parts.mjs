@@ -16,7 +16,19 @@ export const PARTS = [
   'heading', 'text', 'muted', 'label',                 // content
   'button', 'input', 'select', 'checkbox', 'switch',   // controls
   'badge', 'alert', 'stat', 'table', 'avatar', 'tabs', // display
+  'navbar', 'mediacard', 'footer',                     // organisms
 ]
+
+/**
+ * The stand-in for a photograph.
+ *
+ * A card grid without pictures is not a card grid, and a card grid with stock
+ * photographs is a lie about what you are getting. So it is a mark, drawn in
+ * currentColor at low opacity, and obviously a placeholder — the same choice
+ * every wireframe tool makes and for the same reason.
+ */
+export const PHOTO = '<svg viewBox="0 0 48 32" width="44" height="30" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" style="opacity:.35">'
+  + '<rect x="1" y="1" width="46" height="30" rx="3"/><circle cx="13" cy="11" r="3.5"/><path d="M4 27l11-11 8 8 6-5 15 12"/></svg>'
 
 export const TONES = ['neutral', 'brand', 'success', 'warning', 'danger']
 

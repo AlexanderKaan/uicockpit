@@ -80,4 +80,28 @@ export const SCENES = [
       { p: 'row', kids: [{ p: 'checkbox', on: true, text: 'Checkbox' }, { p: 'switch', on: true, text: 'Switch' }] },
     ] }] },
   },
+  {
+    /* The rung the wall was missing: not a panel out of an app but a PAGE, with
+       the two things every page has and no component library talks about — the
+       bar at the top and the block at the bottom. */
+    id: 'site', title: 'A whole page', span: 12,
+    node: { p: 'stack', gap: 0, kids: [
+      { p: 'navbar', brand: 'Havenstad', items: ['Requests', 'Decisions', 'Reports'],
+        kids: [{ p: 'button', tone: 'secondary', text: 'Sign in' }, { p: 'button', tone: 'brand', text: 'Start a request' }] },
+      { p: 'stack', gap: 4, pad: true, kids: [
+        { p: 'heading', level: 2, text: 'What you can arrange here' },
+        { p: 'grid', cols: 3, kids: [
+          { p: 'mediacard', title: 'Building work', text: 'Permission to build, convert or demolish, and what the neighbours are told.', action: 'Read on' },
+          { p: 'mediacard', title: 'Waste and recycling', text: 'Collection days, bulky items, and where the containers are.', action: 'Read on' },
+          { p: 'mediacard', title: 'Parking permits', text: 'For residents, visitors and trades. Renewals open six weeks ahead.', action: 'Read on' },
+        ] },
+      ] },
+      { p: 'footer', note: '© 2026 Gemeente Havenstad · Accessibility statement · Privacy',
+        groups: [
+          { title: 'Arrange', items: ['Requests', 'Permits', 'Objections'] },
+          { title: 'Find', items: ['Opening hours', 'Locations', 'Contact'] },
+          { title: 'About', items: ['Council', 'Decisions', 'Vacancies'] },
+        ] },
+    ] },
+  },
 ]

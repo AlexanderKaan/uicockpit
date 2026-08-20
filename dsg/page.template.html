@@ -622,8 +622,14 @@ function openSheet() {
     <span class="${p.passes ? 'ok' : 'no'}">${p.passes ? '✓' : '✗'}</span>
     <span>${p.label}</span><em>${p.ratio}:1</em></li>`).join('')
 
-  const cav = section(f['MANIFEST.md'], '## What could not be done')
-    .map((l) => l.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>'))
+  /* two different questions, so two lists: a value that could not be set, and
+     a part the kit does not ship at all. Merging them made "nothing could not
+     be done" impossible to ever say. */
+  const md = (l) => l.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>')
+  const cav = [
+    ...section(f['MANIFEST.md'], '## What could not be done').map(md),
+    ...section(f['MANIFEST.md'], '## What these kits have no component for').map(md),
+  ].filter((l) => !/^Nothing —/.test(l.replace(/<[^>]+>/g, '')))
   $('#csection').hidden = !cav.length
   $('#caveats').innerHTML = cav.map((c) => `<li>${c}</li>`).join('')
   $('#sheet').showModal()

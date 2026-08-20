@@ -53,6 +53,9 @@ test('nothing inline carries a number of ours where Material publishes a token',
     for (const d of m[1].split(';').filter(Boolean)) {
       const [prop, val] = d.split(':')
       if (!/color|background|border-radius/.test(prop)) continue
+      /* inherit and currentColor name no colour at all — they defer to whatever
+         Material already set, which is the opposite of a value of ours. */
+      if (/^\s*(inherit|currentColor|transparent|none)\s*$/i.test(val ?? '')) continue
       assert.match(val ?? '', /var\(--md-/, `${d} — a value of ours where Material publishes a token`)
     }
   }

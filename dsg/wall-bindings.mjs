@@ -14,7 +14,7 @@
  *
  * Everything else here is the kit's own classes, verbatim.
  */
-import { esc, list } from './parts.mjs'
+import { esc, list, PHOTO } from './parts.mjs'
 
 const cls = (...c) => c.filter(Boolean).join(' ')
 const A = (n, k, tag, c, extra = '') => `<${tag} class="${c}"${extra}>${n.text != null ? esc(n.text) : k}</${tag}>`
@@ -46,6 +46,22 @@ const tailwind = {
   stat:    (n) => `<div class="rounded-lg border border-line bg-surface p-4"><div class="text-sm text-ink-muted">${esc(n.label)}</div><div class="text-2xl font-semibold text-ink">${esc(n.value)}</div></div>`,
   table:   (n) => `<table class="w-full text-left text-sm"><thead class="border-b border-line text-xs uppercase text-ink-muted"><tr>${list(n.cols).map((c) => `<th class="py-2 pr-3 font-medium">${esc(c)}</th>`).join('')}</tr></thead><tbody>${list(n.rows).map((r) => `<tr class="border-b border-line">${list(r).map((c) => `<td class="py-2 pr-3 text-ink">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
   avatar:  (n) => `<span class="inline-grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-brand-foreground">${esc(n.text)}</span>`,
+  /* the semantic names our package ADDS — the same ones the manifest tells you
+     to reference, shown doing their job */
+  navbar:  (n, k) => `<header class="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-line bg-surface px-4 py-3">
+    <span class="font-semibold text-ink">${esc(n.brand)}</span>
+    <nav class="flex flex-wrap gap-4 text-sm text-ink-muted">${list(n.items).map((t) => `<a href="#" class="hover:text-ink">${esc(t)}</a>`).join('')}</nav>
+    <div class="ml-auto flex items-center gap-2">${k}</div></header>`,
+  mediacard: (n) => `<article class="flex flex-col overflow-hidden rounded-lg border border-line bg-surface">
+    <div class="flex aspect-video items-center justify-center bg-page text-ink-muted">${PHOTO}</div>
+    <div class="flex flex-col gap-2 p-4"><h3 class="text-base font-semibold text-ink">${esc(n.title)}</h3>
+    <p class="text-sm text-ink-muted">${esc(n.text)}</p>
+    <a href="#" class="text-sm font-medium text-brand">${esc(n.action ?? 'Read on')}</a></div></article>`,
+  footer:  (n) => `<footer class="border-t border-line bg-surface px-4 py-6">
+    <div class="grid gap-6" style="grid-template-columns:repeat(${list(n.groups).length || 1},minmax(0,1fr))">${
+      list(n.groups).map((g) => `<div class="flex flex-col gap-2"><p class="text-xs font-semibold text-ink">${esc(g.title)}</p>${
+        list(g.items).map((t) => `<a href="#" class="text-sm text-ink-muted hover:text-ink">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
+    <p class="mt-6 text-sm text-ink-muted">${esc(n.note)}</p></footer>`,
   tabs:    (n) => `<div class="flex gap-4 border-b border-line text-sm">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'border-b-2 border-brand pb-2 font-medium text-ink' : 'pb-2 text-ink-muted'}">${esc(t)}</span>`).join('')}</div>`,
 }
 
@@ -74,6 +90,20 @@ const daisyui = {
   stat:    (n) => `<div class="stats bg-base-100"><div class="stat"><div class="stat-title">${esc(n.label)}</div><div class="stat-value text-2xl">${esc(n.value)}</div></div></div>`,
   table:   (n) => `<div class="overflow-x-auto"><table class="table table-zebra"><thead><tr>${list(n.cols).map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${list(n.rows).map((r) => `<tr>${list(r).map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`,
   avatar:  (n) => `<div class="avatar avatar-placeholder"><div class="bg-primary text-primary-content w-8 rounded-full"><span class="text-xs">${esc(n.text)}</span></div></div>`,
+  /* daisyUI ships BOTH of these as real components: .navbar with its three
+     regions, and .footer with .footer-title. Nothing here is composed by hand. */
+  navbar:  (n, k) => `<div class="navbar bg-base-200 border-b border-base-300">
+    <div class="navbar-start"><span class="btn btn-ghost text-lg">${esc(n.brand)}</span>
+    <ul class="menu menu-horizontal px-1">${list(n.items).map((t) => `<li><a>${esc(t)}</a></li>`).join('')}</ul></div>
+    <div class="navbar-end gap-2">${k}</div></div>`,
+  mediacard: (n) => `<div class="card bg-base-100 border border-base-300">
+    <figure class="bg-base-200 text-base-content" style="aspect-ratio:16/9">${PHOTO}</figure>
+    <div class="card-body"><h3 class="card-title text-base">${esc(n.title)}</h3><p>${esc(n.text)}</p>
+    <div class="card-actions"><a class="link link-primary">${esc(n.action ?? 'Read on')}</a></div></div></div>`,
+  footer:  (n) => `<footer class="footer bg-base-200 text-base-content p-8">${
+    list(n.groups).map((g) => `<nav><h6 class="footer-title">${esc(g.title)}</h6>${
+      list(g.items).map((t) => `<a class="link link-hover">${esc(t)}</a>`).join('')}</nav>`).join('')}
+    </footer><footer class="footer footer-center bg-base-200 text-base-content px-8 pb-6"><aside><p>${esc(n.note)}</p></aside></footer>`,
   tabs:    (n) => `<div class="tabs tabs-border">${list(n.items).map((t, i) => `<a class="tab${i === 0 ? ' tab-active' : ''}">${esc(t)}</a>`).join('')}</div>`,
 }
 
@@ -102,6 +132,20 @@ const bootstrap = {
   stat:    (n) => `<div class="card"><div class="card-body"><div class="text-body-secondary small">${esc(n.label)}</div><div class="fs-3 fw-semibold">${esc(n.value)}</div></div></div>`,
   table:   (n) => `<table class="table"><thead><tr>${list(n.cols).map((c) => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead><tbody>${list(n.rows).map((r) => `<tr>${list(r).map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
   avatar:  (n) => `<span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white" style="width:2rem;height:2rem;font-size:.75rem;font-weight:600">${esc(n.text)}</span>`,
+  /* Bootstrap ships .navbar and the whole .card-img-top anatomy. It ships no
+     footer component at all, so that one is its own utilities on plain markup —
+     and the manifest says so rather than implying a component exists. */
+  navbar:  (n, k) => `<nav class="navbar navbar-expand bg-body-tertiary border-bottom px-3">
+    <span class="navbar-brand">${esc(n.brand)}</span>
+    <ul class="navbar-nav me-auto">${list(n.items).map((t) => `<li class="nav-item"><a class="nav-link" href="#">${esc(t)}</a></li>`).join('')}</ul>
+    <div class="d-flex gap-2">${k}</div></nav>`,
+  mediacard: (n) => `<div class="card h-100"><div class="card-img-top d-flex align-items-center justify-content-center bg-body-secondary" style="aspect-ratio:16/9">${PHOTO}</div>
+    <div class="card-body"><h3 class="card-title h6">${esc(n.title)}</h3><p class="card-text">${esc(n.text)}</p>
+    <a href="#" class="card-link">${esc(n.action ?? 'Read on')}</a></div></div>`,
+  footer:  (n) => `<footer class="border-top bg-body-tertiary p-4">
+    <div class="row">${list(n.groups).map((g) => `<div class="col"><h6 class="text-body-emphasis">${esc(g.title)}</h6>
+      <ul class="nav flex-column">${list(g.items).map((t) => `<li class="nav-item"><a href="#" class="nav-link px-0">${esc(t)}</a></li>`).join('')}</ul></div>`).join('')}</div>
+    <p class="text-body-secondary mb-0 mt-3">${esc(n.note)}</p></footer>`,
   tabs:    (n) => `<ul class="nav nav-tabs">${list(n.items).map((t, i) => `<li class="nav-item"><a class="nav-link${i === 0 ? ' active' : ''}">${esc(t)}</a></li>`).join('')}</ul>`,
 }
 
@@ -142,6 +186,29 @@ const shadcn = {
   stat:    (n) => `<div class="flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm"><div class="px-6"><div class="text-muted-foreground text-sm">${esc(n.label)}</div><div class="text-2xl font-semibold tabular-nums">${esc(n.value)}</div></div></div>`,
   table:   (n) => `<table class="w-full caption-bottom text-sm"><thead class="[&_tr]:border-b"><tr class="hover:bg-muted/50 border-b transition-colors">${list(n.cols).map((c) => `<th class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap">${esc(c)}</th>`).join('')}</tr></thead><tbody class="[&_tr:last-child]:border-0">${list(n.rows).map((r) => `<tr class="hover:bg-muted/50 border-b transition-colors">${list(r).map((c) => `<td class="p-2 align-middle whitespace-nowrap">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
   avatar:  (n) => `<span class="relative flex size-8 shrink-0 overflow-hidden rounded-full"><span class="bg-muted flex size-full items-center justify-center rounded-full text-xs">${esc(n.text)}</span></span>`,
+  /* shadcn ships a navigation-menu and the full card anatomy — header, title,
+     description, content, footer — so the card is built from those rather than
+     from a div with a border. It ships no footer, which is its own utilities. */
+  /* shadcn's navigation-menu string carries `group/navigation-menu` and
+     `group`, which are Tailwind MARKERS: they emit no rule of their own and
+     exist only for group-hover: variants this specimen does not use. Keeping
+     them would be two class names no stylesheet defines. */
+  navbar:  (n, k) => `<header class="bg-background flex flex-wrap items-center gap-x-6 gap-y-2 border-b px-4 py-3">
+    <span class="text-sm font-semibold">${esc(n.brand)}</span>
+    <nav class="relative flex max-w-max flex-1 items-center justify-center">
+    <ul class="flex flex-1 list-none items-center justify-center gap-1">${
+      list(n.items).map((t) => `<li class="relative"><a href="#" class="hover:bg-accent hover:text-accent-foreground flex flex-col gap-1 rounded-sm p-2 text-sm transition-all outline-none">${esc(t)}</a></li>`).join('')}</ul></nav>
+    <div class="ml-auto flex items-center gap-2">${k}</div></header>`,
+  mediacard: (n) => `<div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+    <div class="text-muted-foreground bg-muted mx-6 flex items-center justify-center rounded-lg" style="aspect-ratio:16/9">${PHOTO}</div>
+    <div class="grid auto-rows-min items-start gap-2 px-6"><div class="leading-none font-semibold">${esc(n.title)}</div>
+    <div class="text-muted-foreground text-sm">${esc(n.text)}</div></div>
+    <div class="flex items-center px-6"><a href="#" class="text-primary text-sm font-medium">${esc(n.action ?? 'Read on')}</a></div></div>`,
+  footer:  (n) => `<footer class="bg-background border-t px-4 py-6">
+    <div class="grid gap-6" style="grid-template-columns:repeat(${list(n.groups).length || 1},minmax(0,1fr))">${
+      list(n.groups).map((g) => `<div class="flex flex-col gap-2"><div class="text-xs font-semibold">${esc(g.title)}</div>${
+        list(g.items).map((t) => `<a href="#" class="text-muted-foreground text-sm">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
+    <p class="text-muted-foreground mt-6 text-sm">${esc(n.note)}</p></footer>`,
   tabs:    (n) => `<div class="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'bg-background text-foreground shadow-sm ' : ''}inline-flex h-[calc(100%-1px)] items-center justify-center rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap">${esc(t)}</span>`).join('')}</div>`,
 }
 
@@ -207,6 +274,26 @@ const material = {
     list(n.rows).map((r) => `<tr>${list(r).map((c) => `<td style="padding:12px 8px;border-top:1px solid var(--md-sys-color-outline-variant)">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
   /* nor an avatar */
   avatar:  (n) => `<span class="md-typescale-label-large" style="display:inline-grid;place-items:center;width:40px;height:40px;border-radius:var(--md-sys-shape-corner-full);background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container)">${esc(n.text)}</span>`,
+  /* Material ships a navigation bar as a custom element. It ships no footer
+     and no media card at all — M3 specifies neither — so those two are its own
+     tokens on plain markup, and the manifest names both. */
+  navbar:  (n, k) => `<header class="md-typescale-title-medium" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;padding:12px 16px;background:var(--md-sys-color-surface-container);color:var(--md-sys-color-on-surface)">
+    <span>${esc(n.brand)}</span>
+    <nav class="md-typescale-label-large" style="display:flex;flex-wrap:wrap;gap:16px;color:var(--md-sys-color-on-surface-variant)">${
+      list(n.items).map((t) => `<a href="#" style="color:inherit;text-decoration:none">${esc(t)}</a>`).join('')}</nav>
+    <span style="margin-left:auto;display:flex;gap:8px">${k}</span></header>`,
+  mediacard: (n) => `<md-outlined-card style="display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)">${PHOTO}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding:16px">
+      <h3 class="md-typescale-title-medium" style="margin:0">${esc(n.title)}</h3>
+      <p class="md-typescale-body-medium" style="margin:0;color:var(--md-sys-color-on-surface-variant)">${esc(n.text)}</p>
+      <md-text-button>${esc(n.action ?? 'Read on')}</md-text-button></div></md-outlined-card>`,
+  footer:  (n) => `<footer style="padding:24px 16px;background:var(--md-sys-color-surface-container);color:var(--md-sys-color-on-surface)">
+    <div style="display:grid;gap:24px;grid-template-columns:repeat(${list(n.groups).length || 1},minmax(0,1fr))">${
+      list(n.groups).map((g) => `<div style="display:flex;flex-direction:column;gap:8px">
+        <p class="md-typescale-label-large" style="margin:0">${esc(g.title)}</p>${
+        list(g.items).map((t) => `<a href="#" class="md-typescale-body-medium" style="color:var(--md-sys-color-on-surface-variant);text-decoration:none">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
+    <p class="md-typescale-body-small" style="margin:24px 0 0;color:var(--md-sys-color-on-surface-variant)">${esc(n.note)}</p></footer>`,
   tabs:    (n) => `<md-tabs>${list(n.items).map((t, i) => `<md-primary-tab${i === 0 ? ' active' : ''}>${esc(t)}</md-primary-tab>`).join('')}</md-tabs>`,
 }
 
@@ -261,6 +348,24 @@ const radix = {
      positioned and a hidden bold copy holds the width open so the row does not
      shift when a tab is selected. Render only the visible one and every label
      collapses onto the same point, which is exactly what happened. */
+  /* Radix ships neither a navigation bar nor a footer; what it does ship is
+     rt-Link, rt-Inset for a card's edge-to-edge media, and the card itself. */
+  navbar:  (n, k) => `<header class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-5);padding:var(--space-3) var(--space-4);background:var(--color-panel-solid);border-bottom:1px solid var(--gray-a5)">
+    <span class="rt-Heading rt-r-size-3">${esc(n.brand)}</span>
+    <nav style="display:flex;flex-wrap:wrap;gap:var(--space-4)">${
+      list(n.items).map((t) => `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`).join('')}</nav>
+    <span style="margin-left:auto;display:flex;gap:var(--space-2)">${k}</span></header>`,
+  mediacard: (n) => `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-2 rt-variant-surface" style="display:flex;flex-direction:column;gap:var(--space-2)">
+    <div class="rt-Inset" data-side="top" style="display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;background:var(--gray-a3);color:var(--gray-a9)">${PHOTO}</div>
+    <p class="rt-Heading rt-r-size-3">${esc(n.title)}</p>
+    <p class="rt-Text rt-r-size-2" data-accent-color="gray">${esc(n.text)}</p>
+    <a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#">${esc(n.action ?? 'Read on')}</a></div>`,
+  footer:  (n) => `<footer style="padding:var(--space-5) var(--space-4);background:var(--color-panel-solid);border-top:1px solid var(--gray-a5)">
+    <div class="rt-Grid" style="display:grid;gap:var(--space-5);grid-template-columns:repeat(${list(n.groups).length || 1},minmax(0,1fr))">${
+      list(n.groups).map((g) => `<div style="display:flex;flex-direction:column;gap:var(--space-2)">
+        <p class="rt-Text rt-r-size-1 rt-Strong">${esc(g.title)}</p>${
+        list(g.items).map((t) => `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
+    <p class="rt-Text rt-r-size-1" data-accent-color="gray" style="margin-top:var(--space-5)">${esc(n.note)}</p></footer>`,
   tabs:    (n) => `<nav class="rt-reset rt-BaseTabList rt-r-size-2">${list(n.items).map((t, i) =>
     `<div class="rt-TabNavItem"><a class="rt-reset rt-BaseTabListTrigger rt-TabNavLink"${i === 0 ? ' data-state="active"' : ''}><span class="rt-BaseTabListTriggerInner">${esc(t)}</span><span class="rt-BaseTabListTriggerInnerHidden">${esc(t)}</span></a></div>`).join('')}</nav>`,
 }
@@ -323,6 +428,24 @@ const mantine = {
     list(n.cols).map((c) => `<th class="${mc('Table', 'th')}">${esc(c)}</th>`).join('')}</tr></thead><tbody class="${mc('Table', 'tbody')}">${
     list(n.rows).map((r) => `<tr class="${mc('Table', 'tr')}" data-with-row-border="true">${list(r).map((c) => `<td class="${mc('Table', 'td')}">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
   avatar:  (n) => `<div class="${mc('Avatar')}"><span class="${mc('Avatar', 'placeholder')}">${esc(n.text)}</span></div>`,
+  /* Mantine's AppShell publishes a header AND a footer class — the only kit
+     here that ships both — and Card.section is its edge-to-edge media slot. */
+  navbar:  (n, k) => `<header class="${mc('AppShell', 'header')}" style="position:static;display:flex;flex-wrap:wrap;align-items:center;gap:var(--mantine-spacing-xs) var(--mantine-spacing-lg);padding:var(--mantine-spacing-sm) var(--mantine-spacing-md)">
+    <span class="${mc('Title')}" data-order="4" style="--title-fz:var(--mantine-h4-font-size);--title-fw:var(--mantine-h4-font-weight);--title-lh:var(--mantine-h4-line-height)">${esc(n.brand)}</span>
+    <nav style="display:flex;flex-wrap:wrap;gap:var(--mantine-spacing-md)">${
+      list(n.items).map((t) => `<a class="${mc('Anchor')}" href="#">${esc(t)}</a>`).join('')}</nav>
+    <span style="margin-left:auto;display:flex;gap:var(--mantine-spacing-xs)">${k}</span></header>`,
+  mediacard: (n) => `<div class="${cls(mc('Paper'), mc('Card'))}" data-with-border="true" data-orientation="vertical" style="--card-padding:var(--mantine-spacing-md)">
+    <div class="${mc('Card', 'section')}" style="display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;background:var(--mantine-color-default);color:var(--mantine-color-dimmed)">${PHOTO}</div>
+    <p class="${mc('Title')}" data-order="4" style="--title-fz:var(--mantine-h4-font-size);--title-fw:var(--mantine-h4-font-weight);--title-lh:var(--mantine-h4-line-height);margin-top:var(--mantine-spacing-sm)">${esc(n.title)}</p>
+    <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-sm);--text-color:var(--mantine-color-dimmed)">${esc(n.text)}</p>
+    <a class="${mc('Anchor')}" href="#">${esc(n.action ?? 'Read on')}</a></div>`,
+  footer:  (n) => `<footer class="${mc('AppShell', 'footer')}" style="position:static;padding:var(--mantine-spacing-lg) var(--mantine-spacing-md)">
+    <div style="display:grid;gap:var(--mantine-spacing-lg);grid-template-columns:repeat(${list(n.groups).length || 1},minmax(0,1fr))">${
+      list(n.groups).map((g) => `<div style="display:flex;flex-direction:column;gap:var(--mantine-spacing-xs)">
+        <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);font-weight:600">${esc(g.title)}</p>${
+        list(g.items).map((t) => `<a class="${mc('Anchor')}" href="#" style="--anchor-color:var(--mantine-color-dimmed)">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
+    <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-sm);--text-color:var(--mantine-color-dimmed);margin-top:var(--mantine-spacing-lg)">${esc(n.note)}</p></footer>`,
   tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal"><div class="${mc('Tabs', 'list')}" role="tablist">${
     list(n.items).map((t, i) => `<button class="${mc('Tabs', 'tab')}" role="tab"${i === 0 ? ' data-active="true"' : ''}>${esc(t)}</button>`).join('')}</div></div>`,
 }

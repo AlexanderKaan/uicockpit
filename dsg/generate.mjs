@@ -227,7 +227,23 @@ export const plain = (files) => Object.fromEntries(
  * authority on what exists, and what is absent from it is absent, full stop.
  */
 export const COMPONENT_GAPS = {
+  bootstrap: [
+    ['footer', 'Bootstrap ships a navbar but no footer component; the one on the wall is its own utilities on plain markup'],
+  ],
+  shadcn: [
+    ['footer', 'shadcn ships no footer; the one on the wall is its own tokens on plain markup'],
+  ],
+  radix: [
+    ['navbar', 'Radix Themes ships no navigation bar; the one on the wall is rt-Link and rt-Heading in a flex row'],
+    ['footer', 'and no footer either — same, with rt-Grid'],
+  ],
+  mantine: [
+    ['navbar', 'the header and footer come from AppShell, which normally positions them for a whole app shell; on the wall they sit in flow'],
+  ],
   material: [
+    ['navbar', 'M3 has a top app bar in the specification; @material/web ships only a bottom navigation bar, so the header is its tokens on plain markup'],
+    ['footer', 'no footer in the specification or the package'],
+    ['mediacard', 'no media card: md-outlined-card has no image slot, so the picture area is a plain div on their surface tokens'],
     ['layout', 'Material publishes colour and shape tokens but no spacing scale, and ships no layout components — spacing between elements is yours to decide'],
     ['table', '@material/web ships no data table, though the M3 spec describes one'],
     ['avatar', '@material/web ships no avatar; compose one from its shape and colour tokens'],
@@ -407,7 +423,6 @@ function manifest(routed, kits, values) {
     for (const c of r.chosen ?? []) {
       out.push(`- **${k.name} · ${c.role}** — not a value this kit takes. You asked for \`${c.asked}\`; the nearest of its ${c.of} published ${c.attr.replace('data-', '')} settings is **${c.picked}** (\`${c.got}\`). ${c.why}.`)
     }
-    for (const [part, why] of COMPONENT_GAPS[r.kit] ?? []) out.push(`- **${k.name} · ${part}** — ${why}.`)
     return out
   })
 
@@ -425,6 +440,16 @@ ${ROLES.filter((r) => values[r.id] != null).map((r) => `- \`${r.id}\` — ${valu
 ## What could not be done
 
 ${caveats.length ? caveats.join('\n') : 'Nothing — every value reached every kit you enabled.'}
+
+## What these kits have no component for
+
+Not about your values: these are parts of a screen the kit itself does not
+ship. Nothing here was substituted quietly — where the wall shows one, it is
+plain markup on that kit's own tokens.
+
+${(() => { const gaps = routed.flatMap((r) => (COMPONENT_GAPS[r.kit] ?? [])
+    .map(([part, why]) => `- **${kits[r.kit].name} · ${part}** — ${why}.`))
+  return gaps.length ? gaps.join('\n') : 'Nothing — every part of the wall is a component these kits ship.' })()}
 
 ## Contrast
 
