@@ -7,6 +7,7 @@
   "plain": null,
   "choices": null,
   "classes": null,
+  "ramps": null,
   "version": "1.7.23",
   "license": "MIT",
   "npm": "open-props",

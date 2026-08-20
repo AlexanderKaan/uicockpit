@@ -77,7 +77,7 @@ try {
 
 /* the pure modules, inlined — the same code the CLI runs */
 const strip = (s) => s.replace(/^import[^\n]*from '[^']+'\n/gm, '').replace(/^export (const|function|class|let) /gm, '$1 ').replace(/^export \{[^}]*\}[^\n]*\n/gm, '')
-const parts = ['color.mjs', 'zip.mjs', 'parts.mjs', 'roles.mjs', 'generate.mjs', 'wall-bindings.mjs', 'scenes.mjs', 'stack.mjs']
+const parts = ['color.mjs', 'zip.mjs', 'parts.mjs', 'roles.mjs', 'generate.mjs', 'wall-bindings.mjs', 'scenes.mjs', 'stack.mjs', 'palettes.mjs']
 /* The page's OWN inline script shares that scope too. Checking only the modules
  * missed `hsl` being declared in both color.mjs and the page — a SyntaxError
  * before anything ran, with a blank sheet and nothing in the UI to explain it. */

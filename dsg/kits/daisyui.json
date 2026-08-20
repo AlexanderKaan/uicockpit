@@ -14,6 +14,7 @@
   },
   "choices": null,
   "classes": null,
+  "ramps": null,
   "version": "5.7.20",
   "license": "MIT",
   "npm": "daisyui",

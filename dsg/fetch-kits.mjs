@@ -147,6 +147,21 @@ const SOURCES = {
           .map((name) => [name, /^#[0-9a-f]{6}$/i.exec(blockOf(p.read(`tokens/colors/${name}.css`), ':root, .light, .light-theme', { first: true })[`--${name}-12`] ?? '')?.[0]])
           .filter(([, hex]) => hex)
 
+        /* the full twelve steps of every scale, not only step 9. Radix
+           publishes what each step is FOR — 1 is the app background, 6 a
+           subtle border, 9 the solid colour, 12 high-contrast text — which
+           makes its files the richest palette source in the whole set. */
+        const ramps = {}
+        for (const name of [...new Set([...accents.map(([n]) => n), ...grayNames])]) {
+          const b = blockOf(p.read(`tokens/colors/${name}.css`), ':root, .light, .light-theme', { first: true })
+          const steps = Object.entries(b)
+            .map(([k, v]) => [/^--[a-z]+-(\d{1,2})$/.exec(k)?.[1], v])
+            .filter(([n, v]) => n && /^#[0-9a-f]{6}$/i.test(v))
+            .map(([n, v]) => [Number(n), v])
+            .sort((x, y) => x[0] - y[0])
+          if (steps.length >= 10) ramps[name] = Object.fromEntries(steps)
+        }
+
         const stepped = (text, re, read) => Object.fromEntries([...text.matchAll(re)]
           .map((m) => [m[1], read(blockOf(text, m[0]))]).filter(([, v]) => v != null))
         const layout = p.read('layout/tokens.css')
@@ -174,6 +189,7 @@ const SOURCES = {
               }),
               why: 'Radix scales the whole type and space ramp together, in five steps' },
           },
+          ramps,
           modes: { light, dark } }
       } finally { p.close() }
     },
@@ -266,6 +282,7 @@ for (const [id, kit] of Object.entries(SOURCES)) {
 
   const doc = { id, name: kit.name, what: kit.what, layer: kit.layer, standalone: kit.standalone ?? false,
     plain: read.plain ?? null, choices: read.choices ?? null, classes: read.classes ?? null,
+    ramps: read.ramps ?? null,
     version: read.version, license: read.license ?? null,
     npm: read.npm ?? null, home: read.home ?? null, source: read.source, modes: read.modes }
   const next = JSON.stringify(doc, null, 2) + '\n'

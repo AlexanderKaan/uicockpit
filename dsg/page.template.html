@@ -113,7 +113,21 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .sumrow{display:flex;align-items:baseline;gap:7px;font-size:var(--fs-md);padding:3px 0}
 .sumrow small{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-left:auto}
 
-.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:7px}
+/* The families the stack publishes, as ramps you can browse. Not a palette we
+   chose — Tailwind ships seventeen, Radix thirty-one, and the row changes with
+   the stack because the offer is theirs. */
+.sub{margin:6px 0 0;font-size:var(--fs-xs);color:var(--muted)}
+.pals{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:6px;padding-bottom:2px}
+.pals::-webkit-scrollbar{display:none}
+.pal{flex:none;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r-sm);
+     padding:4px 5px 3px;cursor:pointer;display:flex;flex-direction:column;gap:3px;width:60px}
+.pal:hover{border-color:var(--ink)}
+.pal[aria-pressed=true]{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+.pal__ramp{display:flex;height:14px;border-radius:2px;overflow:hidden}
+.pal__ramp i{flex:1}
+.pal__name{font-size:9px;color:var(--muted);text-align:center;text-transform:capitalize;
+           overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
 .sw{display:flex;flex-direction:column;gap:4px}
 .sw input{-webkit-appearance:none;appearance:none;border:0;padding:0;height:30px;width:100%;border-radius:var(--r);cursor:pointer;background:0}
 .sw input::-webkit-color-swatch-wrapper{padding:0}
@@ -610,6 +624,46 @@ $('#typeshuffle').addEventListener('click', () => {
 $('#pickx').addEventListener('click', () => $('#fontpick').close())
 $('#fontpick').addEventListener('click', (e) => { if (e.target.id === 'fontpick') $('#fontpick').close() })
 
+/* ── palette families ─────────────────────────────────────────────────────── */
+/* Picking one writes seven roles at once: the extremes straight out of their
+ * ramp, and the two in the middle — muted ink and the line — at the WCAG floor
+ * for body text and for a non-text boundary, because those are the two taste
+ * usually decides and a published bar is a better decider. */
+let palAt = null, palNeutral = null, palShort = []
+function renderPalettes() {
+  const st = stack(state.on, KITS)
+  const all = palettesFor(st.order, KITS)
+  const accents = all.filter((p) => p.kind === 'accent')
+  const neutrals = all.filter((p) => p.kind === 'neutral')
+  /* say where the current one came from — a palette you cannot trace is a
+     palette we might as well have invented */
+  $('#palnote').textContent = !accents.length
+    ? 'This stack publishes no colour families — set the roles below by hand.'
+    : palAt
+      ? `${palAt.split(':')[1]} — ${KITS[palAt.split(':')[0]].name}, with ${palNeutral ?? 'its'} for the greys`
+        + (palShort.length ? `. ${palShort.join(' and ')} could not be met from this family — see the contrast list.` : '')
+      : `${accents.length} families your stack publishes${neutrals.length ? `, each matched to one of its ${neutrals.length} greys` : ''}`
+  $('#palettes').innerHTML = accents.map((p, i) => {
+    const five = [0, 0.25, 0.5, 0.75, 1].map((f) => p.ramp[Math.round(f * (p.ramp.length - 1))])
+    return `<button class="pal" data-pal="${i}" aria-pressed="${palAt === `${p.kit}:${p.name}`}"
+      title="${p.name} — ${p.from}"><span class="pal__ramp">${five.map((c) => `<i style="background:${c}"></i>`).join('')}</span>
+      <span class="pal__name">${p.name}</span></button>`
+  }).join('')
+  return { accents, neutrals }
+}
+$('#palettes').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-pal]'); if (!b) return
+  const { accents, neutrals } = renderPalettes()
+  const pick = accents[Number(b.dataset.pal)]; if (!pick) return
+  const own = neutrals.filter((n) => n.kit === pick.kit)
+  const { values, short } = paletteRoles(pick, matchNeutral(pick, own, KITS[pick.kit]) ?? neutrals[0], KITS[pick.kit])
+  palShort = short
+  Object.assign(state.values, values)
+  palAt = `${pick.kit}:${pick.name}`
+  palNeutral = (matchNeutral(pick, own, KITS[pick.kit]) ?? neutrals[0])?.name ?? null
+  sync(); paint()
+})
+
 $('#swatches').innerHTML = SWATCH.map((r) => `<label class="sw" title="${r.what}">
   <input type="color" data-r="${r.id}" value="${state.values[r.id]}">
   <span>${r.label}</span><code data-hex="${r.id}">${state.values[r.id]}</code></label>`).join('')
@@ -660,7 +714,10 @@ function shuffle() {
   const brand = oklchToHex(0.42 + Math.random() * 0.16, 0.10 + Math.random() * 0.09, hue)
   const greys = okNeutralScale(hue, 20 + Math.random() * 40, false, Math.random() < 0.25, 1).map(oklchStrToHex)
   Object.assign(state.values, {
-    brand, onBrand: readableInk(brand),
+    /* aaInk: this function promises never to hand you an unreadable pair, and
+       readableInk splits on luminance without checking whether the split
+       actually clears 4.5:1. It does not, for a whole band of mid blues. */
+    brand, onBrand: aaInk(brand),
     page: greys[1], surface: greys[0], line: greys[5], inkMuted: greys[10] ?? greys.at(-3), ink: greys.at(-1),
     radius: [2, 6, 10, 16][Math.floor(Math.random() * 4)] + 'px',
   })
@@ -686,6 +743,7 @@ function sync() {
     el.value = slider(k, v); $(`[data-v="${el.dataset.r}"]`).textContent = shown(k, v)
   }
   renderStack()
+  renderPalettes()
   typoCards()
   drawRungs()
   drawModes()
