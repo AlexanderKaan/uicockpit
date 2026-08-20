@@ -157,6 +157,15 @@ const INSTALL = {
  * only reason it is checked here rather than shipped. Nothing else compares
  * kits closely enough to notice.
  */
+/**
+ * The entries of generate() that are actual FILES. Keys beginning with `_` are
+ * working data for the page (the per-kit blocks, the detected name clashes) and
+ * are not written anywhere. This rule lived only in the page, so the build
+ * proof wrote an object into a file and the whole end-to-end check died on it.
+ */
+export const plain = (files) => Object.fromEntries(
+  Object.entries(files).filter(([k, v]) => !k.startsWith('_') && typeof v === 'string'))
+
 export function collisions(routed, kits) {
   const out = []
   for (const r of routed) {

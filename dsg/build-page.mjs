@@ -87,7 +87,13 @@ let page = readFileSync('page.template.html', 'utf8')
   }))))
   .replace('/*WALLS*/', JSON.stringify(Object.fromEntries(IDS.map((id) => [id, wall(id)]))))
   .replace('/*ICONS*/', JSON.stringify(lu.icons))
-for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, n === 'box' ? 16 : 14))
+for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
+page = page.split('<!--MARK-->').join(mark(17))
+/* A placeholder that survives into the output is how a lucide box quietly
+ * became the logo for weeks. Nothing silently ships with a hole in it. */
+const left = [...page.matchAll(/<!--(MARK|I:[a-z-]+)-->/g)].map((m) => m[0])
+if (left.length) { console.error(`build: unreplaced ${[...new Set(left)].join(' ')}`); process.exit(1) }
+
 
 writeFileSync(OUT, page)
 console.log(`\n${OUT} — ${(page.length / 1024).toFixed(0)} kB, self-contained`)

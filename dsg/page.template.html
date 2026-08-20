@@ -90,6 +90,7 @@ dialog::backdrop{background:#1c1b1966}
 .fact i{width:11px;height:11px;border-radius:3px;flex:none;font-style:normal;border:1px solid #0000001a}
 .fact b{font-weight:600}
 .dests{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dest--wide{grid-column:1/-1}
 .dest{text-align:left;font:inherit;border:1px solid var(--line);background:var(--panel);border-radius:10px;
       padding:11px 13px;cursor:pointer;min-height:56px;display:flex;flex-direction:column;gap:2px}
 .dest:hover{background:var(--sunken)}
@@ -320,14 +321,30 @@ const grab = (name, body, type = 'text/plain') => {
  * account of what they were. A package you have not read is a package you do
  * not trust — and the two things worth reading are the contrast audit and the
  * list of what this system CANNOT express. */
+/* The frame, as a file. Byte for byte the same document the preview renders —
+ * the kit's compiled CSS, your values over it, the screens in the kit's own
+ * classes — so what you downloaded cannot differ from what you looked at. */
+function screensHtml() {
+  const id = state.show
+  const r = route(state.values, ORDER.filter((k) => state.on.has(k)), KITS).find((x) => x.kit === id)
+  const vars = { ...(r?.vars ?? {}) }
+  if (id === 'material') Object.assign(vars, DERIVED.light ?? {})
+  return `<!doctype html><meta charset="utf-8"><title>${describe(stack(state.on, KITS), KITS)}</title>
+<style>${CSS[id] ?? ''}</style>
+<style>:root{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}</style>
+<body>${WALLS[id] ?? ''}`
+}
+
 const DESTS = [
   { t: 'Everything', d: 'one .zip — theme, install, manifest, agent brief', go: (f) =>
       grab('design-system.zip', zip(plain(f)), 'application/zip') },
   { t: 'Just the theme', d: 'theme.css, to drop in next to your kits', go: (f) => grab('theme.css', f['theme.css']) },
   { t: 'For a coding agent', d: 'DESIGN-SYSTEM.md — what it is and what not to invent', go: (f) => grab('DESIGN-SYSTEM.md', f['DESIGN-SYSTEM.md']) },
   { t: 'The manifest', d: 'versions, licences, and what could not be done', go: (f) => grab('MANIFEST.md', f['MANIFEST.md']) },
+  { t: 'These screens, as one HTML file', wide: true,
+    d: 'exactly what you are looking at — the kit\'s CSS, your values, its classes. Open it in a browser.',
+    go: () => grab('screens.html', screensHtml(), 'text/html') },
 ]
-const plain = (f) => Object.fromEntries(Object.entries(f).filter(([k, v]) => !k.startsWith('_') && typeof v === 'string'))
 
 function openSheet() {
   const f = files()
@@ -343,7 +360,7 @@ function openSheet() {
     ...on.map((k) => `<span class="fact">${KITS[k].name} <b>${KITS[k].version ?? 'live'}</b></span>`),
   ].join('')
 
-  $('#dests').innerHTML = DESTS.map((d, i) => `<button class="dest" data-d="${i}"><b>${d.t}</b><span>${d.d}</span></button>`).join('')
+  $('#dests').innerHTML = DESTS.map((d, i) => `<button class="dest${d.wide ? ' dest--wide' : ''}" data-d="${i}"><b>${d.t}</b><span>${d.d}</span></button>`).join('')
 
   $('#clabel').textContent = `Contrast — ${audit.length - bad.length} of ${audit.length} pairs clear their floor`
   $('#pairs').innerHTML = audit.map((p) => `<li${p.passes ? '' : ' data-bad'}>

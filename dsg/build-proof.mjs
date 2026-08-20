@@ -16,7 +16,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { generate } from './generate.mjs'
+import { generate, plain } from './generate.mjs'
 
 const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '12px', baseText: '1rem' }
@@ -35,7 +35,7 @@ const check = (label, ok, detail = '') => {
 try {
   console.log(`\nunpacking the generated package into an empty directory`)
   mkdirSync(join(dir, 'src'), { recursive: true })
-  for (const [path, body] of Object.entries(files)) writeFileSync(join(dir, path), body)
+  for (const [path, body] of Object.entries(plain(files))) writeFileSync(join(dir, path), body)
 
   /* a project that uses the kit the way its own docs say to */
   writeFileSync(join(dir, 'package.json'), JSON.stringify({

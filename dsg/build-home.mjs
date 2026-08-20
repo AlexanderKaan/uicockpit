@@ -45,6 +45,11 @@ let page = readFileSync('home.template.html', 'utf8')
   .replace('/*CAVEATS*/', JSON.stringify(caveats))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
 page = page.split('<!--MARK-->').join(mark(18))
+/* A placeholder that survives into the output is how a lucide box quietly
+ * became the logo for weeks. Nothing silently ships with a hole in it. */
+const left = [...page.matchAll(/<!--(MARK|I:[a-z-]+)-->/g)].map((m) => m[0])
+if (left.length) { console.error(`build: unreplaced ${[...new Set(left)].join(' ')}`); process.exit(1) }
+
 
 writeFileSync(OUT, page)
 console.log(`\n${OUT} — ${(page.length / 1024).toFixed(0)} kB · ${caveats.length} real caveats · lucide ${lu.version}`)
