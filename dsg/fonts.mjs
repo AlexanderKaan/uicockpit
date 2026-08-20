@@ -14,6 +14,7 @@
  * Cached in kits/fonts.json because it is a 2.7 MB fetch; --refresh re-reads it.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 
 const CACHE = 'kits/fonts.json'
 const SOURCE = 'https://fonts.google.com/metadata/fonts'
@@ -83,7 +84,11 @@ export function kitFonts(kits) {
   return [...seen.values()]
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+/* pathToFileURL, not string concatenation: this project lives in a directory
+ * with a space in its name, so import.meta.url is percent-encoded and
+ * `file://${process.argv[1]}` never matched. The guard was silently false and
+ * running the file directly printed nothing at all. */
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const g = await googleFonts({ refresh: process.argv.includes('--refresh') })
   console.log(`\n  ${g.read} families read from ${g.source}`)
   console.log(`  most popular: ${g.families.slice(0, 8).map((f) => f.family).join(', ')}`)

@@ -22,6 +22,7 @@
  * install; delete that file or pass --refresh to read the package again.
  */
 import { execFileSync } from 'node:child_process'
+import { pathToFileURL } from 'node:url'
 import { readFileSync, writeFileSync, existsSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -112,7 +113,11 @@ export function materialElements({ refresh = false } = {}) {
   } finally { rmSync(dir, { recursive: true, force: true }) }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+/* pathToFileURL, not string concatenation: this project lives in a directory
+ * with a space in its name, so import.meta.url is percent-encoded and
+ * `file://${process.argv[1]}` never matched. The guard was silently false and
+ * running the file directly printed nothing at all. */
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const m = materialElements({ refresh: process.argv.includes('--refresh') })
   console.log(`\n  @material/web ${m.version} · ${m.license}`)
   console.log(`  ${(m.js.length / 1024).toFixed(0)} kB of their code · ${(m.typescale.length / 1024).toFixed(1)} kB of their typography`)

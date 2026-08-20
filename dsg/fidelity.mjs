@@ -17,6 +17,7 @@
  *   node fidelity.mjs
  */
 import { readFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 import { buildCss } from './build-css.mjs'
 import { render } from './parts.mjs'
 import { WALL, useMantineClasses } from './wall-bindings.mjs'
@@ -42,6 +43,31 @@ export const classesOf = (html) => [...new Set([...html.matchAll(/class="([^"]+)
  */
 export const elementsOf = (html) => [...new Set([...html.matchAll(/<([a-z]+-[a-z0-9-]*)/g)].map((m) => m[1]))]
 
+/**
+ * The same question one rung up: how many PARTS are the kit's own?
+ *
+ * The class count is the precise answer and the part count is the legible one.
+ * A part counts as theirs if the markup we emit for it carries at least one
+ * class their stylesheet defines, or one custom element their package
+ * registers. Everything else is a part we drew from their tokens because they
+ * ship nothing for it — and those are named, not totalled away.
+ */
+export function partOwnage(bind, sheet, render, PARTS, tags = null) {
+  const ours = []
+  for (const part of PARTS) {
+    const fn = bind[part]
+    if (typeof fn !== 'function') { ours.push(part); continue }
+    /* a specimen node with every field a part might read */
+    const node = { p: part, text: 'x', title: 'x', label: 'x', value: 'x', brand: 'x', note: 'x',
+      items: ['a', 'b'], options: ['a'], cols: ['a'], rows: [['a']], groups: [{ title: 'a', items: ['b'] }] }
+    let html = ''
+    try { html = render(node, bind) } catch { ours.push(part); continue }
+    const { theirs, els, elsTheirs } = ownage(html, sheet, tags)
+    if (!(theirs > 0 || elsTheirs > 0)) ours.push(part)
+  }
+  return { parts: PARTS.length, theirs: PARTS.length - ours.length, ours }
+}
+
 export function ownage(html, sheet, tags = null) {
   const used = classesOf(html)
   const sel = (c) => [...c].map((ch) => (/[A-Za-z0-9_-]/.test(ch) ? ch
@@ -59,41 +85,52 @@ export function ownage(html, sheet, tags = null) {
     inline: (html.match(/style="/g) ?? []).length }
 }
 
-const css = await buildCss(VALUES, IDS, kits, markup, () => {})
-const mdw = materialElements()
-const TAGS = { material: mdw.bundled }
+/* Guarded, because this file is also imported for `ownage` and `partOwnage`.
+ * Without it, importing one function ran the whole meter -- three npm installs
+ * and a Tailwind build -- as a side effect. Second time this project has been
+ * caught by a module that DOES something when it loads. */
+/* pathToFileURL, not string concatenation: this project lives in a directory
+ * with a space in its name, so import.meta.url is percent-encoded and
+ * `file://${process.argv[1]}` never matched. The guard was silently false and
+ * running the file directly printed nothing at all. */
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const css = await buildCss(VALUES, IDS, kits, markup, () => {})
+  const mdw = materialElements()
+  const TAGS = { material: mdw.bundled }
 
-console.log('\n  Every class we emit, looked up in the kit that should define it.\n')
-let worst = 0
-for (const id of IDS) {
-  const sheet = css[id] ?? ''
-  const { used: n, theirs, missing, els, elsTheirs, strangers } = ownage(markup(id), sheet, TAGS[id] ?? null)
-  const pct = n ? Math.round((theirs / n) * 100) : 100
-  worst = Math.max(worst, missing.length)
+  console.log('\n  Every class we emit, looked up in the kit that should define it.\n')
+  let worst = 0
+  for (const id of IDS) {
+    const sheet = css[id] ?? ''
+    const { used: n, theirs, missing, els, elsTheirs, strangers } = ownage(markup(id), sheet, TAGS[id] ?? null)
+    const pct = n ? Math.round((theirs / n) * 100) : 100
+    worst = Math.max(worst, missing.length)
 
-  /* A kit that emits NO classes scores 100% of nothing, and a meter that
-   * reports that as a pass is worse than one that fails. Material renders
-   * entirely on inline styles of ours — which is the furthest thing from being
-   * its kit, and the number has to say so rather than flatter it. */
-  if (TAGS[id]) {
-    /* two units, both reported: their elements and their typography classes */
-    const pct = els ? Math.round((elsTheirs / els) * 100) : 0
-    console.log(`  ${kits[id].name.padEnd(14)} ${String(pct).padStart(3)}%   ${elsTheirs}/${els} elements are theirs, running their code` +
-      `\n                        ${theirs}/${n} classes are theirs (their md-typescale stylesheet)`)
-    if (strangers.length) { console.log(`                 invented: ${strangers.join(' ')}`); worst = Math.max(worst, strangers.length) }
-    if (!els) worst = Math.max(worst, 1)
-    for (const [part, why] of COMPONENT_GAPS[id] ?? []) console.log(`                 no component: ${part} — ${why}`)
-    continue
+    /* A kit that emits NO classes scores 100% of nothing, and a meter that
+     * reports that as a pass is worse than one that fails. Material renders
+     * entirely on inline styles of ours — which is the furthest thing from being
+     * its kit, and the number has to say so rather than flatter it. */
+    if (TAGS[id]) {
+      /* two units, both reported: their elements and their typography classes */
+      const pct = els ? Math.round((elsTheirs / els) * 100) : 0
+      console.log(`  ${kits[id].name.padEnd(14)} ${String(pct).padStart(3)}%   ${elsTheirs}/${els} elements are theirs, running their code` +
+        `\n                        ${theirs}/${n} classes are theirs (their md-typescale stylesheet)`)
+      if (strangers.length) { console.log(`                 invented: ${strangers.join(' ')}`); worst = Math.max(worst, strangers.length) }
+      if (!els) worst = Math.max(worst, 1)
+      for (const [part, why] of COMPONENT_GAPS[id] ?? []) console.log(`                 no component: ${part} — ${why}`)
+      continue
+    }
+    if (!n) {
+      console.log(`  ${kits[id].name.padEnd(14)}   ——   nothing of theirs on the page at all`)
+      worst = Math.max(worst, 1)
+      continue
+    }
+    const note = id === 'tailwind' ? '  (utilities, not components — nothing here to be 100% of)' : ''
+    console.log(`  ${kits[id].name.padEnd(14)} ${String(pct).padStart(3)}%   ${theirs}/${n} classes are theirs${note}`)
+    if (missing.length && id !== 'tailwind') {
+      console.log(`                 invented: ${missing.slice(0, 12).join(' ')}${missing.length > 12 ? ` …and ${missing.length - 12} more` : ''}`)
+    }
   }
-  if (!n) {
-    console.log(`  ${kits[id].name.padEnd(14)}   ——   nothing of theirs on the page at all`)
-    worst = Math.max(worst, 1)
-    continue
-  }
-  const note = id === 'tailwind' ? '  (utilities, not components — nothing here to be 100% of)' : ''
-  console.log(`  ${kits[id].name.padEnd(14)} ${String(pct).padStart(3)}%   ${theirs}/${n} classes are theirs${note}`)
-  if (missing.length && id !== 'tailwind') {
-    console.log(`                 invented: ${missing.slice(0, 12).join(' ')}${missing.length > 12 ? ` …and ${missing.length - 12} more` : ''}`)
-  }
+  console.log(`\n  ${worst ? 'Not 100%. Everything named above is something we made up.' : 'Every class and every element comes from the kit that defines it.\n  What a kit has no component for is named, not substituted.'}\n`)
+
 }
-console.log(`\n  ${worst ? 'Not 100%. Everything named above is something we made up.' : 'Every class and every element comes from the kit that defines it.\n  What a kit has no component for is named, not substituted.'}\n`)

@@ -11,10 +11,12 @@
     <button class="btn" id="shuffle"><!--I:shuffle-->Shuffle <kbd>S</kbd></button>
   </div>
 
-  <details class="grp" open>
-    <summary><span class="grp__name">Stack</span><span class="grp__sum" id="sum_stack"></span></summary>
-    <div class="stack" id="stack" role="group" aria-label="Your stack"></div>
-  </details>
+  <section class="grp grp--flat">
+    <p class="grp__head"><span class="grp__name">Stack</span>
+      <button class="link" id="change">Change</button></p>
+    <div class="card" id="stackcard"></div>
+    <p class="note" id="stacknote" hidden></p>
+  </section>
 
   <details class="grp" open>
     <summary><span class="grp__name">Colour</span><span class="grp__sum grp__dots" id="sum_colour"></span></summary>
@@ -51,6 +53,33 @@
     <button class="btn btn--go" id="download"><!--I:download-->Use this kit</button>
   </div>
 </footer>
+
+<dialog id="picker"><div class="picker">
+  <header class="pick__top">
+    <div><h2>Choose a stack</h2><p class="pick__sum">A base carries the scales. Components sit on it — or bring their own base and replace it.</p></div>
+    <button class="sheet__x" id="pickerx" aria-label="Close"><!--I:x--></button>
+  </header>
+  <div class="lanes">
+    <section class="lane">
+      <p class="lane__top">Base <small>pick one</small></p>
+      <p class="lane__why">Colour, spacing and type scales. Everything else is built on it.</p>
+      <div class="lane__list" id="laneBase"></div>
+      <p class="lane__top lane__top--sub">Under everything <small>optional</small></p>
+      <div class="lane__list" id="laneUnder"></div>
+    </section>
+    <section class="lane">
+      <p class="lane__top">Components <small>optional</small></p>
+      <p class="lane__why">Buttons, inputs, tables. A greyed kit needs a different base.</p>
+      <div class="lane__list" id="laneComp"></div>
+    </section>
+    <aside class="lane lane--sum">
+      <p class="lane__top">Your stack</p>
+      <div id="pickerSum"></div>
+      <button class="btn btn--go" id="pickerDone">Use this stack</button>
+      <p class="lane__fine">You can change the stack later without losing your values.</p>
+    </aside>
+  </div>
+</div></dialog>
 
 <dialog id="fontpick"><div class="pick">
   <header class="pick__top">

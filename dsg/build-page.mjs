@@ -13,10 +13,10 @@ import { seedFrom, route } from './roles.mjs'
 import { DARK } from './generate.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
-import { render } from './parts.mjs'
+import { render, PARTS } from './parts.mjs'
 import { WALL, useMantineClasses, useRadixTones } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
-import { ownage } from './fidelity.mjs'
+import { ownage, partOwnage } from './fidelity.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
 import { mark } from './mark.mjs'
 import { materialElements } from './material-elements.mjs'
@@ -86,7 +86,10 @@ const seen = new Map()
 for (const [f, src] of [...parts.map((f) => [f, strip(readFileSync(f, 'utf8'))]), ['page.template.html', tplScript]]) {
   for (const m of src.matchAll(/^(?:const|let|function|class)\s+([A-Za-z_$][\w$]*)/gm)) {
     const prev = seen.get(m[1])
-    if (prev && prev !== f) { console.error(`build: "${m[1]}" is declared in both ${prev} and ${f} — the bundle shares one scope, so rename one.`); process.exit(1) }
+    /* twice in the SAME file counts too: two functions called drawPicker in the
+     * page script threw SyntaxError before a line of it ran, and the check
+     * waved it through because both were in one file. */
+    if (prev) { console.error(`build: "${m[1]}" is declared twice — in ${prev} and ${f}. The bundle shares one scope, so rename one.`); process.exit(1) }
     seen.set(m[1], f)
   }
 }
@@ -119,7 +122,11 @@ let page = readFileSync('page.template.html', 'utf8')
   .replace('/*OWN*/', () => JSON.stringify(Object.fromEntries(RENDERS.map((id) => {
     const html = SCENES.map((s) => render(s.node, WALL[id])).join('')
     const { used, theirs, els, elsTheirs } = ownage(html, css[id] ?? '', id === 'material' ? mdw.bundled : null)
+    /* the legible half of the same question: how many PARTS are theirs, and
+       which ones we had to draw from their tokens because they ship none */
+    const part = partOwnage(WALL[id], css[id] ?? '', render, PARTS, id === 'material' ? mdw.bundled : null)
     return [id, { used, theirs, els, elsTheirs, unit: id === 'material' ? 'elements' : 'classes',
+      parts: part.parts, partsTheirs: part.theirs, drawn: part.ours,
       gaps: COMPONENT_GAPS[id] ?? [] }]
   }))))
   /* Google's real elements, bundled.
