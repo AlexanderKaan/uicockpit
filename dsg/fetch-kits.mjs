@@ -19,11 +19,32 @@
  * A generator that falls back to yesterday's guess is a generator that lies.
  */
 import { execFileSync } from 'node:child_process'
-import { readFileSync, writeFileSync, mkdtempSync, existsSync, rmSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdtempSync, existsSync, rmSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const CHECK = process.argv.includes('--check')
+
+/**
+ * Unpack an npm tarball once and read as many files out of it as you like.
+ * Radix ships one stylesheet per accent colour, so a helper that re-packs the
+ * tarball per file would run `npm pack` twenty-five times to answer one
+ * question.
+ */
+function openNpm(pkg) {
+  const dir = mkdtempSync(join(tmpdir(), 'dsg-'))
+  const tgz = execFileSync('npm', ['pack', pkg, '--silent', '--pack-destination', dir], { encoding: 'utf8' }).trim().split('\n').pop()
+  execFileSync('tar', ['xzf', join(dir, tgz), '-C', dir])
+  const meta = JSON.parse(readFileSync(join(dir, 'package', 'package.json'), 'utf8'))
+  return {
+    version: tgz.replace(/^(.+)-(\d.*)\.tgz$/, '$2'),
+    license: typeof meta.license === 'string' ? meta.license : meta.license?.type ?? null,
+    npm: meta.name, home: meta.homepage ?? null,
+    read: (f) => readFileSync(join(dir, 'package', f), 'utf8'),
+    list: (sub) => readdirSync(join(dir, 'package', sub)),
+    close: () => rmSync(dir, { recursive: true, force: true }),
+  }
+}
 
 /** Pull one file out of an npm tarball, without installing anything. */
 function fromNpm(pkg, file) {
@@ -40,6 +61,37 @@ function fromNpm(pkg, file) {
       npm: meta.name, home: meta.homepage ?? null }
   } finally { rmSync(dir, { recursive: true, force: true }) }
 }
+
+/**
+ * The declarations of one CSS block, found by its selector.
+ * `cssVars` on a whole file would sweep up component-level overrides and make
+ * the map look richer than it is; this takes exactly one block.
+ */
+function blockOf(text, selector, { first = false } = {}) {
+  /* EVERY block with this selector, merged in source order.
+   *
+   * Two traps, both hit for real while reading Mantine. A literal string misses
+   * `:root,\n:host {`, so the kit read zero variables and still reported
+   * success. And taking only the FIRST match misses it again: Mantine's first
+   * :root,:host carries one declaration and the 224 variables are in a later
+   * one. Reading a kit wrong is worse than not reading it, because nothing
+   * downstream can tell the difference. */
+  const re = new RegExp(selector instanceof RegExp ? selector.source
+    : selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/,\s+/g, ',\\s*'), 'g')
+  const out = {}
+  for (const at of text.matchAll(re)) {
+    const open = text.indexOf('{', at.index)
+    if (open < 0) continue
+    Object.assign(out, cssVars(text.slice(open, text.indexOf('}', open))))
+    if (first) break
+  }
+  return out
+}
+
+/* Merging is the right default and the wrong one exactly once: Radix repeats
+ * every colour file's selector inside an @supports block to restate the same
+ * scale in display-p3. Merge there and you get color(display-p3 …) where a hex
+ * was asked for, which is how the accent list silently went from 31 to 0. */
 
 /** `--name: value;` pairs of a CSS block, in source order. */
 function cssVars(text) {
@@ -123,6 +175,119 @@ const SOURCES = {
         modes: { light, dark } }
     },
   },
+  radix: {
+    layer: 'components', standalone: true,
+    name: 'Radix Themes',
+    what: 'React components with a real theming API — but one that takes CHOICES, not values',
+    async read() {
+      const p = openNpm('@radix-ui/themes@latest')
+      try {
+        const base = p.read('tokens/base.css')
+        /* Their semantic colours live on .radix-themes; the scales live on
+           :root as calc() over --scaling and --radius-factor, which is exactly
+           why radius and text size here are choices and not lengths. */
+        const light = { ...blockOf(base, ':root {'), ...blockOf(base, ':where(.radix-themes)') }
+        const dark = { ...light, ...blockOf(base, ':is(.dark, .dark-theme)') }
+
+        /* Radix does not take a brand colour. It takes one of its own named
+           accents, and every one of them is a hand-built twelve-step scale.
+           Step 9 is the solid one a button wears, so that is what a brand
+           colour is compared against. Read from their files, not typed. */
+        const accents = p.list('tokens/colors')
+          .filter((f) => f.endsWith('.css') && !f.includes('-alpha') && !f.includes('-p3'))
+          .map((f) => f.replace('.css', ''))
+          /* the LIGHT block only: each colour file repeats every step in
+             display-p3 under @supports, and reading the whole file leaves you
+             with color(display-p3 …) where a hex was wanted */
+          .map((name) => [name, /^#[0-9a-f]{6}$/i.exec(blockOf(p.read(`tokens/colors/${name}.css`), ':root, .light, .light-theme', { first: true })[`--${name}-9`] ?? '')?.[0]])
+          .filter(([, hex]) => hex)
+        /* Each setting's OWN number, so a knob can be matched to the nearest
+           one rather than to whichever name sorts first. --radius-2 is 4px at
+           factor 1, and --font-size-3 is 16px at scaling 1. */
+        /* the greys are a second published set, chosen the same way */
+        const grayNames = [...new Set([...p.read('tokens.css').matchAll(/data-gray-color='([a-z]+)'/g)].map((m) => m[1]))]
+        const grays = grayNames
+          .map((name) => [name, /^#[0-9a-f]{6}$/i.exec(blockOf(p.read(`tokens/colors/${name}.css`), ':root, .light, .light-theme', { first: true })[`--${name}-12`] ?? '')?.[0]])
+          .filter(([, hex]) => hex)
+
+        const stepped = (text, re, read) => Object.fromEntries([...text.matchAll(re)]
+          .map((m) => [m[1], read(blockOf(text, m[0]))]).filter(([, v]) => v != null))
+        const layout = p.read('layout/tokens.css')
+
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://radix-ui.com/themes',
+          source: `npm @radix-ui/themes@${p.version} · tokens/base.css + tokens/colors/*.css`,
+          choices: {
+            brand: { attr: 'data-accent-color', unit: 'colour', of: Object.fromEntries(accents),
+              why: 'Radix has no brand variable. Its accent is one of these hand-built twelve-step scales, chosen on the Theme root' },
+            ink: { attr: 'data-gray-color', unit: 'colour', of: Object.fromEntries(grays),
+              why: 'Radix\'s greys are a chosen twelve-step scale too, and step 12 is the text colour' },
+            radius: { attr: 'data-radius', unit: 'px', base: 4,
+              of: stepped(base, /\[data-radius='([a-z]+)'\]/g, (v) => {
+                /* 'full' is a pill, not a factor: it is the one setting whose
+                   --radius-full stops being 0px. */
+                if (parseFloat(v['--radius-full']) > 0) return '9999px'
+                const f = parseFloat(v['--radius-factor'])
+                return Number.isFinite(f) ? `${f * 4}px` : null
+              }),
+              why: 'every --radius-N is calc(Npx * --scaling * --radius-factor); the factor comes from one of these five settings' },
+            baseText: { attr: 'data-scaling', unit: 'px', base: 16,
+              of: stepped(layout, /\[data-scaling='([0-9]+%)'\]/g, (v) => {
+                const f = parseFloat(v['--scaling'])
+                return Number.isFinite(f) ? `${f * 16}px` : null
+              }),
+              why: 'Radix scales the whole type and space ramp together, in five steps' },
+          },
+          modes: { light, dark } }
+      } finally { p.close() }
+    },
+  },
+  mantine: {
+    layer: 'components', standalone: true,
+    name: 'Mantine',
+    what: 'React components — its variables are public, its class names are build hashes',
+    async read() {
+      const p = openNpm('@mantine/core@latest')
+      try {
+        const css = p.read('styles.css')
+        const root = blockOf(css, ':root, :host')
+        const light = { ...root, ...blockOf(css, "[data-mantine-color-scheme='light']") }
+        const dark = { ...root, ...blockOf(css, "[data-mantine-color-scheme='dark']") }
+
+        /* Mantine's component class names are content hashes — .m_77c9d27d is
+           Button. They are not a documented vocabulary, but each component's
+           own stylesheet names itself, so they are READ rather than typed and a
+           release that rehashes them is caught the next time this runs. */
+        const classes = {}
+        for (const f of p.list('styles')) {
+          if (!f.endsWith('.css') || f.includes('.layer.')) continue
+          const first = /^\.(m_[a-z0-9]+)/m.exec(p.read(`styles/${f}`))
+          if (first) classes[f.replace('.css', '')] = first[1]
+        }
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://mantine.dev',
+          source: `npm @mantine/core@${p.version} · styles.css :root + colour-scheme blocks, class names from styles/*.css`,
+          classes, modes: { light, dark } }
+      } finally { p.close() }
+    },
+  },
+  openprops: {
+    layer: 'tokens', standalone: false,
+    name: 'Open Props',
+    what: 'CSS variables and nothing else — no components, so it sits under whatever renders',
+    async read() {
+      const p = openNpm('open-props@latest')
+      try {
+        /* Two files, two jobs: the scales everyone means by Open Props, and the
+           small semantic layer its normalize ships (--brand, --surface-N,
+           --text-N). Both are :where(html), so both are easy to sit under. */
+        const scales = cssVars(p.read('open-props.min.css'))
+        const light = { ...scales, ...cssVars(p.read('normalize.light.min.css')) }
+        const dark = { ...scales, ...cssVars(p.read('normalize.dark.min.css')) }
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://open-props.style',
+          source: `npm open-props@${p.version} · open-props.min.css + normalize.{light,dark}.min.css`,
+          modes: { light, dark } }
+      } finally { p.close() }
+    },
+  },
   shadcn: {
     layer: 'components',
     name: 'shadcn/ui',
@@ -148,8 +313,19 @@ for (const [id, kit] of Object.entries(SOURCES)) {
     console.error(`  nothing written. ${existsSync(`kits/${id}.json`) ? 'The checked-in file is left alone; it may be out of date.' : 'This kit has no values at all.'}`)
     failed++; continue
   }
+  /* A reader that matched nothing returns an empty object, and an empty object
+   * is a perfectly valid document — so Mantine "read successfully" with zero
+   * variables twice before this line existed. Nothing downstream could tell the
+   * difference between a kit with no theme and a selector we got wrong. */
+  const empty = Object.entries(read.modes).filter(([, v]) => !Object.keys(v).length).map(([m]) => m)
+  if (empty.length) {
+    console.error(`✗ ${id} — read ${empty.join(' and ')} as ZERO variables. The source moved or the selector is wrong; nothing written.`)
+    failed++; continue
+  }
+
   const doc = { id, name: kit.name, what: kit.what, layer: kit.layer, standalone: kit.standalone ?? false,
-    plain: read.plain ?? null, version: read.version, license: read.license ?? null,
+    plain: read.plain ?? null, choices: read.choices ?? null, classes: read.classes ?? null,
+    version: read.version, license: read.license ?? null,
     npm: read.npm ?? null, home: read.home ?? null, source: read.source, modes: read.modes }
   const next = JSON.stringify(doc, null, 2) + '\n'
   const path = `kits/${id}.json`

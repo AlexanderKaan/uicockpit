@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { stack, options, toggle, showing, foundationOf, describe } from './stack.mjs'
 
-const IDS = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material']
+const IDS = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material', 'radix', 'mantine', 'openprops']
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 
 test('the base is read from the kits, not typed here', () => {
@@ -54,4 +54,32 @@ test('every option explains itself in a sentence a reader can act on', () => {
 
 test('the stack has a name', () => {
   assert.equal(describe(stack(['shadcn'], kits), kits), 'Tailwind CSS + shadcn/ui')
+})
+
+test('a tokens layer sits under everything and is never what you look at', () => {
+  const st = stack(['openprops', 'tailwind', 'shadcn'], kits)
+  assert.deepEqual(st.order, ['openprops', 'tailwind', 'shadcn'])
+  assert.equal(showing(st), 'shadcn', 'Open Props renders nothing — you see the kit above it')
+})
+
+test('and it survives a standalone kit replacing the stack', () => {
+  const after = toggle(new Set(['openprops', 'tailwind', 'shadcn']), 'bootstrap', kits)
+  assert.deepEqual([...after].sort(), ['bootstrap', 'openprops'])
+  assert.deepEqual(stack(after, kits).order, ['openprops', 'bootstrap'])
+})
+
+test('Radix and Mantine bring their own base, so they replace the stack', () => {
+  for (const id of ['radix', 'mantine']) {
+    const st = stack(['tailwind', 'shadcn', id], kits)
+    assert.equal(st.base, id)
+    assert.deepEqual(st.layers, [])
+    assert.ok(st.dropped.includes('shadcn'))
+  }
+})
+
+test('toggling a tokens layer disturbs nothing above it', () => {
+  const before = new Set(['tailwind', 'daisyui'])
+  const withProps = toggle(before, 'openprops', kits)
+  assert.deepEqual([...withProps].sort(), ['daisyui', 'openprops', 'tailwind'])
+  assert.deepEqual([...toggle(withProps, 'openprops', kits)].sort(), ['daisyui', 'tailwind'])
 })

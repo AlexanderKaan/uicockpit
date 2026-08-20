@@ -5,6 +5,8 @@
   "layer": "components",
   "standalone": false,
   "plain": null,
+  "choices": null,
+  "classes": null,
   "version": null,
   "license": "MIT",
   "npm": null,

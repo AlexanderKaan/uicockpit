@@ -21,6 +21,8 @@
  *     it is marked as such.
  */
 
+import { hexToOklch } from './color.mjs'
+
 export const ROLES = [
   { id: 'brand',    label: 'Brand',        kind: 'colour', what: 'the colour a primary action wears' },
   { id: 'onBrand',  label: 'On brand',     kind: 'colour', what: 'text and icons on top of the brand colour', derived: true },
@@ -49,6 +51,42 @@ export const MAP = {
     line:     { var: '--color-line', new: true },
     radius:   { var: '--radius-lg', also: ['--radius-md', '--radius-sm'] },
     baseText: { var: '--text-base' },
+  },
+  radix: {
+    _note: 'Radix does not take values, it takes CHOICES from sets it publishes: named accent scales, named grey scales, five radius settings and five scaling steps. Only the page and panel colours are really variables. Every scale is twelve hand-built steps, so a single step written by hand is eleven steps out of step — the knobs are matched to the nearest published set instead, and the manifest names it.',
+    brand:    { choice: 'brand' },
+    onBrand:  { derives: 'brand' },
+    page:     { var: '--color-background' },
+    surface:  { var: '--color-panel-solid', also: ['--color-surface'] },
+    ink:      { choice: 'ink' },
+    inkMuted: { derives: 'ink' },
+    line:     { derives: 'ink' },
+    radius:   { choice: 'radius' },
+    baseText: { choice: 'baseText' },
+  },
+  mantine: {
+    _note: 'Semantic variables throughout, and all settable at runtime. Its COMPONENT class names are content hashes, which is a separate problem and not this table\'s.',
+    brand:    { var: '--mantine-primary-color-filled', also: ['--mantine-primary-color-filled-hover'] },
+    onBrand:  { var: '--mantine-primary-color-contrast' },
+    page:     { var: '--mantine-color-body' },
+    surface:  { var: '--mantine-color-default' },
+    ink:      { var: '--mantine-color-text' },
+    inkMuted: { var: '--mantine-color-dimmed' },
+    line:     { var: '--mantine-color-default-border' },
+    radius:   { var: '--mantine-radius-default', also: ['--mantine-radius-xs', '--mantine-radius-sm', '--mantine-radius-md', '--mantine-radius-lg', '--mantine-radius-xl'] },
+    baseText: { var: '--mantine-font-size-md', also: ['--mantine-font-size-xs', '--mantine-font-size-sm', '--mantine-font-size-lg', '--mantine-font-size-xl'] },
+  },
+  openprops: {
+    _note: 'Scales, plus the small semantic layer its normalize ships. Open Props renders nothing itself — it sits under whatever does, so your own CSS agrees with the kit above it.',
+    brand:    { var: '--brand', new: true, also: ['--link'] },
+    onBrand:  { var: '--surface-1', new: true },
+    page:     { var: '--surface-1' },
+    surface:  { var: '--surface-2', also: ['--surface-3'] },
+    ink:      { var: '--text-1' },
+    inkMuted: { var: '--text-2' },
+    line:     { var: '--surface-4' },
+    radius:   { var: '--radius-2', also: ['--radius-1', '--radius-3'] },
+    baseText: { var: '--font-size-1', also: ['--font-size-0', '--font-size-2', '--font-size-3'] },
   },
   shadcn: {
     _note: 'Semantic variables by design, unprefixed. --border here is a COLOUR.',
@@ -142,12 +180,63 @@ const KIND = Object.fromEntries(ROLES.map((r) => [r.id, r.kind]))
  *
  * @param kits  the fetched kit documents, keyed by id — needed for those ratios
  */
+/**
+ * A kit that takes CHOICES, not values.
+ *
+ * Radix Themes has no brand variable: it has twenty-five hand-built accent
+ * scales and you pick one. Writing our hex into --accent-9 would leave the
+ * other eleven steps belonging to the previous accent — a half-applied theme,
+ * the exact failure this project keeps finding. So the knob is matched to the
+ * nearest thing the kit really offers, and the manifest names it.
+ *
+ * Colours are compared in OKLCH because that is where "nearest" means what a
+ * person means by it; lengths are compared as numbers. Hue is weighted hardest:
+ * a teal asked for and a teal given is the answer, a grey of the same lightness
+ * is not.
+ */
+export function nearestChoice(want, choice) {
+  const entries = Object.entries(choice?.of ?? {})
+  if (!entries.length || want == null) return null
+  if (choice.unit === 'colour') {
+    /* hexToOklch returns a triple, not an object — reading .l/.c/.h off it gave
+       NaN for every accent and the nearest colour to everything was amber. */
+    const hex6 = /^#[0-9a-f]{6}$/i.test(String(want)) ? String(want) : null
+    if (!hex6) return null
+    const [aL, aC, aH] = hexToOklch(hex6)
+    let best = null
+    for (const [name, hex] of entries) {
+      if (!/^#[0-9a-f]{6}$/i.test(hex)) continue
+      const [bL, bC, bH] = hexToOklch(hex)
+      let dh = Math.abs(aH - bH) % 360
+      if (dh > 180) dh = 360 - dh
+      /* Hue counts in proportion to how colourful BOTH are: a hard cut-off sent
+         a grey brand to Radix's gold, because with hue switched off the two
+         happened to sit at a similar lightness. Chroma outweighs lightness --
+         asking for grey and being handed a mustard is the worse answer. */
+      const hueWeight = Math.min(1, Math.min(aC, bC) / 0.06)
+      const d = Math.hypot((aL - bL) * 1.5, (aC - bC) * 6, (dh / 180) * 4 * hueWeight)
+      if (!best || d < best.d) best = { name, value: hex, d }
+    }
+    return best && { ...best, distance: Number(best.d.toFixed(3)) }
+  }
+  const w = parseFloat(want)
+  if (!Number.isFinite(w)) return null
+  let best = null
+  for (const [name, v] of entries) {
+    const n = parseFloat(v)
+    if (!Number.isFinite(n)) continue
+    const d = Math.abs(n - w)
+    if (!best || d < best.d) best = { name, value: v, d }
+  }
+  return best && { ...best, distance: Number(best.d.toFixed(3)) }
+}
+
 export function route(values, kitIds, kits = {}) {
   return kitIds.map((id) => {
     const m = MAP[id]
     if (!m) throw new Error(`no role map for kit "${id}" — add one before listing it`)
     const defaults = Object.assign({}, ...Object.values(kits[id]?.modes ?? {}))
-    const vars = {}, unroutable = [], unscaled = []
+    const vars = {}, unroutable = [], unscaled = [], chosen = [], attrs = {}
 
     for (const role of ROLES) {
       const v = values[role.id]
@@ -158,6 +247,16 @@ export function route(values, kitIds, kits = {}) {
          of Material's forty-seven colour roles and calling it themed is exactly
          the half-applied theme this whole file exists to prevent. */
       if (target.derives) continue
+      /* the kit publishes a set for this job; take the nearest of what it has */
+      if (target.choice) {
+        const set = kits[id]?.choices?.[target.choice]
+        const pick = nearestChoice(v, set)
+        if (!pick) { unroutable.push(role.id); continue }
+        attrs[set.attr] = pick.name
+        chosen.push({ role: role.id, attr: set.attr, picked: pick.name, of: Object.keys(set.of).length,
+          asked: v, got: pick.value, distance: pick.distance, why: set.why })
+        continue
+      }
       if (!target.var) continue            // build-time only; carried in the package, not as a variable
       vars[target.var] = v
       const siblings = target.also ?? []
@@ -174,6 +273,6 @@ export function route(values, kitIds, kits = {}) {
         vars[extra] = `${Number(scaled.toFixed(4))}${want[2]}`
       }
     }
-    return { kit: id, vars, unroutable, unscaled, ...coverage(id) }
+    return { kit: id, vars, attrs, chosen, unroutable, unscaled, ...coverage(id) }
   })
 }

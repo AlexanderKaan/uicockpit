@@ -12,11 +12,13 @@
       "color-scheme": "dark"
     }
   },
-  "version": "5.7.19",
+  "choices": null,
+  "classes": null,
+  "version": "5.7.20",
   "license": "MIT",
   "npm": "daisyui",
   "home": "https://daisyui.com",
-  "source": "npm daisyui@5.7.19 · theme/light.css + theme/dark.css",
+  "source": "npm daisyui@5.7.20 · theme/light.css + theme/dark.css",
   "modes": {
     "light": {
       "--color-base-100": "oklch(100% 0 0)",

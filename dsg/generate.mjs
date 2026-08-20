@@ -101,7 +101,43 @@ ${decl(r.vars)}
 :root {
 ${decl(r.vars)}
 }`,
+
+  /* Half of Radix is not CSS at all.
+   *
+   * Its accent, its corner radius and its type scale are not variables you set
+   * -- they are attributes on the Theme root, chosen from sets Radix publishes.
+   * Writing a hex into --accent-9 would leave the other eleven steps belonging
+   * to the previous accent, so the choices are made where Radix makes them and
+   * the block below carries only what really is a variable. */
+  radix: (r, kit) => `/* ${stamp(kit)} — the half that IS a variable.
+   The other half is on your <Theme>:
+     ${attrLine(r) || '(no choices — nothing matched)'}
+   Set those there, not here: Radix's accent is a twelve-step scale it ships,
+   and one step written by hand is eleven steps out of step. */
+.radix-themes {
+${decl(r.vars)}
+}`,
+
+  mantine: (r, kit) => `/* ${stamp(kit)} — its variables, all settable at runtime.
+   Its COMPONENT class names are content hashes (.m_77c9d27d is Button), so use
+   its React components; these variables are what they read. */
+:root {
+${decl(r.vars)}
+}`,
+
+  /* Open Props renders nothing, so this block exists to make YOUR css agree
+   * with the kit above it: write var(--brand) or var(--size-3) by hand and it
+   * lands on the same values the components use. */
+  openprops: (r, kit) => `/* ${stamp(kit)} — variables only; Open Props ships no components.
+   Loaded UNDER whatever renders, so your own CSS agrees with it. */
+:where(html) {
+${decl(r.vars)}
+}`,
 }
+
+/** The attributes a choice-taking kit needs on its root, as markup. */
+export const attrLine = (r) =>
+  Object.entries(r.attrs ?? {}).map(([a, v]) => `${a}="${v}"`).join(' ')
 
 /* ── the extra files some kits need ───────────────────────────────────────── */
 const EXTRA = {
@@ -143,6 +179,17 @@ const INSTALL = {
     `/* their typography classes ship in the package too: */`,
     `import { styles } from '@material/web/typography/md-typescale-styles.js'`],
   shadcn: () => [`npx shadcn@latest init`, `npx shadcn@latest add button card input dialog table  # whatever you picked`],
+  radix: (k, r) => [`npm install ${k.npm}@${k.version}`, `import '@radix-ui/themes/styles.css'`,
+    `<!-- the choices go on the Theme root, not in CSS: -->`,
+    `<Theme ${attrLine(r) || 'accentColor="indigo"'}>`],
+  mantine: (k) => [`npm install ${k.npm}@${k.version}`, `import '@mantine/core/styles.css'`,
+    `<!-- use its React components; the class names in its stylesheet are -->`,
+    `<!-- content hashes and are not an API you write by hand.           -->`,
+    `<MantineProvider>`],
+  openprops: (k) => [`npm install ${k.npm}@${k.version}`,
+    `/* the scales, then your theme.css after them */`,
+    `@import "open-props/style";`,
+    `@import "open-props/normalize";`],
 }
 
 /**
@@ -229,7 +276,7 @@ ${blocks.join('\n\n')}
 
 ${routed.map((r) => {
   const kit = kits[r.kit]
-  return `## ${kit.name}\n\n\`\`\`bash\n${(INSTALL[r.kit]?.(kit) ?? []).join('\n')}\n\`\`\`\n`
+  return `## ${kit.name}\n\n\`\`\`bash\n${(INSTALL[r.kit]?.(kit, r) ?? []).join('\n')}\n\`\`\`\n`
 }).join('\n')}
 Then import \`theme.css\` after the kits, so your values win.
 `
@@ -304,6 +351,9 @@ function manifest(routed, kits, values) {
     /* Not every gap is a token that would not take a value. Some are parts of a
      * screen the kit ships no component for at all, and a theme that stays
      * silent about those is the reason people find out at build time. */
+    for (const c of r.chosen ?? []) {
+      out.push(`- **${k.name} · ${c.role}** — not a value this kit takes. You asked for \`${c.asked}\`; the nearest of its ${c.of} published ${c.attr.replace('data-', '')} settings is **${c.picked}** (\`${c.got}\`). ${c.why}.`)
+    }
     for (const [part, why] of COMPONENT_GAPS[r.kit] ?? []) out.push(`- **${k.name} · ${part}** — ${why}.`)
     return out
   })
