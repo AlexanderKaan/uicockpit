@@ -58,7 +58,9 @@ test('every control in the wall clears the 24px target floor', () => {
     const buttons = html.match(/<button[^>]*>/g) ?? []
     assert.ok(buttons.length >= 4, `${id} rendered no buttons`)
     for (const b of buttons) {
-      assert.ok(/min-h-9|min-height:40px|btn/.test(b), `${id}: a button with no height floor — ${b.slice(0, 70)}`)
+      /* h-9 is shadcn's own shipped height (36px) — a fixed height is a floor
+         too. The list names each kit's real mechanism; nothing here is ours. */
+      assert.ok(/min-h-9|\bh-9\b|min-height:40px|btn/.test(b), `${id}: a button with no height floor — ${b.slice(0, 70)}`)
     }
   }
 })

@@ -14,6 +14,7 @@ import { deriveMaterial } from './derive-material.mjs'
 import { render } from './parts.mjs'
 import { WALL } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
+import { ownage } from './fidelity.mjs'
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -50,7 +51,7 @@ try {
 
 /* the pure modules, inlined — the same code the CLI runs */
 const strip = (s) => s.replace(/^import[^\n]*from '[^']+'\n/gm, '').replace(/^export (const|function|class|let) /gm, '$1 ').replace(/^export \{[^}]*\}[^\n]*\n/gm, '')
-const parts = ['color.mjs', 'zip.mjs', 'parts.mjs', 'roles.mjs', 'generate.mjs', 'wall-bindings.mjs', 'scenes.mjs']
+const parts = ['color.mjs', 'zip.mjs', 'parts.mjs', 'roles.mjs', 'generate.mjs', 'wall-bindings.mjs', 'scenes.mjs', 'stack.mjs']
 /* The page's OWN inline script shares that scope too. Checking only the modules
  * missed `hsl` being declared in both color.mjs and the page — a SyntaxError
  * before anything ran, with a blank sheet and nothing in the UI to explain it. */
@@ -76,6 +77,13 @@ let page = readFileSync('page.template.html', 'utf8')
   .replace('/*KITS*/', JSON.stringify(kits))
   .replace('/*CSS*/', JSON.stringify(css))
   .replace('/*DERIVED*/', JSON.stringify(derived))
+  /* Measured on the kit's own markup, NOT on wall() — that wrapper adds our
+   * section caption, and counting our chrome against the kit reported 97 of 98
+   * where the truth is 97 of 97. */
+  .replace('/*OWN*/', JSON.stringify(Object.fromEntries(IDS.map((id) => {
+    const { used, theirs, inline } = ownage(SCENES.map((s) => render(s.node, WALL[id])).join(''), css[id] ?? '')
+    return [id, { used, theirs, inline }]
+  }))))
   .replace('/*WALLS*/', JSON.stringify(Object.fromEntries(IDS.map((id) => [id, wall(id)]))))
   .replace('/*ICONS*/', JSON.stringify(lu.icons))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, n === 'box' ? 16 : 14))
