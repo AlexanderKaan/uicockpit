@@ -8,6 +8,7 @@ import { render } from './parts.mjs'
 import { WALL } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
 import { generate, section } from './generate.mjs'
+import { mark } from './mark.mjs'
 
 const OUT = process.argv[2] ?? 'home.html'
 const ALL = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material']
@@ -43,6 +44,7 @@ let page = readFileSync('home.template.html', 'utf8')
   .replace('/*SHOT*/', JSON.stringify(shot))
   .replace('/*CAVEATS*/', JSON.stringify(caveats))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
+page = page.split('<!--MARK-->').join(mark(18))
 
 writeFileSync(OUT, page)
 console.log(`\n${OUT} — ${(page.length / 1024).toFixed(0)} kB · ${caveats.length} real caveats · lucide ${lu.version}`)

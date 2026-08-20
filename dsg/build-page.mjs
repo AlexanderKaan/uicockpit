@@ -15,6 +15,7 @@ import { render } from './parts.mjs'
 import { WALL } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
 import { ownage } from './fidelity.mjs'
+import { mark } from './mark.mjs'
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -67,7 +68,7 @@ for (const [f, src] of [...parts.map((f) => [f, strip(readFileSync(f, 'utf8'))])
 const mods = parts.map((f) => `/* ── ${f} ── */\n${strip(readFileSync(f, 'utf8'))}`).join('\n\n')
 
 console.log('reading the icons from lucide…')
-const NAMES = ['box', 'sparkles', 'shuffle', 'download', 'circle-alert', 'x', 'check']
+const NAMES = ['sparkles', 'shuffle', 'download', 'circle-alert', 'x', 'check']
 const lu = icons(NAMES)
 console.log(`  ✓ lucide ${lu.version} · ${lu.license} — ${NAMES.length} icons`)
 

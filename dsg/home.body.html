@@ -1,6 +1,6 @@
 <div class="app">
 <header class="nav">
-  <p class="mark"><!--I:box-->UIcockpit</p>
+  <p class="mark"><!--MARK-->UIcockpit</p>
   <nav class="nav__links">
     <a href="/generator">Generator</a>
     <a href="#kits">Kits</a>
@@ -51,13 +51,34 @@
   </div>
 </section>
 
-<section class="band-sec">
+<section class="band-sec" id="limits">
   <h2>What it will not do.</h2>
   <div class="nots" id="nots"></div>
 </section>
 
 <footer class="foot">
-  <p><strong>UIcockpit</strong> — the open-source design system generator.</p>
-  <p class="fine">No accounts, no telemetry, no lock-in. Kits are read from their own packages; licences are theirs.</p>
+  <div class="foot__cols">
+    <nav class="foot__col" aria-label="The generator">
+      <p class="foot__head">The generator</p>
+      <a href="/generator">Open the generator</a>
+      <a href="#kits">Five systems, one set of knobs</a>
+      <a href="#export">What you download</a>
+      <a href="#limits">What it will not do</a>
+    </nav>
+    <nav class="foot__col foot__col--wide" aria-label="Built from">
+      <p class="foot__head">Built from</p>
+      <div class="foot__kits" id="footkits"></div>
+    </nav>
+    <nav class="foot__col" aria-label="How it works">
+      <p class="foot__head">How it works</p>
+      <p class="foot__note">Every value on this page is read from the kit that publishes it. One knob is written into each enabled kit in that kit's own vocabulary — a colour as a colour, a length as a scale whose ratio is kept.</p>
+      <p class="foot__note">Where a kit cannot take a value, the package says so by name instead of quietly leaving it out.</p>
+    </nav>
+  </div>
+  <div class="foot__bottom">
+    <p><!--MARK--> <strong>UIcockpit</strong> — the open-source design system generator.</p>
+    <p class="fine">No accounts, no telemetry, no lock-in. The kits are theirs, and so are their licences.
+      Made by <a href="https://pageminds.com" rel="noopener">Alexander Kaan at Pageminds</a>.</p>
+  </div>
 </footer>
 </div>
