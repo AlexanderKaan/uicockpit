@@ -1,0 +1,53 @@
+<div class="app">
+<header class="band">
+  <div class="band__top">
+    <p class="mark">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5 12 3.5l8 4v9L12 20.5l-8-4Z"/><path d="M4 7.5 12 11.5l8-4M12 11.5v9"/></svg>
+      Design System Generator
+    </p>
+    <label class="brief">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4Z"/></svg>
+      <input id="brief" placeholder="Describe it — “calm, readable, good for older users” — or just hit Shuffle" autocomplete="off">
+    </label>
+    <div class="band__acts">
+      <span class="chips" id="chips"></span>
+      <button class="btn" id="shuffle">Shuffle <kbd>S</kbd></button>
+    </div>
+  </div>
+
+  <div class="band__kits">
+    <span class="eyebrow">Built from</span>
+    <div class="kits" id="kits" role="group" aria-label="Kits"></div>
+  </div>
+
+  <div class="band__knobs">
+    <section>
+      <p class="eyebrow">Colour</p>
+      <div class="swatches" id="swatches"></div>
+    </section>
+    <section>
+      <p class="eyebrow">Shape &amp; size</p>
+      <div class="knobs" id="knobs"></div>
+    </section>
+  </div>
+</header>
+
+<main class="wall">
+  <div class="wall__bar">
+    <p class="eyebrow">This is what your app will look like</p>
+    <div class="seg" id="seg" role="radiogroup" aria-label="Rendered with"></div>
+  </div>
+  <div class="frames" id="frames"></div>
+  <p class="wall__note" id="wallnote"></p>
+</main>
+
+<footer class="dock">
+  <div class="dock__what" id="receipt"></div>
+  <div class="dock__acts">
+    <button class="btn btn--ghost" id="manifest">What could not be done</button>
+    <button class="btn btn--go" id="download">Download your design system</button>
+  </div>
+</footer>
+
+<dialog id="sheet"><div class="sheet"><button class="sheet__x" id="sheetx" aria-label="Close">✕</button><div id="sheetbody"></div></div></dialog>
+</div>

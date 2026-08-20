@@ -13,11 +13,9 @@
  *
  *   node preview.mjs [out.html]
  */
-import { execFileSync } from 'node:child_process'
-import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync, existsSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { generate } from './generate.mjs'
+import { buildCss } from './build-css.mjs'
 import { render } from './parts.mjs'
 import { WALL } from './wall-bindings.mjs'
 import { SCENES } from './scenes.mjs'
@@ -31,76 +29,8 @@ const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`ki
 const body = (id) => SCENES.map((s) =>
   `<section style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')
 
-/* ── the CSS each kit really needs ────────────────────────────────────────── */
-const dir = mkdtempSync(join(tmpdir(), 'dsg-preview-'))
-const css = {}
-try {
-  const files = generate(VALUES, IDS, kits)
-
-  /* Tailwind, daisyUI and shadcn all compile through Tailwind. Their markup is
-     scanned so only the utilities actually used are emitted. */
-  mkdirSync(join(dir, 'src'), { recursive: true })
-  writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'p', private: true, type: 'module',
-    devDependencies: { '@tailwindcss/cli': `^${kits.tailwind.version}`, tailwindcss: `^${kits.tailwind.version}`, daisyui: `^${kits.daisyui.version}` } }))
-  for (const [id, plugin] of [['tailwind', ''], ['daisyui', '@plugin "daisyui";'], ['shadcn', '']]) {
-    writeFileSync(join(dir, `src/${id}.html`), body(id))
-    /* ONLY this kit's block. Loading the whole theme.css put shadcn's --border
-       (a colour) into daisyUI's --border (a width) and every checkbox lost its
-       outline — the exact collision the manifest now reports. */
-    writeFileSync(join(dir, `src/${id}.css`), `@import "tailwindcss";\n${plugin}\n${files._blocks[id]}`)
-  }
-  console.log('installing the kits the package names…')
-  execFileSync('npm', ['install', '--silent', '--no-audit', '--no-fund'], { cwd: dir, stdio: 'pipe' })
-  for (const id of ['tailwind', 'daisyui', 'shadcn']) {
-    execFileSync('npx', ['@tailwindcss/cli', '-i', `src/${id}.css`, '-o', `${id}.out.css`, '--content', `src/${id}.html`], { cwd: dir, stdio: 'pipe' })
-    css[id] = readFileSync(join(dir, `${id}.out.css`), 'utf8')
-  }
-
-  /* Bootstrap's brand is compiled, so the preview COMPILES it. Showing the wall
-     in Bootstrap's factory blue while the manifest promises your teal would read
-     as a broken tool — the wall has to do what the package says it does. */
-  console.log('compiling Bootstrap from the Sass entry point the package ships…')
-  execFileSync('npm', ['install', '--silent', '--no-audit', '--no-fund', `bootstrap@${kits.bootstrap.version}`, 'sass'], { cwd: dir, stdio: 'pipe' })
-  writeFileSync(join(dir, 'custom.scss'), files['_custom.scss'].replace('bootstrap/scss/bootstrap', 'node_modules/bootstrap/scss/bootstrap'))
-  try {
-    execFileSync('npx', ['sass', '--no-source-map', '--load-path=.', 'custom.scss', 'bootstrap.out.css'], { cwd: dir, stdio: 'pipe' })
-    css.bootstrap = readFileSync(join(dir, 'bootstrap.out.css'), 'utf8') + '\n' + files._blocks.bootstrap
-  } catch (e) {
-    console.error('  ✗ the Sass build failed — falling back to their shipped CSS, so the brand will be Bootstrap\'s own')
-    const bs = join(dir, 'node_modules/bootstrap/dist/css/bootstrap.min.css')
-    css.bootstrap = (existsSync(bs) ? readFileSync(bs, 'utf8') : '') + '\n' + files._blocks.bootstrap
-  }
-
-  /* Material DERIVES its 47 colour roles from the seed. Setting only --primary
-     and leaving the other 46 at Material's factory purple is exactly the
-     half-applied theme the manifest warns about — so the preview runs their own
-     generator, which is what `derives` was always supposed to mean. */
-  console.log('deriving the Material scheme with its own generator…')
-  let mt = Object.entries(kits.material.modes.light).map(([k, v]) => `${k}:${v}`).join(';')
-  try {
-    execFileSync('npm', ['install', '--silent', '--no-audit', '--no-fund', '@material/material-color-utilities'], { cwd: dir, stdio: 'pipe' })
-    /* Their package ships extensionless ESM imports, which Node will not
-       resolve on its own. A resolve hook is the whole fix — and it is their
-       algorithm doing the work either way, which is the point. */
-    writeFileSync(join(dir, 'ts-loader.mjs'), `import { register } from 'node:module'
-register('data:text/javascript,' + encodeURIComponent(\`
-export async function resolve(spec, ctx, next) {
-  if (spec.startsWith('.') && !/\\\\.[a-z]+$/i.test(spec)) { try { return await next(spec + '.js', ctx) } catch {} }
-  return next(spec, ctx)
-}\`), import.meta.url)`)
-    writeFileSync(join(dir, 'derive.mjs'), `import { themeFromSourceColor, argbFromHex, hexFromArgb } from '@material/material-color-utilities'
-const t = themeFromSourceColor(argbFromHex(process.argv[2]))
-const kebab = (s) => s.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())
-console.log(JSON.stringify(Object.fromEntries(Object.entries(t.schemes.light.toJSON())
-  .map(([k, v]) => ['--md-sys-color-' + kebab(k), hexFromArgb(v)]))))`)
-    const derived = JSON.parse(execFileSync('node', ['--import', './ts-loader.mjs', 'derive.mjs', VALUES.brand], { cwd: dir, encoding: 'utf8' }))
-    mt = `${mt};${Object.entries(derived).map(([k, v]) => `${k}:${v}`).join(';')}`
-    console.log(`  ✓ ${Object.keys(derived).length} roles derived from ${VALUES.brand} by Material's own generator`)
-  } catch (e) {
-    console.error(`  ✗ could not run Material's generator (${e.message.split('\n')[0]}) — showing its factory scheme instead`)
-  }
-  css.material = `:root{${mt}}\n` + files._blocks.material
-} finally { rmSync(dir, { recursive: true, force: true }) }
+const css = await buildCss(VALUES, IDS, kits, body)
+const files = generate(VALUES, IDS, kits)
 
 /* ── one page, five documents ─────────────────────────────────────────────── */
 const frame = (id) => {

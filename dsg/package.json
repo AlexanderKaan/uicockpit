@@ -7,6 +7,7 @@
     "kits:check": "node fetch-kits.mjs --check",
     "test": "node --test roles.test.mjs generate.test.mjs wall.test.mjs",
     "proof": "node build-proof.mjs",
-    "wall": "node preview.mjs"
+    "wall": "node preview.mjs",
+    "page": "node build-page.mjs generator.html"
   }
 }

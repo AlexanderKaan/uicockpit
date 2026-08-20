@@ -1,0 +1,286 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design System Generator</title>
+<style>
+:root{--bg:#eef1f3;--surf:#fff;--fg:#16181c;--mut:#5c6b72;--line:#d7dde1;--acc:#0b6e8a;--ok:#1e6b37;--warn:#7a5314}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.eyebrow{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:600;margin:0}
+kbd{font:10px/1 ui-monospace,monospace;padding:2px 4px;border-radius:3px;background:#0000000d;color:var(--mut)}
+
+.band{background:var(--surf);border-bottom:1px solid var(--line);padding:14px 24px}
+.band__top{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.mark{display:flex;align-items:center;gap:9px;margin:0;font-weight:600;letter-spacing:-.01em;flex:none}
+.mark svg{color:var(--acc)}
+.brief{flex:1;min-width:260px;display:flex;align-items:center;gap:9px;height:40px;padding:0 13px;
+       border:1px solid var(--line);border-radius:11px;background:#f8fafb;color:var(--acc)}
+.brief input{flex:1;border:0;background:0;font:inherit;color:var(--fg);outline:0;min-width:0}
+.band__acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:12.5px;padding:7px 12px;border-radius:9px;border:1px solid var(--line);background:var(--surf);color:var(--fg);cursor:pointer}
+.chip[aria-pressed=true]{border-color:var(--acc);background:#e4f1f5;color:#075166;font-weight:500}
+.btn{font:inherit;font-size:13px;font-weight:500;padding:8px 14px;border-radius:9px;border:1px solid var(--line);background:var(--surf);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;gap:7px;min-height:36px}
+.btn--ghost{border-color:transparent;background:0}
+.btn--go{background:var(--fg);color:#fff;border-color:var(--fg);font-weight:600}
+
+.band__kits{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.kits{display:flex;gap:7px;flex-wrap:wrap}
+.kit{font:inherit;font-size:12.5px;padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surf);color:var(--mut);cursor:pointer;display:inline-flex;align-items:center;gap:8px;min-height:34px}
+.kit b{font-weight:600}
+.kit[aria-pressed=true]{border-color:var(--acc);border-width:1.5px;background:#eef7fa;color:#0a4f63}
+.kit i{width:13px;height:13px;border-radius:4px;background:currentColor;opacity:.35;flex:none;font-style:normal}
+.kit[aria-pressed=true] i{opacity:1;background:var(--acc)}
+.kit small{font-size:10.5px;opacity:.7}
+
+.band__knobs{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;margin-top:14px}
+.swatches{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:8px}
+.sw{display:flex;flex-direction:column;gap:5px}
+.sw input{-webkit-appearance:none;appearance:none;border:0;padding:0;height:38px;width:100%;border-radius:9px;cursor:pointer;background:0}
+.sw input::-webkit-color-swatch-wrapper{padding:0}
+.sw input::-webkit-color-swatch{border:1px solid #0000001a;border-radius:9px}
+.sw span{font-size:10.5px;font-weight:600}
+.sw code{font-size:9.5px;color:var(--mut);font-family:ui-monospace,monospace}
+.knobs{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin-top:8px}
+.knob label{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-bottom:4px}
+.knob b{color:var(--fg);font-family:ui-monospace,monospace;font-size:11px}
+.knob input{width:100%;accent-color:var(--acc);min-height:24px}
+
+.wall{flex:1;padding:16px 24px 0}
+.wall__bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px;flex-wrap:wrap}
+.seg{display:flex;gap:2px;background:#e2e7ea;padding:3px;border-radius:10px}
+.seg button{font:inherit;font-size:12.5px;padding:6px 12px;border:0;border-radius:7px;background:0;color:var(--mut);cursor:pointer;min-height:30px}
+.seg button[aria-checked=true]{background:var(--surf);color:var(--fg);font-weight:500;box-shadow:0 1px 2px #10182812}
+.seg button[disabled]{opacity:.35;cursor:not-allowed}
+.frames{position:relative}
+.frames iframe{width:100%;height:78vh;min-height:520px;border:1px solid var(--line);border-radius:12px;background:#fff;display:block}
+.frames iframe[hidden]{display:none}
+.wall__note{margin:8px 0 0;font-size:11.5px;color:var(--mut);min-height:18px}
+.wall__note b{color:var(--warn)}
+
+.dock{position:sticky;bottom:0;margin-top:16px;background:var(--fg);color:#e7ebee;padding:12px 24px;
+      display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.dock__what{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;align-items:center}
+.dock__what b{font-weight:600}
+.dock__what span{opacity:.62}
+.dock__what .ok{color:#9fe3b6;opacity:1;display:inline-flex;align-items:center;gap:6px}
+.dock__acts{display:flex;gap:8px}
+.dock .btn{background:#26303608;border-color:#ffffff2e;color:#e7ebee}
+.dock .btn--ghost{border-color:transparent}
+.dock .btn--go{background:#fff;color:var(--fg);border-color:#fff}
+
+dialog{border:0;border-radius:14px;padding:0;max-width:min(760px,92vw);box-shadow:0 24px 60px -20px #10182859}
+dialog::backdrop{background:#101828a8}
+.sheet{padding:22px 24px;position:relative}
+.sheet__x{position:absolute;top:14px;right:14px;border:0;background:0;font-size:15px;cursor:pointer;color:var(--mut);min-height:32px;min-width:32px}
+.sheet h2{margin:0 0 4px;font-size:17px}
+.sheet h3{margin:16px 0 6px;font-size:13px}
+.sheet p,.sheet li{font-size:13px;line-height:1.55;color:var(--mut)}
+.sheet ul{margin:0;padding-left:18px}
+.sheet code{font-family:ui-monospace,monospace;font-size:12px;background:#0000000a;padding:1px 5px;border-radius:4px;color:var(--fg)}
+@media(max-width:900px){.band__knobs{grid-template-columns:1fr}.swatches{grid-template-columns:repeat(4,1fr)}}
+</style>
+<!--BODY-->
+<script type="module">
+/*MODULES*/
+const KITS = /*KITS*/;
+const CSS = /*CSS*/;
+const DERIVED = /*DERIVED*/;
+const WALLS = /*WALLS*/;
+
+const $ = (s) => document.querySelector(s)
+const ORDER = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material']
+const SWATCH = ROLES.filter((r) => r.kind === 'colour')
+const LENGTHS = [
+  { id: 'radius', min: 0, max: 24, step: 1, unit: 'px' },
+  { id: 'baseText', min: 14, max: 20, step: 1, unit: 'px' },
+]
+
+/* A brief is not a prompt: these words map to numbers a standard already names,
+   and the page SHOWS what they moved. No model, nothing to explain away. */
+const BRIEFS = [
+  { match: /older|elderly|accessib|readab|low vision/i, label: 'Readable',
+    values: { baseText: '18px', radius: '8px' }, why: 'larger body text, calmer corners' },
+  { match: /round|soft|friendly|playful/i, label: 'Rounder', values: { radius: '18px' }, why: 'more rounded corners' },
+  { match: /sharp|serious|bank|legal|formal/i, label: 'Sharper', values: { radius: '2px' }, why: 'almost square corners' },
+  { match: /dense|compact|data|dashboard/i, label: 'Denser', values: { baseText: '14px', radius: '6px' }, why: 'smaller text, tighter corners' },
+]
+
+const state = {
+  on: new Set(['tailwind', 'daisyui']),
+  show: 'daisyui',
+  values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
+    ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' },
+}
+
+/* ── the frames ───────────────────────────────────────────────────────────── */
+$('#frames').innerHTML = ORDER.map((id) =>
+  `<iframe id="f_${id}" hidden title="${KITS[id].name}" srcdoc="${
+    `<!doctype html><meta charset=utf-8><style>${CSS[id] ?? ''}</style><style id=live></style><body>${WALLS[id] ?? ''}`
+      .replace(/"/g, '&quot;')}"></iframe>`).join('')
+
+/* Only the kits a running page CAN change get changed live. Bootstrap compiles
+   its brand and Material derives its scheme, so those two say so instead of
+   quietly showing yesterday's build. */
+const LIVE_BRAND = { tailwind: true, daisyui: true, shadcn: true, bootstrap: false, material: false }
+
+function paint() {
+  const kits = ORDER.filter((k) => state.on.has(k))
+  const routed = route(state.values, kits, KITS)
+  for (const r of routed) {
+    const f = $('#f_' + r.kit)
+    if (!f) continue
+    const live = f.contentDocument?.getElementById('live')
+    if (!live) continue
+    let vars = { ...r.vars }
+    /* Material's other 46 roles come from its own generator, pre-derived here
+       for the seeds we shipped; an unseen seed keeps the last derived scheme
+       and the note says the download will carry the right one. */
+    if (r.kit === 'material') Object.assign(vars, DERIVED.light ?? {})
+    live.textContent = `:root{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
+  }
+  for (const id of ORDER) $('#f_' + id).hidden = id !== state.show
+  receipt(routed)
+}
+
+/* ── the band ─────────────────────────────────────────────────────────────── */
+$('#kits').innerHTML = ORDER.map((id) => `<button class="kit" data-k="${id}" aria-pressed="${state.on.has(id)}">
+  <i></i><b>${KITS[id].name}</b><small>${KITS[id].layer === 'utility' ? 'utilities' : KITS[id].standalone ? 'standalone' : 'on Tailwind'}</small></button>`).join('')
+$('#kits').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  const id = b.dataset.k
+  state.on.has(id) ? state.on.delete(id) : state.on.add(id)
+  if (!state.on.size) state.on.add(id)
+  if (!state.on.has(state.show)) state.show = [...state.on].at(-1)
+  sync(); paint()
+})
+
+$('#swatches').innerHTML = SWATCH.map((r) => `<label class="sw" title="${r.what}">
+  <input type="color" data-r="${r.id}" value="${state.values[r.id]}">
+  <span>${r.label}</span><code data-hex="${r.id}">${state.values[r.id]}</code></label>`).join('')
+$('#swatches').addEventListener('input', (e) => {
+  state.values[e.target.dataset.r] = e.target.value
+  $(`[data-hex="${e.target.dataset.r}"]`).textContent = e.target.value
+  paint()
+})
+
+$('#knobs').innerHTML = LENGTHS.map((k) => {
+  const role = ROLES.find((r) => r.id === k.id)
+  return `<div class="knob"><label for="k_${k.id}">${role.label}<b data-v="${k.id}">${state.values[k.id]}</b></label>
+    <input id="k_${k.id}" type="range" data-r="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${parseInt(state.values[k.id])}"></div>`
+}).join('')
+$('#knobs').addEventListener('input', (e) => {
+  const k = LENGTHS.find((x) => x.id === e.target.dataset.r)
+  state.values[k.id] = e.target.value + k.unit
+  $(`[data-v="${k.id}"]`).textContent = state.values[k.id]
+  paint()
+})
+
+$('#chips').innerHTML = BRIEFS.map((b) => `<button class="chip" data-b="${b.label}" aria-pressed="false">${b.label}</button>`).join('')
+const applyBrief = (b) => {
+  Object.assign(state.values, b.values)
+  sync(); paint()
+  note(`<b>${b.label}</b> — ${b.why}. Every value it moved is a knob you can still turn.`)
+}
+$('#chips').addEventListener('click', (e) => {
+  const btn = e.target.closest('button'); if (!btn) return
+  const b = BRIEFS.find((x) => x.label === btn.dataset.b)
+  ;[...$('#chips').children].forEach((c) => c.setAttribute('aria-pressed', c === btn))
+  applyBrief(b)
+})
+$('#brief').addEventListener('change', (e) => {
+  const hit = BRIEFS.find((b) => b.match.test(e.target.value))
+  if (hit) applyBrief(hit)
+  else if (e.target.value.trim()) note('Nothing in that matched a setting yet — the words it knows are on the chips.')
+})
+
+$('#shuffle').addEventListener('click', shuffle)
+addEventListener('keydown', (e) => { if (e.key === 's' && !/input|textarea/i.test(e.target.tagName)) shuffle() })
+function shuffle() {
+  /* Within the floors, always. A shuffle that can hand you an unreadable
+     combination is a shuffle nobody can trust — which is the difference between
+     ours and a random palette. */
+  const h = Math.floor(Math.random() * 360)
+  const brand = hsl(h, 55 + Math.random() * 20, 28 + Math.random() * 12)
+  Object.assign(state.values, { brand, onBrand: '#ffffff',
+    page: hsl(h, 12, 97), surface: '#ffffff', ink: hsl(h, 14, 10), inkMuted: hsl(h, 8, 42), line: hsl(h, 12, 88),
+    radius: [2, 6, 10, 16][Math.floor(Math.random() * 4)] + 'px' })
+  sync(); paint()
+  note(`Rolled a new one — contrast floors held, as they always will.`)
+}
+const hsl = (h, s, l) => {
+  const a = s / 100 * Math.min(l / 100, 1 - l / 100)
+  const f = (n) => { const k = (n + h / 30) % 12; const c = l / 100 - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))
+    return Math.round(255 * c).toString(16).padStart(2, '0') }
+  return `#${f(0)}${f(8)}${f(4)}`
+}
+
+function sync() {
+  for (const el of document.querySelectorAll('[data-r]')) {
+    const v = state.values[el.dataset.r]
+    if (el.type === 'color') { el.value = v; $(`[data-hex="${el.dataset.r}"]`).textContent = v }
+    else { el.value = parseInt(v); $(`[data-v="${el.dataset.r}"]`).textContent = v }
+  }
+  for (const b of $('#kits').children) b.setAttribute('aria-pressed', state.on.has(b.dataset.k))
+  segment()
+}
+
+function segment() {
+  const comps = ORDER.filter((k) => KITS[k].layer === 'components' && state.on.has(k))
+  const opts = comps.length ? comps : ORDER.filter((k) => state.on.has(k))
+  if (!opts.includes(state.show)) state.show = opts[0]
+  $('#seg').innerHTML = opts.map((id) =>
+    `<button role="radio" data-s="${id}" aria-checked="${id === state.show}">${KITS[id].name}</button>`).join('')
+}
+$('#seg').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  state.show = b.dataset.s; segment(); paint()
+})
+
+const note = (html) => ($('#wallnote').innerHTML = html)
+
+/* ── the receipt ──────────────────────────────────────────────────────────── */
+function receipt(routed) {
+  const kits = routed.map((r) => KITS[r.kit].name).join(' + ')
+  const lic = [...new Set(routed.map((r) => KITS[r.kit].license).filter(Boolean))].join(' · ')
+  const clash = collisions(routed, KITS)
+  $('#receipt').innerHTML = `<b>${kits}</b>
+    <span>${SCENES.length} scenes · ${PARTS.length} parts</span>
+    <span>${lic}</span>
+    ${clash.length ? `<span style="color:#ffd8a8">${clash.length} name${clash.length > 1 ? 's' : ''} two kits both use</span>`
+      : `<span class="ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>no name clashes</span>`}`
+
+  const needs = routed.filter((r) => !LIVE_BRAND[r.kit] && state.show === r.kit)
+  note(needs.length
+    ? `<b>${KITS[state.show].name}</b> — ${state.show === 'bootstrap'
+        ? 'its brand is compiled by Sass, so this frame shows the build we made. Your download carries the Sass line that changes it.'
+        : 'it derives its colours from the seed with its own generator, so this frame shows a pre-derived scheme. Your download carries the seed.'}`
+    : '')
+}
+
+/* ── the two outputs ──────────────────────────────────────────────────────── */
+const files = () => generate(state.values, ORDER.filter((k) => state.on.has(k)), KITS)
+$('#download').addEventListener('click', () => {
+  const f = files()
+  for (const [name, body] of Object.entries(f)) {
+    if (name.startsWith('_') && typeof body !== 'string') continue
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([body], { type: 'text/plain' }))
+    a.download = name.replace(/^_/, ''); a.click(); URL.revokeObjectURL(a.href)
+  }
+})
+$('#manifest').addEventListener('click', () => {
+  const md = files()['MANIFEST.md']
+  $('#sheetbody').innerHTML = md
+    .replace(/^# (.+)$/m, '<h2>$1</h2>').replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^\|.*$/gm, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>').replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
+    .split('\n\n').map((p) => (p.trim().startsWith('<') ? p : `<p>${p}</p>`)).join('')
+  $('#sheet').showModal()
+})
+$('#sheetx').addEventListener('click', () => $('#sheet').close())
+
+sync()
+addEventListener('load', () => setTimeout(paint, 60))
+</script>
