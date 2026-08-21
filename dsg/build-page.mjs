@@ -14,8 +14,8 @@ import { DARK } from './generate.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render, PARTS } from './parts.mjs'
-import { WALL, useMantineClasses, useRadixTones } from './wall-bindings.mjs'
-import { SCENES } from './scenes.mjs'
+import { WALL, useMantineClasses, useRadixTones, useIcons } from './wall-bindings.mjs'
+import { SCENES, ICON_NAMES, BOARDS, wallMarkup, safeJson } from './scenes.mjs'
 import { ownage, partOwnage } from './fidelity.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
 import { mark } from './mark.mjs'
@@ -62,14 +62,21 @@ const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="lig
   radix: ' class="radix-themes light" data-is-root-theme="true" data-has-background="true" data-panel-background="translucent"',
   mantine: ' data-mantine-color-scheme="light"' }
 const RENDERS = IDS.filter((id) => kits[id].layer !== 'tokens')
-const wall = (id) => `<html${ROOT[id] ?? ''}><main>${SCENES.map((s) =>
-  `<section data-rung="${s.rung}" style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')}</main>
-<style>/* NO font-family here. The wrapper setting one hard-coded our chrome over
-   every kit's own typography, so the font knobs moved the card and nothing
-   else — the kit's stylesheet decides what this page is set in. */
-body{margin:0;padding:20px}
-main{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:start}
-.cap{margin:0 0 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.45;font-weight:600}</style>`
+
+/* The wall for one kit: the same boards, columns and cards the preview and the
+ * hero shot render, from the one implementation in scenes.mjs. */
+const wall = (id) => `<html${ROOT[id] ?? ''}>${wallMarkup(WALL[id])}`
+
+/* The icons the wall names are read BEFORE the CSS is built, because the wall
+ * is what Tailwind scans: an icon read afterwards would be markup no stylesheet
+ * ever saw. Two sets, one read — the chrome's and the cards' — and lucide
+ * throws on a name it does not have, so a blank square cannot ship. */
+console.log('reading the icons from lucide…')
+const CHROME_ICONS = ['sparkles', 'shuffle', 'download', 'circle-alert', 'x', 'check', 'search']
+const NAMES = [...new Set([...CHROME_ICONS, ...ICON_NAMES])]
+const lu = icons(NAMES)
+useIcons(lu.icons)
+console.log(`  ✓ lucide ${lu.version} · ${lu.license} — ${CHROME_ICONS.length} for the chrome, ${ICON_NAMES.length} the cards name`)
 
 console.log('building each kit\'s real CSS…')
 const css = await buildCss(SEED, IDS, kits, (id) => wall(id))
@@ -86,7 +93,11 @@ try {
 
 /* the pure modules, inlined — the same code the CLI runs */
 const strip = (s) => s.replace(/^import[^\n]*from '[^']+'\n/gm, '').replace(/^export (const|function|class|let) /gm, '$1 ').replace(/^export \{[^}]*\}[^\n]*\n/gm, '')
-const parts = ['color.mjs', 'zip.mjs', 'parts.mjs', 'roles.mjs', 'generate.mjs', 'wall-bindings.mjs', 'scenes.mjs', 'stack.mjs', 'palettes.mjs']
+/* wall-bindings is NOT in here. Every kit's markup is rendered at build time
+ * and shipped as WALLS, so the browser never renders a card — inlining the
+ * tables put eighty kilobytes of every kit's class strings in a page that
+ * cannot use them. */
+const parts = ['color.mjs', 'zip.mjs', 'parts.mjs', 'roles.mjs', 'generate.mjs', 'scenes.mjs', 'stack.mjs', 'palettes.mjs']
 /* The page's OWN inline script shares that scope too. Checking only the modules
  * missed `hsl` being declared in both color.mjs and the page — a SyntaxError
  * before anything ran, with a blank sheet and nothing in the UI to explain it. */
@@ -109,11 +120,6 @@ console.log(`  ✓ ${gf.read} families from ${gf.source} · ${kitFonts(kits).len
 
 const mdw = materialElements()
 console.log(`  ✓ @material/web ${mdw.version} · ${mdw.license} — ${mdw.bundled.length} real elements, ${(mdw.js.length / 1024).toFixed(0)} kB`)
-
-console.log('reading the icons from lucide…')
-const NAMES = ['sparkles', 'shuffle', 'download', 'circle-alert', 'x', 'check', 'search']
-const lu = icons(NAMES)
-console.log(`  ✓ lucide ${lu.version} · ${lu.license} — ${NAMES.length} icons`)
 
 let page = readFileSync('page.template.html', 'utf8')
   .replace('<!--BODY-->', () => readFileSync('page.body.html', 'utf8'))
@@ -145,10 +151,10 @@ let page = readFileSync('page.template.html', 'utf8')
    * contains one, so `$'` spliced the entire rest of the page in after it and
    * shipped a generator with two of everything. It built, it loaded, and
    * nothing said a word. Every placeholder here takes a function now. */
-  .replace('/*SCRIPTS*/', () => JSON.stringify({ material: mdw.js.split('</script').join('<\\/script') }))
-  .replace('/*WALLS*/', () => JSON.stringify(Object.fromEntries(RENDERS.map((id) => [id, wall(id)]))))
+  .replace('/*SCRIPTS*/', () => safeJson({ material: mdw.js }))
+  .replace('/*WALLS*/', () => safeJson(Object.fromEntries(RENDERS.map((id) => [id, wall(id)]))))
   .replace('/*ICONS*/', () => JSON.stringify(lu.icons))
-for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
+for (const n of CHROME_ICONS) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
 page = page.split('<!--MARK-->').join(mark(17))
 /* A class in OUR markup with no rule anywhere.
  *
@@ -173,6 +179,26 @@ page = page.split('<!--MARK-->').join(mark(17))
   const bare = [...written].filter((c) => !styled.has(c))
   if (bare.length) {
     console.error(`build: no rule anywhere for ${bare.join(' ')} — our markup uses ${bare.length > 1 ? 'them' : 'it'} and our stylesheet does not.`)
+    process.exit(1)
+  }
+}
+
+/* A closing script tag that ends the page's own script early.
+ *
+ * This shipped once: scenes.mjs carries the wall's pan script, it is inlined
+ * into the page's module, and the closing tag in its source ended that module
+ * where it stood. The rest of the page parsed as HTML, nothing in the tool
+ * drew, and the only clue was a run of SVG attribute errors from markup that
+ * was never meant to be markup. Opens and closes have to balance. */
+{
+  /* Counted against the TEMPLATE, which is where every real script tag comes
+   * from. An OPENING tag inside a value is harmless — it is the closing tag
+   * that ends the block, so one more of those than the template has is a value
+   * that got out. */
+  const real = (readFileSync('page.template.html', 'utf8').match(/<\/script\b/g) ?? []).length
+  const closes = (page.match(/<\/script\b/g) ?? []).length
+  if (closes !== real) {
+    console.error(`build: the template has ${real} closing script tag${real === 1 ? '' : 's'} and the page has ${closes} — a value wrote one. See safeJson in scenes.mjs.`)
     process.exit(1)
   }
 }

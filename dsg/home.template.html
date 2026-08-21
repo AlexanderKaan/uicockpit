@@ -67,7 +67,7 @@ h1{letter-spacing:-.035em;text-wrap:balance;max-width:54rem;margin:0 auto 1.5rem
 .shot{margin:0;border-radius:14px 14px 0 0;overflow:hidden;background:var(--mkt-sunken);padding:10px 10px 0;
       box-shadow:0 -1px 0 var(--mkt-border) inset}
 .shot figcaption{display:flex;justify-content:space-between;padding:2px 6px 10px}
-.shot iframe{width:100%;height:460px;border:0;border-radius:10px 10px 0 0;background:#fff;display:block}
+.shot iframe{width:100%;height:500px;border:0;border-radius:10px 10px 0 0;background:#fff;display:block}
 
 .claim{padding:3.5rem 2rem;text-align:center;background:var(--mkt-fg);color:#f2f2f3}
 .claim p{margin:0;font-size:clamp(1.25rem,2.6vw,1.875rem);line-height:1.3;letter-spacing:-.03em;
@@ -126,6 +126,7 @@ h2{margin:0;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.03em;font-weight:6
 <script type="module">
 const KITS = /*KITS*/;
 const SHOT = /*SHOT*/;
+const CARDS = /*CARDS*/, PARTS = /*PARTS*/;
 const CAVEATS = /*CAVEATS*/;
 const $ = (s) => document.querySelector(s)
 
@@ -140,7 +141,11 @@ hero.addEventListener('pointermove', (e) => {
 })
 hero.addEventListener('pointerleave', () => hero.style.setProperty('--mx', '-9999px'))
 
-$('#shot').innerHTML = `<iframe title="A kit, rendered" srcdoc="${SHOT.replace(/"/g, '&quot;')}"></iframe>`
+/* & before ", because srcdoc is an ATTRIBUTE and its value is entity-decoded
+   before the document is parsed. A stylesheet with an & in it arrives mangled
+   and the frame renders as bare text, with nothing in the console. */
+$('#shot').innerHTML = `<iframe title="A kit, rendered" srcdoc="${SHOT.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></iframe>`
+$('#shotmeta').textContent = `${CARDS} cards · ${PARTS} parts`
 
 $('#kitgrid').innerHTML = Object.values(KITS).map((k) => `<article class="kitcard">
   <h3>${k.name}</h3>

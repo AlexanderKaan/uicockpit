@@ -366,7 +366,7 @@ const state = {
      never chosen — it is whichever layer is on top. */
   on: new Set(['tailwind', 'shadcn']),
   get show() { return showing(stack(this.on, KITS)) },
-  rung: 'all',
+  board: 'foundations',
   mode: 'light',
   values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
     ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
@@ -378,7 +378,6 @@ const state = {
 }
 
 /* ── the frames ───────────────────────────────────────────────────────────── */
-useMantineClasses(KITS.mantine.classes)
 
 /* Seven kits' real stylesheets is two megabytes of CSS, and Radix alone is
  * eight hundred kilobytes. Writing every frame's document up front made the
@@ -392,7 +391,7 @@ function build(id) {
   if (BUILT.has(id)) return
   BUILT.add(id)
   const f = $('#f_' + id); if (!f) return
-  f.srcdoc = `<!doctype html><meta charset=utf-8><style>${CSS[id] ?? ''}</style><style id=live></style><style id=rung></style><body>${WALLS[id] ?? ''}`
+  f.srcdoc = `<!doctype html><meta charset=utf-8><style>${CSS[id] ?? ''}</style><style id=live></style><body>${WALLS[id] ?? ''}`
   if (SCRIPTS[id]) {
     /* Material's components are code, injected rather than written into srcdoc:
      * inside an attribute every quote in 260 kB of their code becomes six
@@ -466,12 +465,9 @@ function paint() {
       if (c.attr !== 'tone') continue
       for (const el of f.contentDocument.querySelectorAll(`[data-tone="${c.role}"]`)) el.setAttribute('data-accent-color', c.picked)
     }
-    /* five scenes at once is a wall you scroll rather than one you read, so
-       each section carries its rung and the frame is told which to show. The
-       markup is built once; only this one rule changes. */
-    const rung = f.contentDocument.getElementById('rung')
-    if (rung) rung.textContent = state.rung === 'all' ? ''
-      : `main > section:not([data-rung="${state.rung}"]){display:none}`
+    /* the wall is one strip you pan, so a board is a place you go rather than
+       a filter — nothing is hidden and nothing is re-rendered */
+    watch(f)
     /* the chosen face has to exist inside the frame too, or the wall shows the
        fallback while the card shows the family */
     for (const role of TYPE) loadFace(f.contentDocument, familyOf(state.values[role.id]))
@@ -647,14 +643,47 @@ $('#modes').addEventListener('click', (e) => {
   state.mode = b.dataset.m; drawModes(); paint()
 })
 
-function drawRungs() {
-  $('#rungs').innerHTML = RUNGS.map((r) =>
-    `<button role="radio" data-g="${r.id}" aria-checked="${r.id === state.rung}">${r.label}</button>`).join('')
+/* ── where you are on the wall ────────────────────────────────────────────── */
+/* The wall is a strip you pan through six boards. These are not filters — they
+ * are STOPS: the wall never hides anything, so pressing one takes you there and
+ * panning past one lights it. A filter would answer the question "what is on
+ * this wall" by removing most of it. */
+function drawBoards() {
+  $('#rungs').innerHTML = BOARDS.map((b) =>
+    `<button role="radio" data-g="${b.id}" aria-checked="${b.id === state.board}" title="${b.note}">${b.label}</button>`).join('')
 }
 $('#rungs').addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return
-  state.rung = b.dataset.g; drawRungs(); paint()
+  goTo(b.dataset.g)
 })
+function goTo(id) {
+  state.board = id; drawBoards()
+  const f = $('#f_' + state.show), el = f?.contentDocument?.getElementById('b_' + id)
+  el?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
+}
+/* and the other direction: pan the wall and the stops keep up. One listener per
+ * frame, added the first time that frame is looked at. */
+const WATCHED = new WeakSet()
+function watch(f) {
+  const strip = f.contentDocument?.getElementById('strip')
+  if (!strip || WATCHED.has(strip)) return
+  WATCHED.add(strip)
+  let queued = false
+  strip.addEventListener('scroll', () => {
+    if (queued) return
+    queued = true
+    requestAnimationFrame(() => {
+      queued = false
+      const edge = strip.scrollLeft + 40
+      let here = BOARDS[0].id
+      for (const b of BOARDS) {
+        const el = strip.querySelector(`#b_${b.id}`)
+        if (el && el.offsetLeft <= edge) here = b.id
+      }
+      if (here !== state.board) { state.board = here; drawBoards() }
+    })
+  }, { passive: true })
+}
 
 /* ── what each folded group still says ────────────────────────────────────── */
 /* A group that folds away and takes its answer with it is a group nobody will
@@ -888,7 +917,7 @@ function sync() {
   renderStack()
   renderPalettes()
   typoCards()
-  drawRungs()
+  drawBoards()
   drawModes()
   summaries()
 }
@@ -901,7 +930,7 @@ function receipt(routed) {
   const lic = [...new Set(routed.map((r) => KITS[r.kit].license).filter(Boolean))].join(' · ')
   const clash = collisions(routed, KITS)
   $('#receipt').innerHTML = `<b>${kits}</b>
-    <span>${SCENES.length} scenes · ${PARTS.length} parts</span>
+    <span>${SCENES.length} cards · ${PARTS.length} parts</span>
     <span>${lic}</span>
     ${clash.length ? `<span style="color:#ffd8a8">${clash.length} name${clash.length > 1 ? 's' : ''} two kits both use</span>`
       : `<span class="ok">${ico('check', 12)}no name clashes</span>`}`

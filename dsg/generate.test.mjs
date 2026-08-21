@@ -145,3 +145,17 @@ test('the Sass file is valid Sass, or it takes the whole build down with it', ()
     }
   }
 })
+
+test('a kit whose variables live only in our file gets its dark defaults too', () => {
+  /* shadcn's components read --muted, --secondary and --accent, and nothing but
+     the file we generate defines them. A dark block with only the seven names
+     we route leaves the rest at their LIGHT value inside .dark — which showed up
+     as a near-white avatar with near-white initials in it. */
+  const ids = ['tailwind', 'shadcn']
+  const kits = Object.fromEntries(ids.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
+  const block = generate(VALUES, ids, kits)._blocks.shadcn
+  const dark = block.slice(block.indexOf('.dark'))
+  for (const name of ['--muted', '--secondary', '--accent', '--destructive']) {
+    assert.match(dark, new RegExp(`\\${name}:`), `${name} keeps its light value in the dark`)
+  }
+})

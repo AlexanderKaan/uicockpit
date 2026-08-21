@@ -4,9 +4,9 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { buildCss } from './build-css.mjs'
 import { icons, svg } from './icons.mjs'
-import { render } from './parts.mjs'
-import { WALL } from './wall-bindings.mjs'
-import { SCENES } from './scenes.mjs'
+import { render, PARTS } from './parts.mjs'
+import { WALL, useIcons, useMantineClasses } from './wall-bindings.mjs'
+import { SCENES, BOARDS, ICON_NAMES, wallMarkup, safeJson } from './scenes.mjs'
 import { generate, section } from './generate.mjs'
 import { mark } from './mark.mjs'
 
@@ -16,20 +16,25 @@ const SHOT_IDS = ['tailwind', 'daisyui']
 const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface: '#f7f9fa',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
 const kits = Object.fromEntries(ALL.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
+useMantineClasses(kits.mantine?.classes)
+useIcons(icons(ICON_NAMES).icons)
 
 /* The wrapper a kit needs to be itself. Without data-theme, daisyUI's dark
  * theme wins on a dark OS and the frame shows its factory purple — which is
  * exactly what happened, on a page whose whole claim is that your values won. */
 const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="light"' }
-const wall = (id) => `<html${ROOT[id] ?? ''}><main>${SCENES.slice(0, 3).map((s) =>
-  `<section style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')}</main>
-<style>body{margin:0;padding:18px;font-family:ui-sans-serif,system-ui,sans-serif;background:#fff}
-main{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;align-items:start}
-.cap{margin:0 0 7px;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.4;font-weight:600}</style>`
+/* One board is the hero shot: the whole wall in a page-wide frame would be a
+ * thumbnail of a thumbnail. Same implementation as the real wall, so the shot
+ * cannot show an arrangement the product does not have. */
+const SHOT = BOARDS.filter((b) => b.id === 'data')
+const wall = (id) => `<!doctype html><html${ROOT[id] ?? ''}><meta charset="utf-8"><style>${css[id] ?? ''}</style><body>${wallMarkup(WALL[id], SHOT)}`
 
 console.log('compiling the hero shot…')
-const css = await buildCss(VALUES, SHOT_IDS, kits, wall)
-const shot = `<!doctype html><meta charset=utf-8><style>${css.daisyui}</style><body>${wall('daisyui')}`
+/* buildCss scans the markup, so it is handed the wall WITHOUT the stylesheet it
+   is about to compile — the same body, one round earlier. */
+const css = {}
+Object.assign(css, await buildCss(VALUES, SHOT_IDS, kits, (id) => wallMarkup(WALL[id], SHOT)))
+const shot = wall('daisyui')
 
 /* the caveats on the page are the REAL ones, pulled out of a real manifest */
 const md = generate(VALUES, ALL, kits)['MANIFEST.md']
@@ -41,7 +46,9 @@ const lu = icons(NAMES)
 let page = readFileSync('home.template.html', 'utf8')
   .replace('<!--BODY-->', () => readFileSync('home.body.html', 'utf8'))
   .replace('/*KITS*/', () => JSON.stringify(kits))
-  .replace('/*SHOT*/', () => JSON.stringify(shot))
+  .replace('/*SHOT*/', () => safeJson(shot))
+  .replace('/*CARDS*/', () => String(SCENES.length))
+  .replace('/*PARTS*/', () => String(PARTS.length))
   .replace('/*CAVEATS*/', () => JSON.stringify(caveats))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
 page = page.split('<!--MARK-->').join(mark(18))
@@ -50,6 +57,18 @@ page = page.split('<!--MARK-->').join(mark(18))
 const left = [...page.matchAll(/<!--(MARK|I:[a-z-]+)-->/g)].map((m) => m[0])
 if (left.length) { console.error(`build: unreplaced ${[...new Set(left)].join(' ')}`); process.exit(1) }
 
+
+/* The same balance check the generator has: a closing script tag that came out
+ * of a value ends the page's own script where it stands, and the only symptom
+ * is a page that does nothing. */
+{
+  const real = (readFileSync('home.template.html', 'utf8').match(/<\/script\b/g) ?? []).length
+  const closes = (page.match(/<\/script\b/g) ?? []).length
+  if (closes !== real) {
+    console.error(`build: the template has ${real} closing script tag${real === 1 ? '' : 's'} and the page has ${closes} — a value wrote one. See safeJson in scenes.mjs.`)
+    process.exit(1)
+  }
+}
 
 writeFileSync(OUT, page)
 console.log(`\n${OUT} — ${(page.length / 1024).toFixed(0)} kB · ${caveats.length} real caveats · lucide ${lu.version}`)

@@ -251,16 +251,31 @@ export const plain = (files) => Object.fromEntries(
 export const COMPONENT_GAPS = {
   bootstrap: [
     ['footer', 'Bootstrap ships a navbar but no footer component; the one on the wall is its own utilities on plain markup'],
+    ['chart', 'and no chart — the bars are its own colour utilities on plain markup'],
+    ['empty', 'and no empty state'],
   ],
   shadcn: [
     ['footer', 'shadcn ships no footer; the one on the wall is its own tokens on plain markup'],
+    ['chart', 'its chart is Recharts in React, which cannot be a class name; the bars here are its own --chart-1 and --chart-2, the same five colours its installation ships'],
   ],
   radix: [
     ['navbar', 'Radix Themes ships no navigation bar; the one on the wall is rt-Link and rt-Heading in a flex row'],
     ['footer', 'and no footer either — same, with rt-Grid'],
+    ['sidenav', 'and no sidebar: its TabNav runs horizontally, so the rail is rt-Text and rt-Badge rows on its own accent scale'],
+    ['breadcrumb', 'and no breadcrumb — rt-Link with a separator'],
+    ['list', 'and no list; DataList is for a label and a value, which is what the key-and-value card really uses'],
+    ['chart', 'and no chart — the bars are its accent scale at steps 9 and 6'],
   ],
   mantine: [
     ['navbar', 'the header and footer come from AppShell, which normally positions them for a whole app shell; on the wall they sit in flow'],
+    ['chart', 'charts live in @mantine/charts, a separate package this page does not load; the bars are its own primary colour'],
+  ],
+  daisyui: [
+    ['chart', 'daisyUI ships no chart; the bars are its own primary colour on plain markup'],
+    ['empty', 'and no empty state'],
+  ],
+  tailwind: [
+    ['chart', 'Tailwind ships utilities, not components — everything on this wall is composed, the chart included'],
   ],
   material: [
     ['navbar', 'M3 has a top app bar in the specification; @material/web ships only a bottom navigation bar, so the header is its tokens on plain markup'],
@@ -270,8 +285,22 @@ export const COMPONENT_GAPS = {
     ['table', '@material/web ships no data table, though the M3 spec describes one'],
     ['avatar', '@material/web ships no avatar; compose one from its shape and colour tokens'],
     ['alert', '@material/web ships no inline alert or banner; the closest is md-filled-card re-toned with its own container token'],
+    ['breadcrumb', 'no breadcrumb in the specification or the package'],
+    ['chart', 'and no chart — the bars are its primary and primary-container tokens'],
+    ['empty', 'and no empty state'],
+    ['sidenav', 'M3 has a navigation drawer and @material/web ships it in labs, where it positions itself for a whole app shell; the rail on the wall is md-list, which is what a drawer is made of'],
   ],
 }
+
+/**
+ * The four specimens that are not components anywhere.
+ *
+ * A colour card, a type scale, a corner ladder and an elevation ladder are how
+ * a design system is DOCUMENTED, not what it ships — no kit here has a class
+ * for one. They are drawn from each kit's own variables and its own text
+ * components, and this line says so once rather than seven times.
+ */
+export const SPECIMENS = ['swatches', 'typespec', 'shapes', 'elevation']
 
 /**
  * A face that has to be fetched, and the line that fetches it.
@@ -325,6 +354,10 @@ export const scopeOf = (id) => SCOPE[id] ?? ':root'
  *
  * `null` means the kit publishes no dark mode at all, and we do not invent one.
  */
+/* Kits that ship a stylesheet carrying their own dark values. Everything else
+ * has to be handed its defaults, because our file is the only place they live. */
+const OWN_DARK_STYLESHEET = new Set(['bootstrap', 'radix', 'mantine', 'material', 'openprops'])
+
 export const DARK = {
   tailwind: null,
   daisyui: 'theme',                 // a second registered theme, not a selector
@@ -374,17 +407,26 @@ function darkBlock(r, kit) {
 ${decl({ ...kit.modes.dark, ...r.dark })}
 }`
   }
+  /* THEIR dark defaults, ours over them — the same rule the light block needed.
+   *
+   * shadcn's variables exist nowhere but the file we generate: its components
+   * are class strings that read --muted, --secondary, --accent. Writing only the
+   * seven we route left every other name at its LIGHT value inside .dark, so an
+   * avatar in dark mode was a near-white circle with near-white initials in it.
+   * Kits with a stylesheet of their own already carry their dark values and are
+   * left alone — re-stating them would put our extraction over their source. */
+  const vars = OWN_DARK_STYLESHEET.has(r.kit) ? r.dark : { ...kit.modes.dark, ...r.dark }
   if (at.startsWith('@media')) {
     return `${head}
 ${at} {
   ${scopeOf(r.kit)} {
-${decl(r.dark, '    ')}
+${decl(vars, '    ')}
   }
 }`
   }
   return `${head}
 ${at} {
-${decl(r.dark)}
+${decl(vars)}
 }`
 }
 

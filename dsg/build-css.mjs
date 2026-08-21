@@ -28,9 +28,17 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   /* Tailwind, daisyUI and shadcn all compile through Tailwind. Their markup is
      scanned so only the utilities actually used are emitted. */
   mkdirSync(join(dir, 'src'), { recursive: true })
-  writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'p', private: true, type: 'module',
-    devDependencies: { '@tailwindcss/cli': `^${kits.tailwind.version}`, tailwindcss: `^${kits.tailwind.version}`, daisyui: `^${kits.daisyui.version}` } }))
   const TW = [['tailwind', ''], ['daisyui', '@plugin "daisyui";'], ['shadcn', '']].filter(([id]) => IDS.includes(id))
+  /* Only the versions of kits that are actually in this build. Naming daisyUI's
+     version while building Bootstrap alone read it off a kit that was never
+     loaded, and the whole preview died before it compiled anything. */
+  const dev = {}
+  if (TW.length) {
+    dev['@tailwindcss/cli'] = `^${kits.tailwind.version}`
+    dev.tailwindcss = `^${kits.tailwind.version}`
+    if (kits.daisyui) dev.daisyui = `^${kits.daisyui.version}`
+  }
+  writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'p', private: true, type: 'module', devDependencies: dev }))
   for (const [id, plugin] of TW) {
     writeFileSync(join(dir, `src/${id}.html`), body(id))
     /* ONLY this kit's block. Loading the whole theme.css put shadcn's --border

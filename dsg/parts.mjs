@@ -12,12 +12,14 @@
  * wall ends up with holes in it.
  */
 export const PARTS = [
-  'stack', 'row', 'grid', 'panel', 'divider',          // layout
-  'heading', 'text', 'muted', 'label',                 // content
-  'button', 'input', 'select', 'checkbox', 'switch',   // controls
-  'badge', 'alert', 'stat', 'table', 'avatar', 'tabs', // display
-  'navbar', 'mediacard', 'footer',                     // organisms
-  'elevation',                                         // foundation specimen
+  'stack', 'row', 'grid', 'panel', 'divider',                        // layout
+  'heading', 'text', 'muted', 'label',                               // content
+  'button', 'iconrow', 'input', 'textarea', 'select',                // controls
+  'checkbox', 'radio', 'switch', 'slider',                           //   and the rest of them
+  'badge', 'alert', 'stat', 'progress', 'table', 'list', 'kv',       // display
+  'chart', 'avatar', 'empty', 'tabs',                                //   and the rest of them
+  'navbar', 'sidenav', 'breadcrumb', 'mediacard', 'footer',          // organisms
+  'elevation', 'swatches', 'typespec', 'shapes',                     // foundation specimens
 ]
 
 /**

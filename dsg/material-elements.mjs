@@ -60,11 +60,14 @@ function typescaleTokens(css) {
  * something Material does not ship. */
 const IMPORTS = [
   'button/filled-button.js', 'button/outlined-button.js', 'button/text-button.js',
-  'button/filled-tonal-button.js', 'checkbox/checkbox.js', 'switch/switch.js',
+  'button/filled-tonal-button.js', 'checkbox/checkbox.js', 'switch/switch.js', 'radio/radio.js',
   'textfield/outlined-text-field.js', 'select/outlined-select.js', 'select/select-option.js',
+  'slider/slider.js', 'progress/linear-progress.js',
   'tabs/tabs.js', 'tabs/primary-tab.js', 'divider/divider.js',
   'chips/chip-set.js', 'chips/assist-chip.js', 'chips/suggestion-chip.js',
-  'list/list.js', 'list/list-item.js', 'labs/card/outlined-card.js', 'labs/card/filled-card.js',
+  'iconbutton/icon-button.js', 'iconbutton/filled-tonal-icon-button.js',
+  'list/list.js', 'list/list-item.js', 'labs/badge/badge.js',
+  'labs/card/outlined-card.js', 'labs/card/filled-card.js',
 ]
 
 export function materialElements({ refresh = false } = {}) {

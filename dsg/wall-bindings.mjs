@@ -15,9 +15,70 @@
  * Everything else here is the kit's own classes, verbatim.
  */
 import { esc, list, PHOTO } from './parts.mjs'
+import { MAP, ROLES } from './roles.mjs'
 
 const cls = (...c) => c.filter(Boolean).join(' ')
 const A = (n, k, tag, c, extra = '') => `<${tag} class="${c}"${extra}>${n.text != null ? esc(n.text) : k}</${tag}>`
+
+/* ── the icons ────────────────────────────────────────────────────────────
+ * lucide, read from lucide at build time and HANDED IN — the same hand-in as
+ * Mantine's class map, and for the same reason: this module is also inlined
+ * into a page where there is no filesystem to read a package from.
+ * A name lucide does not have is an error at build time, in icons.mjs, so
+ * nothing here can quietly render an empty square. */
+let IC = {}
+export const useIcons = (map) => { IC = map ?? {} }
+export const ico = (name, size = 16) => {
+  /* An icon that was never handed in used to come out as an empty <svg>, and an
+     empty svg inside a ghost button is an invisible button. The toolbar shipped
+     that way in the multi-kit preview and looked like a blank card. A hole is
+     drawn as a hole. */
+  const d = IC[name]
+  const body = d || '<rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="3 2"/><path d="M8 16 16 8"/>'
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${d ? '' : ' data-no-icon="' + name + '"'}>${body}</svg>`
+}
+
+/* ── what this kit really calls each role ─────────────────────────────────
+ * The colour card every kit's own site has is a row of squares with variable
+ * names under them. Ours reads those names out of the routing table instead of
+ * carrying a list, so it is right per kit — and where a kit has NO variable for
+ * a role it says which, which is the one thing a page of squares on someone
+ * else's site can never tell you.
+ *
+ * Six answers, the same six the export uses: a variable, a variable we added, a
+ * value the kit computes, a named setting it takes instead of a value, a value
+ * only its build can change, and nothing at all. */
+const LABEL = Object.fromEntries(ROLES.map((r) => [r.id, r.label]))
+/**
+ * `shown` is the variable that CARRIES a role the kit will not let you set.
+ *
+ * Material computes its whole scheme from one seed and Radix takes a named
+ * accent, so for most roles there is no variable to write — but there is one to
+ * read, and leaving the tile blank said "this kit has no page colour" when the
+ * truth is "this kit decides your page colour for you". The swatch shows the
+ * colour; the line under it still says you cannot set it.
+ */
+export function swatchRows(kit, roles, shown = {}) {
+  return list(roles).map((id) => {
+    const e = MAP[kit]?.[id]
+    const paint = e?.var ? `var(${e.var})` : shown[id] ? `var(${shown[id]})` : null
+    const note = !e ? 'no variable'
+      : e.var ? (e.new ? `${e.var} — added` : e.needsBuild ? `${e.var} — compiled` : e.var)
+      : e.derives ? `derived from ${LABEL[e.derives] ? LABEL[e.derives].toLowerCase() : e.derives}`
+      : e.choice ? 'a named setting, not a value'
+      : e.needsBuild ? 'only its build can change this'
+      : 'no variable'
+    return { id, label: LABEL[id] ?? id, paint, note }
+  })
+}
+
+/* The two numbers a bar chart needs, as percentages of the tallest bar, so a
+ * scene can carry plain figures and every kit draws the same shape. */
+export const bars = (n) => {
+  const rows = list(n.bars)
+  const top = Math.max(1, ...rows.flatMap((b) => [b.a ?? 0, b.b ?? 0]))
+  return rows.map((b) => ({ label: b.label, a: Math.round(((b.a ?? 0) / top) * 100), b: Math.round(((b.b ?? 0) / top) * 100) }))
+}
 
 /* ── Tailwind, using the semantic names our package adds ─────────────────── */
 const TW_BTN = { brand: 'bg-brand text-brand-foreground hover:opacity-90', secondary: 'bg-surface text-ink border border-line',
@@ -65,6 +126,37 @@ const tailwind = {
   elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv) =>
     `<div class="flex h-16 w-24 items-center justify-center rounded-lg bg-surface text-xs text-ink-muted shadow-${lv}">${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<div class="flex gap-4 border-b border-line text-sm">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'border-b-2 border-brand pb-2 font-medium text-ink' : 'pb-2 text-ink-muted'}">${esc(t)}</span>`).join('')}</div>`,
+
+  /* ── the rest of a real screen ─────────────────────────────────────────── */
+  textarea: (n) => `<textarea rows="3" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
+  radio:   (n) => `<div class="flex flex-col gap-2">${list(n.items).map((t, i) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="radio" name="${esc(n.name ?? 'g')}" class="size-4 accent-brand"${i === (n.on ?? 0) ? ' checked' : ''}>${esc(t)}</label>`).join('')}</div>`,
+  slider:  (n) => `<input type="range" max="100" value="${n.value ?? 60}" class="h-9 w-full accent-brand">`,
+  progress: (n) => `<div class="h-2 w-full overflow-hidden rounded-full bg-line"><div class="h-full rounded-full bg-brand" style="width:${n.value ?? 60}%"></div></div>`,
+  iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="inline-flex size-9 items-center justify-center rounded-lg text-ink hover:bg-surface">${ico(i)}</button>`).join('')}</div>`,
+  breadcrumb: (n) => `<nav class="flex flex-wrap items-center gap-2 text-sm text-ink-muted">${list(n.items).map((t, i, a) => `${i ? '<span class="text-ink-muted">/</span>' : ''}<a href="#" class="${i === a.length - 1 ? 'font-medium text-ink' : 'hover:text-ink'}">${esc(t)}</a>`).join('')}</nav>`,
+  sidenav: (n) => `<nav class="flex flex-col gap-4">${list(n.groups).map((g) => `<div class="flex flex-col gap-1">
+    <p class="px-2 text-xs font-medium text-ink-muted">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#" class="flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm ${it.on ? 'bg-surface font-medium text-ink' : 'text-ink-muted hover:bg-surface'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="ml-auto rounded-full bg-brand/10 px-2 text-xs text-brand">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</nav>`,
+  list:    (n) => `<div class="flex flex-col">${list(n.rows).map((r) => `<div class="flex min-h-12 items-center gap-3 border-b border-line py-2 last:border-0">
+    <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface text-ink-muted">${ico(r.icon)}</span>
+    <span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-ink">${esc(r.title)}</span><span class="block text-xs text-ink-muted">${esc(r.sub ?? '')}</span></span>
+    <span class="shrink-0 text-sm tabular-nums text-ink-muted">${esc(r.meta ?? '')}</span></div>`).join('')}</div>`,
+  kv:      (n) => `<div class="flex flex-col gap-2">${list(n.rows).map(([k2, v]) => `<div class="flex min-h-9 items-center gap-3 rounded-lg border border-line bg-surface px-3">
+    <code class="flex-1 truncate font-mono text-xs text-ink">${esc(k2)}</code><span class="font-mono text-xs text-ink-muted">${esc(v)}</span></div>`).join('')}</div>`,
+  chart:   (n) => `<div class="flex flex-col gap-3"><div class="flex h-28 items-end gap-2">${bars(n).map((b) => `<div class="flex flex-1 flex-col items-center gap-1">
+    <div class="flex h-24 w-full items-end justify-center gap-0.5"><div class="w-1/2 rounded-t-sm bg-brand" style="height:${b.a}%"></div><div class="w-1/2 rounded-t-sm bg-brand/30" style="height:${b.b}%"></div></div>
+    <span class="text-xs text-ink-muted">${esc(b.label)}</span></div>`).join('')}</div>
+    <div class="flex gap-4 text-xs text-ink-muted">${list(n.legend).map((t, i) => `<span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full ${i ? 'bg-brand/30' : 'bg-brand'}"></span>${esc(t)}</span>`).join('')}</div></div>`,
+  empty:   (n, k) => `<div class="flex flex-col items-center gap-2 py-8 text-center">
+    <span class="inline-flex size-10 items-center justify-center rounded-lg border border-line bg-surface text-ink-muted">${ico(n.icon, 18)}</span>
+    <p class="text-sm font-medium text-ink">${esc(n.title)}</p><p class="max-w-56 text-sm text-ink-muted">${esc(n.text)}</p>${k}</div>`,
+  swatches: (n) => `<div class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('tailwind', n.roles).map((r) => `<div class="flex flex-col gap-1.5">
+    ${r.paint ? `<span class="h-10 rounded-lg border border-line" style="background:${r.paint}"></span>` : '<span class="h-10 rounded-lg border border-dashed border-line"></span>'}
+    <span class="text-xs font-medium text-ink">${esc(r.label)}</span><code class="font-mono text-[10px] leading-tight text-ink-muted">${esc(r.note)}</code></div>`).join('')}</div>`,
+  typespec: (n) => `<div class="flex flex-col gap-4">${list(n.rows).map((r) => `<div class="flex flex-col gap-1">
+    <code class="font-mono text-[10px] uppercase tracking-wide text-ink-muted">${esc({ xl: 'text-4xl', lg: 'text-2xl', md: 'text-base', sm: 'text-sm' }[r.size])}</code>
+    <p class="${{ xl: 'text-4xl font-semibold', lg: 'text-2xl font-semibold', md: 'text-base', sm: 'text-sm' }[r.size]} text-ink">${esc(r.text)}</p></div>`).join('')}</div>`,
+  shapes:  () => `<div class="flex flex-col gap-4"><div class="flex flex-wrap items-end gap-3">${['rounded-sm', 'rounded-md', 'rounded-lg', 'rounded-xl'].map((c) => `<div class="flex flex-col items-center gap-1"><span class="size-12 border border-line bg-surface ${c}"></span><code class="font-mono text-[10px] text-ink-muted">${esc(c)}</code></div>`).join('')}</div>
+    <div class="flex flex-wrap items-center gap-3">${['border', 'border-2', 'border-4'].map((c) => `<span class="inline-flex h-8 items-center rounded-lg ${c} border-line px-3 font-mono text-[10px] text-ink-muted">${esc(c)}</span>`).join('')}</div></div>`,
 }
 
 /* ── daisyUI ─────────────────────────────────────────────────────────────── */
@@ -109,6 +201,40 @@ const daisyui = {
   elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv) =>
     `<div class="card bg-base-100 shadow-${lv} h-16 w-24"><div class="card-body items-center justify-center p-0 text-xs opacity-60">${esc(lv)}</div></div>`).join('')}</div>`,
   tabs:    (n) => `<div class="tabs tabs-border">${list(n.items).map((t, i) => `<a class="tab${i === 0 ? ' tab-active' : ''}">${esc(t)}</a>`).join('')}</div>`,
+
+  /* ── the rest of a real screen ─────────────────────────────────────────── */
+  /* daisyUI ships a component for nearly all of these: .textarea, .range,
+     .progress, .radio, .breadcrumbs, .menu, .list with .list-row. Nothing here
+     is composed by hand except the chart, which no kit in this tool ships. */
+  textarea: (n) => `<textarea rows="3" class="textarea w-full" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
+  radio:   (n) => `<div class="flex flex-col gap-2">${list(n.items).map((t, i) => `<label class="label"><input type="radio" name="${esc(n.name ?? 'g')}" class="radio radio-primary"${i === (n.on ?? 0) ? ' checked' : ''}><span>${esc(t)}</span></label>`).join('')}</div>`,
+  slider:  (n) => `<input type="range" max="100" value="${n.value ?? 60}" class="range range-primary w-full">`,
+  progress: (n) => `<progress class="progress progress-primary w-full" value="${n.value ?? 60}" max="100"></progress>`,
+  iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="btn btn-ghost btn-square btn-sm">${ico(i)}</button>`).join('')}</div>`,
+  breadcrumb: (n) => `<div class="breadcrumbs text-sm"><ul>${list(n.items).map((t) => `<li><a>${esc(t)}</a></li>`).join('')}</ul></div>`,
+  sidenav: (n) => `<ul class="menu w-full p-0">${list(n.groups).map((g) => `<li class="menu-title">${esc(g.title)}</li>${
+    list(g.items).map((it) => `<li><a${it.on ? ' class="menu-active"' : ''}>${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="badge badge-sm badge-primary badge-soft">${esc(it.count)}</span>` : ''}</a></li>`).join('')}`).join('')}</ul>`,
+  list:    (n) => `<ul class="list bg-base-100">${list(n.rows).map((r) => `<li class="list-row items-center">
+    <span class="bg-base-200 text-base-content/60 flex size-8 items-center justify-center rounded-box">${ico(r.icon)}</span>
+    <div><div class="font-medium">${esc(r.title)}</div><div class="text-xs opacity-60">${esc(r.sub ?? '')}</div></div>
+    <span class="text-sm opacity-60 tabular-nums">${esc(r.meta ?? '')}</span></li>`).join('')}</ul>`,
+  kv:      (n) => `<ul class="list bg-base-100">${list(n.rows).map(([k2, v]) => `<li class="list-row items-center py-2">
+    <code class="font-mono text-xs">${esc(k2)}</code><span class="font-mono text-xs opacity-60">${esc(v)}</span></li>`).join('')}</ul>`,
+  chart:   (n) => `<div class="flex flex-col gap-3"><div class="flex h-28 items-end gap-2">${bars(n).map((b) => `<div class="flex flex-1 flex-col items-center gap-1">
+    <div class="flex h-24 w-full items-end justify-center gap-0.5"><div class="bg-primary w-1/2 rounded-t-sm" style="height:${b.a}%"></div><div class="bg-primary/30 w-1/2 rounded-t-sm" style="height:${b.b}%"></div></div>
+    <span class="text-xs opacity-60">${esc(b.label)}</span></div>`).join('')}</div>
+    <div class="flex gap-4 text-xs opacity-60">${list(n.legend).map((t, i) => `<span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full ${i ? 'bg-primary/30' : 'bg-primary'}"></span>${esc(t)}</span>`).join('')}</div></div>`,
+  empty:   (n, k) => `<div class="flex flex-col items-center gap-2 py-8 text-center">
+    <span class="bg-base-200 text-base-content/60 flex size-10 items-center justify-center rounded-box">${ico(n.icon, 18)}</span>
+    <p class="font-medium">${esc(n.title)}</p><p class="max-w-56 text-sm opacity-60">${esc(n.text)}</p>${k}</div>`,
+  swatches: (n) => `<div class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('daisyui', n.roles).map((r) => `<div class="flex flex-col gap-1.5">
+    ${r.paint ? `<span class="border-base-300 h-10 rounded-box border" style="background:${r.paint}"></span>` : '<span class="border-base-300 h-10 rounded-box border border-dashed"></span>'}
+    <span class="text-xs font-medium">${esc(r.label)}</span><code class="font-mono text-[10px] leading-tight opacity-60">${esc(r.note)}</code></div>`).join('')}</div>`,
+  typespec: (n) => `<div class="flex flex-col gap-4">${list(n.rows).map((r) => `<div class="flex flex-col gap-1">
+    <code class="font-mono text-[10px] uppercase tracking-wide opacity-60">${esc({ xl: 'text-4xl', lg: 'text-2xl', md: 'text-base', sm: 'text-sm' }[r.size])}</code>
+    <p class="${{ xl: 'text-4xl font-semibold', lg: 'text-2xl font-semibold', md: 'text-base', sm: 'text-sm' }[r.size]}">${esc(r.text)}</p></div>`).join('')}</div>`,
+  shapes:  () => `<div class="flex flex-col gap-4"><div class="flex flex-wrap items-end gap-3">${['rounded-selector', 'rounded-field', 'rounded-box'].map((c) => `<div class="flex flex-col items-center gap-1"><span class="bg-base-200 border-base-300 size-12 border ${c}"></span><code class="font-mono text-[10px] opacity-60">${esc(c)}</code></div>`).join('')}</div>
+    <div class="flex flex-wrap items-center gap-3">${['border', 'border-2', 'border-4'].map((c) => `<span class="border-base-300 rounded-field inline-flex h-8 items-center px-3 font-mono text-[10px] opacity-60 ${c}">${esc(c)}</span>`).join('')}</div></div>`,
 }
 
 /* ── Bootstrap ───────────────────────────────────────────────────────────── */
@@ -153,6 +279,41 @@ const bootstrap = {
   elevation: (n) => `<div class="d-flex flex-wrap align-items-center gap-3">${list(n.levels).map((lv, i) =>
     `<div class="card ${['shadow-sm', 'shadow', 'shadow-lg'][i] ?? 'shadow'} d-flex align-items-center justify-content-center small text-body-secondary" style="width:6rem;height:4rem">${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<ul class="nav nav-tabs">${list(n.items).map((t, i) => `<li class="nav-item"><a class="nav-link${i === 0 ? ' active' : ''}">${esc(t)}</a></li>`).join('')}</ul>`,
+
+  /* ── the rest of a real screen ─────────────────────────────────────────── */
+  /* .form-range, .progress, .breadcrumb, .list-group and .nav-pills are all
+     Bootstrap components. It ships no chart and no empty state, so those two
+     are its own utilities on plain markup. */
+  textarea: (n) => `<textarea rows="3" class="form-control" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
+  radio:   (n) => `<div>${list(n.items).map((t, i) => `<div class="form-check"><input class="form-check-input" type="radio" name="${esc(n.name ?? 'g')}"${i === (n.on ?? 0) ? ' checked' : ''}><label class="form-check-label">${esc(t)}</label></div>`).join('')}</div>`,
+  slider:  (n) => `<input type="range" class="form-range" max="100" value="${n.value ?? 60}">`,
+  progress: (n) => `<div class="progress" role="progressbar"><div class="progress-bar" style="width:${n.value ?? 60}%"></div></div>`,
+  iconrow: (n) => `<div class="btn-group flex-wrap">${list(n.items).map((i) => `<button type="button" aria-label="${esc(i)}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center">${ico(i)}</button>`).join('')}</div>`,
+  breadcrumb: (n) => `<nav><ol class="breadcrumb mb-0">${list(n.items).map((t, i, a) => `<li class="breadcrumb-item${i === a.length - 1 ? ' active' : ''}">${i === a.length - 1 ? esc(t) : `<a href="#">${esc(t)}</a>`}</li>`).join('')}</ol></nav>`,
+  sidenav: (n) => `<div class="d-flex flex-column gap-3">${list(n.groups).map((g) => `<div>
+    <p class="text-body-secondary text-uppercase small mb-1 px-2">${esc(g.title)}</p>
+    <ul class="nav nav-pills flex-column">${list(g.items).map((it) => `<li class="nav-item"><a href="#" class="nav-link d-flex align-items-center gap-2 py-1${it.on ? ' active' : ' link-body-emphasis'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="badge rounded-pill text-bg-secondary ms-auto">${esc(it.count)}</span>` : ''}</a></li>`).join('')}</ul></div>`).join('')}</div>`,
+  list:    (n) => `<ul class="list-group list-group-flush">${list(n.rows).map((r) => `<li class="list-group-item d-flex align-items-center gap-3 px-0">
+    <span class="d-inline-flex align-items-center justify-content-center rounded bg-body-secondary text-body-secondary" style="width:2rem;height:2rem">${ico(r.icon)}</span>
+    <span class="flex-grow-1"><span class="d-block fw-medium">${esc(r.title)}</span><span class="d-block small text-body-secondary">${esc(r.sub ?? '')}</span></span>
+    <span class="small text-body-secondary font-monospace">${esc(r.meta ?? '')}</span></li>`).join('')}</ul>`,
+  kv:      (n) => `<ul class="list-group">${list(n.rows).map(([k2, v]) => `<li class="list-group-item d-flex justify-content-between align-items-center py-2">
+    <code class="small">${esc(k2)}</code><span class="small text-body-secondary font-monospace">${esc(v)}</span></li>`).join('')}</ul>`,
+  chart:   (n) => `<div class="d-flex flex-column gap-3"><div class="d-flex align-items-end gap-2" style="height:7rem">${bars(n).map((b) => `<div class="d-flex flex-column align-items-center gap-1 flex-fill">
+    <div class="d-flex align-items-end justify-content-center gap-1 w-100" style="height:6rem"><div class="bg-primary rounded-top" style="width:45%;height:${b.a}%"></div><div class="bg-primary-subtle rounded-top" style="width:45%;height:${b.b}%"></div></div>
+    <span class="small text-body-secondary">${esc(b.label)}</span></div>`).join('')}</div>
+    <div class="d-flex gap-3 small text-body-secondary">${list(n.legend).map((t, i) => `<span class="d-inline-flex align-items-center gap-1"><span class="rounded-circle ${i ? 'bg-primary-subtle' : 'bg-primary'}" style="width:.5rem;height:.5rem"></span>${esc(t)}</span>`).join('')}</div></div>`,
+  empty:   (n, k) => `<div class="d-flex flex-column align-items-center gap-2 py-5 text-center">
+    <span class="d-inline-flex align-items-center justify-content-center rounded bg-body-secondary text-body-secondary" style="width:2.5rem;height:2.5rem">${ico(n.icon, 18)}</span>
+    <p class="fw-medium mb-0">${esc(n.title)}</p><p class="small text-body-secondary mb-0" style="max-width:14rem">${esc(n.text)}</p>${k}</div>`,
+  swatches: (n) => `<div class="d-grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('bootstrap', n.roles).map((r) => `<div class="d-flex flex-column gap-1">
+    ${r.paint ? `<span class="rounded border" style="height:2.5rem;background:${r.paint}"></span>` : '<span class="rounded border" style="height:2.5rem;border-style:dashed"></span>'}
+    <span class="small fw-medium">${esc(r.label)}</span><code class="text-body-secondary" style="font-size:10px;line-height:1.3">${esc(r.note)}</code></div>`).join('')}</div>`,
+  typespec: (n) => `<div class="d-flex flex-column gap-3">${list(n.rows).map((r) => `<div>
+    <code class="text-body-secondary text-uppercase d-block" style="font-size:10px">${esc({ xl: 'display-6', lg: 'h4', md: '--bs-body-font-size', sm: 'small' }[r.size])}</code>
+    <p class="${{ xl: 'display-6', lg: 'h4', md: '', sm: 'small' }[r.size]} mb-0">${esc(r.text)}</p></div>`).join('')}</div>`,
+  shapes:  () => `<div class="d-flex flex-column gap-3"><div class="d-flex flex-wrap align-items-end gap-3">${['rounded-1', 'rounded-2', 'rounded-3', 'rounded-4'].map((c) => `<div class="d-flex flex-column align-items-center gap-1"><span class="bg-body-secondary border ${c}" style="width:3rem;height:3rem"></span><code class="text-body-secondary" style="font-size:10px">${esc(c)}</code></div>`).join('')}</div>
+    <div class="d-flex flex-wrap align-items-center gap-3">${['border', 'border-2', 'border-4'].map((c) => `<span class="d-inline-flex align-items-center rounded px-3 text-body-secondary ${c}" style="height:2rem;font-size:10px">${esc(c)}</span>`).join('')}</div></div>`,
 }
 
 /* ── shadcn/ui — its OWN class strings, read from its registry ───────────── */
@@ -218,6 +379,43 @@ const shadcn = {
   elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv, i) =>
     `<div class="bg-card text-muted-foreground flex h-16 w-24 items-center justify-center rounded-xl border text-xs ${['shadow-xs', 'shadow-sm', 'shadow-lg'][i] ?? 'shadow-sm'}">${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<div class="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'bg-background text-foreground shadow-sm ' : ''}inline-flex h-[calc(100%-1px)] items-center justify-center rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap">${esc(t)}</span>`).join('')}</div>`,
+
+  /* ── the rest of a real screen ─────────────────────────────────────────── */
+  /* Still its own strings: the slider is track / range / thumb the way its
+     component composes them, the sidebar uses the --sidebar-* variables its
+     installation ships, and the chart uses --chart-1 and --chart-2 — the five
+     chart colours are in shadcn's own globals.css and in ours. */
+  textarea: (n) => `<textarea rows="3" class="border-input min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
+  radio:   (n) => `<div class="grid gap-3">${list(n.items).map((t, i) => `<label class="flex items-center gap-2 text-sm leading-none font-medium"><input type="radio" name="${esc(n.name ?? 'g')}" class="border-input size-4 shrink-0 rounded-full border shadow-xs accent-primary"${i === (n.on ?? 0) ? ' checked' : ''}>${esc(t)}</label>`).join('')}</div>`,
+  slider:  (n) => `<div class="relative flex h-9 w-full items-center"><div class="bg-muted relative h-1.5 w-full grow overflow-hidden rounded-full"><div class="bg-primary absolute h-full" style="width:${n.value ?? 60}%"></div></div>
+    <div class="border-primary bg-background absolute block size-4 shrink-0 rounded-full border shadow-sm" style="left:calc(${n.value ?? 60}% - 8px)"></div></div>`,
+  progress: (n) => `<div class="bg-primary/20 relative h-2 w-full overflow-hidden rounded-full"><div class="bg-primary h-full transition-all" style="width:${n.value ?? 60}%"></div></div>`,
+  iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="hover:bg-accent hover:text-accent-foreground inline-flex size-9 shrink-0 items-center justify-center rounded-md transition-all outline-none">${ico(i)}</button>`).join('')}</div>`,
+  breadcrumb: (n) => `<nav><ol class="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words">${list(n.items).map((t, i, a) => `${i ? '<li class="[&>svg]:size-3.5" role="presentation">/</li>' : ''}<li class="inline-flex items-center gap-1.5">${i === a.length - 1 ? `<span class="text-foreground font-normal">${esc(t)}</span>` : `<a href="#" class="hover:text-foreground transition-colors">${esc(t)}</a>`}</li>`).join('')}</ol></nav>`,
+  sidenav: (n) => `<div class="bg-sidebar text-sidebar-foreground flex flex-col gap-4 rounded-lg p-2">${list(n.groups).map((g) => `<div class="relative flex w-full min-w-0 flex-col">
+    <div class="text-sidebar-foreground/70 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium">${esc(g.title)}</div>
+    <ul class="flex w-full min-w-0 flex-col gap-1">${list(g.items).map((it) => `<li class="relative"><a href="#" class="${it.on ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium ' : 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground '}flex h-8 w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden">${ico(it.icon)}<span class="truncate">${esc(it.text)}</span>${it.count ? `<span class="text-sidebar-foreground ml-auto text-xs tabular-nums">${esc(it.count)}</span>` : ''}</a></li>`).join('')}</ul></div>`).join('')}</div>`,
+  list:    (n) => `<div class="flex flex-col">${list(n.rows).map((r) => `<div class="flex min-h-12 items-center gap-3 border-b py-2 last:border-0">
+    <span class="bg-muted text-muted-foreground inline-flex size-8 shrink-0 items-center justify-center rounded-lg">${ico(r.icon)}</span>
+    <span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium">${esc(r.title)}</span><span class="text-muted-foreground block text-xs">${esc(r.sub ?? '')}</span></span>
+    <span class="text-muted-foreground shrink-0 text-sm tabular-nums">${esc(r.meta ?? '')}</span></div>`).join('')}</div>`,
+  kv:      (n) => `<div class="flex flex-col gap-2">${list(n.rows).map(([k2, v]) => `<div class="bg-muted/40 flex min-h-9 items-center gap-3 rounded-md border px-3">
+    <code class="flex-1 truncate font-mono text-xs">${esc(k2)}</code><span class="text-muted-foreground font-mono text-xs">${esc(v)}</span></div>`).join('')}</div>`,
+  chart:   (n) => `<div class="flex flex-col gap-3"><div class="flex h-28 items-end gap-2">${bars(n).map((b) => `<div class="flex flex-1 flex-col items-center gap-1">
+    <div class="flex h-24 w-full items-end justify-center gap-0.5"><div class="bg-chart-1 w-1/2 rounded-t-sm" style="height:${b.a}%"></div><div class="bg-chart-2 w-1/2 rounded-t-sm" style="height:${b.b}%"></div></div>
+    <span class="text-muted-foreground text-xs">${esc(b.label)}</span></div>`).join('')}</div>
+    <div class="text-muted-foreground flex gap-4 text-xs">${list(n.legend).map((t, i) => `<span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full ${i ? 'bg-chart-2' : 'bg-chart-1'}"></span>${esc(t)}</span>`).join('')}</div></div>`,
+  empty:   (n, k) => `<div class="flex flex-col items-center gap-2 py-8 text-center">
+    <span class="bg-muted text-muted-foreground inline-flex size-10 items-center justify-center rounded-lg">${ico(n.icon, 18)}</span>
+    <p class="text-sm font-medium">${esc(n.title)}</p><p class="text-muted-foreground max-w-56 text-sm">${esc(n.text)}</p>${k}</div>`,
+  swatches: (n) => `<div class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('shadcn', n.roles).map((r) => `<div class="flex flex-col gap-1.5">
+    ${r.paint ? `<span class="h-10 rounded-md border" style="background:${r.paint}"></span>` : '<span class="h-10 rounded-md border border-dashed"></span>'}
+    <span class="text-xs font-medium">${esc(r.label)}</span><code class="text-muted-foreground font-mono text-[10px] leading-tight">${esc(r.note)}</code></div>`).join('')}</div>`,
+  typespec: (n) => `<div class="flex flex-col gap-4">${list(n.rows).map((r) => `<div class="flex flex-col gap-1">
+    <code class="text-muted-foreground font-mono text-[10px] tracking-wide uppercase">${esc({ xl: 'text-4xl', lg: 'text-2xl', md: 'text-base', sm: 'text-sm' }[r.size])}</code>
+    <p class="${{ xl: 'text-4xl font-semibold tracking-tight', lg: 'text-2xl font-semibold', md: 'text-base', sm: 'text-muted-foreground text-sm' }[r.size]}">${esc(r.text)}</p></div>`).join('')}</div>`,
+  shapes:  () => `<div class="flex flex-col gap-4"><div class="flex flex-wrap items-end gap-3">${['rounded-sm', 'rounded-md', 'rounded-lg', 'rounded-xl'].map((c) => `<div class="flex flex-col items-center gap-1"><span class="bg-muted size-12 border ${c}"></span><code class="text-muted-foreground font-mono text-[10px]">${esc(c)}</code></div>`).join('')}</div>
+    <div class="flex flex-wrap items-center gap-3">${['border', 'border-2', 'border-4'].map((c) => `<span class="text-muted-foreground inline-flex h-8 items-center rounded-md px-3 font-mono text-[10px] ${c}">${esc(c)}</span>`).join('')}</div></div>`,
 }
 
 /* ── Material 3 — Google's real custom elements ──────────────────────────── */
@@ -243,6 +441,10 @@ const MD_CHIP_TOK = {
   danger: '--md-assist-chip-label-text-color:var(--md-sys-color-on-error-container);--md-assist-chip-outline-color:var(--md-sys-color-error)',
 }
 const MD_TYPE = { 2: 'md-typescale-headline-small', 3: 'md-typescale-title-medium' }
+/* the roles its generator fills in from the seed — readable, not settable */
+const MD_SHOWN = { onBrand: '--md-sys-color-on-primary', page: '--md-sys-color-surface',
+  surface: '--md-sys-color-surface-container', ink: '--md-sys-color-on-surface',
+  inkMuted: '--md-sys-color-on-surface-variant', line: '--md-sys-color-outline-variant' }
 const material = {
   _id: 'Material 3',
   /* layout — Material ships none, so these three are ours and say so */
@@ -307,6 +509,49 @@ const material = {
   elevation: (n) => `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px">${list(n.levels).map((lv, i) =>
     `<div style="position:relative;width:96px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:var(--md-sys-shape-corner-md);background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface-variant);font-size:12px"><md-elevation style="--md-elevation-level:${i + 1}"></md-elevation>${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<md-tabs>${list(n.items).map((t, i) => `<md-primary-tab${i === 0 ? ' active' : ''}>${esc(t)}</md-primary-tab>`).join('')}</md-tabs>`,
+
+  /* ── the rest of a real screen ─────────────────────────────────────────── */
+  /* md-slider, md-radio, md-linear-progress, md-icon-button, md-badge and
+     md-list are all Google's elements, running their code. What M3 has no
+     element for — a breadcrumb, a chart, an empty state — is drawn from its own
+     tokens and named in the manifest rather than passed off as theirs. */
+  textarea: (n) => `<md-outlined-text-field type="textarea" rows="3" style="width:100%" label="${esc(n.placeholder ?? '')}" value="${esc(n.value ?? '')}"></md-outlined-text-field>`,
+  radio:   (n) => `<div style="display:flex;flex-direction:column;gap:4px">${list(n.items).map((t, i) => `<label class="md-typescale-body-medium" style="display:inline-flex;align-items:center;gap:8px"><md-radio name="${esc(n.name ?? 'g')}"${i === (n.on ?? 0) ? ' checked' : ''} touch-target="wrapper"></md-radio>${esc(t)}</label>`).join('')}</div>`,
+  slider:  (n) => `<md-slider labeled value="${n.value ?? 60}" style="width:100%"></md-slider>`,
+  progress: (n) => `<md-linear-progress value="${(n.value ?? 60) / 100}"></md-linear-progress>`,
+  iconrow: (n) => `<div style="display:flex;flex-wrap:wrap;gap:4px">${list(n.items).map((i, x, a) => x === a.length - 1
+    ? `<md-filled-tonal-icon-button aria-label="${esc(i)}">${ico(i, 20)}</md-filled-tonal-icon-button>`
+    : `<md-icon-button aria-label="${esc(i)}">${ico(i, 20)}</md-icon-button>`).join('')}</div>`,
+  breadcrumb: (n) => `<nav class="md-typescale-body-medium" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:var(--md-sys-color-on-surface-variant)">${
+    list(n.items).map((t, i, a) => `${i ? '<span>/</span>' : ''}<a href="#" style="text-decoration:none;color:${i === a.length - 1 ? 'var(--md-sys-color-on-surface)' : 'inherit'}">${esc(t)}</a>`).join('')}</nav>`,
+  sidenav: (n) => `<div style="display:flex;flex-direction:column;gap:16px">${list(n.groups).map((g) => `<div>
+    <p class="md-typescale-title-small" style="margin:0 0 4px;padding:0 12px;color:var(--md-sys-color-on-surface-variant)">${esc(g.title)}</p>
+    <md-list style="--md-list-container-color:transparent">${list(g.items).map((it) => `<md-list-item type="button"${it.on ? ' style="--md-list-item-container-color:var(--md-sys-color-secondary-container);--md-list-item-label-text-color:var(--md-sys-color-on-secondary-container)"' : ''}>
+      <span slot="start">${ico(it.icon, 20)}</span><div slot="headline">${esc(it.text)}</div>${it.count ? `<div slot="end" style="position:relative;display:flex;align-items:center;min-width:28px;height:20px"><md-badge value="${esc(it.count)}"></md-badge></div>` : ''}</md-list-item>`).join('')}</md-list></div>`).join('')}</div>`,
+  list:    (n) => `<md-list style="--md-list-container-color:transparent">${list(n.rows).map((r) => `<md-list-item>
+    <span slot="start" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--md-sys-shape-corner-sm);background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)">${ico(r.icon)}</span>
+    <div slot="headline">${esc(r.title)}</div><div slot="supporting-text">${esc(r.sub ?? '')}</div>
+    <div slot="trailing-supporting-text">${esc(r.meta ?? '')}</div></md-list-item>`).join('')}</md-list>`,
+  kv:      (n) => `<md-list style="--md-list-container-color:transparent">${list(n.rows).map(([k2, v]) => `<md-list-item>
+    <div slot="headline" style="font-family:ui-monospace,monospace;font-size:12px">${esc(k2)}</div>
+    <div slot="trailing-supporting-text" style="font-family:ui-monospace,monospace">${esc(v)}</div></md-list-item>`).join('')}</md-list>`,
+  chart:   (n) => `<div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;align-items:flex-end;gap:8px;height:112px">${bars(n).map((b) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:2px;width:100%;height:96px"><div style="width:45%;height:${b.a}%;border-radius:var(--md-sys-shape-corner-xs) var(--md-sys-shape-corner-xs) 0 0;background:var(--md-sys-color-primary)"></div><div style="width:45%;height:${b.b}%;border-radius:var(--md-sys-shape-corner-xs) var(--md-sys-shape-corner-xs) 0 0;background:var(--md-sys-color-primary-container)"></div></div>
+    <span class="md-typescale-label-small" style="color:var(--md-sys-color-on-surface-variant)">${esc(b.label)}</span></div>`).join('')}</div>
+    <div class="md-typescale-label-small" style="display:flex;gap:16px;color:var(--md-sys-color-on-surface-variant)">${list(n.legend).map((t, i) => `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:var(--md-sys-shape-corner-full);background:var(--md-sys-color-${i ? 'primary-container' : 'primary'})"></span>${esc(t)}</span>`).join('')}</div></div>`,
+  empty:   (n, k) => `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px 0;text-align:center">
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--md-sys-shape-corner-md);background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)">${ico(n.icon, 18)}</span>
+    <p class="md-typescale-title-small" style="margin:0">${esc(n.title)}</p>
+    <p class="md-typescale-body-small" style="margin:0;max-width:224px;color:var(--md-sys-color-on-surface-variant)">${esc(n.text)}</p>${k}</div>`,
+  swatches: (n) => `<div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('material', n.roles, MD_SHOWN).map((r) => `<div style="display:flex;flex-direction:column;gap:6px">
+    <span style="height:40px;border-radius:var(--md-sys-shape-corner-sm);border:1px solid var(--md-sys-color-outline-variant)${r.paint ? `;background:${r.paint}` : ';border-style:dashed'}"></span>
+    <span class="md-typescale-label-medium">${esc(r.label)}</span>
+    <span class="md-typescale-label-small" style="font-family:ui-monospace,monospace;line-height:1.3;color:var(--md-sys-color-on-surface-variant)">${esc(r.note)}</span></div>`).join('')}</div>`,
+  typespec: (n) => `<div style="display:flex;flex-direction:column;gap:16px">${list(n.rows).map((r) => `<div style="display:flex;flex-direction:column;gap:4px">
+    <span class="md-typescale-label-small" style="font-family:ui-monospace,monospace;text-transform:uppercase;color:var(--md-sys-color-on-surface-variant)">${esc({ xl: 'display-small', lg: 'headline-small', md: 'body-large', sm: 'label-medium' }[r.size])}</span>
+    <p class="md-typescale-${{ xl: 'display-small', lg: 'headline-small', md: 'body-large', sm: 'label-medium' }[r.size]}" style="margin:0">${esc(r.text)}</p></div>`).join('')}</div>`,
+  shapes:  () => `<div style="display:flex;flex-direction:column;gap:16px"><div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px">${['xs', 'sm', 'md', 'lg'].map((c) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:48px;height:48px;background:var(--md-sys-color-surface-container-high);border-radius:var(--md-sys-shape-corner-${c})"></span><span class="md-typescale-label-small" style="font-family:ui-monospace,monospace;color:var(--md-sys-color-on-surface-variant)">corner-${esc(c)}</span></div>`).join('')}</div>
+    <p class="md-typescale-body-small" style="margin:0;color:var(--md-sys-color-on-surface-variant)">Material publishes shape tokens and no border-width token, so a border here is one pixel because that is what its own components draw.</p></div>`,
 }
 
 /* ── Radix Themes — its own .rt-* classes ────────────────────────────────── */
@@ -330,6 +575,9 @@ const rxAccent = (tone) => {
   return `${accent ? ` data-accent-color="${accent}"` : ''}${t === 'neutral' || t === 'brand' ? '' : ` data-tone="${t}"`}`
 }
 const RX_BTN = { brand: 'solid', secondary: 'soft', ghost: 'ghost', danger: 'solid' }
+/* the steps of its own scales that carry a role it takes as a SETTING */
+const RX_SHOWN = { brand: '--accent-9', onBrand: '--accent-contrast', ink: '--gray-12',
+  inkMuted: '--gray-11', line: '--gray-a6', focus: '--focus-8' }
 const radix = {
   _id: 'Radix Themes',
   stack:   (n, k) => `<div class="rt-Flex" style="display:flex;flex-direction:column;gap:var(--space-${Math.min(9, n.gap ?? 3)})">${k}</div>`,
@@ -382,6 +630,49 @@ const radix = {
     `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-1 rt-variant-surface" style="width:96px;height:64px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-${i + 2})"><span class="rt-Text rt-r-size-1" data-accent-color="gray">${esc(lv)}</span></div>`).join('')}</div>`,
   tabs:    (n) => `<nav class="rt-reset rt-BaseTabList rt-r-size-2">${list(n.items).map((t, i) =>
     `<div class="rt-TabNavItem"><a class="rt-reset rt-BaseTabListTrigger rt-TabNavLink"${i === 0 ? ' data-state="active"' : ''}><span class="rt-BaseTabListTriggerInner">${esc(t)}</span><span class="rt-BaseTabListTriggerInnerHidden">${esc(t)}</span></a></div>`).join('')}</nav>`,
+
+  /* ── the rest of a real screen ─────────────────────────────────────────── */
+  /* Slider, Progress, RadioGroup, TextArea and DataList are all Radix Themes
+     components, written as the stack of classes their React layer emits.
+     It ships no sidebar, no breadcrumb, no list and no chart — those four are
+     its own tokens on plain markup, and the manifest says so. */
+  textarea: (n) => `<div class="rt-TextAreaRoot rt-r-size-2 rt-variant-surface"><textarea rows="3" class="rt-reset rt-TextAreaInput" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea></div>`,
+  radio:   (n) => `<div class="rt-Flex rt-RadioGroupRoot" style="display:flex;flex-direction:column;gap:var(--space-2)">${list(n.items).map((t, i) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-BaseRadioRoot rt-RadioGroupItem rt-r-size-2 rt-variant-surface" role="radio" aria-checked="${i === (n.on ?? 0)}"${i === (n.on ?? 0) ? ' data-state="checked"' : ''}></button>${esc(t)}</label>`).join('')}</div>`,
+  /* Radix reads data-orientation on every PART, not on the root, and its
+     progress bar is a scaleX of --progress-value against --progress-max — not a
+     width. Written the way their primitive writes it: a track with no
+     orientation is a track with no height, which is exactly the invisible
+     slider the first version drew. */
+  slider:  (n) => `<span class="rt-SliderRoot rt-r-size-2 rt-variant-surface" data-orientation="horizontal" style="width:100%"><span class="rt-SliderTrack" data-orientation="horizontal"><span class="rt-SliderRange" data-orientation="horizontal" style="left:0;width:${n.value ?? 60}%"></span></span><span class="rt-SliderThumb" data-orientation="horizontal" style="position:absolute;left:${n.value ?? 60}%;transform:translateX(-50%)"></span></span>`,
+  progress: (n) => `<div class="rt-ProgressRoot rt-r-size-2 rt-variant-surface" data-orientation="horizontal" style="--progress-value:${n.value ?? 60};--progress-max:100"><div class="rt-ProgressIndicator" data-orientation="horizontal"></div></div>`,
+  iconrow: (n) => `<div class="rt-Flex" style="display:flex;flex-wrap:wrap;gap:var(--space-1)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="rt-reset rt-BaseButton rt-r-size-2 rt-variant-soft rt-IconButton" data-accent-color="gray">${ico(i)}</button>`).join('')}</div>`,
+  breadcrumb: (n) => `<nav class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)">${list(n.items).map((t, i, a) => `${i ? '<span class="rt-Text rt-r-size-2" data-accent-color="gray">/</span>' : ''}${i === a.length - 1 ? `<span class="rt-Text rt-r-size-2 rt-Strong">${esc(t)}</span>` : `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`}`).join('')}</nav>`,
+  sidenav: (n) => `<div class="rt-Flex" style="display:flex;flex-direction:column;gap:var(--space-4)">${list(n.groups).map((g) => `<div style="display:flex;flex-direction:column;gap:var(--space-1)">
+    <p class="rt-Text rt-r-size-1 rt-Strong" data-accent-color="gray" style="padding:0 var(--space-2)">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#" class="rt-Text rt-r-size-2" style="display:flex;align-items:center;gap:var(--space-2);min-height:32px;padding:0 var(--space-2);border-radius:var(--radius-2);text-decoration:none;color:${it.on ? 'var(--accent-11)' : 'var(--gray-11)'};background:${it.on ? 'var(--accent-a3)' : 'transparent'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="rt-reset rt-Badge rt-r-size-1 rt-variant-soft" style="margin-left:auto">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,
+  list:    (n) => `<div class="rt-Flex" style="display:flex;flex-direction:column">${list(n.rows).map((r) => `<div style="display:flex;align-items:center;gap:var(--space-3);min-height:48px;padding:var(--space-2) 0;border-bottom:1px solid var(--gray-a4)">
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-3);background:var(--gray-a3);color:var(--gray-11)">${ico(r.icon)}</span>
+    <span style="flex:1;min-width:0"><span class="rt-Text rt-r-size-2 rt-Strong" style="display:block">${esc(r.title)}</span><span class="rt-Text rt-r-size-1" data-accent-color="gray" style="display:block">${esc(r.sub ?? '')}</span></span>
+    <span class="rt-Text rt-r-size-2" data-accent-color="gray">${esc(r.meta ?? '')}</span></div>`).join('')}</div>`,
+  kv:      (n) => `<dl class="rt-DataListRoot rt-r-size-2" data-orientation="horizontal">${list(n.rows).map(([k2, v]) => `<div class="rt-DataListItem">
+    <dt class="rt-DataListLabel" style="min-width:9rem"><code class="rt-reset rt-Code rt-r-size-1 rt-variant-soft">${esc(k2)}</code></dt>
+    <dd class="rt-DataListValue"><span class="rt-Text rt-r-size-1" data-accent-color="gray">${esc(v)}</span></dd></div>`).join('')}</dl>`,
+  chart:   (n) => `<div class="rt-Flex" style="display:flex;flex-direction:column;gap:var(--space-3)"><div style="display:flex;align-items:flex-end;gap:var(--space-2);height:112px">${bars(n).map((b) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-1)">
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:2px;width:100%;height:96px"><div style="width:45%;height:${b.a}%;border-radius:var(--radius-1) var(--radius-1) 0 0;background:var(--accent-9)"></div><div style="width:45%;height:${b.b}%;border-radius:var(--radius-1) var(--radius-1) 0 0;background:var(--accent-6)"></div></div>
+    <span class="rt-Text rt-r-size-1" data-accent-color="gray">${esc(b.label)}</span></div>`).join('')}</div>
+    <div style="display:flex;gap:var(--space-4)">${list(n.legend).map((t, i) => `<span class="rt-Text rt-r-size-1" data-accent-color="gray" style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent-${i ? 6 : 9})"></span>${esc(t)}</span>`).join('')}</div></div>`,
+  empty:   (n, k) => `<div style="display:flex;flex-direction:column;align-items:center;gap:var(--space-2);padding:var(--space-6) 0;text-align:center">
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--radius-3);background:var(--gray-a3);color:var(--gray-11)">${ico(n.icon, 18)}</span>
+    <p class="rt-Text rt-r-size-2 rt-Strong">${esc(n.title)}</p>
+    <p class="rt-Text rt-r-size-2" data-accent-color="gray" style="max-width:224px">${esc(n.text)}</p>${k}</div>`,
+  swatches: (n) => `<div class="rt-Grid" style="display:grid;gap:var(--space-3);grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('radix', n.roles, RX_SHOWN).map((r) => `<div style="display:flex;flex-direction:column;gap:6px">
+    <span style="height:40px;border-radius:var(--radius-3);border:1px ${r.paint ? 'solid' : 'dashed'} var(--gray-a6)${r.paint ? `;background:${r.paint}` : ''}"></span>
+    <span class="rt-Text rt-r-size-1 rt-Strong">${esc(r.label)}</span>
+    <code class="rt-reset rt-Code rt-r-size-1 rt-variant-ghost" data-accent-color="gray" style="line-height:1.3">${esc(r.note)}</code></div>`).join('')}</div>`,
+  typespec: (n) => `<div style="display:flex;flex-direction:column;gap:var(--space-4)">${list(n.rows).map((r) => `<div style="display:flex;flex-direction:column;gap:var(--space-1)">
+    <code class="rt-reset rt-Code rt-r-size-1 rt-variant-ghost" data-accent-color="gray">${esc({ xl: 'size 8', lg: 'size 6', md: 'size 3', sm: 'size 2' }[r.size])}</code>
+    ${r.size === 'xl' || r.size === 'lg' ? `<p class="rt-Heading rt-r-size-${r.size === 'xl' ? 8 : 6}">${esc(r.text)}</p>` : `<p class="rt-Text rt-r-size-${r.size === 'md' ? 3 : 2}">${esc(r.text)}</p>`}</div>`).join('')}</div>`,
+  shapes:  () => `<div style="display:flex;flex-direction:column;gap:var(--space-4)"><div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--space-3)">${[1, 2, 3, 4].map((c) => `<div style="display:flex;flex-direction:column;align-items:center;gap:var(--space-1)"><span style="width:48px;height:48px;background:var(--gray-a3);border-radius:var(--radius-${c})"></span><code class="rt-reset rt-Code rt-r-size-1 rt-variant-ghost" data-accent-color="gray">radius-${c}</code></div>`).join('')}</div>
+    <p class="rt-Text rt-r-size-1" data-accent-color="gray">Radix takes a radius SETTING, not a length: none, small, medium, large or full. The nearest one to your value is the one on this page.</p></div>`,
 }
 
 /* ── Mantine — the class names read out of its own stylesheets ───────────── */
@@ -465,6 +756,43 @@ const mantine = {
     `<div class="${cls(mc('Paper'), mc('Card'))}" data-orientation="vertical" style="--paper-shadow:var(--mantine-shadow-${lv});width:96px;height:64px;display:flex;align-items:center;justify-content:center"><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed)">${esc(lv)}</span></div>`).join('')}</div>`,
   tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal"><div class="${mc('Tabs', 'list')}" role="tablist">${
     list(n.items).map((t, i) => `<button class="${mc('Tabs', 'tab')}" role="tab"${i === 0 ? ' data-active="true"' : ''}>${esc(t)}</button>`).join('')}</div></div>`,
+
+  /* ── the rest of a real screen ─────────────────────────────────────────── */
+  /* Mantine ships a component for every one of these but the chart: Slider,
+     Progress, Radio, Breadcrumbs, ActionIcon, NavLink, DataList and EmptyState
+     are all its own, by the same name→hash map as everything above. */
+  textarea: (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default"><textarea rows="3" class="${mc('Input', 'input')}" data-multiline="true" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea></div>`,
+  radio:   (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-xs)">${list(n.items).map((t, i) => `<label class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)"><span class="${mc('Radio')}"><span class="${mc('Radio', 'inner')}"><input type="radio" name="${esc(n.name ?? 'g')}" class="${mc('Radio', 'radio')}"${i === (n.on ?? 0) ? ' checked' : ''}><span class="${mc('Radio', 'icon')}"></span></span></span><span class="${mc('Text')}">${esc(t)}</span></label>`).join('')}</div>`,
+  slider:  (n) => `<div class="${mc('Slider')}" style="--slider-size:var(--mantine-spacing-xs)"><div class="${mc('Slider', 'trackContainer')}"><div class="${mc('Slider', 'track')}"><div class="${mc('Slider', 'bar')}" style="width:${n.value ?? 60}%;left:0"></div></div></div><div class="${mc('Slider', 'thumb')}" style="left:${n.value ?? 60}%"></div></div>`,
+  progress: (n) => `<div class="${mc('Progress')}"><div class="${mc('Progress', 'section')}" style="--progress-section-width:${n.value ?? 60}%"></div></div>`,
+  iconrow: (n) => `<div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="${mc('ActionIcon')}" data-variant="subtle" style="--ai-bg:transparent;--ai-color:var(--mantine-color-text);--ai-hover:var(--mantine-color-default-hover)"><span class="${mc('ActionIcon', 'icon')}">${ico(i)}</span></button>`).join('')}</div>`,
+  breadcrumb: (n) => `<div class="${mc('Breadcrumbs')}">${list(n.items).map((t, i, a) => `${i ? `<div class="${mc('Breadcrumbs', 'separator')}">/</div>` : ''}<div class="${mc('Breadcrumbs', 'breadcrumb')}">${i === a.length - 1 ? `<span class="${mc('Text')}">${esc(t)}</span>` : `<a class="${mc('Anchor')}" href="#">${esc(t)}</a>`}</div>`).join('')}</div>`,
+  sidenav: (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-md)">${list(n.groups).map((g) => `<div>
+    <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed);padding:0 var(--mantine-spacing-xs);margin:0 0 4px">${esc(g.title)}</p>${
+    list(g.items).map((it) => `<a href="#" class="${mc('NavLink')}"${it.on ? ' data-active="true"' : ''}><span class="${mc('NavLink', 'section')}" data-position="left">${ico(it.icon)}</span><span class="${mc('NavLink', 'body')}"><span class="${mc('NavLink', 'label')}">${esc(it.text)}</span></span>${it.count ? `<span class="${mc('NavLink', 'section')}" data-position="right"><span class="${mc('Badge')}" style="--badge-height:1.125rem">${esc(it.count)}</span></span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,
+  list:    (n) => `<div class="${mc('Stack')}" style="--stack-gap:0">${list(n.rows).map((r) => `<div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-sm);--group-wrap:nowrap;min-height:48px;padding:var(--mantine-spacing-xs) 0;border-bottom:1px solid var(--mantine-color-default-border)">
+    <span class="${mc('ThemeIcon')}" style="--ti-size:2rem;--ti-bg:var(--mantine-color-default);--ti-color:var(--mantine-color-dimmed)">${ico(r.icon)}</span>
+    <span style="flex:1;min-width:0"><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-sm);display:block;font-weight:500">${esc(r.title)}</span><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed);display:block">${esc(r.sub ?? '')}</span></span>
+    <span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-sm);--text-color:var(--mantine-color-dimmed)">${esc(r.meta ?? '')}</span></div>`).join('')}</div>`,
+  kv:      (n) => `<dl class="${mc('DataList')}" data-orientation="horizontal" style="--datalist-gap:var(--mantine-spacing-xs)">${list(n.rows).map(([k2, v]) => `<div class="${mc('DataList', 'item')}">
+    <dt class="${mc('DataList', 'itemLabel')}" style="min-width:9rem"><code class="${mc('Code')}">${esc(k2)}</code></dt>
+    <dd class="${mc('DataList', 'itemValue')}"><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed)">${esc(v)}</span></dd></div>`).join('')}</dl>`,
+  chart:   (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-sm)"><div style="display:flex;align-items:flex-end;gap:var(--mantine-spacing-xs);height:112px">${bars(n).map((b) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:2px;width:100%;height:96px"><div style="width:45%;height:${b.a}%;border-radius:var(--mantine-radius-sm) var(--mantine-radius-sm) 0 0;background:var(--mantine-primary-color-filled)"></div><div style="width:45%;height:${b.b}%;border-radius:var(--mantine-radius-sm) var(--mantine-radius-sm) 0 0;background:var(--mantine-primary-color-light)"></div></div>
+    <span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed)">${esc(b.label)}</span></div>`).join('')}</div>
+    <div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-md)">${list(n.legend).map((t, i) => `<span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed);display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--mantine-${i ? 'primary-color-light' : 'primary-color-filled'})"></span>${esc(t)}</span>`).join('')}</div></div>`,
+  empty:   (n, k) => `<div class="${mc('EmptyState')}"><div class="${mc('EmptyState', 'indicator')}">${ico(n.icon, 18)}</div>
+    <div class="${mc('EmptyState', 'body')}"><p class="${mc('EmptyState', 'title')}">${esc(n.title)}</p><p class="${mc('EmptyState', 'description')}">${esc(n.text)}</p></div>
+    <div class="${mc('EmptyState', 'actions')}">${k}</div></div>`,
+  swatches: (n) => `<div style="display:grid;gap:var(--mantine-spacing-sm);grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('mantine', n.roles).map((r) => `<div style="display:flex;flex-direction:column;gap:6px">
+    <span style="height:40px;border-radius:var(--mantine-radius-default);border:1px ${r.paint ? 'solid' : 'dashed'} var(--mantine-color-default-border)${r.paint ? `;background:${r.paint}` : ''}"></span>
+    <span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);font-weight:500">${esc(r.label)}</span>
+    <code class="${mc('Code')}" style="font-size:10px;line-height:1.3">${esc(r.note)}</code></div>`).join('')}</div>`,
+  typespec: (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-md)">${list(n.rows).map((r) => `<div>
+    <code class="${mc('Code')}" style="font-size:10px">${esc({ xl: 'h1-font-size', lg: 'h3-font-size', md: 'font-size-md', sm: 'font-size-sm' }[r.size])}</code>
+    ${r.size === 'xl' || r.size === 'lg' ? `<p class="${mc('Title')}" data-order="${r.size === 'xl' ? 1 : 3}" style="--title-fz:var(--mantine-h${r.size === 'xl' ? 1 : 3}-font-size);--title-fw:var(--mantine-heading-font-weight);--title-lh:var(--mantine-h${r.size === 'xl' ? 1 : 3}-line-height);margin:4px 0 0">${esc(r.text)}</p>` : `<p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-${r.size});margin:4px 0 0">${esc(r.text)}</p>`}</div>`).join('')}</div>`,
+  shapes:  () => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-md)"><div class="${mc('Group')}">${['xs', 'sm', 'md', 'lg'].map((c) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:48px;height:48px;background:var(--mantine-color-default);border-radius:var(--mantine-radius-${c})"></span><code class="${mc('Code')}" style="font-size:10px">radius-${esc(c)}</code></div>`).join('')}</div>
+    <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed)">Mantine publishes no border-width variable; a border here is the one its own components draw.</p></div>`,
 }
 
 export const WALL = { tailwind, daisyui, bootstrap, shadcn, material, radix, mantine }

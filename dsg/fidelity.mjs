@@ -20,8 +20,9 @@ import { readFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import { buildCss } from './build-css.mjs'
 import { render } from './parts.mjs'
-import { WALL, useMantineClasses } from './wall-bindings.mjs'
-import { SCENES } from './scenes.mjs'
+import { WALL, useMantineClasses, useIcons } from './wall-bindings.mjs'
+import { SCENES, ICON_NAMES } from './scenes.mjs'
+import { icons } from './icons.mjs'
 import { materialElements } from './material-elements.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
 
@@ -30,6 +31,7 @@ const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface:
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(kits.mantine?.classes)
+useIcons(icons(ICON_NAMES).icons)
 
 const markup = (id) => SCENES.map((s) => render(s.node, WALL[id])).join('')
 export const classesOf = (html) => [...new Set([...html.matchAll(/class="([^"]+)"/g)]
