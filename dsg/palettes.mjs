@@ -53,9 +53,14 @@ export function families(kit) {
   return Object.entries(found)
     .filter(([, steps]) => steps.length >= 8)
     .map(([name, steps]) => {
-      const ramp = steps.sort((a, b) => a[0] - b[0]).map(([, v]) => v)
+      const sorted = steps.sort((a, b) => a[0] - b[0])
+      const ramp = sorted.map(([, v]) => v)
+      /* the step NUMBERS travel with the ramp. They are the kit's own names for
+         these colours — slate-400, gray-9 — and a menu that offers a swatch
+         without one is a menu offering an anonymous colour. */
+      const at = sorted.map(([n]) => n)
       const chroma = Math.max(...ramp.map((c) => hexToOklch(c)[1]))
-      return { name, ramp, chroma, from: kit.name,
+      return { name, ramp, at, chroma, from: kit.name,
         /* their own chroma decides: a scale that never becomes colourful is the
            grey ramp, and every one of these kits ships several. */
         kind: chroma >= 0.05 ? 'accent' : 'neutral' }

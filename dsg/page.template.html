@@ -121,15 +121,52 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 
 /* one colour, and the other ten derived from it */
 .seed{display:flex;gap:6px;align-items:center;margin-top:7px}
-.seed input[type=color]{-webkit-appearance:none;appearance:none;border:0;padding:0;flex:none;
-  width:40px;height:30px;border-radius:var(--r);cursor:pointer;background:0}
-.seed input[type=color]::-webkit-color-swatch-wrapper{padding:0}
-.seed input[type=color]::-webkit-color-swatch{border:var(--bw) solid var(--line);border-radius:var(--r)}
+.seed__well{flex:none;width:40px;height:30px;padding:0;cursor:pointer;
+  border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--sunken)}
+.seed__well:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 .seed__hex{flex:1;min-width:0;font:inherit;font-family:ui-monospace,Menlo,monospace;
   font-size:var(--fs-md);min-height:30px;padding:0 9px;color:var(--ink);
   border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--panel)}
 .seed__hex:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 .grp__rule{border:0;border-top:var(--bw) solid var(--line);margin:12px 0 10px}
+
+/* ── the colour picker ──────────────────────────────────────────────────────
+ * The browser's own is an operating-system dialog: it cannot be styled, it
+ * knows nothing about the system you are building, and it works in HSV — where
+ * a step up near yellow is nothing like a step up near blue. This one is a slice
+ * of OKLCH at one hue, drawn from the same maths every value in this tool goes
+ * through, with the sRGB boundary shown rather than clipped past. */
+#cpick{border:0;padding:0;background:0;max-width:none;max-height:none;width:100%;height:100%}
+#cpick::backdrop{background:rgba(10,15,9,.22)}
+.cp{position:fixed;left:346px;top:50%;transform:translateY(-50%);width:288px;max-width:calc(100vw - 24px);
+  display:flex;flex-direction:column;gap:11px;padding:14px;background:var(--panel);
+  border-radius:var(--r);box-shadow:0 18px 44px rgb(10 15 9 / .2)}
+.cp__field{position:relative;line-height:0;border-radius:var(--r-sm);
+  background:repeating-conic-gradient(var(--sunken) 0 25%, transparent 0 50%) 0 0/12px 12px}
+.cp__field:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.cp__plane{display:block;width:100%;height:150px;border-radius:var(--r-sm);cursor:crosshair}
+.cp__dot{position:absolute;width:13px;height:13px;margin:-7px 0 0 -7px;border-radius:50%;
+  border:2px solid #fff;box-shadow:0 0 0 1px rgb(10 15 9 / .45);pointer-events:none}
+.cp__hue{-webkit-appearance:none;appearance:none;width:100%;height:12px;border-radius:99px;cursor:pointer;
+  background:linear-gradient(to right,oklch(.7 .16 0),oklch(.7 .16 60),oklch(.7 .16 120),
+    oklch(.7 .16 180),oklch(.7 .16 240),oklch(.7 .16 300),oklch(.7 .16 360))}
+.cp__hue::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
+  background:#fff;border:var(--bw) solid rgb(10 15 9 / .3);box-shadow:0 1px 3px rgb(10 15 9 / .3);cursor:pointer}
+.cp__hue:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.cp__row{display:flex;align-items:center;gap:7px}
+.cp__well{flex:none;width:26px;height:26px;border-radius:var(--r-sm);border:var(--bw) solid var(--line)}
+.cp__hex{width:8ch;font:inherit;font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-md);
+  min-height:26px;padding:0 7px;color:var(--ink);border:var(--bw) solid var(--line);
+  border-radius:var(--r-sm);background:var(--panel)}
+.cp__hex:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.cp__called{font-size:var(--fs-sm);color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp__pairs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.cp__pairs li{display:grid;grid-template-columns:11px 1fr max-content;gap:7px;align-items:baseline;font-size:var(--fs-sm)}
+.cp__pairs .ok{color:#1e6b37;font-weight:700}
+.cp__pairs .no{color:#8e2c21;font-weight:700}
+.cp__pairs em{font-style:normal;color:var(--muted);font-family:ui-monospace,monospace;font-size:11px}
+.cp__pairs li[data-bad] em{color:#8e2c21;font-weight:600}
+.cp__fine{margin:0;font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
 .pals{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:6px;padding-bottom:2px}
 .pals::-webkit-scrollbar{display:none}
 .pal{flex:none;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r-sm);
@@ -141,12 +178,32 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .pal__name{font-size:9px;color:var(--muted);text-align:center;text-transform:capitalize;
            overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
-.sw{display:flex;flex-direction:column;gap:4px}
-.sw input{-webkit-appearance:none;appearance:none;border:0;padding:0;height:30px;width:100%;border-radius:var(--r);cursor:pointer;background:0}
-.sw input::-webkit-color-swatch-wrapper{padding:0}
-.sw input::-webkit-color-swatch{border:var(--bw) solid var(--line);border-radius:var(--r)}
+.sw{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;
+  border:0;padding:0;background:0;cursor:pointer}
+.sw__well{display:block;height:30px;width:100%;border-radius:var(--r);border:var(--bw) solid var(--line)}
+.sw:hover .sw__well{border-color:var(--muted)}
+.sw:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:var(--r-sm)}
 .sw span{font-size:9.5px;font-weight:600;line-height:1.15}
 .sw code{font-size:9px;color:var(--muted);font-family:ui-monospace,monospace}
+
+/* a role, and the colours the stack has for it */
+.cp--list{width:326px;gap:9px}
+.rp__list{list-style:none;margin:0;padding:0;max-height:min(52vh,420px);overflow:auto;
+  display:flex;flex-direction:column;gap:2px}
+.rp{width:100%;font:inherit;font-size:var(--fs-md);text-align:left;cursor:pointer;
+  display:grid;grid-template-columns:18px 1fr max-content max-content;gap:9px;align-items:center;
+  min-height:30px;padding:0 7px;border:var(--bw) solid transparent;border-radius:var(--r-sm);
+  background:0;color:var(--ink)}
+.rp:hover{background:var(--sunken)}
+.rp:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+.rp[aria-pressed=true]{border-color:var(--muted);background:var(--sunken);font-weight:600}
+.rp i{width:18px;height:18px;border-radius:var(--r-sm);border:var(--bw) solid var(--line)}
+.rp__name{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp__from{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap}
+.rp em{font-style:normal;font-size:11px;color:var(--muted);font-family:ui-monospace,monospace}
+.rp em[data-bad]{color:#8e2c21;font-weight:600}
+.rp__none{font-size:var(--fs-md);color:var(--muted);padding:6px 2px}
+.rp__free{margin-top:2px}
 
 .typo{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}
 .font{font:inherit;text-align:left;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r);
@@ -847,6 +904,126 @@ function seenRef() {
   return ref
 }
 
+const HEX6 = /^#[0-9a-f]{6}$/i
+
+/* ── the colour picker ────────────────────────────────────────────────────── */
+/* A slice of OKLCH at one hue: lightness up, chroma right, and the sRGB
+ * boundary drawn rather than clipped past. The browser's own picker is an
+ * operating-system dialog — unstylable, and it works in HSV, where a step up
+ * near yellow is nothing like a step up near blue. This runs on the same maths
+ * every value in this tool already goes through.
+ *
+ * The plane is drawn small and scaled up. At full size it is 36,000 conversions
+ * per repaint; at 120x75 it is 9,000, and the gradient is smooth either way
+ * because a gradient is what it is. It redraws only when the HUE changes — the
+ * marker is an element over the canvas, not a pixel in it. */
+const CP = { L: 0.5, C: 0.1, H: 200, max: 0.3, apply: null }
+const PW = 120, PH = 75
+const cpOff = document.createElement('canvas')
+cpOff.width = PW; cpOff.height = PH
+const cpOffCtx = cpOff.getContext('2d')
+const cpCtx = $('#cpplane').getContext('2d')
+
+function cpPlane() {
+  /* the most chroma this hue can reach, so the slice fills the box whatever hue
+     it is — cyan tops out at a third of what magenta does, and a fixed axis
+     would leave two thirds of the box empty for half the wheel */
+  CP.max = Math.max(0.06, peakChroma(CP.H).c)
+  const img = cpOffCtx.createImageData(PW, PH)
+  const d = img.data
+  for (let y = 0; y < PH; y++) {
+    const L = 1 - y / (PH - 1)
+    for (let x = 0; x < PW; x++) {
+      const C = (x / (PW - 1)) * CP.max
+      const i = (y * PW + x) * 4
+      if (!inSrgb(L, C, CP.H)) { d[i + 3] = 0; continue }
+      const h = oklchToHex(L, C, CP.H)
+      d[i] = parseInt(h.slice(1, 3), 16)
+      d[i + 1] = parseInt(h.slice(3, 5), 16)
+      d[i + 2] = parseInt(h.slice(5, 7), 16)
+      d[i + 3] = 255
+    }
+  }
+  cpOffCtx.putImageData(img, 0, 0)
+  const c = $('#cpplane')
+  cpCtx.clearRect(0, 0, c.width, c.height)
+  cpCtx.imageSmoothingEnabled = true
+  cpCtx.drawImage(cpOff, 0, 0, c.width, c.height)
+}
+
+const cpHex = () => oklchToHex(CP.L, CP.C, CP.H)
+
+function cpShow() {
+  const hex = cpHex()
+  $('#cpdot').style.left = `${(CP.C / CP.max) * 100}%`
+  $('#cpdot').style.top = `${(1 - CP.L) * 100}%`
+  $('#cpwell').style.background = hex
+  if (document.activeElement !== $('#cphex')) $('#cphex').value = hex
+  $('#cpcalled').textContent = nameColor(hex)
+  /* the two questions a brand colour has to answer, asked while you are still
+     choosing it rather than in a report afterwards */
+  const ink = aaInk(hex), page = state.values.page ?? '#ffffff'
+  const rows = [
+    ['Text on it', contrast(ink, hex), 4.5, `${ink === '#ffffff' ? 'white' : 'black'}`],
+    ['It on the page', contrast(hex, page), 3, null],
+  ]
+  $('#cppairs').innerHTML = rows.map(([label, r, min, how]) => {
+    const ok = r >= min
+    return `<li${ok ? '' : ' data-bad'}><span class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span>
+      <span>${label}${how ? ` — ${how}` : ''}</span><em>${r.toFixed(2)}:1</em></li>`
+  }).join('')
+  CP.apply?.(hex)
+}
+
+function cpOpen(hex, title, sum, apply) {
+  const [L, C, H] = hexToOklch(hex)
+  CP.L = L; CP.C = C; CP.H = H; CP.apply = null
+  $('#cptitle').textContent = title
+  $('#cpsum').textContent = sum
+  $('#cphue').value = Math.round(H)
+  cpPlane(); cpShow()
+  CP.apply = apply
+  $('#cpick').showModal()
+}
+$('#cpx').addEventListener('click', () => $('#cpick').close())
+$('#cpick').addEventListener('click', (e) => { if (e.target.id === 'cpick') $('#cpick').close() })
+$('#cphue').addEventListener('input', (e) => {
+  CP.H = Number(e.target.value)
+  /* the reachable chroma changes with the hue, so a value that fitted at 300
+     may not fit at 200 — clamped rather than clipped, which is the whole point */
+  cpPlane(); CP.C = Math.min(CP.C, CP.max); cpShow()
+})
+
+let cpDrag = false
+const cpAt = (e) => {
+  const r = $('#cpplane').getBoundingClientRect()
+  CP.C = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * CP.max
+  CP.L = 1 - Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))
+  cpShow()
+}
+$('#cpfield').addEventListener('pointerdown', (e) => { cpDrag = true; $('#cpfield').setPointerCapture(e.pointerId); cpAt(e) })
+$('#cpfield').addEventListener('pointermove', (e) => { if (cpDrag) cpAt(e) })
+addEventListener('pointerup', () => { cpDrag = false })
+/* and by keyboard, because a colour you can only reach with a mouse is a colour
+   half the people who need this tool cannot set */
+$('#cpfield').addEventListener('keydown', (e) => {
+  const step = e.shiftKey ? 0.05 : 0.01
+  const move = { ArrowUp: [step, 0], ArrowDown: [-step, 0], ArrowRight: [0, step / 3], ArrowLeft: [0, -step / 3] }[e.key]
+  if (!move) return
+  e.preventDefault()
+  CP.L = Math.max(0, Math.min(1, CP.L + move[0]))
+  CP.C = Math.max(0, Math.min(CP.max, CP.C + move[1]))
+  cpShow()
+})
+$('#cphex').addEventListener('input', (e) => {
+  const v = e.target.value.trim()
+  if (!HEX6.test(v)) return
+  const [L, C, H] = hexToOklch(v)
+  CP.L = L; CP.C = C
+  if (Math.abs(H - CP.H) > 0.5) { CP.H = H; $('#cphue').value = Math.round(H); cpPlane() }
+  cpShow()
+})
+
 /* ── one colour, and the other ten derived from it ────────────────────────── */
 /* Every generator in this space has a box that takes a brand colour, and every
  * one of them fills the rest with an opinion. We are not allowed one, and it
@@ -872,12 +1049,12 @@ function seedNote(out) {
     + 'The focus ring is your colour; the ink on it is whichever of black or white clears 4.5:1.'
     + (out.short.length ? ` <b>${out.short.join(' and ')}</b> could not be met from this — see the checks.` : '')
 }
-const HEX6 = /^#[0-9a-f]{6}$/i
-$('#seedcolor').addEventListener('input', (e) => { $('#seedhex').value = e.target.value; buildFrom(e.target.value) })
+$('#seedwell').addEventListener('click', () => cpOpen(state.values.brand ?? '#0b6e8a', 'Your colour',
+  'The one thing you say. Everything else is read out of what your stack publishes.',
+  (hex) => { $('#seedhex').value = hex; buildFrom(hex) }))
 $('#seedhex').addEventListener('input', (e) => {
   const v = e.target.value.trim()
   if (!HEX6.test(v)) return                    // half-typed is not wrong yet
-  $('#seedcolor').value = v
   buildFrom(v)
 })
 
@@ -921,13 +1098,103 @@ $('#palettes').addEventListener('click', (e) => {
   sync(); paint()
 })
 
-$('#swatches').innerHTML = SWATCH.map((r) => `<label class="sw" title="${r.what}">
-  <input type="color" data-r="${r.id}" value="${state.values[r.id]}">
-  <span>${r.label}</span><code data-hex="${r.id}">${state.values[r.id]}</code></label>`).join('')
-$('#swatches').addEventListener('input', (e) => {
-  state.values[e.target.dataset.r] = e.target.value
-  $(`[data-hex="${e.target.dataset.r}"]`).textContent = e.target.value
-  paint()
+/* ── a role, and the colours your stack has for it ────────────────────────── */
+/* The eleven roles below are DERIVED — from your one colour, from a family you
+ * picked, from a bar. Handing each one a free colour wheel invites exactly the
+ * drift this tool exists to prevent: a border nobody chose, three greys that
+ * are nearly the same. So the swatch opens a list of the colours your stack
+ * actually publishes for that job, each with its own name and, where it means
+ * something, what it measures. A free colour is still one press away — it is
+ * just no longer the first thing offered. */
+const AGAINST = { ink: 'page', inkMuted: 'page', line: 'surface', onBrand: 'brand' }
+const FLOOR = { ink: 4.5, inkMuted: 4.5, line: 3, onBrand: 4.5 }
+
+function roleOptions(role) {
+  const st = stack(state.on, KITS)
+  const all = palettesFor(st.order, KITS)
+  const brand = state.values.brand ?? '#000000'
+  const out = []
+  const push = (hex, label, from) => { if (hex && !out.some((o) => o.hex.toLowerCase() === hex.toLowerCase())) out.push({ hex, label, from }) }
+
+  if (role === 'brand' || role === 'focus') {
+    /* the solid of every family they publish — the step a button wears */
+    for (const f of all.filter((x) => x.kind === 'accent')) {
+      push(KITS[f.kit]?.choices?.brand?.of?.[f.name] ?? f.ramp.reduce((a, c) => (hexToOklch(c)[1] > hexToOklch(a)[1] ? c : a)), f.name, f.from)
+    }
+  } else if (role === 'onBrand') {
+    push('#ffffff', 'white', null)
+    push('#000000', 'black', null)
+    for (const id of st.order) { const s = seedFrom('onBrand', KITS, [id]); if (s) push(s.value, s.variable, s.from) }
+  } else if (role === 'success' || role === 'warning' || role === 'danger') {
+    /* everyone's, not only the stack's: these are roles a kit may have no
+       variable for and you still have to set — the checks say which */
+    for (const id of [...st.order, ...Object.keys(KITS).filter((k) => !st.order.includes(k))]) {
+      const s = seedFrom(role, KITS, [id]); if (s) push(s.value, s.variable, s.from)
+    }
+  } else {
+    /* page, surface, ink, muted ink, line: the grey ramp matched to your brand,
+       step by step, under their own names */
+    const neutrals = all.filter((x) => x.kind === 'neutral')
+    const mine = { name: 'yours', ramp: [brand], chroma: hexToOklch(brand)[1] }
+    const grey = matchNeutral(mine, neutrals) ?? neutrals[0]
+    if (grey) grey.ramp.forEach((hex, i) => push(hex, `${grey.name}-${grey.at[i]}`, grey.from))
+  }
+  return out
+}
+
+let rpRole = null
+function openRole(role) {
+  rpRole = SWATCH.find((r) => r.id === role)
+  if (!rpRole) return
+  const bg = state.values[AGAINST[role]]
+  const floor = FLOOR[role]
+  $('#rptitle').textContent = rpRole.label
+  $('#rpsum').textContent = rpRole.what
+  const opts = roleOptions(role)
+  /* the value it has NOW, when that is not one of the published steps — because
+     it came from a bar, or from the picker, or from a family you have since
+     changed. A menu that cannot show you where you are is a menu you cannot
+     leave and come back to. */
+  const here = state.values[role]
+  if (here && !opts.some((o) => o.hex.toLowerCase() === here.toLowerCase())) {
+    opts.unshift({ hex: here, label: here, from: 'set here' })
+  }
+  $('#rplist').innerHTML = opts.map((o) => {
+    const r = bg ? contrast(role === 'onBrand' ? o.hex : o.hex, bg) : null
+    const bad = r != null && floor != null && r < floor
+    return `<li><button class="rp" data-hex="${o.hex}" aria-pressed="${(state.values[role] ?? '').toLowerCase() === o.hex.toLowerCase()}">
+      <i style="background:${o.hex}"></i>
+      <span class="rp__name">${o.label}</span>
+      <span class="rp__from">${o.from ?? ''}</span>
+      ${r != null ? `<em${bad ? ' data-bad' : ''}>${r.toFixed(2)}:1</em>` : '<em></em>'}</button></li>`
+  }).join('') || '<li class="rp__none">This stack publishes nothing for this role — set it by hand.</li>'
+  $('#rolepick').showModal()
+}
+$('#rplist').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-hex]'); if (!b || !rpRole) return
+  state.values[rpRole.id] = b.dataset.hex
+  palAt = null; palNeutral = null
+  sync(); paint()
+  $('#rolepick').close()
+})
+$('#rpfree').addEventListener('click', () => {
+  const role = rpRole
+  $('#rolepick').close()
+  cpOpen(state.values[role.id] ?? '#000000', role.label, role.what, (hex) => {
+    state.values[role.id] = hex
+    palAt = null; palNeutral = null
+    sync(); paint()
+  })
+})
+$('#rpx').addEventListener('click', () => $('#rolepick').close())
+$('#rolepick').addEventListener('click', (e) => { if (e.target.id === 'rolepick') $('#rolepick').close() })
+
+$('#swatches').innerHTML = SWATCH.map((r) => `<button class="sw" data-role="${r.id}" title="${r.what}">
+  <i class="sw__well" data-r="${r.id}"></i>
+  <span>${r.label}</span><code data-hex="${r.id}">${state.values[r.id]}</code></button>`).join('')
+$('#swatches').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-role]'); if (!b) return
+  openRole(b.dataset.role)
 })
 
 const knobHtml = (k) => {
@@ -988,8 +1255,8 @@ function sync() {
      one attribute along. */
   for (const el of $('#swatches').querySelectorAll('[data-r]')) {
     const v = state.values[el.dataset.r]
-    if (el.type === 'color') { el.value = v; $(`[data-hex="${el.dataset.r}"]`).textContent = v }
-    else { el.value = parseInt(v); $(`[data-v="${el.dataset.r}"]`).textContent = v }
+    el.style.background = v
+    $(`[data-hex="${el.dataset.r}"]`).textContent = v
   }
   for (const el of document.querySelectorAll('#knobs [data-r], #typeknobs [data-r]')) {
     const k = LENGTHS.find((x) => x.id === el.dataset.r), v = state.values[el.dataset.r]
@@ -998,8 +1265,8 @@ function sync() {
   /* and the one-colour field follows the brand, however the brand was set —
      by hand in the swatch row, by a palette, or by a shuffle */
   if (HEX6.test(state.values.brand ?? '')) {
-    $('#seedcolor').value = state.values.brand
-    $('#seedhex').value = state.values.brand
+    $('#seedwell').style.background = state.values.brand
+    if (document.activeElement !== $('#seedhex')) $('#seedhex').value = state.values.brand
   }
   renderStack()
   renderPalettes()

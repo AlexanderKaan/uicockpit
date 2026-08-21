@@ -62,7 +62,7 @@ const oklch = (L, C, H, a) => {
   const Hs = ((H % 360 + 360) % 360).toFixed(1);
   return a === void 0 ? `oklch(${Lp}% ${Cs} ${Hs})` : `oklch(${Lp}% ${Cs} ${Hs} / ${a})`;
 };
-function oklchToHex(L, C, H) {
+function oklchToLinear(L, C, H) {
   const hr = H * Math.PI / 180;
   const a = C * Math.cos(hr);
   const b = C * Math.sin(hr);
@@ -72,9 +72,39 @@ function oklchToHex(L, C, H) {
   const l = l_ * l_ * l_;
   const m = m_ * m_ * m_;
   const s = s_ * s_ * s_;
-  const lr = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
-  const lg = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
-  const lb = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+  return [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s
+  ];
+}
+/**
+ * Whether sRGB can show this colour AT ALL, before anything clips it.
+ *
+ * oklchToHex clamps each channel, and clamping does not dim a colour — it TURNS
+ * it: a 224° teal pushed past the gamut came back at 196°, a hue nobody asked
+ * for. Asking first is the difference between drawing the boundary and drawing
+ * a lie beyond it. The epsilon is for the float, not for the eye.
+ */
+function inSrgb(L, C, H) {
+  return oklchToLinear(L, C, H).every((v) => v >= -1e-4 && v <= 1.0001);
+}
+/** The most chroma this hue can reach in sRGB, and the lightness where it does. */
+function peakChroma(H, steps = 48) {
+  let best = { c: 0, l: 0.5 };
+  for (let i = 0; i <= steps; i++) {
+    const l = i / steps;
+    let lo = 0, hi = 0.45;
+    for (let k = 0; k < 18; k++) {
+      const mid = (lo + hi) / 2;
+      if (inSrgb(l, mid, H)) lo = mid; else hi = mid;
+    }
+    if (lo > best.c) best = { c: lo, l };
+  }
+  return best;
+}
+function oklchToHex(L, C, H) {
+  const [lr, lg, lb] = oklchToLinear(L, C, H);
   const enc = (v) => {
     const c = v <= 31308e-7 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
     return Math.round(Math.max(0, Math.min(1, c)) * 255).toString(16).padStart(2, "0");
@@ -282,8 +312,10 @@ export {
   okAccentScale,
   okNeutralScale,
   oklch,
+  inSrgb,
   oklchStrToHex,
   oklchToHex,
+  peakChroma,
   paletteSet,
   readableInk,
   relLum

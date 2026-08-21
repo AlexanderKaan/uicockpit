@@ -13,7 +13,7 @@
     <summary><span class="grp__name">Colour</span><span class="grp__sum grp__dots" id="sum_colour"></span></summary>
     <p class="eyebrow">Start from one colour</p>
     <div class="seed">
-      <input type="color" id="seedcolor" value="#0b6e8a" aria-label="Your colour">
+      <button class="seed__well" id="seedwell" aria-label="Choose your colour"></button>
       <input class="seed__hex" id="seedhex" value="#0b6e8a" spellcheck="false" autocomplete="off" aria-label="Your colour, as hex">
     </div>
     <p class="sub" id="seednote"></p>
@@ -92,6 +92,37 @@
       <p class="lane__fine">You can change the stack later without losing your values.</p>
     </aside>
   </div>
+</div></dialog>
+
+<dialog id="rolepick"><div class="cp cp--list">
+  <header class="pick__top">
+    <div><h2 id="rptitle"></h2><p class="pick__sum" id="rpsum"></p></div>
+    <button class="sheet__x" id="rpx" aria-label="Close"><!--I:x--></button>
+  </header>
+  <ul class="rp__list" id="rplist"></ul>
+  <button class="mini rp__free" id="rpfree">Any colour at all…</button>
+</div></dialog>
+
+<dialog id="cpick"><div class="cp">
+  <header class="pick__top">
+    <div><h2 id="cptitle">Your colour</h2><p class="pick__sum" id="cpsum"></p></div>
+    <button class="sheet__x" id="cpx" aria-label="Close"><!--I:x--></button>
+  </header>
+  <div class="cp__field" id="cpfield" tabindex="0" role="application"
+    aria-label="Lightness and chroma, at the hue below">
+    <canvas class="cp__plane" id="cpplane" width="240" height="150"></canvas>
+    <span class="cp__dot" id="cpdot"></span>
+  </div>
+  <input class="cp__hue" id="cphue" type="range" min="0" max="360" step="1" aria-label="Hue">
+  <div class="cp__row">
+    <span class="cp__well" id="cpwell"></span>
+    <input class="cp__hex" id="cphex" spellcheck="false" autocomplete="off" aria-label="This colour, as hex">
+    <span class="cp__called" id="cpcalled"></span>
+  </div>
+  <ul class="cp__pairs" id="cppairs"></ul>
+  <p class="cp__fine">Lightness up, chroma right, in OKLCH — so a step is the same size
+    wherever you are on the wheel. Outside the shape is a colour sRGB cannot show, and clipping one
+    does not dim it, it turns it.</p>
 </div></dialog>
 
 <dialog id="fontpick"><div class="pick">

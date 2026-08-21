@@ -4,7 +4,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { okAccentScale, okNeutralScale, nameColor, contrast, hexToOklch, readableInk, oklchStrToHex } from './color.mjs'
+import { okAccentScale, okNeutralScale, nameColor, contrast, hexToOklch, readableInk, oklchStrToHex, inSrgb, peakChroma, oklchToHex } from './color.mjs'
 
 const L = (s) => Number(/oklch\(([\d.]+)%/.exec(s)[1])
 const C = (s) => Number(/oklch\([\d.]+%\s+([\d.]+)/.exec(s)[1])
@@ -72,5 +72,39 @@ test('none is read the same way everywhere it appears in a kit', () => {
   assert.ok(withNone.length, 'Tailwind stopped using `none` — this guard has nothing left to guard')
   for (const [name, v] of withNone) {
     assert.notEqual(oklchStrToHex(v), '#000000', `${name} = ${v} still reads as black`)
+  }
+})
+
+test('every colour a screen can really show reads as one it can show', () => {
+  /* The picker draws its own boundary from this, so a false negative is a hole
+     punched in the middle of the plane and a false positive is a swatch that
+     lies. Walked over the cube rather than argued about. */
+  let bad = 0
+  for (let r = 0; r < 256; r += 17) for (let g = 0; g < 256; g += 17) for (let b = 0; b < 256; b += 17) {
+    const hex = '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')
+    const [L, C, H] = hexToOklch(hex)
+    if (!inSrgb(L, C, H)) bad++
+  }
+  assert.equal(bad, 0, `${bad} real colours were called unshowable`)
+})
+
+test('and a colour past the edge is called what it is', () => {
+  /* clipping does not dim a colour, it TURNS it — a 224° teal came back at
+     196° — so the plane shows the edge instead of drawing past it. */
+  assert.equal(inSrgb(0.5, 0.4, 200), false)
+  assert.equal(inSrgb(0.99, 0.3, 30), false)
+})
+
+test('the reachable chroma is a fact about the hue, not a constant', () => {
+  /* cyan tops out at about a third of what magenta does, which is why the
+     picker rescales its axis per hue instead of leaving two thirds of the box
+     empty for half the wheel. */
+  const cyan = peakChroma(200).c, magenta = peakChroma(320).c
+  assert.ok(cyan > 0.1 && cyan < 0.2, `cyan peaked at ${cyan}`)
+  assert.ok(magenta > cyan * 1.5, `magenta (${magenta}) is not far past cyan (${cyan})`)
+  for (const h of [0, 60, 120, 180, 240, 300]) {
+    const { c, l } = peakChroma(h)
+    assert.ok(inSrgb(l, c, h), `the peak it reports for ${h}° is itself out of gamut`)
+    assert.ok(!inSrgb(l, c + 0.02, h), `${h}° reaches further than it says`)
   }
 })
