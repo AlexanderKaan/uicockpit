@@ -691,7 +691,15 @@ $('#palettes').addEventListener('click', (e) => {
   const { accents, neutrals } = renderPalettes()
   const pick = accents[Number(b.dataset.pal)]; if (!pick) return
   const own = neutrals.filter((n) => n.kit === pick.kit)
-  const { values, short } = paletteRoles(pick, matchNeutral(pick, own, KITS[pick.kit]) ?? neutrals[0], KITS[pick.kit])
+  /* what the kit you are LOOKING at publishes for the two roles a bar would
+     otherwise decide — its border and its muted text */
+  const seen = KITS[showing(stack(state.on, KITS))]
+  const ref = {}
+  for (const role of ['line', 'inkMuted']) {
+    const v = MAP[seen.id]?.[role]?.var
+    if (v && seen.modes?.light?.[v]) ref[role] = seen.modes.light[v]
+  }
+  const { values, short } = paletteRoles(pick, matchNeutral(pick, own, KITS[pick.kit]) ?? neutrals[0], KITS[pick.kit], ref)
   palShort = short
   Object.assign(state.values, values)
   palAt = `${pick.kit}:${pick.name}`

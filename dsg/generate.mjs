@@ -60,6 +60,21 @@ ${decl(bridge)}${radius ? `
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);` : ''}
+}
+
+/* The base layer shadcn's own installation prescribes, and the third thing this
+ * kit has needed that we were not sending.
+ *
+ * Its components use the BARE border utility, which in Tailwind v4 sets a
+ * width and leaves the colour at currentColor. (No backticks in here: this
+ * whole block is a JS template literal, and one backtick in a comment breaks
+ * the file at a line far from the edit. Fourth time.) Without this rule every card,
+ * input and table in a shadcn app draws its border in the TEXT colour — a
+ * near-black hairline where a #e5e5e5 one belongs. It looked wrong on the wall
+ * and it was wrong in the package we hand people. */
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground; }
 }`
   },
 

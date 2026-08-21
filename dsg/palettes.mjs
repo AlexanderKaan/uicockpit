@@ -111,7 +111,17 @@ const byLight = (ramp) => [...ramp].sort((a, b) => hexToOklch(b)[0] - hexToOklch
  * boundary. If no step clears the bar, the darkest available is used and the
  * caller is told — never a value invented to fill the gap.
  */
-export function paletteRoles(accent, neutral, kit = null) {
+/**
+ * The step of a ramp nearest in lightness to a value the kit already publishes.
+ * Their convention, in your family's colours.
+ */
+const nearestLightness = (ramp, target) => {
+  const t = hex(target) && hexToOklch(hex(target))[0]
+  if (t == null) return null
+  return ramp.reduce((a, b) => (Math.abs(hexToOklch(b)[0] - t) < Math.abs(hexToOklch(a)[0] - t) ? b : a))
+}
+
+export function paletteRoles(accent, neutral, kit = null, reference = {}) {
   const n = byLight(neutral?.ramp ?? accent.ramp)
   const surface = n[0]
   const page = n[1] ?? n[0]
@@ -122,8 +132,16 @@ export function paletteRoles(accent, neutral, kit = null) {
     const ok = n.filter((c) => contrast(c, page) >= bar)
     return ok.length ? ok[0] : null           // byLight is dark-last, so [0] is the quietest that clears
   }
-  const muted = quietestOver(4.5)
-  const line = quietestOver(3)
+  /* A published bar is the right decider only where the kit says nothing.
+   *
+   * Picking the line at the 1.4.11 floor made every border three times darker
+   * than any kit in the set actually uses — shadcn's is 1.26:1 and ours came
+   * out at 3:1, which reads as a black hairline and looks like no kit at all.
+   * So where the kit publishes its own border or muted text, the step nearest
+   * THEIR lightness is taken, and the contrast audit reports what that costs.
+   * The tool reproduces their convention; the meter says where it falls short. */
+  const muted = nearestLightness(n, reference.inkMuted) ?? quietestOver(4.5)
+  const line = nearestLightness(n, reference.line) ?? quietestOver(3)
   /* Some solids take neither black nor white at 4.5:1 — a mid olive is the
      classic case. aaInk returns its best attempt; saying so is the difference
      between a palette and a promise we cannot keep. */
@@ -137,5 +155,7 @@ export function paletteRoles(accent, neutral, kit = null) {
     values: { brand, onBrand: ink4, page, surface, ink,
       inkMuted: muted ?? ink, line: line ?? n.at(-2) ?? ink },
     short: [muted ? null : 'inkMuted', line ? null : 'line', onBrandShort ? 'onBrand' : null].filter(Boolean),
+    /* which of the two came from the kit rather than from the bar */
+    fromKit: [reference.inkMuted ? 'inkMuted' : null, reference.line ? 'line' : null].filter(Boolean),
   }
 }
