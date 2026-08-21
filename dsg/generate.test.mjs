@@ -4,7 +4,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { hexToOklch } from './color.mjs'
-import { generate, collisions, section } from './generate.mjs'
+import { generate, collisions, section, auditContrast } from './generate.mjs'
 import { MAP } from './roles.mjs'
 
 const ALL = Object.keys(MAP)
@@ -176,4 +176,18 @@ test('the download says which of its own variables nothing reads', () => {
   const other = generate(VALUES, ['tailwind'], kits, { unread: measured })['MANIFEST.md']
   assert.match(section(other, '## Variables in here that nothing reads').length ? 'x' : 'Nothing', /Nothing/)
   assert.match(other, /every variable this theme writes is read/)
+})
+
+test('the contrast audit names the line for the job that makes it a requirement', () => {
+  /* Almost every kit's own default border fails 3:1 against its own surface,
+     and a failure nobody can read is a failure nobody acts on. A card's border
+     identifies nothing — the card has a background. The line round a text field
+     is the only thing that says where the field is, which is what 1.4.11 puts
+     at 3:1, so the pair is named for that. */
+  const audit = auditContrast({ ...VALUES, line: '#dfe2e7', surface: '#ffffff' })
+  const pair = audit.find((p) => p.fg === 'line' && p.bg === 'surface')
+  assert.ok(pair, 'the line is not audited against the surface at all')
+  assert.equal(pair.min, 3)
+  assert.match(pair.label, /field/, 'the label has to say what the line is for')
+  assert.equal(pair.passes, false, 'a 1.3:1 border has to read as a failure, not be rounded away')
 })

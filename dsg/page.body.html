@@ -39,14 +39,24 @@
     <p class="wall__count" id="wallcount"></p>
   </div>
   <div class="frames" id="frames"></div>
-  <p class="wall__note" id="wallnote"></p>
+
 </main>
 
 <footer class="dock">
-  <div class="dock__what" id="receipt"></div>
-  <div class="dock__acts">
-    <button class="btn btn--ghost" id="manifest"><!--I:circle-alert-->What could not be done</button>
-    <button class="btn btn--go" id="export"><!--I:download-->Export this kit</button>
+  <div class="lint" id="lint">
+    <p class="eyebrow">Checks</p>
+    <div class="lint__row" id="lintrow"></div>
+  </div>
+  <div class="dock__bar">
+    <div class="dock__what" id="receipt"></div>
+    <div class="dock__acts">
+      <button class="btn btn--go" id="export"><!--I:download-->Export this kit</button>
+    </div>
+  </div>
+  <div class="lint__panel" id="lintpanel" hidden aria-live="polite">
+    <header class="lint__top"><p class="eyebrow" id="lintname"></p>
+      <button class="sheet__x" id="lintx" aria-label="Close"><!--I:x--></button></header>
+    <div id="lintbody"></div>
   </div>
 </footer>
 
@@ -117,10 +127,9 @@
       <ul class="tree" id="tree"></ul>
       <p class="fine" id="dropnote">Drop the folder in your repo root. The rules file is what a model reads;
         the scenes are how you check it followed them.</p>
+      <p class="fine" id="drawerchecks"></p>
       <button class="btn btn--go" id="downloadzip"><!--I:download-->Download the zip</button>
       <div class="dests" id="dests"></div>
-      <section><p class="eyebrow" id="clabel">Contrast</p><ul class="pairs" id="pairs"></ul></section>
-      <section id="csection"><p class="eyebrow">What could not be done</p><ul class="caveats" id="caveats"></ul></section>
       <div class="facts" id="facts"></div>
     </aside>
   </div>

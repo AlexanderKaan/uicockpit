@@ -159,10 +159,38 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .frames{flex:1;min-height:0}
 .frames iframe{width:100%;height:100%;min-height:480px;border:0;border-radius:var(--r);background:#fff;display:block}
 .frames iframe[hidden]{display:none}
-.wall__note{margin:9px 0 0;font-size:11.5px;color:var(--muted);min-height:17px}
-.wall__note b{color:var(--ink);font-weight:600}
+/* ── the checks, next to the wall ───────────────────────────────────────────
+ * These used to live inside the export drawer, which is to say: you found out
+ * what was wrong with your system at the moment you were done with it. They sit
+ * under the wall now, and the contrast one moves while you drag a colour.
+ * One row at rest, one panel open at a time. */
+/* The dock's first row: what you HAVE is below it, what is WRONG with it is
+ * here, and both are sticky, so neither goes off screen while you scroll a wall
+ * that is taller than the window. */
+.lint{min-height:26px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding-bottom:9px;border-bottom:var(--bw) solid var(--line)}
+.lint .eyebrow{flex:none}
+.lint__row{display:flex;gap:5px;flex-wrap:wrap}
+.lint__c{font:inherit;font-size:var(--fs-sm);line-height:1;display:inline-flex;align-items:center;gap:6px;
+  min-height:24px;padding:0 10px;border:var(--bw) solid var(--line);border-radius:99px;
+  background:var(--panel);color:var(--muted);cursor:pointer}
+.lint__c:hover{color:var(--ink)}
+.lint__c:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.lint__c[aria-expanded=true]{background:var(--sunken);color:var(--ink);border-color:var(--muted)}
+.lint__c i{width:6px;height:6px;border-radius:50%;background:#1e6b37;flex:none}
+.lint__c[data-state=warn] i{background:#b8651a}
+.lint__c b{color:var(--ink);font-weight:600}
+.lint__c[data-state=warn] b{color:#8e2c21}
+.lint__panel{position:absolute;left:14px;right:14px;bottom:calc(100% + 8px);z-index:6;max-height:52vh;overflow:auto;
+  padding:12px 14px;background:var(--panel);border:var(--bw) solid var(--line);border-radius:var(--r);
+  box-shadow:0 14px 34px rgb(10 15 9 / .14);animation:rise .16s ease}
+.lint__panel[hidden]{display:none}
+.lint__top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.lint__why{margin:0 0 9px;font-size:var(--fs-md);line-height:1.55;color:var(--muted)}
+.lint__why b{color:var(--ink);font-weight:600}
 
-.dock{position:sticky;bottom:12px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.dock{position:sticky;bottom:12px;padding:9px 14px 11px;display:flex;flex-direction:column;gap:9px}
+.dock__bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .dock__what{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;align-items:center;color:var(--muted)}
 .dock__what b{color:var(--ink);font-weight:600}
 .dock__what .ok{display:inline-flex;align-items:center;gap:6px}
@@ -923,18 +951,135 @@ function sync() {
   summaries()
 }
 
-const note = (html) => ($('#wallnote').innerHTML = html)
+/* ── the checks, next to the wall ─────────────────────────────────────────── */
+/* Five questions this tool can answer about the system you are building, asked
+ * where you can still act on the answer.
+ *
+ * They used to live inside the export drawer, which is to say: you found out
+ * what was wrong with your system at the moment you had finished making it. The
+ * contrast one moves while you drag a colour; the other four move when you
+ * change the stack. None of them is a guess — the contrast comes from your own
+ * values, and the rest from the routing table and the counts this page was
+ * built with.
+ *
+ * A check with nothing to report is still shown. "No name two kits both use" is
+ * information, and a strip that only ever appears when something is wrong is a
+ * strip nobody trusts when it is quiet. */
+let openCheck = null
+let lastRouted = []
+
+function checks(routed) {
+  const on = new Set(routed.map((r) => r.kit))
+  const nameOf = (id) => KITS[id].name
+  /* a check with nothing to report says so. An empty list under a heading reads
+     as a list that failed to load. */
+  const li = (rows, clear) => rows.length
+    ? `<ul class="caveats">${rows.map((r) => `<li>${r}</li>`).join('')}</ul>`
+    : `<ul class="caveats"><li>${clear}</li></ul>`
+
+  /* 1 — contrast, the only one that moves while you drag a slider */
+  const pairs = auditContrast(state.values)
+  const bad = pairs.filter((p) => !p.passes)
+
+  /* 2 — a value you set that this stack cannot take as you set it */
+  const cannot = []
+  for (const role of ROLES) {
+    const v = state.values[role.id]
+    if (v == null || v === '') continue
+    const derives = routed.filter((r) => (r.derived ?? []).some((d) => d.role === role.id))
+    const takes = routed.filter((r) => !(r.missing ?? []).includes(role.id)
+      && !derives.some((d) => d.kit === r.kit))
+    const builds = routed.filter((r) => (r.needsBuild ?? []).some((b) => b.role === role.id))
+    if (!takes.length) {
+      cannot.push(derives.length
+        ? `<b>${role.label}</b> — <b>${nameOf(derives[0].kit)}</b> computes it from the brand, so your value does not reach it.`
+        : `<b>${role.label}</b> — nothing in this stack has a variable for it.`)
+    } else if (builds.length) {
+      const line = (builds[0].needsBuild ?? []).find((x) => x.role === role.id)
+      cannot.push(`<b>${role.label}</b> — <b>${nameOf(builds[0].kit)}</b> compiles it: ${line?.why ?? 'a rebuild puts it into the components'}.`
+        + (line?.sass ? ` Your download carries <code>${line.sass}</code>.` : ''))
+    }
+  }
+
+  /* 3 — a variable this theme writes that nothing reads */
+  const orphans = UNREAD.filter((u) => on.has(u.kit))
+
+  /* 4 — a name two kits both use */
+  const clash = collisions(routed, KITS)
+
+  /* 5 — what the frame in front of you cannot show. Not a fault in the system:
+     a fault in the PREVIEW, and the difference is worth a line of its own. */
+  const frame = []
+  if (!LIVE_BRAND[state.show]) {
+    frame.push(state.show === 'bootstrap'
+      ? `<b>${nameOf(state.show)}</b> — its component colours are compiled by Sass, so this frame shows the build we made. Your download carries the Sass lines that change them.`
+      : `<b>${nameOf(state.show)}</b> — it derives its colours from the seed with its own generator, so this frame shows a pre-derived scheme. Your download carries the seed.`)
+  }
+  /* the compiled roles are NOT repeated here: "this stack compiles it" is a
+     fact about the system and lives in the check above. Saying it twice, once
+     as a value and once as a preview, reads as two problems. */
+
+  return [
+    { k: 'contrast', label: 'Contrast', ok: !bad.length,
+      chip: `Contrast <b>${pairs.length - bad.length} of ${pairs.length}</b>`,
+      why: 'Only the pairs that really meet on screen, each against the floor WCAG sets for it: 4.5:1 for text (1.4.3), and 3:1 for the line that identifies a control (1.4.11). A pair nothing ever renders is not audited — a phantom failure is worse than none.',
+      body: () => `<ul class="pairs">${pairs.map((p) => `<li${p.passes ? '' : ' data-bad'}>
+        <span class="${p.passes ? 'ok' : 'no'}">${p.passes ? '✓' : '✗'}</span>
+        <span>${p.label}</span><em>${p.ratio}:1</em></li>`).join('')}</ul>` },
+
+    { k: 'lands', label: 'Values this stack can take', ok: !cannot.length,
+      chip: cannot.length ? `<b>${cannot.length}</b> it decides for you` : 'Every value lands',
+      why: 'A knob you turned that this stack answers itself — because it computes the value, because it compiles it, or because no kit here has a variable for it.',
+      body: () => li(cannot, 'Nothing — every value you set reaches this stack as you set it.') },
+
+    { k: 'read', label: 'Variables nothing reads', ok: !orphans.length,
+      chip: orphans.length ? `<b>${orphans.reduce((n, u) => n + u.names.length, 0)}</b> nothing reads` : 'Every variable is read',
+      why: 'Counted in each kit\'s own stylesheet, and in its component code where its components are code rather than classes. A variable nobody reads is a knob that does nothing — it is written, it is in the download, and turning it changes not one pixel.',
+      body: () => li(orphans.map((u) => `<b>${u.name} · ${u.role}</b> — ${u.names.map((n) => `<code>${n}</code>`).join(' ')}${
+        u.tokensOnly ? '. A token layer publishes for your code; its own stylesheet reads none of it.'
+          : u.instead.length ? `. What it does read is ${u.instead.slice(0, 3).map((n) => `<code>${n}</code>`).join(' ')}${u.instead.length > 3 ? ' and others' : ''}.` : '.'}`),
+        'Nothing — every variable this theme writes is read by the kit it belongs to.') },
+
+    { k: 'clash', label: 'Names two kits both use', ok: !clash.length,
+      chip: clash.length ? `<b>${clash.length}</b> shared name${clash.length > 1 ? 's' : ''}` : 'No shared names',
+      why: 'These variables mean different things to different kits you enabled. Whichever stylesheet loads second wins, and nothing warns.',
+      body: () => li(clash.map((c) => `<code>${c.variable}</code> — written for <b>${KITS[c.written].name}</b>, and <b>${KITS[c.read].name}</b> also reads it. Load their stylesheets in separate scopes, or drop one of the two.`),
+        'Nothing — no variable in this stack means two different things.') },
+
+    { k: 'frame', label: 'What this frame cannot show', ok: !frame.length,
+      chip: frame.length ? `<b>${frame.length}</b> the frame cannot show` : 'The frame is live',
+      why: 'About the preview, not about your system: two of these kits decide their colours somewhere a running page cannot reach. The download is right either way.',
+      body: () => li(frame, 'Nothing — every value you turn moves this frame as it would move your app.') },
+  ]
+}
+
+function drawLint(routed) {
+  const cs = checks(routed)
+  $('#lintrow').innerHTML = cs.map((c) => `<button class="lint__c" data-k="${c.k}"
+    data-state="${c.ok ? 'ok' : 'warn'}" aria-expanded="${openCheck === c.k}">
+    <i></i>${c.chip}</button>`).join('')
+  const c = cs.find((x) => x.k === openCheck)
+  $('#lintpanel').hidden = !c
+  if (!c) return
+  $('#lintname').textContent = c.label
+  $('#lintbody').innerHTML = `<p class="lint__why">${c.why}</p>${c.body()}`
+}
+$('#lintrow').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  openCheck = openCheck === b.dataset.k ? null : b.dataset.k
+  drawLint(lastRouted)
+})
+$('#lintx').addEventListener('click', () => { openCheck = null; drawLint(lastRouted) })
 
 /* ── the receipt ──────────────────────────────────────────────────────────── */
 function receipt(routed) {
   const kits = routed.map((r) => KITS[r.kit].name).join(' + ')
   const lic = [...new Set(routed.map((r) => KITS[r.kit].license).filter(Boolean))].join(' · ')
-  const clash = collisions(routed, KITS)
+  /* what you HAVE. What is wrong with it is under the wall now, in one grammar,
+     instead of a warning here and an audit in the drawer. */
   $('#receipt').innerHTML = `<b>${kits}</b>
     <span>${SCENES.length} cards · ${PARTS.length} parts</span>
-    <span>${lic}</span>
-    ${clash.length ? `<span style="color:#ffd8a8">${clash.length} name${clash.length > 1 ? 's' : ''} two kits both use</span>`
-      : `<span class="ok">${ico('check', 12)}no name clashes</span>`}`
+    <span>${lic}</span>`
 
   /* What the stack actually produced, under the frame. The claim that these
      are really their components is only worth something if it is counted where
@@ -950,20 +1095,8 @@ function receipt(routed) {
           own.theirs < own.used ? ` — ${own.used - own.theirs === 1 ? 'one is' : (own.used - own.theirs) + ' are'} ours` : ''}`
       : `<b>nothing of theirs</b> on this screen at all`
 
-  /* a role the shown kit compiles rather than reads, named while you are
-     turning its knob rather than after you download */
-  /* across the whole stack, not the top layer: it is Tailwind that compiles a
-     shadow, and shadcn — which rides on it — is what you are looking at. */
-  const compiled = routed.flatMap((r) => (r.needsBuild ?? []).map((b) => ({ ...b, kit: r.kit })))
-    .filter((b) => state.values[b.role] != null && b.role === 'elevation')
-  const needs = routed.filter((r) => !LIVE_BRAND[r.kit] && state.show === r.kit)
-  note(needs.length
-    ? `<b>${KITS[state.show].name}</b> — ${state.show === 'bootstrap'
-        ? 'its component colours — brand, success, warning and danger — are compiled by Sass, so this frame shows the build we made. Your download carries the Sass lines that change them.'
-        : 'it derives its colours from the seed with its own generator, so this frame shows a pre-derived scheme. Your download carries the seed.'}`
-    : compiled.length
-      ? `<b>${KITS[compiled[0].kit].name}</b> — ${compiled.map((b) => b.role).join(', ')} is compiled into its utilities rather than read at runtime, so this frame cannot show the change. Your download carries the value; ${KITS[compiled[0].kit].name}'s own build puts it into the components.`
-      : '')
+  lastRouted = routed
+  drawLint(routed)
 }
 
 /* ── the two outputs ──────────────────────────────────────────────────────── */
@@ -1010,8 +1143,6 @@ const DESTS = [
 function openSheet() {
   const f = files()
   const on = ORDER.filter((k) => state.on.has(k))
-  const audit = auditContrast(state.values)
-  const bad = audit.filter((p) => !p.passes)
 
   $('#sum').textContent = `${Object.keys(state.values).length} settings · ${on.length} kit${on.length > 1 ? 's' : ''} · ${Object.keys(plain(f)).length} files`
 
@@ -1023,25 +1154,19 @@ function openSheet() {
 
   $('#dests').innerHTML = DESTS.map((d, i) => `<button class="dest${d.wide ? ' dest--wide' : ''}" data-d="${i}"><b>${d.t}</b><span>${d.d}</span></button>`).join('')
 
-  $('#clabel').textContent = `Contrast — ${audit.length - bad.length} of ${audit.length} pairs clear their floor`
-  $('#pairs').innerHTML = audit.map((p) => `<li${p.passes ? '' : ' data-bad'}>
-    <span class="${p.passes ? 'ok' : 'no'}">${p.passes ? '✓' : '✗'}</span>
-    <span>${p.label}</span><em>${p.ratio}:1</em></li>`).join('')
+  /* The audit and the caveat list used to be here, in full, and this was the
+     only place either of them appeared: you learned what was wrong with your
+     system at the moment you had finished making it. They are under the wall
+     now, live, so this says what those checks found and where to read the
+     long version. */
+  const cs = checks(lastRouted)
+  const warn = cs.filter((c) => !c.ok)
+  const plainChip = (c) => c.chip.replace(/<[^>]+>/g, '')
+  $('#drawerchecks').innerHTML = warn.length
+    ? `The Checks bar under the wall reports ${warn.length === 1 ? 'one thing' : `${warn.length} things`} — ${
+        warn.map(plainChip).join(' · ')}. The long version is in <b>MANIFEST.md</b>, below.`
+    : `Every check in the bar under the wall is clear. The same account, at length, is in <b>MANIFEST.md</b>.`
 
-  /* two different questions, so two lists: a value that could not be set, and
-     a part the kit does not ship at all. Merging them made "nothing could not
-     be done" impossible to ever say. */
-  const md = (l) => l.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>')
-  const cav = [
-    ...section(f['MANIFEST.md'], '## What could not be done').map(md),
-    ...section(f['MANIFEST.md'], '## What these kits have no component for').map(md),
-    /* and the third: a variable this theme writes that nothing reads. Counted
-       at build time in each kit's own stylesheet, so this list is usually empty
-       and never guessed. */
-    ...section(f['MANIFEST.md'], '## Variables in here that nothing reads').map(md),
-  ].filter((l) => !/^Nothing —/.test(l.replace(/<[^>]+>/g, '')))
-  $('#csection').hidden = !cav.length
-  $('#caveats').innerHTML = cav.map((c) => `<li>${c}</li>`).join('')
   /* ── the files, side by side with what you would ship ──────────────────── */
   const shown = plain(f)
   drawFiles(shown)
@@ -1083,7 +1208,10 @@ $('#dests').addEventListener('click', (e) => {
 })
 $('#export').addEventListener('click', openSheet)
 $('#downloadzip').addEventListener('click', () => DESTS[0].go(files()))
-$('#manifest').addEventListener('click', openSheet)
+/* The dock used to carry a second door to the same drawer, labelled "What could
+ * not be done". The Checks bar above it now answers that where you can still act
+ * on the answer, so the door is gone rather than sitting there saying the same
+ * thing one click further away. */
 $('#sheetx').addEventListener('click', () => ($('#drawer').hidden = true))
 addEventListener('keydown', (e) => { if (e.key === 'Escape') $('#drawer').hidden = true })
 

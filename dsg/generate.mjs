@@ -524,7 +524,13 @@ const PAIRS = [
   ['Muted text on a surface', 'inkMuted', 'surface', 4.5],
   ['Button text on the brand', 'onBrand', 'brand', 4.5],
   ['The brand against the page', 'brand', 'page', 3],
-  ['A line against a surface', 'line', 'surface', 3],
+  /* Named for what it IS, because this one fails for almost every kit's own
+     default and a failure nobody can read is a failure nobody acts on. A card's
+     border identifies nothing — the card has a background. The line round a
+     text field is the only thing that says where the field is, and that is what
+     1.4.11 puts at 3:1. Our own palette moved this line OFF 3:1 on purpose, to
+     look like the kits really look; this is what that costs. */
+  ['The line that shows where a field is', 'line', 'surface', 3],
 ]
 export function auditContrast(values) {
   const out = []
