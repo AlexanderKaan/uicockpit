@@ -81,11 +81,19 @@ export const bars = (n) => {
 }
 
 /* ── Tailwind, using the semantic names our package adds ─────────────────── */
+/* The semantic names our package ADDS, doing their job.
+ *
+ * These used to be bg-green-50 / bg-amber-50 / bg-red-600 — Tailwind's stock
+ * palette — while the generated theme dutifully wrote --color-success and
+ * friends. So the three semantic knobs wrote variables nothing on the wall
+ * read, and turning them changed not one pixel here. Counted, not noticed. */
 const TW_BTN = { brand: 'bg-brand text-brand-foreground hover:opacity-90', secondary: 'bg-surface text-ink border border-line',
-  ghost: 'text-ink hover:bg-surface', danger: 'bg-red-600 text-white' }
+  ghost: 'text-ink hover:bg-surface', danger: 'bg-danger text-white' }
 const TW_TONE = { neutral: 'bg-surface text-ink border-line', brand: 'bg-brand/10 text-brand border-brand/25',
-  success: 'bg-green-50 text-green-800 border-green-200', warning: 'bg-amber-50 text-amber-900 border-amber-200',
-  danger: 'bg-red-50 text-red-800 border-red-200' }
+  success: 'bg-success/10 text-success border-success/25', warning: 'bg-warning/10 text-warning border-warning/25',
+  danger: 'bg-danger/10 text-danger border-danger/25' }
+/* and the ring, on everything you can tab into */
+const TW_RING = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 const tailwind = {
   _id: 'Tailwind',
   stack:   (n, k) => `<div class="flex flex-col gap-${n.gap ?? 3}">${k}</div>`,
@@ -93,13 +101,13 @@ const tailwind = {
   grid:    (n, k) => `<div class="grid gap-3" style="grid-template-columns:repeat(${n.cols ?? 2},minmax(0,1fr))">${k}</div>`,
   panel:   (n, k) => `<div class="rounded-lg border border-line bg-surface p-4">${k}</div>`,
   divider: () => `<hr class="border-line">`,
-  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, n.level === 2 ? 'text-xl font-semibold text-ink' : 'text-base font-semibold text-ink'),
-  text:    (n, k) => A(n, k, 'p', 'text-sm text-ink'),
+  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, `font-heading font-strong tracking-normal text-ink ${n.level === 2 ? 'text-xl' : 'text-base'}`),
+  text:    (n, k) => A(n, k, 'p', 'text-sm tracking-normal text-ink'),
   muted:   (n, k) => A(n, k, 'p', 'text-sm text-ink-muted'),
   label:   (n, k) => A(n, k, 'label', 'text-sm font-medium text-ink'),
   button:  (n, k) => A(n, k, 'button', cls('inline-flex min-h-9 items-center rounded-lg px-4 text-sm font-medium', TW_BTN[n.tone ?? 'brand'])),
-  input:   (n) => `<input class="min-h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}">`,
-  select:  (n) => `<select class="min-h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
+  input:   (n) => `<input class="min-h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink ${TW_RING}" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}">`,
+  select:  (n) => `<select class="min-h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink ${TW_RING}">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
   checkbox: (n) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="checkbox" class="size-4 accent-brand"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
   switch:  (n) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="checkbox" role="switch" class="h-5 w-9 appearance-none rounded-full ${n.on ? 'bg-brand' : 'bg-line'}"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
   badge:   (n, k) => A(n, k, 'span', cls('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium', TW_TONE[n.tone ?? 'neutral'])),
@@ -128,7 +136,7 @@ const tailwind = {
   tabs:    (n) => `<div class="flex gap-4 border-b border-line text-sm">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'border-b-2 border-brand pb-2 font-medium text-ink' : 'pb-2 text-ink-muted'}">${esc(t)}</span>`).join('')}</div>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
-  textarea: (n) => `<textarea rows="3" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
+  textarea: (n) => `<textarea rows="3" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink ${TW_RING}" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
   radio:   (n) => `<div class="flex flex-col gap-2">${list(n.items).map((t, i) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="radio" name="${esc(n.name ?? 'g')}" class="size-4 accent-brand"${i === (n.on ?? 0) ? ' checked' : ''}>${esc(t)}</label>`).join('')}</div>`,
   slider:  (n) => `<input type="range" max="100" value="${n.value ?? 60}" class="h-9 w-full accent-brand">`,
   progress: (n) => `<div class="h-2 w-full overflow-hidden rounded-full bg-line"><div class="h-full rounded-full bg-brand" style="width:${n.value ?? 60}%"></div></div>`,
@@ -436,7 +444,7 @@ const MD_BTN = { brand: 'md-filled-button', secondary: 'md-filled-tonal-button',
 const MD_CHIP = { neutral: 'md-assist-chip', brand: 'md-suggestion-chip', success: 'md-assist-chip', warning: 'md-assist-chip', danger: 'md-assist-chip' }
 /* their component tokens, the documented way to re-tone one instance */
 const MD_CHIP_TOK = {
-  success: '--md-assist-chip-label-text-color:var(--md-sys-color-on-tertiary-container);--md-assist-chip-container-shape:var(--md-sys-shape-corner-sm)',
+  success: '--md-assist-chip-label-text-color:var(--md-sys-color-on-tertiary-container);--md-assist-chip-container-shape:var(--md-sys-shape-corner-small)',
   warning: '--md-assist-chip-label-text-color:var(--md-sys-color-on-secondary-container)',
   danger: '--md-assist-chip-label-text-color:var(--md-sys-color-on-error-container);--md-assist-chip-outline-color:var(--md-sys-color-error)',
 }
@@ -507,7 +515,7 @@ const material = {
   /* M3 has an elevation model; @material/web ships md-elevation as an element
      and no level tokens, so the specimen is their element at its own levels. */
   elevation: (n) => `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px">${list(n.levels).map((lv, i) =>
-    `<div style="position:relative;width:96px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:var(--md-sys-shape-corner-md);background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface-variant);font-size:12px"><md-elevation style="--md-elevation-level:${i + 1}"></md-elevation>${esc(lv)}</div>`).join('')}</div>`,
+    `<div style="position:relative;width:96px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:var(--md-sys-shape-corner-medium);background:var(--md-sys-color-surface-container-low);color:var(--md-sys-color-on-surface-variant);font-size:12px"><md-elevation style="--md-elevation-level:${i + 1}"></md-elevation>${esc(lv)}</div>`).join('')}</div>`,
   tabs:    (n) => `<md-tabs>${list(n.items).map((t, i) => `<md-primary-tab${i === 0 ? ' active' : ''}>${esc(t)}</md-primary-tab>`).join('')}</md-tabs>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
@@ -529,28 +537,28 @@ const material = {
     <md-list style="--md-list-container-color:transparent">${list(g.items).map((it) => `<md-list-item type="button"${it.on ? ' style="--md-list-item-container-color:var(--md-sys-color-secondary-container);--md-list-item-label-text-color:var(--md-sys-color-on-secondary-container)"' : ''}>
       <span slot="start">${ico(it.icon, 20)}</span><div slot="headline">${esc(it.text)}</div>${it.count ? `<div slot="end" style="position:relative;display:flex;align-items:center;min-width:28px;height:20px"><md-badge value="${esc(it.count)}"></md-badge></div>` : ''}</md-list-item>`).join('')}</md-list></div>`).join('')}</div>`,
   list:    (n) => `<md-list style="--md-list-container-color:transparent">${list(n.rows).map((r) => `<md-list-item>
-    <span slot="start" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--md-sys-shape-corner-sm);background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)">${ico(r.icon)}</span>
+    <span slot="start" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--md-sys-shape-corner-small);background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)">${ico(r.icon)}</span>
     <div slot="headline">${esc(r.title)}</div><div slot="supporting-text">${esc(r.sub ?? '')}</div>
     <div slot="trailing-supporting-text">${esc(r.meta ?? '')}</div></md-list-item>`).join('')}</md-list>`,
   kv:      (n) => `<md-list style="--md-list-container-color:transparent">${list(n.rows).map(([k2, v]) => `<md-list-item>
     <div slot="headline" style="font-family:ui-monospace,monospace;font-size:12px">${esc(k2)}</div>
     <div slot="trailing-supporting-text" style="font-family:ui-monospace,monospace">${esc(v)}</div></md-list-item>`).join('')}</md-list>`,
   chart:   (n) => `<div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;align-items:flex-end;gap:8px;height:112px">${bars(n).map((b) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
-    <div style="display:flex;align-items:flex-end;justify-content:center;gap:2px;width:100%;height:96px"><div style="width:45%;height:${b.a}%;border-radius:var(--md-sys-shape-corner-xs) var(--md-sys-shape-corner-xs) 0 0;background:var(--md-sys-color-primary)"></div><div style="width:45%;height:${b.b}%;border-radius:var(--md-sys-shape-corner-xs) var(--md-sys-shape-corner-xs) 0 0;background:var(--md-sys-color-primary-container)"></div></div>
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:2px;width:100%;height:96px"><div style="width:45%;height:${b.a}%;border-radius:var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 0 0;background:var(--md-sys-color-primary)"></div><div style="width:45%;height:${b.b}%;border-radius:var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 0 0;background:var(--md-sys-color-primary-container)"></div></div>
     <span class="md-typescale-label-small" style="color:var(--md-sys-color-on-surface-variant)">${esc(b.label)}</span></div>`).join('')}</div>
     <div class="md-typescale-label-small" style="display:flex;gap:16px;color:var(--md-sys-color-on-surface-variant)">${list(n.legend).map((t, i) => `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:var(--md-sys-shape-corner-full);background:var(--md-sys-color-${i ? 'primary-container' : 'primary'})"></span>${esc(t)}</span>`).join('')}</div></div>`,
   empty:   (n, k) => `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px 0;text-align:center">
-    <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--md-sys-shape-corner-md);background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)">${ico(n.icon, 18)}</span>
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--md-sys-shape-corner-medium);background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface-variant)">${ico(n.icon, 18)}</span>
     <p class="md-typescale-title-small" style="margin:0">${esc(n.title)}</p>
     <p class="md-typescale-body-small" style="margin:0;max-width:224px;color:var(--md-sys-color-on-surface-variant)">${esc(n.text)}</p>${k}</div>`,
   swatches: (n) => `<div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('material', n.roles, MD_SHOWN).map((r) => `<div style="display:flex;flex-direction:column;gap:6px">
-    <span style="height:40px;border-radius:var(--md-sys-shape-corner-sm);border:1px solid var(--md-sys-color-outline-variant)${r.paint ? `;background:${r.paint}` : ';border-style:dashed'}"></span>
+    <span style="height:40px;border-radius:var(--md-sys-shape-corner-small);border:1px solid var(--md-sys-color-outline-variant)${r.paint ? `;background:${r.paint}` : ';border-style:dashed'}"></span>
     <span class="md-typescale-label-medium">${esc(r.label)}</span>
     <span class="md-typescale-label-small" style="font-family:ui-monospace,monospace;line-height:1.3;color:var(--md-sys-color-on-surface-variant)">${esc(r.note)}</span></div>`).join('')}</div>`,
   typespec: (n) => `<div style="display:flex;flex-direction:column;gap:16px">${list(n.rows).map((r) => `<div style="display:flex;flex-direction:column;gap:4px">
     <span class="md-typescale-label-small" style="font-family:ui-monospace,monospace;text-transform:uppercase;color:var(--md-sys-color-on-surface-variant)">${esc({ xl: 'display-small', lg: 'headline-small', md: 'body-large', sm: 'label-medium' }[r.size])}</span>
     <p class="md-typescale-${{ xl: 'display-small', lg: 'headline-small', md: 'body-large', sm: 'label-medium' }[r.size]}" style="margin:0">${esc(r.text)}</p></div>`).join('')}</div>`,
-  shapes:  () => `<div style="display:flex;flex-direction:column;gap:16px"><div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px">${['xs', 'sm', 'md', 'lg'].map((c) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:48px;height:48px;background:var(--md-sys-color-surface-container-high);border-radius:var(--md-sys-shape-corner-${c})"></span><span class="md-typescale-label-small" style="font-family:ui-monospace,monospace;color:var(--md-sys-color-on-surface-variant)">corner-${esc(c)}</span></div>`).join('')}</div>
+  shapes:  () => `<div style="display:flex;flex-direction:column;gap:16px"><div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px">${['extra-small', 'small', 'medium', 'large'].map((c) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:48px;height:48px;background:var(--md-sys-color-surface-container-high);border-radius:var(--md-sys-shape-corner-${c})"></span><span class="md-typescale-label-small" style="font-family:ui-monospace,monospace;color:var(--md-sys-color-on-surface-variant)">corner-${esc(c)}</span></div>`).join('')}</div>
     <p class="md-typescale-body-small" style="margin:0;color:var(--md-sys-color-on-surface-variant)">Material publishes shape tokens and no border-width token, so a border here is one pixel because that is what its own components draw.</p></div>`,
 }
 
@@ -690,7 +698,10 @@ export const useMantineClasses = (map) => { MC = map ?? {} }
  * for parts that have no file of their own. */
 const mc = (name, part = 'root') => MC[name]?.[part] ?? `mantine-missing-${name}-${part}`
 const MN_BTN = {
-  brand: '', secondary: '--button-bg:var(--mantine-color-default);--button-color:var(--mantine-color-text);--button-bd:1px solid var(--mantine-color-default-border)',
+  /* Their React layer passes the contrast colour in as --button-color; without
+     it the label falls back to white and the On-brand knob writes a variable
+     nothing reads. */
+  brand: '--button-color:var(--mantine-primary-color-contrast)', secondary: '--button-bg:var(--mantine-color-default);--button-color:var(--mantine-color-text);--button-bd:1px solid var(--mantine-color-default-border)',
   ghost: '--button-bg:transparent;--button-color:var(--mantine-primary-color-filled)',
   /* their semantic name, not a red I picked */
   danger: '--button-bg:var(--mantine-color-error);--button-color:var(--mantine-color-white)',

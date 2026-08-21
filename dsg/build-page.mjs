@@ -9,14 +9,15 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { icons, svg } from './icons.mjs'
-import { seedFrom, route } from './roles.mjs'
-import { DARK } from './generate.mjs'
+import { seedFrom, route, darken } from './roles.mjs'
+import { DARK, generate } from './generate.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render, PARTS } from './parts.mjs'
 import { WALL, useMantineClasses, useRadixTones, useIcons } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES, BOARDS, wallMarkup, safeJson } from './scenes.mjs'
 import { ownage, partOwnage } from './fidelity.mjs'
+import { analyse, unread } from './orphans.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
 import { mark } from './mark.mjs'
 import { materialElements } from './material-elements.mjs'
@@ -35,7 +36,13 @@ const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`ki
 useMantineClasses(kits.mantine?.classes)
 
 /* The semantic knobs open on a published value, not on a green we picked. The
- * order is the order kits are asked in, and the page says which kit answered. */
+ * order is the order kits are asked in, and the page says which kit answered.
+ *
+ * The two font roles are in here for a different reason: Tailwind compiles a
+ * utility only for a theme entry that EXISTS, so a build with no --font-heading
+ * ships no .font-heading rule and the heading-family knob can never take effect,
+ * whatever the browser sets the variable to afterwards. The value seeded here is
+ * replaced the moment the page opens; what matters is that the name is there. */
 const SEEDS = {}
 for (const role of ['success', 'warning', 'danger', 'focus']) {
   const seed = seedFrom(role, kits, ['daisyui', 'bootstrap', 'mantine', 'material', 'shadcn', 'radix'])
@@ -47,6 +54,14 @@ useRadixTones(Object.fromEntries((route(SEED, ['radix'], kits)[0]?.chosen ?? [])
   .filter((c) => c.attr === 'tone').map((c) => [c.role, c.picked])))
 
 console.log(`  ✓ semantic colours seeded from ${[...new Set(Object.values(SEEDS).map((s) => s.from))].join(', ') || 'nothing — no kit publishes one'}`)
+
+/* And the two font roles, for a different reason and with no note attached: the
+ * page replaces both the moment it opens. What the build needs is only that the
+ * NAME exists, or Tailwind emits no rule that could ever read it. */
+for (const role of ['fontHeading', 'fontBody']) {
+  const seed = seedFrom(role, kits, IDS)
+  if (seed) SEED[role] = seed.value
+}
 
 /* The wrapper a kit needs to be itself. Without data-theme, daisyUI's dark
  * theme wins on a dark OS and the frame shows its factory purple — which is
@@ -134,6 +149,11 @@ let page = readFileSync('page.template.html', 'utf8')
   .replace('/*RENDERS*/', () => JSON.stringify(RENDERS))
   .replace('/*SEEDS*/', () => JSON.stringify(SEEDS))
   .replace('/*FONTS*/', () => JSON.stringify({ google: gf.families, stacks: kitFonts(kits) }))
+  /* Which of the variables this theme writes anything actually reads —
+   * measured over the stylesheets already compiled above, so the page knows it
+   * without a second build. */
+  .replace('/*UNREAD*/', () => JSON.stringify(unread(analyse({
+    kits, css, files: generate(SEED, IDS, kits), routed: darken(route(SEED, IDS, kits), kits), code: mdw.js }))))
   .replace('/*OWN*/', () => JSON.stringify(Object.fromEntries(RENDERS.map((id) => {
     const html = SCENES.map((s) => render(s.node, WALL[id])).join('')
     const { used, theirs, els, elsTheirs } = ownage(html, css[id] ?? '', id === 'material' ? mdw.bundled : null)

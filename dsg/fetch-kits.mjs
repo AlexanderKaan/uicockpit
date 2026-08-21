@@ -87,6 +87,32 @@ const SOURCES = {
     async read() {
       const colour = fromNpm('@material/web@latest', 'labs/gb/styles/color/md-color-tokens.css')
       const shape = fromNpm('@material/web@latest', 'labs/gb/styles/shape/md-shape-tokens.css')
+      /* @material/web ships TWO shape vocabularies and its components read the
+       * older one. labs/gb publishes corner-xs … corner-xxl; every component in
+       * the package reads corner-extra-small … corner-extra-large. Reading only
+       * the labs file gave us six names Google publishes and nothing in Google's
+       * own kit reads — the corner-radius knob moved nothing at all. So both are
+       * read, and the routing points at the pair the components use.
+       *
+       * The version directory is not typed: tokens/_md-sys-shape.scss says which
+       * one it uses, so the file names itself. */
+      const shipped = (() => {
+        const p = openNpm('@material/web@latest')
+        try {
+          const index = p.read('tokens/_md-sys-shape.scss')
+          const version = /@use\s+'versions\/([^/]+)\/md-sys-shape'/.exec(index)?.[1]
+          const supported = [...index.slice(index.indexOf('$supported-tokens'), index.indexOf('$unsupported-tokens'))
+            .matchAll(/'([a-z-]+)'/g)].map((m) => m[1])
+          if (!version || !supported.length) return {}
+          const values = p.read(`tokens/versions/${version}/_md-sys-shape.scss`)
+          const out = {}
+          for (const m of values.matchAll(/'([a-z-]+)':\s*if\([^,]+,\s*null,\s*([0-9.]+px)\)/g)) {
+            if (supported.includes(m[1])) out[`--md-sys-shape-${m[1]}`] = m[2]
+          }
+          return out
+        } finally { p.close() }
+      })()
+      if (!Object.keys(shipped).length) throw new Error('could not read the shape tokens @material/web\'s own components use')
       /* Material splits its typefaces in two — plain for body, brand for
          headings — which is the same split Radix and Mantine make. */
       const type = fromNpm('@material/web@latest', 'labs/gb/styles/m3.css')
@@ -95,12 +121,12 @@ const SOURCES = {
       const light = {}, dark = {}
       const typeface = Object.fromEntries(Object.entries(cssVars(type.text))
         .filter(([n]) => n.startsWith('--md-ref-typeface-')))
-      for (const [name, raw] of Object.entries({ ...cssVars(colour.text), ...cssVars(shape.text), ...typeface })) {
+      for (const [name, raw] of Object.entries({ ...cssVars(colour.text), ...cssVars(shape.text), ...shipped, ...typeface })) {
         const pair = /^light-dark\(\s*([^,]+?)\s*,\s*(.+?)\s*\)$/.exec(raw)
         light[name] = pair ? pair[1] : raw
         dark[name] = pair ? pair[2] : raw
       }
-      return { ...colour, source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens + m3.css typefaces`,
+      return { ...colour, source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens + tokens/_md-sys-shape (what its components read) + m3.css typefaces`,
         modes: { light, dark } }
     },
   },

@@ -318,6 +318,7 @@ const CSS = /*CSS*/;
 const DERIVED = /*DERIVED*/;
 const WALLS = /*WALLS*/;
 const SCRIPTS = /*SCRIPTS*/;
+const UNREAD = /*UNREAD*/
 const OWN = /*OWN*/;
 const RENDERS = /*RENDERS*/;
 const DARKSWITCH = /*DARK*/;
@@ -967,7 +968,7 @@ function receipt(routed) {
 
 /* ── the two outputs ──────────────────────────────────────────────────────── */
 const files = () => generate(state.values, ORDER.filter((k) => state.on.has(k)), KITS,
-  { name: kitName() || 'design-system', parts: PARTS, overview: ($('#kitover')?.value ?? '').trim() })
+  { name: kitName() || 'design-system', parts: PARTS, unread: UNREAD, overview: ($('#kitover')?.value ?? '').trim() })
 const grab = (name, body, type = 'text/plain') => {
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([body], { type }))
@@ -1034,6 +1035,10 @@ function openSheet() {
   const cav = [
     ...section(f['MANIFEST.md'], '## What could not be done').map(md),
     ...section(f['MANIFEST.md'], '## What these kits have no component for').map(md),
+    /* and the third: a variable this theme writes that nothing reads. Counted
+       at build time in each kit's own stylesheet, so this list is usually empty
+       and never guessed. */
+    ...section(f['MANIFEST.md'], '## Variables in here that nothing reads').map(md),
   ].filter((l) => !/^Nothing —/.test(l.replace(/<[^>]+>/g, '')))
   $('#csection').hidden = !cav.length
   $('#caveats').innerHTML = cav.map((c) => `<li>${c}</li>`).join('')

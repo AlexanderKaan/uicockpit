@@ -12,6 +12,8 @@
     "serve": "node serve.mjs",
     "home": "node build-home.mjs home.html",
     "fidelity": "node fidelity.mjs",
-    "fonts": "node fonts.mjs"
+    "fonts": "node fonts.mjs",
+    "orphans": "node orphans.mjs",
+    "orphans:gate": "node orphans.mjs --gate"
   }
 }

@@ -4,7 +4,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { hexToOklch } from './color.mjs'
-import { generate, collisions } from './generate.mjs'
+import { generate, collisions, section } from './generate.mjs'
 import { MAP } from './roles.mjs'
 
 const ALL = Object.keys(MAP)
@@ -158,4 +158,22 @@ test('a kit whose variables live only in our file gets its dark defaults too', (
   for (const name of ['--muted', '--secondary', '--accent', '--destructive']) {
     assert.match(dark, new RegExp(`\\${name}:`), `${name} keeps its light value in the dark`)
   }
+})
+
+test('the download says which of its own variables nothing reads', () => {
+  const ids = ['tailwind', 'mantine']
+  const kits = Object.fromEntries(ids.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
+  const measured = [{ kit: 'mantine', name: 'Mantine', role: 'Corner radius',
+    names: ['--mantine-radius-md'], instead: ['--mantine-radius-default'], tokensOnly: false }]
+
+  const withIt = generate(VALUES, ids, kits, { unread: measured })['MANIFEST.md']
+  assert.match(withIt, /## Variables in here that nothing reads/)
+  assert.match(withIt, /Mantine · Corner radius/)
+  assert.match(withIt, /--mantine-radius-default/, 'it has to say what the kit reads instead')
+
+  /* and a stack none of it applies to says so, rather than carrying an empty
+     heading that reads like a hole */
+  const other = generate(VALUES, ['tailwind'], kits, { unread: measured })['MANIFEST.md']
+  assert.match(section(other, '## Variables in here that nothing reads').length ? 'x' : 'Nothing', /Nothing/)
+  assert.match(other, /every variable this theme writes is read/)
 })

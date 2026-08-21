@@ -16,6 +16,7 @@ import { render } from './parts.mjs'
 import { elementsOf } from './fidelity.mjs'
 import { materialElements } from './material-elements.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
+import { MAP } from './roles.mjs'
 
 const mdw = materialElements()
 const html = SCENES.map((s) => render(s.node, WALL.material)).join('')
@@ -59,4 +60,15 @@ test('nothing inline carries a number of ours where Material publishes a token',
       assert.match(val ?? '', /var\(--md-/, `${d} — a value of ours where Material publishes a token`)
     }
   }
+})
+
+test('the corner-radius knob writes a token their own components really read', () => {
+  /* @material/web ships two shape vocabularies. labs/gb publishes corner-xs …
+     corner-xxl; every element in the package reads corner-extra-small …
+     corner-extra-large. We routed to the labs names for months, so the knob
+     wrote six variables Google publishes and Google's own components ignore.
+     Counted in their bundle, which is where a custom element keeps its rules. */
+  const name = MAP.material.radius.var
+  assert.ok(mdw.js.includes(`var(${name}`),
+    `${name} is published by Material and read by none of its components — route to one they read`)
 })

@@ -27,8 +27,16 @@ import { materialElements } from './material-elements.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
 
 const IDS = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material', 'radix', 'mantine']
+/* EVERY role, not the seven the first version set.
+ *
+ * A role left blank writes no variable, so Tailwind never generates the utility
+ * that would read it — and the meter then reports our own bg-success as a class
+ * we invented. The meter has to compile the same theme the product writes. */
 const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface: '#f7f9fa',
-  ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
+  ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px',
+  space: '1', elevation: '1', lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600',
+  borderWidth: '1px', success: '#2f9e44', warning: '#f08c00', danger: '#e03131', focus: '#0b6e8a',
+  fontHeading: 'Fraunces, serif', fontBody: 'Inter, sans-serif' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(kits.mantine?.classes)
 useIcons(icons(ICON_NAMES).icons)

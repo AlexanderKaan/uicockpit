@@ -168,3 +168,21 @@ test('every kit says which of the four answers applies to each role', () => {
   assert.deepEqual([...seen].sort(), ['added', 'derived', 'missing', 'needsBuild'],
     'all four kinds of honest answer are in use across the five kits')
 })
+
+test('every variable we write is one the kit publishes, or one we say we added', () => {
+  /* The other half of the orphan question, and the cheap half: a name that is
+     neither theirs nor declared as ours is a typo in the routing table, and a
+     typo there writes a variable that can never be read by anything. */
+  for (const [id, table] of Object.entries(MAP)) {
+    const kit = JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))
+    const published = new Set(Object.keys(Object.assign({}, ...Object.values(kit.modes ?? {}))))
+    if (!published.size) continue
+    for (const [role, e] of Object.entries(table)) {
+      if (role.startsWith('_') || !e || typeof e !== 'object' || e.new) continue
+      const names = [e.var, ...(e.also ?? []), ...(e.tint ?? []), ...(e.rgb ?? []), ...(e.shadows ?? [])].filter(Boolean)
+      for (const n of names) {
+        assert.ok(published.has(n), `${id}.${role} writes ${n}, which ${kit.name} does not publish and we do not declare as added`)
+      }
+    }
+  }
+})

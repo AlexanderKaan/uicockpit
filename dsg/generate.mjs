@@ -467,7 +467,7 @@ ${routed.map((r) => {
 Then import \`theme.css\` after the kits, so your values win.
 `
 
-  files['MANIFEST.md'] = manifest(routed, kits, values)
+  files['MANIFEST.md'] = manifest(routed, kits, values, opts)
   /* One set of rules, under the three names different tools look for. Cursor
    * reads .cursor/rules, Claude Code reads CLAUDE.md, and AGENTS.md is the
    * convention the rest are converging on — same file, so none of them is
@@ -549,7 +549,7 @@ export const section = (md, heading) => {
 }
 
 /** What you have, where it came from, and — the part nobody else prints — what could not be done. */
-function manifest(routed, kits, values) {
+function manifest(routed, kits, values, opts = {}) {
   const rows = routed.map((r) => {
     const k = kits[r.kit]
     return `| ${k.name} | ${k.version ?? 'live'} | ${k.license ?? 'see project'} | ${Object.keys(r.vars).length} | ${k.source} |`
@@ -597,6 +597,21 @@ ${ROLES.filter((r) => values[r.id] != null).map((r) => `- \`${r.id}\` — ${valu
 ## What could not be done
 
 ${caveats.length ? caveats.join('\n') : 'Nothing — every value reached every kit you enabled.'}
+
+## Variables in here that nothing reads
+
+${(() => {
+  const on = new Set(routed.map((r) => r.kit))
+  const rows = (opts.unread ?? []).filter((u) => on.has(u.kit))
+  if (!rows.length) return 'Nothing — every variable this theme writes is read by the kit it belongs to, or by your code.'
+  return `Counted in each kit's own stylesheet, and in its component code where its
+components are code rather than classes. These are written because the kit
+publishes the name and a later release may read it. Yours to reference; the
+kit will not.
+
+${rows.map((u) => `- **${u.name} · ${u.role}** — ${u.names.map((n) => `\`${n}\``).join(' ')}${
+  u.tokensOnly ? '. A token layer publishes for your code; its own stylesheet reads none of it.'
+    : u.instead.length ? `. What it does read is ${u.instead.slice(0, 3).map((n) => `\`${n}\``).join(' ')}${u.instead.length > 3 ? ' and others' : ''}.` : '.'}`).join('\n')}` })()}
 
 ## What these kits have no component for
 

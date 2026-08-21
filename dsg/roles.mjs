@@ -89,7 +89,7 @@ export const MAP = {
                     also: ['--text-xs--line-height', '--text-sm--line-height', '--text-lg--line-height',
                            '--text-xl--line-height', '--text-2xl--line-height', '--text-3xl--line-height'] },
     letterSpacing: { var: '--tracking-normal' },
-    fontWeight:   { var: '--font-weight-heading', new: true },
+    fontWeight:   { var: '--font-weight-strong', new: true },
     borderWidth:  null,
   },
   radix: {
@@ -267,9 +267,19 @@ export const MAP = {
     ink:      { derives: 'brand' },
     inkMuted: { derives: 'brand' },
     line:     { derives: 'brand' },
-    radius:   { var: '--md-sys-shape-corner-md',
-                also: ['--md-sys-shape-corner-xs', '--md-sys-shape-corner-sm', '--md-sys-shape-corner-lg',
-                       '--md-sys-shape-corner-xl', '--md-sys-shape-corner-xxl'] },
+    /* @material/web ships two shape vocabularies and its components read the
+     * OLDER one. labs/gb publishes corner-xs … corner-xxl; every element in the
+     * package reads corner-extra-small … corner-extra-large. We routed to the
+     * labs names, so the corner-radius knob wrote six variables that Google
+     * publishes and Google's own components ignore — it moved nothing. Found by
+     * counting reads in their bundle, not by looking at a button.
+     * Both are written, because both are theirs and a later release will read
+     * the short ones; the route points at the pair that works today. */
+    radius:   { var: '--md-sys-shape-corner-medium',
+                also: ['--md-sys-shape-corner-extra-small', '--md-sys-shape-corner-small',
+                       '--md-sys-shape-corner-large', '--md-sys-shape-corner-extra-large',
+                       '--md-sys-shape-corner-xs', '--md-sys-shape-corner-sm', '--md-sys-shape-corner-md',
+                       '--md-sys-shape-corner-lg', '--md-sys-shape-corner-xl', '--md-sys-shape-corner-xxl'] },
     baseText: null,
     /* Material is the one kit that names both halves outright: plain for body,
        brand for headings. Its typescale reads them, so setting these two moves
@@ -511,11 +521,24 @@ function asRgbTriple(value) {
  * value and the name of the kit it came from, so the page can say so.
  */
 export function seedFrom(roleId, kits, ids = Object.keys(kits)) {
+  /* A colour comes back as hex because every knob downstream speaks hex. Every
+     other kind comes back as the kit published it — a font stack, a length, a
+     number — which is the only reason this works for the two font roles, and
+     they need it: Tailwind compiles a utility only for a theme entry that
+     exists, so a build with no --font-heading ships no .font-heading rule and
+     that knob can never take effect however the page sets the variable later. */
+  const colour = ROLES.find((x) => x.id === roleId)?.kind === 'colour'
   for (const id of ids) {
     const target = MAP[id]?.[roleId]
     if (!target?.var) continue
     const raw = kits[id]?.modes?.light?.[target.var]
-    const hex = raw && (asOklch(raw) ? oklchToHex(...asOklch(raw)) : null)
+    if (raw == null || raw === '') continue
+    /* a kit that defines a role in terms of another of its own variables has
+       published a POINTER, not a value; Material's heading face is
+       var(--md-ref-typeface-plain), which means nothing outside Material. */
+    if (String(raw).includes('var(')) continue
+    if (!colour) return { value: raw, from: kits[id].name, variable: target.var }
+    const hex = asOklch(raw) ? oklchToHex(...asOklch(raw)) : null
     if (hex) return { value: hex, from: kits[id].name, variable: target.var }
   }
   return null
