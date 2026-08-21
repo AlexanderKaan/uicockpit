@@ -341,10 +341,29 @@ function paint() {
      layer belongs under all of it, which is what it does in your app. */
   const st = stack(state.on, KITS)
   const below = (id) => st.order.slice(0, st.order.indexOf(id) + 1)
-  const varsOf = (ids, dark) => Object.assign({}, ...ids.map((k) => {
-    const r = routed.find((x) => x.kit === k)
-    return (dark && r?.dark) ? r.dark : r?.vars ?? {}
-  }))
+  /* A frame carries its whole stack, bottom-up — but a lower layer may NOT
+   * overwrite a name the shown kit publishes itself.
+   *
+   * shadcn's --border is a colour and daisyUI's --border is a WIDTH. The
+   * collision was already detected and reported; once the frame started
+   * carrying every layer (so shadcn could see Tailwind's --font-sans), it also
+   * started happening: daisyUI's buttons got a border of `#dfe2e7 solid` and
+   * rendered at 3px instead of 1. A variable the kit you are looking at
+   * publishes is that kit's to own. */
+  const varsOf = (ids, dark) => {
+    const top = ids.at(-1)
+    const mine = KITS[top]?.modes?.light ?? {}
+    const out = {}
+    for (const k of ids) {
+      const r = routed.find((x) => x.kit === k)
+      const from = (dark && r?.dark) ? r.dark : r?.vars ?? {}
+      for (const [name, value] of Object.entries(from)) {
+        if (k !== top && mine[name] !== undefined) continue
+        out[name] = value
+      }
+    }
+    return out
+  }
   for (const r of routed) {
     const f = $('#f_' + r.kit)
     if (!f) continue

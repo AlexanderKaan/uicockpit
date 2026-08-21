@@ -165,7 +165,14 @@ const EXTRA = {
 //
 //   @import "custom";
 //
-${r.needsBuild.map((b) => `${b.sass}: ${values[b.role] ?? '/* set me */'};   // ${b.why}`).join('\n')}
+${r.needsBuild
+  /* Only the ones with a value. A placeholder here is not a comment, it is a
+   * syntax error — `$success: /* set me *\/;` made the whole Sass build fail,
+   * and the build falls back to Bootstrap's shipped CSS when it does. So one
+   * unset semantic colour silently took the BRAND down with it and the wall
+   * showed Bootstrap's factory blue while the note claimed otherwise. */
+  .filter((b) => values[b.role] != null && !String(b.sass).startsWith('--'))
+  .map((b) => `${b.sass}: ${values[b.role]};   // ${b.why}`).join('\n') || '// nothing here needs a build-time value'}
 
 @import "bootstrap/scss/bootstrap";
 `,

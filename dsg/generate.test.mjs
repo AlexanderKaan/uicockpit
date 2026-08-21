@@ -131,3 +131,17 @@ test("shadcn's variables are bridged into Tailwind's namespace, or nothing reads
   /* and we must not bridge --radius as if it were a colour */
   assert.doesNotMatch(css, /--color-radius/)
 })
+
+test('the Sass file is valid Sass, or it takes the whole build down with it', () => {
+  /* A placeholder here is not a comment, it is a syntax error. One unset
+     semantic colour wrote `$success: /* set me *\/;`, the Sass build failed,
+     buildCss fell back to Bootstrap's shipped stylesheet, and the entire
+     preview showed its factory blue while the note claimed we had compiled it. */
+  for (const values of [{ brand: '#0b6e8a' }, { brand: '#0b6e8a', danger: '#7b1fa2' }, { radius: '10px' }]) {
+    const scss = generate(values, ['bootstrap'], KITS)['_custom.scss']
+    assert.doesNotMatch(scss, /set me/, 'a placeholder in Sass is a syntax error, not a note')
+    for (const line of scss.split('\n').filter((l) => l.startsWith('$'))) {
+      assert.match(line, /^\$[a-z-]+:\s*\S+;/, `not valid Sass: ${line}`)
+    }
+  }
+})

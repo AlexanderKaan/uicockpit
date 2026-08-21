@@ -51,7 +51,15 @@ console.log(`  ✓ semantic colours seeded from ${[...new Set(Object.values(SEED
  * theme wins on a dark OS and the frame shows its factory purple — which is
  * exactly what happened, on a page whose whole claim is that your values won. */
 const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="light"',
-  radix: ' class="radix-themes light"', mantine: ' data-mantine-color-scheme="light"' }
+  /* Radix's own <Theme> sets five attributes, and two of them are load-bearing.
+   * Without data-has-background its rule
+   *   .radix-themes:where([data-has-background='true']) { background: var(--color-background) }
+   * never fires, so the page colour was written into the variable and never
+   * painted — the page knob did nothing at all for this kit. And without
+   * data-panel-background, --color-panel resolves to nothing. Measured against
+   * their own playground, which sets all of these. */
+  radix: ' class="radix-themes light" data-is-root-theme="true" data-has-background="true" data-panel-background="translucent"',
+  mantine: ' data-mantine-color-scheme="light"' }
 const RENDERS = IDS.filter((id) => kits[id].layer !== 'tokens')
 const wall = (id) => `<html${ROOT[id] ?? ''}><main>${SCENES.map((s) =>
   `<section data-rung="${s.rung}" style="grid-column:span ${s.span}"><p class="cap">${s.title}</p>${render(s.node, WALL[id])}</section>`).join('')}</main>

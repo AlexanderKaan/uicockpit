@@ -58,7 +58,7 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
     execFileSync('npx', ['sass', '--no-source-map', '--style=compressed', '--load-path=.', 'custom.scss', 'bootstrap.out.css'], { cwd: dir, stdio: 'pipe' })
     css.bootstrap = readFileSync(join(dir, 'bootstrap.out.css'), 'utf8') + '\n' + files._blocks.bootstrap
   } catch (e) {
-    log('  ✗ the Sass build failed — falling back to their shipped CSS, so the brand will be Bootstrap\'s own')
+    log(`\n  ################  BOOTSTRAP'S SASS BUILD FAILED  ################\n  ✗ the Sass build failed — falling back to their shipped CSS, so the brand will be Bootstrap's own\n    ${String(e.stderr ?? e.message).split('\n').slice(0, 6).join('\n    ')}`)
     const bs = join(dir, 'node_modules/bootstrap/dist/css/bootstrap.min.css')
     css.bootstrap = (existsSync(bs) ? readFileSync(bs, 'utf8') : '') + '\n' + files._blocks.bootstrap
   }
