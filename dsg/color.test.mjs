@@ -3,7 +3,8 @@
  * so it is the only one that needs testing for what it INVENTS. */
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { okAccentScale, okNeutralScale, nameColor, contrast, hexToOklch, readableInk } from './color.mjs'
+import { readFileSync } from 'node:fs'
+import { okAccentScale, okNeutralScale, nameColor, contrast, hexToOklch, readableInk, oklchStrToHex } from './color.mjs'
 
 const L = (s) => Number(/oklch\(([\d.]+)%/.exec(s)[1])
 const C = (s) => Number(/oklch\([\d.]+%\s+([\d.]+)/.exec(s)[1])
@@ -51,4 +52,25 @@ test('contrast is the floor everything else is measured against', () => {
   assert.ok(contrast('#16181c', '#f7f9fa') >= 4.5, 'our own ink on our own page')
   assert.equal(readableInk('#ffffff'), '#16160c')
   assert.equal(readableInk('#0b6e8a'), '#ffffff')
+})
+
+test('a channel written as `none` is a channel, not a parse failure', () => {
+  /* CSS Color 4 lets any component be the keyword `none`, and Tailwind uses it:
+     --color-zinc-50 is oklch(98.5% 0 none), a hueless near-white. Demanding
+     three numbers missed it and returned #000000, so the LIGHTEST step of two
+     of Tailwind's neutral ramps read as pure black — thirteen published values
+     across zinc and neutral — and every role taken from either came out a step
+     off with nothing anywhere to say why. */
+  assert.equal(oklchStrToHex('oklch(98.5% 0 none)'), '#fafafa')
+  assert.equal(oklchStrToHex('oklch(96.7% 0.001 286.375)'), '#f4f4f5')
+  assert.notEqual(oklchStrToHex('oklch(98.5% 0 none)'), '#000000')
+})
+
+test('none is read the same way everywhere it appears in a kit', () => {
+  const kit = JSON.parse(readFileSync('kits/tailwind.json', 'utf8'))
+  const withNone = Object.entries(kit.modes.light).filter(([, v]) => /oklch\([^)]*\bnone\b/.test(String(v)))
+  assert.ok(withNone.length, 'Tailwind stopped using `none` — this guard has nothing left to guard')
+  for (const [name, v] of withNone) {
+    assert.notEqual(oklchStrToHex(v), '#000000', `${name} = ${v} still reads as black`)
+  }
 })

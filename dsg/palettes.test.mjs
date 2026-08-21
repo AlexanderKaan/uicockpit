@@ -4,7 +4,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { families, palettesFor, matchNeutral, paletteRoles } from './palettes.mjs'
+import { families, palettesFor, matchNeutral, paletteRoles, fromOneColour } from './palettes.mjs'
+import { seedFrom } from './roles.mjs'
 import { contrast, hexToOklch } from './color.mjs'
 
 const IDS = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material', 'radix', 'mantine', 'openprops']
@@ -89,4 +90,84 @@ test('the offer changes with the stack, because the offer is theirs', () => {
   const alone = palettesFor(['tailwind'], kits).length
   assert.ok(withRadix > alone, 'switching Radix on did not add its scales')
   assert.equal(palettesFor(['bootstrap'], kits).length, 0)
+})
+
+const ROLES_OUT = ['brand', 'onBrand', 'page', 'surface', 'ink', 'inkMuted', 'line', 'success', 'warning', 'danger', 'focus']
+
+test('one colour fills every colour role, and the one you gave survives exactly', () => {
+  for (const c of ['#0b6e8a', '#6c7f00', '#e11d48', '#7c3aed']) {
+    const out = fromOneColour(c, ['tailwind', 'shadcn'], kits, {})
+    assert.ok(out, `${c} produced nothing`)
+    for (const r of ROLES_OUT) assert.match(out.values[r] ?? '', /^#[0-9a-f]{6}$/i, `${r} is not a colour`)
+    assert.equal(out.values.brand, c, 'the one thing you said has to come back unchanged')
+    assert.equal(out.values.focus, c, 'the ring is your colour')
+  }
+})
+
+test('nothing in a one-colour system is invented', () => {
+  /* the whole claim. Every value is either the colour you gave, a step of a
+     ramp your stack publishes, a value some kit publishes for that role, or
+     black or white — which are not a palette opinion. */
+  const ids = ['tailwind', 'shadcn']
+  const order = [...ids, ...Object.keys(kits).filter((id) => !ids.includes(id))]
+  /* what a kit publishes, as hex — they write oklch() and seedFrom is the one
+     thing that converts it, so asking it is asking the same question the
+     derivation asked. */
+  const published = new Set(['success', 'warning', 'danger']
+    .map((role) => order.map((id) => seedFrom(role, kits, [id])).find(Boolean)?.value?.toLowerCase())
+    .filter(Boolean))
+  for (const c of ['#0b6e8a', '#e11d48']) {
+    const out = fromOneColour(c, ids, kits, {})
+    const ramp = new Set((palettesFor(ids, kits).find((f) => f.name === out.neutral.name)?.ramp ?? []).map((v) => v.toLowerCase()))
+    for (const r of ROLES_OUT) {
+      const v = out.values[r].toLowerCase()
+      const ok = v === c.toLowerCase() || v === '#ffffff' || v === '#000000' || ramp.has(v) || published.has(v)
+      assert.ok(ok, `${r} = ${v} came from nowhere`)
+    }
+  }
+})
+
+test('the semantic three are the kit\'s own, unchanged', () => {
+  /* An earlier version moved each one by the step your brand takes from theirs.
+     It made a coherent system with a bad red in it: a brand at a third of
+     daisyUI's chroma turned its danger into a dusty pink, and a warning that
+     whispers has failed at the only job it has. */
+  const ids = ['tailwind', 'shadcn']
+  const order = [...ids, ...Object.keys(kits).filter((id) => !ids.includes(id))]
+  const out = fromOneColour('#6c7f00', ids, kits, {})
+  for (const role of ['success', 'warning', 'danger']) {
+    const theirs = order.map((id) => seedFrom(role, kits, [id])).find(Boolean)
+    assert.equal(out.values[role], theirs.value, `${role} was moved off ${theirs.from}'s published value`)
+  }
+})
+
+test('the greys are the published ramp whose hue sits closest to yours', () => {
+  /* not the same ramp every time, or it would be a grey of ours with extra
+     steps. A warm brand gets a warm neutral. */
+  const warm = fromOneColour('#e11d48', ['tailwind', 'shadcn'], kits, {})
+  const cool = fromOneColour('#0b6e8a', ['tailwind', 'shadcn'], kits, {})
+  assert.ok(warm.neutral && cool.neutral, 'no neutral was matched at all')
+  assert.notEqual(warm.neutral.name, cool.neutral.name, 'every brand got the same grey ramp')
+  const hue = (h) => hexToOklch(h)[2]
+  const near = (a, b) => { let d = Math.abs(hue(a) - hue(b)) % 360; return d > 180 ? 360 - d : d }
+  for (const out of [warm, cool]) {
+    const ramp = palettesFor(['tailwind', 'shadcn'], kits).find((f) => f.name === out.neutral.name).ramp
+    const mid = ramp[Math.floor(ramp.length / 2)]
+    assert.ok(near(mid, out.values.brand) <= 90, `${out.neutral.name} is not near ${out.values.brand} in hue`)
+  }
+})
+
+test('body text clears its floor from one colour, whatever colour it is', () => {
+  /* 1.4.3 is not negotiable and it is invisible until someone cannot read the
+     page, so the muted-ink step is decided by the bar and not by the kit's
+     convention. The BORDER is 1.4.11 and every kit here misses it by their own
+     choice — that one is taken from them, and the checks say what it costs. */
+  for (const c of ['#0b6e8a', '#6c7f00', '#e11d48', '#7c3aed', '#111111']) {
+    const out = fromOneColour(c, ['tailwind', 'shadcn'], kits, { line: '#e5e5e5' })
+    const { ink, inkMuted, page, surface } = out.values
+    for (const [label, fg, bg] of [['ink/page', ink, page], ['ink/surface', ink, surface],
+      ['muted/page', inkMuted, page], ['muted/surface', inkMuted, surface]]) {
+      assert.ok(contrast(fg, bg) >= 4.5, `${c}: ${label} is ${contrast(fg, bg).toFixed(2)}:1`)
+    }
+  }
 })

@@ -117,6 +117,19 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
    chose — Tailwind ships seventeen, Radix thirty-one, and the row changes with
    the stack because the offer is theirs. */
 .sub{margin:6px 0 0;font-size:var(--fs-xs);color:var(--muted)}
+.sub b{color:var(--ink);font-weight:600}
+
+/* one colour, and the other ten derived from it */
+.seed{display:flex;gap:6px;align-items:center;margin-top:7px}
+.seed input[type=color]{-webkit-appearance:none;appearance:none;border:0;padding:0;flex:none;
+  width:40px;height:30px;border-radius:var(--r);cursor:pointer;background:0}
+.seed input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.seed input[type=color]::-webkit-color-swatch{border:var(--bw) solid var(--line);border-radius:var(--r)}
+.seed__hex{flex:1;min-width:0;font:inherit;font-family:ui-monospace,Menlo,monospace;
+  font-size:var(--fs-md);min-height:30px;padding:0 9px;color:var(--ink);
+  border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--panel)}
+.seed__hex:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.grp__rule{border:0;border-top:var(--bw) solid var(--line);margin:12px 0 10px}
 .pals{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:6px;padding-bottom:2px}
 .pals::-webkit-scrollbar{display:none}
 .pal{flex:none;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r-sm);
@@ -821,6 +834,53 @@ $('#typeshuffle').addEventListener('click', () => {
 $('#pickx').addEventListener('click', () => $('#fontpick').close())
 $('#fontpick').addEventListener('click', (e) => { if (e.target.id === 'fontpick') $('#fontpick').close() })
 
+/* What the kit you are LOOKING at publishes for the two roles a bar would
+ * otherwise decide — its border and its muted text. Both the palette row and
+ * the one-colour field need it, and a second copy of it is a second answer. */
+function seenRef() {
+  const seen = KITS[showing(stack(state.on, KITS))]
+  const ref = {}
+  for (const role of ['line', 'inkMuted']) {
+    const v = MAP[seen.id]?.[role]?.var
+    if (v && seen.modes?.light?.[v]) ref[role] = seen.modes.light[v]
+  }
+  return ref
+}
+
+/* ── one colour, and the other ten derived from it ────────────────────────── */
+/* Every generator in this space has a box that takes a brand colour, and every
+ * one of them fills the rest with an opinion. We are not allowed one, and it
+ * turns out we do not need one — the kits have already published every
+ * relationship this needs. What comes back is written into the roles, and the
+ * line underneath says which kit answered for what. */
+function buildFrom(value) {
+  const out = fromOneColour(value, stack(state.on, KITS).order, KITS, seenRef())
+  if (!out) return false
+  Object.assign(state.values, out.values)
+  /* the palette row's selection would be a lie now */
+  palAt = null; palNeutral = null; palShort = out.short
+  seedNote(out)
+  sync(); paint()
+  return true
+}
+const SEED_OPENING = 'One colour, and the other ten come from what your stack publishes — no palette of ours anywhere in it.'
+function seedNote(out) {
+  if (!out) return ($('#seednote').textContent = SEED_OPENING)
+  const named = [...new Set(out.derived.filter((d) => d.from).map((d) => d.from))]
+  $('#seednote').innerHTML = `The greys are <b>${out.neutral.from}</b>'s <b>${out.neutral.name}</b> — the ramp whose hue sits closest to yours. `
+    + (named.length ? `Success, warning and danger are ${named.map((n) => `<b>${n}</b>`).join(' and ')}'s own, unchanged. ` : '')
+    + 'The focus ring is your colour; the ink on it is whichever of black or white clears 4.5:1.'
+    + (out.short.length ? ` <b>${out.short.join(' and ')}</b> could not be met from this — see the checks.` : '')
+}
+const HEX6 = /^#[0-9a-f]{6}$/i
+$('#seedcolor').addEventListener('input', (e) => { $('#seedhex').value = e.target.value; buildFrom(e.target.value) })
+$('#seedhex').addEventListener('input', (e) => {
+  const v = e.target.value.trim()
+  if (!HEX6.test(v)) return                    // half-typed is not wrong yet
+  $('#seedcolor').value = v
+  buildFrom(v)
+})
+
 /* ── palette families ─────────────────────────────────────────────────────── */
 /* Picking one writes seven roles at once: the extremes straight out of their
  * ramp, and the two in the middle — muted ink and the line — at the WCAG floor
@@ -853,15 +913,7 @@ $('#palettes').addEventListener('click', (e) => {
   const { accents, neutrals } = renderPalettes()
   const pick = accents[Number(b.dataset.pal)]; if (!pick) return
   const own = neutrals.filter((n) => n.kit === pick.kit)
-  /* what the kit you are LOOKING at publishes for the two roles a bar would
-     otherwise decide — its border and its muted text */
-  const seen = KITS[showing(stack(state.on, KITS))]
-  const ref = {}
-  for (const role of ['line', 'inkMuted']) {
-    const v = MAP[seen.id]?.[role]?.var
-    if (v && seen.modes?.light?.[v]) ref[role] = seen.modes.light[v]
-  }
-  const { values, short } = paletteRoles(pick, matchNeutral(pick, own, KITS[pick.kit]) ?? neutrals[0], KITS[pick.kit], ref)
+  const { values, short } = paletteRoles(pick, matchNeutral(pick, own, KITS[pick.kit]) ?? neutrals[0], KITS[pick.kit], seenRef())
   palShort = short
   Object.assign(state.values, values)
   palAt = `${pick.kit}:${pick.name}`
@@ -942,6 +994,12 @@ function sync() {
   for (const el of document.querySelectorAll('#knobs [data-r], #typeknobs [data-r]')) {
     const k = LENGTHS.find((x) => x.id === el.dataset.r), v = state.values[el.dataset.r]
     el.value = slider(k, v); $(`[data-v="${el.dataset.r}"]`).textContent = shown(k, v)
+  }
+  /* and the one-colour field follows the brand, however the brand was set —
+     by hand in the swatch row, by a palette, or by a shuffle */
+  if (HEX6.test(state.values.brand ?? '')) {
+    $('#seedcolor').value = state.values.brand
+    $('#seedhex').value = state.values.brand
   }
   renderStack()
   renderPalettes()
@@ -1230,6 +1288,7 @@ for (const role of TYPE) {
   state.values[role.id] = own?.family ?? 'system-ui, sans-serif'
 }
 
+seedNote(null)
 sync()
 addEventListener('load', () => setTimeout(paint, 60))
 </script>

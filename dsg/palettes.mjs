@@ -17,6 +17,7 @@
  * published standard.
  */
 import { hexToOklch, oklchStrToHex, contrast, aaInk } from './color.mjs'
+import { seedFrom } from './roles.mjs'
 
 const hex = (v) => {
   const s = String(v ?? '').trim()
@@ -158,4 +159,88 @@ export function paletteRoles(accent, neutral, kit = null, reference = {}) {
     /* which of the two came from the kit rather than from the bar */
     fromKit: [reference.inkMuted ? 'inkMuted' : null, reference.line ? 'line' : null].filter(Boolean),
   }
+}
+
+/**
+ * TEN ROLES FROM ONE COLOUR.
+ *
+ * Every generator in this space has a box that takes a brand colour, and every
+ * one of them fills the rest of the system with an opinion — a grey ramp
+ * somebody liked, a green somebody picked. We are not allowed one, and it turns
+ * out we do not need one: the kits in the stack have already published every
+ * relationship this needs.
+ *
+ *   the brand      is yours, exactly. It is the one thing you said.
+ *   the greys      are the neutral ramp your stack publishes whose HUE sits
+ *                  closest to yours — Radix's own "auto", generalised — and the
+ *                  page, surface, ink, muted ink and line are read out of it the
+ *                  same way a family is.
+ *   the semantics  are the kit's OWN green, amber and red, each moved by the
+ *                  step your brand takes from theirs: same hue, your lightness
+ *                  difference, your chroma ratio. A quiet brand gets a quiet
+ *                  red. That is the rule this project keeps arriving at — read
+ *                  their published pair, take the relationship out of it, put
+ *                  your value through it — for the fifth time.
+ *   the focus ring is your brand, unless a kit in the stack publishes one.
+ *
+ * Nothing here is invented, and `derived` says which kit answered for what, so
+ * the note under the field can say it out loud rather than asking to be trusted.
+ */
+export function fromOneColour(brand, ids, kits, reference = {}) {
+  const b = hex(brand)
+  if (!b) return null
+  const all = palettesFor(ids, kits)
+  const neutrals = all.filter((f) => f.kind === 'neutral')
+  /* your colour as a family of one, so the hue-match that pairs an accent with
+     a grey ramp works for a colour no kit publishes */
+  const mine = { name: 'yours', ramp: [b], chroma: hexToOklch(b)[1], kind: 'accent' }
+  const neutral = matchNeutral(mine, neutrals)
+  const kit = kits[neutral?.kit ?? ids[0]]
+  /* THEIR border, OUR bar for muted text — and the split is the point.
+   *
+   * paletteRoles takes the kit's own convention for both where it is offered,
+   * which is right when you are picking one of their families and want it to
+   * look like their kit. This is the other case: you gave one colour and asked
+   * for a system, so a starting point that fails body-text contrast is not a
+   * starting point. 1.4.3 is not negotiable and it is invisible until someone
+   * cannot read the page, so muted ink is decided by the bar. The border is
+   * 1.4.11 and every kit here misses it by their own choice — taking theirs
+   * keeps the system looking like the kit you are on, and the checks under the
+   * wall say what it costs, by name. */
+  const { values, short, fromKit } = paletteRoles(mine, neutral, kit, { line: reference.line })
+  /* paletteRoles reads the brand out of the ramp, and a ramp of one has one
+     answer — but saying it here is the difference between right and lucky. */
+  values.brand = b
+
+  /* success, warning and danger are the kit's OWN, unchanged.
+   *
+   * The first version put each one through the step your brand takes from
+   * theirs — their hue, your lightness difference, your chroma ratio — and it
+   * produced a coherent system with a bad red in it: a brand at a third of
+   * daisyUI's chroma turned its danger into a dusty pink. A warning that
+   * whispers has failed at the only job it has, and "coherent" is not worth
+   * that. These are values a real design system chose to read as success,
+   * warning and danger; the honest move is to leave them alone and say whose
+   * they are.
+   *
+   * The stack you are on answers first, then anyone. Tailwind and shadcn
+   * publish no green at all, and a system that arrives without a success colour
+   * because of that is a system with a hole in it — the checks under the wall
+   * are what say no variable in this stack reads it. */
+  const derived = []
+  const order = [...ids, ...Object.keys(kits).filter((id) => !ids.includes(id))]
+  for (const role of ['success', 'warning', 'danger']) {
+    const theirs = order.map((id) => seedFrom(role, kits, [id])).find(Boolean)
+    if (!theirs) continue
+    values[role] = theirs.value
+    derived.push({ role, from: theirs.from })
+  }
+  /* The focus ring is YOUR colour. A kit whose whole palette is grey publishes a
+     grey ring, which is a statement about its palette and not about focus — and
+     the one thing you did say is the one thing a ring should be made of. */
+  values.focus = b
+  derived.push({ role: 'focus', from: null })
+
+  return { values, short, fromKit, derived,
+    neutral: neutral ? { name: neutral.name, from: kits[neutral.kit].name } : null }
 }

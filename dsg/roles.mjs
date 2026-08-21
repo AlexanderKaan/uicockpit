@@ -468,7 +468,7 @@ function asOklch(value) {
  * value through it. Nothing here is a shade we invented — it is their shade
  * arithmetic, applied to your colour.
  */
-function relative(want, base, sibling) {
+export function relative(want, base, sibling) {
   const w = asOklch(want), b = asOklch(base), s = asOklch(sibling)
   if (!w || !b || !s) return null
   const dL = s[0] - b[0]

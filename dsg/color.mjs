@@ -93,11 +93,22 @@ const hslA = (h, s, l, a) => {
  * both: daisyUI writes oklch(76% 0.177 163) and shadcn writes
  * oklch(0.577 0.245 27.325). A regex that demanded the percent sign read every
  * shadcn colour as #000000 and said nothing about it. */
+/* `none` is a component, not a syntax error.
+ *
+ * CSS Color 4 lets any channel be the keyword `none`, and Tailwind uses it:
+ * --color-zinc-50 is `oklch(98.5% 0 none)`, a hueless near-white. The old
+ * pattern demanded three numbers, missed, and returned #000000 — so the
+ * lightest step of that ramp read as PURE BLACK, and every role taken from
+ * zinc came out one step off with nothing to say why. For conversion a missing
+ * component is zero, which is what the specification says and what a chroma of
+ * zero means anyway. */
 const oklchStrToHex = (str) => {
-  const m = String(str).match(/oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+)/i);
+  const num = "([\\d.]+|none)";
+  const m = String(str).match(new RegExp(`oklch\\(\\s*${num}(%?)\\s+${num}\\s+${num}`, "i"));
   if (!m) return "#000000";
-  const l = m[2] === "%" ? parseFloat(m[1]) / 100 : parseFloat(m[1]);
-  return oklchToHex(l, parseFloat(m[3]), parseFloat(m[4]));
+  const n = (v) => (v === "none" ? 0 : parseFloat(v));
+  const l = m[2] === "%" ? n(m[1]) / 100 : n(m[1]);
+  return oklchToHex(l, n(m[3]), n(m[4]));
 };
 const SCALE_L_LIGHT = [0.995, 0.98, 0.958, 0.937, 0.916, 0.892, 0.858, 0.8, 0.64, 0.605, 0.503, 0.16];
 const SCALE_L_DARK = [0.176, 0.213, 0.254, 0.285, 0.317, 0.355, 0.423, 0.536, 0.64, 0.693, 0.775, 0.945];
