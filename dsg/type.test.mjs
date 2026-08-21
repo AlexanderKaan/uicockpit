@@ -52,13 +52,14 @@ test('Bootstrap says its heading family is compiled, rather than writing a varia
 test('a face that must be fetched is named, with the line that fetches it', () => {
   const w = webfonts(V)
   assert.deepEqual(w.map((f) => f.family), ['Fraunces', 'Inter'])
-  /* in the file a MODEL reads, since that is where the instruction has to land */
-  const md = generate({ ...V, brand: '#0b6e8a', radius: '10px' }, ['tailwind'], kits)['AGENTS.md']
-  assert.match(md, /fonts\.googleapis\.com/, 'the rules name a webfont and never say where it comes from')
+  /* in DESIGN.md, since that is the file the tokens live in */
+  const md = generate({ ...V, brand: '#0b6e8a', radius: '10px' }, ['tailwind'], kits)['DESIGN.md']
+  assert.match(md, /fonts\.googleapis\.com/, 'the system names a webfont and never says where it comes from')
   assert.match(md, /Fraunces/)
   const f = generate({ ...V, brand: '#0b6e8a' }, ['tailwind'], kits)
-  assert.equal(f['CLAUDE.md'], f['AGENTS.md'], 'the three names must carry the SAME rules, or one of them is stale')
+  assert.equal(f['CLAUDE.md'], f['AGENTS.md'], 'the pointer must be identical under every name, or one goes stale')
   assert.equal(f['.cursor/rules'], f['AGENTS.md'])
+  assert.match(f['AGENTS.md'], /DESIGN\.md/, 'the pointer must point at the system')
   assert.match(f['tokens.json'], /"\$type": "color"/, 'tokens.json is not in the published token format')
 })
 

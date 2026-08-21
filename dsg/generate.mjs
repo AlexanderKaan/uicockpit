@@ -430,10 +430,31 @@ Then import \`theme.css\` after the kits, so your values win.
    * reads .cursor/rules, Claude Code reads CLAUDE.md, and AGENTS.md is the
    * convention the rest are converging on — same file, so none of them is
    * reading a stale copy of the other. */
-  const rules = agents(routed, kits, values, opts)
-  files['AGENTS.md'] = rules
-  files['CLAUDE.md'] = rules
-  files['.cursor/rules'] = rules
+  /* Three layers, which is the convention that settled in 2026: DESIGN.md holds
+   * the tokens and the reasoning, AGENTS.md tells the agent to go and read it,
+   * and the tool-specific files are the same pointer under the names Claude
+   * Code and Cursor look for. A pointer is short on purpose — a rules file that
+   * repeats the design system is a second copy that will go stale. */
+  files['DESIGN.md'] = designMd(routed, kits, values, opts)
+  const pointer = `# ${opts.name ?? 'This project'}
+
+Before writing or changing ANY user interface — a colour, a spacing, a
+component, a screen — read \`DESIGN.md\` in this directory and follow it.
+
+It carries the design system: the values, where each one comes from, what this
+stack cannot express, and the rules for working inside it. It is generated, so
+do not edit it by hand; change it where it was made and export again.
+
+Two things it will tell you that are easy to get wrong:
+
+- Never introduce a second UI library. This project is built on
+  ${routed.map((r) => kits[r.kit].name).join(' + ')}.
+- Never write a raw hex, radius or font size. Everything is a variable in
+  \`theme.css\`.
+`
+  files['AGENTS.md'] = pointer
+  files['CLAUDE.md'] = pointer
+  files['.cursor/rules'] = pointer
   files['tokens.json'] = tokensJson(values, routed, kits)
   /* per-kit blocks too: anything showing ONE kit must load only that kit's
      block, or the collision above happens inside your own preview */
@@ -575,88 +596,206 @@ a kit could not take a value, this file says so rather than the package pretendi
  * system is, in its own vocabulary, and the two or three things it must not do.
  */
 /**
- * THE FILE A MODEL READS.
+ * DESIGN.md, to Google Labs' published spec.
  *
- * Not documentation. This is handed to a coding agent as its rules, so it is
- * written the way rules are written: short, absolute, and specific about the
- * two things a model gets wrong on its own — reaching for a second UI library,
- * and inventing a colour when it cannot find one.
+ * The format is not ours to design. Google Labs specced it in April 2026 with a
+ * fixed section order, a YAML front matter schema and a linter, and at least
+ * three generators already emit it. So we conform, for the same reason we read
+ * a kit's defaults instead of typing them: a shape someone else publishes and
+ * validates is worth more than a shape of our own.
  *
- * Everything in it is computed. The contrast warning is the real audit, the
- * parts list is the real vocabulary, and "not in this stack" is what the kits
- * genuinely do not ship.
+ * What we bring to it is what nobody else can fill honestly. Their `components`
+ * block is handwork for every other tool — you type that a button's background
+ * is {colors.primary} — because they have no kit. We routed those values into
+ * the kit ourselves, so we already know. And their `omitted` field, which
+ * exists to record sections you left out ON PURPOSE, is exactly the place for
+ * what a stack cannot express.
+ *
+ * SECTION ORDER IS PART OF THE SPEC and duplicate headings are an error, so the
+ * order below is the order there: Overview, Colors, Typography, Layout,
+ * Elevation & Depth, Shapes, Components, Do's and Don'ts.
  */
-function agents(routed, kits, values, { name = 'this project', parts = [] } = {}) {
-  const set = ROLES.filter((r) => values[r.id] != null)
-  const colours = set.filter((r) => KIND[r.id] === 'colour')
-  /* the families are said once, in their own line — not again as a "size" */
-  const sizes = set.filter((r) => KIND[r.id] !== 'colour' && KIND[r.id] !== 'font')
-  const label = (r) => r.label.toLowerCase()
 
-  const pair = (a, b) => `${(label(a) + ' ' + values[a.id]).padEnd(26)}${b ? label(b) + ' ' + values[b.id] : ''}`.trimEnd()
-  const rows = []
-  for (let i = 0; i < colours.length; i += 2) rows.push(pair(colours[i], colours[i + 1]))
+/* our role names → the names the spec recommends */
+const SPEC_COLOR = {
+  brand: 'primary', onBrand: 'on-primary', page: 'surface', surface: 'surface-container',
+  ink: 'on-surface', inkMuted: 'on-surface-variant', line: 'outline',
+  success: 'success', warning: 'warning', danger: 'error', focus: 'focus',
+}
 
-  /* the audit, said as an instruction rather than as a number */
-  /* The advice has to fit the pair. "Never use it for text" is exactly wrong
-   * for on-brand, which IS the text — a warning that tells a model the opposite
-   * of what to do is worse than no warning. */
-  const warnings = auditContrast(values).filter((p) => !p.passes).map((p) => {
-    const fg = ROLES.find((r) => r.id === p.fg)?.label ?? p.fg
-    const bg = ROLES.find((r) => r.id === p.bg)?.label.toLowerCase() ?? p.bg
-    const head = `${fg} is ${p.ratio}:1 against ${bg}, under the ${p.min}:1 it needs.`
-    if (p.min >= 4.5) {
-      return `${head} That pairing fails for body text — either darken one of them, or use it only at 24px or 19px bold, where 3:1 is the bar.`
-    }
-    return `${head} Use it for fills and decoration, but never as the only thing marking a control apart from its background.`
-  })
+const yamlStr = (v) => `"${String(v).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
 
+function designMd(routed, kits, values, { name = 'Design system', parts = [], overview = '' } = {}) {
+  const has = (r) => values[r] != null && values[r] !== ''
   const stack = routed.map((r) => {
     const k = kits[r.kit]
     const role = k.layer === 'tokens' ? 'variables only' : k.standalone || k.layer === 'utility' ? 'base' : 'components'
     return `${k.name}${k.version ? ` ${k.version}` : ''} (${role})`
   }).join(' + ')
+  const seen = routed.at(-1)
+  const seenKit = kits[seen?.kit]
 
-  const gaps = routed.flatMap((r) => (COMPONENT_GAPS[r.kit] ?? [])
-    .map(([part, why]) => `- **${part}** — ${why}. Compose it from the parts and variables above; do not add a dependency for it.`))
+  /* ── front matter ─────────────────────────────────────────────────────── */
+  const colors = ROLES.filter((r) => KIND[r.id] === 'colour' && has(r.id))
+    .map((r) => `  ${SPEC_COLOR[r.id] ?? r.id}: ${yamlStr(values[r.id])}`)
 
-  return `# Design system: ${name}
+  /* Only fields the user actually set. A Typography object with an invented
+   * heading size would be the one thing this whole project refuses to do. */
+  const typeBlock = (label, family, weight) => {
+    const lines = []
+    if (family) lines.push(`    fontFamily: ${yamlStr(family)}`)
+    if (label === 'body-md' && has('baseText')) lines.push(`    fontSize: ${yamlStr(values.baseText)}`)
+    if (weight) lines.push(`    fontWeight: ${weight}`)
+    if (has('lineHeight')) lines.push(`    lineHeight: ${values.lineHeight}`)
+    if (has('letterSpacing')) lines.push(`    letterSpacing: ${yamlStr(values.letterSpacing)}`)
+    return lines.length ? [`  ${label}:`, ...lines] : []
+  }
+  const typography = [
+    ...typeBlock('headline-lg', values.fontHeading, has('fontWeight') ? values.fontWeight : null),
+    ...typeBlock('body-md', values.fontBody ?? values.fontHeading, null),
+  ]
 
-Stack: ${stack}.
+  const rounded = has('radius') ? [`  md: ${yamlStr(values.radius)}`] : []
+  /* the step every spacing utility in this stack is a multiple of, if the kit
+     let us write one */
+  /* across the whole stack: it is Tailwind that carries the step, and shadcn —
+     the layer you are looking at — inherits it. */
+  const spaceVar = routed.flatMap((r) => Object.entries(r.vars))
+    .find(([n]) => /^--spacing$|spacing-md$|^--size-3$/.test(n))
+  const spacing = spaceVar ? [`  base: ${yamlStr(spaceVar[1])}`] : []
 
-Never introduce another UI library. Never write a raw hex, a raw radius or a
-raw font size — every one of them is a variable in \`theme.css\`, written in the
-vocabulary of the kit you are rendering with.
+  /* The block that is handwork everywhere else. These are the roles the kit's
+     own components read — which is what routing them MEANS. */
+  const components = has('brand') ? [
+    '  button-primary:',
+    '    backgroundColor: "{colors.primary}"',
+    ...(has('onBrand') ? ['    textColor: "{colors.on-primary}"'] : []),
+    ...(rounded.length ? ['    rounded: "{rounded.md}"'] : []),
+    ...(has('surface') ? [
+      '  card:', '    backgroundColor: "{colors.surface-container}"',
+      ...(has('ink') ? ['    textColor: "{colors.on-surface}"'] : []),
+      ...(rounded.length ? ['    rounded: "{rounded.md}"'] : []),
+    ] : []),
+    ...(has('line') ? [
+      '  input:',
+      ...(has('surface') ? ['    backgroundColor: "{colors.surface-container}"'] : []),
+      ...(has('ink') ? ['    textColor: "{colors.on-surface}"'] : []),
+      ...(rounded.length ? ['    rounded: "{rounded.md}"'] : []),
+    ] : []),
+  ] : []
 
-## Colour roles
+  /* omitted: the spec's own field for sections left out on purpose, which is
+     the honest half of this tool given a standard place to live. */
+  const omitted = []
+  if (!typography.length) omitted.push(['typography', 'no family was chosen'])
+  if (!rounded.length) omitted.push(['rounded', 'no radius was set'])
+  if (!spacing.length) {
+    const why = routed.map((r) => (coverage(r.kit).missing.includes('space') ? kits[r.kit].name : null)).filter(Boolean)
+    omitted.push(['spacing', why.length ? `${why.join(' and ')} publishes no spacing scale` : 'this stack scales its own step rather than naming one'])
+  }
+  if (!components.length) omitted.push(['components', 'no brand colour was set, so no component could be described'])
 
-\`\`\`
-${rows.join('\n')}
-\`\`\`
+  const front = [
+    'version: alpha',
+    `name: ${yamlStr(name)}`,
+    `description: ${yamlStr(stack)}`,
+    ...(omitted.length ? ['omitted:', ...omitted.map(([sec, why]) => `  - section: ${sec}\n    reason: ${yamlStr(why)}`)] : []),
+    ...(colors.length ? ['colors:', ...colors] : []),
+    ...(typography.length ? ['typography:', ...typography] : []),
+    ...(rounded.length ? ['rounded:', ...rounded] : []),
+    ...(spacing.length ? ['spacing:', ...spacing] : []),
+    ...(components.length ? ['components:', ...components] : []),
+  ].join('\n')
+
+  /* ── the prose ────────────────────────────────────────────────────────── */
+  const bad = auditContrast(values).filter((p) => !p.passes)
+  const warnings = bad.map((p) => {
+    const fg = ROLES.find((r) => r.id === p.fg)?.label ?? p.fg
+    const bg = ROLES.find((r) => r.id === p.bg)?.label.toLowerCase() ?? p.bg
+    const head = `${fg} is ${p.ratio}:1 against ${bg}, under the ${p.min}:1 it needs.`
+    return p.min >= 4.5
+      ? `${head} That pairing fails for body text — darken one of them, or use it only at 24px, or 19px bold, where 3:1 is the bar.`
+      : `${head} Use it for fills and decoration, never as the only thing marking a control apart from its background.`
+  })
+
+  const gaps = routed.flatMap((r) => (COMPONENT_GAPS[r.kit] ?? []).map(([part, why]) => [kits[r.kit].name, part, why]))
+  const webs = webfonts(values)
+
+  /* Elevation is not a mood here, it is a measurement: whether the stack
+   * publishes a shadow scale at all, and where the knob sits. */
+  const lifts = routed.some((r) => !coverage(r.kit).missing.includes('elevation'))
+  const strength = parseFloat(values.elevation ?? '1')
+  const depth = !lifts
+    ? `Nothing in this stack publishes a shadow scale, so depth here is a border and a change of surface — never a drop shadow.`
+    : strength <= 0.05
+      ? `Shadows are turned off. Depth comes from the border and from the step between the page and a surface.`
+      : `Depth comes from ${seenKit?.name ?? 'the kit'}'s own shadow scale at ${Math.round(strength * 100)}% of its published strength, together with a ${values.borderWidth ?? '1px'} border. Use both; do not invent a third.`
+
+  return `---
+${front}
+---
+
+# ${name}
+
+## Overview
+
+${overview.trim() || `No brand description was written. This system is defined by its values, not by a
+mood — ${stack} with the colours, type and shape below.`}
+
+## Colors
+
+Every colour here is written into a variable ${stack.includes('+') ? 'those kits publish' : 'that kit publishes'};
+none of them is a name invented for this file.
 ${warnings.length ? `\n${warnings.join('\n')}\n` : ''}
-## Shape and size
+## Typography
 
-${sizes.map((r) => `${label(r)} ${KIND[r.id] === 'ratio' ? `×${values[r.id]}` : values[r.id]}`).join(' · ')}
-${values.fontHeading ? `\nHeadings: ${values.fontHeading}.\nBody: ${values.fontBody ?? values.fontHeading}.\n` : ''}
-## The parts you have
-
-${parts.length ? `${parts.join(', ')} — ${parts.length} in all.` : 'See the scenes in this package.'}
-Use these. Do not write a new button, card or input: one already exists.
-${gaps.length ? `\n## Not in this stack\n\n${gaps.join('\n')}\n` : ''}
-${(() => { const w = webfonts(values); return w.length ? `## The type has to be fetched
-
-${w.map((f) => `**${f.family}**`).join(' and ')} ${w.length > 1 ? 'are faces' : 'is a face'} that must be
-downloaded. Put this in the document head, or every measurement above is off:
+${values.fontHeading ? `Headings are set in ${values.fontHeading}.\nBody text is set in ${values.fontBody ?? values.fontHeading}.` : 'No family was chosen; the kit\'s own stack is in use.'}
+${webs.length ? `\n${webs.map((f) => `**${f.family}**`).join(' and ')} must be fetched. Put this in the document head,
+or every measurement in this file is off:
 
 \`\`\`html
-${fontLink(w.map((f) => f.family))}
+${fontLink(webs.map((f) => f.family))}
 \`\`\`
+` : ''}
+## Layout
 
-` : '' })()}## Where these values came from
+${spacing.length
+  ? `Every gap, padding and margin in this stack is a multiple of \`spacing.base\`. Use the
+kit's own spacing utilities rather than a pixel value.`
+  : `This stack names no spacing scale. Use the kit's own spacing utilities and keep them
+consistent; do not introduce a scale of your own.`}
 
-Every variable in \`theme.css\` belongs to the kit that publishes it; none was
-invented here. \`MANIFEST.md\` lists what could not be set and why. If you need
-something this system cannot express, say so rather than inventing it.
+## Elevation & Depth
+
+${depth}
+
+## Shapes
+
+${has('radius')
+  ? `One radius, \`rounded.md\` at ${values.radius}. The kit scales its own smaller and larger
+corners from it, so use its named radii rather than a literal.`
+  : 'No radius was set; the kit\'s own corners are in use.'}
+
+## Components
+
+The components come from ${stack}. Use them. Do not write a new button, card or
+input: one already exists, and the values above are what it reads.
+${parts.length ? `\nThe wall this system was checked against covers: ${parts.join(', ')}.` : ''}
+${gaps.length ? `\n${gaps.map(([, part, why]) => `- **${part}** — ${why}.`).join('\n')}` : ''}
+
+## Do's and Don'ts
+
+- **Never write a raw hex, radius or font size.** Every one of them is a variable
+  in \`theme.css\`, in the vocabulary of the kit you are rendering with.
+- **Never add a second UI library.** If something is missing, compose it from the
+  components above and the values in this file.
+${warnings.map((w) => `- ${w}`).join('\n')}
+${gaps.map(([kit, part]) => `- **Do not install a dependency for a ${part}.** ${kit} ships none on purpose; build it from the parts above.`).join('\n')}
+- **This project may already contain colours, radii and font sizes that are not in
+  this file.** Replace them with the nearest role here. Do not keep a value because
+  it is already in the code.
+- **If this system cannot express something you need, say so** rather than inventing
+  it. \`MANIFEST.md\` lists what could not be set and why.
 `
 }
 

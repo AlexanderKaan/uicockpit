@@ -187,6 +187,17 @@ dialog::backdrop{background:#1c1b1966}
                     border:var(--bw) solid transparent;border-radius:var(--r-sm);background:0;padding:3px 6px;min-width:150px}
 .drawer__name input:hover{border-color:var(--line)}
 .drawer__name input:focus{border-color:var(--brand);outline:0}
+/* The one thing in the whole export we cannot derive: what it should FEEL
+ * like. So it is asked for once, here, where you are already deciding what to
+ * hand over — and left out of the file with a reason if you skip it. */
+.drawer__over{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;max-width:420px}
+.drawer__over .eyebrow{display:flex;gap:6px;align-items:baseline}
+.drawer__over em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:400;opacity:.7}
+.drawer__over input{font:inherit;font-size:var(--fs-md);color:var(--ink);border:var(--bw) solid transparent;
+                    border-radius:var(--r-sm);background:0;padding:3px 6px;width:100%}
+.drawer__over input:hover{border-color:var(--line)}
+.drawer__over input:focus{border-color:var(--brand);outline:0}
+.drawer__over input::placeholder{color:var(--muted)}
 .drawer__sum{margin:0;font-size:var(--fs-sm);color:var(--muted)}
 .drawer__top .btn{margin-left:auto}
 .drawer__cols{display:grid;grid-template-columns:1.35fr .95fr;gap:14px;padding:12px 14px 14px;overflow:hidden;min-height:0}
@@ -927,7 +938,7 @@ function receipt(routed) {
 
 /* ── the two outputs ──────────────────────────────────────────────────────── */
 const files = () => generate(state.values, ORDER.filter((k) => state.on.has(k)), KITS,
-  { name: kitName() || 'design-system', parts: PARTS })
+  { name: kitName() || 'design-system', parts: PARTS, overview: ($('#kitover')?.value ?? '').trim() })
 const grab = (name, body, type = 'text/plain') => {
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([body], { type }))
@@ -959,7 +970,7 @@ const DESTS = [
   { t: 'Everything', d: 'one .zip — theme, install, manifest, agent brief', go: (f) =>
       grab(`${kitName() || 'design-system'}.zip`, zip(plain(f)), 'application/zip') },
   { t: 'Just the theme', d: 'theme.css, to drop in next to your kits', go: (f) => grab('theme.css', f['theme.css']) },
-  { t: 'Just the rules', d: 'AGENTS.md — the same file CLAUDE.md and .cursor/rules get', go: (f) => grab('AGENTS.md', f['AGENTS.md']) },
+  { t: 'Just the system', d: 'DESIGN.md — the tokens, the reasoning and the rules, to Google\'s spec', go: (f) => grab('DESIGN.md', f['DESIGN.md']) },
   { t: 'The manifest', d: 'versions, licences, and what could not be done', go: (f) => grab('MANIFEST.md', f['MANIFEST.md']) },
   { t: 'These screens, as one HTML file', wide: true,
     d: 'exactly what you are looking at — the kit\'s CSS, your values, its classes. Open it in a browser.',
@@ -1005,8 +1016,8 @@ function openSheet() {
 
 /* One set of rules under the three names different tools look for, so the
  * tab strip is a tab strip and not four different documents. */
-const FILES = ['AGENTS.md', 'CLAUDE.md', '.cursor/rules', 'tokens.json', 'theme.css', 'install.md', 'MANIFEST.md']
-let fileAt = 'AGENTS.md'
+const FILES = ['DESIGN.md', 'AGENTS.md', '.cursor/rules', 'tokens.json', 'theme.css', 'install.md', 'MANIFEST.md']
+let fileAt = 'DESIGN.md'
 function drawFiles(shown) {
   const have = FILES.filter((n) => shown[n] != null)
   if (!have.includes(fileAt)) fileAt = have[0]
@@ -1031,6 +1042,7 @@ $('#fcopy').addEventListener('click', async () => {
   setTimeout(() => ($('#fcopy').textContent = 'Copy'), 1400)
 })
 $('#kitname').addEventListener('input', () => drawFiles(plain(files())))
+$('#kitover').addEventListener('input', () => drawFiles(plain(files())))
 $('#dests').addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b) return
   DESTS[Number(b.dataset.d)].go(files())
