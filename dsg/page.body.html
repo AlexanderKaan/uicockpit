@@ -2,15 +2,6 @@
 <aside class="rail">
   <a class="mark" href="/" title="UIcockpit — home"><!--MARK--> Design System Generator</a>
 
-  <label class="brief">
-    <!--I:sparkles-->
-    <input id="brief" placeholder="Describe it — “calm, readable”" autocomplete="off">
-  </label>
-  <div class="rail__acts">
-    <span class="chips" id="chips"></span>
-    <button class="btn" id="shuffle"><!--I:shuffle-->Shuffle <kbd>S</kbd></button>
-  </div>
-
   <section class="grp grp--flat">
     <p class="grp__head"><span class="grp__name">Stack</span>
       <button class="link" id="change">Change</button></p>
@@ -20,6 +11,7 @@
 
   <details class="grp" open>
     <summary><span class="grp__name">Colour</span><span class="grp__sum grp__dots" id="sum_colour"></span></summary>
+    <button class="mini" id="shuffle" title="Shuffle the colour"><!--I:shuffle-->Shuffle the colour <kbd>S</kbd></button>
     <p class="sub" id="palnote"></p>
     <div class="pals" id="palettes"></div>
     <div class="swatches" id="swatches"></div>
@@ -34,6 +26,7 @@
 
   <details class="grp" open>
     <summary><span class="grp__name">Shape &amp; space</span><span class="grp__sum" id="sum_shape"></span></summary>
+    <div class="chips" id="chips"></div>
     <div class="knobs" id="knobs"></div>
   </details>
 </aside>

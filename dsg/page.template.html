@@ -42,7 +42,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .rail__acts{display:flex;align-items:center;gap:6px}
 /* one scrolling row, not three wrapped ones: in a 322px rail the brief presets
    pushed Shape & space below the fold on a laptop screen */
-.chips{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:none}
 .chip,.btn{font:inherit;font-size:12.5px;font-weight:500;min-height:34px;padding:0 11px;border-radius:var(--r);
@@ -273,15 +273,18 @@ const store = (k, n) => `${Number((Number(n) / k.factor).toFixed(4))}${k.unit}`
 const shown = (k, v) => (k.pct ? `${Math.round(parseFloat(v) * 100)}%` : String(v))
 const slider = (k, v) => Math.round(parseFloat(v) * k.factor)
 
-/* A brief is not a prompt: these words map to numbers a standard already names,
-   and the page SHOWS what they moved. No model, nothing to explain away. */
-const BRIEFS = [
-  { match: /older|elderly|accessib|readab|low vision/i, label: 'Readable',
-    values: { baseText: '18px', radius: '8px', space: '1.15' }, why: 'larger body text, calmer corners, more room' },
-  { match: /round|soft|friendly|playful/i, label: 'Rounder', values: { radius: '18px' }, why: 'more rounded corners' },
-  { match: /sharp|serious|bank|legal|formal/i, label: 'Sharper', values: { radius: '2px' }, why: 'almost square corners' },
-  { match: /dense|compact|data|dashboard/i, label: 'Denser', values: { baseText: '14px', radius: '6px', space: '0.85' }, why: 'smaller text, tighter corners, less room' },
-  { match: /roomy|airy|spacious|calm|breath/i, label: 'Roomier', values: { space: '1.3' }, why: 'more room between everything' },
+/* Presets, not a prompt.
+ *
+ * These were a text field you described your kit to, and five words it knew.
+ * That made them look like autocomplete for a thing that only ever set four
+ * numbers — so the field is gone and they are what they always were: buttons
+ * that move the sliders below them, where you can still see what moved. */
+const PRESETS = [
+  { label: 'Readable', values: { baseText: '18px', radius: '8px', space: '1.15', lineHeight: '1.65' }, why: 'larger body text, calmer corners, more room, more air between lines' },
+  { label: 'Rounder', values: { radius: '18px' }, why: 'more rounded corners' },
+  { label: 'Sharper', values: { radius: '2px' }, why: 'almost square corners' },
+  { label: 'Denser', values: { baseText: '14px', radius: '6px', space: '0.85', lineHeight: '1.4' }, why: 'smaller text, tighter corners, less room' },
+  { label: 'Roomier', values: { space: '1.3' }, why: 'more room between everything' },
 ]
 
 const state = {
@@ -756,22 +759,14 @@ for (const host of ['#knobs', '#typeknobs']) {
   })
 }
 
-$('#chips').innerHTML = BRIEFS.map((b) => `<button class="chip" data-b="${b.label}" aria-pressed="false">${b.label}</button>`).join('')
-const applyBrief = (b) => {
-  Object.assign(state.values, b.values)
-  sync(); paint()
-  note(`<b>${b.label}</b> — ${b.why}. Every value it moved is a knob you can still turn.`)
-}
+$('#chips').innerHTML = PRESETS.map((b) => `<button class="chip" data-b="${b.label}" aria-pressed="false">${b.label}</button>`).join('')
 $('#chips').addEventListener('click', (e) => {
   const btn = e.target.closest('button'); if (!btn) return
-  const b = BRIEFS.find((x) => x.label === btn.dataset.b)
+  const b = PRESETS.find((x) => x.label === btn.dataset.b); if (!b) return
   ;[...$('#chips').children].forEach((c) => c.setAttribute('aria-pressed', c === btn))
-  applyBrief(b)
-})
-$('#brief').addEventListener('change', (e) => {
-  const hit = BRIEFS.find((b) => b.match.test(e.target.value))
-  if (hit) applyBrief(hit)
-  else if (e.target.value.trim()) note('Nothing in that matched a setting yet — the words it knows are on the chips.')
+  Object.assign(state.values, b.values)
+  sync(); paint()
+  note(`<b>${b.label}</b> — ${b.why}. Every value it moved is a slider you can still turn.`)
 })
 
 $('#shuffle').addEventListener('click', shuffle)
