@@ -155,7 +155,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .cp__hue:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .cp__row{display:flex;align-items:center;gap:7px}
 .cp__well{flex:none;width:26px;height:26px;border-radius:var(--r-sm);border:var(--bw) solid var(--line)}
-.cp__hex{width:8ch;font:inherit;font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-md);
+.cp__hex{width:9.5ch;font:inherit;font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-md);
   min-height:26px;padding:0 7px;color:var(--ink);border:var(--bw) solid var(--line);
   border-radius:var(--r-sm);background:var(--panel)}
 .cp__hex:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
@@ -202,8 +202,10 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .rp__from{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap}
 .rp em{font-style:normal;font-size:11px;color:var(--muted);font-family:ui-monospace,monospace}
 .rp em[data-bad]{color:#8e2c21;font-weight:600}
-.rp__none{font-size:var(--fs-md);color:var(--muted);padding:6px 2px}
-.rp__free{margin-top:2px}
+.rp__none{margin:0;font-size:var(--fs-md);line-height:1.5;color:var(--muted);padding:2px 2px 0}
+.rp--free{margin-top:4px;border-top:var(--bw) solid var(--line);border-radius:0 0 var(--r-sm) var(--r-sm);padding-top:7px;min-height:36px}
+.rp__any{background:conic-gradient(oklch(.7 .16 0),oklch(.7 .16 60),oklch(.7 .16 120),
+  oklch(.7 .16 180),oklch(.7 .16 240),oklch(.7 .16 300),oklch(.7 .16 360))}
 
 .typo{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}
 .font{font:inherit;text-align:left;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r);
@@ -917,7 +919,7 @@ const HEX6 = /^#[0-9a-f]{6}$/i
  * per repaint; at 120x75 it is 9,000, and the gradient is smooth either way
  * because a gradient is what it is. It redraws only when the HUE changes — the
  * marker is an element over the canvas, not a pixel in it. */
-const CP = { L: 0.5, C: 0.1, H: 200, max: 0.3, apply: null }
+const CP = { L: 0.5, C: 0.1, H: 200, apply: null }
 const PW = 120, PH = 75
 const cpOff = document.createElement('canvas')
 cpOff.width = PW; cpOff.height = PH
@@ -925,19 +927,23 @@ const cpOffCtx = cpOff.getContext('2d')
 const cpCtx = $('#cpplane').getContext('2d')
 
 function cpPlane() {
-  /* the most chroma this hue can reach, so the slice fills the box whatever hue
-     it is — cyan tops out at a third of what magenta does, and a fixed axis
-     would leave two thirds of the box empty for half the wheel */
-  CP.max = Math.max(0.06, peakChroma(CP.H).c)
+  /* EVERY ROW GETS ITS OWN EDGE.
+   *
+   * The first version put one chroma axis across the whole slice, at the most
+   * the hue can reach anywhere. The gamut is a wedge, not a rectangle — hue 200
+   * reaches 0.14 near white and 0.03 near black — so two thirds of the box was
+   * a colour no screen can show, and it read as a broken control rather than as
+   * a fact about sRGB. Now the axis means "as far as this lightness can go",
+   * every pixel in the box is a colour you can have, and the fine print says so.
+   */
   const img = cpOffCtx.createImageData(PW, PH)
   const d = img.data
   for (let y = 0; y < PH; y++) {
     const L = 1 - y / (PH - 1)
+    const edge = maxChroma(L, CP.H)
     for (let x = 0; x < PW; x++) {
-      const C = (x / (PW - 1)) * CP.max
+      const h = oklchToHex(L, (x / (PW - 1)) * edge, CP.H)
       const i = (y * PW + x) * 4
-      if (!inSrgb(L, C, CP.H)) { d[i + 3] = 0; continue }
-      const h = oklchToHex(L, C, CP.H)
       d[i] = parseInt(h.slice(1, 3), 16)
       d[i + 1] = parseInt(h.slice(3, 5), 16)
       d[i + 2] = parseInt(h.slice(5, 7), 16)
@@ -954,8 +960,10 @@ function cpPlane() {
 const cpHex = () => oklchToHex(CP.L, CP.C, CP.H)
 
 function cpShow() {
+  const edge = Math.max(1e-4, maxChroma(CP.L, CP.H))
+  CP.C = Math.min(CP.C, edge)
   const hex = cpHex()
-  $('#cpdot').style.left = `${(CP.C / CP.max) * 100}%`
+  $('#cpdot').style.left = `${(CP.C / edge) * 100}%`
   $('#cpdot').style.top = `${(1 - CP.L) * 100}%`
   $('#cpwell').style.background = hex
   if (document.activeElement !== $('#cphex')) $('#cphex').value = hex
@@ -988,17 +996,18 @@ function cpOpen(hex, title, sum, apply) {
 $('#cpx').addEventListener('click', () => $('#cpick').close())
 $('#cpick').addEventListener('click', (e) => { if (e.target.id === 'cpick') $('#cpick').close() })
 $('#cphue').addEventListener('input', (e) => {
+  /* what one lightness can hold changes with the hue, so a chroma that fitted
+     at 320 may not fit at 200 — cpShow clamps it rather than letting oklchToHex
+     clip it, because clipping turns a colour instead of dimming it */
   CP.H = Number(e.target.value)
-  /* the reachable chroma changes with the hue, so a value that fitted at 300
-     may not fit at 200 — clamped rather than clipped, which is the whole point */
-  cpPlane(); CP.C = Math.min(CP.C, CP.max); cpShow()
+  cpPlane(); cpShow()
 })
 
 let cpDrag = false
 const cpAt = (e) => {
   const r = $('#cpplane').getBoundingClientRect()
-  CP.C = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * CP.max
   CP.L = 1 - Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))
+  CP.C = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * maxChroma(CP.L, CP.H)
   cpShow()
 }
 $('#cpfield').addEventListener('pointerdown', (e) => { cpDrag = true; $('#cpfield').setPointerCapture(e.pointerId); cpAt(e) })
@@ -1011,8 +1020,12 @@ $('#cpfield').addEventListener('keydown', (e) => {
   const move = { ArrowUp: [step, 0], ArrowDown: [-step, 0], ArrowRight: [0, step / 3], ArrowLeft: [0, -step / 3] }[e.key]
   if (!move) return
   e.preventDefault()
+  /* the arrows move the FRACTION, so a step sideways is the same size wherever
+     you are — which is the whole reason for a per-row edge */
+  const was = maxChroma(CP.L, CP.H)
+  const t = was > 1e-4 ? CP.C / was : 0
   CP.L = Math.max(0, Math.min(1, CP.L + move[0]))
-  CP.C = Math.max(0, Math.min(CP.max, CP.C + move[1]))
+  CP.C = Math.max(0, Math.min(1, t + move[1] * 3)) * maxChroma(CP.L, CP.H)
   cpShow()
 })
 $('#cphex').addEventListener('input', (e) => {
@@ -1116,6 +1129,15 @@ function roleOptions(role) {
   const out = []
   const push = (hex, label, from) => { if (hex && !out.some((o) => o.hex.toLowerCase() === hex.toLowerCase())) out.push({ hex, label, from }) }
 
+  /* WHAT THE KITS YOU HAVE ON SET THIS TO, whatever the role is.
+   *
+   * Material publishes no colour families at all — its colours are semantic
+   * roles, not ramps — so on that stack the Brand menu offered nothing but the
+   * colour already in it and a link to a colour wheel. Asking the routing table
+   * what each kit calls this role, and what it set it to, is an answer every
+   * kit can give. */
+  for (const id of st.order) { const s = seedFrom(role, KITS, [id]); if (s) push(s.value, s.variable, s.from) }
+
   if (role === 'brand' || role === 'focus') {
     /* the solid of every family they publish — the step a button wears */
     for (const f of all.filter((x) => x.kind === 'accent')) {
@@ -1124,11 +1146,10 @@ function roleOptions(role) {
   } else if (role === 'onBrand') {
     push('#ffffff', 'white', null)
     push('#000000', 'black', null)
-    for (const id of st.order) { const s = seedFrom('onBrand', KITS, [id]); if (s) push(s.value, s.variable, s.from) }
   } else if (role === 'success' || role === 'warning' || role === 'danger') {
-    /* everyone's, not only the stack's: these are roles a kit may have no
-       variable for and you still have to set — the checks say which */
-    for (const id of [...st.order, ...Object.keys(KITS).filter((k) => !st.order.includes(k))]) {
+    /* and everyone else's, not only the stack's: these are roles a kit may have
+       no variable for and you still have to set — the Checks bar says which */
+    for (const id of Object.keys(KITS).filter((k) => !st.order.includes(k))) {
       const s = seedFrom(role, KITS, [id]); if (s) push(s.value, s.variable, s.from)
     }
   } else {
@@ -1140,6 +1161,16 @@ function roleOptions(role) {
     if (grey) grey.ramp.forEach((hex, i) => push(hex, `${grey.name}-${grey.at[i]}`, grey.from))
   }
   return out
+}
+
+/* Why a role has no scale to offer — the same three answers the Checks bar
+ * gives, read out of the same routing table. */
+function roleWhy(role) {
+  const derives = lastRouted.filter((r) => (r.derived ?? []).some((d) => d.role === role))
+  const chosen = lastRouted.filter((r) => (r.chosen ?? []).some((c) => c.role === role))
+  if (derives.length) return `${KITS[derives[0].kit].name} computes this one from your brand, so it publishes no scale for it. Whatever you set still goes into the download.`
+  if (chosen.length) return `${KITS[chosen[0].kit].name} takes a named setting here rather than a value, and picks the nearest one to what you set.`
+  return 'Nothing in this stack publishes a scale for this role. Whatever you set still goes into the download, and the Checks bar says which kit will read it.'
 }
 
 let rpRole = null
@@ -1157,7 +1188,7 @@ function openRole(role) {
      leave and come back to. */
   const here = state.values[role]
   if (here && !opts.some((o) => o.hex.toLowerCase() === here.toLowerCase())) {
-    opts.unshift({ hex: here, label: here, from: 'set here' })
+    opts.unshift({ hex: here, label: here, from: 'what it is now' })
   }
   $('#rplist').innerHTML = opts.map((o) => {
     const r = bg ? contrast(role === 'onBrand' ? o.hex : o.hex, bg) : null
@@ -1167,7 +1198,12 @@ function openRole(role) {
       <span class="rp__name">${o.label}</span>
       <span class="rp__from">${o.from ?? ''}</span>
       ${r != null ? `<em${bad ? ' data-bad' : ''}>${r.toFixed(2)}:1</em>` : '<em></em>'}</button></li>`
-  }).join('') || '<li class="rp__none">This stack publishes nothing for this role — set it by hand.</li>'
+  }).join('')
+  /* a menu with nothing in it but the colour already there should say WHY, not
+     shrug and point at a colour wheel. The reason is in the routing table. */
+  const bare = opts.filter((o) => o.from !== 'what it is now').length === 0
+  $('#rpnone').hidden = !bare
+  if (bare) $('#rpnone').textContent = roleWhy(role)
   $('#rolepick').showModal()
 }
 $('#rplist').addEventListener('click', (e) => {

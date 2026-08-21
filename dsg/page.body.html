@@ -100,7 +100,10 @@
     <button class="sheet__x" id="rpx" aria-label="Close"><!--I:x--></button>
   </header>
   <ul class="rp__list" id="rplist"></ul>
-  <button class="mini rp__free" id="rpfree">Any colour at all…</button>
+  <p class="rp__none" id="rpnone" hidden></p>
+  <button class="rp rp--free" id="rpfree">
+    <i class="rp__any"></i><span class="rp__name">Mix your own…</span>
+    <span class="rp__from">an OKLCH slice</span><em></em></button>
 </div></dialog>
 
 <dialog id="cpick"><div class="cp">
@@ -120,9 +123,9 @@
     <span class="cp__called" id="cpcalled"></span>
   </div>
   <ul class="cp__pairs" id="cppairs"></ul>
-  <p class="cp__fine">Lightness up, chroma right, in OKLCH — so a step is the same size
-    wherever you are on the wheel. Outside the shape is a colour sRGB cannot show, and clipping one
-    does not dim it, it turns it.</p>
+  <p class="cp__fine">Lightness up, chroma right, in OKLCH — so a step is the same size wherever you
+    are on the wheel. The right edge is as far as <em>that</em> lightness can go in sRGB, which is
+    further near white than it is near black.</p>
 </div></dialog>
 
 <dialog id="fontpick"><div class="pick">

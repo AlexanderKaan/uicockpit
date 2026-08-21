@@ -89,6 +89,23 @@ function oklchToLinear(L, C, H) {
 function inSrgb(L, C, H) {
   return oklchToLinear(L, C, H).every((v) => v >= -1e-4 && v <= 1.0001);
 }
+/**
+ * The most chroma this hue can reach AT THIS LIGHTNESS.
+ *
+ * The gamut is a wedge, not a rectangle: hue 200 tops out at 0.15 near white
+ * and at a third of that in the middle. A picker with one chroma axis for the
+ * whole slice therefore leaves most of its box unreachable, which reads as a
+ * broken control rather than as a fact about sRGB. So each row gets its own
+ * edge, and the axis means "as far as this lightness can go".
+ */
+function maxChroma(L, H) {
+  let lo = 0, hi = 0.45;
+  for (let k = 0; k < 18; k++) {
+    const mid = (lo + hi) / 2;
+    if (inSrgb(L, mid, H)) lo = mid; else hi = mid;
+  }
+  return lo;
+}
 /** The most chroma this hue can reach in sRGB, and the lightness where it does. */
 function peakChroma(H, steps = 48) {
   let best = { c: 0, l: 0.5 };
@@ -313,6 +330,7 @@ export {
   okNeutralScale,
   oklch,
   inSrgb,
+  maxChroma,
   oklchStrToHex,
   oklchToHex,
   peakChroma,
