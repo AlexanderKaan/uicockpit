@@ -38,6 +38,10 @@ export const ROLES = [
   { id: 'fontBody',    label: 'Body',     kind: 'font', what: 'the family everything else is set in' },
   { id: 'focus',    label: 'Focus ring',   kind: 'colour', what: 'the ring that says where the keyboard is' },
   { id: 'elevation', label: 'Elevation',   kind: 'ratio',  what: 'how strongly things lift off the page' },
+  { id: 'lineHeight',   label: 'Line height',    kind: 'number', what: 'how much air sits between lines of body text' },
+  { id: 'letterSpacing', label: 'Letter spacing', kind: 'length', what: 'how tightly the letters sit together' },
+  { id: 'fontWeight',    label: 'Heading weight', kind: 'number', what: 'how heavy headings are set' },
+  { id: 'borderWidth',   label: 'Border width',   kind: 'length', what: 'how thick a border is drawn' },
   { id: 'space',    label: 'Spacing',      kind: 'ratio',  what: 'how much room everything gets, as a multiple of the kit\'s own step' },
   { id: 'radius',   label: 'Corner radius', kind: 'length', what: 'how round a box is' },
   { id: 'baseText', label: 'Base text',    kind: 'length', what: 'the size body text is set at' },
@@ -75,6 +79,18 @@ export const MAP = {
     elevation: { shadows: ['--shadow-2xs', '--shadow-xs', '--shadow-sm', '--shadow-md', '--shadow-lg', '--shadow-xl', '--shadow-2xl'],
                  needsBuild: { where: 'theme.css', sass: '--shadow-*',
                    why: 'Tailwind compiles each shadow utility from the theme, so the new values only appear after its build runs again' } },
+    /* No standalone leading token: Tailwind carries a line height per type step.
+       This is the body one; the other steps keep their own, which is deliberate
+       on their part. And its border utilities carry a fixed 1px, so there is
+       nothing to write for a border width. */
+    lineHeight:   { var: '--text-base--line-height',
+                    /* every step, because Tailwind pairs each size with its own
+                       leading and a screen is mostly text-sm */
+                    also: ['--text-xs--line-height', '--text-sm--line-height', '--text-lg--line-height',
+                           '--text-xl--line-height', '--text-2xl--line-height', '--text-3xl--line-height'] },
+    letterSpacing: { var: '--tracking-normal' },
+    fontWeight:   { var: '--font-weight-heading', new: true },
+    borderWidth:  null,
   },
   radix: {
     _note: 'Radix does not take values, it takes CHOICES from sets it publishes: named accent scales, named grey scales, five radius settings and five scaling steps. Only the page and panel colours are really variables. Every scale is twelve hand-built steps, so a single step written by hand is eleven steps out of step — the knobs are matched to the nearest published set instead, and the manifest names it.',
@@ -103,6 +119,14 @@ export const MAP = {
     /* and its shadows are built from --gray-a* and colour-mix(): the alpha
        lives in a variable, so there is no strength in the string to scale. */
     elevation: null,
+    /* Radix's line heights are LENGTHS on its type scale, so the size choice
+       already moved them. Its letter spacing is a per-step offset, and step 3
+       is the body one. Its headings wear its published bold step — there is no
+       separate heading weight to set. */
+    lineHeight:   { derives: 'baseText' },
+    letterSpacing: { var: '--letter-spacing-3' },
+    fontWeight:   null,
+    borderWidth:  null,
   },
   mantine: {
     _note: 'Semantic variables throughout, and all settable at runtime. Its COMPONENT class names are content hashes, which is a separate problem and not this table\'s.',
@@ -124,6 +148,16 @@ export const MAP = {
     space:    { var: '--mantine-scale', scale: true },
     focus:    null,
     elevation: { shadows: ['--mantine-shadow-xs', '--mantine-shadow-sm', '--mantine-shadow-md', '--mantine-shadow-lg', '--mantine-shadow-xl'] },
+    lineHeight:   { var: '--mantine-line-height',
+                    /* its headings carry their own, and a table cell reads the
+                       size-matched one rather than the base */
+                    also: ['--mantine-line-height-xs', '--mantine-line-height-sm', '--mantine-line-height-md',
+                           '--mantine-line-height-lg', '--mantine-line-height-xl',
+                           '--mantine-h1-line-height', '--mantine-h2-line-height', '--mantine-h3-line-height',
+                           '--mantine-h4-line-height', '--mantine-h5-line-height', '--mantine-h6-line-height'] },
+    letterSpacing: null,
+    fontWeight:   { var: '--mantine-heading-font-weight' },
+    borderWidth:  null,
   },
   openprops: {
     _note: 'Scales, plus the small semantic layer its normalize ships. Open Props renders nothing itself — it sits under whatever does, so your own CSS agrees with the kit above it.',
@@ -146,6 +180,12 @@ export const MAP = {
     focus:    null,
     /* Open Props publishes the knob itself: one strength every shadow reads. */
     elevation: { shadows: ['--shadow-strength'] },
+    lineHeight:   { var: '--font-lineheight-3',
+                    also: ['--font-lineheight-0', '--font-lineheight-1', '--font-lineheight-2', '--font-lineheight-4', '--font-lineheight-5'] },
+    /* its letter-spacing scale starts at -.05em and has no zero anchor */
+    letterSpacing: null,
+    fontWeight:   { var: '--font-weight-7' },
+    borderWidth:  { var: '--border-size-1', also: ['--border-size-2', '--border-size-3'] },
   },
   shadcn: {
     _note: 'Semantic variables by design, unprefixed. --border here is a COLOUR.',
@@ -171,6 +211,10 @@ export const MAP = {
     space:    { inherits: 'the base' },
     focus:    { var: '--ring' },
     elevation: { inherits: 'the base' },
+    lineHeight:   { inherits: 'the base' },
+    letterSpacing: { inherits: 'the base' },
+    fontWeight:   { inherits: 'the base' },
+    borderWidth:  { inherits: 'the base' },
   },
   bootstrap: {
     _note: 'Runtime-themeable for surface, ink, line, radius and type — --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
@@ -209,6 +253,10 @@ export const MAP = {
     space:    { needsBuild: { sass: '$spacer', why: 'Bootstrap has no spacing variable at runtime; p-3 and gap-4 are compiled from $spacer' } },
     focus:    { var: '--bs-focus-ring-color', alphaFrom: '--bs-focus-ring-opacity' },
     elevation: { shadows: ['--bs-box-shadow', '--bs-box-shadow-sm', '--bs-box-shadow-lg', '--bs-box-shadow-inset'] },
+    lineHeight:   { var: '--bs-body-line-height' },
+    letterSpacing: null,
+    fontWeight:   { needsBuild: { sass: '$headings-font-weight', why: 'Bootstrap compiles its heading weight; there is no --bs variable for it' } },
+    borderWidth:  { var: '--bs-border-width' },
   },
   material: {
     _note: 'M3 takes ONE input. Its 47 colour roles — containers, on-colours, inverses, fixed variants — are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
@@ -242,6 +290,13 @@ export const MAP = {
     space:    null,
     focus:    null,
     elevation: null,
+    /* Its typescale carries a line height and a weight per style, both as
+       lengths derived from the shorthand it publishes — there is no single
+       ratio to set. And M3 specifies no border width at all. */
+    lineHeight:   null,
+    letterSpacing: null,
+    fontWeight:   null,
+    borderWidth:  null,
   },
   daisyui: {
     _note: 'Registers into Tailwind\'s --color-* namespace on purpose. --border here is a WIDTH, not a colour.',
@@ -265,6 +320,10 @@ export const MAP = {
     focus:    null,
     /* daisyUI publishes --depth, a 0/1 flag, not a shadow scale. */
     elevation: null,
+    lineHeight:   { inherits: 'the base' },
+    letterSpacing: null,
+    fontWeight:   null,
+    borderWidth:  { var: '--border' },
   },
 }
 
@@ -619,17 +678,43 @@ export function route(values, kitIds, kits = {}) {
       }
 
       const siblings = target.also ?? []
-      if (KIND[role.id] !== 'length') { for (const extra of siblings) vars[extra] = v; continue }
+      /* A COLOUR's siblings must match it exactly; a length's keep their ratio.
+       * A bare number — a line height of 1.55, a weight of 700 — is a scale
+       * too, and Mantine publishes its five line heights as bare ratios. So the
+       * ratio path takes both, and only colour copies. */
+      if (KIND[role.id] === 'colour' || KIND[role.id] === 'font') { for (const extra of siblings) vars[extra] = v; continue }
 
-      const want = LEN.exec(String(v))
-      const base = LEN.exec(defaults[target.var] ?? '')
+      /* A bare number is a value for a NUMBER role and nothing for a length:
+         `radius: '12'` has no unit, and accepting it would write --radius-md: 8
+         into a stylesheet, which is not a radius. */
+      const bare = KIND[role.id] === 'number'
+      const num = (x) => {
+        const m = LEN.exec(String(x ?? ''))
+        if (m) return [Number(m[1]), m[2]]
+        if (!bare) return null
+        const t = String(x ?? '').trim()
+        const n = Number(t)
+        if (t !== '' && Number.isFinite(n)) return [n, '']
+        /* Tailwind writes a line height as the division it means:
+           calc(1.25 / 0.875). The first number is not the ratio — the quotient
+           is — so the two simple calc forms are worked out rather than skipped. */
+        const div = /^calc\(\s*([\d.]+)\s*([*/])\s*([\d.]+)\s*\)$/.exec(t)
+        if (div) {
+          const [, a, op, b] = div
+          const v = op === '/' ? Number(a) / Number(b) : Number(a) * Number(b)
+          return Number.isFinite(v) ? [Number(v.toFixed(4)), ''] : null
+        }
+        return null
+      }
+      const want = num(v)
+      const base = num(defaults[target.var])
       for (const extra of siblings) {
-        const own = LEN.exec(defaults[extra] ?? '')
+        const own = num(defaults[extra])
         /* no published pair to take a ratio from → leave their value alone and
            say so, rather than overwrite a scale with a guess */
-        if (!want || !base || !own || Number(base[1]) === 0) { unscaled.push(extra); continue }
-        const scaled = (Number(own[1]) / Number(base[1])) * Number(want[1])
-        vars[extra] = `${Number(scaled.toFixed(4))}${want[2]}`
+        if (!want || !base || !own || base[0] === 0) { unscaled.push(extra); continue }
+        const scaled = (own[0] / base[0]) * want[0]
+        vars[extra] = `${Number(scaled.toFixed(4))}${want[1]}`
       }
     }
     return { kit: id, vars, attrs, chosen, unroutable, unscaled, ...coverage(id) }

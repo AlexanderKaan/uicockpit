@@ -256,18 +256,22 @@ const $ = (s) => document.querySelector(s)
 const ORDER = ['openprops', 'tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material', 'radix', 'mantine']
 const SWATCH = ROLES.filter((r) => r.kind === 'colour')
 const TYPE = ROLES.filter((r) => r.kind === 'font')
+/* Each slider stores what the ROLE wants and shows what a person reads. The
+ * factor is the only thing that differs: spacing is a multiple shown as a
+ * percentage, letter spacing is thousandths of an em, a weight is just itself. */
 const LENGTHS = [
-  { id: 'radius', min: 0, max: 24, step: 1, unit: 'px' },
-  { id: 'baseText', min: 14, max: 20, step: 1, unit: 'px' },
-  /* Spacing is a MULTIPLE of the kit's own step, not a length: Tailwind's step
-     is 4px and Mantine's is 16px, so one number of ours would mean two very
-     different things. The slider reads as a percentage; the value stored is the
-     ratio each kit applies to what it published. */
-  { id: 'space', min: 80, max: 150, step: 5, unit: '%', ratio: true },
-  { id: 'elevation', min: 0, max: 250, step: 10, unit: '%', ratio: true },
+  { id: 'radius', min: 0, max: 24, step: 1, unit: 'px', factor: 1, group: 'shape' },
+  { id: 'borderWidth', min: 0, max: 4, step: 1, unit: 'px', factor: 1, group: 'shape' },
+  { id: 'space', min: 80, max: 150, step: 5, unit: '', factor: 100, pct: true, group: 'shape' },
+  { id: 'elevation', min: 0, max: 250, step: 10, unit: '', factor: 100, pct: true, group: 'shape' },
+  { id: 'baseText', min: 14, max: 20, step: 1, unit: 'px', factor: 1, group: 'type' },
+  { id: 'lineHeight', min: 110, max: 200, step: 5, unit: '', factor: 100, group: 'type' },
+  { id: 'letterSpacing', min: -50, max: 100, step: 5, unit: 'em', factor: 1000, group: 'type' },
+  { id: 'fontWeight', min: 300, max: 900, step: 100, unit: '', factor: 1, group: 'type' },
 ]
-const shown = (k, v) => (k.ratio ? `${Math.round(parseFloat(v) * 100)}%` : v)
-const slider = (k, v) => (k.ratio ? Math.round(parseFloat(v) * 100) : parseInt(v))
+const store = (k, n) => `${Number((Number(n) / k.factor).toFixed(4))}${k.unit}`
+const shown = (k, v) => (k.pct ? `${Math.round(parseFloat(v) * 100)}%` : String(v))
+const slider = (k, v) => Math.round(parseFloat(v) * k.factor)
 
 /* A brief is not a prompt: these words map to numbers a standard already names,
    and the page SHOWS what they moved. No model, nothing to explain away. */
@@ -289,6 +293,7 @@ const state = {
   mode: 'light',
   values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
     ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
+    lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600', borderWidth: '1px',
     /* filled in below from whichever kit publishes one */
     success: '', warning: '', danger: '',
     /* seeded from what the base kit publishes, not from a face we like */
@@ -584,7 +589,7 @@ function summaries() {
     const fam = familyOf(state.values[r.id])
     return FONTS.stacks.find((s) => s.family === state.values[r.id])?.name ?? fam
   }).join(' · ')
-  $('#sum_shape').textContent = LENGTHS.map((k) => shown(k, state.values[k.id])).join(' · ')
+  $('#sum_shape').textContent = LENGTHS.filter((k) => k.group === 'shape').map((k) => shown(k, state.values[k.id])).join(' · ')
 }
 
 $('#typo').addEventListener('click', (e) => {
@@ -735,17 +740,21 @@ $('#swatches').addEventListener('input', (e) => {
   paint()
 })
 
-$('#knobs').innerHTML = LENGTHS.map((k) => {
+const knobHtml = (k) => {
   const role = ROLES.find((r) => r.id === k.id)
   return `<div class="knob"><label for="k_${k.id}">${role.label}<b data-v="${k.id}">${shown(k, state.values[k.id])}</b></label>
     <input id="k_${k.id}" type="range" data-r="${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${slider(k, state.values[k.id])}"></div>`
-}).join('')
-$('#knobs').addEventListener('input', (e) => {
-  const k = LENGTHS.find((x) => x.id === e.target.dataset.r)
-  state.values[k.id] = k.ratio ? String(Number(e.target.value) / 100) : e.target.value + k.unit
-  $(`[data-v="${k.id}"]`).textContent = shown(k, state.values[k.id])
-  paint()
-})
+}
+$('#knobs').innerHTML = LENGTHS.filter((k) => k.group === 'shape').map(knobHtml).join('')
+$('#typeknobs').innerHTML = LENGTHS.filter((k) => k.group === 'type').map(knobHtml).join('')
+for (const host of ['#knobs', '#typeknobs']) {
+  $(host).addEventListener('input', (e) => {
+    const k = LENGTHS.find((x) => x.id === e.target.dataset.r); if (!k) return
+    state.values[k.id] = store(k, e.target.value)
+    $(`[data-v="${k.id}"]`).textContent = shown(k, state.values[k.id])
+    paint()
+  })
+}
 
 $('#chips').innerHTML = BRIEFS.map((b) => `<button class="chip" data-b="${b.label}" aria-pressed="false">${b.label}</button>`).join('')
 const applyBrief = (b) => {
@@ -800,7 +809,7 @@ function sync() {
     if (el.type === 'color') { el.value = v; $(`[data-hex="${el.dataset.r}"]`).textContent = v }
     else { el.value = parseInt(v); $(`[data-v="${el.dataset.r}"]`).textContent = v }
   }
-  for (const el of $('#knobs').querySelectorAll('[data-r]')) {
+  for (const el of document.querySelectorAll('#knobs [data-r], #typeknobs [data-r]')) {
     const k = LENGTHS.find((x) => x.id === el.dataset.r), v = state.values[el.dataset.r]
     el.value = slider(k, v); $(`[data-v="${el.dataset.r}"]`).textContent = shown(k, v)
   }

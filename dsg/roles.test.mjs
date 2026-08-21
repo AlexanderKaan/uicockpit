@@ -34,8 +34,9 @@ test('every variable we write into exists in the kit that publishes it', () => {
 
 test('a role a kit cannot take is named, never silently dropped', () => {
   const daisy = coverage('daisyui')
-  assert.deepEqual(daisy.missing.sort(), ['baseText', 'elevation', 'focus', 'inkMuted', 'line'],
-    'daisyUI has no muted ink, no border COLOUR (--border there is a width), no focus token, and a 0/1 depth flag rather than a shadow scale')
+  assert.deepEqual(daisy.missing.sort(),
+    ['baseText', 'elevation', 'focus', 'fontWeight', 'inkMuted', 'letterSpacing', 'line'],
+    'daisyUI has no muted ink, no border COLOUR (--border there is a width), no focus token, no letter spacing, no heading weight, and a 0/1 depth flag rather than a shadow scale')
   /* shadcn ships ONE semantic colour — --destructive — and no success or
      warning at all. Material ships only error, because M3 has no other. Both
      say so rather than growing a name their components do not read. */

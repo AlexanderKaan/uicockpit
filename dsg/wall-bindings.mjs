@@ -417,9 +417,10 @@ const mantine = {
   divider: () => `<div class="${mc('Divider')}"></div>`,
   /* Mantine's Title reads --title-fz/fw/lh, which its React layer fills from
      the theme's own --mantine-h<n>-* variables. Same variables, set here. */
-  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, mc('Title'), ` data-order="${n.level ?? 3}" style="${
-    ['font-size', 'font-weight', 'line-height'].map((prop, i) =>
-      `--title-${['fz', 'fw', 'lh'][i]}:var(--mantine-h${n.level ?? 3}-${prop})`).join(';')}"`),
+  /* --title-fw comes from theme.headings.fontWeight in their React layer, which
+     is --mantine-heading-font-weight. Wiring it to the per-h weight instead
+     pinned every heading at 700 and left the weight knob dead. */
+  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, mc('Title'), ` data-order="${n.level ?? 3}" style="--title-fz:var(--mantine-h${n.level ?? 3}-font-size);--title-fw:var(--mantine-heading-font-weight);--title-lh:var(--mantine-h${n.level ?? 3}-line-height)"`),
   text:    (n, k) => A(n, k, 'p', mc('Text')),
   muted:   (n, k) => A(n, k, 'p', mc('Text'), ' style="--text-color:var(--mantine-color-dimmed)"'),
   label:   (n, k) => A(n, k, 'label', mc('Input', 'label')),
