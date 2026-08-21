@@ -150,6 +150,33 @@ let page = readFileSync('page.template.html', 'utf8')
   .replace('/*ICONS*/', () => JSON.stringify(lu.icons))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
 page = page.split('<!--MARK-->').join(mark(17))
+/* A class in OUR markup with no rule anywhere.
+ *
+ * Three edits to the stylesheet took the whole font picker and the segmented
+ * control with them, and the page shipped: the specimen rows lost their layout,
+ * the tabs turned back into browser buttons, and every check we have still
+ * passed, because a missing rule breaks nothing that can be asserted in node.
+ *
+ * Read from the SOURCE, never the built page — the built page carries every
+ * kit's markup too, and those classes are styled by their own stylesheets
+ * inside the frames. A check that cannot tell our chrome from their components
+ * reports four hundred false alarms and gets switched off. */
+{
+  const tpl = readFileSync('page.template.html', 'utf8')
+  const sheet = tpl.slice(tpl.indexOf('<style>'), tpl.indexOf('</style>'))
+  const styled = new Set([...sheet.matchAll(/\.([a-z][a-z0-9_-]*)/gi)].map((m) => m[1]))
+  const chrome = readFileSync('page.body.html', 'utf8') + tpl.slice(tpl.indexOf('<script'))
+  const written = new Set()
+  for (const m of chrome.matchAll(/class="([a-z][a-z0-9_ -]*)"/gi)) {
+    for (const c of m[1].split(/\s+/)) if (c) written.add(c)
+  }
+  const bare = [...written].filter((c) => !styled.has(c))
+  if (bare.length) {
+    console.error(`build: no rule anywhere for ${bare.join(' ')} — our markup uses ${bare.length > 1 ? 'them' : 'it'} and our stylesheet does not.`)
+    process.exit(1)
+  }
+}
+
 /* A placeholder that survives into the output is how a lucide box quietly
  * became the logo for weeks. Nothing silently ships with a hole in it. */
 const left = [...page.matchAll(/<!--(MARK|I:[a-z-]+)-->/g)].map((m) => m[0])
