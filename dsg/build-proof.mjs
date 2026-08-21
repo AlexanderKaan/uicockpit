@@ -35,7 +35,13 @@ const check = (label, ok, detail = '') => {
 try {
   console.log(`\nunpacking the generated package into an empty directory`)
   mkdirSync(join(dir, 'src'), { recursive: true })
-  for (const [path, body] of Object.entries(plain(files))) writeFileSync(join(dir, path), body)
+  /* .cursor/rules is a path, not a name: unpacking has to make the folder the
+     way anyone unzipping this would get one. */
+  for (const [path, body] of Object.entries(plain(files))) {
+    const at = join(dir, path)
+    if (path.includes('/')) mkdirSync(at.slice(0, at.lastIndexOf('/')), { recursive: true })
+    writeFileSync(at, body)
+  }
 
   /* a project that uses the kit the way its own docs say to */
   writeFileSync(join(dir, 'package.json'), JSON.stringify({

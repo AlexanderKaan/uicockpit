@@ -304,7 +304,7 @@ export function coverage(kitId) {
  * is the one the ratio lives in; their multiplier stays theirs.
  */
 const LEN = /^(?:calc\(\s*)?(-?[\d.]+)(rem|em|px)\b/
-const KIND = Object.fromEntries(ROLES.map((r) => [r.id, r.kind]))
+export const KIND = Object.fromEntries(ROLES.map((r) => [r.id, r.kind]))
 
 /**
  * A colour and a length do not travel the same way.

@@ -52,9 +52,14 @@ test('Bootstrap says its heading family is compiled, rather than writing a varia
 test('a face that must be fetched is named, with the line that fetches it', () => {
   const w = webfonts(V)
   assert.deepEqual(w.map((f) => f.family), ['Fraunces', 'Inter'])
-  const md = generate({ ...V, brand: '#0b6e8a', radius: '10px' }, ['tailwind'], kits)['DESIGN-SYSTEM.md']
-  assert.match(md, /fonts\.googleapis\.com/, 'the package names a webfont and never says where it comes from')
+  /* in the file a MODEL reads, since that is where the instruction has to land */
+  const md = generate({ ...V, brand: '#0b6e8a', radius: '10px' }, ['tailwind'], kits)['AGENTS.md']
+  assert.match(md, /fonts\.googleapis\.com/, 'the rules name a webfont and never say where it comes from')
   assert.match(md, /Fraunces/)
+  const f = generate({ ...V, brand: '#0b6e8a' }, ['tailwind'], kits)
+  assert.equal(f['CLAUDE.md'], f['AGENTS.md'], 'the three names must carry the SAME rules, or one of them is stale')
+  assert.equal(f['.cursor/rules'], f['AGENTS.md'])
+  assert.match(f['tokens.json'], /"\$type": "color"/, 'tokens.json is not in the published token format')
 })
 
 test('a system stack is NOT reported as a download', () => {

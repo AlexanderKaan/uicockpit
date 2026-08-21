@@ -52,7 +52,7 @@
   <div class="dock__what" id="receipt"></div>
   <div class="dock__acts">
     <button class="btn btn--ghost" id="manifest"><!--I:circle-alert-->What could not be done</button>
-    <button class="btn btn--go" id="download"><!--I:download-->Use this kit</button>
+    <button class="btn btn--go" id="export"><!--I:download-->Export this kit</button>
   </div>
 </footer>
 
@@ -97,14 +97,34 @@
   </footer>
 </div></dialog>
 
-<dialog id="sheet"><div class="sheet">
-  <header class="sheet__top">
-    <div><h2>Use this kit</h2><p class="sheet__sum" id="sum"></p></div>
-    <button class="sheet__x" id="sheetx" aria-label="Close"><!--I:x--></button>
+<section class="drawer" id="drawer" hidden aria-label="Export">
+  <header class="drawer__top">
+    <div class="drawer__name">
+      <label for="kitname" class="eyebrow">Name this kit</label>
+      <input id="kitname" value="design-system" spellcheck="false" autocomplete="off">
+    </div>
+    <p class="drawer__sum" id="sum"></p>
+    <button class="btn btn--ghost" id="sheetx"><!--I:x-->Close</button>
   </header>
-  <section><p class="eyebrow">In this kit</p><div class="facts" id="facts"></div></section>
-  <section><p class="eyebrow">Where do you want it?</p><div class="dests" id="dests"></div></section>
-  <section><p class="eyebrow" id="clabel">Contrast</p><ul class="pairs" id="pairs"></ul></section>
-  <section id="csection"><p class="eyebrow">What could not be done</p><ul class="caveats" id="caveats"></ul></section>
-</div></dialog>
+
+  <div class="drawer__cols">
+    <section class="drawer__file">
+      <div class="seg" id="ftabs" role="radiogroup" aria-label="Which file"></div>
+      <div class="filehead"><span id="fmeta"></span><button class="link" id="fcopy">Copy</button></div>
+      <pre class="filebody" id="fbody"></pre>
+    </section>
+
+    <aside class="drawer__side">
+      <p class="eyebrow">What is in the zip</p>
+      <ul class="tree" id="tree"></ul>
+      <p class="fine" id="dropnote">Drop the folder in your repo root. The rules file is what a model reads;
+        the scenes are how you check it followed them.</p>
+      <button class="btn btn--go" id="downloadzip"><!--I:download-->Download the zip</button>
+      <div class="dests" id="dests"></div>
+      <section><p class="eyebrow" id="clabel">Contrast</p><ul class="pairs" id="pairs"></ul></section>
+      <section id="csection"><p class="eyebrow">What could not be done</p><ul class="caveats" id="caveats"></ul></section>
+      <div class="facts" id="facts"></div>
+    </aside>
+  </div>
+</section>
 </div>

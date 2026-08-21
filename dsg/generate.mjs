@@ -13,7 +13,7 @@
  * And the manifest carries what could NOT be done, by name. A package that
  * quietly leaves out a third of a theme is worse than one that says so.
  */
-import { ROLES, MAP, route, coverage, darken } from './roles.mjs'
+import { ROLES, MAP, KIND, route, coverage, darken } from './roles.mjs'
 import { contrast } from './color.mjs'
 
 const stamp = (kit) => `${kit.name}${kit.version ? ' ' + kit.version : ''}`
@@ -366,7 +366,7 @@ ${decl(r.dark)}
 }`
 }
 
-export function generate(values, kitIds, kits) {
+export function generate(values, kitIds, kits, opts = {}) {
   const routed = darken(route(values, kitIds, kits), kits)
   const files = {}
 
@@ -404,7 +404,15 @@ Then import \`theme.css\` after the kits, so your values win.
 `
 
   files['MANIFEST.md'] = manifest(routed, kits, values)
-  files['DESIGN-SYSTEM.md'] = brief(routed, kits, values)
+  /* One set of rules, under the three names different tools look for. Cursor
+   * reads .cursor/rules, Claude Code reads CLAUDE.md, and AGENTS.md is the
+   * convention the rest are converging on — same file, so none of them is
+   * reading a stale copy of the other. */
+  const rules = agents(routed, kits, values, opts)
+  files['AGENTS.md'] = rules
+  files['CLAUDE.md'] = rules
+  files['.cursor/rules'] = rules
+  files['tokens.json'] = tokensJson(values, routed, kits)
   /* per-kit blocks too: anything showing ONE kit must load only that kit's
      block, or the collision above happens inside your own preview */
   files._blocks = byKit
@@ -544,40 +552,106 @@ a kit could not take a value, this file says so rather than the package pretendi
  * reach for. So the package carries a file written FOR that reader: what the
  * system is, in its own vocabulary, and the two or three things it must not do.
  */
-function brief(routed, kits, values) {
+/**
+ * THE FILE A MODEL READS.
+ *
+ * Not documentation. This is handed to a coding agent as its rules, so it is
+ * written the way rules are written: short, absolute, and specific about the
+ * two things a model gets wrong on its own — reaching for a second UI library,
+ * and inventing a colour when it cannot find one.
+ *
+ * Everything in it is computed. The contrast warning is the real audit, the
+ * parts list is the real vocabulary, and "not in this stack" is what the kits
+ * genuinely do not ship.
+ */
+function agents(routed, kits, values, { name = 'this project', parts = [] } = {}) {
   const set = ROLES.filter((r) => values[r.id] != null)
-  return `# The design system for this project
+  const colours = set.filter((r) => KIND[r.id] === 'colour')
+  /* the families are said once, in their own line — not again as a "size" */
+  const sizes = set.filter((r) => KIND[r.id] !== 'colour' && KIND[r.id] !== 'font')
+  const label = (r) => r.label.toLowerCase()
 
-Read this before writing any UI. Everything below is decided; none of it is
-yours to choose again.
+  const pair = (a, b) => `${(label(a) + ' ' + values[a.id]).padEnd(26)}${b ? label(b) + ' ' + values[b.id] : ''}`.trimEnd()
+  const rows = []
+  for (let i = 0; i < colours.length; i += 2) rows.push(pair(colours[i], colours[i + 1]))
 
-## Install
+  /* the audit, said as an instruction rather than as a number */
+  /* The advice has to fit the pair. "Never use it for text" is exactly wrong
+   * for on-brand, which IS the text — a warning that tells a model the opposite
+   * of what to do is worse than no warning. */
+  const warnings = auditContrast(values).filter((p) => !p.passes).map((p) => {
+    const fg = ROLES.find((r) => r.id === p.fg)?.label ?? p.fg
+    const bg = ROLES.find((r) => r.id === p.bg)?.label.toLowerCase() ?? p.bg
+    const head = `${fg} is ${p.ratio}:1 against ${bg}, under the ${p.min}:1 it needs.`
+    if (p.min >= 4.5) {
+      return `${head} That pairing fails for body text — either darken one of them, or use it only at 24px or 19px bold, where 3:1 is the bar.`
+    }
+    return `${head} Use it for fills and decoration, but never as the only thing marking a control apart from its background.`
+  })
 
-${routed.map((r) => `- **${kits[r.kit].name}** ${kits[r.kit].version ?? ''} — see \`install.md\``).join('\n')}
+  const stack = routed.map((r) => {
+    const k = kits[r.kit]
+    const role = k.layer === 'tokens' ? 'variables only' : k.standalone || k.layer === 'utility' ? 'base' : 'components'
+    return `${k.name}${k.version ? ` ${k.version}` : ''} (${role})`
+  }).join(' + ')
 
-Import \`theme.css\` AFTER the kits, so these values win.
-${(() => { const w = webfonts(values); return w.length ? `
-The type is ${w.map((f) => `**${f.family}**`).join(' and ')}, which ${w.length > 1 ? 'are faces' : 'is a face'}
-that must be fetched. Put this in your \`<head>\`, or the page renders in the
-fallback and none of the spacing below will look right:
+  const gaps = routed.flatMap((r) => (COMPONENT_GAPS[r.kit] ?? [])
+    .map(([part, why]) => `- **${part}** — ${why}. Compose it from the parts and variables above; do not add a dependency for it.`))
+
+  return `# Design system: ${name}
+
+Stack: ${stack}.
+
+Never introduce another UI library. Never write a raw hex, a raw radius or a
+raw font size — every one of them is a variable in \`theme.css\`, written in the
+vocabulary of the kit you are rendering with.
+
+## Colour roles
+
+\`\`\`
+${rows.join('\n')}
+\`\`\`
+${warnings.length ? `\n${warnings.join('\n')}\n` : ''}
+## Shape and size
+
+${sizes.map((r) => `${label(r)} ${KIND[r.id] === 'ratio' ? `×${values[r.id]}` : values[r.id]}`).join(' · ')}
+${values.fontHeading ? `\nHeadings: ${values.fontHeading}.\nBody: ${values.fontBody ?? values.fontHeading}.\n` : ''}
+## The parts you have
+
+${parts.length ? `${parts.join(', ')} — ${parts.length} in all.` : 'See the scenes in this package.'}
+Use these. Do not write a new button, card or input: one already exists.
+${gaps.length ? `\n## Not in this stack\n\n${gaps.join('\n')}\n` : ''}
+${(() => { const w = webfonts(values); return w.length ? `## The type has to be fetched
+
+${w.map((f) => `**${f.family}**`).join(' and ')} ${w.length > 1 ? 'are faces' : 'is a face'} that must be
+downloaded. Put this in the document head, or every measurement above is off:
 
 \`\`\`html
 ${fontLink(w.map((f) => f.family))}
 \`\`\`
-` : '' })()}
 
-## The values
+` : '' })()}## Where these values came from
 
-${set.map((r) => `- \`${r.id}\` — ${values[r.id]} · ${r.what}`).join('\n')}
-
-## Rules
-
-- Use the components of the kits above. Do not write a new button, card or
-  input; one already exists in every kit here.
-- Never hard-code a colour, a radius or a font size. Every one of them is a
-  variable in \`theme.css\`, in the vocabulary of the kit you are rendering with.
-- ${routed.some((r) => r.needsBuild?.length) ? 'Some values are build-time, not runtime — see MANIFEST.md before changing the brand.' : 'All values above are settable at runtime.'}
-- MANIFEST.md lists what this system CANNOT express. If you need something that
-  is not in it, say so rather than inventing it.
+Every variable in \`theme.css\` belongs to the kit that publishes it; none was
+invented here. \`MANIFEST.md\` lists what could not be set and why. If you need
+something this system cannot express, say so rather than inventing it.
 `
+}
+
+/**
+ * The same values, machine-readable, in the W3C Design Tokens format.
+ * Their spec, not a shape of ours — so a tool that reads design tokens can read
+ * this one without being told about us.
+ */
+function tokensJson(values, routed, kits) {
+  const group = (kind, type) => Object.fromEntries(ROLES
+    .filter((r) => values[r.id] != null && (kind === 'other' ? KIND[r.id] !== 'colour' : KIND[r.id] === 'colour'))
+    .map((r) => [r.id, { $type: type, $value: values[r.id], $description: r.what }]))
+  return JSON.stringify({
+    $description: `Generated from ${routed.map((r) => kits[r.kit].name).join(' + ')}. `
+      + 'Every value belongs to the kit that publishes it.',
+    color: group('colour', 'color'),
+    size: Object.fromEntries(Object.entries(group('other', 'dimension')).map(([k, v]) => [k,
+      /^[\d.]+$/.test(String(v.$value)) ? { ...v, $type: 'number' } : v])),
+  }, null, 2) + '\n'
 }
