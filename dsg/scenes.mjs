@@ -398,7 +398,32 @@ body{margin:0;overflow:hidden}
 .board__cols{flex:1;min-height:0;display:flex;gap:20px;align-items:flex-start}
 .col{flex:none;display:flex;flex-direction:column;gap:20px;min-width:0}
 .card{margin:0;display:flex;flex-direction:column;gap:8px;cursor:auto}
-.cap{margin:0;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.42;font-weight:600}</style>
+.cap{margin:0;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.42;font-weight:600}
+
+/* ── ONE CARD, ACROSS EVERY FRAME AT ONCE ─────────────────────────────────
+ * The compare grid asks six frames to show the SAME card and hide the rest.
+ * That is a request from outside: the wall never decides what to hide — it is
+ * a strip you pan, and it stays one. Both attributes are set by whoever is
+ * holding the frame, and with neither of them present nothing here applies.
+ *
+ * data-pick   this frame is being compared, so a card can be chosen
+ * data-solo   one card is chosen; it carries data-solo too */
+/* BY ATTRIBUTE AND BY PATH, NEVER BY CLASS NAME.
+ * .card is this wall's own class AND daisyUI's component class AND
+ * Bootstrap's — so a rule hiding every .card without data-solo reached inside
+ * the one card it meant to keep and hid the daisyUI card in it. Two of the six
+ * panes came up as a caption over nothing. .col is Bootstrap's grid class for
+ * the same reason. Everything below is addressed by data-card, which only this
+ * file writes, or by a path from the strip, which only this file builds.
+ * (And no backticks in here: the whole block is a template literal. Sixth.) */
+html[data-pick] [data-card]{cursor:zoom-in}
+html[data-pick] [data-card]:hover{outline:1px solid rgb(128 128 128 / .3);outline-offset:7px;border-radius:2px}
+html[data-solo] [data-card]{cursor:zoom-out}
+html[data-solo] #strip > .board > .board__top{display:none}
+html[data-solo] #strip > .board{border-inline-end:0;padding:14px 16px}
+html[data-solo] #strip [data-card]:not([data-solo]){display:none}
+html[data-solo] #strip > .board > .board__cols > .col:not(:has(> [data-solo])){display:none}
+html[data-solo] #strip > .board:not(:has([data-card][data-solo])){display:none}</style>
 <script>(function(){
   var m=document.getElementById('strip')
   /* A mouse has one wheel and this wall runs the other way, so a vertical wheel

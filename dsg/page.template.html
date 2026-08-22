@@ -247,6 +247,39 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .frames{flex:1;min-height:0}
 .frames iframe{width:100%;height:100%;min-height:480px;border:0;border-radius:var(--r);background:#fff;display:block}
 .frames iframe[hidden]{display:none}
+
+/* ── comparing ─────────────────────────────────────────────────────────────
+ * Not a second product: the same frames, laid out. The page already carries a
+ * frame per kit and every kit's CSS — one is shown and the rest wait — so this
+ * is an arrangement rather than a build. */
+.frames[data-compare]{display:grid;gap:10px;background:var(--ground);border-radius:var(--r);padding:10px;
+  grid-template-columns:repeat(var(--cols,3),minmax(0,1fr))}
+.frames[data-compare] .pane{margin:0;min-width:0;display:flex;flex-direction:column;background:var(--panel);
+  border-radius:var(--r);overflow:hidden}
+/* after the rule above, not before it: a grid item that says display:flex wins
+   over a plain .pane[hidden], and the two kits left out of the six stayed on
+   screen as empty white boxes. */
+.frames[data-compare] .pane[hidden]{display:none}
+.frames[data-compare] .pane iframe{min-height:0;flex:1;border-radius:0}
+.frames[data-compare] .pane figcaption{display:flex;align-items:center;gap:6px;padding:7px 9px;
+  border-bottom:var(--bw) solid var(--line);font-size:var(--fs-xs);letter-spacing:.09em;text-transform:uppercase;
+  font-weight:600;color:var(--muted);min-width:0}
+.frames[data-compare] .pane figcaption b{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frames[data-compare] .pane figcaption em{font-style:normal;margin-left:auto;letter-spacing:0;text-transform:none;
+  font-weight:400;flex:none}
+.pane{margin:0;height:100%;min-width:0;display:flex;flex-direction:column}
+.pane figcaption{display:none}
+.pane[hidden]{display:none}
+
+.panes{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.panes__cap{margin:0;font-size:var(--fs-sm);color:var(--muted)}
+.panes__cap b{color:var(--ink);font-weight:600}
+.pchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:var(--bw) solid var(--line);
+  border-radius:var(--r);background:var(--panel);font-size:var(--fs-md);color:var(--muted);cursor:pointer}
+.pchip[aria-pressed=true]{border-color:var(--ink);color:var(--ink);font-weight:600}
+.pchip[disabled]{opacity:.45;cursor:not-allowed}
+.pchip i{width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.55}
+.solobar{display:inline-flex;align-items:center;gap:8px;margin-left:auto;font-size:var(--fs-sm);color:var(--muted)}
 /* ── the checks, next to the wall ───────────────────────────────────────────
  * These used to live inside the export drawer, which is to say: you found out
  * what was wrong with your system at the moment you were done with it. They sit
@@ -488,6 +521,13 @@ const state = {
   /* what you said you are building in, or null for "anything". Only ever dims
      the cards that cannot run there — it never picks for you. */
   runIn: null,
+  /* COMPARING IS A VIEW, NOT A SECOND PRODUCT.
+     `compare` holds the kits on screen, at most six, or null for the one kit
+     you are building. `solo` is the card every pane has been asked to show —
+     null means the whole wall. Neither changes your values or your stack: what
+     you are looking at is the same values in somebody else's vocabulary. */
+  compare: null,
+  solo: null,
   values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
     ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
     lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600', borderWidth: '1px',
@@ -504,7 +544,8 @@ const state = {
  * browser parse all of it to show one. A frame is built the first time you
  * actually look at it. */
 $('#frames').innerHTML = RENDERS.map((id) =>
-  `<iframe id="f_${id}" hidden title="${KITS[id].name}"></iframe>`).join('')
+  `<figure class="pane" id="p_${id}" hidden><figcaption><b>${KITS[id].name}</b><em id="n_${id}"></em></figcaption>` +
+  `<iframe id="f_${id}" title="${KITS[id].name}"></iframe></figure>`).join('')
 
 const BUILT = new Set()
 function build(id) {
@@ -547,35 +588,53 @@ function paint() {
      --font-sans, and the font knobs moved the card and nothing else. A tokens
      layer belongs under all of it, which is what it does in your app. */
   const st = stack(state.on, KITS)
-  const below = (id) => st.order.slice(0, st.order.indexOf(id) + 1)
-  /* A frame carries its whole stack, bottom-up — but a lower layer may NOT
-   * overwrite a name the shown kit publishes itself.
-   *
-   * shadcn's --border is a colour and daisyUI's --border is a WIDTH. The
-   * collision was already detected and reported; once the frame started
-   * carrying every layer (so shadcn could see Tailwind's --font-sans), it also
-   * started happening: daisyUI's buttons got a border of `#dfe2e7 solid` and
-   * rendered at 3px instead of 1. A variable the kit you are looking at
-   * publishes is that kit's to own. */
-  const varsOf = (ids, dark) => {
-    const top = ids.at(-1)
-    const mine = KITS[top]?.modes?.light ?? {}
-    const out = {}
-    for (const k of ids) {
-      const r = routed.find((x) => x.kit === k)
-      const from = (dark && r?.dark) ? r.dark : r?.vars ?? {}
-      for (const [name, value] of Object.entries(from)) {
-        if (k !== top && mine[name] !== undefined) continue
-        out[name] = value
-      }
-    }
-    return out
+  for (const r of routed) dress(r, st.order.slice(0, st.order.indexOf(r.kit) + 1), routed)
+
+  /* AND THE KITS YOU ARE ONLY LOOKING AT.
+     A compared pane is not a layer of your stack — it is another kit answering
+     the SAME values, so it carries its own smallest stack: a layer kit gets the
+     engine under it, a standalone kit stands alone. Routing them through their
+     own tables is the whole point of the view; skipping it would show you eight
+     frames of one kit's variables. */
+  for (const id of comparing()) {
+    if (state.on.has(id)) continue
+    const own = stack(new Set([id]), KITS)
+    dress({ kit: id }, own.order, darken(route(state.values, own.order, KITS), KITS))
   }
-  for (const r of routed) {
+
+  layout()
+  receipt(routed)
+
+  function dress(r0, order, routed) {
+    const r = routed.find((x) => x.kit === r0.kit) ?? r0
     const f = $('#f_' + r.kit)
-    if (!f) continue
+    if (!f) return
+    const below = (id) => order.slice(0, order.indexOf(id) + 1)
+    /* A frame carries its whole stack, bottom-up — but a lower layer may NOT
+     * overwrite a name the shown kit publishes itself.
+     *
+     * shadcn's --border is a colour and daisyUI's --border is a WIDTH. The
+     * collision was already detected and reported; once the frame started
+     * carrying every layer (so shadcn could see Tailwind's --font-sans), it
+     * also started happening: daisyUI's buttons got a border of
+     * `#dfe2e7 solid` and rendered at 3px instead of 1. A variable the kit you
+     * are looking at publishes is that kit's to own. */
+    const varsOf = (ids, dark) => {
+      const top = ids.at(-1)
+      const mine = KITS[top]?.modes?.light ?? {}
+      const out = {}
+      for (const k of ids) {
+        const rr = routed.find((x) => x.kit === k)
+        const from = (dark && rr?.dark) ? rr.dark : rr?.vars ?? {}
+        for (const [name, value] of Object.entries(from)) {
+          if (k !== top && mine[name] !== undefined) continue
+          out[name] = value
+        }
+      }
+      return out
+    }
     const live = f.contentDocument?.getElementById('live')
-    if (!live) continue
+    if (!live) return
     /* Radix takes attributes, not values: its accent, grey, radius and scaling
        are set on the theme root the way its <Theme> would set them. */
     const root = f.contentDocument.documentElement
@@ -588,7 +647,7 @@ function paint() {
     /* and its per-element tones, which live in the markup rather than in a
        variable — the wall is built once, so they are re-tuned in place */
     for (const c of r.chosen ?? []) {
-      if (c.attr !== 'tone') continue
+      if (c.attr !== 'tone') continue    // eslint-disable-line no-continue
       for (const el of f.contentDocument.querySelectorAll(`[data-tone="${c.role}"]`)) el.setAttribute('data-accent-color', c.picked)
     }
     /* the wall is one strip you pan, so a board is a place you go rather than
@@ -613,10 +672,148 @@ function paint() {
     /* the same selector the generated file uses — a block only wins if it
        out-specifies the kit's own, which :root does not always do */
     live.textContent = `${scopeOf(r.kit)}{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
+    pick(f)
   }
-  build(state.show)
-  for (const id of RENDERS) $('#f_' + id).hidden = id !== state.show
-  receipt(routed)
+}
+
+/* ── comparing ──────────────────────────────────────────────────────────────
+ * The page already carries a frame per kit and every kit's CSS; one is shown
+ * and the rest wait. So this is arrangement, not a second product — and the
+ * only thing it adds is the question "the same values, in whose vocabulary?",
+ * which is the one question you cannot answer anywhere else.
+ *
+ * SIX, because that is where a pane stops being a screen and starts being a
+ * thumbnail. The cap is a fact about reading, not about the machine.
+ */
+const MAX_PANES = 6
+
+/** The kits on screen: your own first, then the rest in the order they load. */
+function comparing() {
+  if (!state.compare) return []
+  return state.compare.filter((id) => RENDERS.includes(id)).slice(0, MAX_PANES)
+}
+
+function startCompare() {
+  const mine = state.show
+  const rest = RENDERS.filter((id) => id !== mine)
+  state.compare = [mine, ...rest].slice(0, MAX_PANES)
+}
+
+/** Lay the frames out, and hand the wall in each one the card it must show. */
+function layout() {
+  const shown = state.compare ? comparing() : [state.show]
+  shown.forEach(build)
+  const box = $('#frames')
+  if (state.compare) {
+    box.dataset.compare = ''
+    box.style.setProperty('--cols', String(shown.length <= 2 ? shown.length : shown.length <= 4 ? 2 : 3))
+  } else {
+    delete box.dataset.compare
+    box.style.removeProperty('--cols')
+  }
+  for (const id of RENDERS) {
+    const pane = $('#p_' + id)
+    if (pane) pane.hidden = !shown.includes(id)
+    /* the pane says which of the three cannot follow your knobs live, because
+       in a grid of six an unexplained disagreement reads as a bug */
+    const note = $('#n_' + id)
+    if (note) note.textContent = state.compare && !LIVE_BRAND[id] ? 'built, not live' : ''
+    solo($('#f_' + id))
+  }
+  $('#panes').hidden = !state.compare
+  if (state.compare) drawPanes()
+}
+
+/** Ask one frame for one card — or for the whole wall again. */
+function solo(f) {
+  const d = f?.contentDocument
+  const root = d?.documentElement
+  if (!root) return
+  if (state.compare) root.dataset.pick = ''; else delete root.dataset.pick
+  for (const el of d.querySelectorAll('.card[data-solo]')) delete el.dataset.solo
+  const card = state.solo && d.querySelector(`.card[data-card="${state.solo}"]`)
+  const strip = d.getElementById('strip')
+  if (card) {
+    card.dataset.solo = ''
+    root.dataset.solo = state.solo
+    /* AND SCROLL BACK TO THE START.
+       Hiding the other boards does not move the strip: each pane kept whatever
+       pan position it had, so a card that is now the only thing in the frame
+       could still be a thousand pixels off to the right. Three of the six came
+       up blank, which reads as a kit that failed to render. */
+    if (strip) { strip.scrollLeft = 0; strip.scrollTop = 0 }
+  } else {
+    delete root.dataset.solo
+    /* and back to the board you were on, which is where you left it */
+    const b = strip?.querySelector('#b_' + state.board)
+    if (b) strip.scrollLeft = b.offsetLeft
+  }
+}
+
+/** Clicking a card picks it — in every pane at once. */
+const PICKED = new WeakSet()
+function pick(f) {
+  const d = f?.contentDocument
+  if (!d || PICKED.has(d)) return
+  PICKED.add(d)
+  d.addEventListener('click', (e) => {
+    if (!state.compare) return
+    /* a control is a control first. The wall is live now, so a click on a
+       switch has to switch rather than rearrange the page around it. */
+    if (e.target.closest('input,select,textarea,button,a,label,summary,[role=slider],[role=tab],[role=menuitem],[role=switch],[role=checkbox],[role=radio]')) return
+    const card = e.target.closest('.card[data-card]')
+    if (!card) return
+    state.solo = state.solo === card.dataset.card ? null : card.dataset.card
+    for (const id of comparing()) solo($('#f_' + id))
+    drawPanes()
+  })
+}
+
+function drawPanes() {
+  const on = comparing()
+  const full = on.length >= MAX_PANES
+  $('#panes').innerHTML =
+    `<p class="panes__cap"><b>${on.length}</b> of ${MAX_PANES} — the same values, in each kit's own vocabulary</p>`
+    + RENDERS.map((id) => {
+      const lit = on.includes(id)
+      const stop = !lit && full
+      return `<button class="pchip" data-k="${id}" aria-pressed="${lit}"${stop ? ' disabled' : ''}
+        title="${lit ? 'showing' : stop ? `six is the most that still reads — drop one first` : 'add to the grid'}"><i></i>${KITS[id].name}</button>`
+    }).join('')
+    + (state.solo
+      ? `<span class="solobar">showing <b>${(SCENES.find((c) => c.id === state.solo) ?? {}).title ?? state.solo}</b> in all ${on.length}
+         <button class="link" id="unsolo">show the whole wall</button></span>`
+      : `<span class="solobar">click any card to compare just that one</span>`)
+}
+
+$('#panes').addEventListener('click', (e) => {
+  if (e.target.id === 'unsolo') {
+    state.solo = null
+    for (const id of comparing()) solo($('#f_' + id))
+    return drawPanes()
+  }
+  const b = e.target.closest('.pchip'); if (!b || b.disabled) return
+  const id = b.dataset.k
+  const on = comparing()
+  if (on.includes(id)) {
+    if (on.length <= 2) return               // two is the least that compares
+    state.compare = on.filter((x) => x !== id)
+  } else state.compare = [...on, id].slice(0, MAX_PANES)
+  paint()
+})
+
+$('#view').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return
+  if (b.dataset.v === 'one') { state.compare = null; state.solo = null } else startCompare()
+  drawView(); paint()
+})
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && state.solo) { state.solo = null; layout(); drawPanes() }
+})
+
+function drawView() {
+  $('#view').innerHTML = [['one', 'One kit'], ['many', 'Compare']]
+    .map(([id, label]) => `<button role="radio" data-v="${id}" aria-checked="${(state.compare ? 'many' : 'one') === id}">${label}</button>`).join('')
 }
 
 /* ── the stack, as a card ─────────────────────────────────────────────────── */
@@ -1654,6 +1851,7 @@ for (const role of TYPE) {
 }
 
 seedNote(null)
+drawView()
 sync()
 addEventListener('load', () => setTimeout(paint, 60))
 </script>
