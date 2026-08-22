@@ -697,6 +697,30 @@ export const useMantineClasses = (map) => { MC = map ?? {} }
  * first version took the first class in each stylesheet and invented nine names
  * for parts that have no file of their own. */
 const mc = (name, part = 'root') => MC[name]?.[part] ?? `mantine-missing-${name}-${part}`
+/* WHAT THEIR REACT LAYER WRITES.
+ *
+ * Every Mantine component gets a block of custom properties set on it inline —
+ * the size, the radius, the colour — and the CSS reads them with fallbacks that
+ * do not all agree with the default their components actually use: a button
+ * with no --button-fz falls back to font-size-sm, an input with none falls back
+ * to md. So our input rendered at 16px next to their 14px, on the same theme.
+ * Measured against mantine.dev, one component at a time.
+ *
+ * Everything named below is declared or read by Mantine's own stylesheet. */
+const MN_FOCUS = 'mantine-focus-auto'
+const MN_BTN_VARS = '--button-height:var(--button-height-sm);--button-padding-x:var(--button-padding-x-sm);--button-fz:var(--mantine-font-size-sm);--button-radius:var(--mantine-radius-md);'
+const MN_INPUT_VARS = '--input-margin-top:calc(var(--mantine-spacing-xs) / 2);--input-height:var(--input-height-sm);--input-fz:var(--mantine-font-size-sm);--input-radius:var(--mantine-radius-md)'
+const MN_LABEL_VARS = '--label-fz:var(--mantine-font-size-sm);--label-lh:var(--label-lh-sm)'
+/* A checkbox, a radio and a switch share one wrapper: root, body, label wrapper
+ * and label all come out of utils/InlineInput. Reading only esm/components left
+ * four parts of every one of them unnamed, so we composed a Group and a Text
+ * around the two we could name — which is why they lined up with each other on
+ * their site and not on ours. */
+const mnInline = (root, data, vars, control, label) => `<div class="${cls(root, mc('InlineInput', 'root'))}" data-label-position="right"${data} style="${vars}">
+  <div class="${mc('InlineInput', 'body')}">${control}
+    <div class="${mc('InlineInput', 'labelWrapper')}"><label class="${mc('InlineInput', 'label')}">${esc(label)}</label></div>
+  </div></div>`
+
 const MN_BTN = {
   /* Their React layer passes the contrast colour in as --button-color; without
      it the label falls back to white and the On-brand knob writes a variable
@@ -722,22 +746,37 @@ const mantine = {
   /* --title-fw comes from theme.headings.fontWeight in their React layer, which
      is --mantine-heading-font-weight. Wiring it to the per-h weight instead
      pinned every heading at 700 and left the weight knob dead. */
-  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, mc('Title'), ` data-order="${n.level ?? 3}" style="--title-fz:var(--mantine-h${n.level ?? 3}-font-size);--title-fw:var(--mantine-heading-font-weight);--title-lh:var(--mantine-h${n.level ?? 3}-line-height)"`),
+  /* the three their Title writes, per level — the weight included, now that the
+     six per-level names travel with the knob */
+  heading: (n, k) => A(n, k, `h${n.level ?? 3}`, mc('Title'), ` data-order="${n.level ?? 3}" style="--title-fz:var(--mantine-h${n.level ?? 3}-font-size);--title-fw:var(--mantine-h${n.level ?? 3}-font-weight);--title-lh:var(--mantine-h${n.level ?? 3}-line-height)"`),
   text:    (n, k) => A(n, k, 'p', mc('Text')),
   muted:   (n, k) => A(n, k, 'p', mc('Text'), ' style="--text-color:var(--mantine-color-dimmed)"'),
   label:   (n, k) => A(n, k, 'label', mc('Input', 'label')),
-  button:  (n, k) => A(n, k, 'button', mc('Button'), MN_BTN[n.tone ?? 'brand'] ? ` style="${MN_BTN[n.tone ?? 'brand']}"` : ''),
+  /* their button is Button-root AND UnstyledButton-root, with the focus and
+     press classes their own stylesheet defines — ours had neither, so a Mantine
+     button on this wall had no focus ring at all */
+  button:  (n, k) => A(n, k, 'button', cls(MN_FOCUS, 'mantine-active', mc('Button'), mc('UnstyledButton')),
+    ` style="${MN_BTN_VARS}${MN_BTN[n.tone ?? 'brand']}"`),
   /* wrapper OUTSIDE, input inside: data-variant on the wrapper is what sets
      --input-bd and --input-bg, and an input without it has `border: 1px solid`
      with no colour — an invisible field, which is what the first pass shipped. */
-  input:   (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default"><input class="${mc('Input', 'input')}" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}"></div>`,
-  select:  (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default"><select class="${mc('Input', 'input')}">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select></div>`,
+  input:   (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default" data-size="sm" style="${MN_INPUT_VARS}"><input class="${cls(MN_FOCUS, mc('Input', 'input'))}" data-variant="default" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}"></div>`,
+  select:  (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default" data-size="sm" style="${MN_INPUT_VARS}"><select class="${cls(MN_FOCUS, mc('Input', 'input'))}" data-variant="default">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select></div>`,
   /* --checkbox-size lives on the ROOT and the input reads it, so an input on
      its own is a zero-sized box. Their nesting, not ours. */
-  checkbox: (n) => `<label class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)"><span class="${mc('Checkbox')}"><span class="${mc('Checkbox', 'inner')}"><input type="checkbox" class="${mc('Checkbox', 'input')}"${n.on ? ' checked' : ''}></span></span><span class="${mc('Text')}">${esc(n.text ?? '')}</span></label>`,
+  checkbox: (n) => mnInline(mc('Checkbox'), ' data-variant="filled" data-size="sm"',
+    `--checkbox-size:var(--checkbox-size-sm);--checkbox-radius:var(--mantine-radius-sm);--checkbox-color:var(--mantine-primary-color-filled);${MN_LABEL_VARS}`,
+    `<div class="${mc('Checkbox', 'inner')}" data-label-position="right"><input type="checkbox" class="${cls(MN_FOCUS, mc('Checkbox', 'input'))}" data-variant="filled"${n.on ? ' checked' : ''}></div>`,
+    n.text ?? ''),
   /* the track is a SIBLING of the input, not the same element: Mantine styles
      it through `input:checked + track`. */
-  switch:  (n) => `<label class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)"><span class="${mc('Switch')}"><input type="checkbox" role="switch" class="${mc('Switch', 'input')}"${n.on ? ' checked' : ''}><span class="${mc('Switch', 'track')}"><span class="${mc('Switch', 'thumb')}"></span></span></span><span class="${mc('Text')}">${esc(n.text ?? '')}</span></label>`,
+  switch:  (n) => mnInline(mc('Switch'), ` data-size="sm" data-checked="${!!n.on}"`,
+    `--switch-height:var(--switch-height-sm);--switch-radius:var(--mantine-radius-xl);--switch-color:var(--mantine-primary-color-filled);${MN_LABEL_VARS}`,
+    `<input type="checkbox" role="switch" class="${cls(MN_FOCUS, mc('Switch', 'input'))}" data-checked="${!!n.on}"${n.on ? ' checked' : ''}>
+     <span class="${mc('Switch', 'track')}" data-label-position="right" data-without-labels="true">
+       <span class="${mc('Switch', 'trackLabel')}"></span>
+       <span class="${mc('Switch', 'thumb')}" data-reduce-motion="true"></span></span>`,
+    n.text ?? ''),
   badge:   (n, k) => A(n, k, 'span', mc('Badge'), MN_BADGE[n.tone ?? 'neutral'] ? ` style="${MN_BADGE[n.tone ?? 'neutral']}"` : ''),
   alert:   (n, k) => `<div class="${mc('Alert')}" style="--alert-bg:var(--mantine-color-${{ danger: 'error', warning: 'yellow-light', success: 'success' }[n.tone] ?? 'blue-light'})"><div class="${mc('Text')}">${n.text != null ? esc(n.text) : k}</div></div>`,
   stat:    (n) => `<div class="${cls(mc('Paper'), mc('Card'))}" data-with-border="true" data-orientation="vertical" style="--card-padding:var(--mantine-spacing-lg)"><p class="${mc('Text')}" style="--text-color:var(--mantine-color-dimmed);--text-fz:var(--mantine-font-size-sm)">${esc(n.label)}</p><p class="${mc('Title')}" data-order="2" style="--title-fz:var(--mantine-h2-font-size);--title-fw:var(--mantine-h2-font-weight);--title-lh:var(--mantine-h2-line-height)">${esc(n.value)}</p></div>`,
@@ -765,18 +804,30 @@ const mantine = {
     <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-sm);--text-color:var(--mantine-color-dimmed);margin-top:var(--mantine-spacing-lg)">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="${mc('Group')}">${list(n.levels).map((lv) =>
     `<div class="${cls(mc('Paper'), mc('Card'))}" data-orientation="vertical" style="--paper-shadow:var(--mantine-shadow-${lv});width:96px;height:64px;display:flex;align-items:center;justify-content:center"><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed)">${esc(lv)}</span></div>`).join('')}</div>`,
-  tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal"><div class="${mc('Tabs', 'list')}" role="tablist">${
-    list(n.items).map((t, i) => `<button class="${mc('Tabs', 'tab')}" role="tab"${i === 0 ? ' data-active="true"' : ''}>${esc(t)}</button>`).join('')}</div></div>`,
+  tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal" data-variant="default" style="--tabs-radius:var(--mantine-radius-md);--tabs-color:var(--mantine-primary-color-filled)"><div class="${mc('Tabs', 'list')}" role="tablist" data-orientation="horizontal" data-variant="default">${
+    list(n.items).map((t, i) => `<button class="${cls(MN_FOCUS, mc('Tabs', 'tab'))}" role="tab"${i === 0 ? ' data-active="true"' : ''}><span class="${mc('Tabs', 'tabLabel')}">${esc(t)}</span></button>`).join('')}</div></div>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   /* Mantine ships a component for every one of these but the chart: Slider,
      Progress, Radio, Breadcrumbs, ActionIcon, NavLink, DataList and EmptyState
      are all its own, by the same name→hash map as everything above. */
-  textarea: (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default"><textarea rows="3" class="${mc('Input', 'input')}" data-multiline="true" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea></div>`,
-  radio:   (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-xs)">${list(n.items).map((t, i) => `<label class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)"><span class="${mc('Radio')}"><span class="${mc('Radio', 'inner')}"><input type="radio" name="${esc(n.name ?? 'g')}" class="${mc('Radio', 'radio')}"${i === (n.on ?? 0) ? ' checked' : ''}><span class="${mc('Radio', 'icon')}"></span></span></span><span class="${mc('Text')}">${esc(t)}</span></label>`).join('')}</div>`,
-  slider:  (n) => `<div class="${mc('Slider')}" style="--slider-size:var(--mantine-spacing-xs)"><div class="${mc('Slider', 'trackContainer')}"><div class="${mc('Slider', 'track')}"><div class="${mc('Slider', 'bar')}" style="width:${n.value ?? 60}%;left:0"></div></div></div><div class="${mc('Slider', 'thumb')}" style="left:${n.value ?? 60}%"></div></div>`,
-  progress: (n) => `<div class="${mc('Progress')}"><div class="${mc('Progress', 'section')}" style="--progress-section-width:${n.value ?? 60}%"></div></div>`,
-  iconrow: (n) => `<div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="${mc('ActionIcon')}" data-variant="subtle" style="--ai-bg:transparent;--ai-color:var(--mantine-color-text);--ai-hover:var(--mantine-color-default-hover)"><span class="${mc('ActionIcon', 'icon')}">${ico(i)}</span></button>`).join('')}</div>`,
+  textarea: (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default" data-size="sm" style="${MN_INPUT_VARS}"><textarea rows="3" class="${cls(MN_FOCUS, mc('Input', 'input'))}" data-variant="default" data-multiline="true" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea></div>`,
+  radio:   (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-xs)">${list(n.items).map((t, i) => mnInline(mc('Radio'), ' data-variant="filled" data-size="sm"',
+    `--radio-size:var(--radio-size-sm);--radio-radius:var(--mantine-radius-xl);--radio-color:var(--mantine-primary-color-filled);${MN_LABEL_VARS}`,
+    `<div class="${mc('Radio', 'inner')}" data-label-position="right"><input type="radio" name="${esc(n.name ?? 'g')}" class="${cls(MN_FOCUS, mc('Radio', 'radio'))}"${i === (n.on ?? 0) ? ' checked' : ''}><span class="${mc('Radio', 'icon')}"></span></div>`,
+    t)).join('')}</div>`,
+  /* their own size, radius and thumb, and the bar positioned the way their
+     component positions it — a width and a left of ours put the bar in roughly
+     the right place and left the track at no height at all */
+  slider:  (n) => `<div class="${mc('Slider')}" data-size="md" style="--slider-size:var(--slider-size-md);--slider-color:var(--mantine-primary-color-filled);--slider-radius:var(--mantine-radius-xl);--slider-thumb-size:calc(var(--slider-size) * 2)">
+    <div class="${mc('Slider', 'trackContainer')}"><div class="${mc('Slider', 'track')}">
+      <div class="${mc('Slider', 'bar')}" style="--slider-bar-width:calc(${n.value ?? 60}% + 2 * var(--slider-size));--slider-bar-offset:calc(0% - var(--slider-size))"></div>
+    </div></div><div class="${mc('Slider', 'thumb')}" style="--slider-thumb-offset:${n.value ?? 60}%"></div></div>`,
+  /* --progress-section-WIDTH was a name of ours that nothing reads: their
+     section reads --progress-section-size for the width and
+     --progress-section-color for the fill, so this bar had neither. */
+  progress: (n) => `<div class="${mc('Progress')}"><div class="${mc('Progress', 'section')}" style="--progress-section-size:${n.value ?? 60}%;--progress-section-color:var(--mantine-primary-color-filled)"></div></div>`,
+  iconrow: (n) => `<div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="${cls(MN_FOCUS, 'mantine-active', mc('ActionIcon'), mc('UnstyledButton'))}" data-variant="subtle" style="--ai-size:var(--ai-size-md);--ai-radius:var(--mantine-radius-md);--ai-bg:transparent;--ai-color:var(--mantine-color-text);--ai-hover:var(--mantine-color-default-hover)"><span class="${mc('ActionIcon', 'icon')}">${ico(i)}</span></button>`).join('')}</div>`,
   breadcrumb: (n) => `<div class="${mc('Breadcrumbs')}">${list(n.items).map((t, i, a) => `${i ? `<div class="${mc('Breadcrumbs', 'separator')}">/</div>` : ''}<div class="${mc('Breadcrumbs', 'breadcrumb')}">${i === a.length - 1 ? `<span class="${mc('Text')}">${esc(t)}</span>` : `<a class="${mc('Anchor')}" href="#">${esc(t)}</a>`}</div>`).join('')}</div>`,
   sidenav: (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-md)">${list(n.groups).map((g) => `<div>
     <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed);padding:0 var(--mantine-spacing-xs);margin:0 0 4px">${esc(g.title)}</p>${

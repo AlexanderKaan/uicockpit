@@ -239,15 +239,22 @@ const SOURCES = {
            ships esm/components/<Name>/<Name>.module.mjs holding exactly
            { th: 'm_4e7aa4f3', td: 'm_4e7aa4ef', … }. So it is read, and a
            release that rehashes them changes this map rather than our code. */
+        /* esm/utils as well as esm/components. A checkbox and a switch share
+           their body, their label wrapper and one of their two root classes,
+           and those live in utils/InlineInput — so reading only the component
+           folders left us naming four parts of every checkbox we could not
+           name, and composing our own layout around the two we could. */
         const classes = {}
-        for (const name of p.list('esm/components')) {
-          let src
-          try { src = p.read(`esm/components/${name}/${name}.module.mjs`) } catch { continue }
-          const map = Object.fromEntries([...src.matchAll(/"([A-Za-z0-9_]+)":\s*"(m_[a-z0-9]+)"/g)].map((m) => [m[1], m[2]]))
-          if (Object.keys(map).length) classes[name] = map
+        for (const where of ['esm/components', 'esm/utils']) {
+          for (const name of p.list(where)) {
+            let src
+            try { src = p.read(`${where}/${name}/${name}.module.mjs`) } catch { continue }
+            const map = Object.fromEntries([...src.matchAll(/"([A-Za-z0-9_]+)":\s*"(m_[a-z0-9]+)"/g)].map((m) => [m[1], m[2]]))
+            if (Object.keys(map).length) classes[name] ??= map
+          }
         }
         return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://mantine.dev',
-          source: `npm @mantine/core@${p.version} · styles.css :root + colour-scheme blocks, class names from esm/components/*/*.module.mjs`,
+          source: `npm @mantine/core@${p.version} · styles.css :root + colour-scheme blocks, class names from esm/{components,utils}/*/*.module.mjs`,
           classes, modes: { light, dark } }
       } finally { p.close() }
     },

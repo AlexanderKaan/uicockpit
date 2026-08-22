@@ -24,8 +24,18 @@ import { SCENES, ICON_NAMES, wallMarkup } from './scenes.mjs'
 import { icons } from './icons.mjs'
 
 const OUT = process.argv[2] ?? 'wall.html'
+/* EVERY role, not the nine this started with.
+ *
+ * A role left blank writes no variable, so the kit keeps its own default and
+ * the preview quietly shows something the product would not: Mantine's headings
+ * stayed at its published 700 while the weight knob said 600, and it looked
+ * like a binding bug for twenty minutes. Third harness to be caught by this —
+ * fidelity and orphans both had it — so it is written out in full here too. */
 const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
-  ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '1rem' }
+  ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px',
+  space: '1', elevation: '1', lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600',
+  borderWidth: '1px', success: '#2f9e44', warning: '#f08c00', danger: '#e03131', focus: '#0b6e8a',
+  fontHeading: 'Fraunces, serif', fontBody: 'Inter, sans-serif' }
 /* Seven walls on one page is seven stylesheets and two megabytes of CSS, which
  * is more than a browser will paint at once when you only wanted to look at
  * one. DSG_KITS narrows it, the same switch build-page.mjs takes. */

@@ -156,7 +156,12 @@ export const MAP = {
                            '--mantine-h1-line-height', '--mantine-h2-line-height', '--mantine-h3-line-height',
                            '--mantine-h4-line-height', '--mantine-h5-line-height', '--mantine-h6-line-height'] },
     letterSpacing: null,
-    fontWeight:   { var: '--mantine-heading-font-weight' },
+    /* Their Title writes --title-fw: var(--mantine-h<n>-font-weight), one per
+       level — not the theme-wide name. Routing to that name alone left every
+       heading at 700 whatever the knob said, so the six travel with it. */
+    fontWeight:   { var: '--mantine-heading-font-weight',
+                    also: ['--mantine-h1-font-weight', '--mantine-h2-font-weight', '--mantine-h3-font-weight',
+                           '--mantine-h4-font-weight', '--mantine-h5-font-weight', '--mantine-h6-font-weight'] },
     borderWidth:  null,
   },
   openprops: {
