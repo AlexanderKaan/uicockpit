@@ -632,8 +632,18 @@ const radix = {
   /* Radix's checkbox is a button with an indicator inside, not an <input>:
      rt-reset strips the native appearance, so an input renders as an empty box
      that never fills in. Their markup, their states. */
-  checkbox: (n) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-BaseCheckboxRoot rt-CheckboxRoot rt-r-size-2 rt-variant-${n.on ? 'solid' : 'surface'}" role="checkbox" aria-checked="${!!n.on}"${n.on ? ' data-state="checked"' : ''}>${n.on ? '<svg class="rt-BaseCheckboxIndicator" viewBox="0 0 9 9" fill="currentColor"><path d="M0,4 L3,7 L9,1 L8,0 L3,5 L1,3 Z"/></svg>' : ''}</button>${esc(n.text ?? '')}</label>`,
-  switch:  (n) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-SwitchRoot rt-r-size-2 rt-variant-surface"${n.on ? ' data-state="checked"' : ''}><span class="rt-SwitchThumb"></span></button>${esc(n.text ?? '')}</label>`,
+  /* UNCHECKED IS A STATE, AND SOLID IS NOT A CHECKBOX VARIANT.
+     Their checkbox has surface and classic and nothing else, so switching to
+     rt-variant-solid when ticked matched no rule at all: a ticked box had no
+     box. The variant is a property of the whole control, not of its state —
+     data-state is what fills it, in
+     .rt-BaseCheckboxRoot:where(.rt-variant-surface):where([data-state='checked'])::before.
+     Their surface variant draws the empty one the same way in
+     .rt-BaseCheckboxRoot[data-state='unchecked']::before — so leaving the
+     attribute off when the box is empty left an empty box with no box: a
+     tick floating next to a label, which is what this wall showed. */
+  checkbox: (n) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-BaseCheckboxRoot rt-CheckboxRoot rt-r-size-2 rt-variant-surface" role="checkbox" aria-checked="${!!n.on}" data-state="${n.on ? 'checked' : 'unchecked'}">${n.on ? '<svg class="rt-BaseCheckboxIndicator" viewBox="0 0 9 9" fill="currentColor"><path d="M0,4 L3,7 L9,1 L8,0 L3,5 L1,3 Z"/></svg>' : ''}</button>${esc(n.text ?? '')}</label>`,
+  switch:  (n) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-SwitchRoot rt-r-size-2 rt-variant-surface" role="switch" aria-checked="${!!n.on}" data-state="${n.on ? 'checked' : 'unchecked'}"><span class="rt-SwitchThumb" data-state="${n.on ? 'checked' : 'unchecked'}"></span></button>${esc(n.text ?? '')}</label>`,
   badge:   (n, k) => A(n, k, 'span', 'rt-reset rt-Badge rt-r-size-1 rt-variant-soft', rxAccent(n.tone)),
   alert:   (n, k) => `<div class="rt-reset rt-BaseCard rt-CalloutRoot rt-r-size-2 rt-variant-soft"${rxAccent(n.tone)}><p class="rt-Text rt-r-size-2">${n.text != null ? esc(n.text) : k}</p></div>`,
   stat:    (n) => `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-2 rt-variant-surface"><p class="rt-Text rt-r-size-1" data-accent-color="gray">${esc(n.label)}</p><p class="rt-Heading rt-r-size-6">${esc(n.value)}</p></div>`,
@@ -665,8 +675,13 @@ const radix = {
     <p class="rt-Text rt-r-size-1" data-accent-color="gray" style="margin-top:var(--space-5)">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4)">${list(n.levels).map((lv, i) =>
     `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-1 rt-variant-surface" style="width:96px;height:64px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-${i + 2})"><span class="rt-Text rt-r-size-1" data-accent-color="gray">${esc(lv)}</span></div>`).join('')}</div>`,
+  /* A TabNav marks its current link with data-ACTIVE; data-state is what a Tabs
+     trigger uses. Ours said data-state on a TabNavLink, so the base rule read it
+     as selected and the rule that styles the label read
+     .rt-TabNavLink:not([data-active]) and read it as not — one tab styled two
+     ways at once, and the selected one did not look selected. */
   tabs:    (n) => `<nav class="rt-reset rt-BaseTabList rt-r-size-2">${list(n.items).map((t, i) =>
-    `<div class="rt-TabNavItem"><a class="rt-reset rt-BaseTabListTrigger rt-TabNavLink"${i === 0 ? ' data-state="active"' : ''}><span class="rt-BaseTabListTriggerInner">${esc(t)}</span><span class="rt-BaseTabListTriggerInnerHidden">${esc(t)}</span></a></div>`).join('')}</nav>`,
+    `<div class="rt-TabNavItem"><a class="rt-reset rt-BaseTabListTrigger rt-TabNavLink"${i === 0 ? ' data-active' : ''}><span class="rt-BaseTabListTriggerInner">${esc(t)}</span><span class="rt-BaseTabListTriggerInnerHidden">${esc(t)}</span></a></div>`).join('')}</nav>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   /* Slider, Progress, RadioGroup, TextArea and DataList are all Radix Themes
@@ -674,7 +689,7 @@ const radix = {
      It ships no sidebar, no breadcrumb, no list and no chart — those four are
      its own tokens on plain markup, and the manifest says so. */
   textarea: (n) => `<div class="rt-TextAreaRoot rt-r-size-2 rt-variant-surface"><textarea rows="3" class="rt-reset rt-TextAreaInput" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea></div>`,
-  radio:   (n) => `<div class="rt-Flex rt-RadioGroupRoot" style="display:flex;flex-direction:column;gap:var(--space-2)">${list(n.items).map((t, i) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-BaseRadioRoot rt-RadioGroupItem rt-r-size-2 rt-variant-surface" role="radio" aria-checked="${i === (n.on ?? 0)}"${i === (n.on ?? 0) ? ' data-state="checked"' : ''}></button>${esc(t)}</label>`).join('')}</div>`,
+  radio:   (n) => `<div class="rt-Flex rt-RadioGroupRoot" style="display:flex;flex-direction:column;gap:var(--space-2)">${list(n.items).map((t, i) => `<label class="rt-Text rt-r-size-2" style="display:inline-flex;align-items:center;gap:var(--space-2)"><button class="rt-reset rt-BaseRadioRoot rt-RadioGroupItem rt-r-size-2 rt-variant-surface" role="radio" aria-checked="${i === (n.on ?? 0)}" data-state="${i === (n.on ?? 0) ? 'checked' : 'unchecked'}"></button>${esc(t)}</label>`).join('')}</div>`,
   /* Radix reads data-orientation on every PART, not on the root, and its
      progress bar is a scaleX of --progress-value against --progress-max — not a
      width. Written the way their primitive writes it: a track with no

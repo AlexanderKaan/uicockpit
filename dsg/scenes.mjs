@@ -100,6 +100,10 @@ export const BOARDS = [
         ] } },
         { id: 'choices', title: 'Choices', panel: true, node: { p: 'stack', gap: 3, kids: [
           { p: 'checkbox', on: true, text: 'This is my own household' },
+          /* and one that is OFF. Every checkbox on this wall used to be ticked,
+             so the empty state was never on screen — which is how Radix went out
+             with no box around an unticked one for weeks. */
+          { p: 'checkbox', on: false, text: 'Send me a copy by post' },
           { p: 'switch', on: true, text: 'Notify me by email' },
           { p: 'divider' },
           { p: 'radio', name: 'send', on: 1, items: ['By post', 'By email', 'Collect in person'] },
