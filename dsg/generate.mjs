@@ -142,6 +142,21 @@ ${SCOPE.mantine} {
 ${decl(r.vars)}
 }`,
 
+  /* ANT DESIGN'S BLOCK IS THE LEFTOVERS, ON PURPOSE.
+   * Everything routable there is a token you hand their generator, and that is
+   * what the file below the export writes. What is left is the two the
+   * generator has no input for — their three shadow strings — plus the values
+   * themselves, so a reader can see what the theme resolved to without running
+   * anything. Written under .antd, which is the scope their own cssVar option
+   * puts them in. */
+  antd: (r, kit) => `/* ${stamp(kit)} — the leftovers.
+   Ant Design derives everything from the tokens in antd.theme.ts next to this
+   file; do not write these by hand unless you mean to overrule its algorithm.
+   The shadows are here because its token API takes no strength. */
+.antd {
+${decl(r.vars)}
+}`,
+
   /* Open Props renders nothing, so this block exists to make YOUR css agree
    * with the kit above it: write var(--brand) or var(--size-3) by hand and it
    * lands on the same values the components use. */
@@ -177,6 +192,22 @@ ${r.needsBuild
 @import "bootstrap/scss/bootstrap";
 `,
   }),
+  antd: (r) => ({
+    'antd.theme.ts': `// The theme, because Ant Design has no stylesheet to edit.
+// Its 1,289 variables are computed from these by its own algorithm, so this
+// object is the whole of your kit — a variable written by hand would move one
+// value and leave the two hundred derived from it behind.
+import type { ThemeConfig } from 'antd'
+
+export const theme: ThemeConfig = {
+  cssVar: { key: 'antd' },
+  hashed: false,
+  token: ${JSON.stringify(r.tokens ?? {}, null, 4).replace(/\n/g, '\n  ')},
+}
+
+// <ConfigProvider theme={theme}> around your app, and nothing else to import.
+`,
+  }),
   shadcn: () => ({
     'components.json': JSON.stringify({
       $schema: 'https://ui.shadcn.com/schema.json',
@@ -209,6 +240,12 @@ const INSTALL = {
       `/* their menu, dialog, popover and tooltip name ten utilities that live  */`,
       `/* in that package and nowhere else. Without it those classes have no    */`,
       `/* rule and every one of those components appears with no entrance.      */`] : [])],
+  antd: (k) => [`npm install ${k.npm}@${k.version}`,
+    `<!-- No stylesheet. Ant Design generates its CSS from the theme object -->`,
+    `<!-- in antd.theme.ts, so the provider IS the installation.            -->`,
+    `import { ConfigProvider } from 'antd'`,
+    `import { theme } from './antd.theme'`,
+    `<ConfigProvider theme={theme}>`],
   radix: (k, r) => [`npm install ${k.npm}@${k.version}`, `import '@radix-ui/themes/styles.css'`,
     `<!-- the choices go on the Theme root, not in CSS: -->`,
     `<Theme ${attrLine(r) || 'accentColor="indigo"'}>`],
@@ -282,6 +319,11 @@ export const COMPONENT_GAPS = {
   ],
   tailwind: [
     ['chart', 'Tailwind ships utilities, not components — everything on this wall is composed, the chart included'],
+  ],
+  antd: [
+    ['chart', 'Ant Design ships no chart; charts live in @ant-design/charts, a separate package — the bars here are its own primary at two fills'],
+    ['stack', 'their layout is Flex and Space, which are components; a column of ours is their spacing on a plain div'],
+    ['sidenav', 'their Menu in inline mode is the sidebar, and it is theirs — but the rail on this wall has a count on one row, which their item API has no slot for, so that badge sits in the label'],
   ],
   material: [
     ['navbar', 'M3 has a top app bar in the specification; @material/web ships only a bottom navigation bar, so the header is its tokens on plain markup'],
@@ -373,6 +415,9 @@ export const DARK = {
   radix: '.dark, .dark-theme',
   mantine: ":root[data-mantine-color-scheme='dark'], [data-mantine-color-scheme='dark']",
   openprops: '@media (prefers-color-scheme: dark)',
+  /* Their dark is an ALGORITHM, not a selector: theme.darkAlgorithm run over
+     the same seeds. There is no block of ours to write, so there is none. */
+  antd: 'algorithm',
 }
 
 export function collisions(routed, kits) {
@@ -402,6 +447,19 @@ export function collisions(routed, kits) {
 function darkBlock(r, kit) {
   const at = DARK[r.kit]
   if (!at || !r.dark) return ''
+  /* A KIT WHOSE DARK IS A FUNCTION, NOT A SELECTOR.
+     Ant Design's dark mode is theme.darkAlgorithm run over the same seeds, so
+     there is no block of ours to write and the theme file says so instead.
+     Written as a selector it copied their 835 published dark values into our
+     file — including a navy their Layout header carries as a literal, which is
+     how the check that nothing here is a colour we chose found it. */
+  if (at === 'algorithm') {
+    return `/* ${kit.name} in the dark — an ALGORITHM, not a selector.
+   theme.darkAlgorithm over the same tokens, set in antd.theme.ts:
+     import { theme as antdTheme } from 'antd'
+     <ConfigProvider theme={{ ...theme, algorithm: antdTheme.darkAlgorithm }}>
+   Nothing to write here; a block of variables would overrule the generator. */`
+  }
   const head = `/* ${kit.name} in the dark — your values through this kit's own
    published light-to-dark relationship, in the switch it actually reads. */`
   if (r.kit === 'daisyui') {

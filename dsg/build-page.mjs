@@ -14,7 +14,7 @@ import { DARK, generate } from './generate.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render, PARTS } from './parts.mjs'
-import { WALL, useMantineClasses, useRadixTones, useIcons, useShadcnParts } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useRadixTones, useIcons, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES, BOARDS, wallMarkup, safeJson } from './scenes.mjs'
 import { ownage, partOwnage } from './fidelity.mjs'
 import { analyse, unread } from './orphans.mjs'
@@ -28,13 +28,14 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const OUT = process.argv[2] ?? 'index.html'
-const IDS = (process.env.DSG_KITS ?? 'tailwind,daisyui,shadcn,bootstrap,material,radix,mantine,openprops').split(',')
+const IDS = (process.env.DSG_KITS ?? 'tailwind,daisyui,shadcn,bootstrap,material,radix,mantine,antd,openprops').split(',')
 const SEED = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
   lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600', borderWidth: '1px' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(kits.mantine?.classes)
 useShadcnParts(kits.shadcn?.parts)
+useAntdParts(kits.antd?.parts)
 
 /* The semantic knobs open on a published value, not on a green we picked. The
  * order is the order kits are asked in, and the page says which kit answered.
@@ -46,7 +47,7 @@ useShadcnParts(kits.shadcn?.parts)
  * replaced the moment the page opens; what matters is that the name is there. */
 const SEEDS = {}
 for (const role of ['success', 'warning', 'danger', 'focus']) {
-  const seed = seedFrom(role, kits, ['daisyui', 'bootstrap', 'mantine', 'material', 'shadcn', 'radix'])
+  const seed = seedFrom(role, kits, ['daisyui', 'bootstrap', 'mantine', 'material', 'shadcn', 'radix', 'antd'])
   if (seed) { SEED[role] = seed.value; SEEDS[role] = seed }
 }
 /* the wall is built once, so Radix's per-element tones are baked from the seed;
@@ -157,7 +158,10 @@ let page = readFileSync('page.template.html', 'utf8')
     kits, css, files: generate(SEED, IDS, kits), routed: darken(route(SEED, IDS, kits), kits), code: mdw.js }))))
   .replace('/*OWN*/', () => JSON.stringify(Object.fromEntries(RENDERS.map((id) => {
     const html = SCENES.map((s) => render(s.node, WALL[id])).join('')
-    const { used, theirs, els, elsTheirs } = ownage(html, css[id] ?? '', id === 'material' ? mdw.bundled : null)
+    /* Ant Design's classes come out of its own render, so what it emitted IS
+       what is theirs — the same question the meter asks, asked the same way. */
+    const { used, theirs, els, elsTheirs } = ownage(html, css[id] ?? '',
+      id === 'material' ? mdw.bundled : null, id === 'antd' ? kits.antd?.classes : null)
     /* the legible half of the same question: how many PARTS are theirs, and
        which ones we had to draw from their tokens because they ship none */
     const part = partOwnage(WALL[id], css[id] ?? '', render, PARTS, id === 'material' ? mdw.bundled : null)

@@ -1,5 +1,4 @@
-import { render } from './parts.mjs'
-import { BINDING_ICONS } from './wall-bindings.mjs'
+import { render, BINDING_ICONS } from './parts.mjs'
 
 /**
  * THE WALL — written once, rendered by whichever kit is on.

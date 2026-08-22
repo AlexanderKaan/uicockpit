@@ -19,7 +19,7 @@ import { route } from './roles.mjs'
 import { materialElements } from './material-elements.mjs'
 import { buildCss } from './build-css.mjs'
 import { render } from './parts.mjs'
-import { WALL, useIcons, useMantineClasses, useShadcnParts } from './wall-bindings.mjs'
+import { WALL, useIcons, useMantineClasses, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES, wallMarkup } from './scenes.mjs'
 import { icons } from './icons.mjs'
 
@@ -39,12 +39,13 @@ const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface:
 /* Seven walls on one page is seven stylesheets and two megabytes of CSS, which
  * is more than a browser will paint at once when you only wanted to look at
  * one. DSG_KITS narrows it, the same switch build-page.mjs takes. */
-const IDS = (process.env.DSG_KITS ?? 'tailwind,daisyui,shadcn,bootstrap,material,radix,mantine').split(',')
+const IDS = (process.env.DSG_KITS ?? 'tailwind,daisyui,shadcn,bootstrap,material,radix,mantine,antd').split(',')
 /* Tailwind's document is always loaded, rendered or not: daisyUI and shadcn are
    compiled BY it, so a `DSG_KITS=shadcn` run still needs to know its version. */
 const kits = Object.fromEntries([...new Set([...IDS, 'tailwind'])].map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(JSON.parse(readFileSync('kits/mantine.json', 'utf8')).classes)
 useShadcnParts(JSON.parse(readFileSync('kits/shadcn.json', 'utf8')).parts)
+useAntdParts(JSON.parse(readFileSync('kits/antd.json', 'utf8')).parts)
 useIcons(icons(ICON_NAMES).icons)
 
 const body = (id) => wallMarkup(WALL[id])

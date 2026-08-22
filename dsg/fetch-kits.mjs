@@ -21,6 +21,11 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { openNpm, fromNpm, blockOf, cssVars } from './npm-read.mjs'
 import { readParts, STYLE } from './registry-read.mjs'
+import { antdBundle, antdRender } from './antd-render.mjs'
+import { antdNodes } from './antd-nodes.mjs'
+import { SCENES, ICON_NAMES } from './scenes.mjs'
+import { SPECIMEN } from './parts.mjs'
+import { icons } from './icons.mjs'
 
 const CHECK = process.argv.includes('--check')
 
@@ -71,6 +76,7 @@ const BEHAVIOUR = [
   [/^lit$/, 'lit', 'custom elements, so the behaviour ships inside the element'],
   [/^@floating-ui\//, 'its own React layer', 'React components that carry their own behaviour'],
   [/^@popperjs\//, 'its own JavaScript', 'the scripts it ships in dist/js'],
+  [/^@rc-component\//, 'rc-component', 'the rc-* behaviour packages — the unstyled React primitives Ant Design is built on'],
 ]
 /** What a package's own dependency list says it leans on for behaviour. */
 function behaviourOf(names) {
@@ -319,6 +325,37 @@ const SOURCES = {
           source: `npm open-props@${p.version} · open-props.min.css + normalize.{light,dark}.min.css`,
           modes: { light, dark } }
       } finally { p.close() }
+    },
+  },
+  antd: {
+    layer: 'components', engine: 'own', standalone: true,
+    name: 'Ant Design',
+    what: 'React components with the styles generated at runtime — no stylesheet to import, a theme object instead',
+    async read() {
+      /* THE ONLY KIT HERE THAT HAS TO BE RUN TO BE READ.
+       *
+       * Everything else publishes something you can open: a stylesheet, a
+       * theme file, a registry of class strings. Ant Design publishes React,
+       * and its variables only exist once its algorithm has been asked for
+       * them. So this asks — at its own published defaults, which is what a
+       * kit's document is supposed to hold — and the values that come back are
+       * the ones its own generator produced, not ones we read off a page.
+       *
+       * The markup comes out of the same run, because the classes it wears are
+       * a fact about their components and not about our tokens. */
+      const meta = antdBundle()
+      const nodes = antdNodes(SCENES, SPECIMEN)
+      const light = antdRender({ nodes, icons: icons(ICON_NAMES).icons })
+      const dark = antdRender({ nodes, dark: true, icons: icons(ICON_NAMES).icons })
+      const vars = (css) => Object.fromEntries([...css.matchAll(/(--ant-[a-z0-9-]+)\s*:\s*([^;}]+)/gi)]
+        .map((m) => [m[1], m[2].trim()]))
+      return { version: meta.version, license: meta.license, npm: meta.npm, home: meta.home,
+        source: meta.source,
+        parts: light.parts, classes: light.classes,
+        /* what their own package.json says they lean on, read the same way as
+           every other kit's — theirs names forty of them, all rc-component */
+        behaviour: behaviourOf(meta.deps ?? []),
+        modes: { light: vars(light.css), dark: vars(dark.css) } }
     },
   },
   shadcn: {

@@ -3,13 +3,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { PARTS, render, gaps } from './parts.mjs'
-import { WALL, useMantineClasses, useShadcnParts } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
 import { BOARDS, SCENES } from './scenes.mjs'
 import { readFileSync } from 'node:fs'
 
 const mantineKit = JSON.parse(readFileSync('kits/mantine.json', 'utf8'))
 useMantineClasses(mantineKit.classes)
 useShadcnParts(JSON.parse(readFileSync('kits/shadcn.json', 'utf8')).parts)
+useAntdParts(JSON.parse(readFileSync('kits/antd.json', 'utf8')).parts)
 const KITS = Object.keys(WALL)
 
 /* How each kit gives a control its height — its OWN mechanism, named. None of
@@ -21,6 +22,7 @@ const HEIGHT = {
   material: /^<md-[a-z-]*(button|icon-button)/,
   radix: /\brt-r-size-\d/,
   mantine: new RegExp(`${mantineKit.classes.Button.root}|${mantineKit.classes.ActionIcon.root}`),
+  antd: /\bant-btn\b/,
 }
 
 /* Cards are looked up by NAME, never by index. The wall is a composition now

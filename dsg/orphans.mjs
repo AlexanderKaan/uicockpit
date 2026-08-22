@@ -32,14 +32,14 @@ import { pathToFileURL } from 'node:url'
 import { buildCss } from './build-css.mjs'
 import { generate } from './generate.mjs'
 import { MAP, ROLES, route, darken } from './roles.mjs'
-import { WALL, useMantineClasses, useIcons, useShadcnParts } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useIcons, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES, wallMarkup } from './scenes.mjs'
 import { render } from './parts.mjs'
 import { SPECIMENS } from './generate.mjs'
 import { icons } from './icons.mjs'
 import { materialElements } from './material-elements.mjs'
 
-const IDS = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material', 'radix', 'mantine', 'openprops']
+const IDS = ['tailwind', 'daisyui', 'shadcn', 'bootstrap', 'material', 'radix', 'mantine', 'antd', 'openprops']
 const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff', ink: '#16181c',
   inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
   lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600', borderWidth: '1px',
@@ -94,7 +94,10 @@ export function written(kit) {
       ...(e.alphaFrom ? [[e.alphaFrom, 'the alpha this colour is drawn at']] : []),
     ]
     if (!names.length) continue
-    out.push({ role: role.id, label: role.label, names, added: !!e.new, needsBuild: !!e.needsBuild })
+    out.push({ role: role.id, label: role.label, names, added: !!e.new, needsBuild: !!e.needsBuild,
+      /* A role handed to a generator is not read from a stylesheet, and asking
+         whether anything reads it answers no for a knob that works. */
+      seed: e.seed ?? null })
   }
   return out
 }
@@ -111,6 +114,8 @@ export function lookup(name, { sheet, code, wall }) {
  * otherwise have to compile it a second time just to know this — and a meter
  * that doubles the build is a meter that gets switched off.
  */
+const esc = (v) => String(v).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 export function analyse({ kits, css, files, routed, code = '' }) {
   return routed.map((r) => {
     const whole = css[r.kit] ?? ''
@@ -125,10 +130,18 @@ export function analyse({ kits, css, files, routed, code = '' }) {
     const roles = written(r.kit).map((w) => {
       const names = w.names.map(([name, why]) => ({ name, why, ...lookup(name, where) }))
       /* what has to read it depends on where this kit keeps its rules */
-      const seen = IN_CODE.has(r.kit)
-        ? names.some((n) => n.code > 0)
-        : names.some((n) => n.sheet + n.wall > 0)
-      return { ...w, names, seen }
+      /* AND ON WHETHER IT IS READ AT ALL.
+         Ant Design's page colour is not a variable its stylesheet reads, it is
+         an argument its algorithm takes — and what proves the knob works is
+         that the stylesheet their generator produced carries OUR value under
+         THAT name. Asking the read question instead reported two working knobs
+         as doing nothing, which is a false alarm and the worst kind. */
+      const seen = w.seed
+        ? names.some((n) => new RegExp(`${n.name}\\s*:\\s*${esc(String(r.vars[n.name] ?? '\0'))}`, 'i').test(sheet))
+        : IN_CODE.has(r.kit)
+          ? names.some((n) => n.code > 0)
+          : names.some((n) => n.sheet + n.wall > 0)
+      return { ...w, names, seen, generated: !!w.seed }
     })
     return { kit: r.kit, name: kits[r.kit].name, scanned: SCANNED.has(r.kit),
       tokensOnly, inCode: IN_CODE.has(r.kit), separable: !!block && whole.includes(block), roles }
@@ -142,7 +155,7 @@ export function analyse({ kits, css, files, routed, code = '' }) {
  * accusation against the kit.
  */
 export function unread(report) {
-  return report.filter((k) => !k.scanned).flatMap((k) => k.roles.flatMap((r) => {
+  return report.filter((k) => !k.scanned).flatMap((k) => k.roles.filter((r) => !r.generated).flatMap((r) => {
     const nowhere = r.names.filter((n) => n.sheet + n.code + n.wall === 0)
     if (!nowhere.length) return []
     const instead = r.names.filter((n) => n.sheet + n.code + n.wall > 0).map((n) => n.name)
@@ -155,6 +168,7 @@ export async function orphans(log = () => {}) {
   const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
   useMantineClasses(kits.mantine.classes)
 useShadcnParts(kits.shadcn?.parts)
+useAntdParts(kits.antd?.parts)
   useIcons(icons(ICON_NAMES).icons)
   const css = await buildCss(VALUES, IDS, kits, (id) => wallMarkup(WALL[id] ?? WALL.tailwind), log)
   return analyse({ kits, css, files: generate(VALUES, IDS, kits),

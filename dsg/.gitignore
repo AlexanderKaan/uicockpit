@@ -3,5 +3,10 @@ generator.html
 home.html
 node_modules/
 kits/material.elements.json
+# the Ant Design renderer: three megabytes of React, antd and a DOM, folded
+# into one file so a build does not have to install them. A build artefact
+# like the Material bundle above it, rebuilt on demand from antd-tree.mjs.
+kits/antd.render.mjs
+kits/antd.render.json
 wall.elements.js
 kits/fonts.json

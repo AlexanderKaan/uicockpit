@@ -17,6 +17,12 @@ import { generate } from './generate.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { materialElements } from './material-elements.mjs'
 import { openNpm } from './npm-read.mjs'
+import { route } from './roles.mjs'
+import { antdRender } from './antd-render.mjs'
+import { antdNodes } from './antd-nodes.mjs'
+import { SCENES, ICON_NAMES } from './scenes.mjs'
+import { SPECIMEN } from './parts.mjs'
+import { icons } from './icons.mjs'
 
 /**
  * A stylesheet is read from a file and written into a <style> element, and a
@@ -135,6 +141,20 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
      classes, so the text on the page is theirs too and not our font sizes. */
   const mdw = materialElements()
   css.material = `:root{${mt}}\n${mdw.typeTokens}\n${mdw.typescale}\n` + files._blocks.material
+  }
+
+  /* ANT DESIGN HAS TO BE RUN.
+     It publishes no stylesheet at all: 3,056 class rules and 1,289 variables
+     that only exist once its own algorithm has been asked for them. So the
+     seeds the routing collected are handed to their generator and what comes
+     back is their CSS about their tokens. Our block still goes after it, for
+     the two roles their API takes no input for. */
+  if (IDS.includes('antd')) {
+    log("running Ant Design's own components for their CSS…")
+    const routed = route(VALUES, ['antd'], kits)[0]
+    const got = antdRender({ token: routed.tokens, nodes: antdNodes(SCENES, SPECIMEN), icons: icons(ICON_NAMES).icons })
+    log(`  ✓ ${Object.keys(routed.tokens).length} tokens in, ${(got.css.length / 1024).toFixed(0)} kB of their CSS out`)
+    css.antd = got.css + '\n' + (files._blocks.antd ?? '')
   }
 
   /* Radix, Mantine and Open Props each ship one finished stylesheet: no build

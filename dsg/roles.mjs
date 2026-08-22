@@ -51,6 +51,10 @@ export const ROLES = [
  *   `new: true`  the kit has no variable for this role; we add one, and the
  *                export tells you to reference it.
  *   `also`       further variables the same knob has to keep in step. */
+/* Their seeds are numbers. `10px` is a length to us and nothing to them. */
+const num = (v) => { const n = parseFloat(v); return Number.isFinite(n) ? n : null }
+const px = (v) => num(v)
+
 export const MAP = {
   tailwind: {
     _note: 'Tailwind ships a palette, not roles. Semantic names are added under @theme and its utilities pick them up.',
@@ -312,6 +316,48 @@ export const MAP = {
     letterSpacing: null,
     fontWeight:   null,
     borderWidth:  null,
+  },
+  antd: {
+    _note: 'Ant Design publishes no stylesheet and no theme file: 3,056 class rules that read 1,289 variables, and every one of those variables is computed at runtime by its own algorithm out of a handful of SEED tokens. So the knobs here are not variables to write, they are arguments to hand their generator — the same relationship as Material, one layer deeper. The variable each one lands in is named so the swatch can show it, but writing that variable on its own would move one value and leave the two hundred it derives behind.',
+    brand:    { var: '--ant-color-primary', seed: 'colorPrimary', seeds: 'antd' },
+    /* Their algorithm decides what goes on top of the brand — it has a whole
+       token for it, colorTextLightSolid — so this is not ours to set. */
+    onBrand:  { derives: 'brand' },
+    page:     { var: '--ant-color-bg-base', seed: 'colorBgBase' },
+    surface:  { var: '--ant-color-bg-container', seed: 'colorBgContainer' },
+    ink:      { var: '--ant-color-text-base', seed: 'colorTextBase' },
+    inkMuted: { var: '--ant-color-text-secondary', seed: 'colorTextSecondary' },
+    line:     { var: '--ant-color-border', seed: 'colorBorder' },
+    success:  { var: '--ant-color-success', seed: 'colorSuccess' },
+    warning:  { var: '--ant-color-warning', seed: 'colorWarning' },
+    danger:   { var: '--ant-color-error', seed: 'colorError' },
+    /* Their focus ring is the brand at a lighter step — colorPrimaryBorder —
+       and there is no separate input for it. */
+    focus:    { derives: 'brand' },
+    /* Their seeds are NUMBERS of pixels, not lengths: borderRadius is 6, not
+       6px. A length written straight in would be dropped by their algorithm
+       without a word. */
+    radius:   { var: '--ant-border-radius', seed: 'borderRadius', from: px },
+    baseText: { var: '--ant-font-size', seed: 'fontSize', from: px },
+    borderWidth: { var: '--ant-line-width', seed: 'lineWidth', from: px },
+    lineHeight: { var: '--ant-line-height', seed: 'lineHeight', from: num },
+    fontWeight: { var: '--ant-font-weight-strong', seed: 'fontWeightStrong', from: num },
+    fontBody: { var: '--ant-font-family', seed: 'fontFamily' },
+    /* One family, for everything. antd's Typography.Title is set in the same
+       fontFamily as its body text and there is no second token. */
+    fontHeading: null,
+    /* Their whole spacing scale is sizeUnit multiplied by sizeStep, so the
+       ratio knob multiplies the unit and the scale follows.
+       NO VARIABLE. Their generator publishes --ant-size-unit and then bakes
+       every size it derives as a literal, so nothing reads it — and naming it
+       here wrote a bare ratio into a length and then reported the knob as
+       doing nothing. The token IS the answer; there is no variable to name. */
+    space:    { seed: 'sizeUnit', from: (v) => 4 * (num(v) ?? 1) },
+    /* Three published shadow strings, taken as strings and re-alpha'd the same
+       way every other kit's are. Their algorithm has no strength input. */
+    elevation: { shadows: ['--ant-box-shadow', '--ant-box-shadow-secondary', '--ant-box-shadow-tertiary'] },
+    /* Ant Design specifies no letter spacing at all. */
+    letterSpacing: null,
   },
   daisyui: {
     _note: 'Registers into Tailwind\'s --color-* namespace on purpose. --border here is a WIDTH, not a colour.',
@@ -611,7 +657,7 @@ export function route(values, kitIds, kits = {}) {
        text came out pale — exactly inverted. The preview is light; the
        relationships have to be read from the same mode. */
     const defaults = kits[id]?.modes?.light ?? {}
-    const vars = {}, unroutable = [], unscaled = [], chosen = [], attrs = {}
+    const vars = {}, unroutable = [], unscaled = [], chosen = [], attrs = {}, tokens = {}
 
     for (const role of ROLES) {
       const v = values[role.id]
@@ -663,6 +709,19 @@ export function route(values, kitIds, kits = {}) {
           unscaled.push(name)
         }
         continue
+      }
+      /* AN ARGUMENT, NOT A VARIABLE.
+         A kit that computes its whole theme from a few inputs takes the value
+         at the top of its own pipeline; writing the variable that input lands
+         in would set one value and leave everything derived from it behind.
+         The variable is still written below, because it is the one the swatch
+         names and because agreeing with their generator costs nothing.
+         Called `tokens` and not `seeds`, because coverage() already answers a
+         different question under that name — which role is derived by whose
+         generator — and the spread below quietly won. */
+      if (target.seed) {
+        const made = target.from ? target.from(v) : v
+        if (made != null) tokens[target.seed] = made
       }
       if (target.derives) continue
       /* the layer under this one already answers it — not a gap, and not ours
@@ -745,6 +804,6 @@ export function route(values, kitIds, kits = {}) {
         vars[extra] = `${Number(scaled.toFixed(4))}${want[1]}`
       }
     }
-    return { kit: id, vars, attrs, chosen, unroutable, unscaled, ...coverage(id) }
+    return { kit: id, vars, attrs, tokens, chosen, unroutable, unscaled, ...coverage(id) }
   })
 }

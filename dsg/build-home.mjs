@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { buildCss } from './build-css.mjs'
 import { icons, svg } from './icons.mjs'
 import { render, PARTS } from './parts.mjs'
-import { WALL, useIcons, useMantineClasses, useShadcnParts } from './wall-bindings.mjs'
+import { WALL, useIcons, useMantineClasses, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
 import { SCENES, BOARDS, ICON_NAMES, wallMarkup, safeJson } from './scenes.mjs'
 import { generate, section } from './generate.mjs'
 import { mark } from './mark.mjs'
@@ -18,6 +18,7 @@ const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface:
 const kits = Object.fromEntries(ALL.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(kits.mantine?.classes)
 useShadcnParts(kits.shadcn?.parts)
+useAntdParts(kits.antd?.parts)
 useIcons(icons(ICON_NAMES).icons)
 
 /* The wrapper a kit needs to be itself. Without data-theme, daisyUI's dark

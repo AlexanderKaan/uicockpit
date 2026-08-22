@@ -15,6 +15,7 @@
  * Everything else here is the kit's own classes, verbatim.
  */
 import { esc, list, PHOTO } from './parts.mjs'
+import { ANTD_OWNS } from './antd-nodes.mjs'
 import { MAP, ROLES } from './roles.mjs'
 
 const cls = (...c) => c.filter(Boolean).join(' ')
@@ -28,15 +29,7 @@ const A = (n, k, tag, c, extra = '') => `<${tag} class="${c}"${extra}>${n.text !
  * nothing here can quietly render an empty square. */
 let IC = {}
 export const useIcons = (map) => { IC = map ?? {} }
-/**
- * The icons a BINDING needs, as opposed to the ones a card names.
- *
- * A menu trigger has a chevron and a chosen option has a tick because that is
- * what those components are, not because a card asked for them — so they are
- * declared here and the wall's icon list starts from them. Naming them on the
- * card meant every card that ever renders a menu has to remember to.
- */
-export const BINDING_ICONS = ['chevron-down', 'check']
+
 export const ico = (name, size = 16, cls = '') => {
   /* An icon that was never handed in used to come out as an empty <svg>, and an
      empty svg inside a ghost button is an invisible button. The toolbar shipped
@@ -1037,4 +1030,57 @@ const mantine = {
     <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed)">Mantine publishes no border-width variable; a border here is the one its own components draw.</p></div>`,
 }
 
-export const WALL = { tailwind, daisyui, bootstrap, shadcn, material, radix, mantine }
+/* ── Ant Design ───────────────────────────────────────────────────────────
+ * The one kit on this wall whose markup had to be RUN to exist. Everything
+ * else publishes class names you can look up; Ant Design publishes React, and
+ * what a Table or a Select wears is only a fact once their component has
+ * rendered it. So its components arrive pre-rendered — see antd-tree.mjs — and
+ * are handed in the same way Mantine's class map and shadcn's registry are.
+ *
+ * What is left in this table is exactly what they do NOT ship: the layout you
+ * put their components in, and the four specimens that show their tokens. Both
+ * are their own variables on plain markup, and the manifest says so rather
+ * than letting a div in an ant- class pass for a component.
+ */
+let ANTD_PRE = {}
+export const useAntdParts = (map) => { ANTD_PRE = map ?? {} }
+
+/* the variable that CARRIES a role their generator will not let you hand in */
+const ANT_SHOWN = { onBrand: '--ant-color-text-light-solid', focus: '--ant-color-primary-border' }
+
+/* A part they ship but that nothing pre-rendered — a scene added without a new
+   fetch, or a render that failed. A hole, drawn as a hole. */
+const antHole = (n) => `<span data-missing="${esc(n.p)}" style="display:inline-block;padding:4px 8px;border:1px dashed currentColor;opacity:.6;font-size:12px">${esc(n.p)} — not rendered by antd; run npm run kits</span>`
+
+const antd = {
+  _id: 'Ant Design',
+  get _pre() { return ANTD_PRE },
+  /* Their layout: Flex and Card are components, so those come pre-rendered
+     when a scene asks for them by name — but a stack of ours is a stack of
+     ours, and it is written as their spacing on a plain div. */
+  stack:   (n, k) => `<div style="display:flex;flex-direction:column;gap:calc(var(--ant-margin-xs) * ${Math.max(1, n.gap ?? 3) / 2})">${k}</div>`,
+  row:     (n, k) => `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:calc(var(--ant-margin-xs) * ${Math.max(1, n.gap ?? 2) / 2})${n.between ? ';justify-content:space-between' : ''}">${k}</div>`,
+  grid:    (n, k) => `<div style="display:grid;gap:var(--ant-margin);grid-template-columns:repeat(${n.cols ?? 2},minmax(0,1fr))">${k}</div>`,
+  /* every part they DO ship — answered by the render, never by a string */
+  ...Object.fromEntries([...ANTD_OWNS].map((part) => [part, antHole])),
+
+  /* ── the specimens: their tokens, on plain markup ──────────────────────── */
+  swatches: (n) => `<div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('antd', n.roles, ANT_SHOWN).map((r) => `<div style="display:flex;flex-direction:column;gap:6px">
+    <span style="height:40px;border-radius:var(--ant-border-radius-lg);border:1px ${r.paint ? 'solid' : 'dashed'} var(--ant-color-border)${r.paint ? `;background:${r.paint}` : ''}"></span>
+    <span style="font-size:var(--ant-font-size-sm);font-weight:var(--ant-font-weight-strong);color:var(--ant-color-text)">${esc(r.label)}</span>
+    <code style="font-family:var(--ant-font-family-code);font-size:12px;line-height:1.3;color:var(--ant-color-text-secondary)">${esc(r.note)}</code></div>`).join('')}</div>`,
+  typespec: (n) => `<div style="display:flex;flex-direction:column;gap:20px">${list(n.rows).map((r) => `<div style="display:flex;flex-direction:column;gap:4px">
+    <code style="font-family:var(--ant-font-family-code);font-size:12px;color:var(--ant-color-text-secondary)">${esc({ xl: 'heading-1', lg: 'heading-3', md: 'font-size', sm: 'font-size-sm' }[r.size])}</code>
+    <p style="margin:0;color:var(--ant-color-text);font-family:var(--ant-font-family);font-weight:${r.size === 'xl' || r.size === 'lg' ? 'var(--ant-font-weight-strong)' : 'inherit'};font-size:var(--ant-font-size${{ xl: '-heading-1', lg: '-heading-3', md: '', sm: '-sm' }[r.size]});line-height:var(--ant-line-height${{ xl: '-heading-1', lg: '-heading-3', md: '', sm: '-sm' }[r.size]})">${esc(r.text)}</p></div>`).join('')}</div>`,
+  shapes:  () => `<div style="display:flex;flex-direction:column;gap:20px"><div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px">${['xs', 'sm', '', 'lg'].map((c) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:48px;height:48px;background:var(--ant-color-fill-secondary);border-radius:var(--ant-border-radius${c ? '-' + c : ''})"></span><code style="font-family:var(--ant-font-family-code);font-size:12px;color:var(--ant-color-text-secondary)">border-radius${c ? '-' + c : ''}</code></div>`).join('')}</div>
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px">${[1, 2, 4].map((w) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:48px;height:48px;border-radius:var(--ant-border-radius);border:${w}px solid var(--ant-color-border)"></span><code style="font-family:var(--ant-font-family-code);font-size:12px;color:var(--ant-color-text-secondary)">${w}px</code></div>`).join('')}</div></div>`,
+  elevation: (n) => `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px">${list(n.levels).map((lv, i) =>
+    `<div style="width:96px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:var(--ant-border-radius-lg);background:var(--ant-color-bg-container);box-shadow:var(--ant-box-shadow${['-tertiary', '', '-secondary'][i] ?? ''})"><span style="font-size:var(--ant-font-size-sm);color:var(--ant-color-text-secondary)">${esc(lv)}</span></div>`).join('')}</div>`,
+  /* Ant Design ships no chart; the bars are its own primary at two fills. */
+  chart:   (n) => `<div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;align-items:flex-end;gap:8px;height:112px">${bars(n).map((b) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+    <div style="display:flex;align-items:flex-end;justify-content:center;gap:2px;width:100%;height:96px"><div style="width:45%;height:${b.a}%;border-radius:var(--ant-border-radius-xs) var(--ant-border-radius-xs) 0 0;background:var(--ant-color-primary)"></div><div style="width:45%;height:${b.b}%;border-radius:var(--ant-border-radius-xs) var(--ant-border-radius-xs) 0 0;background:var(--ant-color-primary-bg)"></div></div>
+    <span style="font-size:var(--ant-font-size-sm);color:var(--ant-color-text-secondary)">${esc(b.label)}</span></div>`).join('')}</div>
+    <div style="display:flex;gap:16px">${list(n.legend).map((t, i) => `<span style="display:inline-flex;align-items:center;gap:6px;font-size:var(--ant-font-size-sm);color:var(--ant-color-text-secondary)"><span style="width:8px;height:8px;border-radius:50%;background:var(--ant-color-primary${i ? '-bg' : ''})"></span>${esc(t)}</span>`).join('')}</div></div>`,
+}
+
+export const WALL = { tailwind, daisyui, bootstrap, shadcn, material, radix, mantine, antd }
