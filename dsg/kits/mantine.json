@@ -570,6 +570,18 @@
   "ramps": null,
   "style": null,
   "parts": null,
+  "bands": {
+    "behaviour": {
+      "by": "its own React layer",
+      "what": "React components that carry their own behaviour",
+      "from": [
+        "@floating-ui/react"
+      ]
+    },
+    "engine": "own",
+    "tokens": 381,
+    "components": true
+  },
   "version": "9.5.1",
   "license": "MIT",
   "npm": "@mantine/core",

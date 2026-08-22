@@ -497,6 +497,18 @@
       ]
     }
   },
+  "bands": {
+    "behaviour": {
+      "by": "radix-ui",
+      "what": "the Radix behaviour packages — unstyled focus, keyboard and ARIA",
+      "from": [
+        "radix-ui"
+      ]
+    },
+    "engine": "tailwind",
+    "tokens": 32,
+    "components": true
+  },
   "version": null,
   "license": "MIT",
   "npm": null,

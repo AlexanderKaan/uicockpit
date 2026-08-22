@@ -10,6 +10,18 @@
   "ramps": null,
   "style": null,
   "parts": null,
+  "bands": {
+    "behaviour": {
+      "by": "its own JavaScript",
+      "what": "the scripts it ships in dist/js",
+      "from": [
+        "@popperjs/core"
+      ]
+    },
+    "engine": "own",
+    "tokens": 117,
+    "components": true
+  },
   "version": "5.3.8",
   "license": "MIT",
   "npm": "bootstrap",

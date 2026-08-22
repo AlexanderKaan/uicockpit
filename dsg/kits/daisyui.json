@@ -17,6 +17,12 @@
   "ramps": null,
   "style": null,
   "parts": null,
+  "bands": {
+    "behaviour": null,
+    "engine": "tailwind",
+    "tokens": 28,
+    "components": true
+  },
   "version": "5.7.20",
   "license": "MIT",
   "npm": "daisyui",

@@ -191,3 +191,28 @@ test('the contrast audit names the line for the job that makes it a requirement'
   assert.match(pair.label, /field/, 'the label has to say what the line is for')
   assert.equal(pair.passes, false, 'a 1.3:1 border has to read as a failure, not be rounded away')
 })
+
+test('the manifest says what the stack is really made of, in four bands', () => {
+  /* "shadcn on Tailwind" hid the two things that make a stack a stack: shadcn
+     BRINGS the Radix behaviour package and its own tokens, and leans on
+     Tailwind for the engine. Read from what the packages declare, not typed. */
+  const ids = ['tailwind', 'shadcn']
+  const kits = Object.fromEntries([...ids, 'openprops', 'daisyui'].map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
+  const md = generate(VALUES, ids, kits)['MANIFEST.md']
+  const bands = section(md, '## What this stack is made of')
+  assert.equal(bands.length, 4, 'a stack has four bands')
+  assert.match(bands[0], /radix-ui/, 'the behaviour shadcn brings is not named')
+  assert.match(bands[0], /shadcn\/ui brings/, 'it has to say who brings it')
+  assert.match(bands[1], /Tailwind CSS/)
+  assert.match(bands[3], /shadcn\/ui/)
+
+  /* and bottom-first, whatever order the ids arrive in */
+  const three = generate(VALUES, ['openprops', 'daisyui', 'tailwind'], kits)['MANIFEST.md']
+  const tokens = section(three, '## What this stack is made of')[2]
+  assert.match(tokens, /daisyUI, over Open Props and Tailwind CSS/, `read as: ${tokens}`)
+
+  /* a stack that brings none says so, because that is the thing you have to
+     write yourself and nobody else prints it */
+  const plain = section(generate(VALUES, ['tailwind', 'daisyui'], kits)['MANIFEST.md'], '## What this stack is made of')
+  assert.match(plain[0], /nothing here brings any/)
+})

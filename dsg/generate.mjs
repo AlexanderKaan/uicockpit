@@ -604,6 +604,26 @@ ${ROLES.filter((r) => values[r.id] != null).map((r) => `- \`${r.id}\` — ${valu
 
 ${caveats.length ? caveats.join('\n') : 'Nothing — every value reached every kit you enabled.'}
 
+## What this stack is made of
+
+${(() => {
+  /* bottom-first, the way a stack really loads — the ids arrive in whatever
+     order they were switched on, and "Open Props over daisyUI" is backwards. */
+  const rank = (k) => (k.layer === 'tokens' ? 0 : k.layer === 'utility' ? 1 : 2)
+  const kits_ = routed.map((r) => kits[r.kit]).sort((a, b) => rank(a) - rank(b))
+  const top = (fn) => [...kits_].reverse().find(fn)
+  const beh = top((k) => k.bands?.behaviour)
+  const eng = top((k) => k.bands?.engine === 'own')
+  const tok = kits_.filter((k) => (k.bands?.tokens ?? 0) > 0)
+  const comp = [...kits_].reverse().find((k) => k.bands?.components)
+  return [
+    `- **Behaviour** — ${beh ? `\`${beh.bands.behaviour.by}\`, which ${beh.name} brings with it: ${beh.bands.behaviour.what}.`
+      : 'nothing here brings any. These are classes, so the keyboard order, the focus management and the ARIA are yours to write.'}`,
+    `- **Engine** — ${eng ? `${eng.name}${eng.layer === 'utility' ? ', compiled from what your markup uses' : ', its own stylesheet'}.` : 'none in this stack.'}`,
+    `- **Tokens** — ${tok.length ? `${tok.at(-1).name}${tok.length > 1 ? `, over ${tok.slice(0, -1).map((k) => k.name).join(' and ')}` : ''}, and your values over all of it.` : 'none.'}`,
+    `- **Components** — ${comp ? comp.name + '.' : 'none — the parts are tokens on plain markup.'}`,
+  ].join('\n') })()}
+
 ## Variables in here that nothing reads
 
 ${(() => {

@@ -10,6 +10,12 @@
   "ramps": null,
   "style": null,
   "parts": null,
+  "bands": {
+    "behaviour": null,
+    "engine": "own",
+    "tokens": 419,
+    "components": false
+  },
   "version": "4.3.3",
   "license": "MIT",
   "npm": "tailwindcss",

@@ -48,30 +48,63 @@ const SHADCN_PARTS = ['button', 'badge', 'alert', 'card', 'input', 'textarea', '
   'radio-group', 'switch', 'slider', 'progress', 'table', 'tabs', 'avatar', 'separator', 'label',
   'breadcrumb', 'sidebar', 'navigation-menu', 'empty', 'item']
 
+/* ── THE FOUR BANDS A STACK IS MADE OF ──────────────────────────────────────
+ *
+ * "Base plus layers" was too few words for what people really build. shadcn is
+ * the case that shows it: it is not a layer ON Tailwind, it is a set of files
+ * that BRING the Radix behaviour package, sit on the Tailwind engine, carry
+ * their own tokens, and give you components. Four different things, and our
+ * picker called it one.
+ *
+ *   behaviour   focus, keyboard, ARIA — the part with no look at all
+ *   engine      how the styles are written and compiled
+ *   tokens      the named values
+ *   components  the styled parts you see
+ *
+ * A kit fills one or more and needs the rest. Most of it is READ: what brings
+ * behaviour is what the package itself declares it depends on, and shadcn's
+ * registry declares it per component. The rest is what kind of thing the kit is,
+ * which is stated here next to `layer` and `standalone` for the same reason.
+ */
+const BEHAVIOUR = [
+  [/^(@radix-ui\/|radix-ui$)/, 'radix-ui', 'the Radix behaviour packages — unstyled focus, keyboard and ARIA'],
+  [/^lit$/, 'lit', 'custom elements, so the behaviour ships inside the element'],
+  [/^@floating-ui\//, 'its own React layer', 'React components that carry their own behaviour'],
+  [/^@popperjs\//, 'its own JavaScript', 'the scripts it ships in dist/js'],
+]
+/** What a package's own dependency list says it leans on for behaviour. */
+function behaviourOf(names) {
+  for (const [re, by, what] of BEHAVIOUR) {
+    const found = names.filter((n) => re.test(n))
+    if (found.length) return { by, what, from: found }
+  }
+  return null
+}
+
 const SOURCES = {
   tailwind: {
-    layer: 'utility',
+    layer: 'utility', engine: 'own',
     name: 'Tailwind CSS',
     what: 'utility classes — no components; the theme is CSS variables you can override',
     async read() {
       const t = fromNpm('tailwindcss@latest', 'theme.css')
-      return { ...t, source: `npm tailwindcss@${t.version} · theme.css`, modes: { light: cssVars(t.text) } }
+      return { ...t, source: `npm tailwindcss@${t.version} · theme.css`, behaviour: behaviourOf(t.deps ?? []), modes: { light: cssVars(t.text) } }
     },
   },
   daisyui: {
-    layer: 'components',
+    layer: 'components', engine: 'tailwind',
     name: 'daisyUI',
     what: 'component classes on top of Tailwind — no JavaScript, works in any framework',
     async read() {
       const light = fromNpm('daisyui@latest', 'theme/light.css')
       const dark = fromNpm('daisyui@latest', 'theme/dark.css')
-      return { ...light, source: `npm daisyui@${light.version} · theme/light.css + theme/dark.css`,
+      return { ...light, source: `npm daisyui@${light.version} · theme/light.css + theme/dark.css`, behaviour: behaviourOf(light.deps ?? []),
         modes: { light: cssVars(light.text), dark: cssVars(dark.text) },
         plain: { light: cssPlain(light.text), dark: cssPlain(dark.text) } }
     },
   },
   bootstrap: {
-    layer: 'components', standalone: true,
+    layer: 'components', standalone: true, engine: 'own',
     name: 'Bootstrap',
     what: 'component classes, no build step needed — the widest-installed CSS framework there is',
     async read() {
@@ -86,11 +119,12 @@ const SOURCES = {
         return cssVars(text.slice(at, text.indexOf('}', at)))
       }
       return { ...pkg, source: `npm bootstrap@${pkg.version} · dist/css/bootstrap.css :root + [data-bs-theme=dark]`,
+        behaviour: behaviourOf(pkg.deps ?? []),
         modes: { light: block(':root,'), dark: block('[data-bs-theme=dark]') } }
     },
   },
   material: {
-    layer: 'components', standalone: true,
+    layer: 'components', standalone: true, engine: 'own',
     name: 'Material 3',
     what: 'Google\'s design system — 47 colour roles derived from ONE seed, plus web components',
     async read() {
@@ -135,12 +169,12 @@ const SOURCES = {
         light[name] = pair ? pair[1] : raw
         dark[name] = pair ? pair[2] : raw
       }
-      return { ...colour, source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens + tokens/_md-sys-shape (what its components read) + m3.css typefaces`,
+      return { ...colour, behaviour: behaviourOf(colour.deps ?? []), source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens + tokens/_md-sys-shape (what its components read) + m3.css typefaces`,
         modes: { light, dark } }
     },
   },
   radix: {
-    layer: 'components', standalone: true,
+    layer: 'components', standalone: true, engine: 'own',
     name: 'Radix Themes',
     what: 'React components with a real theming API — but one that takes CHOICES, not values',
     async read() {
@@ -201,7 +235,7 @@ const SOURCES = {
           .map((m) => [m[1], read(blockOf(text, m[0]))]).filter(([, v]) => v != null))
         const layout = p.read('layout/tokens.css')
 
-        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://radix-ui.com/themes',
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://radix-ui.com/themes', behaviour: behaviourOf(p.deps ?? []),
           source: `npm @radix-ui/themes@${p.version} · tokens/base.css + tokens/colors/*.css`,
           choices: {
             brand: { attr: 'data-accent-color', unit: 'colour', of: Object.fromEntries(accents),
@@ -230,7 +264,7 @@ const SOURCES = {
     },
   },
   mantine: {
-    layer: 'components', standalone: true,
+    layer: 'components', standalone: true, engine: 'own',
     name: 'Mantine',
     what: 'React components — its variables are public, its class names are build hashes',
     async read() {
@@ -262,14 +296,14 @@ const SOURCES = {
             if (Object.keys(map).length) classes[name] ??= map
           }
         }
-        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://mantine.dev',
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://mantine.dev', behaviour: behaviourOf(p.deps ?? []),
           source: `npm @mantine/core@${p.version} · styles.css :root + colour-scheme blocks, class names from esm/{components,utils}/*/*.module.mjs`,
           classes, modes: { light, dark } }
       } finally { p.close() }
     },
   },
   openprops: {
-    layer: 'tokens', standalone: false,
+    layer: 'tokens', standalone: false, engine: null,
     name: 'Open Props',
     what: 'CSS variables and nothing else — no components, so it sits under whatever renders',
     async read() {
@@ -281,14 +315,14 @@ const SOURCES = {
         const scales = cssVars(p.read('open-props.min.css'))
         const light = { ...scales, ...cssVars(p.read('normalize.light.min.css')) }
         const dark = { ...scales, ...cssVars(p.read('normalize.dark.min.css')) }
-        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://open-props.style',
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://open-props.style', behaviour: behaviourOf(p.deps ?? []),
           source: `npm open-props@${p.version} · open-props.min.css + normalize.{light,dark}.min.css`,
           modes: { light, dark } }
       } finally { p.close() }
     },
   },
   shadcn: {
-    layer: 'components',
+    layer: 'components', engine: 'tailwind',
     name: 'shadcn/ui',
     what: 'React components copied into your repo — you own the source, it is not a dependency',
     async read() {
@@ -304,8 +338,10 @@ const SOURCES = {
        * the states. Read now, the same as every other kit, so a shadcn release
        * changes this file rather than our code. */
       const parts = await readParts(SHADCN_PARTS)
+      /* their own registry names it, component by component */
+      const declared = [...new Set(Object.values(parts).flatMap((p) => p.needs))]
       return { version: null, license: 'MIT', npm: null, home: 'https://ui.shadcn.com',
-        style: STYLE, parts,
+        style: STYLE, parts, behaviour: behaviourOf(declared),
         source: `ui.shadcn.com/r/colors/neutral.json · cssVars, and r/styles/${STYLE}/*.json for the components`,
         modes: { light: pre(d.cssVars.light), dark: pre(d.cssVars.dark) } }
     },
@@ -335,6 +371,13 @@ for (const [id, kit] of Object.entries(SOURCES)) {
     ramps: read.ramps ?? null,
     /* the components, where a kit publishes them as source rather than as CSS */
     style: read.style ?? null, parts: read.parts ?? null,
+    /* the four bands: what this kit fills, and what it needs under it */
+    bands: {
+      behaviour: read.behaviour ?? null,
+      engine: kit.engine ?? null,
+      tokens: Object.keys(read.modes.light ?? {}).length,
+      components: kit.layer === 'components',
+    },
     version: read.version, license: read.license ?? null,
     npm: read.npm ?? null, home: read.home ?? null, source: read.source, modes: read.modes }
   const next = JSON.stringify(doc, null, 2) + '\n'

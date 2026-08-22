@@ -10,6 +10,12 @@
   "ramps": null,
   "style": null,
   "parts": null,
+  "bands": {
+    "behaviour": null,
+    "engine": null,
+    "tokens": 614,
+    "components": false
+  },
   "version": "1.7.23",
   "license": "MIT",
   "npm": "open-props",

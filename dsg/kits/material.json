@@ -10,6 +10,18 @@
   "ramps": null,
   "style": null,
   "parts": null,
+  "bands": {
+    "behaviour": {
+      "by": "lit",
+      "what": "custom elements, so the behaviour ships inside the element",
+      "from": [
+        "lit"
+      ]
+    },
+    "engine": "own",
+    "tokens": 65,
+    "components": true
+  },
   "version": "2.5.0",
   "license": "Apache-2.0",
   "npm": "@material/web",

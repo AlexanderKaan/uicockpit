@@ -75,9 +75,14 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
       margin-left:auto;text-decoration:underline;text-underline-offset:2px}
 .link:hover{color:var(--ink)}
 .card{border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--faint);padding:10px 11px}
-.card__layer{display:flex;align-items:baseline;gap:7px;font-size:var(--fs-lg)}
-.card__layer b{font-weight:600}
-.card__layer small{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+/* the four bands a stack is really made of, one row each */
+.band{display:grid;grid-template-columns:74px minmax(0,1fr);gap:8px;align-items:baseline;
+  padding:3px 0;font-size:var(--fs-md)}
+.band + .band{border-top:var(--bw) solid var(--line)}
+.band small{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.7}
+.band b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.band[data-none] b{font-weight:400;color:var(--muted)}
+.band em{display:block;font-style:normal;font-size:var(--fs-xs);color:var(--muted);line-height:1.4}
 .card__facts{margin:7px 0 0;font-size:var(--fs-sm);color:var(--muted)}
 .note{margin:8px 0 0;padding:9px 10px;border-radius:var(--r);font-size:var(--fs-sm);line-height:1.5;
       background:var(--warn-bg);border:var(--bw) solid var(--warn-line);color:var(--ink)}
@@ -110,7 +115,10 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .opt__meta{margin-left:auto;font-size:var(--fs-xs);color:var(--muted);white-space:nowrap}
 .opt__why{font-size:var(--fs-sm);color:var(--muted);line-height:1.45}
 .opt__tag{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--brand)}
-.sumrow{display:flex;align-items:baseline;gap:7px;font-size:var(--fs-md);padding:3px 0}
+.sumrow{display:flex;align-items:baseline;gap:7px;font-size:var(--fs-md);padding:4px 0}
+.sumrow + .sumrow{border-top:var(--bw) solid var(--line)}
+.sumrow[data-none]{color:var(--muted)}
+.sumrow em{font-style:normal;font-size:var(--fs-xs);color:var(--muted)}
 .sumrow small{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-left:auto}
 
 /* The families the stack publishes, as ramps you can browse. Not a palette we
@@ -600,10 +608,14 @@ function paint() {
 function renderStack() {
   const st = stack(state.on, KITS)
   const own = OWN[showing(st)] ?? {}
-  $('#stackcard').innerHTML = st.order.map((id) => {
-    const role = KITS[id].layer === 'tokens' ? 'under' : id === st.base ? 'base' : 'components'
-    return `<span class="card__layer"><b>${KITS[id].name}</b><small>${role}</small></span>`
-  }).join('')
+  /* Four bands, not a list of kits. "shadcn on Tailwind" hid the two things
+     that make a stack a stack: shadcn BRINGS the Radix behaviour package and
+     its own tokens, and leans on Tailwind for the engine. All four rows are
+     read from what the packages themselves declare. */
+  $('#stackcard').innerHTML = bandsOf(st, KITS).map((b) => `<span class="band"${b.name ? '' : ' data-none'} title="${b.what} — ${b.note}">
+    <small>${b.label}</small>
+    <span><b>${b.name ?? 'none'}</b>${b.via ? `<em>via ${b.via}</em>` : ''}${
+      b.over?.length ? `<em>over ${b.over.join(', ')}</em>` : ''}</span></span>`).join('')
     + `<p class="card__facts">${own.parts ? `${own.partsTheirs} of ${own.parts} parts from the kit · ` : ''}${
       [...new Set(st.order.map((k) => KITS[k].license).filter(Boolean))].join(' · ')}</p>`
 
@@ -636,7 +648,7 @@ function drawStackPicker() {
     <span class="opt__why">${why}</span></button>`
 
   $('#laneBase').innerHTML = bases.map((id) => card(id, {
-    on: st.base === id, tag: st.base === id ? 'base' : '',
+    on: st.base === id, tag: st.base === id ? 'engine' : '',
     why: KITS[id].what,
   })).join('')
   $('#laneUnder').innerHTML = under.map((id) => card(id, {
@@ -654,10 +666,10 @@ function drawStackPicker() {
   }).join('')
 
   const own = OWN[showing(st)] ?? {}
-  $('#pickerSum').innerHTML = st.order.map((id) => {
-    const role = KITS[id].layer === 'tokens' ? 'under' : id === st.base ? 'base' : 'components'
-    return `<p class="sumrow">${KITS[id].name}<small>${role}</small></p>`
-  }).join('')
+  /* the same four bands the card shows, so what you are choosing and what you
+     end up with are described in one vocabulary */
+  $('#pickerSum').innerHTML = bandsOf(st, KITS).map((b) => `<p class="sumrow"${b.name ? '' : ' data-none'}>
+    <span>${b.name ?? 'none'}${b.via ? ` <em>via ${b.via}</em>` : ''}</span><small>${b.label}</small></p>`).join('')
     + `<p class="card__facts">${own.parts ? `${own.partsTheirs} of ${own.parts} parts from the kit` : ''}</p>`
     + ((own.drawn ?? []).length ? `<p class="note">Not covered by this stack: ${own.drawn.join(', ')}. The generator draws those from tokens.</p>` : '')
 }

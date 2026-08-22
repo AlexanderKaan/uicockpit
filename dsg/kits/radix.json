@@ -522,6 +522,19 @@
   },
   "style": null,
   "parts": null,
+  "bands": {
+    "behaviour": {
+      "by": "radix-ui",
+      "what": "the Radix behaviour packages — unstyled focus, keyboard and ARIA",
+      "from": [
+        "@radix-ui/colors",
+        "radix-ui"
+      ]
+    },
+    "engine": "own",
+    "tokens": 136,
+    "components": true
+  },
   "version": "3.3.0",
   "license": "MIT",
   "npm": "@radix-ui/themes",

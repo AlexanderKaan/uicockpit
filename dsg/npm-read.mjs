@@ -26,6 +26,10 @@ export function openNpm(pkg) {
     version: tgz.replace(/^(.+)-(\d.*)\.tgz$/, '$2'),
     license: typeof meta.license === 'string' ? meta.license : meta.license?.type ?? null,
     npm: meta.name, home: meta.homepage ?? null,
+    /* what the package itself says it leans on. The stack model reads behaviour
+       out of this rather than out of an opinion: a kit that depends on radix-ui
+       brings the Radix behaviour with it, and says so in its own manifest. */
+    deps: [...Object.keys(meta.dependencies ?? {}), ...Object.keys(meta.peerDependencies ?? {})],
     read: (f) => readFileSync(join(dir, 'package', f), 'utf8'),
     list: (sub) => readdirSync(join(dir, 'package', sub)),
     close: () => rmSync(dir, { recursive: true, force: true }),
@@ -44,7 +48,8 @@ export function fromNpm(pkg, file) {
     const meta = JSON.parse(readFileSync(join(dir, 'package', 'package.json'), 'utf8'))
     return { text: readFileSync(join(dir, 'package', file), 'utf8'), version,
       license: typeof meta.license === 'string' ? meta.license : meta.license?.type ?? null,
-      npm: meta.name, home: meta.homepage ?? null }
+      npm: meta.name, home: meta.homepage ?? null,
+      deps: [...Object.keys(meta.dependencies ?? {}), ...Object.keys(meta.peerDependencies ?? {})] }
   } finally { rmSync(dir, { recursive: true, force: true }) }
 }
 
