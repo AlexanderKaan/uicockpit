@@ -10,6 +10,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { icons, svg } from './icons.mjs'
 import { seedFrom, route, darken } from './roles.mjs'
+import { hexToOklch } from './color.mjs'
 import { DARK, generate } from './generate.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
@@ -98,6 +99,64 @@ console.log(`  ✓ lucide ${lu.version} · ${lu.license} — ${CHROME_ICONS.leng
 console.log('building each kit\'s real CSS…')
 const css = await buildCss(SEED, IDS, kits, (id) => wall(id))
 
+/**
+ * BOOTSTRAP, LIVE AFTER ALL.
+ *
+ * Its brand is compiled, so the page has always said "built, not live" over
+ * that frame and left it at whatever it was built with. That was true about
+ * SASS and false about the result: reading the compiled stylesheet back shows
+ * every one of the twenty-seven places the brand lands is a --bs- CUSTOM
+ * PROPERTY, and a custom property can be written again later.
+ *
+ * So this reads them out — the selector, the property, and the value Bootstrap
+ * derived — and the page rewrites them from your brand through Bootstrap's own
+ * relationship. Their arithmetic, your colour, which is the rule this whole
+ * project keeps arriving back at.
+ *
+ * What is NOT taken: anything achromatic. --bs-btn-color is white because
+ * Sass ran color-contrast() against the brand it was built with, and a
+ * relationship is not what that is — it is a decision, taken once, that a
+ * running page cannot retake. That one stays compiled and the caveat says so.
+ */
+function bootstrapLive(sheet, seedHex) {
+  const seed = String(seedHex).toLowerCase()
+  const [, seedC, seedH] = hexToOklch(seed)
+  const near = (v) => {
+    const hex = /^#[0-9a-f]{6}$/i.test(v) ? v : null
+    if (!hex && !/^rgb\(/i.test(v)) return false
+    try {
+      const [, c, h] = hexToOklch(hex ?? rgbToHex(v))
+      if (c < 0.02 || seedC < 0.02) return false
+      const d = Math.min(Math.abs(h - seedH), 360 - Math.abs(h - seedH))
+      return d < 25
+    } catch { return false }
+  }
+  const rgbToHex = (v) => {
+    const m = /^rgb\(\s*([\d.]+%?)\s*[, ]\s*([\d.]+%?)\s*[, ]\s*([\d.]+%?)\s*\)$/i.exec(v)
+    if (!m) return '#000000'
+    return '#' + m.slice(1, 4).map((x) => {
+      const n = parseFloat(x)
+      return Math.max(0, Math.min(255, Math.round(x.endsWith('%') ? (n / 100) * 255 : n))).toString(16).padStart(2, '0')
+    }).join('')
+  }
+  const out = []
+  for (const [, head, body] of sheet.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
+    if (!body.toLowerCase().includes(seed) && !new RegExp(seed.replace('#', ''), 'i').test(body)) continue
+    const sel = head.split('}').pop().split('{').pop().trim()
+    if (!sel || sel.startsWith('@')) continue
+    const props = []
+    for (const [, prop, raw] of body.matchAll(/(--bs-[a-z0-9-]+)\s*:\s*([^;]+)/gi)) {
+      const v = raw.trim()
+      if (v.toLowerCase() === seed) props.push([prop, 'brand'])
+      else if (near(v)) props.push([prop, v])
+    }
+    if (props.length) out.push([sel, props])
+  }
+  return out
+}
+const BSLIVE = css.bootstrap ? bootstrapLive(css.bootstrap, SEED.brand) : []
+console.log(`  ✓ Bootstrap: ${BSLIVE.reduce((n, [, p]) => n + p.length, 0)} of its compiled brand declarations can be rewritten live, across ${BSLIVE.length} rules`)
+
 /* Material's scheme is derived once here, for the seed the page opens on. */
 console.log('deriving Material\'s scheme…')
 const tmp = mkdtempSync(join(tmpdir(), 'dsg-md-'))
@@ -149,6 +208,8 @@ let page = readFileSync('page.template.html', 'utf8')
    * where the truth is 97 of 97. */
   .replace('/*DARK*/', () => JSON.stringify(DARK))
   .replace('/*RENDERS*/', () => JSON.stringify(RENDERS))
+  .replace('/*BSLIVE*/', () => JSON.stringify(BSLIVE))
+  .replace('/*BSSEED*/', () => JSON.stringify(SEED.brand))
   .replace('/*SEEDS*/', () => JSON.stringify(SEEDS))
   .replace('/*FONTS*/', () => JSON.stringify({ google: gf.families, stacks: kitFonts(kits) }))
   /* Which of the variables this theme writes anything actually reads —

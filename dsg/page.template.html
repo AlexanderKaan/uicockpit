@@ -470,6 +470,10 @@ const SCRIPTS = /*SCRIPTS*/;
 const UNREAD = /*UNREAD*/
 const OWN = /*OWN*/;
 const RENDERS = /*RENDERS*/;
+/* Bootstrap's compiled brand, and every place it landed. Read back out of the
+   stylesheet we built, so this is a fact about the build rather than a list. */
+const BSLIVE = /*BSLIVE*/;
+const BSSEED = /*BSSEED*/;
 const DARKSWITCH = /*DARK*/;
 const FONTS = /*FONTS*/;
 const SEEDS = /*SEEDS*/;
@@ -577,7 +581,7 @@ function build(id) {
    Ant Design has no stylesheet at all — its rules and its 838 variables are
    produced by React at build time. All three are honest about it in the check
    below rather than showing a frame that quietly disagrees with the download. */
-const LIVE_BRAND = { tailwind: true, daisyui: true, shadcn: true, bootstrap: false, material: false,
+const LIVE_BRAND = { tailwind: true, daisyui: true, shadcn: true, bootstrap: true, material: false,
   radix: true, mantine: true, openprops: true, antd: false }
 
 function paint() {
@@ -672,6 +676,18 @@ function paint() {
     /* the same selector the generated file uses — a block only wins if it
        out-specifies the kit's own, which :root does not always do */
     live.textContent = `${scopeOf(r.kit)}{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
+    /* AND BOOTSTRAP'S COMPILED HALF, REWRITTEN.
+       Its component colours are Sass output, which is why they never moved —
+       but every one of them landed in a --bs- custom property, and a custom
+       property can be written again. Each is re-derived from your brand through
+       the relationship Bootstrap's own build put between the two. */
+    if (r.kit === 'bootstrap' && BSLIVE.length) {
+      const want = state.values.brand
+      live.textContent += BSLIVE.map(([sel, props]) => `${sel}{${props.map(([prop, from]) => {
+        const made = from === 'brand' ? want : relative(want, BSSEED, from)?.hex
+        return made ? `${prop}:${made}` : ''
+      }).filter(Boolean).join(';')}}`).join('')
+    }
     pick(f)
   }
 }
@@ -1628,6 +1644,17 @@ function checks(routed) {
   /* 5 — what the frame in front of you cannot show. Not a fault in the system:
      a fault in the PREVIEW, and the difference is worth a line of its own. */
   const frame = []
+  /* WHAT IS LEFT OF BOOTSTRAP'S BUILD.
+     Its brand follows the knob now — every place it lands is a custom property
+     and the page rewrites all forty from Bootstrap's own relationship. What it
+     cannot rewrite is a DECISION rather than a relationship: Sass ran
+     color-contrast() once and wrote #fff for the text on a filled button. On a
+     dark brand that is still the answer, so this only speaks up when the brand
+     has gone light enough that Bootstrap itself would have picked black. */
+  const bsShown = state.compare ? comparing().includes('bootstrap') : state.show === 'bootstrap'
+  if (bsShown && HEX6.test(state.values.brand ?? '') && relLum(state.values.brand) > 0.179) {
+    frame.push(`<b>Bootstrap</b> — its text on a filled button is white, chosen by Sass against the brand it was built with. Yours is light enough that Bootstrap would now pick black, and that one choice is the half of it a running page cannot retake.`)
+  }
   if (!LIVE_BRAND[state.show]) {
     frame.push(state.show === 'bootstrap'
       ? `<b>${nameOf(state.show)}</b> — its component colours are compiled by Sass, so this frame shows the build we made. Your download carries the Sass lines that change them.`

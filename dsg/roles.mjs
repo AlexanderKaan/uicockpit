@@ -498,8 +498,20 @@ function asOklch(value) {
      reading it as plain white produced a solid white border in dark mode.
      Refusing here makes the caller fall back to the kit's own value, which is
      the right answer for anything we cannot faithfully carry. */
-  if (/\/|rgba?\(|hsla\(|^#(?:[0-9a-f]{4}|[0-9a-f]{8})$/i.test(v)) return null
-  const hex = /^#[0-9a-f]{6}$/i.test(v) ? v
+  if (/\/|rgba\(|hsla\(|^#(?:[0-9a-f]{4}|[0-9a-f]{8})$/i.test(v)) return null
+  /* AN OPAQUE rgb() IS A COLOUR. The refusal above is about ALPHA — a value we
+     cannot carry a relationship through — and it used to catch every rgb() with
+     it. Bootstrap's Sass writes its shades as rgb() with PERCENTAGES
+     (rgb(3.67%, 36.67%, 46%) is its 15% shade of your brand), so the one kit
+     whose own arithmetic we most wanted to read published it in the one form
+     this function refused. */
+  const rgb = /^rgb\(\s*([\d.]+%?)\s*[, ]\s*([\d.]+%?)\s*[, ]\s*([\d.]+%?)\s*\)$/i.exec(v)
+  const ch = (x) => {
+    const n = parseFloat(x)
+    return Math.max(0, Math.min(255, Math.round(x.endsWith('%') ? (n / 100) * 255 : n)))
+  }
+  const hex = rgb ? '#' + [rgb[1], rgb[2], rgb[3]].map((x) => ch(x).toString(16).padStart(2, '0')).join('')
+    : /^#[0-9a-f]{6}$/i.test(v) ? v
     : /^#[0-9a-f]{3}$/i.test(v) ? '#' + v.slice(1).split('').map((c) => c + c).join('')
     : v.startsWith('oklch') ? oklchStrToHex(v) : null
   return hex ? hexToOklch(hex) : null
