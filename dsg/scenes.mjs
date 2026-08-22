@@ -418,4 +418,191 @@ body{margin:0;overflow:hidden}
   })
   m.addEventListener('pointermove',function(e){ if(d)m.scrollLeft=d.l-(e.clientX-d.x) })
   addEventListener('pointerup',function(){ d=null; m.classList.remove('pan') })
+
+  /* ── AND THE WALL BEHAVES ───────────────────────────────────────────────
+   * Four of these kits keep a control's state in ATTRIBUTES and CLASSES
+   * rather than in a pseudo-class, because their real components are React
+   * and React writes them. Markup on its own writes nothing back, so a
+   * switch did not switch, a tab did not move and a slider did not drag —
+   * which are the first three things anybody tries.
+   *
+   * Nothing below decides how a kit should behave. Every rule reads what
+   * that kit ALREADY WROTE for the two states it rendered side by side and
+   * moves the difference across. The kit whose chosen tab differs by a
+   * class gets its class moved; the one that differs by an attribute gets
+   * its attribute moved; the one that writes a percentage into a calc()
+   * gets a new number inside the same calc(). None of those shapes is one
+   * we picked, and a kit we have never seen would work the same way. */
+
+  /* A LINK TO NOWHERE IS STILL A LINK.
+     Every kit's nav, breadcrumb and menu is built from anchors, and a wall
+     writes href="#" because there is nowhere to go. Inside a srcdoc frame
+     that is not inert: the frame resolves it against the PARENT page and
+     navigates itself to the whole wall, so one click on a breadcrumb
+     replaced five of the seven specimens with a copy of the page they were
+     sitting in. It looked like the tool had crashed. Nothing in any kit is
+     at fault and nothing in any kit can fix it. */
+  m.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a'),h=a&&a.getAttribute('href')
+    if(a&&(!h||h.charAt(0)==='#'))e.preventDefault()
+  })
+
+  /* EVERY BACKSLASH IN HERE IS DOUBLED, because this whole script is a
+     template literal and one of them is eaten on the way out. A split on
+     whitespace written with a single backslash shipped as a regular
+     expression that matches nothing — so a class list never split, no state
+     word was ever found, and Bootstrap's sidebar was the only chooser on the
+     wall that did not move. It failed silently in one place out of seven. */
+
+  /* what makes this element different from that one: attribute by
+     attribute, class attribute included, and never id or style */
+  function sig(el){
+    var a=[],x=el.attributes,i
+    for(i=0;i<x.length;i++){ if(x[i].name==='style'||x[i].name==='id')continue; a.push(x[i].name+'\\u0001'+x[i].value) }
+    return a.sort().join('\\u0002')
+  }
+  /* the pairs of (name, chosen value, unchosen value) that separate them.
+     null on either side means the attribute is simply absent there. */
+  function mark(on,off){
+    var out=[],seen={},i,n
+    for(i=0;i<on.attributes.length;i++){ n=on.attributes[i].name
+      if(n==='style'||n==='id')continue; seen[n]=1
+      if(off.getAttribute(n)!==on.attributes[i].value)out.push([n,on.attributes[i].value,off.getAttribute(n)]) }
+    for(i=0;i<off.attributes.length;i++){ n=off.attributes[i].name
+      if(n==='style'||n==='id'||seen[n])continue; out.push([n,null,off.getAttribute(n)]) }
+    return out
+  }
+  function put(el,name,v){ if(v===null)el.removeAttribute(name); else el.setAttribute(name,v) }
+
+  /* THE VOCABULARY OF BEING THE CHOSEN ONE.
+     Every kit here says it with one of these names, and the whole point is
+     that we do not have to know which. What does NOT count is a difference
+     that is merely a difference: a red menu item is not a chosen menu item,
+     and a colour class is not a state. Without this the wall let you click
+     Delete and watch it stop being red while Rename went red instead. */
+  var STATEATTR=/^(data-(state|active|selected|checked|current)|aria-(selected|current|checked|pressed))$/
+  var STATECLASS=/(^|[-_])(active|selected|current|checked|open)([-_]|$)/
+  function saysChosen(m){
+    for(var i=0;i<m.length;i++){
+      if(STATEATTR.test(m[i][0]))return true
+      if(m[i][0]==='class'){
+        var a=(m[i][1]||'').split(/\\s+/),b=(m[i][2]||'').split(/\\s+/),j
+        for(j=0;j<a.length;j++)if(b.indexOf(a[j])<0&&STATECLASS.test(a[j]))return true
+        for(j=0;j<b.length;j++)if(a.indexOf(b[j])<0&&STATECLASS.test(b[j]))return true
+      }
+    }
+    return false
+  }
+
+  /* A CHOOSER IS A ROW WHERE EXACTLY ONE IS DIFFERENT.
+     Three or more of the same tag, two shapes between them, one of which
+     appears once: that one is the chosen one, whatever this kit calls it.
+     Only things you can operate — a link, a button, or anything that names
+     its own role — and never a custom element, whose own code already runs.
+     Anything a rule above already owns is left to that rule. */
+  function chooser(set){
+    if(set.length<3)return
+    var tag=set[0].tagName,i,el
+    if(tag.indexOf('-')>0)return
+    for(i=0;i<set.length;i++){ el=set[i]
+      if(el.tagName!==tag)return
+      if(tag!=='A'&&tag!=='BUTTON'&&!el.getAttribute('role'))return
+      if(/^(switch|checkbox|radio)$/.test(el.getAttribute('role')||''))return
+    }
+    var by={},k
+    for(i=0;i<set.length;i++){ k=sig(set[i]); (by[k]=by[k]||[]).push(set[i]) }
+    var keys=Object.keys(by); if(keys.length!==2)return
+    var one=by[keys[0]].length===1?by[keys[0]][0]:by[keys[1]].length===1?by[keys[1]][0]:null
+    if(!one)return
+    var other=null
+    for(i=0;i<set.length;i++)if(set[i]!==one){other=set[i];break}
+    var m=mark(one,other)
+    if(!m.length||!saysChosen(m))return
+    set.forEach(function(el){ el.addEventListener('click',function(){
+      set.forEach(function(o){ m.forEach(function(p){ put(o,p[0],o===el?p[1]:p[2]) }) })
+    }) })
+  }
+  /* THE SET IS A TAG, NOT A ROW.
+     A rail is not a clean row of four links: there is a heading above them
+     and one of them carries a count. Insisting the whole row be identical in
+     shape meant a rail was a chooser in one kit and not in the six others,
+     which is an accident and not a decision. So the row is grouped BY TAG and
+     each tag with three or more members is offered on its own. */
+  function bytag(set,fn){
+    var by={},i,t
+    for(i=0;i<set.length;i++){ if(!set[i])continue; t=set[i].tagName; (by[t]=by[t]||[]).push(set[i]) }
+    for(t in by)if(by[t].length>=3)fn(by[t])
+  }
+  var all=m.querySelectorAll('*')
+  for(var q=0;q<all.length;q++){
+    var kids=Array.prototype.slice.call(all[q].children)
+    if(kids.length<3)continue
+    bytag(kids,chooser)
+    /* one wrapper deep, for a kit that puts each choice in its own li or div */
+    bytag(kids.map(function(k){return k.firstElementChild}),chooser)
+  }
+
+  /* A BUTTON THAT SAYS IT IS A SWITCH, A BOX OR A RADIO.
+     Their components put the answer in aria-checked and repeat it in
+     data-state down the subtree, so both move together. */
+  function checked(el,on){
+    el.setAttribute('aria-checked',on?'true':'false')
+    var n=[el].concat(Array.prototype.slice.call(el.querySelectorAll('[data-state]')))
+    n.forEach(function(x){ var v=x.getAttribute('data-state')
+      if(v==='checked'||v==='unchecked')x.setAttribute('data-state',on?'checked':'unchecked') })
+  }
+  m.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('button[role=switch],button[role=checkbox],button[role=radio]')
+    if(!b)return
+    if(b.getAttribute('role')==='radio'){
+      var g=b.closest('[role=radiogroup]')||b.parentElement.parentElement
+      Array.prototype.forEach.call(g.querySelectorAll('[role=radio]'),function(r){checked(r,false)})
+      return checked(b,true)
+    }
+    checked(b,b.getAttribute('aria-checked')!=='true')
+  })
+  /* and a kit that uses a real input but repeats the answer on a wrapper */
+  m.addEventListener('change',function(e){
+    var i=e.target; if(!i.matches||!i.matches('input'))return
+    for(var n=i;n&&n!==m;n=n.parentElement)
+      if(n.hasAttribute('data-checked'))n.setAttribute('data-checked',i.checked?'true':'false')
+  })
+
+  /* A SLIDER DRAGS.
+     Three of these draw theirs out of divs, and each writes the value as a
+     percentage somewhere in an inline style — a width, a left, a custom
+     property inside a calc(). Which one is not our business: the percent
+     that is already there is taken out and the style kept as a stencil, so
+     dragging writes the kit's own expression with a different number. */
+  Array.prototype.forEach.call(m.querySelectorAll('[role=slider]'),function(th){
+    var box=th.offsetParent; if(!box)return
+    var now=+th.getAttribute('aria-valuenow'); if(!(now>=0))return
+    var cut=String(now)+'%', tpl=[]
+    var nodes=[box].concat(Array.prototype.slice.call(box.querySelectorAll('*')))
+    nodes.forEach(function(el){ var t=el.style.cssText
+      if(t&&t.indexOf(cut)>=0)tpl.push([el,t.split(cut).join('\\u0000')]) })
+    if(!tpl.length)return
+    function at(pct){
+      pct=Math.max(0,Math.min(100,Math.round(pct)))
+      tpl.forEach(function(p){ p[0].style.cssText=p[1].split('\\u0000').join(pct+'%') })
+      th.setAttribute('aria-valuenow',pct)
+    }
+    /* Measured on the box itself, padding included. A percentage in a left
+       or a width resolves against the containing block, and that is the
+       padding box — so a kit that insets its track by half a thumb has
+       already accounted for it. Taking the padding off again put its thumb
+       three pixels behind the pointer. (No backticks in here: this whole
+       block is a template literal. Fifth time.) */
+    function from(x){ var r=box.getBoundingClientRect(); return r.width>0?(x-r.left)/r.width*100:0 }
+    var drag=false
+    box.addEventListener('pointerdown',function(e){ drag=true; box.setPointerCapture&&box.setPointerCapture(e.pointerId); at(from(e.clientX)); e.preventDefault() })
+    box.addEventListener('pointermove',function(e){ if(drag)at(from(e.clientX)) })
+    addEventListener('pointerup',function(){ drag=false })
+    th.addEventListener('keydown',function(e){
+      var v=+th.getAttribute('aria-valuenow'),k=e.key
+      if(k==='ArrowLeft'||k==='ArrowDown')at(v-1); else if(k==='ArrowRight'||k==='ArrowUp')at(v+1)
+      else if(k==='Home')at(0); else if(k==='End')at(100); else return
+      e.preventDefault()
+    })
+  })
 })()${CLOSE}`

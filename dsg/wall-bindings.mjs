@@ -133,7 +133,10 @@ const tailwind = {
     <p class="mt-6 text-sm text-ink-muted">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv) =>
     `<div class="flex h-16 w-24 items-center justify-center rounded-lg bg-surface text-xs text-ink-muted shadow-${lv}">${esc(lv)}</div>`).join('')}</div>`,
-  tabs:    (n) => `<div class="flex gap-4 border-b border-line text-sm">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'border-b-2 border-brand pb-2 font-medium text-ink' : 'pb-2 text-ink-muted'}">${esc(t)}</span>`).join('')}</div>`,
+  /* A tab is a button with a role, even when the kit is only utilities: a row
+     of spans cannot be reached by a keyboard and says nothing to a screen
+     reader, and there is no Tailwind class that would have fixed either. */
+  tabs:    (n) => `<div role="tablist" class="flex gap-4 border-b border-line text-sm">${list(n.items).map((t, i) => `<button role="tab" aria-selected="${i === 0}" class="${i === 0 ? 'border-b-2 border-brand pb-2 font-medium text-ink' : 'pb-2 text-ink-muted'}">${esc(t)}</button>`).join('')}</div>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   textarea: (n) => `<textarea rows="3" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink ${TW_RING}" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
@@ -150,7 +153,7 @@ const tailwind = {
       <hr class="-mx-1 my-1 border-line">
       <a href="#" class="flex items-center rounded-md px-2 py-1.5 text-sm text-danger hover:bg-page">${esc(n.danger ?? 'Delete')}</a></div></div>`,
   sidenav: (n) => `<nav class="flex flex-col gap-4">${list(n.groups).map((g) => `<div class="flex flex-col gap-1">
-    <p class="px-2 text-xs font-medium text-ink-muted">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#" class="flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm ${it.on ? 'bg-surface font-medium text-ink' : 'text-ink-muted hover:bg-surface'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="ml-auto rounded-full bg-brand/10 px-2 text-xs text-brand">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</nav>`,
+    <p class="px-2 text-xs font-medium text-ink-muted">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#"${it.on ? ' aria-current="page"' : ''} class="flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm ${it.on ? 'bg-surface font-medium text-ink' : 'text-ink-muted hover:bg-surface'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="ml-auto rounded-full bg-brand/10 px-2 text-xs text-brand">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</nav>`,
   list:    (n) => `<div class="flex flex-col">${list(n.rows).map((r) => `<div class="flex min-h-12 items-center gap-3 border-b border-line py-2 last:border-0">
     <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface text-ink-muted">${ico(r.icon)}</span>
     <span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-ink">${esc(r.title)}</span><span class="block text-xs text-ink-muted">${esc(r.sub ?? '')}</span></span>
@@ -215,7 +218,7 @@ const daisyui = {
     </footer><footer class="footer footer-center bg-base-200 text-base-content px-8 pb-6"><aside><p>${esc(n.note)}</p></aside></footer>`,
   elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv) =>
     `<div class="card bg-base-100 shadow-${lv} h-16 w-24"><div class="card-body items-center justify-center p-0 text-xs opacity-60">${esc(lv)}</div></div>`).join('')}</div>`,
-  tabs:    (n) => `<div class="tabs tabs-border">${list(n.items).map((t, i) => `<a class="tab${i === 0 ? ' tab-active' : ''}">${esc(t)}</a>`).join('')}</div>`,
+  tabs:    (n) => `<div role="tablist" class="tabs tabs-border">${list(n.items).map((t, i) => `<a role="tab" class="tab${i === 0 ? ' tab-active' : ''}">${esc(t)}</a>`).join('')}</div>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   /* daisyUI ships a component for nearly all of these: .textarea, .range,
@@ -304,7 +307,7 @@ const bootstrap = {
     <p class="text-body-secondary mb-0 mt-3">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="d-flex flex-wrap align-items-center gap-3">${list(n.levels).map((lv, i) =>
     `<div class="card ${['shadow-sm', 'shadow', 'shadow-lg'][i] ?? 'shadow'} d-flex align-items-center justify-content-center small text-body-secondary" style="width:6rem;height:4rem">${esc(lv)}</div>`).join('')}</div>`,
-  tabs:    (n) => `<ul class="nav nav-tabs">${list(n.items).map((t, i) => `<li class="nav-item"><a class="nav-link${i === 0 ? ' active' : ''}">${esc(t)}</a></li>`).join('')}</ul>`,
+  tabs:    (n) => `<ul class="nav nav-tabs" role="tablist">${list(n.items).map((t, i) => `<li class="nav-item" role="presentation"><a class="nav-link${i === 0 ? ' active' : ''}" role="tab" aria-selected="${i === 0}">${esc(t)}</a></li>`).join('')}</ul>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   /* .form-range, .progress, .breadcrumb, .list-group and .nav-pills are all
@@ -416,7 +419,13 @@ const shadcn = {
     return `<label class="${sSlot('label')}" data-slot="label"><button type="button" role="radio" aria-checked="${on}" data-slot="radio-group-item" data-state="${on ? 'checked' : 'unchecked'}" class="${sSlot('radio-group-item')}">${
       on ? `<span data-slot="radio-group-indicator" class="${sSlot('radio-group-indicator')}"></span>` : ''}</button>${esc(t)}</label>` }).join('')}</div>`,
   switch:  (n) => `<label class="${sSlot('label')}" data-slot="label"><button type="button" role="switch" aria-checked="${!!n.on}" data-slot="switch" data-size="default" data-state="${n.on ? 'checked' : 'unchecked'}" class="${sSlot('switch')}"><span data-slot="switch-thumb" data-state="${n.on ? 'checked' : 'unchecked'}" class="${sSlot('switch-thumb')}"></span></button>${esc(n.text ?? '')}</label>`,
-  slider:  (n) => `<span data-slot="slider" data-orientation="horizontal" class="${sSlot('slider')}"><span data-slot="slider-track" data-orientation="horizontal" class="${sSlot('slider-track')}"><span data-slot="slider-range" data-orientation="horizontal" class="${sSlot('slider-range')}" style="width:${n.value ?? 60}%"></span></span><span data-slot="slider-thumb" class="${sSlot('slider-thumb')}" style="position:absolute;left:calc(${n.value ?? 60}% - 8px)"></span></span>`,
+  /* THE THUMB IS A ROLE, NOT A DECORATION.
+     Their component renders role=slider, a tabindex and the three aria-value
+     attributes on it; the class strings the registry publishes cannot carry
+     those, so leaving them off meant the thumb could not be focused, its own
+     focus-visible rule never fired, and nothing on the wall could be dragged.
+     Every div-built slider here gets what its real one has. */
+  slider:  (n) => `<span data-slot="slider" data-orientation="horizontal" class="${sSlot('slider')}"><span data-slot="slider-track" data-orientation="horizontal" class="${sSlot('slider-track')}"><span data-slot="slider-range" data-orientation="horizontal" class="${sSlot('slider-range')}" style="width:${n.value ?? 60}%"></span></span><span data-slot="slider-thumb" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${n.value ?? 60}" aria-orientation="horizontal" class="${sSlot('slider-thumb')}" style="position:absolute;left:calc(${n.value ?? 60}% - 8px)"></span></span>`,
   progress: (n) => `<div data-slot="progress" class="${sSlot('progress')}"><div data-slot="progress-indicator" class="${sSlot('progress-indicator')}" style="transform:translateX(-${100 - (n.value ?? 60)}%)"></div></div>`,
   badge:   (n, k) => A(n, k, 'span', sCva('badge', 'badgeVariants', { variant: SC_BADGE[n.tone ?? 'neutral'] }), ` data-slot="badge"`),
   alert:   (n, k) => `<div role="alert" data-slot="alert" class="${sCva('alert', 'alertVariants', { variant: n.tone === 'danger' ? 'destructive' : 'default' })}"><div data-slot="alert-description" class="${sSlot('alert-description')}">${n.text != null ? esc(n.text) : k}</div></div>`,
@@ -756,7 +765,7 @@ const radix = {
      width. Written the way their primitive writes it: a track with no
      orientation is a track with no height, which is exactly the invisible
      slider the first version drew. */
-  slider:  (n) => `<span class="rt-SliderRoot rt-r-size-2 rt-variant-surface" data-orientation="horizontal" style="width:100%"><span class="rt-SliderTrack" data-orientation="horizontal"><span class="rt-SliderRange" data-orientation="horizontal" style="left:0;width:${n.value ?? 60}%"></span></span><span class="rt-SliderThumb" data-orientation="horizontal" style="position:absolute;left:${n.value ?? 60}%;transform:translateX(-50%)"></span></span>`,
+  slider:  (n) => `<span class="rt-SliderRoot rt-r-size-2 rt-variant-surface" data-orientation="horizontal" style="width:100%"><span class="rt-SliderTrack" data-orientation="horizontal"><span class="rt-SliderRange" data-orientation="horizontal" style="left:0;width:${n.value ?? 60}%"></span></span><span class="rt-SliderThumb" data-orientation="horizontal" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${n.value ?? 60}" aria-orientation="horizontal" style="position:absolute;left:${n.value ?? 60}%;transform:translateX(-50%)"></span></span>`,
   progress: (n) => `<div class="rt-ProgressRoot rt-r-size-2 rt-variant-surface" data-orientation="horizontal" style="--progress-value:${n.value ?? 60};--progress-max:100"><div class="rt-ProgressIndicator" data-orientation="horizontal"></div></div>`,
   iconrow: (n) => `<div class="rt-Flex" style="display:flex;flex-wrap:wrap;gap:var(--space-1)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="rt-reset rt-BaseButton rt-r-size-2 rt-variant-soft rt-IconButton" data-accent-color="gray">${ico(i)}</button>`).join('')}</div>`,
   breadcrumb: (n) => `<nav class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)">${list(n.items).map((t, i, a) => `${i ? '<span class="rt-Text rt-r-size-2" data-accent-color="gray">/</span>' : ''}${i === a.length - 1 ? `<span class="rt-Text rt-r-size-2 rt-Strong">${esc(t)}</span>` : `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`}`).join('')}</nav>`,
@@ -771,7 +780,7 @@ const radix = {
         <div class="rt-BaseMenuSeparator"></div>
         <div class="rt-reset rt-BaseMenuItem" role="menuitem" data-accent-color="red">${esc(n.danger ?? 'Delete')}</div></div></div></div>`,
   sidenav: (n) => `<div class="rt-Flex" style="display:flex;flex-direction:column;gap:var(--space-4)">${list(n.groups).map((g) => `<div style="display:flex;flex-direction:column;gap:var(--space-1)">
-    <p class="rt-Text rt-r-size-1 rt-Strong" data-accent-color="gray" style="padding:0 var(--space-2)">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#" class="rt-Text rt-r-size-2" style="display:flex;align-items:center;gap:var(--space-2);min-height:32px;padding:0 var(--space-2);border-radius:var(--radius-2);text-decoration:none;color:${it.on ? 'var(--accent-11)' : 'var(--gray-11)'};background:${it.on ? 'var(--accent-a3)' : 'transparent'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="rt-reset rt-Badge rt-r-size-1 rt-variant-soft" style="margin-left:auto">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,
+    <p class="rt-Text rt-r-size-1 rt-Strong" data-accent-color="gray" style="padding:0 var(--space-2)">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#"${it.on ? ' aria-current="page"' : ''} class="rt-Text rt-r-size-2" style="display:flex;align-items:center;gap:var(--space-2);min-height:32px;padding:0 var(--space-2);border-radius:var(--radius-2);text-decoration:none;color:${it.on ? 'var(--accent-11)' : 'var(--gray-11)'};background:${it.on ? 'var(--accent-a3)' : 'transparent'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="rt-reset rt-Badge rt-r-size-1 rt-variant-soft" style="margin-left:auto">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,
   list:    (n) => `<div class="rt-Flex" style="display:flex;flex-direction:column">${list(n.rows).map((r) => `<div style="display:flex;align-items:center;gap:var(--space-3);min-height:48px;padding:var(--space-2) 0;border-bottom:1px solid var(--gray-a4)">
     <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--radius-3);background:var(--gray-a3);color:var(--gray-11)">${ico(r.icon)}</span>
     <span style="flex:1;min-width:0"><span class="rt-Text rt-r-size-2 rt-Strong" style="display:block">${esc(r.title)}</span><span class="rt-Text rt-r-size-1" data-accent-color="gray" style="display:block">${esc(r.sub ?? '')}</span></span>
@@ -937,7 +946,7 @@ const mantine = {
   slider:  (n) => `<div class="${mc('Slider')}" data-size="md" style="--slider-size:var(--slider-size-md);--slider-color:var(--mantine-primary-color-filled);--slider-radius:var(--mantine-radius-xl);--slider-thumb-size:calc(var(--slider-size) * 2)">
     <div class="${mc('Slider', 'trackContainer')}"><div class="${mc('Slider', 'track')}">
       <div class="${mc('Slider', 'bar')}" style="--slider-bar-width:calc(${n.value ?? 60}% + 2 * var(--slider-size));--slider-bar-offset:calc(0% - var(--slider-size))"></div>
-    </div></div><div class="${mc('Slider', 'thumb')}" style="--slider-thumb-offset:${n.value ?? 60}%"></div></div>`,
+    </div></div><div class="${cls(MN_FOCUS, mc('Slider', 'thumb'))}" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${n.value ?? 60}" aria-orientation="horizontal" style="--slider-thumb-offset:${n.value ?? 60}%"></div></div>`,
   /* --progress-section-WIDTH was a name of ours that nothing reads: their
      section reads --progress-section-size for the width and
      --progress-section-color for the fill, so this bar had neither. */
