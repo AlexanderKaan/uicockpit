@@ -526,7 +526,13 @@ ${blocks.join('\n\n')}
 
 ${routed.map((r) => {
   const kit = kits[r.kit]
-  return `## ${kit.name}\n\n\`\`\`bash\n${(INSTALL[r.kit]?.(kit, r) ?? []).join('\n')}\n\`\`\`\n`
+  /* WHAT YOU HAVE TO BE RUNNING, before the command to install it.
+     Read from the kit's own peer dependencies. Someone who finds out on line
+     one that this is React-only has lost a minute; someone who finds out after
+     wiring a theme has lost an afternoon. */
+  const run = kit.runsIn
+  const line = run ? `> ${run.framework ? `**${run.framework} only** — ` : '**Any framework** — '}${run.what}.\n\n` : ''
+  return `## ${kit.name}\n\n${line}\`\`\`bash\n${(INSTALL[r.kit]?.(kit, r) ?? []).join('\n')}\n\`\`\`\n`
 }).join('\n')}
 Then import \`theme.css\` after the kits, so your values win.
 `
@@ -622,7 +628,7 @@ export const section = (md, heading) => {
 function manifest(routed, kits, values, opts = {}) {
   const rows = routed.map((r) => {
     const k = kits[r.kit]
-    return `| ${k.name} | ${k.version ?? 'live'} | ${k.license ?? 'see project'} | ${Object.keys(r.vars).length} | ${k.source} |`
+    return `| ${k.name} | ${k.version ?? 'live'} | ${k.license ?? 'see project'} | ${k.runsIn?.framework ?? 'anything'} | ${Object.keys(r.vars).length} | ${k.source} |`
   })
 
   const caveats = routed.flatMap((r) => {
@@ -656,8 +662,8 @@ function manifest(routed, kits, values, opts = {}) {
   const clash = collisions(routed, kits)
   return `# Your design system
 
-| Kit | Version | Licence | Variables set | Read from |
-|---|---|---|---|---|
+| Kit | Version | Licence | Runs in | Variables set | Read from |
+|---|---|---|---|---|---|
 ${rows.join('\n')}
 
 ## What you set

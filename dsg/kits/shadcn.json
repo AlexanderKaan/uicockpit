@@ -521,6 +521,13 @@
     "version": "1.4.0",
     "license": "MIT"
   },
+  "runsIn": {
+    "framework": "React",
+    "from": [
+      "react"
+    ],
+    "what": "every component in its registry declares radix-ui and lucide-react"
+  },
   "bands": {
     "behaviour": {
       "by": "radix-ui",

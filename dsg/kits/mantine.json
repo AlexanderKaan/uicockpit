@@ -571,6 +571,13 @@
   "style": null,
   "parts": null,
   "animates": null,
+  "runsIn": {
+    "framework": "React",
+    "from": [
+      "react"
+    ],
+    "what": "its package names react as peer dependencies"
+  },
   "bands": {
     "behaviour": {
       "by": "its own React layer",

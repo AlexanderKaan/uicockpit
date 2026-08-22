@@ -65,6 +65,9 @@ export function antdBundle({ refresh = false } = {}) {
       /* what they declare they lean on, so the stack model reads their
          behaviour layer out of their own manifest like every other kit's */
       deps: [...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.peerDependencies ?? {})],
+      /* and what it demands of the app around it, which is the question of
+         whether you can use it at all */
+      peers: Object.keys(pkg.peerDependencies ?? {}),
       bytes: readFileSync(BUNDLE).length,
     }
     writeFileSync(META, JSON.stringify(meta, null, 2) + '\n')

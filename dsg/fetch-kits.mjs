@@ -78,6 +78,44 @@ const BEHAVIOUR = [
   [/^@popperjs\//, 'its own JavaScript', 'the scripts it ships in dist/js'],
   [/^@rc-component\//, 'rc-component', 'the rc-* behaviour packages — the unstyled React primitives Ant Design is built on'],
 ]
+/**
+ * WHAT YOU HAVE TO BE RUNNING TO USE THIS AT ALL.
+ *
+ * The first question anyone asks about a design system, and the one nobody
+ * answers on a comparison page: can I use it? Read out of the package's own
+ * PEER dependencies, which is exactly what a peer dependency means — not what
+ * the kit carries, but what it demands of the app around it.
+ *
+ * Nothing here is a judgement. Mantine says `react` in its own manifest;
+ * Tailwind says nothing at all, and a kit that demands nothing runs in
+ * anything. Five of the nine here demand nothing, which is the whole reason
+ * this tool is not a React tool.
+ */
+const FRAMEWORK = [
+  [/^react$/, 'React'],
+  [/^vue$/, 'Vue'],
+  [/^@angular\/core$/, 'Angular'],
+  [/^svelte$/, 'Svelte'],
+  [/^solid-js$/, 'Solid'],
+]
+function runsIn(peers = [], said = null) {
+  for (const [re, name] of FRAMEWORK) {
+    if (peers.some((p) => re.test(p))) {
+      /* `what` is the EVIDENCE, never the claim. The claim is the framework
+         name and every reader states it in its own words — a card says
+         "React only", a manifest says it in a column — so carrying the claim
+         in here too produced "React only — its components are React
+         components — the package names…" and read like a stutter. */
+      return { framework: name, from: peers.filter((p) => FRAMEWORK.some(([r]) => r.test(p))),
+        what: said ?? `its package names ${peers.filter((p) => FRAMEWORK.some(([r]) => r.test(p))).join(' and ')} as peer dependencies` }
+    }
+  }
+  return { framework: null, from: [],
+    what: peers.length
+      ? `the only thing it asks of your app is ${peers.join(' and ')}`
+      : 'it names no peer dependency at all, so it runs in whatever you are already using' }
+}
+
 /** What a package's own dependency list says it leans on for behaviour. */
 function behaviourOf(names) {
   for (const [re, by, what] of BEHAVIOUR) {
@@ -94,7 +132,7 @@ const SOURCES = {
     what: 'utility classes — no components; the theme is CSS variables you can override',
     async read() {
       const t = fromNpm('tailwindcss@latest', 'theme.css')
-      return { ...t, source: `npm tailwindcss@${t.version} · theme.css`, behaviour: behaviourOf(t.deps ?? []), modes: { light: cssVars(t.text) } }
+      return { ...t, source: `npm tailwindcss@${t.version} · theme.css`, behaviour: behaviourOf(t.deps ?? []), runsIn: runsIn(t.peers), modes: { light: cssVars(t.text) } }
     },
   },
   daisyui: {
@@ -104,7 +142,7 @@ const SOURCES = {
     async read() {
       const light = fromNpm('daisyui@latest', 'theme/light.css')
       const dark = fromNpm('daisyui@latest', 'theme/dark.css')
-      return { ...light, source: `npm daisyui@${light.version} · theme/light.css + theme/dark.css`, behaviour: behaviourOf(light.deps ?? []),
+      return { ...light, source: `npm daisyui@${light.version} · theme/light.css + theme/dark.css`, behaviour: behaviourOf(light.deps ?? []), runsIn: runsIn(light.peers),
         modes: { light: cssVars(light.text), dark: cssVars(dark.text) },
         plain: { light: cssPlain(light.text), dark: cssPlain(dark.text) } }
     },
@@ -125,7 +163,7 @@ const SOURCES = {
         return cssVars(text.slice(at, text.indexOf('}', at)))
       }
       return { ...pkg, source: `npm bootstrap@${pkg.version} · dist/css/bootstrap.css :root + [data-bs-theme=dark]`,
-        behaviour: behaviourOf(pkg.deps ?? []),
+        behaviour: behaviourOf(pkg.deps ?? []), runsIn: runsIn(pkg.peers),
         modes: { light: block(':root,'), dark: block('[data-bs-theme=dark]') } }
     },
   },
@@ -175,7 +213,7 @@ const SOURCES = {
         light[name] = pair ? pair[1] : raw
         dark[name] = pair ? pair[2] : raw
       }
-      return { ...colour, behaviour: behaviourOf(colour.deps ?? []), source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens + tokens/_md-sys-shape (what its components read) + m3.css typefaces`,
+      return { ...colour, behaviour: behaviourOf(colour.deps ?? []), runsIn: runsIn(colour.peers), source: `npm @material/web@${colour.version} · labs/gb/styles/{color,shape} tokens + tokens/_md-sys-shape (what its components read) + m3.css typefaces`,
         modes: { light, dark } }
     },
   },
@@ -241,7 +279,7 @@ const SOURCES = {
           .map((m) => [m[1], read(blockOf(text, m[0]))]).filter(([, v]) => v != null))
         const layout = p.read('layout/tokens.css')
 
-        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://radix-ui.com/themes', behaviour: behaviourOf(p.deps ?? []),
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://radix-ui.com/themes', behaviour: behaviourOf(p.deps ?? []), runsIn: runsIn(p.peers),
           source: `npm @radix-ui/themes@${p.version} · tokens/base.css + tokens/colors/*.css`,
           choices: {
             brand: { attr: 'data-accent-color', unit: 'colour', of: Object.fromEntries(accents),
@@ -302,7 +340,7 @@ const SOURCES = {
             if (Object.keys(map).length) classes[name] ??= map
           }
         }
-        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://mantine.dev', behaviour: behaviourOf(p.deps ?? []),
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://mantine.dev', behaviour: behaviourOf(p.deps ?? []), runsIn: runsIn(p.peers),
           source: `npm @mantine/core@${p.version} · styles.css :root + colour-scheme blocks, class names from esm/{components,utils}/*/*.module.mjs`,
           classes, modes: { light, dark } }
       } finally { p.close() }
@@ -321,7 +359,7 @@ const SOURCES = {
         const scales = cssVars(p.read('open-props.min.css'))
         const light = { ...scales, ...cssVars(p.read('normalize.light.min.css')) }
         const dark = { ...scales, ...cssVars(p.read('normalize.dark.min.css')) }
-        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://open-props.style', behaviour: behaviourOf(p.deps ?? []),
+        return { version: p.version, license: p.license, npm: p.npm, home: p.home ?? 'https://open-props.style', behaviour: behaviourOf(p.deps ?? []), runsIn: runsIn(p.peers),
           source: `npm open-props@${p.version} · open-props.min.css + normalize.{light,dark}.min.css`,
           modes: { light, dark } }
       } finally { p.close() }
@@ -354,7 +392,7 @@ const SOURCES = {
         parts: light.parts, classes: light.classes,
         /* what their own package.json says they lean on, read the same way as
            every other kit's — theirs names forty of them, all rc-component */
-        behaviour: behaviourOf(meta.deps ?? []),
+        behaviour: behaviourOf(meta.deps ?? []), runsIn: runsIn(meta.peers ?? []),
         modes: { light: vars(light.css), dark: vars(dark.css) } }
     },
   },
@@ -390,6 +428,11 @@ const SOURCES = {
       const anim = fromNpm('tw-animate-css@latest', 'package.json')
       return { version: null, license: 'MIT', npm: null, home: 'https://ui.shadcn.com',
         style: STYLE, parts, behaviour: behaviourOf(declared),
+        /* shadcn is not on npm, so there are no peers to read. What its
+           registry declares per component is the same fact by another route:
+           every one of them names radix-ui and lucide-react. */
+        runsIn: runsIn(declared.includes('radix-ui') || declared.includes('lucide-react') ? ['react'] : [],
+          `every component in its registry declares ${declared.filter((d) => /^(radix-ui|lucide-react)$/.test(d)).join(' and ')}`),
         animates: { npm: anim.npm, version: anim.version, license: anim.license },
         source: `ui.shadcn.com/r/colors/neutral.json · cssVars, and r/styles/${STYLE}/*.json for the components, with tw-animate-css@${anim.version} for the entrance utilities they name`,
         modes: { light: pre(d.cssVars.light), dark: pre(d.cssVars.dark) } }
@@ -425,6 +468,8 @@ for (const [id, kit] of Object.entries(SOURCES)) {
        and the manifest has to name it, so it is carried here rather than typed
        into either. */
     animates: read.animates ?? null,
+    /* what you have to be running to use it at all, read from its own peers */
+    runsIn: read.runsIn ?? null,
     /* the four bands: what this kit fills, and what it needs under it */
     bands: {
       behaviour: read.behaviour ?? null,

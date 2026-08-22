@@ -104,6 +104,14 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .lane__why{margin:0 0 3px;font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
 .lane__list{display:flex;flex-direction:column;gap:7px}
 .lane__fine{margin:0;font-size:var(--fs-xs);color:var(--muted);line-height:1.5;text-align:center}
+.pick__run{margin:7px 0 0;font-size:var(--fs-sm);color:var(--muted);display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.runpick{display:inline-flex;gap:3px;padding:2px;border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--sunk)}
+.runpick button{appearance:none;border:0;background:none;font:inherit;color:var(--muted);padding:2px 9px;border-radius:calc(var(--r) - 3px);cursor:pointer}
+.runpick button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgb(0 0 0/.06)}
+.opt__run{font-size:var(--fs-xs);color:var(--muted)}
+.opt__run b{font-weight:600;color:var(--ink)}
+.opt[data-cannot]{opacity:.5}
+.opt[data-cannot] .opt__run b{color:var(--warn-ink,var(--muted))}
 .opt{font:inherit;text-align:left;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r);
      padding:10px 11px;cursor:pointer;display:flex;flex-direction:column;gap:3px}
 .opt:hover{border-color:var(--ink)}
@@ -477,6 +485,9 @@ const state = {
   get show() { return showing(stack(this.on, KITS)) },
   board: 'foundations',
   mode: 'light',
+  /* what you said you are building in, or null for "anything". Only ever dims
+     the cards that cannot run there — it never picks for you. */
+  runIn: null,
   values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
     ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
     lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600', borderWidth: '1px',
@@ -646,12 +657,31 @@ function drawStackPicker() {
   const comps = ORDER.filter((id) => !KITS[id].standalone && KITS[id].layer === 'components')
   const under = ORDER.filter((id) => KITS[id].layer === 'tokens')
 
+  /* WHAT YOU HAVE TO BE RUNNING, on every card.
+     This is a starting point for a design system whatever you build in, and
+     five of these nine ask nothing of your app at all. Saying so is the
+     difference between a comparison and a shortlist: without it someone on Vue
+     could set every knob on Mantine and download a package they cannot use. */
+  const runs = (id) => KITS[id].runsIn ?? { framework: null, what: '' }
+  /* Three answers, and the third is the one that matters. The kits between
+     them name exactly one framework, so a control built only from what they
+     name offers React and nothing else — useless to the person this line is
+     for, who is on Vue or Svelte or nothing at all and only needs to know
+     which of these are closed to them. A kit that demands a framework is
+     closed to everyone not running it, whichever one that is. */
+  const cannot = (id) => (state.runIn === 'other'
+    ? !!runs(id).framework
+    : !!(state.runIn && runs(id).framework && runs(id).framework !== state.runIn))
+
   const card = (id, { on, disabled, why, tag }) => `<button class="opt" data-p="${id}"
-    aria-pressed="${!!on}"${disabled ? ' disabled' : ''}>
+    aria-pressed="${!!on}"${disabled ? ' disabled' : ''}${cannot(id) ? ' data-cannot' : ''}>
     ${tag ? `<span class="opt__tag">${tag}</span>` : ''}
     <span class="opt__top"><b>${KITS[id].name}</b>
       <span class="opt__meta">${KITS[id].license ?? ''}${KITS[id].version ? ` · v${KITS[id].version}` : ''}</span></span>
-    <span class="opt__why">${why}</span></button>`
+    <span class="opt__why">${why}</span>
+    <span class="opt__run" title="${runs(id).what.replace(/"/g, '&quot;')}">${runs(id).framework
+      ? `<b>${runs(id).framework} only</b>${cannot(id) ? ' — not where you are building' : ''}`
+      : '<b>any framework</b> — it asks nothing of your app'}</span></button>`
 
   $('#laneBase').innerHTML = bases.map((id) => card(id, {
     on: st.base === id, tag: st.base === id ? 'engine' : '',
@@ -671,6 +701,12 @@ function drawStackPicker() {
     })
   }).join('')
 
+  /* the choices are the frameworks the KITS name, plus the one that means
+     "nothing" — never a list of frameworks we happen to have heard of */
+  const FRAMEWORKS = [...new Set(Object.keys(KITS).map((k) => runs(k).framework).filter(Boolean))]
+  $('#runpick').innerHTML = [[null, 'anything'], ...FRAMEWORKS.map((f) => [f, f]), ['other', 'something else']]
+    .map(([v, label]) => `<button type="button" data-run="${v ?? ''}" aria-pressed="${(state.runIn ?? null) === v}">${label}</button>`).join('')
+
   const own = OWN[showing(st)] ?? {}
   /* the same four bands the card shows, so what you are choosing and what you
      end up with are described in one vocabulary */
@@ -679,6 +715,12 @@ function drawStackPicker() {
     + `<p class="card__facts">${own.parts ? `${own.partsTheirs} of ${own.parts} parts from the kit` : ''}</p>`
     + ((own.drawn ?? []).length ? `<p class="note">Not covered by this stack: ${own.drawn.join(', ')}. The generator draws those from tokens.</p>` : '')
 }
+$('#runpick').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-run]')
+  if (!b) return
+  state.runIn = b.dataset.run || null
+  drawStackPicker()
+})
 $('#change').addEventListener('click', () => { drawStackPicker(); $('#picker').showModal() })
 $('#pickerx').addEventListener('click', () => $('#picker').close())
 $('#pickerDone').addEventListener('click', () => $('#picker').close())

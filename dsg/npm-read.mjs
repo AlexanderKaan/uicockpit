@@ -30,6 +30,12 @@ export function openNpm(pkg) {
        out of this rather than out of an opinion: a kit that depends on radix-ui
        brings the Radix behaviour with it, and says so in its own manifest. */
     deps: [...Object.keys(meta.dependencies ?? {}), ...Object.keys(meta.peerDependencies ?? {})],
+    /* AND THE PEERS ON THEIR OWN, which is a different question with a
+       different answer: a dependency is what a package carries, a PEER is what
+       it demands of the app around it. Mantine depends on forty things and
+       demands one — React — and that second number is the one that decides
+       whether you can use it at all. */
+    peers: Object.keys(meta.peerDependencies ?? {}),
     read: (f) => readFileSync(join(dir, 'package', f), 'utf8'),
     list: (sub) => readdirSync(join(dir, 'package', sub)),
     close: () => rmSync(dir, { recursive: true, force: true }),
@@ -49,7 +55,8 @@ export function fromNpm(pkg, file) {
     return { text: readFileSync(join(dir, 'package', file), 'utf8'), version,
       license: typeof meta.license === 'string' ? meta.license : meta.license?.type ?? null,
       npm: meta.name, home: meta.homepage ?? null,
-      deps: [...Object.keys(meta.dependencies ?? {}), ...Object.keys(meta.peerDependencies ?? {})] }
+      deps: [...Object.keys(meta.dependencies ?? {}), ...Object.keys(meta.peerDependencies ?? {})],
+      peers: Object.keys(meta.peerDependencies ?? {}) }
   } finally { rmSync(dir, { recursive: true, force: true }) }
 }
 

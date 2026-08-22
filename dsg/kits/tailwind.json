@@ -11,6 +11,11 @@
   "style": null,
   "parts": null,
   "animates": null,
+  "runsIn": {
+    "framework": null,
+    "from": [],
+    "what": "it names no peer dependency at all, so it runs in whatever you are already using"
+  },
   "bands": {
     "behaviour": null,
     "engine": "own",

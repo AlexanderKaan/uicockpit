@@ -390,6 +390,13 @@
     "{\"p\":\"mediacard\",\"title\":\"Waste and recycling\",\"text\":\"Collection days, bulky items, and where the containers are.\",\"action\":\"Read on\"}": "<div class=\"ant-card ant-card-bordered antd\"><div class=\"ant-card-cover\"><div data-photo=\"1\" style=\"aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; background: var(--ant-color-fill-quaternary); color: var(--ant-color-text-quaternary);\"></div></div><div class=\"ant-card-body\"><div class=\"ant-card-meta\"><div class=\"ant-card-meta-section\"><div class=\"ant-card-meta-title\">Waste and recycling</div><div class=\"ant-card-meta-description\">Collection days, bulky items, and where the containers are.</div></div></div><a href=\"#\" class=\"ant-typography ant-typography-link antd\" style=\"display: inline-block; margin-top: 12px;\">Read on</a></div></div>"
   },
   "animates": null,
+  "runsIn": {
+    "framework": "React",
+    "from": [
+      "react"
+    ],
+    "what": "its package names react as peer dependencies"
+  },
   "bands": {
     "behaviour": {
       "by": "rc-component",

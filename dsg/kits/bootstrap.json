@@ -11,6 +11,11 @@
   "style": null,
   "parts": null,
   "animates": null,
+  "runsIn": {
+    "framework": null,
+    "from": [],
+    "what": "the only thing it asks of your app is @popperjs/core"
+  },
   "bands": {
     "behaviour": {
       "by": "its own JavaScript",

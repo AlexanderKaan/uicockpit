@@ -16,6 +16,15 @@ const SHOT_IDS = ['tailwind', 'daisyui']
 const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface: '#f7f9fa',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
 const kits = Object.fromEntries(ALL.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
+/* COUNTED, not typed. "Five of the nine ask nothing of your app" is the whole
+   positioning in one line, and a number typed into a page is a number that
+   goes wrong the first time a kit is added. Every kit document, not the five
+   this page happens to render. */
+const EVERY = ['tailwind', 'daisyui', 'bootstrap', 'shadcn', 'material', 'radix', 'mantine', 'antd', 'openprops']
+const runsIn = EVERY.map((id) => JSON.parse(readFileSync(`kits/${id}.json`, 'utf8')).runsIn)
+const FREE = runsIn.filter((r) => !r?.framework).length
+const WORD_OF = (n) => ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][n] ?? String(n)
+const WORD = WORD_OF(FREE)
 useMantineClasses(kits.mantine?.classes)
 useShadcnParts(kits.shadcn?.parts)
 useAntdParts(kits.antd?.parts)
@@ -50,6 +59,8 @@ let page = readFileSync('home.template.html', 'utf8')
   .replace('/*KITS*/', () => JSON.stringify(kits))
   .replace('/*SHOT*/', () => safeJson(shot))
   .replace('/*CARDS*/', () => String(SCENES.length))
+  .replace('/*FRAMEWORKFREE*/', () => WORD)
+  .replace('/*KITCOUNT*/', () => WORD_OF(EVERY.length))
   .replace('/*PARTS*/', () => String(PARTS.length))
   .replace('/*CAVEATS*/', () => JSON.stringify(caveats))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
