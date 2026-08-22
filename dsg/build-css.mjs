@@ -33,6 +33,12 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
      version while building Bootstrap alone read it off a kit that was never
      loaded, and the whole preview died before it compiled anything. */
   const dev = {}
+  if (TW.length && !kits.tailwind) {
+    /* daisyUI and shadcn are compiled BY Tailwind, so its document is needed
+       even when it is not one of the kits being rendered. Saying which is
+       missing beats a TypeError three frames down. */
+    throw new Error(`${TW.map(([id]) => id).join(' and ')} compile through Tailwind, so kits/tailwind.json has to be loaded too`)
+  }
   if (TW.length) {
     dev['@tailwindcss/cli'] = `^${kits.tailwind.version}`
     dev.tailwindcss = `^${kits.tailwind.version}`

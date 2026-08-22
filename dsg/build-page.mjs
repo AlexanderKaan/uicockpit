@@ -14,7 +14,7 @@ import { DARK, generate } from './generate.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render, PARTS } from './parts.mjs'
-import { WALL, useMantineClasses, useRadixTones, useIcons } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useRadixTones, useIcons, useShadcnParts } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES, BOARDS, wallMarkup, safeJson } from './scenes.mjs'
 import { ownage, partOwnage } from './fidelity.mjs'
 import { analyse, unread } from './orphans.mjs'
@@ -34,6 +34,7 @@ const SEED = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '
   lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600', borderWidth: '1px' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(kits.mantine?.classes)
+useShadcnParts(kits.shadcn?.parts)
 
 /* The semantic knobs open on a published value, not on a green we picked. The
  * order is the order kits are asked in, and the page says which kit answered.

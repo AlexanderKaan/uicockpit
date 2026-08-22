@@ -8,6 +8,8 @@
   "choices": null,
   "classes": null,
   "ramps": null,
+  "style": null,
+  "parts": null,
   "version": "4.3.3",
   "license": "MIT",
   "npm": "tailwindcss",

@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import { buildCss } from './build-css.mjs'
 import { render } from './parts.mjs'
-import { WALL, useMantineClasses, useIcons } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useIcons, useShadcnParts } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES } from './scenes.mjs'
 import { icons } from './icons.mjs'
 import { materialElements } from './material-elements.mjs'
@@ -39,6 +39,7 @@ const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface:
   fontHeading: 'Fraunces, serif', fontBody: 'Inter, sans-serif' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 useMantineClasses(kits.mantine?.classes)
+useShadcnParts(kits.shadcn?.parts)
 useIcons(icons(ICON_NAMES).icons)
 
 const markup = (id) => SCENES.map((s) => render(s.node, WALL[id])).join('')
@@ -82,7 +83,18 @@ export function ownage(html, sheet, tags = null) {
   const used = classesOf(html)
   const sel = (c) => [...c].map((ch) => (/[A-Za-z0-9_-]/.test(ch) ? ch
     : `\\\\?${ch.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}`)).join('')
-  const missing = used.filter((c) => !new RegExp(`\\.${sel(c)}(?=[\\s,{:.>~+\\[)])`).test(sheet))
+  /* A MARKER IS NOT A CLASS THAT CAN HAVE A RULE.
+   *
+   * `group/switch` and `peer/x` emit nothing of their own — they name a subtree
+   * so that `group-data-[state=checked]/switch:` can reach it, and the name only
+   * ever appears inside the rule that variant generates. Asking whether the
+   * sheet DEFINES one is the wrong question and answers "invented"; asking
+   * whether it references it at all is the right one, and a marker nothing
+   * references is a real finding of its own: a name we carry whose variants this
+   * wall never renders. */
+  const marker = (c) => /^(?:group|peer)\//.test(c)
+  const held = used.filter((c) => marker(c) && !new RegExp(`\\.${sel(c)}`).test(sheet))
+  const missing = used.filter((c) => !marker(c) && !new RegExp(`\\.${sel(c)}(?=[\\s,{:.>~+\\[)])`).test(sheet))
   /* A kit whose unit is not a class. Material ships custom elements, so the
    * question there is not which classes its stylesheet defines but which
    * elements its package declares AND its bundle really registers — a tag that
@@ -90,7 +102,7 @@ export function ownage(html, sheet, tags = null) {
    * element and look like a hole in their kit. */
   const els = tags ? elementsOf(html) : []
   const strangers = els.filter((t) => !tags.includes(t))
-  return { used: used.length, theirs: used.length - missing.length, missing,
+  return { used: used.length, theirs: used.length - missing.length, missing, held,
     els: els.length, elsTheirs: els.length - strangers.length, strangers,
     inline: (html.match(/style="/g) ?? []).length }
 }
@@ -112,7 +124,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   let worst = 0
   for (const id of IDS) {
     const sheet = css[id] ?? ''
-    const { used: n, theirs, missing, els, elsTheirs, strangers } = ownage(markup(id), sheet, TAGS[id] ?? null)
+    const { used: n, theirs, missing, held, els, elsTheirs, strangers } = ownage(markup(id), sheet, TAGS[id] ?? null)
     const pct = n ? Math.round((theirs / n) * 100) : 100
     worst = Math.max(worst, missing.length)
 
@@ -137,6 +149,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     }
     const note = id === 'tailwind' ? '  (utilities, not components — nothing here to be 100% of)' : ''
     console.log(`  ${kits[id].name.padEnd(14)} ${String(pct).padStart(3)}%   ${theirs}/${n} classes are theirs${note}`)
+    if (held.length) console.log(`                 markers nothing on this wall reaches for: ${held.join(' ')}`)
     if (missing.length && id !== 'tailwind') {
       console.log(`                 invented: ${missing.slice(0, 12).join(' ')}${missing.length > 12 ? ` …and ${missing.length - 12} more` : ''}`)
     }

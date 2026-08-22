@@ -520,6 +520,8 @@
       "12": "#473b1f"
     }
   },
+  "style": null,
+  "parts": null,
   "version": "3.3.0",
   "license": "MIT",
   "npm": "@radix-ui/themes",

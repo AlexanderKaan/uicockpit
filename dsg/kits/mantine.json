@@ -568,6 +568,8 @@
     }
   },
   "ramps": null,
+  "style": null,
+  "parts": null,
   "version": "9.5.1",
   "license": "MIT",
   "npm": "@mantine/core",

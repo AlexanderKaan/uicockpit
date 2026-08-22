@@ -20,6 +20,7 @@
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { openNpm, fromNpm, blockOf, cssVars } from './npm-read.mjs'
+import { readParts, STYLE } from './registry-read.mjs'
 
 const CHECK = process.argv.includes('--check')
 
@@ -38,6 +39,14 @@ function cssPlain(text) {
   }
   return out
 }
+
+/* Every shadcn component the wall renders. Named here rather than discovered,
+ * because a registry of two hundred entries is not a reason to fetch two
+ * hundred files — and a part the wall does not draw is a part we cannot claim
+ * to ship. */
+const SHADCN_PARTS = ['button', 'badge', 'alert', 'card', 'input', 'textarea', 'select', 'checkbox',
+  'radio-group', 'switch', 'slider', 'progress', 'table', 'tabs', 'avatar', 'separator', 'label',
+  'breadcrumb', 'sidebar', 'navigation-menu', 'empty', 'item']
 
 const SOURCES = {
   tailwind: {
@@ -288,8 +297,16 @@ const SOURCES = {
       const d = await r.json()
       const pre = (o) => Object.fromEntries(Object.entries(o ?? {}).map(([k, v]) => ['--' + k, v]))
       if (!d.cssVars?.light) throw new Error('no cssVars.light in the registry answer')
+      /* AND THE COMPONENTS. Their variables were read from here all along; their
+       * class strings were typed into wall-bindings.mjs from a snapshot, which
+       * made this the one kit in the tool that could go stale — and it had. We
+       * carried about half of each component and always dropped the same half:
+       * the states. Read now, the same as every other kit, so a shadcn release
+       * changes this file rather than our code. */
+      const parts = await readParts(SHADCN_PARTS)
       return { version: null, license: 'MIT', npm: null, home: 'https://ui.shadcn.com',
-        source: 'ui.shadcn.com/r/colors/neutral.json · cssVars',
+        style: STYLE, parts,
+        source: `ui.shadcn.com/r/colors/neutral.json · cssVars, and r/styles/${STYLE}/*.json for the components`,
         modes: { light: pre(d.cssVars.light), dark: pre(d.cssVars.dark) } }
     },
   },
@@ -316,6 +333,8 @@ for (const [id, kit] of Object.entries(SOURCES)) {
   const doc = { id, name: kit.name, what: kit.what, layer: kit.layer, standalone: kit.standalone ?? false,
     plain: read.plain ?? null, choices: read.choices ?? null, classes: read.classes ?? null,
     ramps: read.ramps ?? null,
+    /* the components, where a kit publishes them as source rather than as CSS */
+    style: read.style ?? null, parts: read.parts ?? null,
     version: read.version, license: read.license ?? null,
     npm: read.npm ?? null, home: read.home ?? null, source: read.source, modes: read.modes }
   const next = JSON.stringify(doc, null, 2) + '\n'

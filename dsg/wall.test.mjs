@@ -3,12 +3,13 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { PARTS, render, gaps } from './parts.mjs'
-import { WALL, useMantineClasses } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useShadcnParts } from './wall-bindings.mjs'
 import { BOARDS, SCENES } from './scenes.mjs'
 import { readFileSync } from 'node:fs'
 
 const mantineKit = JSON.parse(readFileSync('kits/mantine.json', 'utf8'))
 useMantineClasses(mantineKit.classes)
+useShadcnParts(JSON.parse(readFileSync('kits/shadcn.json', 'utf8')).parts)
 const KITS = Object.keys(WALL)
 
 /* How each kit gives a control its height — its OWN mechanism, named. None of

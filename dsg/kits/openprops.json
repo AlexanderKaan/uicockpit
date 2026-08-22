@@ -8,6 +8,8 @@
   "choices": null,
   "classes": null,
   "ramps": null,
+  "style": null,
+  "parts": null,
   "version": "1.7.23",
   "license": "MIT",
   "npm": "open-props",

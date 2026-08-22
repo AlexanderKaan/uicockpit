@@ -324,61 +324,120 @@ const bootstrap = {
     <div class="d-flex flex-wrap align-items-center gap-3">${['border', 'border-2', 'border-4'].map((c) => `<span class="d-inline-flex align-items-center rounded px-3 text-body-secondary ${c}" style="height:2rem;font-size:10px">${esc(c)}</span>`).join('')}</div></div>`,
 }
 
-/* ── shadcn/ui — its OWN class strings, read from its registry ───────────── */
-/* Not an approximation of shadcn: the exact strings its components ship, taken
- * from ui.shadcn.com/r/styles/new-york-v4/*.json. The earlier version inherited
- * the Tailwind table and dragged our semantic names (bg-brand, text-ink) into a
- * kit that has none — 82% of the classes were theirs and the rest were mine.
- * A kit we half-write is a kit we cannot claim to ship. */
-const SC_BTN_BASE = 'inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none h-9 px-4 py-2'
-const SC_BTN = {
-  brand: 'bg-primary text-primary-foreground hover:bg-primary/90',
-  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-  ghost: 'hover:bg-accent hover:text-accent-foreground',
-  danger: 'bg-destructive text-white hover:bg-destructive/90',
+/* ── shadcn/ui — read from its registry, not typed here ─────────────────────
+ *
+ * shadcn is not a package: it is a registry of source files you copy in, which
+ * is why the export tells you to run `npx shadcn add`. Its class strings used to
+ * be typed into this file from a snapshot, and that made it the one kit in the
+ * tool that could go stale — and it had. We carried about half of each
+ * component, and the half we dropped was always the same one: the STATES. Their
+ * button says focus-visible:ring-[3px] disabled:opacity-50
+ * aria-invalid:border-destructive; ours said none of it, so a shadcn button on
+ * this wall had no focus ring, no disabled state and no invalid state.
+ *
+ * Now the registry is read at build time (registry-read.mjs) and handed in, the
+ * same way Mantine's class map is. Their data-slot and data-variant attributes
+ * are carried too — not decoration: half their classes key on them, so
+ * data-state="checked" is what makes a checked switch really checked rather
+ * than a picture of one. */
+let SC = {}, SC_SLOT = {}
+export const useShadcnParts = (map) => {
+  SC = map ?? {}
+  SC_SLOT = {}
+  for (const part of Object.values(SC)) for (const [k, v] of Object.entries(part.slots ?? {})) SC_SLOT[k] ??= v
 }
-const SC_BADGE = { neutral: 'bg-secondary text-secondary-foreground', brand: 'bg-primary text-primary-foreground',
-  success: 'bg-primary text-primary-foreground', warning: 'bg-secondary text-secondary-foreground',
-  danger: 'bg-destructive text-white' }
+/** A slot, by the name shadcn puts in its own data-slot attribute. */
+const sSlot = (name) => SC_SLOT[name] ?? `shadcn-missing-${name}`
+/** A cva, by the name it is declared under, with the variants picked. */
+const sCva = (part, which, pick = {}) => {
+  const c = SC[part]?.cva?.[which]
+  if (!c) return `shadcn-missing-${which}`
+  return [c.base, ...Object.entries(pick).map(([g, k]) => c.variants?.[g]?.[k]).filter(Boolean)].join(' ')
+}
+/* our tones, in their variant names — the only mapping in here, because they
+   ship no success or warning and we will not invent one for them */
+const SC_BTN = { brand: 'default', secondary: 'secondary', ghost: 'ghost', danger: 'destructive' }
+const SC_BADGE = { neutral: 'secondary', brand: 'default', success: 'default', warning: 'secondary', danger: 'destructive' }
 const shadcn = {
   _id: 'shadcn/ui',
+  /* layout is Tailwind's, because shadcn ships none */
   stack:   (n, k) => `<div class="flex flex-col gap-${n.gap ?? 3}">${k}</div>`,
   row:     (n, k) => `<div class="flex flex-wrap items-center gap-${n.gap ?? 2}${n.between ? ' justify-between' : ''}">${k}</div>`,
   grid:    (n, k) => `<div class="grid gap-3" style="grid-template-columns:repeat(${n.cols ?? 2},minmax(0,1fr))">${k}</div>`,
-  panel:   (n, k) => `<div class="flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm"><div class="px-6">${k}</div></div>`,
-  divider: () => `<div class="bg-border h-px w-full"></div>`,
+  panel:   (n, k) => `<div data-slot="card" class="${sSlot('card')}"><div data-slot="card-content" class="${sSlot('card-content')}">${k}</div></div>`,
+  divider: () => `<div data-slot="separator" role="none" data-orientation="horizontal" class="${sSlot('separator')}"></div>`,
   heading: (n, k) => A(n, k, `h${n.level ?? 3}`, n.level === 2 ? 'text-2xl leading-none font-semibold' : 'leading-none font-semibold'),
   text:    (n, k) => A(n, k, 'p', 'text-sm'),
   muted:   (n, k) => A(n, k, 'p', 'text-muted-foreground text-sm'),
-  label:   (n, k) => A(n, k, 'label', 'flex items-center gap-2 text-sm leading-none font-medium select-none'),
-  button:  (n, k) => A(n, k, 'button', cls(SC_BTN_BASE, SC_BTN[n.tone ?? 'brand'])),
-  input:   (n) => `<input class="h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}">`,
-  select:  (n) => `<select class="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
-  checkbox: (n) => `<label class="flex items-center gap-2 text-sm leading-none font-medium"><input type="checkbox" class="border-input size-4 shrink-0 rounded-[4px] border shadow-xs accent-primary"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
-  switch:  (n) => `<label class="flex items-center gap-2 text-sm leading-none font-medium"><span class="${n.on ? 'bg-primary' : 'bg-input'} inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs"><span class="bg-background pointer-events-none block size-4 rounded-full ring-0${n.on ? ' translate-x-[calc(100%-2px)]' : ''}"></span></span>${esc(n.text ?? '')}</label>`,
-  badge:   (n, k) => A(n, k, 'span', cls('inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap', SC_BADGE[n.tone ?? 'neutral'])),
-  alert:   (n, k) => `<div class="relative grid w-full items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm ${n.tone === 'danger' ? 'text-destructive bg-card' : 'bg-card text-card-foreground'}">${n.text != null ? esc(n.text) : k}</div>`,
-  stat:    (n) => `<div class="flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm"><div class="px-6"><div class="text-muted-foreground text-sm">${esc(n.label)}</div><div class="text-2xl font-semibold tabular-nums">${esc(n.value)}</div></div></div>`,
-  table:   (n) => `<table class="w-full caption-bottom text-sm"><thead class="[&_tr]:border-b"><tr class="hover:bg-muted/50 border-b transition-colors">${list(n.cols).map((c) => `<th class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap">${esc(c)}</th>`).join('')}</tr></thead><tbody class="[&_tr:last-child]:border-0">${list(n.rows).map((r) => `<tr class="hover:bg-muted/50 border-b transition-colors">${list(r).map((c) => `<td class="p-2 align-middle whitespace-nowrap">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
-  avatar:  (n) => `<span class="relative flex size-8 shrink-0 overflow-hidden rounded-full"><span class="bg-muted flex size-full items-center justify-center rounded-full text-xs">${esc(n.text)}</span></span>`,
-  /* shadcn ships a navigation-menu and the full card anatomy — header, title,
-     description, content, footer — so the card is built from those rather than
-     from a div with a border. It ships no footer, which is its own utilities. */
-  /* shadcn's navigation-menu string carries `group/navigation-menu` and
-     `group`, which are Tailwind MARKERS: they emit no rule of their own and
-     exist only for group-hover: variants this specimen does not use. Keeping
-     them would be two class names no stylesheet defines. */
+  label:   (n, k) => A(n, k, 'label', sSlot('label'), ' data-slot="label"'),
+  button:  (n, k) => {
+    const variant = SC_BTN[n.tone ?? 'brand']
+    return A(n, k, 'button', sCva('button', 'buttonVariants', { variant, size: 'default' }),
+      ` data-slot="button" data-variant="${variant}" data-size="default"`)
+  },
+  iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) =>
+    `<button aria-label="${esc(i)}" data-slot="button" data-variant="ghost" data-size="icon" class="${sCva('button', 'buttonVariants', { variant: 'ghost', size: 'icon' })}">${ico(i)}</button>`).join('')}</div>`,
+  input:   (n) => `<input data-slot="input" class="${sSlot('input')}" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}">`,
+  textarea: (n) => `<textarea rows="3" data-slot="textarea" class="${sSlot('textarea')}" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
+  /* their select is a Radix trigger with a popover; a native select wearing the
+     trigger's classes is the honest static stand-in, and the manifest says so */
+  select:  (n) => `<select data-slot="select-trigger" data-size="default" class="${sSlot('select-trigger')}">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
+  /* their checkbox, radio and switch are Radix buttons whose classes key on
+     data-state — so the checked state here is theirs, not a drawing of it */
+  checkbox: (n) => `<label class="${sSlot('label')}" data-slot="label"><button type="button" role="checkbox" aria-checked="${!!n.on}" data-slot="checkbox" data-state="${n.on ? 'checked' : 'unchecked'}" class="${sSlot('checkbox')}">${
+    n.on ? `<span data-slot="checkbox-indicator" data-state="checked" class="${sSlot('checkbox-indicator')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="size-3.5"><path d="M20 6 9 17l-5-5"/></svg></span>` : ''}</button>${esc(n.text ?? '')}</label>`,
+  radio:   (n) => `<div role="radiogroup" data-slot="radio-group" class="${sSlot('radio-group')}">${list(n.items).map((t, i) => {
+    const on = i === (n.on ?? 0)
+    return `<label class="${sSlot('label')}" data-slot="label"><button type="button" role="radio" aria-checked="${on}" data-slot="radio-group-item" data-state="${on ? 'checked' : 'unchecked'}" class="${sSlot('radio-group-item')}">${
+      on ? `<span data-slot="radio-group-indicator" class="${sSlot('radio-group-indicator')}"></span>` : ''}</button>${esc(t)}</label>` }).join('')}</div>`,
+  switch:  (n) => `<label class="${sSlot('label')}" data-slot="label"><button type="button" role="switch" aria-checked="${!!n.on}" data-slot="switch" data-size="default" data-state="${n.on ? 'checked' : 'unchecked'}" class="${sSlot('switch')}"><span data-slot="switch-thumb" data-state="${n.on ? 'checked' : 'unchecked'}" class="${sSlot('switch-thumb')}"></span></button>${esc(n.text ?? '')}</label>`,
+  slider:  (n) => `<span data-slot="slider" data-orientation="horizontal" class="${sSlot('slider')}"><span data-slot="slider-track" data-orientation="horizontal" class="${sSlot('slider-track')}"><span data-slot="slider-range" data-orientation="horizontal" class="${sSlot('slider-range')}" style="width:${n.value ?? 60}%"></span></span><span data-slot="slider-thumb" class="${sSlot('slider-thumb')}" style="position:absolute;left:calc(${n.value ?? 60}% - 8px)"></span></span>`,
+  progress: (n) => `<div data-slot="progress" class="${sSlot('progress')}"><div data-slot="progress-indicator" class="${sSlot('progress-indicator')}" style="transform:translateX(-${100 - (n.value ?? 60)}%)"></div></div>`,
+  badge:   (n, k) => A(n, k, 'span', sCva('badge', 'badgeVariants', { variant: SC_BADGE[n.tone ?? 'neutral'] }), ` data-slot="badge"`),
+  alert:   (n, k) => `<div role="alert" data-slot="alert" class="${sCva('alert', 'alertVariants', { variant: n.tone === 'danger' ? 'destructive' : 'default' })}"><div data-slot="alert-description" class="${sSlot('alert-description')}">${n.text != null ? esc(n.text) : k}</div></div>`,
+  stat:    (n) => `<div data-slot="card" class="${sSlot('card')}"><div data-slot="card-header" class="${sSlot('card-header')}"><div data-slot="card-description" class="${sSlot('card-description')}">${esc(n.label)}</div><div data-slot="card-title" class="${sSlot('card-title')} text-2xl tabular-nums">${esc(n.value)}</div></div></div>`,
+  table:   (n) => `<div data-slot="table-container" class="${sSlot('table-container')}"><table data-slot="table" class="${sSlot('table')}"><thead data-slot="table-header" class="${sSlot('table-header')}"><tr data-slot="table-row" class="${sSlot('table-row')}">${
+    list(n.cols).map((c) => `<th data-slot="table-head" class="${sSlot('table-head')}">${esc(c)}</th>`).join('')}</tr></thead><tbody data-slot="table-body" class="${sSlot('table-body')}">${
+    list(n.rows).map((r) => `<tr data-slot="table-row" class="${sSlot('table-row')}">${list(r).map((c) => `<td data-slot="table-cell" class="${sSlot('table-cell')}">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`,
+  /* Item is their row: media, content, title, description, actions */
+  list:    (n) => `<div data-slot="item-group" class="${sSlot('item-group')}">${list(n.rows).map((r) => `<div data-slot="item" data-variant="default" data-size="default" class="${sCva('item', 'itemVariants', { variant: 'default', size: 'default' })}">
+    <div data-slot="item-media" data-variant="icon" class="${sCva('item', 'itemMediaVariants', { variant: 'icon' })}">${ico(r.icon)}</div>
+    <div data-slot="item-content" class="${sSlot('item-content')}"><div data-slot="item-title" class="${sSlot('item-title')}">${esc(r.title)}</div>
+    <div data-slot="item-description" class="${sSlot('item-description')}">${esc(r.sub ?? '')}</div></div>
+    <div data-slot="item-actions" class="${sSlot('item-actions')}"><span class="text-muted-foreground text-sm tabular-nums">${esc(r.meta ?? '')}</span></div></div>`).join('')}</div>`,
+  kv:      (n) => `<div class="flex flex-col gap-2">${list(n.rows).map(([k2, v]) => `<div class="bg-muted/40 flex min-h-9 items-center gap-3 rounded-md border px-3">
+    <code class="flex-1 truncate font-mono text-xs">${esc(k2)}</code><span class="text-muted-foreground font-mono text-xs">${esc(v)}</span></div>`).join('')}</div>`,
+  chart:   (n) => `<div class="flex flex-col gap-3"><div class="flex h-28 items-end gap-2">${bars(n).map((b) => `<div class="flex flex-1 flex-col items-center gap-1">
+    <div class="flex h-24 w-full items-end justify-center gap-0.5"><div class="bg-chart-1 w-1/2 rounded-t-sm" style="height:${b.a}%"></div><div class="bg-chart-2 w-1/2 rounded-t-sm" style="height:${b.b}%"></div></div>
+    <span class="text-muted-foreground text-xs">${esc(b.label)}</span></div>`).join('')}</div>
+    <div class="text-muted-foreground flex gap-4 text-xs">${list(n.legend).map((t, i) => `<span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full ${i ? 'bg-chart-2' : 'bg-chart-1'}"></span>${esc(t)}</span>`).join('')}</div></div>`,
+  avatar:  (n) => `<span data-slot="avatar" class="${sSlot('avatar')}"><span data-slot="avatar-fallback" class="${sSlot('avatar-fallback')}">${esc(n.text)}</span></span>`,
+  empty:   (n, k) => `<div data-slot="empty" class="${sSlot('empty')}"><div data-slot="empty-header" class="${sSlot('empty-header')}">
+    <div data-slot="empty-media" data-variant="icon" class="${sCva('empty', 'emptyMediaVariants', { variant: 'icon' })}">${ico(n.icon, 18)}</div>
+    <div data-slot="empty-title" class="${sSlot('empty-title')}">${esc(n.title)}</div>
+    <div data-slot="empty-description" class="${sSlot('empty-description')}">${esc(n.text)}</div></div>
+    <div data-slot="empty-content" class="${sSlot('empty-content')}">${k}</div></div>`,
+  tabs:    (n) => `<div data-slot="tabs" class="${sSlot('tabs')}"><div role="tablist" data-slot="tabs-list" data-variant="default" class="${sCva('tabs', 'tabsListVariants', { variant: 'default' })}">${
+    list(n.items).map((t, i) => `<button role="tab" data-slot="tabs-trigger" data-state="${i === 0 ? 'active' : 'inactive'}" class="${sSlot('tabs-trigger')}">${esc(t)}</button>`).join('')}</div></div>`,
   navbar:  (n, k) => `<header class="bg-background flex flex-wrap items-center gap-x-6 gap-y-2 border-b px-4 py-3">
     <span class="text-sm font-semibold">${esc(n.brand)}</span>
-    <nav class="relative flex max-w-max flex-1 items-center justify-center">
-    <ul class="flex flex-1 list-none items-center justify-center gap-1">${
-      list(n.items).map((t) => `<li class="relative"><a href="#" class="hover:bg-accent hover:text-accent-foreground flex flex-col gap-1 rounded-sm p-2 text-sm transition-all outline-none">${esc(t)}</a></li>`).join('')}</ul></nav>
+    <nav data-slot="navigation-menu" class="${sSlot('navigation-menu')}"><ul data-slot="navigation-menu-list" class="${sSlot('navigation-menu-list')}">${
+      list(n.items).map((t) => `<li data-slot="navigation-menu-item"><a href="#" data-slot="navigation-menu-link" class="${sSlot('navigation-menu-link')}">${esc(t)}</a></li>`).join('')}</ul></nav>
     <div class="ml-auto flex items-center gap-2">${k}</div></header>`,
-  mediacard: (n) => `<div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+  sidenav: (n) => `<div data-slot="sidebar-content" class="${sSlot('sidebar-content')} bg-sidebar text-sidebar-foreground rounded-lg p-2">${list(n.groups).map((g) => `<div data-slot="sidebar-group" class="${sSlot('sidebar-group')}">
+    <div data-slot="sidebar-group-label" class="${sSlot('sidebar-group-label')}">${esc(g.title)}</div>
+    <div data-slot="sidebar-group-content" class="${sSlot('sidebar-group-content')}"><ul data-slot="sidebar-menu" class="${sSlot('sidebar-menu')}">${
+      list(g.items).map((it) => `<li data-slot="sidebar-menu-item" class="${sSlot('sidebar-menu-item')}"><a href="#" data-slot="sidebar-menu-button" data-size="default" data-active="${!!it.on}" class="${sCva('sidebar', 'sidebarMenuButtonVariants', { variant: 'default', size: 'default' })}">${ico(it.icon)}<span>${esc(it.text)}</span></a>${
+        it.count ? `<div data-slot="sidebar-menu-badge" class="${sSlot('sidebar-menu-badge')}">${esc(it.count)}</div>` : ''}</li>`).join('')}</ul></div></div>`).join('')}</div>`,
+  breadcrumb: (n) => `<nav aria-label="breadcrumb" data-slot="breadcrumb"><ol data-slot="breadcrumb-list" class="${sSlot('breadcrumb-list')}">${
+    list(n.items).map((t, i, a) => `${i ? `<li role="presentation" data-slot="breadcrumb-separator" class="${sSlot('breadcrumb-separator')}">/</li>` : ''}<li data-slot="breadcrumb-item" class="${sSlot('breadcrumb-item')}">${
+      i === a.length - 1 ? `<span role="link" aria-current="page" data-slot="breadcrumb-page" class="${sSlot('breadcrumb-page')}">${esc(t)}</span>`
+        : `<a href="#" data-slot="breadcrumb-link" class="${sSlot('breadcrumb-link')}">${esc(t)}</a>`}</li>`).join('')}</ol></nav>`,
+  mediacard: (n) => `<div data-slot="card" class="${sSlot('card')}">
     <div class="text-muted-foreground bg-muted mx-6 flex items-center justify-center rounded-lg" style="aspect-ratio:16/9">${PHOTO}</div>
-    <div class="grid auto-rows-min items-start gap-2 px-6"><div class="leading-none font-semibold">${esc(n.title)}</div>
-    <div class="text-muted-foreground text-sm">${esc(n.text)}</div></div>
-    <div class="flex items-center px-6"><a href="#" class="text-primary text-sm font-medium">${esc(n.action ?? 'Read on')}</a></div></div>`,
+    <div data-slot="card-header" class="${sSlot('card-header')}"><div data-slot="card-title" class="${sSlot('card-title')}">${esc(n.title)}</div>
+    <div data-slot="card-description" class="${sSlot('card-description')}">${esc(n.text)}</div></div>
+    <div data-slot="card-footer" class="${sSlot('card-footer')}"><a href="#" class="text-primary text-sm font-medium">${esc(n.action ?? 'Read on')}</a></div></div>`,
   footer:  (n) => `<footer class="bg-background border-t px-4 py-6">
     <div class="grid gap-6" style="grid-template-columns:repeat(${list(n.groups).length || 1},minmax(0,1fr))">${
       list(n.groups).map((g) => `<div class="flex flex-col gap-2"><div class="text-xs font-semibold">${esc(g.title)}</div>${
@@ -386,36 +445,6 @@ const shadcn = {
     <p class="text-muted-foreground mt-6 text-sm">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv, i) =>
     `<div class="bg-card text-muted-foreground flex h-16 w-24 items-center justify-center rounded-xl border text-xs ${['shadow-xs', 'shadow-sm', 'shadow-lg'][i] ?? 'shadow-sm'}">${esc(lv)}</div>`).join('')}</div>`,
-  tabs:    (n) => `<div class="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]">${list(n.items).map((t, i) => `<span class="${i === 0 ? 'bg-background text-foreground shadow-sm ' : ''}inline-flex h-[calc(100%-1px)] items-center justify-center rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap">${esc(t)}</span>`).join('')}</div>`,
-
-  /* ── the rest of a real screen ─────────────────────────────────────────── */
-  /* Still its own strings: the slider is track / range / thumb the way its
-     component composes them, the sidebar uses the --sidebar-* variables its
-     installation ships, and the chart uses --chart-1 and --chart-2 — the five
-     chart colours are in shadcn's own globals.css and in ours. */
-  textarea: (n) => `<textarea rows="3" class="border-input min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
-  radio:   (n) => `<div class="grid gap-3">${list(n.items).map((t, i) => `<label class="flex items-center gap-2 text-sm leading-none font-medium"><input type="radio" name="${esc(n.name ?? 'g')}" class="border-input size-4 shrink-0 rounded-full border shadow-xs accent-primary"${i === (n.on ?? 0) ? ' checked' : ''}>${esc(t)}</label>`).join('')}</div>`,
-  slider:  (n) => `<div class="relative flex h-9 w-full items-center"><div class="bg-muted relative h-1.5 w-full grow overflow-hidden rounded-full"><div class="bg-primary absolute h-full" style="width:${n.value ?? 60}%"></div></div>
-    <div class="border-primary bg-background absolute block size-4 shrink-0 rounded-full border shadow-sm" style="left:calc(${n.value ?? 60}% - 8px)"></div></div>`,
-  progress: (n) => `<div class="bg-primary/20 relative h-2 w-full overflow-hidden rounded-full"><div class="bg-primary h-full transition-all" style="width:${n.value ?? 60}%"></div></div>`,
-  iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="hover:bg-accent hover:text-accent-foreground inline-flex size-9 shrink-0 items-center justify-center rounded-md transition-all outline-none">${ico(i)}</button>`).join('')}</div>`,
-  breadcrumb: (n) => `<nav><ol class="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words">${list(n.items).map((t, i, a) => `${i ? '<li class="[&>svg]:size-3.5" role="presentation">/</li>' : ''}<li class="inline-flex items-center gap-1.5">${i === a.length - 1 ? `<span class="text-foreground font-normal">${esc(t)}</span>` : `<a href="#" class="hover:text-foreground transition-colors">${esc(t)}</a>`}</li>`).join('')}</ol></nav>`,
-  sidenav: (n) => `<div class="bg-sidebar text-sidebar-foreground flex flex-col gap-4 rounded-lg p-2">${list(n.groups).map((g) => `<div class="relative flex w-full min-w-0 flex-col">
-    <div class="text-sidebar-foreground/70 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium">${esc(g.title)}</div>
-    <ul class="flex w-full min-w-0 flex-col gap-1">${list(g.items).map((it) => `<li class="relative"><a href="#" class="${it.on ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium ' : 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground '}flex h-8 w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden">${ico(it.icon)}<span class="truncate">${esc(it.text)}</span>${it.count ? `<span class="text-sidebar-foreground ml-auto text-xs tabular-nums">${esc(it.count)}</span>` : ''}</a></li>`).join('')}</ul></div>`).join('')}</div>`,
-  list:    (n) => `<div class="flex flex-col">${list(n.rows).map((r) => `<div class="flex min-h-12 items-center gap-3 border-b py-2 last:border-0">
-    <span class="bg-muted text-muted-foreground inline-flex size-8 shrink-0 items-center justify-center rounded-lg">${ico(r.icon)}</span>
-    <span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium">${esc(r.title)}</span><span class="text-muted-foreground block text-xs">${esc(r.sub ?? '')}</span></span>
-    <span class="text-muted-foreground shrink-0 text-sm tabular-nums">${esc(r.meta ?? '')}</span></div>`).join('')}</div>`,
-  kv:      (n) => `<div class="flex flex-col gap-2">${list(n.rows).map(([k2, v]) => `<div class="bg-muted/40 flex min-h-9 items-center gap-3 rounded-md border px-3">
-    <code class="flex-1 truncate font-mono text-xs">${esc(k2)}</code><span class="text-muted-foreground font-mono text-xs">${esc(v)}</span></div>`).join('')}</div>`,
-  chart:   (n) => `<div class="flex flex-col gap-3"><div class="flex h-28 items-end gap-2">${bars(n).map((b) => `<div class="flex flex-1 flex-col items-center gap-1">
-    <div class="flex h-24 w-full items-end justify-center gap-0.5"><div class="bg-chart-1 w-1/2 rounded-t-sm" style="height:${b.a}%"></div><div class="bg-chart-2 w-1/2 rounded-t-sm" style="height:${b.b}%"></div></div>
-    <span class="text-muted-foreground text-xs">${esc(b.label)}</span></div>`).join('')}</div>
-    <div class="text-muted-foreground flex gap-4 text-xs">${list(n.legend).map((t, i) => `<span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full ${i ? 'bg-chart-2' : 'bg-chart-1'}"></span>${esc(t)}</span>`).join('')}</div></div>`,
-  empty:   (n, k) => `<div class="flex flex-col items-center gap-2 py-8 text-center">
-    <span class="bg-muted text-muted-foreground inline-flex size-10 items-center justify-center rounded-lg">${ico(n.icon, 18)}</span>
-    <p class="text-sm font-medium">${esc(n.title)}</p><p class="text-muted-foreground max-w-56 text-sm">${esc(n.text)}</p>${k}</div>`,
   swatches: (n) => `<div class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${swatchRows('shadcn', n.roles).map((r) => `<div class="flex flex-col gap-1.5">
     ${r.paint ? `<span class="h-10 rounded-md border" style="background:${r.paint}"></span>` : '<span class="h-10 rounded-md border border-dashed"></span>'}
     <span class="text-xs font-medium">${esc(r.label)}</span><code class="text-muted-foreground font-mono text-[10px] leading-tight">${esc(r.note)}</code></div>`).join('')}</div>`,

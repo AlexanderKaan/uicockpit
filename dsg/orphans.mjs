@@ -32,7 +32,7 @@ import { pathToFileURL } from 'node:url'
 import { buildCss } from './build-css.mjs'
 import { generate } from './generate.mjs'
 import { MAP, ROLES, route, darken } from './roles.mjs'
-import { WALL, useMantineClasses, useIcons } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useIcons, useShadcnParts } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES, wallMarkup } from './scenes.mjs'
 import { render } from './parts.mjs'
 import { SPECIMENS } from './generate.mjs'
@@ -154,6 +154,7 @@ export function unread(report) {
 export async function orphans(log = () => {}) {
   const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
   useMantineClasses(kits.mantine.classes)
+useShadcnParts(kits.shadcn?.parts)
   useIcons(icons(ICON_NAMES).icons)
   const css = await buildCss(VALUES, IDS, kits, (id) => wallMarkup(WALL[id] ?? WALL.tailwind), log)
   return analyse({ kits, css, files: generate(VALUES, IDS, kits),

@@ -8,6 +8,8 @@
   "choices": null,
   "classes": null,
   "ramps": null,
+  "style": null,
+  "parts": null,
   "version": "2.5.0",
   "license": "Apache-2.0",
   "npm": "@material/web",

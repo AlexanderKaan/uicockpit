@@ -8,6 +8,8 @@
   "choices": null,
   "classes": null,
   "ramps": null,
+  "style": null,
+  "parts": null,
   "version": "5.3.8",
   "license": "MIT",
   "npm": "bootstrap",
