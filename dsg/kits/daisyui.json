@@ -17,6 +17,7 @@
   "ramps": null,
   "style": null,
   "parts": null,
+  "animates": null,
   "bands": {
     "behaviour": null,
     "engine": "tailwind",

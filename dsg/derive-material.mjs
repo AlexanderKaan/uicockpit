@@ -26,13 +26,27 @@ register('data:text/javascript,' + encodeURIComponent([
 ].join('\\n')), import.meta.url)
 `
 
-const DERIVE = `import { themeFromSourceColor, argbFromHex, hexFromArgb } from '@material/material-color-utilities'
-const theme = themeFromSourceColor(argbFromHex(process.argv[2]))
+const DERIVE = `import { Hct, SchemeTonalSpot, MaterialDynamicColors, argbFromHex, hexFromArgb } from '@material/material-color-utilities'
+/* THE DYNAMIC SCHEME, NOT THE LEGACY ONE.
+ *
+ * themeFromSourceColor().schemes.light is M3's 2021 Scheme: 29 roles, and
+ * surface-container is not among them. @material/web reads the 2023 roles —
+ * its menu, its card and its list all draw on surface-container — so those
+ * five fell through to the package's own defaults, which are the baseline
+ * lavender. A teal seed produced a lavender menu and nothing said why.
+ *
+ * MaterialDynamicColors over a SchemeTonalSpot is the same generator their
+ * theme builder runs, and it answers all 54. */
+const src = Hct.fromInt(argbFromHex(process.argv[2]))
 const kebab = (s) => s.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())
 const out = {}
 for (const mode of ['light', 'dark']) {
-  out[mode] = Object.fromEntries(
-    Object.entries(theme.schemes[mode].toJSON()).map(([k, v]) => ['--md-sys-color-' + kebab(k), hexFromArgb(v)]))
+  const scheme = new SchemeTonalSpot(src, mode === 'dark', 0)
+  out[mode] = {}
+  for (const [name, colour] of Object.entries(MaterialDynamicColors)) {
+    if (!colour || typeof colour.getArgb !== 'function') continue
+    out[mode]['--md-sys-color-' + kebab(name)] = hexFromArgb(colour.getArgb(scheme))
+  }
 }
 console.log(JSON.stringify(out))
 `

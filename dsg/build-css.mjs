@@ -18,6 +18,14 @@ import { deriveMaterial } from './derive-material.mjs'
 import { materialElements } from './material-elements.mjs'
 import { openNpm } from './npm-read.mjs'
 
+/**
+ * A stylesheet is read from a file and written into a <style> element, and a
+ * byte order mark survives that trip as a character. Stripped for every kit,
+ * not just the one that was caught: any of them could ship one tomorrow, and
+ * the failure is silent in all of them.
+ */
+export const noBom = (s) => s.replace(/^\uFEFF/, '')
+
 export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   const dir = mkdtempSync(join(tmpdir(), 'dsg-css-'))
   const css = {}
@@ -28,7 +36,11 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   /* Tailwind, daisyUI and shadcn all compile through Tailwind. Their markup is
      scanned so only the utilities actually used are emitted. */
   mkdirSync(join(dir, 'src'), { recursive: true })
-  const TW = [['tailwind', ''], ['daisyui', '@plugin "daisyui";'], ['shadcn', '']].filter(([id]) => IDS.includes(id))
+  /* shadcn's prelude is not empty: ten of the class names its registry hands us
+     are tw-animate-css utilities, which its own globals.css imports. Left out,
+     its menu, dialog, popover and tooltip have no entrance at all. */
+  const TW = [['tailwind', ''], ['daisyui', '@plugin "daisyui";'],
+    ['shadcn', kits.shadcn?.animates ? '@import "tw-animate-css";' : '']].filter(([id]) => IDS.includes(id))
   /* Only the versions of kits that are actually in this build. Naming daisyUI's
      version while building Bootstrap alone read it off a kit that was never
      loaded, and the whole preview died before it compiled anything. */
@@ -43,6 +55,7 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
     dev['@tailwindcss/cli'] = `^${kits.tailwind.version}`
     dev.tailwindcss = `^${kits.tailwind.version}`
     if (kits.daisyui) dev.daisyui = `^${kits.daisyui.version}`
+    if (kits.shadcn?.animates) dev[kits.shadcn.animates.npm] = `^${kits.shadcn.animates.version}`
   }
   writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'p', private: true, type: 'module', devDependencies: dev }))
   for (const [id, plugin] of TW) {
@@ -69,12 +82,26 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   execFileSync('npm', ['install', '--silent', '--no-audit', '--no-fund', `bootstrap@${kits.bootstrap.version}`, 'sass'], { cwd: dir, stdio: 'pipe' })
   writeFileSync(join(dir, 'custom.scss'), files['_custom.scss'].replace('bootstrap/scss/bootstrap', 'node_modules/bootstrap/scss/bootstrap'))
   try {
-    execFileSync('npx', ['sass', '--no-source-map', '--style=compressed', '--load-path=.', 'custom.scss', 'bootstrap.out.css'], { cwd: dir, stdio: 'pipe' })
-    css.bootstrap = readFileSync(join(dir, 'bootstrap.out.css'), 'utf8') + '\n' + files._blocks.bootstrap
+    /* --no-charset, and the strip below.
+     *
+     * In compressed mode dart-sass puts a BYTE ORDER MARK at the top of the
+     * file instead of an @charset rule. Read as a file that is invisible; read
+     * INTO a <style> element in the middle of a page it is one more character
+     * in front of the first selector, and `\uFEFF:root, [data-bs-theme=light]`
+     * is not a selector. The browser threw the whole list away — so Bootstrap
+     * ran with its ENTIRE :root variable block missing, every default of the
+     * five hundred it publishes gone, and only the thirty our own block writes
+     * left standing. Its dropdown had no border because the border colour it
+     * asks for was one of the casualties.
+     *
+     * Nothing reported this. The stylesheet compiled, the page rendered, and
+     * what was on it was Bootstrap minus its defaults. */
+    execFileSync('npx', ['sass', '--no-source-map', '--style=compressed', '--no-charset', '--load-path=.', 'custom.scss', 'bootstrap.out.css'], { cwd: dir, stdio: 'pipe' })
+    css.bootstrap = noBom(readFileSync(join(dir, 'bootstrap.out.css'), 'utf8')) + '\n' + files._blocks.bootstrap
   } catch (e) {
     log(`\n  ################  BOOTSTRAP'S SASS BUILD FAILED  ################\n  ✗ the Sass build failed — falling back to their shipped CSS, so the brand will be Bootstrap's own\n    ${String(e.stderr ?? e.message).split('\n').slice(0, 6).join('\n    ')}`)
     const bs = join(dir, 'node_modules/bootstrap/dist/css/bootstrap.min.css')
-    css.bootstrap = (existsSync(bs) ? readFileSync(bs, 'utf8') : '') + '\n' + files._blocks.bootstrap
+    css.bootstrap = (existsSync(bs) ? noBom(readFileSync(bs, 'utf8')) : '') + '\n' + files._blocks.bootstrap
   }
 
   }
@@ -91,7 +118,16 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
     const derived = deriveMaterial(VALUES.brand, dir)
     if (derived.error) throw new Error(derived.error)
     mt = `${mt};${Object.entries(derived.light).map(([k, v]) => `${k}:${v}`).join(';')}`
+    /* WHICH ROLES THE GENERATOR DID NOT ANSWER.
+     *
+     * Our line goes after theirs, so anything the generator leaves out keeps
+     * the package's own default — which is M3's baseline lavender, whatever
+     * seed you gave it. That is not a missing colour, it is a WRONG one, and
+     * it is invisible unless it is counted. Five of them shipped this way. */
+    const left = Object.keys(kits.material.modes.light)
+      .filter((k) => k.startsWith('--md-sys-color-') && !(k in derived.light))
     log(`  ✓ ${Object.keys(derived.light).length} roles derived from ${VALUES.brand} by Material's own generator`)
+    if (left.length) log(`  ! ${left.length} colour role(s) their generator does not answer, so these keep Material's own baseline: ${left.join(' ')}`)
   } catch (e) {
     log(`  ✗ could not run Material's generator (${e.message.split('\n')[0]}) — showing its factory scheme instead`)
   }
@@ -113,8 +149,16 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
     if (!IDS.includes(id)) continue
     log(`reading ${kits[id].name}'s own stylesheet…`)
     const p = openNpm(`${pkg}@${kits[id].version}`)
-    try { css[id] = wanted.map((f) => p.read(f)).join('\n') + '\n' + (files._blocks[id] ?? '') }
+    try { css[id] = wanted.map((f) => noBom(p.read(f))).join('\n') + '\n' + (files._blocks[id] ?? '') }
     finally { p.close() }
+  }
+
+  /* The guard, because the fix above is one call per kit and a kit added later
+     is a kit that does not have it. A mark anywhere in a stylesheet that gets
+     inlined kills the selector it lands in front of, and kills it quietly. */
+  for (const [id, sheet] of Object.entries(css)) {
+    const at = sheet.indexOf('\uFEFF')
+    if (at >= 0) throw new Error(`${id}'s stylesheet carries a byte order mark at ${at}. Inlined into a <style> element that is a character in front of a selector, and the browser drops the whole rule. Run it through noBom() where it is read.`)
   }
 
     return css

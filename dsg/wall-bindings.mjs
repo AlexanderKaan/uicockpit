@@ -142,6 +142,13 @@ const tailwind = {
   progress: (n) => `<div class="h-2 w-full overflow-hidden rounded-full bg-line"><div class="h-full rounded-full bg-brand" style="width:${n.value ?? 60}%"></div></div>`,
   iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="inline-flex size-9 items-center justify-center rounded-lg text-ink hover:bg-surface">${ico(i)}</button>`).join('')}</div>`,
   breadcrumb: (n) => `<nav class="flex flex-wrap items-center gap-2 text-sm text-ink-muted">${list(n.items).map((t, i, a) => `${i ? '<span class="text-ink-muted">/</span>' : ''}<a href="#" class="${i === a.length - 1 ? 'font-medium text-ink' : 'hover:text-ink'}">${esc(t)}</a>`).join('')}</nav>`,
+  menu:    (n) => `<div class="relative inline-block">
+    <button class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-sm text-ink">${esc(n.trigger ?? 'Actions')}${n.icon ? ico(n.icon, 14) : ''}</button>
+    <div class="mt-1 min-w-48 overflow-hidden rounded-lg border border-line bg-surface p-1 shadow-md">
+      <p class="px-2 py-1.5 text-xs font-medium text-ink-muted">${esc(n.label ?? '')}</p>
+      ${list(n.items).map((t) => `<a href="#" class="flex items-center rounded-md px-2 py-1.5 text-sm text-ink hover:bg-page">${esc(t)}</a>`).join('')}
+      <hr class="-mx-1 my-1 border-line">
+      <a href="#" class="flex items-center rounded-md px-2 py-1.5 text-sm text-danger hover:bg-page">${esc(n.danger ?? 'Delete')}</a></div></div>`,
   sidenav: (n) => `<nav class="flex flex-col gap-4">${list(n.groups).map((g) => `<div class="flex flex-col gap-1">
     <p class="px-2 text-xs font-medium text-ink-muted">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#" class="flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm ${it.on ? 'bg-surface font-medium text-ink' : 'text-ink-muted hover:bg-surface'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="ml-auto rounded-full bg-brand/10 px-2 text-xs text-brand">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</nav>`,
   list:    (n) => `<div class="flex flex-col">${list(n.rows).map((r) => `<div class="flex min-h-12 items-center gap-3 border-b border-line py-2 last:border-0">
@@ -220,6 +227,17 @@ const daisyui = {
   progress: (n) => `<progress class="progress progress-primary w-full" value="${n.value ?? 60}" max="100"></progress>`,
   iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="btn btn-ghost btn-square btn-sm">${ico(i)}</button>`).join('')}</div>`,
   breadcrumb: (n) => `<div class="breadcrumbs text-sm"><ul>${list(n.items).map((t) => `<li><a>${esc(t)}</a></li>`).join('')}</ul></div>`,
+  /* .dropdown with .dropdown-content and their .menu — a real daisyUI menu,
+     drawn open because a closed one shows nothing on a wall. Their panel is
+     absolutely positioned, as it is in their own docs, so the card would
+     collapse behind it: the wrapper reserves exactly the room it takes, off
+     their own row height rather than a guess. */
+  menu:    (n) => `<div class="dropdown dropdown-open" style="min-height:${(list(n.items).length + 1) * 32 + (n.label ? 28 : 0) + 60}px">
+    <div tabindex="0" role="button" class="btn">${esc(n.trigger ?? 'Actions')}${n.icon ? ico(n.icon, 14) : ''}</div>
+    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-56 p-2 shadow-sm">
+      ${n.label ? `<li class="menu-title">${esc(n.label)}</li>` : ''}
+      ${list(n.items).map((t) => `<li><a>${esc(t)}</a></li>`).join('')}
+      <li><a class="text-error">${esc(n.danger ?? 'Delete')}</a></li></ul></div>`,
   sidenav: (n) => `<ul class="menu w-full p-0">${list(n.groups).map((g) => `<li class="menu-title">${esc(g.title)}</li>${
     list(g.items).map((it) => `<li><a${it.on ? ' class="menu-active"' : ''}>${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="badge badge-sm badge-primary badge-soft">${esc(it.count)}</span>` : ''}</a></li>`).join('')}`).join('')}</ul>`,
   list:    (n) => `<ul class="list bg-base-100">${list(n.rows).map((r) => `<li class="list-row items-center">
@@ -298,6 +316,13 @@ const bootstrap = {
   progress: (n) => `<div class="progress" role="progressbar"><div class="progress-bar" style="width:${n.value ?? 60}%"></div></div>`,
   iconrow: (n) => `<div class="btn-group flex-wrap">${list(n.items).map((i) => `<button type="button" aria-label="${esc(i)}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center">${ico(i)}</button>`).join('')}</div>`,
   breadcrumb: (n) => `<nav><ol class="breadcrumb mb-0">${list(n.items).map((t, i, a) => `<li class="breadcrumb-item${i === a.length - 1 ? ' active' : ''}">${i === a.length - 1 ? esc(t) : `<a href="#">${esc(t)}</a>`}</li>`).join('')}</ol></nav>`,
+  menu:    (n) => `<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" aria-expanded="true">${esc(n.trigger ?? 'Actions')}</button>
+    <ul class="dropdown-menu show position-static">
+      <li><h6 class="dropdown-header">${esc(n.label ?? '')}</h6></li>
+      ${list(n.items).map((t) => `<li><a class="dropdown-item" href="#">${esc(t)}</a></li>`).join('')}
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="#">${esc(n.danger ?? 'Delete')}</a></li></ul></div>`,
   sidenav: (n) => `<div class="d-flex flex-column gap-3">${list(n.groups).map((g) => `<div>
     <p class="text-body-secondary text-uppercase small mb-1 px-2">${esc(g.title)}</p>
     <ul class="nav nav-pills flex-column">${list(g.items).map((it) => `<li class="nav-item"><a href="#" class="nav-link d-flex align-items-center gap-2 py-1${it.on ? ' active' : ' link-body-emphasis'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="badge rounded-pill text-bg-secondary ms-auto">${esc(it.count)}</span>` : ''}</a></li>`).join('')}</ul></div>`).join('')}</div>`,
@@ -433,6 +458,17 @@ const shadcn = {
     list(n.items).map((t, i, a) => `${i ? `<li role="presentation" data-slot="breadcrumb-separator" class="${sSlot('breadcrumb-separator')}">/</li>` : ''}<li data-slot="breadcrumb-item" class="${sSlot('breadcrumb-item')}">${
       i === a.length - 1 ? `<span role="link" aria-current="page" data-slot="breadcrumb-page" class="${sSlot('breadcrumb-page')}">${esc(t)}</span>`
         : `<a href="#" data-slot="breadcrumb-link" class="${sSlot('breadcrumb-link')}">${esc(t)}</a>`}</li>`).join('')}</ol></nav>`,
+  /* their dropdown-menu, open. The content class reads
+     --radix-dropdown-menu-content-* variables their primitive sets while
+     positioning; on a wall those are simply unset, which is what `origin-()`
+     and a max-height with no value mean anyway. */
+  menu:    (n) => `<div class="relative inline-block">
+    <button data-slot="button" data-variant="outline" data-size="default" class="${sCva('button', 'buttonVariants', { variant: 'outline', size: 'default' })}">${esc(n.trigger ?? 'Actions')}${n.icon ? ico(n.icon, 14) : ''}</button>
+    <div data-slot="dropdown-menu-content" data-state="open" data-side="bottom" class="${sSlot('dropdown-menu-content')} mt-1">
+      <div data-slot="dropdown-menu-label" class="${sSlot('dropdown-menu-label')}">${esc(n.label ?? '')}</div>
+      ${list(n.items).map((t) => `<div role="menuitem" data-slot="dropdown-menu-item" class="${sSlot('dropdown-menu-item')}">${esc(t)}</div>`).join('')}
+      <div role="separator" data-slot="dropdown-menu-separator" class="${sSlot('dropdown-menu-separator')}"></div>
+      <div role="menuitem" data-slot="dropdown-menu-item" data-variant="destructive" class="${sSlot('dropdown-menu-item')}">${esc(n.danger ?? 'Delete')}</div></div></div>`,
   mediacard: (n) => `<div data-slot="card" class="${sSlot('card')}">
     <div class="text-muted-foreground bg-muted mx-6 flex items-center justify-center rounded-lg" style="aspect-ratio:16/9">${PHOTO}</div>
     <div data-slot="card-header" class="${sSlot('card-header')}"><div data-slot="card-title" class="${sSlot('card-title')}">${esc(n.title)}</div>
@@ -561,6 +597,31 @@ const material = {
     : `<md-icon-button aria-label="${esc(i)}">${ico(i, 20)}</md-icon-button>`).join('')}</div>`,
   breadcrumb: (n) => `<nav class="md-typescale-body-medium" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:var(--md-sys-color-on-surface-variant)">${
     list(n.items).map((t, i, a) => `${i ? '<span>/</span>' : ''}<a href="#" style="text-decoration:none;color:${i === a.length - 1 ? 'var(--md-sys-color-on-surface)' : 'inherit'}">${esc(t)}</a>`).join('')}</nav>`,
+  /* Their own md-menu, drawn open.
+   *
+   * It positions itself against an anchor by id, which means it is out of flow
+   * and the card would collapse behind it — so a span reserves exactly the room
+   * the open menu takes, counted off their own 56px item height rather than
+   * guessed. `positioning="absolute"` keeps it measured against the card
+   * instead of a viewport this wall pans across.
+   *
+   * The heading is a plain div on their typescale class, not a component:
+   * @material/web ships no group header for a menu, and a disabled md-menu-item
+   * would be a 56px-tall row pretending to be one.
+   *
+   * The span is NOT positioned. Their menu measures its offset against the
+   * anchor's offsetParent and writes a plain inset, so a positioned span would
+   * be a second origin: the two disagreed by the height of the button and the
+   * panel hung out of the bottom of the card. */
+  menu:    (n) => `<div style="position:relative;display:inline-flex;flex-direction:column;gap:8px;align-items:flex-start">
+    <md-outlined-button id="menu-anchor">${esc(n.trigger ?? 'Actions')}</md-outlined-button>
+    <span style="display:block;min-width:224px;min-height:${(list(n.items).length + 1) * 56 + (n.label ? 28 : 0) + 33}px">
+      <md-menu anchor="menu-anchor" positioning="absolute" open quick default-focus="none" style="min-width:224px">
+        ${n.label ? `<div class="md-typescale-label-medium" style="padding:6px 12px;color:var(--md-sys-color-on-surface-variant)">${esc(n.label)}</div>` : ''}
+        ${list(n.items).map((t) => `<md-menu-item><div slot="headline">${esc(t)}</div></md-menu-item>`).join('')}
+        <md-divider></md-divider>
+        <md-menu-item style="--md-menu-item-label-text-color:var(--md-sys-color-error)"><div slot="headline">${esc(n.danger ?? 'Delete')}</div></md-menu-item>
+      </md-menu></span></div>`,
   sidenav: (n) => `<div style="display:flex;flex-direction:column;gap:16px">${list(n.groups).map((g) => `<div>
     <p class="md-typescale-title-small" style="margin:0 0 4px;padding:0 12px;color:var(--md-sys-color-on-surface-variant)">${esc(g.title)}</p>
     <md-list style="--md-list-container-color:transparent">${list(g.items).map((it) => `<md-list-item type="button"${it.on ? ' style="--md-list-item-container-color:var(--md-sys-color-secondary-container);--md-list-item-label-text-color:var(--md-sys-color-on-secondary-container)"' : ''}>
@@ -699,6 +760,16 @@ const radix = {
   progress: (n) => `<div class="rt-ProgressRoot rt-r-size-2 rt-variant-surface" data-orientation="horizontal" style="--progress-value:${n.value ?? 60};--progress-max:100"><div class="rt-ProgressIndicator" data-orientation="horizontal"></div></div>`,
   iconrow: (n) => `<div class="rt-Flex" style="display:flex;flex-wrap:wrap;gap:var(--space-1)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="rt-reset rt-BaseButton rt-r-size-2 rt-variant-soft rt-IconButton" data-accent-color="gray">${ico(i)}</button>`).join('')}</div>`,
   breadcrumb: (n) => `<nav class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)">${list(n.items).map((t, i, a) => `${i ? '<span class="rt-Text rt-r-size-2" data-accent-color="gray">/</span>' : ''}${i === a.length - 1 ? `<span class="rt-Text rt-r-size-2 rt-Strong">${esc(t)}</span>` : `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`}`).join('')}</nav>`,
+  /* their own menu classes — BaseMenu is what both the dropdown and the
+     context menu are built from, and DropdownMenuContent is the surface */
+  menu:    (n) => `<div class="rt-Flex" style="display:inline-flex;flex-direction:column;gap:var(--space-2);align-items:flex-start">
+    <button class="rt-reset rt-BaseButton rt-r-size-2 rt-variant-surface rt-Button" data-accent-color="gray">${esc(n.trigger ?? 'Actions')}</button>
+    <div class="rt-PopperContent rt-BaseMenuContent rt-DropdownMenuContent rt-r-size-2 rt-variant-solid" data-state="open" data-side="bottom" style="min-width:224px">
+      <div class="rt-BaseMenuViewport">
+        <div class="rt-BaseMenuLabel">${esc(n.label ?? '')}</div>
+        ${list(n.items).map((t) => `<div class="rt-reset rt-BaseMenuItem" role="menuitem">${esc(t)}</div>`).join('')}
+        <div class="rt-BaseMenuSeparator"></div>
+        <div class="rt-reset rt-BaseMenuItem" role="menuitem" data-accent-color="red">${esc(n.danger ?? 'Delete')}</div></div></div></div>`,
   sidenav: (n) => `<div class="rt-Flex" style="display:flex;flex-direction:column;gap:var(--space-4)">${list(n.groups).map((g) => `<div style="display:flex;flex-direction:column;gap:var(--space-1)">
     <p class="rt-Text rt-r-size-1 rt-Strong" data-accent-color="gray" style="padding:0 var(--space-2)">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#" class="rt-Text rt-r-size-2" style="display:flex;align-items:center;gap:var(--space-2);min-height:32px;padding:0 var(--space-2);border-radius:var(--radius-2);text-decoration:none;color:${it.on ? 'var(--accent-11)' : 'var(--gray-11)'};background:${it.on ? 'var(--accent-a3)' : 'transparent'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="rt-reset rt-Badge rt-r-size-1 rt-variant-soft" style="margin-left:auto">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,
   list:    (n) => `<div class="rt-Flex" style="display:flex;flex-direction:column">${list(n.rows).map((r) => `<div style="display:flex;align-items:center;gap:var(--space-3);min-height:48px;padding:var(--space-2) 0;border-bottom:1px solid var(--gray-a4)">
@@ -873,6 +944,28 @@ const mantine = {
   progress: (n) => `<div class="${mc('Progress')}"><div class="${mc('Progress', 'section')}" style="--progress-section-size:${n.value ?? 60}%;--progress-section-color:var(--mantine-primary-color-filled)"></div></div>`,
   iconrow: (n) => `<div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="${cls(MN_FOCUS, 'mantine-active', mc('ActionIcon'), mc('UnstyledButton'))}" data-variant="subtle" style="--ai-size:var(--ai-size-md);--ai-radius:var(--mantine-radius-md);--ai-bg:transparent;--ai-color:var(--mantine-color-text);--ai-hover:var(--mantine-color-default-hover)"><span class="${mc('ActionIcon', 'icon')}">${ico(i)}</span></button>`).join('')}</div>`,
   breadcrumb: (n) => `<div class="${mc('Breadcrumbs')}">${list(n.items).map((t, i, a) => `${i ? `<div class="${mc('Breadcrumbs', 'separator')}">/</div>` : ''}<div class="${mc('Breadcrumbs', 'breadcrumb')}">${i === a.length - 1 ? `<span class="${mc('Text')}">${esc(t)}</span>` : `<a class="${mc('Anchor')}" href="#">${esc(t)}</a>`}</div>`).join('')}</div>`,
+  /* THEIR MENU IS A POPOVER WITH A MENU INSIDE IT.
+   *
+   * Menu.dropdown is four pixels of padding and nothing else — the white, the
+   * border and the radius all live on Popover.dropdown, which their own
+   * MenuDropdown renders as well. With only the Menu class the panel had no
+   * background, no border and square corners, and looked like a list that had
+   * lost its card.
+   *
+   * No shadow: their Popover only gets one from a `shadow` prop, and Menu
+   * passes none. Their docs demo writes shadow="md" by hand, which is a choice
+   * that demo makes and not what the component does.
+   *
+   * The item is an UnstyledButton like every other Mantine control, and a red
+   * one is --menu-item-color, the variable their own varsResolver writes from
+   * the color prop. */
+  menu:    (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-xs);align-items:flex-start">
+    <button class="${cls(MN_FOCUS, 'mantine-active', mc('Button'), mc('UnstyledButton'))}" style="${MN_BTN_VARS}${MN_BTN.secondary}">${esc(n.trigger ?? 'Actions')}</button>
+    <div class="${cls(mc('Popover', 'dropdown'), mc('Menu', 'dropdown'))}" role="menu" aria-orientation="vertical" data-menu-dropdown style="position:static;min-width:224px">
+      ${n.label ? `<div class="${mc('Menu', 'label')}">${esc(n.label)}</div>` : ''}
+      ${list(n.items).map((t) => `<button class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('Menu', 'item'))}" role="menuitem" data-menu-item><span class="${mc('Menu', 'itemLabel')}" data-menu-item-label>${esc(t)}</span></button>`).join('')}
+      <div class="${mc('Menu', 'divider')}"></div>
+      <button class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('Menu', 'item'))}" role="menuitem" data-menu-item style="--menu-item-color:var(--mantine-color-red-6);--menu-item-hover:var(--mantine-color-red-0)"><span class="${mc('Menu', 'itemLabel')}" data-menu-item-label>${esc(n.danger ?? 'Delete')}</span></button></div></div>`,
   sidenav: (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-md)">${list(n.groups).map((g) => `<div>
     <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed);padding:0 var(--mantine-spacing-xs);margin:0 0 4px">${esc(g.title)}</p>${
     list(g.items).map((it) => `<a href="#" class="${mc('NavLink')}"${it.on ? ' data-active="true"' : ''}><span class="${mc('NavLink', 'section')}" data-position="left">${ico(it.icon)}</span><span class="${mc('NavLink', 'body')}"><span class="${mc('NavLink', 'label')}">${esc(it.text)}</span></span>${it.count ? `<span class="${mc('NavLink', 'section')}" data-position="right"><span class="${mc('Badge')}" style="--badge-height:1.125rem">${esc(it.count)}</span></span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,

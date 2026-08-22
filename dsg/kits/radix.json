@@ -522,6 +522,7 @@
   },
   "style": null,
   "parts": null,
+  "animates": null,
   "bands": {
     "behaviour": {
       "by": "radix-ui",

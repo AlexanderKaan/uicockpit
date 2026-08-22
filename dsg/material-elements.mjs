@@ -67,6 +67,7 @@ const IMPORTS = [
   'chips/chip-set.js', 'chips/assist-chip.js', 'chips/suggestion-chip.js',
   'iconbutton/icon-button.js', 'iconbutton/filled-tonal-icon-button.js',
   'list/list.js', 'list/list-item.js', 'labs/badge/badge.js',
+  'menu/menu.js', 'menu/menu-item.js',
   'labs/card/outlined-card.js', 'labs/card/filled-card.js',
 ]
 

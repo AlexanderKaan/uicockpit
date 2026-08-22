@@ -18,7 +18,7 @@ export const PARTS = [
   'checkbox', 'radio', 'switch', 'slider',                           //   and the rest of them
   'badge', 'alert', 'stat', 'progress', 'table', 'list', 'kv',       // display
   'chart', 'avatar', 'empty', 'tabs',                                //   and the rest of them
-  'navbar', 'sidenav', 'breadcrumb', 'mediacard', 'footer',          // organisms
+  'navbar', 'sidenav', 'breadcrumb', 'menu', 'mediacard', 'footer',  // organisms
   'elevation', 'swatches', 'typespec', 'shapes',                     // foundation specimens
 ]
 

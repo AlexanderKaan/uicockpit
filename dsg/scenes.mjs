@@ -264,6 +264,10 @@ export const BOARDS = [
             { icon: 'life-buoy', text: 'Help' },
           ] },
         ] } },
+        { id: 'actions', title: 'A menu, open', panel: true, node: { p: 'menu',
+          icon: 'chevron-down', trigger: 'Actions', label: 'This request',
+          items: ['Assign to someone', 'Ask for documents', 'Put on hold'],
+          danger: 'Withdraw' } },
       ] },
       { w: 340, cards: [
         { id: 'nothing', title: 'When there is nothing yet', panel: true, node: { p: 'empty',

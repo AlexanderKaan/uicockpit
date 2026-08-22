@@ -46,7 +46,7 @@ function cssPlain(text) {
  * to ship. */
 const SHADCN_PARTS = ['button', 'badge', 'alert', 'card', 'input', 'textarea', 'select', 'checkbox',
   'radio-group', 'switch', 'slider', 'progress', 'table', 'tabs', 'avatar', 'separator', 'label',
-  'breadcrumb', 'sidebar', 'navigation-menu', 'empty', 'item']
+  'breadcrumb', 'sidebar', 'navigation-menu', 'empty', 'item', 'dropdown-menu']
 
 /* ── THE FOUR BANDS A STACK IS MADE OF ──────────────────────────────────────
  *
@@ -340,9 +340,21 @@ const SOURCES = {
       const parts = await readParts(SHADCN_PARTS)
       /* their own registry names it, component by component */
       const declared = [...new Set(Object.values(parts).flatMap((p) => p.needs))]
+      /* AND THE PACKAGE THAT DEFINES THEIR ANIMATIONS.
+       *
+       * Ten of the class names their registry hands us — animate-in, fade-in-0,
+       * zoom-in-95, slide-in-from-top-2 and the rest — are not Tailwind's. They
+       * come from tw-animate-css, which shadcn's own globals.css imports and
+       * which nothing else in this tool would install. Without it those ten are
+       * classes with no rule: their menu, dialog, popover and tooltip appear
+       * with no entrance at all, and the meter cannot tell that apart from ten
+       * class names we made up. Read for its version and licence, so the
+       * manifest can name it the same way it names every other dependency. */
+      const anim = fromNpm('tw-animate-css@latest', 'package.json')
       return { version: null, license: 'MIT', npm: null, home: 'https://ui.shadcn.com',
         style: STYLE, parts, behaviour: behaviourOf(declared),
-        source: `ui.shadcn.com/r/colors/neutral.json · cssVars, and r/styles/${STYLE}/*.json for the components`,
+        animates: { npm: anim.npm, version: anim.version, license: anim.license },
+        source: `ui.shadcn.com/r/colors/neutral.json · cssVars, and r/styles/${STYLE}/*.json for the components, with tw-animate-css@${anim.version} for the entrance utilities they name`,
         modes: { light: pre(d.cssVars.light), dark: pre(d.cssVars.dark) } }
     },
   },
@@ -371,6 +383,11 @@ for (const [id, kit] of Object.entries(SOURCES)) {
     ramps: read.ramps ?? null,
     /* the components, where a kit publishes them as source rather than as CSS */
     style: read.style ?? null, parts: read.parts ?? null,
+    /* a second package the kit's own classes need. shadcn names ten utilities
+       that live in tw-animate-css and nowhere else; the build has to install it
+       and the manifest has to name it, so it is carried here rather than typed
+       into either. */
+    animates: read.animates ?? null,
     /* the four bands: what this kit fills, and what it needs under it */
     bands: {
       behaviour: read.behaviour ?? null,

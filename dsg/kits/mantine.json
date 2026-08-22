@@ -570,6 +570,7 @@
   "ramps": null,
   "style": null,
   "parts": null,
+  "animates": null,
   "bands": {
     "behaviour": {
       "by": "its own React layer",
