@@ -101,8 +101,13 @@ const TW_BTN = { brand: 'bg-brand text-brand-foreground hover:opacity-90', secon
 const TW_TONE = { neutral: 'bg-surface text-ink border-line', brand: 'bg-brand/10 text-brand border-brand/25',
   success: 'bg-success/10 text-success border-success/25', warning: 'bg-warning/10 text-warning border-warning/25',
   danger: 'bg-danger/10 text-danger border-danger/25' }
-/* and the ring, on everything you can tab into */
-const TW_RING = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+/* THE RING, ON EVERYTHING YOU CAN TAB INTO — which is what the line above
+   this one used to claim while three components carried it. A button, a tab, a
+   checkbox, a slider and every link in a nav had no focus ring at all, and
+   Tailwind is the one kit here where that is nobody's fault but ours: it
+   publishes the utility, we simply never wrote it. --color-ring is the focus
+   role, so the ring is the colour the knob sets. */
+const TW_RING = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-page'
 const tailwind = {
   _id: 'Tailwind',
   stack:   (n, k) => `<div class="flex flex-col gap-${n.gap ?? 3}">${k}</div>`,
@@ -114,11 +119,11 @@ const tailwind = {
   text:    (n, k) => A(n, k, 'p', 'text-sm tracking-normal text-ink'),
   muted:   (n, k) => A(n, k, 'p', 'text-sm text-ink-muted'),
   label:   (n, k) => A(n, k, 'label', 'text-sm font-medium text-ink'),
-  button:  (n, k) => A(n, k, 'button', cls('inline-flex min-h-9 items-center rounded-lg px-4 text-sm font-medium', TW_BTN[n.tone ?? 'brand'])),
+  button:  (n, k) => A(n, k, 'button', cls('inline-flex min-h-9 items-center rounded-lg px-4 text-sm font-medium', TW_RING, TW_BTN[n.tone ?? 'brand'])),
   input:   (n) => `<input class="min-h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink ${TW_RING}" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}">`,
   select:  (n) => `<select class="min-h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink ${TW_RING}">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
-  checkbox: (n) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="checkbox" class="size-4 accent-brand"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
-  switch:  (n) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="checkbox" role="switch" class="h-5 w-9 appearance-none rounded-full ${n.on ? 'bg-brand' : 'bg-line'}"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
+  checkbox: (n) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="checkbox" class="size-4 accent-brand ${TW_RING}"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
+  switch:  (n) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="checkbox" role="switch" class="h-5 w-9 appearance-none rounded-full ${TW_RING} ${n.on ? 'bg-brand' : 'bg-line'}"${n.on ? ' checked' : ''}>${esc(n.text ?? '')}</label>`,
   badge:   (n, k) => A(n, k, 'span', cls('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium', TW_TONE[n.tone ?? 'neutral'])),
   alert:   (n, k) => `<div class="${cls('rounded-lg border p-3 text-sm', TW_TONE[n.tone ?? 'neutral'])}">${n.text != null ? esc(n.text) : k}</div>`,
   stat:    (n) => `<div class="rounded-lg border border-line bg-surface p-4"><div class="text-sm text-ink-muted">${esc(n.label)}</div><div class="text-2xl font-semibold text-ink">${esc(n.value)}</div></div>`,
@@ -128,41 +133,41 @@ const tailwind = {
      to reference, shown doing their job */
   navbar:  (n, k) => `<header class="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-line bg-surface px-4 py-3">
     <span class="font-semibold text-ink">${esc(n.brand)}</span>
-    <nav class="flex flex-wrap gap-4 text-sm text-ink-muted">${list(n.items).map((t) => `<a href="#" class="hover:text-ink">${esc(t)}</a>`).join('')}</nav>
+    <nav class="flex flex-wrap gap-4 text-sm text-ink-muted">${list(n.items).map((t) => `<a href="#" class="hover:text-ink ${TW_RING}">${esc(t)}</a>`).join('')}</nav>
     <div class="ml-auto flex items-center gap-2">${k}</div></header>`,
   mediacard: (n) => `<article class="flex flex-col overflow-hidden rounded-lg border border-line bg-surface">
     <div class="flex aspect-video items-center justify-center bg-page text-ink-muted">${PHOTO}</div>
     <div class="flex flex-col gap-2 p-4"><h3 class="text-base font-semibold text-ink">${esc(n.title)}</h3>
     <p class="text-sm text-ink-muted">${esc(n.text)}</p>
-    <a href="#" class="text-sm font-medium text-brand">${esc(n.action ?? 'Read on')}</a></div></article>`,
+    <a href="#" class="text-sm font-medium text-brand ${TW_RING}">${esc(n.action ?? 'Read on')}</a></div></article>`,
   footer:  (n) => `<footer class="border-t border-line bg-surface px-4 py-6">
     <div class="grid gap-6" style="grid-template-columns:repeat(${list(n.groups).length || 1},minmax(0,1fr))">${
       list(n.groups).map((g) => `<div class="flex flex-col gap-2"><p class="text-xs font-semibold text-ink">${esc(g.title)}</p>${
-        list(g.items).map((t) => `<a href="#" class="text-sm text-ink-muted hover:text-ink">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
+        list(g.items).map((t) => `<a href="#" class="text-sm text-ink-muted hover:text-ink ${TW_RING}">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
     <p class="mt-6 text-sm text-ink-muted">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="flex flex-wrap items-center gap-4">${list(n.levels).map((lv) =>
     `<div class="flex h-16 w-24 items-center justify-center rounded-lg bg-surface text-xs text-ink-muted shadow-${lv}">${esc(lv)}</div>`).join('')}</div>`,
   /* A tab is a button with a role, even when the kit is only utilities: a row
      of spans cannot be reached by a keyboard and says nothing to a screen
      reader, and there is no Tailwind class that would have fixed either. */
-  tabs:    (n) => `<div role="tablist" class="flex gap-4 border-b border-line text-sm">${list(n.items).map((t, i) => `<button role="tab" aria-selected="${i === 0}" class="${i === 0 ? 'border-b-2 border-brand pb-2 font-medium text-ink' : 'pb-2 text-ink-muted'}">${esc(t)}</button>`).join('')}</div>`,
+  tabs:    (n) => `<div role="tablist" class="flex gap-4 border-b border-line text-sm">${list(n.items).map((t, i) => `<button role="tab" aria-selected="${i === 0}" class="${TW_RING} ${i === 0 ? 'border-b-2 border-brand pb-2 font-medium text-ink' : 'pb-2 text-ink-muted'}">${esc(t)}</button>`).join('')}</div>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   textarea: (n) => `<textarea rows="3" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink ${TW_RING}" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
-  radio:   (n) => `<div class="flex flex-col gap-2">${list(n.items).map((t, i) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="radio" name="${esc(n.name ?? 'g')}" class="size-4 accent-brand"${i === (n.on ?? 0) ? ' checked' : ''}>${esc(t)}</label>`).join('')}</div>`,
-  slider:  (n) => `<input type="range" max="100" value="${n.value ?? 60}" class="h-9 w-full accent-brand">`,
+  radio:   (n) => `<div class="flex flex-col gap-2">${list(n.items).map((t, i) => `<label class="inline-flex min-h-6 items-center gap-2 text-sm text-ink"><input type="radio" name="${esc(n.name ?? 'g')}" class="size-4 accent-brand ${TW_RING}"${i === (n.on ?? 0) ? ' checked' : ''}>${esc(t)}</label>`).join('')}</div>`,
+  slider:  (n) => `<input type="range" max="100" value="${n.value ?? 60}" class="h-9 w-full accent-brand ${TW_RING}">`,
   progress: (n) => `<div class="h-2 w-full overflow-hidden rounded-full bg-line"><div class="h-full rounded-full bg-brand" style="width:${n.value ?? 60}%"></div></div>`,
-  iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="inline-flex size-9 items-center justify-center rounded-lg text-ink hover:bg-surface">${ico(i)}</button>`).join('')}</div>`,
+  iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="inline-flex size-9 items-center justify-center rounded-lg text-ink hover:bg-surface ${TW_RING}">${ico(i)}</button>`).join('')}</div>`,
   breadcrumb: (n) => `<nav class="flex flex-wrap items-center gap-2 text-sm text-ink-muted">${list(n.items).map((t, i, a) => `${i ? '<span class="text-ink-muted">/</span>' : ''}<a href="#" class="${i === a.length - 1 ? 'font-medium text-ink' : 'hover:text-ink'}">${esc(t)}</a>`).join('')}</nav>`,
   menu:    (n) => `<div class="relative inline-block">
-    <button aria-haspopup="menu" aria-expanded="true" class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-sm text-ink">${esc(n.trigger ?? 'Actions')}${ico('chevron-down', 14)}</button>
+    <button aria-haspopup="menu" aria-expanded="true" class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-sm text-ink ${TW_RING}">${esc(n.trigger ?? 'Actions')}${ico('chevron-down', 14)}</button>
     <div class="mt-1 min-w-48 overflow-hidden rounded-lg border border-line bg-surface p-1 shadow-md">
       <p class="px-2 py-1.5 text-xs font-medium text-ink-muted">${esc(n.label ?? '')}</p>
-      ${list(n.items).map((t) => `<a href="#" class="flex items-center rounded-md px-2 py-1.5 text-sm text-ink hover:bg-page">${esc(t)}</a>`).join('')}
+      ${list(n.items).map((t) => `<a href="#" class="flex items-center rounded-md px-2 py-1.5 text-sm text-ink hover:bg-page ${TW_RING}">${esc(t)}</a>`).join('')}
       <hr class="-mx-1 my-1 border-line">
-      <a href="#" class="flex items-center rounded-md px-2 py-1.5 text-sm text-danger hover:bg-page">${esc(n.danger ?? 'Delete')}</a></div></div>`,
+      <a href="#" class="flex items-center rounded-md px-2 py-1.5 text-sm text-danger hover:bg-page ${TW_RING}">${esc(n.danger ?? 'Delete')}</a></div></div>`,
   sidenav: (n) => `<nav class="flex flex-col gap-4">${list(n.groups).map((g) => `<div class="flex flex-col gap-1">
-    <p class="px-2 text-xs font-medium text-ink-muted">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#"${it.on ? ' aria-current="page"' : ''} class="flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm ${it.on ? 'bg-surface font-medium text-ink' : 'text-ink-muted hover:bg-surface'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="ml-auto rounded-full bg-brand/10 px-2 text-xs text-brand">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</nav>`,
+    <p class="px-2 text-xs font-medium text-ink-muted">${esc(g.title)}</p>${list(g.items).map((it) => `<a href="#"${it.on ? ' aria-current="page"' : ''} class="flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm ${TW_RING} ${it.on ? 'bg-surface font-medium text-ink' : 'text-ink-muted hover:bg-surface'}">${ico(it.icon)}<span>${esc(it.text)}</span>${it.count ? `<span class="ml-auto rounded-full bg-brand/10 px-2 text-xs text-brand">${esc(it.count)}</span>` : ''}</a>`).join('')}</div>`).join('')}</nav>`,
   list:    (n) => `<div class="flex flex-col">${list(n.rows).map((r) => `<div class="flex min-h-12 items-center gap-3 border-b border-line py-2 last:border-0">
     <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface text-ink-muted">${ico(r.icon)}</span>
     <span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium text-ink">${esc(r.title)}</span><span class="block text-xs text-ink-muted">${esc(r.sub ?? '')}</span></span>
@@ -1006,7 +1011,7 @@ const mantine = {
       <button class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('Menu', 'item'))}" role="menuitem" data-menu-item style="--menu-item-color:var(--mantine-color-red-6);--menu-item-hover:var(--mantine-color-red-0)"><span class="${mc('Menu', 'itemLabel')}" data-menu-item-label>${esc(n.danger ?? 'Delete')}</span></button></div></div>`,
   sidenav: (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-md)">${list(n.groups).map((g) => `<div>
     <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed);padding:0 var(--mantine-spacing-xs);margin:0 0 4px">${esc(g.title)}</p>${
-    list(g.items).map((it) => `<a href="#" class="${mc('NavLink')}"${it.on ? ' data-active="true"' : ''}><span class="${mc('NavLink', 'section')}" data-position="left">${ico(it.icon)}</span><span class="${mc('NavLink', 'body')}"><span class="${mc('NavLink', 'label')}">${esc(it.text)}</span></span>${it.count ? `<span class="${mc('NavLink', 'section')}" data-position="right"><span class="${mc('Badge')}" style="--badge-height:1.125rem">${esc(it.count)}</span></span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,
+    list(g.items).map((it) => `<a href="#" class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('NavLink'))}"${it.on ? ' data-active="true"' : ''}><span class="${mc('NavLink', 'section')}" data-position="left">${ico(it.icon)}</span><span class="${mc('NavLink', 'body')}"><span class="${mc('NavLink', 'label')}">${esc(it.text)}</span></span>${it.count ? `<span class="${mc('NavLink', 'section')}" data-position="right"><span class="${mc('Badge')}" style="--badge-height:1.125rem">${esc(it.count)}</span></span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,
   list:    (n) => `<div class="${mc('Stack')}" style="--stack-gap:0">${list(n.rows).map((r) => `<div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-sm);--group-wrap:nowrap;min-height:48px;padding:var(--mantine-spacing-xs) 0;border-bottom:1px solid var(--mantine-color-default-border)">
     <span class="${mc('ThemeIcon')}" style="--ti-size:2rem;--ti-bg:var(--mantine-color-default);--ti-color:var(--mantine-color-dimmed)">${ico(r.icon)}</span>
     <span style="flex:1;min-width:0"><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-sm);display:block;font-weight:500">${esc(r.title)}</span><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed);display:block">${esc(r.sub ?? '')}</span></span>
