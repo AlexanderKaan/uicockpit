@@ -28,14 +28,23 @@ const A = (n, k, tag, c, extra = '') => `<${tag} class="${c}"${extra}>${n.text !
  * nothing here can quietly render an empty square. */
 let IC = {}
 export const useIcons = (map) => { IC = map ?? {} }
-export const ico = (name, size = 16) => {
+/**
+ * The icons a BINDING needs, as opposed to the ones a card names.
+ *
+ * A menu trigger has a chevron and a chosen option has a tick because that is
+ * what those components are, not because a card asked for them — so they are
+ * declared here and the wall's icon list starts from them. Naming them on the
+ * card meant every card that ever renders a menu has to remember to.
+ */
+export const BINDING_ICONS = ['chevron-down', 'check']
+export const ico = (name, size = 16, cls = '') => {
   /* An icon that was never handed in used to come out as an empty <svg>, and an
      empty svg inside a ghost button is an invisible button. The toolbar shipped
      that way in the multi-kit preview and looked like a blank card. A hole is
      drawn as a hole. */
   const d = IC[name]
   const body = d || '<rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="3 2"/><path d="M8 16 16 8"/>'
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${d ? '' : ' data-no-icon="' + name + '"'}>${body}</svg>`
+  return `<svg${cls ? ` class="${cls}"` : ''} width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${d ? '' : ' data-no-icon="' + name + '"'}>${body}</svg>`
 }
 
 /* ── what this kit really calls each role ─────────────────────────────────
@@ -146,7 +155,7 @@ const tailwind = {
   iconrow: (n) => `<div class="flex flex-wrap gap-1">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="inline-flex size-9 items-center justify-center rounded-lg text-ink hover:bg-surface">${ico(i)}</button>`).join('')}</div>`,
   breadcrumb: (n) => `<nav class="flex flex-wrap items-center gap-2 text-sm text-ink-muted">${list(n.items).map((t, i, a) => `${i ? '<span class="text-ink-muted">/</span>' : ''}<a href="#" class="${i === a.length - 1 ? 'font-medium text-ink' : 'hover:text-ink'}">${esc(t)}</a>`).join('')}</nav>`,
   menu:    (n) => `<div class="relative inline-block">
-    <button class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-sm text-ink">${esc(n.trigger ?? 'Actions')}${n.icon ? ico(n.icon, 14) : ''}</button>
+    <button aria-haspopup="menu" aria-expanded="true" class="inline-flex min-h-9 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-sm text-ink">${esc(n.trigger ?? 'Actions')}${ico('chevron-down', 14)}</button>
     <div class="mt-1 min-w-48 overflow-hidden rounded-lg border border-line bg-surface p-1 shadow-md">
       <p class="px-2 py-1.5 text-xs font-medium text-ink-muted">${esc(n.label ?? '')}</p>
       ${list(n.items).map((t) => `<a href="#" class="flex items-center rounded-md px-2 py-1.5 text-sm text-ink hover:bg-page">${esc(t)}</a>`).join('')}
@@ -236,7 +245,7 @@ const daisyui = {
      collapse behind it: the wrapper reserves exactly the room it takes, off
      their own row height rather than a guess. */
   menu:    (n) => `<div class="dropdown dropdown-open" style="min-height:${(list(n.items).length + 1) * 32 + (n.label ? 28 : 0) + 60}px">
-    <div tabindex="0" role="button" class="btn">${esc(n.trigger ?? 'Actions')}${n.icon ? ico(n.icon, 14) : ''}</div>
+    <div tabindex="0" role="button" aria-haspopup="menu" aria-expanded="true" class="btn">${esc(n.trigger ?? 'Actions')}${ico('chevron-down', 14)}</div>
     <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-56 p-2 shadow-sm">
       ${n.label ? `<li class="menu-title">${esc(n.label)}</li>` : ''}
       ${list(n.items).map((t) => `<li><a>${esc(t)}</a></li>`).join('')}
@@ -409,7 +418,19 @@ const shadcn = {
   textarea: (n) => `<textarea rows="3" data-slot="textarea" class="${sSlot('textarea')}" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
   /* their select is a Radix trigger with a popover; a native select wearing the
      trigger's classes is the honest static stand-in, and the manifest says so */
-  select:  (n) => `<select data-slot="select-trigger" data-size="default" class="${sSlot('select-trigger')}">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
+  /* THEIR SELECT IS NOT A <select>.
+     select-trigger is the class for a BUTTON that opens a panel of their own
+     items; on a native select it styles the closed box and the operating
+     system draws the list — so the one thing you were looking at was the one
+     thing that was not theirs. Trigger, panel and items are all published in
+     their registry; the panel opens on the trigger, which is what the
+     component does. */
+  select:  (n) => `<div class="relative">
+    <button type="button" role="combobox" aria-expanded="false" data-slot="select-trigger" data-size="default" class="${sSlot('select-trigger')} w-full">
+      <span data-slot="select-value">${esc(list(n.options)[0] ?? '')}</span>${ico('chevron-down')}</button>
+    <div data-slot="select-content" data-state="closed" data-side="bottom" class="${sSlot('select-content')} absolute mt-1 w-full p-1" hidden>${
+      list(n.options).map((o, i) => `<div role="option" aria-selected="${i === 0}" data-slot="select-item" class="${sSlot('select-item')}"><span data-slot="select-item-indicator" class="${sSlot('select-item-indicator')}">${i === 0 ? ico('check') : ''}</span>${esc(o)}</div>`).join('')
+    }</div></div>`,
   /* their checkbox, radio and switch are Radix buttons whose classes key on
      data-state — so the checked state here is theirs, not a drawing of it */
   checkbox: (n) => `<label class="${sSlot('label')}" data-slot="label"><button type="button" role="checkbox" aria-checked="${!!n.on}" data-slot="checkbox" data-state="${n.on ? 'checked' : 'unchecked'}" class="${sSlot('checkbox')}">${
@@ -472,7 +493,7 @@ const shadcn = {
      positioning; on a wall those are simply unset, which is what `origin-()`
      and a max-height with no value mean anyway. */
   menu:    (n) => `<div class="relative inline-block">
-    <button data-slot="button" data-variant="outline" data-size="default" class="${sCva('button', 'buttonVariants', { variant: 'outline', size: 'default' })}">${esc(n.trigger ?? 'Actions')}${n.icon ? ico(n.icon, 14) : ''}</button>
+    <button data-slot="button" data-variant="outline" data-size="default" aria-haspopup="menu" aria-expanded="true" class="${sCva('button', 'buttonVariants', { variant: 'outline', size: 'default' })}">${esc(n.trigger ?? 'Actions')}${ico('chevron-down', 14)}</button>
     <div data-slot="dropdown-menu-content" data-state="open" data-side="bottom" class="${sSlot('dropdown-menu-content')} mt-1">
       <div data-slot="dropdown-menu-label" class="${sSlot('dropdown-menu-label')}">${esc(n.label ?? '')}</div>
       ${list(n.items).map((t) => `<div role="menuitem" data-slot="dropdown-menu-item" class="${sSlot('dropdown-menu-item')}">${esc(t)}</div>`).join('')}
@@ -698,7 +719,15 @@ const radix = {
   label:   (n, k) => A(n, k, 'label', 'rt-Text rt-r-size-2 rt-Strong'),
   button:  (n, k) => A(n, k, 'button', `rt-reset rt-BaseButton rt-r-size-2 rt-variant-${RX_BTN[n.tone ?? 'brand']} rt-Button`, rxAccent(n.tone === 'danger' ? 'danger' : 'brand')),
   input:   (n) => `<div class="rt-TextFieldRoot rt-r-size-2 rt-variant-surface"><input class="rt-reset rt-TextFieldInput" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}"></div>`,
-  select:  (n) => `<select class="rt-reset rt-SelectTrigger rt-r-size-2 rt-variant-surface" style="width:100%">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
+  /* Their Select is a button and a panel too, and rt-SelectTrigger on a
+     native one handed the list to the operating system. The class names and
+     the nesting are read off their own component: trigger, inner, icon;
+     content, viewport, item, indicator. */
+  select:  (n) => `<div style="position:relative;width:100%">
+    <button class="rt-reset rt-SelectTrigger rt-r-size-2 rt-variant-surface" role="combobox" aria-expanded="false" style="width:100%">
+      <span class="rt-SelectTriggerInner">${esc(list(n.options)[0] ?? '')}</span>${ico('chevron-down', 16, 'rt-SelectIcon')}</button>
+    <div class="rt-SelectContent rt-r-size-2 rt-variant-solid" data-accent-color="" hidden style="position:absolute;inset-inline:0;margin-top:4px;z-index:1">
+      <div class="rt-SelectViewport">${list(n.options).map((o, i) => `<div class="rt-SelectItem" role="option" aria-selected="${i === 0}"${i === 0 ? ' data-state="checked"' : ''}>${i === 0 ? `<span class="rt-SelectItemIndicator">${ico('check', 16, 'rt-SelectItemIndicatorIcon')}</span>` : ''}${esc(o)}</div>`).join('')}</div></div></div>`,
   /* Radix's checkbox is a button with an indicator inside, not an <input>:
      rt-reset strips the native appearance, so an input renders as an empty box
      that never fills in. Their markup, their states. */
@@ -772,7 +801,7 @@ const radix = {
   /* their own menu classes — BaseMenu is what both the dropdown and the
      context menu are built from, and DropdownMenuContent is the surface */
   menu:    (n) => `<div class="rt-Flex" style="display:inline-flex;flex-direction:column;gap:var(--space-2);align-items:flex-start">
-    <button class="rt-reset rt-BaseButton rt-r-size-2 rt-variant-surface rt-Button" data-accent-color="gray">${esc(n.trigger ?? 'Actions')}</button>
+    <button class="rt-reset rt-BaseButton rt-r-size-2 rt-variant-surface rt-Button" data-accent-color="gray" aria-haspopup="menu" aria-expanded="true">${esc(n.trigger ?? 'Actions')}</button>
     <div class="rt-PopperContent rt-BaseMenuContent rt-DropdownMenuContent rt-r-size-2 rt-variant-solid" data-state="open" data-side="bottom" style="min-width:224px">
       <div class="rt-BaseMenuViewport">
         <div class="rt-BaseMenuLabel">${esc(n.label ?? '')}</div>
@@ -969,7 +998,7 @@ const mantine = {
    * one is --menu-item-color, the variable their own varsResolver writes from
    * the color prop. */
   menu:    (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-xs);align-items:flex-start">
-    <button class="${cls(MN_FOCUS, 'mantine-active', mc('Button'), mc('UnstyledButton'))}" style="${MN_BTN_VARS}${MN_BTN.secondary}">${esc(n.trigger ?? 'Actions')}</button>
+    <button class="${cls(MN_FOCUS, 'mantine-active', mc('Button'), mc('UnstyledButton'))}" aria-haspopup="menu" aria-expanded="true" style="${MN_BTN_VARS}${MN_BTN.secondary}">${esc(n.trigger ?? 'Actions')}</button>
     <div class="${cls(mc('Popover', 'dropdown'), mc('Menu', 'dropdown'))}" role="menu" aria-orientation="vertical" data-menu-dropdown style="position:static;min-width:224px">
       ${n.label ? `<div class="${mc('Menu', 'label')}">${esc(n.label)}</div>` : ''}
       ${list(n.items).map((t) => `<button class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('Menu', 'item'))}" role="menuitem" data-menu-item><span class="${mc('Menu', 'itemLabel')}" data-menu-item-label>${esc(t)}</span></button>`).join('')}

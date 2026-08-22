@@ -1,4 +1,5 @@
 import { render } from './parts.mjs'
+import { BINDING_ICONS } from './wall-bindings.mjs'
 
 /**
  * THE WALL — written once, rendered by whichever kit is on.
@@ -340,7 +341,7 @@ export const SCENES = BOARDS.flatMap((b) => b.cols.flatMap((c) => c.cards.map((c
  * missing glyph used to ship.
  */
 export const ICON_NAMES = (() => {
-  const out = new Set()
+  const out = new Set(BINDING_ICONS)
   const walk = (n) => {
     if (!n || typeof n !== 'object') return
     if (n.icon) out.add(n.icon)
@@ -566,6 +567,35 @@ body{margin:0;overflow:hidden}
     var i=e.target; if(!i.matches||!i.matches('input'))return
     for(var n=i;n&&n!==m;n=n.parentElement)
       if(n.hasAttribute('data-checked'))n.setAttribute('data-checked',i.checked?'true':'false')
+  })
+
+  /* A THING THAT SAYS IT IS EXPANDED CAN BE.
+     aria-expanded is not a kit's invention, it is the attribute a select
+     trigger is REQUIRED to carry — so the panel it opens is found without
+     knowing whose select it is: the next element along, hidden. Their own
+     data-state moves with it, because that is what their CSS watches. */
+  m.addEventListener('click',function(e){
+    var t=e.target.closest&&e.target.closest('[aria-expanded]'); if(!t)return
+    var pan=t.nextElementSibling; if(!pan)return
+    var open=t.getAttribute('aria-expanded')!=='true'
+    t.setAttribute('aria-expanded',open?'true':'false')
+    pan.hidden=!open
+    if(pan.getAttribute('data-state'))pan.setAttribute('data-state',open?'open':'closed')
+  })
+  /* and clicking away closes it, the way every one of them does — but only
+     what was drawn CLOSED. This wall draws its menus open on purpose, since a
+     closed one shows nothing, and a menu that vanished on the first stray
+     click and had to be hunted back would be a worse specimen, not a truer
+     one. Anything that starts closed is a select, and a select closes. */
+  Array.prototype.forEach.call(m.querySelectorAll('[aria-expanded=true]'),function(t){t.dataset.wallOpen='1'})
+  m.addEventListener('click',function(e){
+    Array.prototype.forEach.call(m.querySelectorAll('[aria-expanded=true]'),function(t){
+      if(t.dataset.wallOpen)return
+      if(t===e.target||t.contains(e.target))return
+      var pan=t.nextElementSibling; if(!pan||pan.contains(e.target))return
+      t.setAttribute('aria-expanded','false'); pan.hidden=true
+      if(pan.getAttribute('data-state'))pan.setAttribute('data-state','closed')
+    })
   })
 
   /* A SLIDER DRAGS.
