@@ -13,11 +13,11 @@
 
 <!-- ── 1 · THE NAME ─────────────────────────────────────────────────────── -->
 <section class="name">
-  <p class="eyebrow rise">Nine systems, one set of knobs</p>
+  <p class="eyebrow rise">Nine design systems, one screen</p>
   <h1 class="rise">The open-source <em>design system generator</em></h1>
-  <p class="lede rise">Not a design system, but the machine that makes yours. Pick from
-    <b data-count="kits">nine</b> real UI kits, read from their own published packages, turn the
-    knobs once, and install the folder that comes out.</p>
+  <p class="lede rise">Try <b data-count="kits">nine</b> real UI kits on the same screen, in your
+    own colours, and find out which one actually fits before you build on it. Then export the one
+    you kept, or the combination.</p>
   <!-- NO BUTTON HERE. Four lines in, nobody knows yet what this is, so asking
        them to start is asking for a decision they cannot make. The thing that
        explains it is directly below and it is interactive, so this points at
@@ -38,12 +38,15 @@
     <div id="wallshot"></div>
     <div class="sweep" id="sweep" aria-hidden="true"></div>
   </div>
+  <p class="wall__after">One at a time here. In the tool you can put
+    <a id="wallsix" href="/generator">six side by side</a>
+    and click any element to see all six versions of it at once.</p>
 </figure>
 
 <!-- ── 2 · THE TURN ─────────────────────────────────────────────────────── -->
 <section class="turn">
-  <p>A design system hands you someone else's taste.<br>
-    <b>A generator hands you all of them, in one theme.</b></p>
+  <p>You cannot tell which design system fits by reading its homepage.<br>
+    <b>So try all nine, on one screen, in your own colours.</b></p>
 </section>
 
 <!-- ── 3 · THE VOCABULARY ───────────────────────────────────────────────── -->
@@ -51,9 +54,10 @@
   <div class="band__head">
     <p class="eyebrow">One value, every vocabulary</p>
     <h2>You turn one knob. Nine systems answer in their own words.</h2>
-    <p class="lede">One colour, <code id="knobbrand"></code>, and one length, <code id="knobradius"></code>.
-      The table is not written, it is read: the same router the generator runs, asked what it just
-      wrote and where. Pick a row and both the wall above and the note beside it follow.</p>
+    <p class="lede">That is what makes them comparable. Every frame above is holding the same
+      colour, <code id="knobbrand"></code>, and the same corner, <code id="knobradius"></code>, in
+      each kit's own name for it, so what you are looking at is the kit and not a difference in
+      what it was given. Pick a row and the wall follows.</p>
   </div>
 
   <div class="vocab">
@@ -83,9 +87,10 @@
   <div class="band__head">
     <p class="eyebrow">Read, never guessed</p>
     <h2>Four bands make a stack, and no kit fills them all.</h2>
-    <p class="lede">Behaviour, an engine, tokens, components. Every version, licence and count here
-      came out of the kit's own package at build time, including which of them ask nothing at all of
-      the app around them.</p>
+    <p class="lede">Behaviour, an engine, tokens, components. Most kits fill some and lean on the
+      rest, which is why a combination is often the answer rather than a single name: shadcn brings
+      the behaviour and the tokens and sits on Tailwind's engine. Every count here came out of the
+      kit's own package at build time.</p>
   </div>
 
   <div class="scroller">
@@ -131,8 +136,9 @@
   <ul class="files" id="files"></ul>
 
   <div class="door">
-    <h2>Start with the kits you already use.</h2>
-    <p>One colour is enough to begin. The rest comes from what your stack publishes.</p>
+    <h2>Try all nine. Keep the one that fits.</h2>
+    <p>One colour is enough to begin, and the rest comes from whatever you switched on. Nothing to
+      install to find out.</p>
     <p class="acts">
       <a class="btn btn--lg" href="/generator"><!--I:sliders-horizontal-->Design your system</a>
     </p>

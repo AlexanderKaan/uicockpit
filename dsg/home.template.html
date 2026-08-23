@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UIcockpit · The open-source design system generator</title>
-<meta name="description" content="The open-source design system generator. Nine real UI kits, read from their own published packages: turn the knobs once and every one of them answers in its own vocabulary.">
+<meta name="description" content="Try nine real UI kits on one screen, in your own colours, and find out which one fits before you build on it. Compare six side by side, then export the one you kept. Free and open source.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -149,6 +149,11 @@ h1 em{display:block;font-style:normal;color:var(--ink)}
    chrome says "this one" in ink; the colour inside the picture is the kit's. */
 .wall__pick button[aria-checked=true]{background:var(--ink);border-color:var(--ink);color:var(--ground);font-weight:500}
 .wall__pick small{font:400 10.5px var(--mono);opacity:.6;letter-spacing:0}
+/* the wall shows one; the tool shows six. The page never said so, and it is the
+   thing the app is actually built around. */
+.wall__after{max-width:74rem;margin:1.25rem auto 0;padding:0 20px;text-align:center;
+  font-size:13.5px;color:var(--ink-2)}
+.wall__after a{color:var(--accent);text-underline-offset:3px}
 .wall__stage{position:relative;isolation:isolate;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 9%),
     linear-gradient(to right,transparent 0,#000 7%,#000 93%,transparent 100%);
@@ -558,6 +563,10 @@ $('#footruns').innerHTML = [['any', 'Runs in anything'], ['React', 'React only']
   const note = all.length === shown.length ? `${all.length} systems` : `${all.length} systems · ${shown.length} to compare`
   return `<a href="${go({ compare: shown.map((k) => k.id).slice(0, 6).join(',') })}">${label}<em>${note}</em></a>`
 }).join('')
+
+/* the one link in the body that names kits: taken from the same list, so it
+   cannot point at a kit we stopped shipping */
+$('#wallsix').href = go({ compare: RENDERING.slice(0, 6).map((k) => k.id).join(',') })
 
 /* By the card's OWN id, checked against the list the wall publishes — a title
    typed here would point at a card the wall may have renamed, and the filter
