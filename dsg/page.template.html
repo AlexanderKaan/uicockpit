@@ -322,7 +322,13 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
   color:var(--ink);font-weight:600;display:flex;flex-direction:column;gap:2px}
 .pickrail__head small{font-size:var(--fs-xs);letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
 .pickrail__head--sub{margin-top:6px;padding-top:9px;border-top:var(--bw) solid var(--line)}
-.pickrail__why{margin:2px 0 0;font-size:var(--fs-xs);color:var(--muted);line-height:1.5}
+.steppedfold{margin-top:6px;padding-top:9px;border-top:var(--bw) solid var(--line);
+  display:flex;flex-direction:column;gap:7px}
+.steppedfold summary{cursor:pointer;list-style:none;font-size:var(--fs-sm);color:var(--muted);padding:2px 0}
+.steppedfold summary::-webkit-details-marker{display:none}
+.steppedfold summary::after{content:" ▸";color:var(--muted)}
+.steppedfold[open] summary::after{content:" ▾"}
+.steppedfold summary:hover{color:var(--ink)}
 .lane__fine{margin:0;font-size:var(--fs-xs);color:var(--muted);line-height:1.5;text-align:center}
 .runline{margin:11px 0 0;padding-top:10px;border-top:var(--bw) solid var(--line);
   font-size:var(--fs-sm);color:var(--muted);display:flex;gap:7px;align-items:center;flex-wrap:wrap}
@@ -518,10 +524,12 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
    headed "what is rendering this" that names it in four bands. Two of them and
    the row wrapped, which put the switch below the line it belongs on. */
 .app[data-compare] #wallhead,.app[data-stage=wall] #wallhead{display:none}
-/* the switch sits at the same corner in both rooms, because two halves of one
-   control in opposite corners means relocating your eye and your hand every
-   time you use it — and this one is meant to be used constantly */
+/* The switch sits at the same corner in both rooms — and only ONE half is ever
+   on screen. The strip along the bottom of the composer carries the wall's own
+   bar, so without this the composer showed See-the-wall at the top and
+   Back-to-the-kit at the bottom of one screen: both doors of one hallway. */
 .wall__back{margin-left:auto}
+.app[data-stage=compose] .wall__back{display:none}
 .wall__count{margin:9px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5}
 .wall__count b{color:var(--ink);font-weight:600}
 .frames{flex:1;min-height:0}
@@ -1197,7 +1205,7 @@ function renderStack() {
         b.over?.length ? `<em>over ${b.over.join(', ')}</em>` : ''}</span>${
         opens ? '<span class="band__go" aria-hidden="true"><!--I:chevron-down--></span>' : ''}</${T}>`
   }).join('')
-    + `<p class="card__facts">${own.parts ? `${own.partsTheirs} of ${own.parts} parts from the kit · ` : ''}${
+    + `<p class="card__facts">${own.parts ? `${own.partsTheirs} of ${own.parts} parts ${KITS[showing(st)]?.bands?.components ? 'from the kit' : 'composed from its utilities'} · ` : ''}${
       [...new Set(st.order.map((k) => KITS[k].license).filter(Boolean))].join(' · ')}</p>`
 
   /* the parts this kit ships nothing for, named where you can still act on it */
@@ -1293,15 +1301,17 @@ function drawStackPicker() {
           <span class="opt__top"><b>Nothing yet</b><span class="opt__meta">tokens only</span></span>
           <span class="opt__why">Take the values and add components later. The wall draws every part
             from what the base publishes.</span></button>`
-      + (stepped.length ? `<p class="pickrail__head pickrail__head--sub">Stepped back <small>needs a different base</small></p>`
-        + stepped.map((id) => `<div class="stepped">
+      /* FOLDED, because they are secondary by definition: you are picking
+         components for the base you have. Five open rows of dashed cards were
+         most of the rail. The summary carries the count; opening it is one
+         click, and each row still says what it needs and offers to move you. */
+      + (stepped.length ? `<details class="steppedfold"><summary>${stepped.length} more need a different base</summary>${
+        stepped.map((id) => `<div class="stepped">
             <span class="stepped__who"><b>${KITS[id].name}</b>
               <em>${needs(id) === id ? 'brings its own base' : `needs ${KITS[needs(id)].name}`}</em></span>
             ${parts(id)}
             <button class="link" data-p="${id}">Switch base</button>
-          </div>`).join('')
-        + `<p class="pickrail__why">Nothing is greyed out and left at that: each one says what it
-            needs and offers to fix it for you.</p>` : '')
+          </div>`).join('')}</details>` : '')
   }
 
   /* the choices are the frameworks the KITS name, plus the one that means
@@ -1543,12 +1553,20 @@ function watch(f) {
     queued = true
     requestAnimationFrame(() => {
       queued = false
-      const edge = strip.scrollLeft + 40
+      /* THE MIDDLE OF YOUR VIEW DECIDES, NOT THE LEFT EDGE PLUS FORTY.
+         With the old rule a board filling most of the screen kept the previous
+         tab lit until its start crossed the far left — and the LAST board could
+         never win at all: you can only scroll to scrollWidth minus the
+         viewport, so a final board wider than the viewport keeps its start
+         forever out of reach. Panned to the end, the end is what you are on. */
+      const atEnd = strip.scrollLeft >= strip.scrollWidth - strip.clientWidth - 2
+      const edge = strip.scrollLeft + strip.clientWidth / 2
       let here = BOARDS[0].id
       for (const b of BOARDS) {
         const el = strip.querySelector(`#b_${b.id}`)
         if (el && el.offsetLeft <= edge) here = b.id
       }
+      if (atEnd) here = BOARDS.at(-1).id
       if (here !== state.board) { state.board = here; drawBoards() }
     })
   }, { passive: true })

@@ -96,8 +96,12 @@ export function bandsOf(st, kits) {
     { ...BANDS[2], by: tKits.at(-1) ?? null, name: tKits.length ? nameOf(tKits.at(-1)) : null, via: null,
       over: tKits.slice(0, -1).map(nameOf),
       note: `${(kits[tKits.at(-1)]?.bands?.tokens ?? 0)} named values, and yours over them` },
-    { ...BANDS[3], by: cKit ?? null, name: cKit ? nameOf(cKit) : null, via: null,
-      note: cKit && kits[cKit].layer !== 'components' ? 'nothing in this stack ships components — the parts on the wall are its tokens on plain markup'
+    /* NAMED ONLY IF IT SHIPS THEM. The top layer used to be printed here
+       whatever it was, so a Tailwind-only stack read "COMPONENTS: Tailwind CSS"
+       — a kit that ships no components, credited with all of them. */
+    { ...BANDS[3], by: cKit ?? null,
+      name: cKit && kits[cKit].bands?.components ? nameOf(cKit) : null, via: null,
+      note: cKit && !kits[cKit].bands?.components ? 'nothing in this stack ships components — the parts on the wall are composed from its utilities'
         : 'the parts on the wall' },
   ]
 }
