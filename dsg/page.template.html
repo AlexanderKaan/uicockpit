@@ -105,20 +105,25 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 /* ── THE CONCEPT ──────────────────────────────────────────────────────────
  * A kit has a name and can be kept, which is what makes trying a second one
  * cost nothing. Kept in this browser and nowhere else. */
-.concept{position:relative;display:flex;align-items:center;gap:5px}
-.concept__name{border:var(--bw) solid transparent;background:0;border-radius:var(--r-sm);
-  font:600 13.5px var(--sans);color:var(--ink);padding:4px 6px;min-width:8ch;width:16ch;outline:0}
-.concept__name:hover{border-color:var(--line)}
-.concept__name:focus{border-color:var(--brand);background:var(--panel)}
-/* a real chevron. It was the character ⌄, which is a modifier letter and sits
-   low and thin on its own baseline — it reads as a dropped comma. */
-.concept__more{display:inline-flex;align-items:center;justify-content:center;
-  border:0;background:0;color:var(--muted);cursor:pointer;width:22px;height:22px;
-  border-radius:var(--r-sm);padding:0}
-.concept__more svg{width:13px;height:13px;transition:transform .15s}
-.concept__more:hover{background:var(--sunken);color:var(--ink)}
-.concept__more[aria-expanded=true] svg{transform:rotate(180deg)}
+.concept{position:relative;display:flex;align-items:center}
+/* one button: dot, name, state, chevron. An input that only revealed itself on
+   hover was a rename nobody found, and the chevron beside it read as a stray. */
+.concept__btn{display:inline-flex;align-items:center;gap:8px;border:var(--bw) solid transparent;
+  background:0;cursor:pointer;font:inherit;padding:5px 8px;border-radius:var(--r-sm);max-width:40ch}
+.concept__btn:hover{border-color:var(--line);background:var(--panel)}
+.concept__btn svg{flex:none;width:13px;height:13px;color:var(--muted);transition:transform .15s}
+.concept__btn[aria-expanded=true] svg{transform:rotate(180deg)}
+.concept__dot{flex:none;width:13px;height:13px;border-radius:4px;border:var(--bw) solid var(--line)}
+.concept__title{font:600 13.5px var(--sans);color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .concept__state{font-size:var(--fs-xs);color:var(--muted);font-variant-numeric:tabular-nums}
+/* the rename, as a FIELD with a name on it, first thing in the menu */
+.concept__field{display:block;padding:2px 2px 9px;margin-bottom:6px;border-bottom:var(--bw) solid var(--line)}
+.concept__field span{display:block;margin:0 0 4px 1px;font-size:var(--fs-xs);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:600}
+.concept__name{display:block;width:100%;border:var(--bw) solid var(--line);background:var(--panel);
+  border-radius:var(--r-sm);font:600 var(--fs-md) var(--sans);color:var(--ink);padding:7px 8px;outline:0}
+.concept__name:focus{border-color:var(--brand)}
 .concept__pop{position:absolute;left:0;top:calc(100% + 7px);z-index:60;width:274px;padding:8px;
   border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--panel);
   box-shadow:0 14px 34px rgb(17 17 18 / .16)}
@@ -1483,7 +1488,6 @@ $('#switchboth').addEventListener('click', () => {
   const n = readKept().length + 1
   state.on = pendingOn; pendingOn = null
   $('#conceptname').value = `${kept} on ${KITS[stack(state.on, KITS).base].name}`.slice(0, 40)
-  saved = null
   sync(); paint(); drawStackPicker(); markState()
   $('#switch').close()
 })
@@ -2650,17 +2654,23 @@ $('#startblank').addEventListener('click', () => stage('compose'))
  * Deliberately not kept: which board you were looking at and whether the wall
  * was dark. Those are where you were standing, not what you made. */
 const KEPT = 'uicockpit.concepts.v1'
-const readKept = () => { try { return JSON.parse(localStorage.getItem(KEPT) ?? '[]') } catch { return [] } }
-const writeKept = (list) => { try { localStorage.setItem(KEPT, JSON.stringify(list)) } catch {} }
+let keptCache = null
+const readKept = () => keptCache ?? (keptCache = (() => {
+  try { return JSON.parse(localStorage.getItem(KEPT) ?? '[]') } catch { return [] }
+})())
+const writeKept = (list) => { keptCache = list; try { localStorage.setItem(KEPT, JSON.stringify(list)) } catch {} }
 const snap = () => ({ on: [...state.on], values: { ...state.values } })
-let saved = null                       // the snapshot as it was last kept, for the dirty mark
 
 const same = (a, b) => a && b && JSON.stringify(a) === JSON.stringify(b)
 function markState() {
   const el = $('#conceptstate'); if (!el) return
   /* "not kept yet" read like a verdict; saved/unsaved is the vocabulary every
      product already taught people */
-  el.textContent = saved ? (same(saved, snap()) ? 'saved' : 'unsaved changes') : 'unsaved'
+  const name = $('#conceptname').value.trim() || 'Untitled kit'
+  const mine = readKept().find((c) => c.name === name)
+  el.textContent = mine ? (same(mine.snap, snap()) ? 'saved' : 'unsaved changes') : 'unsaved'
+  $('#concepttitle').textContent = name
+  $('#conceptdot').style.background = state.values.brand ?? 'transparent'
 }
 
 function drawKept() {
@@ -2686,7 +2696,6 @@ function keepIt(name = $('#conceptname').value.trim() || 'Untitled kit') {
   const list = readKept().filter((c) => c.name !== name)
   list.push({ name, snap: snap() })
   writeKept(list)
-  saved = snap()
   drawKept(); markState()
   return name
 }
@@ -2701,6 +2710,12 @@ addEventListener('click', (e) => {
   if (!e.target.closest('.concept')) { $('#conceptpop').hidden = true; $('#conceptmenu').setAttribute('aria-expanded', 'false') }
 })
 $('#conceptname').addEventListener('input', markState)
+$('#conceptname').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return
+  e.target.blur()
+  $('#conceptpop').hidden = true
+  $('#conceptmenu').setAttribute('aria-expanded', 'false')
+})
 $('#conceptkeep').addEventListener('click', () => { keepIt(); $('#conceptpop').hidden = true })
 $('#conceptfork').addEventListener('click', () => {
   /* NEVER OVERWRITE THE ONE YOU KEPT. Branching from an edited kit means the
@@ -2711,7 +2726,6 @@ $('#conceptfork').addEventListener('click', () => {
   if (!readKept().some((c) => c.name === now)) keepIt(now)
   const n = readKept().length + 1
   $('#conceptname').value = `Concept ${n}`
-  saved = null
   drawKept(); markState()
   $('#conceptpop').hidden = true
 })
@@ -2727,7 +2741,6 @@ $('#keptlist').addEventListener('click', (e) => {
   state.on = new Set(c.snap.on)
   Object.assign(state.values, c.snap.values)
   $('#conceptname').value = c.name
-  saved = snap()
   $('#conceptpop').hidden = true
   sync(); paint(); typoCards(); markState()
 })

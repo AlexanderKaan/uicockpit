@@ -33,11 +33,22 @@
          composing is being able to try something without losing the thing you
          had. -->
     <div class="concept">
-      <input class="concept__name" id="conceptname" value="Untitled kit" spellcheck="false"
-             autocomplete="off" aria-label="What this kit is called">
-      <button class="concept__more" id="conceptmenu" aria-expanded="false" aria-label="Kept kits"><!--I:chevron-down--></button>
-      <span class="concept__state" id="conceptstate"></span>
+      <!-- ONE control. The name looked editable only if you happened to hover
+           it, and the chevron and the state floated beside it as strays. Now
+           the whole thing is a single button that opens the kit menu, and the
+           RENAMING lives inside that menu as a labelled field. -->
+      <button class="concept__btn" id="conceptmenu" aria-expanded="false" aria-haspopup="true">
+        <span class="concept__dot" id="conceptdot"></span>
+        <span class="concept__title" id="concepttitle">Untitled kit</span>
+        <span class="concept__state" id="conceptstate"></span>
+        <!--I:chevron-down-->
+      </button>
       <div class="concept__pop" id="conceptpop" hidden>
+        <label class="concept__field">
+          <span>Name</span>
+          <input class="concept__name" id="conceptname" value="Untitled kit" spellcheck="false"
+                 autocomplete="off" aria-label="What this kit is called">
+        </label>
         <p class="concept__head" id="kepthead" hidden>Saved kits</p>
         <div class="concept__list" id="keptlist"></div>
         <button class="concept__do" id="conceptkeep">Save this kit</button>
