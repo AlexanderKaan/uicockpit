@@ -89,6 +89,40 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
   background:color-mix(in srgb,var(--ground) 90%,transparent);backdrop-filter:blur(8px)}
 .compose__top .mark{margin:0}
 .compose__acts{display:flex;align-items:center;gap:8px;margin-left:auto}
+
+/* ── THE CONCEPT ──────────────────────────────────────────────────────────
+ * A kit has a name and can be kept, which is what makes trying a second one
+ * cost nothing. Kept in this browser and nowhere else. */
+.concept{position:relative;display:flex;align-items:center;gap:5px}
+.concept__name{border:var(--bw) solid transparent;background:0;border-radius:var(--r-sm);
+  font:600 13.5px var(--sans);color:var(--ink);padding:4px 6px;min-width:8ch;width:16ch;outline:0}
+.concept__name:hover{border-color:var(--line)}
+.concept__name:focus{border-color:var(--brand);background:var(--panel)}
+.concept__more{border:0;background:0;color:var(--muted);cursor:pointer;font-size:12px;padding:3px 5px;
+  border-radius:var(--r-sm);line-height:1}
+.concept__more:hover{background:var(--sunken);color:var(--ink)}
+.concept__state{font-size:var(--fs-xs);color:var(--muted);font-variant-numeric:tabular-nums}
+.concept__pop{position:absolute;left:0;top:calc(100% + 7px);z-index:60;width:268px;padding:6px;
+  border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--panel);
+  box-shadow:0 14px 34px rgb(17 17 18 / .16)}
+.concept__head{margin:0;padding:6px 7px 5px;font-size:var(--fs-xs);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);font-weight:600}
+.concept__list{display:flex;flex-direction:column;gap:1px;padding-bottom:5px}
+.concept__list:not(:empty){margin-bottom:5px;border-bottom:var(--bw) solid var(--line)}
+.kept{display:flex;align-items:center;border-radius:var(--r-sm)}
+.kept:hover,.kept[aria-current=true]{background:var(--sunken)}
+.kept__open{display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding:7px;border:0;
+  background:0;cursor:pointer;text-align:left;font:inherit;border-radius:var(--r-sm)}
+.kept__dot{flex:none;width:15px;height:15px;border-radius:4px;border:var(--bw) solid var(--line)}
+.kept__who{min-width:0;display:flex;flex-direction:column;gap:1px}
+.kept__who b{font-size:var(--fs-md);font-weight:600;color:var(--ink)}
+.kept__who small{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kept__x{flex:none;border:0;background:0;color:var(--muted);cursor:pointer;
+  font-size:11px;padding:6px 8px;border-radius:var(--r-sm);line-height:1}
+.kept__x:hover{background:var(--panel);color:var(--ink)}
+.concept__do{display:block;width:100%;text-align:left;padding:7px;border:0;border-radius:var(--r-sm);
+  background:0;font:500 var(--fs-md) var(--sans);color:var(--ink);cursor:pointer}
+.concept__do:hover{background:var(--sunken)}
 .compose__head{max-width:76rem;width:100%;margin:0 auto;padding:34px 20px 0}
 .compose__head h1{font-family:var(--display);font-weight:700;font-size:clamp(1.65rem,3vw,2.35rem);
   line-height:1.1;letter-spacing:-.038em;margin:.5rem 0 0;color:var(--ink)}
@@ -784,6 +818,7 @@ function paint() {
   layout()
   receipt(routed)
   toUrl()
+  markState()
 
   function dress(r0, order, routed) {
     const r = routed.find((x) => x.kit === r0.kit) ?? r0
@@ -1240,6 +1275,18 @@ function askSwitch(next) {
 }
 $('#switchgo').addEventListener('click', () => {
   if (pendingOn) { state.on = pendingOn; pendingOn = null; sync(); paint(); drawStackPicker() }
+  $('#switch').close()
+})
+/* KEEP BOTH. The whole reason the diff is bearable: you do not have to choose
+   between the kit you have and the one you are curious about. */
+$('#switchboth').addEventListener('click', () => {
+  if (!pendingOn) return $('#switch').close()
+  const kept = keepIt()
+  const n = readKept().length + 1
+  state.on = pendingOn; pendingOn = null
+  $('#conceptname').value = `${kept} on ${KITS[stack(state.on, KITS).base].name}`.slice(0, 40)
+  saved = null
+  sync(); paint(); drawStackPicker(); markState()
   $('#switch').close()
 })
 $('#switchno').addEventListener('click', () => { pendingOn = null; $('#switch').close() })
@@ -2252,6 +2299,96 @@ $('#vibes').addEventListener('click', (e) => {
   takeVibe(VIBES[Number(b.dataset.v)])
 })
 $('#startblank').addEventListener('click', () => stage('compose'))
+
+/* ── CONCEPTS ─────────────────────────────────────────────────────────────
+ * Trying a second idea should not cost you the first one. A concept is the
+ * whole of what you decided — the stack and all twenty-one values — under a
+ * name you gave it, kept in THIS BROWSER and sent nowhere. That is the same
+ * promise the rest of the tool makes: no account, no server, nothing to lose
+ * access to.
+ *
+ * Deliberately not kept: which board you were looking at and whether the wall
+ * was dark. Those are where you were standing, not what you made. */
+const KEPT = 'uicockpit.concepts.v1'
+const readKept = () => { try { return JSON.parse(localStorage.getItem(KEPT) ?? '[]') } catch { return [] } }
+const writeKept = (list) => { try { localStorage.setItem(KEPT, JSON.stringify(list)) } catch {} }
+const snap = () => ({ on: [...state.on], values: { ...state.values } })
+let saved = null                       // the snapshot as it was last kept, for the dirty mark
+
+const same = (a, b) => a && b && JSON.stringify(a) === JSON.stringify(b)
+function markState() {
+  const el = $('#conceptstate'); if (!el) return
+  el.textContent = saved ? (same(saved, snap()) ? 'kept' : 'edited') : 'not kept yet'
+}
+
+function drawKept() {
+  const list = readKept()
+  $('#kepthead').hidden = !list.length
+  $('#keptlist').innerHTML = list.map((c, i) => {
+    /* the NAME the kit gave the stack, not its first entry: "-apple-system"
+       tells you nothing you would recognise a kit by */
+    const hv = c.snap.values.fontHeading ?? ''
+    const head = FONTS.stacks.find((f) => f.family === hv)?.name ?? familyOf(hv)
+    const kits = (c.snap.on ?? []).map((k) => KITS[k]?.name).filter(Boolean).join(' + ')
+    return `<div class="kept" aria-current="${c.name === $('#conceptname').value}">
+      <button class="kept__open" data-open="${i}">
+        <span class="kept__dot" style="background:${c.snap.values.brand ?? 'transparent'}"></span>
+        <span class="kept__who"><b>${c.name}</b><small>${[kits, head].filter(Boolean).join(' · ')}</small></span>
+      </button>
+      <button class="kept__x" data-drop="${i}" aria-label="Forget ${c.name}">✕</button>
+    </div>`
+  }).join('')
+}
+
+function keepIt(name = $('#conceptname').value.trim() || 'Untitled kit') {
+  const list = readKept().filter((c) => c.name !== name)
+  list.push({ name, snap: snap() })
+  writeKept(list)
+  saved = snap()
+  drawKept(); markState()
+  return name
+}
+
+$('#conceptmenu').addEventListener('click', () => {
+  const pop = $('#conceptpop'), open = pop.hidden
+  if (open) drawKept()
+  pop.hidden = !open
+  $('#conceptmenu').setAttribute('aria-expanded', String(open))
+})
+addEventListener('click', (e) => {
+  if (!e.target.closest('.concept')) { $('#conceptpop').hidden = true; $('#conceptmenu').setAttribute('aria-expanded', 'false') }
+})
+$('#conceptname').addEventListener('input', markState)
+$('#conceptkeep').addEventListener('click', () => { keepIt(); $('#conceptpop').hidden = true })
+$('#conceptfork').addEventListener('click', () => {
+  /* NEVER OVERWRITE THE ONE YOU KEPT. Branching from an edited kit means the
+     edit becomes the new one and the kept one stays as you left it — otherwise
+     branching quietly destroys the thing it exists to protect. A name that was
+     never kept is kept first, because that one would be lost. */
+  const now = $('#conceptname').value.trim() || 'Untitled kit'
+  if (!readKept().some((c) => c.name === now)) keepIt(now)
+  const n = readKept().length + 1
+  $('#conceptname').value = `Concept ${n}`
+  saved = null
+  drawKept(); markState()
+  $('#conceptpop').hidden = true
+})
+$('#keptlist').addEventListener('click', (e) => {
+  const drop = e.target.closest('[data-drop]')
+  if (drop) {
+    e.stopPropagation()
+    const list = readKept(); list.splice(Number(drop.dataset.drop), 1); writeKept(list)
+    return drawKept()
+  }
+  const open = e.target.closest('[data-open]'); if (!open) return
+  const c = readKept()[Number(open.dataset.open)]; if (!c) return
+  state.on = new Set(c.snap.on)
+  Object.assign(state.values, c.snap.values)
+  $('#conceptname').value = c.name
+  saved = snap()
+  $('#conceptpop').hidden = true
+  sync(); paint(); typoCards(); markState()
+})
 
 /* ── AND BACK AND FORTH BETWEEN THE OTHER TWO ─────────────────────────────── */
 $('#tofold').addEventListener('click', () => stage('wall'))

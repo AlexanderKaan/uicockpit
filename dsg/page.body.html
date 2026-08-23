@@ -29,9 +29,26 @@
      this file had to learn a new name. -->
 <section class="compose">
   <header class="compose__top">
-    <a class="mark" href="/" title="UIcockpit — home"><!--MARK--> Design System Generator</a>
+    <a class="mark" href="/" title="UIcockpit — home"><!--MARK--></a>
+
+    <!-- A kit you are allowed to keep, and to keep a SECOND of. Half of
+         composing is being able to try something without losing the thing you
+         had. -->
+    <div class="concept">
+      <input class="concept__name" id="conceptname" value="Untitled kit" spellcheck="false"
+             autocomplete="off" aria-label="What this kit is called">
+      <button class="concept__more" id="conceptmenu" aria-expanded="false" aria-label="Kept kits">⌄</button>
+      <span class="concept__state" id="conceptstate"></span>
+      <div class="concept__pop" id="conceptpop" hidden>
+        <p class="concept__head" id="kepthead" hidden>Kept so far</p>
+        <div class="concept__list" id="keptlist"></div>
+        <button class="concept__do" id="conceptkeep">Keep this one</button>
+        <button class="concept__do" id="conceptfork">Branch into a new one</button>
+        <button class="concept__do" id="restart">Start over from a vibe</button>
+      </div>
+    </div>
+
     <div class="compose__acts">
-      <button class="btn btn--ghost" id="restart">Start over</button>
       <button class="btn btn--go" id="tofold"><!--I:maximize-->Fold it up</button>
     </div>
   </header>
@@ -178,6 +195,7 @@
   <div class="switch__rows" id="switchrows"></div>
   <footer class="switch__foot">
     <button class="btn btn--go" id="switchgo">Move it over</button>
+    <button class="btn" id="switchboth">Keep both</button>
     <button class="btn" id="switchno">Leave it as it is</button>
     <p class="lane__fine" id="switchfine"></p>
   </footer>
