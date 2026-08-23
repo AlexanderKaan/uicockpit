@@ -34,7 +34,7 @@ export const BOARDS = [
     cols: [
       { w: 440, cards: [
         { id: 'roles', title: 'Colour roles', panel: true, node: { p: 'stack', gap: 3, kids: [
-          { p: 'muted', text: 'Every role, painted by the variable this stack really reads — and named, where it has one.' },
+          { p: 'muted', text: 'Every role, painted by the variable this stack really reads, and named where it has one.' },
           { p: 'swatches', roles: ['brand', 'onBrand', 'page', 'surface', 'ink', 'inkMuted', 'line', 'success', 'warning', 'danger', 'focus'] },
         ] } },
         { id: 'shape', title: 'Corners and borders', panel: true, node: { p: 'shapes' } },
@@ -51,7 +51,7 @@ export const BOARDS = [
           { p: 'elevation', levels: ['sm', 'md', 'lg'] },
         ] } },
         { id: 'focusring', title: 'Focus ring', panel: true, node: { p: 'stack', gap: 2, kids: [
-          { p: 'muted', text: 'The one specimen that cannot be drawn — tab into the field to see it.' },
+          { p: 'muted', text: 'The one specimen that cannot be drawn. Tab into the field to see it.' },
           { p: 'input', placeholder: 'Tab here' },
         ] } },
       ] },
@@ -189,8 +189,8 @@ export const BOARDS = [
           ] },
           { p: 'table', cols: ['Reference', 'Owner', 'Status', 'Due'], rows: [
             ['2026-04471', 'M. Visser', 'Under review', '28 Sep'],
-            ['2026-03918', 'K. Boone', 'Granted', '—'],
-            ['2026-03744', 'A. Yildiz', 'Refused', '—'],
+            ['2026-03918', 'K. Boone', 'Granted', 'None'],
+            ['2026-03744', 'A. Yildiz', 'Refused', 'None'],
             ['2026-03502', 'T. Okonkwo', 'Under review', '4 Oct'],
           ] },
         ] } },
@@ -226,7 +226,7 @@ export const BOARDS = [
   /* ── 5 ─────────────────────────────────────────────────────────────────── */
   {
     id: 'navigation', label: 'Navigation',
-    note: 'How someone knows where they are — the parts every kit shows last, or not at all.',
+    note: 'How someone knows where they are: the parts every kit shows last, or not at all.',
     cols: [
       { w: 640, cards: [
         { id: 'topbar', title: 'A bar across the top', panel: false, node: { p: 'navbar', brand: 'Havenstad',

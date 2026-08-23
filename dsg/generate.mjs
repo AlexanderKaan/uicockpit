@@ -21,7 +21,7 @@ const decl = (vars, indent = '  ') => Object.entries(vars).map(([k, v]) => `${in
 
 /* ── one block per kit, in the form that kit reads ────────────────────────── */
 const EMIT = {
-  tailwind: (r, kit) => `/* ${stamp(kit)} — semantic names Tailwind does not ship.
+  tailwind: (r, kit) => `/* ${stamp(kit)}: semantic names Tailwind does not ship.
    These generate utilities: bg-brand, text-ink, border-line, rounded-lg. */
 @theme {
 ${decl(r.vars)}
@@ -46,7 +46,7 @@ ${decl(r.vars)}
       .filter((n) => n !== '--radius')
       .map((n) => [n.replace(/^--/, '--color-'), `var(${n})`]))
     const radius = all['--radius']
-    return `/* ${stamp(kit)} — the variables its components read: its published
+    return `/* ${stamp(kit)}: the variables its components read, its published
    defaults with your values over them. The dark half is below. */
 :root {
 ${decl(all)}
@@ -88,13 +88,13 @@ ${decl(bridge)}${radius ? `
    *
    * So the rule the whole product already claims applies to us too: their
    * defaults are the base, our values go on top. */
-  daisyui: (r, kit) => `/* ${stamp(kit)} — a named theme, registered as the default.
+  daisyui: (r, kit) => `/* ${stamp(kit)}: a named theme, registered as the default.
    Their published defaults with your values over them: a theme block replaces
    the theme, so anything left out would be missing rather than inherited.
    SET data-theme="yourkit" ON YOUR <html>. A dark theme is registered below with
    prefersdark, which is the flag daisyUI's own dark theme uses to beat
    default:true the moment a visitor's OS is dark. Without one of ours there,
-   theirs won and none of these values applied — which is exactly what happened
+   theirs won and none of these values applied, which is exactly what happened
    the first time, and turned the whole wall its factory purple. */
 @plugin "daisyui/theme" {
   name: "yourkit";
@@ -103,14 +103,14 @@ ${decl(kit.plain?.light ?? {})}
 ${decl({ ...kit.modes.light, ...r.vars })}
 }`,
 
-  bootstrap: (r, kit) => `/* ${stamp(kit)} — what a running page can change.
+  bootstrap: (r, kit) => `/* ${stamp(kit)}: what a running page can change.
    The brand is NOT here: see _custom.scss. \`var(--bs-primary)\` appears zero
    times in Bootstrap's own stylesheet, so setting it would change nothing. */
 :root {
 ${decl(r.vars)}
 }`,
 
-  material: (r, kit) => `/* ${stamp(kit)} — the seed and the corner ramp.
+  material: (r, kit) => `/* ${stamp(kit)}: the seed and the corner ramp.
    M3 computes its other 46 colour roles from the seed; generate them with
    @material/material-color-utilities rather than setting them by hand. */
 :root {
@@ -124,16 +124,16 @@ ${decl(r.vars)}
    * Writing a hex into --accent-9 would leave the other eleven steps belonging
    * to the previous accent, so the choices are made where Radix makes them and
    * the block below carries only what really is a variable. */
-  radix: (r, kit) => `/* ${stamp(kit)} — the half that IS a variable.
+  radix: (r, kit) => `/* ${stamp(kit)}: the half that IS a variable.
    The other half is on your <Theme>:
-     ${attrLine(r) || '(no choices — nothing matched)'}
+     ${attrLine(r) || '(no choices matched)'}
    Set those there, not here: Radix's accent is a twelve-step scale it ships,
    and one step written by hand is eleven steps out of step. */
 ${SCOPE.radix} {
 ${decl(r.vars)}
 }`,
 
-  mantine: (r, kit) => `/* ${stamp(kit)} — its variables, all settable at runtime.
+  mantine: (r, kit) => `/* ${stamp(kit)}: its variables, all settable at runtime.
    Its COMPONENT class names are content hashes (.m_77c9d27d is Button), so use
    its React components; these variables are what they read.
    The selector is theirs, not :root: Mantine's own block is
@@ -149,7 +149,7 @@ ${decl(r.vars)}
    * themselves, so a reader can see what the theme resolved to without running
    * anything. Written under .antd, which is the scope their own cssVar option
    * puts them in. */
-  antd: (r, kit) => `/* ${stamp(kit)} — the leftovers.
+  antd: (r, kit) => `/* ${stamp(kit)}: the leftovers.
    Ant Design derives everything from the tokens in antd.theme.ts next to this
    file; do not write these by hand unless you mean to overrule its algorithm.
    The shadows are here because its token API takes no strength. */
@@ -160,7 +160,7 @@ ${decl(r.vars)}
   /* Open Props renders nothing, so this block exists to make YOUR css agree
    * with the kit above it: write var(--brand) or var(--size-3) by hand and it
    * lands on the same values the components use. */
-  openprops: (r, kit) => `/* ${stamp(kit)} — variables only; Open Props ships no components.
+  openprops: (r, kit) => `/* ${stamp(kit)}: variables only. Open Props ships no components.
    Loaded UNDER whatever renders, so your own CSS agrees with it. */
 ${SCOPE.openprops} {
 ${decl(r.vars)}
@@ -174,7 +174,7 @@ export const attrLine = (r) =>
 /* ── the extra files some kits need ───────────────────────────────────────── */
 const EXTRA = {
   bootstrap: (r, kit, values) => ({
-    '_custom.scss': `// ${stamp(kit)} — the half a running page cannot change.
+    '_custom.scss': `// ${stamp(kit)}: the half a running page cannot change.
 // Bootstrap compiles component colours, so the brand is a build-time variable.
 // Import this INSTEAD of plain bootstrap.css:
 //
@@ -294,7 +294,7 @@ export const plain = (files) => Object.fromEntries(
 export const COMPONENT_GAPS = {
   bootstrap: [
     ['footer', 'Bootstrap ships a navbar but no footer component; the one on the wall is its own utilities on plain markup'],
-    ['chart', 'and no chart — the bars are its own colour utilities on plain markup'],
+    ['chart', 'and no chart, so the bars are its own colour utilities on plain markup'],
     ['empty', 'and no empty state'],
   ],
   shadcn: [
@@ -303,11 +303,11 @@ export const COMPONENT_GAPS = {
   ],
   radix: [
     ['navbar', 'Radix Themes ships no navigation bar; the one on the wall is rt-Link and rt-Heading in a flex row'],
-    ['footer', 'and no footer either — same, with rt-Grid'],
+    ['footer', 'and no footer either, the same with rt-Grid'],
     ['sidenav', 'and no sidebar: its TabNav runs horizontally, so the rail is rt-Text and rt-Badge rows on its own accent scale'],
-    ['breadcrumb', 'and no breadcrumb — rt-Link with a separator'],
+    ['breadcrumb', 'and no breadcrumb, so rt-Link with a separator'],
     ['list', 'and no list; DataList is for a label and a value, which is what the key-and-value card really uses'],
-    ['chart', 'and no chart — the bars are its accent scale at steps 9 and 6'],
+    ['chart', 'and no chart, so the bars are its accent scale at steps 9 and 6'],
   ],
   mantine: [
     ['navbar', 'the header and footer come from AppShell, which normally positions them for a whole app shell; on the wall they sit in flow'],
@@ -318,23 +318,23 @@ export const COMPONENT_GAPS = {
     ['empty', 'and no empty state'],
   ],
   tailwind: [
-    ['chart', 'Tailwind ships utilities, not components — everything on this wall is composed, the chart included'],
+    ['chart', 'Tailwind ships utilities, not components, so everything on this wall is composed, the chart included'],
   ],
   antd: [
-    ['chart', 'Ant Design ships no chart; charts live in @ant-design/charts, a separate package — the bars here are its own primary at two fills'],
+    ['chart', 'Ant Design ships no chart; charts live in @ant-design/charts, a separate package, so the bars here are its own primary at two fills'],
     ['stack', 'their layout is Flex and Space, which are components; a column of ours is their spacing on a plain div'],
-    ['sidenav', 'their Menu in inline mode is the sidebar, and it is theirs — but the rail on this wall has a count on one row, which their item API has no slot for, so that badge sits in the label'],
+    ['sidenav', 'their Menu in inline mode is the sidebar, and it is theirs, but the rail on this wall has a count on one row, which their item API has no slot for, so that badge sits in the label'],
   ],
   material: [
     ['navbar', 'M3 has a top app bar in the specification; @material/web ships only a bottom navigation bar, so the header is its tokens on plain markup'],
     ['footer', 'no footer in the specification or the package'],
     ['mediacard', 'no media card: md-outlined-card has no image slot, so the picture area is a plain div on their surface tokens'],
-    ['layout', 'Material publishes colour and shape tokens but no spacing scale, and ships no layout components — spacing between elements is yours to decide'],
+    ['layout', 'Material publishes colour and shape tokens but no spacing scale, and ships no layout components, so spacing between elements is yours to decide'],
     ['table', '@material/web ships no data table, though the M3 spec describes one'],
     ['avatar', '@material/web ships no avatar; compose one from its shape and colour tokens'],
     ['alert', '@material/web ships no inline alert or banner; the closest is md-filled-card re-toned with its own container token'],
     ['breadcrumb', 'no breadcrumb in the specification or the package'],
-    ['chart', 'and no chart — the bars are its primary and primary-container tokens'],
+    ['chart', 'and no chart, so the bars are its primary and primary-container tokens'],
     ['empty', 'and no empty state'],
     ['sidenav', 'M3 has a navigation drawer and @material/web ships it in labs, where it positions itself for a whole app shell; the rail on the wall is md-list, which is what a drawer is made of'],
   ],
@@ -454,13 +454,13 @@ function darkBlock(r, kit) {
      file — including a navy their Layout header carries as a literal, which is
      how the check that nothing here is a colour we chose found it. */
   if (at === 'algorithm') {
-    return `/* ${kit.name} in the dark — an ALGORITHM, not a selector.
+    return `/* ${kit.name} in the dark: an ALGORITHM, not a selector.
    theme.darkAlgorithm over the same tokens, set in antd.theme.ts:
      import { theme as antdTheme } from 'antd'
      <ConfigProvider theme={{ ...theme, algorithm: antdTheme.darkAlgorithm }}>
    Nothing to write here; a block of variables would overrule the generator. */`
   }
-  const head = `/* ${kit.name} in the dark — your values through this kit's own
+  const head = `/* ${kit.name} in the dark: your values through this kit's own
    published light-to-dark relationship, in the switch it actually reads. */`
   if (r.kit === 'daisyui') {
     return `${head}
@@ -503,9 +503,9 @@ export function generate(values, kitIds, kits, opts = {}) {
   const byKit = {}
   const blocks = routed.flatMap((r) => {
     const kit = kits[r.kit]
-    if (!kit) throw new Error(`no fetched values for "${r.kit}" — run fetch-kits.mjs`)
+    if (!kit) throw new Error(`no fetched values for "${r.kit}", run fetch-kits.mjs`)
     const emit = EMIT[r.kit]
-    if (!emit) throw new Error(`no emitter for "${r.kit}" — a kit without one would ship an empty theme`)
+    if (!emit) throw new Error(`no emitter for "${r.kit}": a kit without one would ship an empty theme`)
     Object.assign(files, EXTRA[r.kit]?.(r, kit, values) ?? {})
     const pair = [emit(r, kit), darkBlock(r, kit)].filter(Boolean)
     byKit[r.kit] = pair.join('\n\n')
@@ -531,7 +531,7 @@ ${routed.map((r) => {
      one that this is React-only has lost a minute; someone who finds out after
      wiring a theme has lost an afternoon. */
   const run = kit.runsIn
-  const line = run ? `> ${run.framework ? `**${run.framework} only** — ` : '**Any framework** — '}${run.what}.\n\n` : ''
+  const line = run ? `> ${run.framework ? `**${run.framework} only.** ` : '**Any framework.** '}${run.what}.\n\n` : ''
   return `## ${kit.name}\n\n${line}\`\`\`bash\n${(INSTALL[r.kit]?.(kit, r) ?? []).join('\n')}\n\`\`\`\n`
 }).join('\n')}
 Then import \`theme.css\` after the kits, so your values win.
@@ -550,8 +550,8 @@ Then import \`theme.css\` after the kits, so your values win.
   files['DESIGN.md'] = designMd(routed, kits, values, opts)
   const pointer = `# ${opts.name ?? 'This project'}
 
-Before writing or changing ANY user interface — a colour, a spacing, a
-component, a screen — read \`DESIGN.md\` in this directory and follow it.
+Before writing or changing ANY user interface, be it a colour, a spacing, a
+component or a screen, read \`DESIGN.md\` in this directory and follow it.
 
 It carries the design system: the values, where each one comes from, what this
 stack cannot express, and the rules for working inside it. It is generated, so
@@ -634,27 +634,27 @@ function manifest(routed, kits, values, opts = {}) {
   const caveats = routed.flatMap((r) => {
     const k = kits[r.kit]
     const out = []
-    for (const b of r.needsBuild ?? []) out.push(`- **${k.name} · ${b.role}** — not settable at runtime. \`${b.sass}\` is in \`${b.where ?? '_custom.scss'}\`; ${b.why}.`)
+    for (const b of r.needsBuild ?? []) out.push(`- **${k.name} · ${b.role}**: not settable at runtime. \`${b.sass}\` is in \`${b.where ?? '_custom.scss'}\`; ${b.why}.`)
     for (const [from, roles] of Object.entries(Object.groupBy(r.derived ?? [], (d) => d.from))) {
       const names = roles.map((d) => d.role).join(', ')
       out.push(from === 'brand'
-        ? `- **${k.name} · ${names}** — computed by the kit from your brand colour. Generate the full scheme with its own tool rather than setting these by hand.`
-        : `- **${k.name} · ${names}** — this kit ties that to \`${from}\`, so the ${from} knob already moved it. There is nothing separate to set.`)
+        ? `- **${k.name} · ${names}**: computed by the kit from your brand colour. Generate the full scheme with its own tool rather than setting these by hand.`
+        : `- **${k.name} · ${names}**: this kit ties that to \`${from}\`, so the ${from} knob already moved it. There is nothing separate to set.`)
     }
-    if (r.unroutable?.length) out.push(`- **${k.name} · ${r.unroutable.join(', ')}** — this kit has no variable for that job, so the value was not written anywhere.`)
-    if (r.unscaled?.length) out.push(`- **${k.name}** — ${r.unscaled.join(', ')} were left at their published values: no ratio could be read from a unitless input.`)
-    if (r.added?.length) out.push(`- **${k.name} · ${r.added.join(', ')}** — this kit ships no semantic name for these, so they were ADDED. Reference them yourself (\`bg-brand\`, \`text-ink\`).`)
+    if (r.unroutable?.length) out.push(`- **${k.name} · ${r.unroutable.join(', ')}**: this kit has no variable for that job, so the value was not written anywhere.`)
+    if (r.unscaled?.length) out.push(`- **${k.name}**: ${r.unscaled.join(', ')} were left at their published values: no ratio could be read from a unitless input.`)
+    if (r.added?.length) out.push(`- **${k.name} · ${r.added.join(', ')}**: this kit ships no semantic name for these, so they were ADDED. Reference them yourself (\`bg-brand\`, \`text-ink\`).`)
     /* Not every gap is a token that would not take a value. Some are parts of a
      * screen the kit ships no component for at all, and a theme that stays
      * silent about those is the reason people find out at build time. */
     for (const role of ROLES) {
       const t = MAP[r.kit]?.[role.id]
-      if (t?.overrides && values[role.id]) out.push(`- **${k.name} · ${role.id}** — this kit derives that colour itself. Your value replaces ${t.overrides}; everything else in the scheme still comes from the seed.`)
+      if (t?.overrides && values[role.id]) out.push(`- **${k.name} · ${role.id}**: this kit derives that colour itself. Your value replaces ${t.overrides}; everything else in the scheme still comes from the seed.`)
     }
-    if (r.noDarkMode) out.push(`- **${k.name} · dark mode** — this kit publishes no dark values of its own, so none were generated. Anything else would be a palette we invented.`)
-    if (r.greyscale?.length) out.push(`- **${k.name} · dark mode for \`${r.greyscale.join('`, `')}\`** — this kit's own light-to-dark change does not fit your colour: carrying it through would cost more than half its chroma to stay inside sRGB, which washes it out rather than darkening it. ${k.name === 'shadcn/ui' ? 'shadcn ships no brand colour of its own — --primary is part of its neutral ramp and simply inverts — so it has never said what to do with a colour. ' : ''}Left unchanged; check it against the contrast list.`)
+    if (r.noDarkMode) out.push(`- **${k.name} · dark mode**: this kit publishes no dark values of its own, so none were generated. Anything else would be a palette we invented.`)
+    if (r.greyscale?.length) out.push(`- **${k.name} · dark mode for \`${r.greyscale.join('`, `')}\`**: this kit's own light-to-dark change does not fit your colour: carrying it through would cost more than half its chroma to stay inside sRGB, which washes it out rather than darkening it. ${k.name === 'shadcn/ui' ? 'shadcn ships no brand colour of its own — --primary is part of its neutral ramp and simply inverts — so it has never said what to do with a colour. ' : ''}Left unchanged; check it against the contrast list.`)
     for (const c of r.chosen ?? []) {
-      out.push(`- **${k.name} · ${c.role}** — not a value this kit takes. You asked for \`${c.asked}\`; the nearest of its ${c.of} published ${c.attr.replace('data-', '')} settings is **${c.picked}** (\`${c.got}\`). ${c.why}.`)
+      out.push(`- **${k.name} · ${c.role}**: not a value this kit takes. You asked for \`${c.asked}\`; the nearest of its ${c.of} published ${c.attr.replace('data-', '')} settings is **${c.picked}** (\`${c.got}\`). ${c.why}.`)
     }
     return out
   })
@@ -668,11 +668,11 @@ ${rows.join('\n')}
 
 ## What you set
 
-${ROLES.filter((r) => values[r.id] != null).map((r) => `- \`${r.id}\` — ${values[r.id]}  *(${r.what})*`).join('\n')}
+${ROLES.filter((r) => values[r.id] != null).map((r) => `- \`${r.id}\`: ${values[r.id]}  *(${r.what})*`).join('\n')}
 
 ## What could not be done
 
-${caveats.length ? caveats.join('\n') : 'Nothing — every value reached every kit you enabled.'}
+${caveats.length ? caveats.join('\n') : 'Nothing. Every value reached every kit you enabled.'}
 
 ## What this stack is made of
 
@@ -687,11 +687,11 @@ ${(() => {
   const tok = kits_.filter((k) => (k.bands?.tokens ?? 0) > 0)
   const comp = [...kits_].reverse().find((k) => k.bands?.components)
   return [
-    `- **Behaviour** — ${beh ? `\`${beh.bands.behaviour.by}\`, which ${beh.name} brings with it: ${beh.bands.behaviour.what}.`
+    `- **Behaviour:** ${beh ? `\`${beh.bands.behaviour.by}\`, which ${beh.name} brings with it: ${beh.bands.behaviour.what}.`
       : 'nothing here brings any. These are classes, so the keyboard order, the focus management and the ARIA are yours to write.'}`,
-    `- **Engine** — ${eng ? `${eng.name}${eng.layer === 'utility' ? ', compiled from what your markup uses' : ', its own stylesheet'}.` : 'none in this stack.'}`,
-    `- **Tokens** — ${tok.length ? `${tok.at(-1).name}${tok.length > 1 ? `, over ${tok.slice(0, -1).map((k) => k.name).join(' and ')}` : ''}, and your values over all of it.` : 'none.'}`,
-    `- **Components** — ${comp ? comp.name + '.' : 'none — the parts are tokens on plain markup.'}`,
+    `- **Engine:** ${eng ? `${eng.name}${eng.layer === 'utility' ? ', compiled from what your markup uses' : ', its own stylesheet'}.` : 'none in this stack.'}`,
+    `- **Tokens:** ${tok.length ? `${tok.at(-1).name}${tok.length > 1 ? `, over ${tok.slice(0, -1).map((k) => k.name).join(' and ')}` : ''}, and your values over all of it.` : 'none.'}`,
+    `- **Components:** ${comp ? comp.name + '.' : 'none, so the parts are tokens on plain markup.'}`,
   ].join('\n') })()}
 
 ## Variables in here that nothing reads
@@ -699,38 +699,38 @@ ${(() => {
 ${(() => {
   const on = new Set(routed.map((r) => r.kit))
   const rows = (opts.unread ?? []).filter((u) => on.has(u.kit))
-  if (!rows.length) return 'Nothing — every variable this theme writes is read by the kit it belongs to, or by your code.'
+  if (!rows.length) return 'Nothing. Every variable this theme writes is read by the kit it belongs to, or by your code.'
   return `Counted in each kit's own stylesheet, and in its component code where its
 components are code rather than classes. These are written because the kit
 publishes the name and a later release may read it. Yours to reference; the
 kit will not.
 
-${rows.map((u) => `- **${u.name} · ${u.role}** — ${u.names.map((n) => `\`${n}\``).join(' ')}${
+${rows.map((u) => `- **${u.name} · ${u.role}**: ${u.names.map((n) => `\`${n}\``).join(' ')}${
   u.tokensOnly ? '. A token layer publishes for your code; its own stylesheet reads none of it.'
     : u.instead.length ? `. What it does read is ${u.instead.slice(0, 3).map((n) => `\`${n}\``).join(' ')}${u.instead.length > 3 ? ' and others' : ''}.` : '.'}`).join('\n')}` })()}
 
 ## What these kits have no component for
 
 Not about your values: these are parts of a screen the kit itself does not
-ship. Nothing here was substituted quietly — where the wall shows one, it is
+ship. Nothing here was substituted quietly. Where the wall shows one, it is
 plain markup on that kit's own tokens.
 
 ${(() => { const gaps = routed.flatMap((r) => (COMPONENT_GAPS[r.kit] ?? [])
-    .map(([part, why]) => `- **${kits[r.kit].name} · ${part}** — ${why}.`))
-  return gaps.length ? gaps.join('\n') : 'Nothing — every part of the wall is a component these kits ship.' })()}
+    .map(([part, why]) => `- **${kits[r.kit].name} · ${part}**: ${why}.`))
+  return gaps.length ? gaps.join('\n') : 'Nothing. Every part of the wall is a component these kits ship.' })()}
 
 ## Contrast
 
 ${(() => { const a = auditContrast(values); const bad = a.filter((p) => !p.passes)
   return `${a.length - bad.length} of ${a.length} pairs clear their floor.\n\n` +
-    a.map((p) => `- ${p.passes ? '✓' : '✗'} ${p.label} — **${p.ratio}:1**, needs ${p.min}`).join('\n') })()}
+    a.map((p) => `- ${p.passes ? '✓' : '✗'} ${p.label}: **${p.ratio}:1**, needs ${p.min}`).join('\n') })()}
 
 ${clash.length ? `## Names two kits both use
 
 These variables mean different things to different kits you enabled. Whichever
 stylesheet loads second wins, and nothing warns.
 
-${clash.map((c) => `- \`${c.variable}\` — written for **${kits[c.written].name}**, but **${kits[c.read].name}** also reads it (its own value: \`${c.theirValue}\`). Load their stylesheets in separate scopes, or drop one of the two.`).join('\n')}
+${clash.map((c) => `- \`${c.variable}\`: written for **${kits[c.written].name}**, but **${kits[c.read].name}** also reads it (its own value: \`${c.theirValue}\`). Load their stylesheets in separate scopes, or drop one of the two.`).join('\n')}
 
 ` : ''}## The rule this was generated under
 
@@ -867,7 +867,7 @@ function designMd(routed, kits, values, { name = 'Design system', parts = [], ov
     const bg = ROLES.find((r) => r.id === p.bg)?.label.toLowerCase() ?? p.bg
     const head = `${fg} is ${p.ratio}:1 against ${bg}, under the ${p.min}:1 it needs.`
     return p.min >= 4.5
-      ? `${head} That pairing fails for body text — darken one of them, or use it only at 24px, or 19px bold, where 3:1 is the bar.`
+      ? `${head} That pairing fails for body text. Darken one of them, or use it only at 24px, or 19px bold, where 3:1 is the bar.`
       : `${head} Use it for fills and decoration, never as the only thing marking a control apart from its background.`
   })
 
@@ -879,7 +879,7 @@ function designMd(routed, kits, values, { name = 'Design system', parts = [], ov
   const lifts = routed.some((r) => !coverage(r.kit).missing.includes('elevation'))
   const strength = parseFloat(values.elevation ?? '1')
   const depth = !lifts
-    ? `Nothing in this stack publishes a shadow scale, so depth here is a border and a change of surface — never a drop shadow.`
+    ? `Nothing in this stack publishes a shadow scale, so depth here is a border and a change of surface, never a drop shadow.`
     : strength <= 0.05
       ? `Shadows are turned off. Depth comes from the border and from the step between the page and a surface.`
       : `Depth comes from ${seenKit?.name ?? 'the kit'}'s own shadow scale at ${Math.round(strength * 100)}% of its published strength, together with a ${values.borderWidth ?? '1px'} border. Use both; do not invent a third.`
@@ -893,7 +893,7 @@ ${front}
 ## Overview
 
 ${overview.trim() || `No brand description was written. This system is defined by its values, not by a
-mood — ${stack} with the colours, type and shape below.`}
+mood: ${stack} with the colours, type and shape below.`}
 
 ## Colors
 
@@ -934,7 +934,7 @@ corners from it, so use its named radii rather than a literal.`
 The components come from ${stack}. Use them. Do not write a new button, card or
 input: one already exists, and the values above are what it reads.
 ${parts.length ? `\nThe wall this system was checked against covers: ${parts.join(', ')}.` : ''}
-${gaps.length ? `\n${gaps.map(([, part, why]) => `- **${part}** — ${why}.`).join('\n')}` : ''}
+${gaps.length ? `\n${gaps.map(([, part, why]) => `- **${part}**: ${why}.`).join('\n')}` : ''}
 
 ## Do's and Don'ts
 

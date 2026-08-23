@@ -97,7 +97,7 @@ export const MAP = {
     borderWidth:  null,
   },
   radix: {
-    _note: 'Radix does not take values, it takes CHOICES from sets it publishes: named accent scales, named grey scales, five radius settings and five scaling steps. Only the page and panel colours are really variables. Every scale is twelve hand-built steps, so a single step written by hand is eleven steps out of step — the knobs are matched to the nearest published set instead, and the manifest names it.',
+    _note: 'Radix does not take values, it takes CHOICES from sets it publishes: named accent scales, named grey scales, five radius settings and five scaling steps. Only the page and panel colours are really variables. Every scale is twelve hand-built steps, so a single step written by hand is eleven steps out of step. The knobs are matched to the nearest published set instead, and the manifest names it.',
     brand:    { choice: 'brand' },
     onBrand:  { derives: 'brand' },
     page:     { var: '--color-background' },
@@ -169,7 +169,7 @@ export const MAP = {
     borderWidth:  null,
   },
   openprops: {
-    _note: 'Scales, plus the small semantic layer its normalize ships. Open Props renders nothing itself — it sits under whatever does, so your own CSS agrees with the kit above it.',
+    _note: 'Scales, plus the small semantic layer its normalize ships. Open Props renders nothing itself: it sits under whatever does, so your own CSS agrees with the kit above it.',
     brand:    { var: '--brand', new: true, also: ['--link'] },
     onBrand:  { var: '--surface-1', new: true },
     page:     { var: '--surface-1' },
@@ -226,10 +226,10 @@ export const MAP = {
     borderWidth:  { inherits: 'the base' },
   },
   bootstrap: {
-    _note: 'Runtime-themeable for surface, ink, line, radius and type — --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
+    _note: 'Runtime-themeable for surface, ink, line, radius and type: --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
     brand:    { var: '--bs-link-color', also: ['--bs-primary'],
                 needsBuild: { sass: '$primary', why: 'component colours are compiled; setting --bs-primary alone changes links and nothing else' } },
-    onBrand:  { needsBuild: { sass: '$primary-text-emphasis', why: 'same — compiled into each component' } },
+    onBrand:  { needsBuild: { sass: '$primary-text-emphasis', why: 'the same, compiled into each component' } },
     page:     { var: '--bs-body-bg', also: ['--bs-secondary-bg'] },
     surface:  { var: '--bs-tertiary-bg' },
     ink:      { var: '--bs-body-color', also: ['--bs-emphasis-color'] },
@@ -268,7 +268,7 @@ export const MAP = {
     borderWidth:  { var: '--bs-border-width' },
   },
   material: {
-    _note: 'M3 takes ONE input. Its 47 colour roles — containers, on-colours, inverses, fixed variants — are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
+    _note: 'M3 takes ONE input. Its 47 colour roles (containers, on-colours, inverses, fixed variants) are computed from a seed by material-color-utilities, and the tonal surface ramp is an elevation model, not a set of siblings. So the other colour knobs do not reach this kit, and we say so instead of writing four of forty-seven and calling it themed.',
     brand:    { var: '--md-sys-color-primary', seeds: '@material/material-color-utilities' },
     onBrand:  { derives: 'brand' },
     page:     { derives: 'brand' },
@@ -318,7 +318,7 @@ export const MAP = {
     borderWidth:  null,
   },
   antd: {
-    _note: 'Ant Design publishes no stylesheet and no theme file: 3,056 class rules that read 1,289 variables, and every one of those variables is computed at runtime by its own algorithm out of a handful of SEED tokens. So the knobs here are not variables to write, they are arguments to hand their generator — the same relationship as Material, one layer deeper. The variable each one lands in is named so the swatch can show it, but writing that variable on its own would move one value and leave the two hundred it derives behind.',
+    _note: 'Ant Design publishes no stylesheet and no theme file: 3,056 class rules that read 1,289 variables, and every one of those variables is computed at runtime by its own algorithm out of a handful of SEED tokens. So the knobs here are not variables to write, they are arguments to hand their generator: the same relationship as Material, one layer deeper. The variable each one lands in is named so the swatch can show it, but writing that variable on its own would move one value and leave the two hundred it derives behind.',
     brand:    { var: '--ant-color-primary', seed: 'colorPrimary', seeds: 'antd' },
     /* Their algorithm decides what goes on top of the brand — it has a whole
        token for it, colorTextLightSolid — so this is not ours to set. */

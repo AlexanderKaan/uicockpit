@@ -399,6 +399,7 @@
     },
     "RollingNumber": {
       "root": "m_47dd3981",
+      "copyValue": "m_ccf525bd",
       "digit": "m_b301d46e",
       "digitColumn": "m_8ae40964",
       "char": "m_47d64bf5"
@@ -590,11 +591,11 @@
     "tokens": 381,
     "components": true
   },
-  "version": "9.5.1",
+  "version": "9.5.2",
   "license": "MIT",
   "npm": "@mantine/core",
   "home": "https://mantine.dev/",
-  "source": "npm @mantine/core@9.5.1 · styles.css :root + colour-scheme blocks, class names from esm/{components,utils}/*/*.module.mjs",
+  "source": "npm @mantine/core@9.5.2 · styles.css :root + colour-scheme blocks, class names from esm/{components,utils}/*/*.module.mjs",
   "modes": {
     "light": {
       "--mantine-z-index-app": "100",

@@ -39,8 +39,8 @@ test('the kits that need more than CSS get their extra file', () => {
 
 test('the manifest states every kind of thing that could not be done', () => {
   const m = generate(VALUES, ALL, KITS)['MANIFEST.md']
-  assert.match(m, /Bootstrap · brand\*\* — not settable at runtime/, 'needsBuild is named')
-  assert.match(m, /Material 3 · .*— computed by the kit/, 'derived is named')
+  assert.match(m, /Bootstrap · brand\*\*: not settable at runtime/, 'needsBuild is named')
+  assert.match(m, /Material 3 · .*: computed by the kit/, 'derived is named')
   assert.match(m, /daisyUI · inkMuted, line/, 'unroutable is named')
   assert.match(m, /Tailwind CSS · .*were ADDED/, 'added is named')
   /* and the licences come from the packages, not from anyone's memory */
@@ -50,7 +50,7 @@ test('the manifest states every kind of thing that could not be done', () => {
 
 test('a clean run says so rather than printing an empty section', () => {
   const m = generate({ radius: '12px' }, ['shadcn'], KITS)['MANIFEST.md']
-  assert.match(m, /Nothing — every value reached every kit you enabled\./)
+  assert.match(m, /Nothing\. Every value reached every kit you enabled\./)
 })
 
 test('nothing in the package is a value we invented', () => {
@@ -175,7 +175,7 @@ test('the download says which of its own variables nothing reads', () => {
      heading that reads like a hole */
   const other = generate(VALUES, ['tailwind'], kits, { unread: measured })['MANIFEST.md']
   assert.match(section(other, '## Variables in here that nothing reads').length ? 'x' : 'Nothing', /Nothing/)
-  assert.match(other, /every variable this theme writes is read/)
+  assert.match(other, /Every variable this theme writes is read/)
 })
 
 test('the contrast audit names the line for the job that makes it a requirement', () => {
