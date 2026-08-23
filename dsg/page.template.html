@@ -554,13 +554,25 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 .panes{display:flex;flex-direction:column;gap:5px}
 .panes__cap{margin:0 0 3px;font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
 .panes__cap b{color:var(--ink);font-weight:600}
-.pchip{display:flex;align-items:center;gap:8px;width:100%;min-height:32px;padding:0 10px;
-  border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--panel);
-  font:inherit;font-size:var(--fs-md);color:var(--muted);cursor:pointer;text-align:left}
-.pchip:hover:not([disabled]){border-color:var(--ink);color:var(--ink)}
-.pchip[aria-pressed=true]{border-color:var(--ink);color:var(--ink);font-weight:600}
-.pchip[disabled]{opacity:.45;cursor:not-allowed}
-.pchip i{flex:none;width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.55}
+/* ONE LIST, NOT EIGHT BOXES.
+ * Eight bordered blocks of identical weight, each with a grey square that meant
+ * nothing — it was currentColor at half opacity, so it said the same thing on
+ * every row, and read as a checkbox that did not work. A row here answers one
+ * question, in or out, so the box IS a checkbox and it ticks. The count is what
+ * that pane costs you: how many of the 39 parts the kit ships itself. */
+.panes__list{border:var(--bw) solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel)}
+.pchip{display:flex;align-items:center;gap:10px;width:100%;min-height:36px;padding:0 11px;
+  border:0;background:0;font:inherit;font-size:var(--fs-md);color:var(--muted);cursor:pointer;text-align:left}
+.pchip + .pchip{border-top:var(--bw) solid var(--line)}
+.pchip:hover:not([disabled]){background:var(--sunken);color:var(--ink)}
+.pchip[aria-pressed=true]{color:var(--ink);font-weight:600}
+.pchip[disabled]{opacity:.42;cursor:not-allowed}
+.pchip__box{flex:none;display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:var(--r-sm);border:var(--bw) solid var(--line);background:var(--panel)}
+.pchip[aria-pressed=true] .pchip__box{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.pchip__box svg{width:10px;height:10px}
+.pchip__who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pchip__n{flex:none;font-size:var(--fs-xs);color:var(--muted);font-variant-numeric:tabular-nums}
 .panes__why{margin:4px 0 0;font-size:var(--fs-xs);color:var(--muted);line-height:1.5}
 .solobar{margin:9px 0 0;padding-top:9px;border-top:var(--bw) solid var(--line);
   font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
@@ -1112,11 +1124,15 @@ function drawPanes() {
   const full = on.length >= MAX_PANES
   $('#panes').innerHTML =
     `<p class="panes__cap"><b>${on.length}</b> of ${MAX_PANES} panes, the same values in each kit's own vocabulary</p>`
-    + RENDERS.map((id) => {
+    + `<div class="panes__list">` + RENDERS.map((id) => {
       const lit = on.includes(id)
       const stop = !lit && full
-      return `<button class="pchip" data-k="${id}" aria-pressed="${lit}"${stop ? ' disabled' : ''}><i></i>${KITS[id].name}</button>`
-    }).join('')
+      const o = OWN[id] ?? {}
+      return `<button class="pchip" data-k="${id}" aria-pressed="${lit}"${stop ? ' disabled' : ''}>
+        <i class="pchip__box">${lit ? '<!--I:check-->' : ''}</i>
+        <span class="pchip__who">${KITS[id].name}</span>
+        <span class="pchip__n">${o.parts ? `${o.partsTheirs}/${o.parts}` : ''}</span></button>`
+    }).join('') + `</div>`
     /* THE REASON, NOT A TOOLTIP. Two of the eight go quiet at six, and a
        control that dims without saying why is the thing this tool spent a
        commit removing from the stack picker. */
