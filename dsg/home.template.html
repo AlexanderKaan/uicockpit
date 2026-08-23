@@ -72,16 +72,10 @@ code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.85em}
 .btn--go:hover{background:var(--mkt-accent-hover)}
 .btn--lg{min-height:48px;padding:0 22px;font-size:16px;border-radius:12px;font-weight:600}
 
-/* the hero, at the scale the site already used */
-.hero{text-align:center;padding:5.5rem 1.5rem 0;position:relative}
-.hero>*{position:relative;z-index:1}
-.mkt__hero-grid{pointer-events:none;z-index:0;position:absolute;inset:0;
-  background-image:radial-gradient(circle,#0000001a 1px,#0000 1.6px);background-size:22px 22px;
-  -webkit-mask-image:linear-gradient(#000 55%,#0000 100%);mask-image:linear-gradient(#000 55%,#0000 100%)}
-.mkt__hero-grid::after{content:"";position:absolute;inset:0;transition:opacity .3s;
-  background-image:radial-gradient(circle,var(--mkt-accent) 1.3px,transparent 1.8px);background-size:22px 22px;
-  -webkit-mask-image:radial-gradient(circle 220px at var(--mx,-9999px) var(--my,-9999px),#000 0%,#0009 40%,transparent 100%);
-  mask-image:radial-gradient(circle 220px at var(--mx,-9999px) var(--my,-9999px),#000 0%,#0009 40%,transparent 100%)}
+/* the hero, at the scale the site already used. No pattern behind it: the one
+   picture on this page is the wall, and a dot grid under the headline was a
+   second texture competing with it for the same glance. */
+.hero{text-align:center;padding:5.5rem 1.5rem 0}
 .tag{display:inline-block;margin:0 0 1.5rem;font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:99px;
      background:var(--mkt-sunken);color:var(--mkt-fg-muted)}
 h1{letter-spacing:-.035em;text-wrap:balance;max-width:54rem;margin:0 auto 1.5rem;
@@ -295,17 +289,6 @@ const CARDS = /*CARDS*/, PARTS = /*PARTS*/;
 const CARDLIST = /*CARDLIST*/;
 const CAVEATS = /*CAVEATS*/;
 const $ = (s) => document.querySelector(s)
-
-/* The dot grid: two custom properties on pointermove, and the accent layer's
-   mask does the rest. Nothing to animate, nothing to tear down. */
-const hero = $('.hero')
-hero.insertAdjacentHTML('afterbegin', '<div class="mkt__hero-grid" aria-hidden="true"></div>')
-hero.addEventListener('pointermove', (e) => {
-  const r = hero.getBoundingClientRect()
-  hero.style.setProperty('--mx', `${e.clientX - r.left}px`)
-  hero.style.setProperty('--my', `${e.clientY - r.top}px`)
-})
-hero.addEventListener('pointerleave', () => hero.style.setProperty('--mx', '-9999px'))
 
 /* & before ", because srcdoc is an ATTRIBUTE and its value is entity-decoded
    before the document is parsed. A stylesheet with an & in it arrives mangled
