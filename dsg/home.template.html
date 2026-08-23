@@ -23,8 +23,11 @@
 :root{
   /* The ground is warm off-white paper. Ink is near-black, not black: at this
      size a true #000 serif buzzes against a warm ground. */
-  --ground:#efeeec;
-  --paper:#f8f7f5;
+  /* the three neutrals are given, not derived: paper, the bar a control sits
+     in, and the line. The same three the app uses. */
+  --ground:#f1f0ee;
+  --paper:#f7f6f4;
+  --bar:#e4e2df;
   --ink:#111112;
   --ink-2:#5b5a5e;                       /* 5.9:1 on the ground */
   /* THE FAINT INK IS NOT DECORATIVE GREY. It carries every eyebrow, every
@@ -36,7 +39,7 @@
   /* Hairlines, in two weights: one that separates bands and one that separates
      rows inside a table. Both are the ink at low alpha rather than a grey, so
      they sit on any surface without a seam. */
-  --rule:#0000001f;
+  --rule:#dad9d7;
   --rule-2:#0000000f;
   /* THE BRAND SET, and what each one is allowed to do.
      Measured on this ground, because two of the three cannot carry text and a
@@ -92,13 +95,12 @@ h1,h2,h3,p,ul,ol,dl,figure{margin:0}
   transition:background .16s,color .16s,transform .16s}
 .btn:hover{background:var(--ink);color:var(--ground)}
 .btn:active{transform:translateY(1px)}
-/* THE ONE PLACE ALL THREE MEET. The gradient is the brand's own, coral into
-   violet, and it belongs on the single thing the whole page is asking you to
-   do. It is a background-image, so the solid violet underneath is what a
-   browser without gradients falls back to rather than nothing. */
-.btn--go{background-color:var(--accent);background-image:var(--gradient);
-  border-color:transparent;color:#fff}
-.btn--go:hover{background-image:none;background-color:var(--ink);border-color:var(--ink);color:var(--ground)}
+/* THE GRADIENT IS A BORDER AND NEVER A FILL. Two backgrounds: the solid one
+   clipped to the padding box, the gradient to the border box, so the ring
+   follows the radius the way a real border does. */
+.btn--go{color:#fff;border:2px solid transparent;
+  background:linear-gradient(var(--ink),var(--ink)) padding-box,var(--gradient) border-box}
+.btn--go:hover{background:linear-gradient(#2b2a30,#2b2a30) padding-box,var(--gradient) border-box}
 .btn--lg{min-height:48px;padding:0 22px;font-size:15.5px}
 
 /* ── 1 · THE NAME ─────────────────────────────────────────────────────────── */
@@ -142,7 +144,10 @@ h1 em{display:block;font-style:normal;color:var(--ink)}
   font:450 13px var(--sans);padding:6px 13px;white-space:nowrap;
   transition:color .14s,border-color .14s,background .14s}
 .wall__pick button:hover{color:var(--ink);border-color:var(--ink-3)}
-.wall__pick button[aria-checked=true]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+/* INK, NOT VIOLET. The board inside the frame is themed with our violet now, so
+   a violet chip a centimetre above it reads as part of the same thing. The
+   chrome says "this one" in ink; the colour inside the picture is the kit's. */
+.wall__pick button[aria-checked=true]{background:var(--ink);border-color:var(--ink);color:var(--ground);font-weight:500}
 .wall__pick small{font:400 10.5px var(--mono);opacity:.6;letter-spacing:0}
 .wall__stage{position:relative;isolation:isolate;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 9%),
@@ -236,11 +241,6 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
 .scroller{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
 @media(max-width:820px){
   .spec{font-size:13px;min-width:34rem}
-  .spec th:first-child,.spec__kit{padding-left:0}
-  .spec tbody tr[aria-selected=true] .spec__kit{box-shadow:none}
-  .spec tbody tr[aria-selected=true] .spec__kit::after{content:"";position:absolute;inset:0;
-    box-shadow:inset 3px 0 0 var(--accent)}
-  .spec__kit{position:relative}
 }
 
 /* the knob, beside the table that is its answer */
@@ -296,8 +296,9 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
 .door h2{color:#fff;margin:0 auto;max-width:16ch}
 .door p{margin:1rem auto 0;max-width:34rem;color:#a3a2a6;font-size:1.0625rem}
 .door .acts{margin-top:2rem}
-.door .btn{border-color:transparent;background-color:var(--accent);background-image:var(--gradient);color:#fff}
-.door .btn:hover{background-image:none;background-color:#fff;border-color:#fff;color:var(--ink)}
+.door .btn{color:var(--ink);border:2px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,var(--gradient) border-box}
+.door .btn:hover{background:linear-gradient(var(--ground),var(--ground)) padding-box,var(--gradient) border-box}
 .door .fine{color:#8a898e;margin-top:1.5rem}
 
 /* ── FOOTER ───────────────────────────────────────────────────────────────

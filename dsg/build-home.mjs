@@ -22,7 +22,11 @@ const ALL = ['tailwind', 'daisyui', 'bootstrap', 'shadcn', 'material', 'radix', 
    bouquet to show for it — that is a fact about the kit and the page says it
    in the grid rather than showing an empty frame. */
 const SHOT_IDS = ALL.filter((id) => id !== 'openprops')
-const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface: '#f7f9fa',
+/* THE DEMO VALUE IS ONE OF OURS. It was an arbitrary teal, which made the one
+   picture on the page an advert for a colour nobody chose. Violet is the only
+   one of the three that white text clears AA on (5.53:1), which a filled
+   button on this wall needs. */
+const VALUES = { brand: '#6644FC', onBrand: '#ffffff', page: '#ffffff', surface: '#f7f9fa',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
 const kits = Object.fromEntries(ALL.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
 /* The counts on the page — "five of the nine ask nothing of your app" — are

@@ -9,12 +9,28 @@
  * have. And the wall changes its look on every click, so the page around it has
  * to be quiet ground — a gallery paints its walls grey for the same reason.
  *
- * Warm off-white, a neutral ramp with a green cast, olive for anything that is
- * a link or an accent, near-black for the one action that commits. */
+ * Warm off-white paper, a neutral ramp with no cast in it at all, and violet
+ * for anything that is a link or an accent. The ramp used to lean green and the
+ * accent was olive, which is a look, and this chrome is not allowed one: it
+ * wraps somebody else's kit and every hue it carries is a hue the preview has
+ * to compete with.
+ *
+ * THE THREE NEUTRALS ARE GIVEN, not derived: paper, the bar a segmented control
+ * sits in, and the line. Everything else is measured against them.
+ *
+ * The accents and what each may do, measured on the worst of the three grounds
+ * (the bar), because a palette whose limits are not written down gets used
+ * wrongly in a week:
+ *   --brand   4.28:1 on the bar. A RING or a MARK, never small text.
+ *   --link    5.43:1 on the bar. The one violet that may be text.
+ *   coral, pink   2.4:1 and 2.63:1. Marks and fills only.
+ * The gradient runs coral into violet and is only ever a BORDER. */
 :root{
-  --ground:#efeee9; --panel:#fff; --sunken:#e6ebe6; --faint:#f6faf6;
-  --ink:#0a0f09; --muted:#60665f; --line:#d8ddd8;
-  --brand:#6c7f00; --link:#4a5a00; --go:#0a0f09;
+  --ground:#f1f0ee; --panel:#fff; --sunken:#e4e2df; --faint:#f7f6f4;
+  --ink:#111112; --muted:#5b5a5e; --line:#dad9d7;
+  --brand:#6644fc; --link:#5433e6; --go:#111112;
+  --accent-2:#ed46ba; --accent-3:#fe5a48;
+  --gradient:linear-gradient(90deg,#fe5a48 42.04%,#6645fd 100%);
   --warn-bg:#fdf8e8; --warn-line:#f0e3b8;
   --r:7px; --r-sm:4px; --bw:1px;
   --fs-xs:10px; --fs-sm:11.5px; --fs-md:12.5px; --fs-lg:13.5px; --fs-xl:19px; --fs-2xl:24px;
@@ -50,7 +66,12 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
            display:inline-flex;align-items:center;gap:7px}
 .chip[aria-pressed=true]{background:var(--sunken);border-color:transparent;font-weight:600}
 .btn--ghost{border-color:transparent;background:0;color:var(--muted)}
-.btn--go{background:var(--go);color:#fff;border-color:var(--go);font-weight:600}
+/* THE GRADIENT IS A BORDER AND NEVER A FILL. Two backgrounds: the solid one
+   clipped to the padding box, the gradient to the border box, so the ring
+   follows the radius the way a real border does. */
+.btn--go{color:#fff;font-weight:600;border:2px solid transparent;
+  background:linear-gradient(var(--go),var(--go)) padding-box,var(--gradient) border-box}
+.btn--go:hover{background:linear-gradient(#2b2a30,#2b2a30) padding-box,var(--gradient) border-box}
 
 .grp{border-top:var(--bw) solid var(--line);padding-top:8px}
 /* sticky, because the rail scrolls: the header you would fold has to still be
@@ -91,7 +112,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 /* its own rules, not an override of .pick — that one is a left-hand drawer and
    is defined further down, so every property here lost the tie */
 #picker{border:0;padding:0;background:0;max-width:none;max-height:none;width:100%;height:100%}
-#picker::backdrop{background:#0a0f0955}
+#picker::backdrop{background:#11111255}
 .picker{position:fixed;inset:20px;margin:auto;width:min(1020px,calc(100vw - 40px));max-height:calc(100vh - 40px);
         background:var(--panel);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:14px;
         box-shadow:0 24px 60px rgba(0,0,0,.24)}
@@ -532,7 +553,7 @@ const state = {
      you are looking at is the same values in somebody else's vocabulary. */
   compare: null,
   solo: null,
-  values: { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
+  values: { brand: '#6644FC', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
     ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
     lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600', borderWidth: '1px',
     /* filled in below from whichever kit publishes one */
@@ -1336,7 +1357,7 @@ function seedNote(out) {
     + 'The focus ring is your colour; the ink on it is whichever of black or white clears 4.5:1.'
     + (out.short.length ? ` <b>${out.short.join(' and ')}</b> could not be met from this — see the checks.` : '')
 }
-$('#seedwell').addEventListener('click', () => cpOpen(state.values.brand ?? '#0b6e8a', 'Your colour',
+$('#seedwell').addEventListener('click', () => cpOpen(state.values.brand ?? '#6644FC', 'Your colour',
   'The one thing you say. Everything else is read out of what your stack publishes.',
   (hex) => { $('#seedhex').value = hex; buildFrom(hex) }))
 $('#seedhex').addEventListener('input', (e) => {
