@@ -2010,11 +2010,7 @@ $('#scales').addEventListener('click', (e) => {
 })
 
 $('#shuffle').addEventListener('click', shuffle)
-/* the letters only mean anything in the room that has the cards in it */
-addEventListener('keydown', (e) => {
-  if (state.stage !== 'compose' || /input|textarea/i.test(e.target.tagName) || e.metaKey || e.ctrlKey) return
-  if (e.key === 's') shuffle()
-})
+
 function shuffle() {
   /* Within the floors, always — and with the SAME maths the export uses, not a
      hand-rolled HSL twin. A shuffle that can hand you an unreadable combination
@@ -2604,16 +2600,24 @@ function feelShuffle() {
   note(`<b>${b.label}</b> — ${b.why}. Every value it moved is a slider you can still turn.`)
 }
 let lastFeel = null
+/* ── ONE LETTER, AND ONLY ONE ────────────────────────────────────────────
+ * There were five: a letter for each shuffle, one for all three at once, and
+ * this. The four are gone.
+ *
+ * A shortcut earns its place when the thing is repetitive AND the control is
+ * not already under your hand. Every shuffle button sits in the header of the
+ * card you are looking at, so the letter saved one mouse trip and cost a badge
+ * beside each one. And a single global letter that throws away your colour,
+ * with no undo and a guard that only knows about inputs, fires the first time
+ * a button has focus — which on this screen is always.
+ *
+ * F stays because it is not an edit. It moves you between the two rooms, whose
+ * buttons are deliberately in different places, and going back and forth to
+ * check the wall without losing your place is the whole point of having two. */
 addEventListener('keydown', (e) => {
-  if (/input|textarea/i.test(e.target.tagName) || e.metaKey || e.ctrlKey) return
-  /* F WORKS IN BOTH ROOMS, because going back and forth is the point. Being
-     able to check the wall without losing your place is the difference between
-     a preview and somewhere you are working. */
-  if (e.key === 'f' && state.stage !== 'start') return stage(state.stage === 'compose' ? 'wall' : 'compose')
-  if (state.stage !== 'compose') return
-  if (e.key === 't') $('#typeshuffle').click()
-  if (e.key === 'u') feelShuffle()
-  if (e.key === 'a') $('#surprise').click()
+  if (e.key !== 'f' || state.stage === 'start') return
+  if (/input|textarea/i.test(e.target.tagName) || e.target.isContentEditable || e.metaKey || e.ctrlKey || e.altKey) return
+  stage(state.stage === 'compose' ? 'wall' : 'compose')
 })
 
 /* ── THE ADDRESS IS THE STATE ──────────────────────────────────────────────
