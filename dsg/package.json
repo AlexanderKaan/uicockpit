@@ -16,6 +16,6 @@
     "orphans": "node orphans.mjs",
     "orphans:gate": "node orphans.mjs --gate",
     "sweep": "node sweep-check.mjs",
-    "dist": "rm -rf dist && mkdir dist && cp home.html dist/index.html && cp generator.html dist/generator.html"
+    "dist": "rm -rf dist && mkdir dist && cp home.html dist/index.html && cp generator.html dist/generator.html && cp sw.js dist/sw.js"
   }
 }
