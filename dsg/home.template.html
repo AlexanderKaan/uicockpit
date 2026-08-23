@@ -113,21 +113,18 @@ h1,h2,h3,p,ul,ol,dl,figure{margin:0}
    arrives, which costs the sentence nothing. */
 h1{font-family:var(--display);font-weight:700;font-size:clamp(2.75rem,6.6vw,5rem);line-height:1;
   letter-spacing:-.042em;text-wrap:balance;max-width:min(20ch,100%);margin:1.6rem auto 0;
-  color:var(--ink-2)}
+  color:var(--ink)}
 /* the two halves each take a line, so the break can never fall inside "design
    system" the way a balanced wrap kept choosing to put it */
-h1 em{display:block;font-style:normal;color:var(--ink)}
+h1 em{display:block;font-style:normal}
+/* three short checkable facts where the slogan chip stood */
+.ticks{display:inline-flex;gap:20px;margin:0;font:500 13.5px var(--sans);color:var(--ink)}
+.ticks span{display:inline-flex;align-items:center;gap:6px}
+.ticks svg{width:14px;height:14px;color:var(--accent)}
 .name .lede{margin:1.5rem auto 0;max-width:34rem;font-size:clamp(1rem,1.6vw,1.1875rem);
-  line-height:1.55;color:var(--ink-2);text-wrap:balance}
+  line-height:1.55;color:var(--ink);text-wrap:balance}
 .name .lede b{color:var(--ink);font-weight:500}
 .acts{display:flex;flex-wrap:wrap;gap:11px;justify-content:center;margin:2.25rem 0 0}
-/* the cue takes the buttons' place: an instruction for the picture below rather
-   than a call to act on something not yet explained */
-.cue{margin:2.25rem 0 0;display:inline-flex;align-items:center;gap:8px;
-  font:500 13.5px var(--sans);letter-spacing:.01em;color:var(--accent)}
-.cue svg{animation:nudge 2.6s cubic-bezier(.4,0,.2,1) infinite}
-@keyframes nudge{0%,70%,100%{transform:none}82%{transform:translateY(3px)}}
-@media (prefers-reduced-motion:reduce){.cue svg{animation:none}}
 
 /* ── THE WALL ─────────────────────────────────────────────────────────────
  * The one picture the page is built on, so it runs the whole width with no
@@ -159,8 +156,10 @@ h1 em{display:block;font-style:normal;color:var(--ink)}
   mask-image:linear-gradient(to bottom,transparent 0,#000 9%),
     linear-gradient(to right,transparent 0,#000 7%,#000 93%,transparent 100%);
   -webkit-mask-composite:source-in;mask-composite:intersect}
-.wall iframe{width:100%;height:min(72vh,600px);border:0;background:#fff;display:block}
-@media (max-width:720px){.wall iframe{height:58vh}}
+/* tall enough that no kit's board scrolls inside the shot: the tallest
+   (Material, 873px) fits with room, measured across widths. A picture of an
+   app that scrolls inside itself reads as a broken window, not a picture. */
+.wall iframe{width:100%;height:900px;border:0;background:#fff;display:block}
 
 /* ── THE LIGHT SWEEP ──────────────────────────────────────────────────────
  * Not decoration: the light is the thing DOING the change. It travels from the
