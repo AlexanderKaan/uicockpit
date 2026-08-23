@@ -2,47 +2,82 @@
 <header class="nav">
   <p class="mark"><!--MARK-->UIcockpit</p>
   <nav class="nav__links">
-    <a href="/generator">Generator</a>
+    <a href="#how">How it works</a>
     <a href="#kits">Kits</a>
-    <a href="#export">Export</a>
+    <a href="#export">What you get</a>
   </nav>
   <a class="btn btn--go" href="/generator"><!--I:sparkles-->Open the generator</a>
 </header>
 
-<section class="hero">
+<!-- ── ATTENTION ─────────────────────────────────────────────────────────── -->
+<section class="hero bleed">
   <p class="tag">Free &amp; open source</p>
-  <h1>The open-source design system generator</h1>
+  <h1>The open-source design&nbsp;system generator</h1>
   <p class="sub">
     Not another design system — <strong>the machine that makes yours</strong>. Pick the kits you
     already use, turn a handful of knobs, and install the result.
-  </p>
-  <p class="sub sub--runs">
-    Whatever you build in: <b>/*FRAMEWORKFREE*/ of the /*KITCOUNT*/ kits</b> name no framework
-    at all — the picker says which, before you turn a knob.
   </p>
   <p class="hero__acts">
     <a class="btn btn--go btn--lg" href="/generator"><!--I:sparkles-->Start with your kits</a>
     <a class="btn btn--lg" href="#export"><!--I:download-->See what you download</a>
   </p>
-  <figure class="shot">
-    <figcaption><span class="eyebrow">Live · daisyUI on Tailwind</span><span class="eyebrow" id="shotmeta"></span></figcaption>
-    <div id="shot"></div>
+
+  <!-- the proof, before the argument: one screen, every system, one click -->
+  <figure class="shot bleed">
+    <figcaption>
+      <span class="eyebrow" id="shotwho">Live</span>
+      <span class="eyebrow" id="shotmeta"></span>
+    </figcaption>
+    <div class="shot__pick" id="shotpick" role="radiogroup" aria-label="Which system"></div>
+    <div class="shot__stage">
+      <div id="shot"></div>
+      <div class="shot__sweep" id="shotsweep" aria-hidden="true"></div>
+    </div>
   </figure>
 </section>
 
-<section class="claim">
-  <p>A design system hands you someone else's taste.<br><strong>A generator hands you all of them — in one theme, installable.</strong></p>
+<!-- ── INTEREST ──────────────────────────────────────────────────────────── -->
+<!-- the turn, on the ground rather than in a panel: the page needs one place
+     to breathe between the proof and the mechanism -->
+<section class="turn">
+  <p>A design system hands you someone else's taste.<br>
+    <strong>A generator hands you all of them — in one theme, installable.</strong></p>
 </section>
 
-<section class="band-sec" id="kits">
-  <h2>Five systems, one set of knobs.</h2>
-  <p class="lede">Everything comes from the kit you picked. We read each one's published defaults, and one knob writes into every enabled kit in its own vocabulary — we never invent a token.</p>
-  <div class="kitgrid" id="kitgrid"></div>
+<section class="band-sec" id="how">
+  <p class="eyebrow">How it works</p>
+  <h2>Three decisions, and a folder that installs.</h2>
+  <p class="lede">Everything comes from the kit you picked. We read each one's published defaults, and one
+    knob writes into every enabled kit in its own vocabulary — we never invent a token.</p>
+  <ol class="steps">
+    <li>
+      <b>Pick a stack.</b>
+      <p>Four bands make one: behaviour, an engine, tokens and components. A kit fills some and leans on
+        the rest — shadcn brings the Radix behaviour and its own tokens, and sits on Tailwind's engine.</p>
+      <p class="fine">And it says what you have to be running: <b id="howfree"></b> of the
+        <b id="howcount"></b> kits name no framework at all.</p>
+    </li>
+    <li>
+      <b>Turn a handful of knobs.</b>
+      <p>Twenty roles, no more — a brand colour, a corner radius, the family your body text is set in.
+        One value lands in each kit's own name for it: <code>--primary</code>, <code>--bs-primary</code>,
+        <code>--mantine-primary-color-filled</code>, <code>colorPrimary</code>.</p>
+      <p class="fine">A length keeps its ratio. A shadow keeps its strength. Their arithmetic, your value.</p>
+    </li>
+    <li>
+      <b>Install the result.</b>
+      <p>A folder with the files each kit expects, plus a manifest naming everything that could not be
+        set and why. No accounts, no sign-up, nothing to keep paying for.</p>
+      <p class="fine">Or compare six side by side first — the same values in six vocabularies, one click a card.</p>
+    </li>
+  </ol>
 </section>
 
-<section class="band-sec" id="export">
-  <h2>What you download.</h2>
-  <p class="lede">A folder that installs. Not a screenshot, not a palette — the files each kit expects, plus the one thing nobody else prints.</p>
+<!-- ── DESIRE ────────────────────────────────────────────────────────────── -->
+<section class="band-sec band-sec--panel" id="export">
+  <p class="eyebrow">What you get</p>
+  <h2>A folder that installs.</h2>
+  <p class="lede">Not a screenshot, not a palette — the files each kit expects, plus the one thing nobody else prints.</p>
   <div class="two">
     <div class="panel">
       <ul class="files" id="files"></ul>
@@ -55,9 +90,76 @@
   </div>
 </section>
 
+<!-- the bento sits between the mechanism and the proof: it is what the
+     mechanism produces, at a glance, before the page starts listing -->
+<section class="band-sec" id="proof">
+  <p class="eyebrow">The whole claim, counted</p>
+  <h2>Nothing on this page is ours.</h2>
+  <p class="lede">Every class on that wall belongs to the kit that publishes it. Every version, licence and
+    default came out of its own package at build time. Here is the shape of it.</p>
+  <!-- Two rows of two spans each, so the grid closes with no holes:
+       [ shot · shadcn ][ systems ][ runs anywhere ]
+       [               ][ parts   ][               ]
+       [ one value              ][ shot · Material ] -->
+  <div class="bento">
+    <figure class="b--shot b--w2 b--h2" data-frame="shadcn:controls">
+      <figcaption>shadcn/ui<small>the controls board</small></figcaption>
+    </figure>
+
+    <article class="b--cool">
+      <p class="num">Systems</p>
+      <p class="big" id="bkits">9<small>read from their own packages, never typed</small></p>
+    </article>
+
+    <article class="b--h2">
+      <p class="num">Runs anywhere</p>
+      <h3 id="bfree"></h3>
+      <p>The rest name React as a peer dependency — read from what each package demands of the app around
+        it, and the picker says which before you turn a knob.</p>
+      <div class="chips" id="bchips"></div>
+    </article>
+
+    <article>
+      <p class="num">On one screen</p>
+      <p class="big" id="bparts">39<small>parts, on <span id="bcards">29</span> cards, in every kit</small></p>
+    </article>
+
+    <article class="b--warm b--w2 b--h2">
+      <p class="num">One value, every vocabulary</p>
+      <h3>A colour as a colour, a length as a scale.</h3>
+      <p>Turn the corner knob once and Tailwind goes 10&nbsp;→&nbsp;2, daisyUI 5&nbsp;→&nbsp;1,
+        shadcn 8&nbsp;→&nbsp;0, Radix 5&nbsp;→&nbsp;2 — each through its own arithmetic, not ours.</p>
+      <p class="fine">Measured, not claimed: that is one turn of one knob, read back off six frames.</p>
+    </article>
+
+    <figure class="b--shot b--w2 b--h2" data-frame="material:forms">
+      <figcaption>Material 3<small>the same values, its own scheme</small></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="band-sec" id="kits">
+  <p class="eyebrow">Read, never guessed</p>
+  <h2>Nine systems, one set of knobs.</h2>
+  <p class="lede">Every version, licence and default on this page came out of the kit's own package at build
+    time. A hand-typed default is wrong the day they change it.</p>
+  <div class="kitgrid" id="kitgrid"></div>
+</section>
+
 <section class="band-sec" id="limits">
+  <p class="eyebrow">Being straight with you</p>
   <h2>What it will not do.</h2>
   <div class="nots" id="nots"></div>
+</section>
+
+<!-- ── ACTION ────────────────────────────────────────────────────────────── -->
+<section class="close bleed">
+  <h2>Start with the kits you already use.</h2>
+  <p>One colour is enough to begin. The other ten come from what your stack publishes.</p>
+  <p class="close__acts">
+    <a class="btn btn--go btn--lg" href="/generator"><!--I:sparkles-->Open the generator</a>
+  </p>
+  <p class="fine">Free and open source. No accounts, no telemetry, no lock-in.</p>
 </section>
 
 <footer class="foot">
@@ -65,8 +167,9 @@
     <nav class="foot__col" aria-label="The generator">
       <p class="foot__head">The generator</p>
       <a href="/generator">Open the generator</a>
-      <a href="#kits">Five systems, one set of knobs</a>
-      <a href="#export">What you download</a>
+      <a href="#how">How it works</a>
+      <a href="#export">What you get</a>
+      <a href="#kits">The kits</a>
       <a href="#limits">What it will not do</a>
     </nav>
     <nav class="foot__col foot__col--wide" aria-label="Built from">
@@ -74,7 +177,7 @@
       <div class="foot__kits" id="footkits"></div>
     </nav>
     <nav class="foot__col" aria-label="How it works">
-      <p class="foot__head">How it works</p>
+      <p class="foot__head">The rules</p>
       <p class="foot__note">Every value on this page is read from the kit that publishes it. One knob is written into each enabled kit in that kit's own vocabulary — a colour as a colour, a length as a scale whose ratio is kept.</p>
       <p class="foot__note">Where a kit cannot take a value, the package says so by name instead of quietly leaving it out.</p>
     </nav>

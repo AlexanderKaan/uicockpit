@@ -9,6 +9,7 @@ kits/material.elements.json
 kits/antd.render.mjs
 kits/antd.render.json
 wall.elements.js
+home.elements.js
 kits/fonts.json
 # the design canvas and its working files — exploration, not the product
 _design/

@@ -416,6 +416,15 @@ body{margin:0;overflow:hidden}
  * the same reason. Everything below is addressed by data-card, which only this
  * file writes, or by a path from the strip, which only this file builds.
  * (And no backticks in here: the whole block is a template literal. Sixth.) */
+/* A WALL SOMEBODY IS ONLY LOOKING AT.
+ * The strip is a thing you pan, and its scrollbars say so — which is right in
+ * the tool and wrong in a hero, where two bars around the one picture the page
+ * is built on read as a component that overflowed. The bars go, the panning
+ * stays: this hides the furniture, it does not take the movement away. */
+html[data-quiet] #strip{scrollbar-width:none;-ms-overflow-style:none}
+html[data-quiet] #strip::-webkit-scrollbar{width:0;height:0}
+html[data-quiet] #strip{cursor:default}
+
 html[data-pick] [data-card]{cursor:zoom-in}
 html[data-pick] [data-card]:hover{outline:1px solid rgb(128 128 128 / .3);outline-offset:7px;border-radius:2px}
 html[data-solo] [data-card]{cursor:zoom-out}
