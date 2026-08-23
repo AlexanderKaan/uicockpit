@@ -249,6 +249,25 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .opt__meta{margin-left:auto;font-size:var(--fs-xs);color:var(--muted);white-space:nowrap}
 .opt__why{font-size:var(--fs-sm);color:var(--muted);line-height:1.45}
 .opt__tag{font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--brand)}
+/* WHAT A SHELF COSTS YOU, on the card rather than in a manifest you read later.
+   Counted the same way the wall counts it: how many of its parts this kit ships
+   a component for, and how many the generator would have to draw from tokens. */
+.opt__parts{font-variant-numeric:tabular-nums;color:var(--ink);margin-right:7px}
+.opt__parts b{font-weight:600}
+/* the base and nothing on it is an ANSWER, so it looks like the others */
+.opt--none{border-style:dashed}
+
+/* ── STEPPED BACK ─────────────────────────────────────────────────────────
+ * A kit that cannot fit the base you picked is not greyed out and left at
+ * that: it says which base it needs and offers to move it for you. Quieter
+ * than a live card, and not a dead one. */
+.stepped{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:var(--r);
+  border:var(--bw) dashed var(--line);background:var(--faint)}
+.stepped__who{display:flex;flex-direction:column;gap:1px;margin-right:auto;min-width:0}
+.stepped__who b{font-size:var(--fs-md);font-weight:600;color:var(--muted)}
+.stepped__who em{font-style:normal;font-size:var(--fs-xs);color:var(--muted)}
+.stepped .opt__parts{font-size:var(--fs-xs);color:var(--muted);margin:0}
+.lanes__foot{margin:10px 0 0;font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
 .sumrow{display:flex;align-items:baseline;gap:7px;font-size:var(--fs-md);padding:4px 0}
 .sumrow + .sumrow{border-top:var(--bw) solid var(--line)}
 .sumrow[data-none]{color:var(--muted)}
@@ -1019,11 +1038,11 @@ function drawStackPicker() {
     ? !!runs(id).framework
     : !!(state.runIn && runs(id).framework && runs(id).framework !== state.runIn))
 
-  const card = (id, { on, disabled, why, tag }) => `<button class="opt" data-p="${id}"
+  const card = (id, { on, disabled, why, tag, extra = '' }) => `<button class="opt" data-p="${id}"
     aria-pressed="${!!on}"${disabled ? ' disabled' : ''}${cannot(id) ? ' data-cannot' : ''}>
     ${tag ? `<span class="opt__tag">${tag}</span>` : ''}
     <span class="opt__top"><b>${KITS[id].name}</b>
-      <span class="opt__meta">${KITS[id].license ?? ''}${KITS[id].version ? ` · v${KITS[id].version}` : ''}</span></span>
+      <span class="opt__meta">${extra}${KITS[id].license ?? ''}${KITS[id].version ? ` · v${KITS[id].version}` : ''}</span></span>
     <span class="opt__why">${why}</span>
     <span class="opt__run" title="${runs(id).what.replace(/"/g, '&quot;')}">${runs(id).framework
       ? `<b>${runs(id).framework} only</b>${cannot(id) ? ' — not where you are building' : ''}`
@@ -1037,15 +1056,44 @@ function drawStackPicker() {
     on: st.order.includes(id), tag: st.order.includes(id) ? 'added' : '',
     why: KITS[id].what,
   })).join('')
-  $('#laneComp').innerHTML = comps.map((id) => {
-    const fits = st.base === carrier
-    return card(id, {
-      on: st.layers.includes(id), tag: st.layers.includes(id) ? 'added' : '',
-      disabled: false,
-      why: fits ? KITS[id].what
-        : `${KITS[id].what} — needs ${KITS[carrier].name}; picking it moves the base back.`,
-    })
-  }).join('')
+  /* ── EVERY KIT THAT SHIPS COMPONENTS IS ON THE RIGHT SHELF ────────────────
+   * "I want Material's buttons" is a components thought, not a base thought, so
+   * looking for Material in the base column is looking in the wrong place. The
+   * ones that bring their own base are here too — STEPPED BACK, saying what
+   * they need and offering to do it, rather than greyed out with no reason
+   * given or missing entirely. Nothing is hidden and nothing is silent.
+   *
+   * A kit's own bands say which base it needs: 'own' means it IS one, anything
+   * else names the engine it sits on. Nothing below is a list we keep. */
+  const needs = (id) => (KITS[id].bands?.engine === 'own' ? id : KITS[id].bands?.engine ?? carrier)
+  const withParts = (id) => {
+    const o = OWN[id] ?? {}
+    return o.parts ? `<span class="opt__parts"><b>${o.partsTheirs}</b> / ${o.parts} parts</span>` : ''
+  }
+  const shipsParts = ORDER.filter((id) => KITS[id].bands?.components)
+  const fitsNow = shipsParts.filter((id) => needs(id) === st.base)
+  const stepped = shipsParts.filter((id) => needs(id) !== st.base)
+
+  $('#compfit').textContent = fitsNow.length
+    ? `${fitsNow.length} fit ${KITS[st.base].name}`
+    : `none fit ${KITS[st.base].name}`
+  $('#laneComp').innerHTML = fitsNow.map((id) => card(id, {
+    on: st.order.includes(id), tag: st.order.includes(id) ? 'added' : '',
+    why: KITS[id].what, extra: withParts(id),
+  })).join('')
+    /* and the honest fourth option, which is a real answer and not an absence */
+    + `<button class="opt opt--none" data-clear aria-pressed="${!shipsParts.some((id) => st.order.includes(id))}">
+        <span class="opt__top"><b>Nothing yet</b><span class="opt__meta">tokens only</span></span>
+        <span class="opt__why">Take the values and add components later. The wall draws every part
+          from what the base publishes.</span></button>`
+
+  $('#backhead').hidden = !stepped.length
+  $('#laneBack').innerHTML = stepped.map((id) => `<div class="stepped">
+    <span class="stepped__who"><b>${KITS[id].name}</b>
+      <em>${needs(id) === id ? 'brings its own base' : `needs ${KITS[needs(id)].name}`}</em></span>
+    ${withParts(id)}
+    <button class="link" data-p="${id}">Switch base</button>
+  </div>`).join('')
 
   /* the choices are the frameworks the KITS name, plus the one that means
      "nothing" — never a list of frameworks we happen to have heard of */
@@ -1072,6 +1120,14 @@ $('#pickerx').addEventListener('click', () => $('#picker').close())
 $('#pickerDone').addEventListener('click', () => $('#picker').close())
 $('#picker').addEventListener('click', (e) => { if (e.target.id === 'picker') $('#picker').close() })
 document.querySelector('.lanes').addEventListener('click', (e) => {
+  /* the base and nothing on it: a real choice, so it is a button and not the
+     absence of one */
+  if (e.target.closest('[data-clear]')) {
+    const st = stack(state.on, KITS)
+    state.on = new Set([...st.under, st.base])
+    sync(); paint(); drawStackPicker()
+    return
+  }
   const b = e.target.closest('button[data-p]'); if (!b || b.disabled) return
   state.on = toggle(state.on, b.dataset.p, KITS)
   sync(); paint(); drawStackPicker()
