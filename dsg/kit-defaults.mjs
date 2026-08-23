@@ -9,26 +9,32 @@
  * rest of the tool routes into. Pick "Bootstrap" on the start screen and you
  * begin where Bootstrap begins: #0d6efd, its system stack, .375rem corners.
  *
- * A kit that publishes no value for a role simply has a GAP, said out loud on
- * the card: Tailwind ships seventeen palettes and no house colour, so its card
- * offers its typeface and its corners and tells you the colour is yours to
- * bring. A REQUIRED var that has gone missing from a fetched package is a
- * build error, so a kit renaming its tokens cannot silently turn into a card
- * of stale hexes.
+ * A kit that publishes no value for a role simply has a gap, and the card's
+ * record lines carry only what exists. A REQUIRED var that has gone missing
+ * from a fetched package is a build error, so a kit renaming its tokens
+ * cannot silently turn into a card of stale hexes.
  */
 import { oklchStrToHex } from './color.mjs'
 
 /* the vars each kit's defaults live in. `need` throws when absent, the rest
  * skip: absence of an optional var is a fact about the kit, not a failure. */
 const TABLE = {
+  /* Tailwind the framework names no house colour, but Tailwind Plus — their
+     own component kit — dresses every primary in indigo-600: the buttons are
+     bg-indigo-600, the badges indigo, the logo is requested at
+     ?color=indigo&shade=600. The FAMILY choice is theirs; the values are
+     still read from the fetched theme.css, never typed. Greys likewise:
+     their components set text in gray-900/500 on white with gray-200 rules. */
   tailwind: { stack: ['tailwind'],
-    vars: { fontBody: '--font-sans', radius: '--radius-md' },
-    need: ['fontBody'], gap: 'ships seventeen palettes and no house colour' },
+    vars: { brand: '--color-indigo-600', page: '--color-white', ink: '--color-gray-900',
+      inkMuted: '--color-gray-500', line: '--color-gray-200',
+      fontBody: '--font-sans', radius: '--radius-md' },
+    need: ['brand', 'ink', 'fontBody'] },
   daisyui: { stack: ['tailwind', 'daisyui'],
     vars: { brand: '--color-primary', page: '--color-base-100', ink: '--color-base-content',
       line: '--color-base-300', success: '--color-success', warning: '--color-warning',
       danger: '--color-error', radius: '--radius-field' },
-    need: ['brand', 'page', 'ink'], gap: 'names no typeface' },
+    need: ['brand', 'page', 'ink'] },
   bootstrap: { stack: ['bootstrap'],
     vars: { brand: '--bs-primary', page: '--bs-body-bg', ink: '--bs-body-color',
       inkMuted: '--bs-secondary-color', line: '--bs-border-color', success: '--bs-success',
@@ -39,7 +45,7 @@ const TABLE = {
     vars: { brand: '--primary', page: '--background', ink: '--foreground',
       inkMuted: '--muted-foreground', line: '--border', danger: '--destructive',
       radius: '--radius' },
-    need: ['brand', 'page', 'ink'], gap: 'names no typeface' },
+    need: ['brand', 'page', 'ink'] },
   material: { stack: ['material'],
     vars: { brand: '--md-sys-color-primary', page: '--md-sys-color-surface',
       ink: '--md-sys-color-on-surface', inkMuted: '--md-sys-color-on-surface-variant',
@@ -148,7 +154,7 @@ export function kitDefaults(kits, ids) {
       if (!hex) throw new Error(`${id}: ramp ${family}/${step} missing — its start card would be stale`)
       values[role] = hex
     }
-    out[id] = { id, name: kit?.name ?? id, stack: spec.stack, values, gap: spec.gap ?? null }
+    out[id] = { id, name: kit?.name ?? id, stack: spec.stack, values }
   }
   return out
 }

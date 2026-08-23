@@ -229,23 +229,25 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
    vibe's own faces at that vibe's own size and shape */
 /* border-radius, border-width, padding, gap and font-size all come from the
    vibe itself, written inline: the card IS the specimen. */
-.vibe{display:flex;flex-direction:column;cursor:pointer;text-align:left;align-items:stretch;
+.vibe{display:flex;flex-direction:column;gap:14px;cursor:pointer;text-align:left;align-items:stretch;
   padding:var(--pad);border:1px solid var(--line);background:var(--panel);border-radius:var(--r-lg);
   transition:border-color .16s,transform .16s,box-shadow .16s}
 .vibe:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:0 8px 22px rgb(17 17 18 / .07)}
 .vibe:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-/* the colours this start would really derive, not three we chose to look nice */
-.vibe__chips{display:flex;gap:4px;min-height:22px}
-.vibe__chips i{width:22px;height:22px;border-radius:5px}
-.vibe__head{display:grid;gap:6px}
+/* the colours this start would really set, straight from the kit's package */
+.vibe__chips{display:flex;gap:5px;min-height:24px}
+.vibe__chips i{width:24px;height:24px;border-radius:7px;border:1px solid rgb(17 17 18 / .08)}
 /* spans in a button, so every one of them has to be told it is a block */
-.vibe__name{display:block;font-size:1.16em;letter-spacing:-.02em;line-height:1.15;color:var(--ink)}
-.vibe__blurb{display:block;font-size:.79em;line-height:1.5}
-.vibe__foot{margin-top:auto;display:grid;gap:9px;justify-items:start}
-.vibe__btn{display:inline-flex;align-items:center;padding:.55em 1.05em;font-weight:600;font-size:.8em;
+.vibe__name{display:block;font-size:1.16em;font-weight:650;letter-spacing:-.02em;line-height:1.15;color:var(--ink)}
+.vibe__foot{margin-top:auto;display:grid;gap:12px;justify-items:start}
+.vibe__btn{display:inline-flex;align-items:center;min-height:34px;padding:0 1.1em;font-weight:600;font-size:.82em;
   border:0;white-space:nowrap;border-radius:var(--r)}
-.vibe__type{display:block;font:10px ui-monospace,SFMono-Regular,monospace;
-  letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+/* two quiet lines of record, the same two on every card, so the bottoms line
+   up: what colour, then what face and what corner */
+.vibe__facts{display:grid;gap:2px;min-height:2.6em}
+.vibe__fact{font-size:11.5px;line-height:1.3;color:var(--muted);font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.vibe__fact code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:10.5px}
 
 .start__foot{display:grid;justify-items:center;gap:12px;margin-top:2rem}
 .start__blank{font:500 13.5px var(--sans);color:var(--ink);background:0;border:0;padding:5px 2px;cursor:pointer;
@@ -2580,20 +2582,16 @@ function drawStarts() {
     const btn = v.brand
       ? `background:${v.brand};color:${aaInk(v.brand)};`
       : `background:${v.ink ?? 'var(--ink)'};color:#fff;`
-    const foot = [
-      v.brand ? `${nameColor(v.brand)} ${v.brand}` : null,
-      faceName(v.fontBody),
-      v.radius != null ? `${parseInt(v.radius)}px corners` : null,
-    ].filter(Boolean).join(' · ')
+    const colourLine = v.brand ? `${nameColor(v.brand)} <code>${v.brand}</code>` : 'No house colour'
+    const shapeLine = [faceName(v.fontBody), v.radius != null ? `${parseInt(v.radius)}px corners` : null]
+      .filter(Boolean).join(' · ')
     return `<button class="vibe" data-k="${d.id}">
       <span class="vibe__chips">${chips.map((h) => `<i style="background:${h}"></i>`).join('')}</span>
-      <span class="vibe__head">
-        <span class="vibe__name" style="${face}">${d.name}</span>
-        ${d.gap ? `<span class="vibe__blurb">It ${d.gap}.</span>` : ''}
-      </span>
+      <span class="vibe__name" style="${face}">${d.name}</span>
       <span class="vibe__foot">
         <span class="vibe__btn" style="${face}${btn}border-radius:${v.radius ?? 'var(--r)'}">Get started</span>
-        <span class="vibe__type">${foot}</span>
+        <span class="vibe__facts"><span class="vibe__fact">${colourLine}</span>
+          <span class="vibe__fact">${shapeLine}</span></span>
       </span>
     </button>`
   }).join('')
