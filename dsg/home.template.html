@@ -25,6 +25,7 @@
      size a true #000 serif buzzes against a warm ground. */
   /* the three neutrals are given, not derived: paper, the bar a control sits
      in, and the line. The same three the app uses. */
+  --r:10px; --r-lg:14px;
   --ground:#f1f0ee;
   --paper:#f7f6f4;
   --bar:#e4e2df;
@@ -89,7 +90,7 @@ h1,h2,h3,p,ul,ol,dl,figure{margin:0}
 .top nav a:hover{color:var(--ink);border-bottom-color:var(--accent)}
 @media(max-width:760px){.top nav{display:none}}
 
-.btn{font:500 14px var(--sans);min-height:38px;padding:0 15px;border-radius:12px;cursor:pointer;
+.btn{font:500 14px var(--sans);min-height:38px;padding:0 15px;border-radius:var(--r);cursor:pointer;
   border:1px solid var(--ink);background:0;color:var(--ink);text-decoration:none;
   display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
   transition:background .16s,color .16s,transform .16s}
@@ -134,8 +135,6 @@ h1 em{display:block;font-style:normal;color:var(--ink)}
  * settles into the paper instead of ending at a line. Two masks composited:
  * one for the top, one for the sides, intersected so a corner gets both. */
 .wall{margin:clamp(2.5rem,5vw,4rem) 0 0;position:relative}
-.wall__bar{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;
-  max-width:74rem;margin:0 auto;padding:0 20px 11px}
 .wall__pick{display:flex;gap:5px;overflow-x:auto;padding:0 20px 16px;scrollbar-width:none;
   max-width:74rem;margin:0 auto;justify-content:safe center}
 .wall__pick::-webkit-scrollbar{display:none}
@@ -300,7 +299,7 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
  * The last thing on the page is the thing to do. It is the one place the ink
  * inverts, because it is the one place you act. */
 .door{margin-top:clamp(2.5rem,5vw,4rem);background:var(--ink);color:var(--ground);
-  border-radius:14px;padding:clamp(3rem,6vw,4.5rem) 2rem;text-align:center}
+  border-radius:var(--r-lg);padding:clamp(3rem,6vw,4.5rem) 2rem;text-align:center}
 .door h2{color:#fff;margin:0 auto;max-width:16ch}
 .door p{margin:1rem auto 0;max-width:34rem;color:#a3a2a6;font-size:1.0625rem}
 .door .acts{margin-top:2rem}
@@ -402,24 +401,17 @@ function pick(id, dir) {
   }
   writeNote(id)
   if (HEAD[id]) showKit(id, dir ?? (ORDER.indexOf(id) >= ORDER.indexOf(showing) ? 'ltr' : 'rtl'))
-  else caption(showing, KITS[id].name)
-}
 
-function caption(shownId, asked) {
-  const k = KITS[shownId]
-  $('#wallwho').textContent = asked
-    ? `${asked} renders nothing of its own, so this is ${k.name}`
-    : `Live · ${k.name} · ${k.version ? `v${k.version}` : 'read live'} · ${k.license ?? ''}`
 }
 
 function showKit(id, dir) {
-  if (id === showing) return caption(id)
+  if (id === showing) return
   /* THE LIGHT IS WHAT THE CUT HIDES BEHIND.
      An iframe swaps in one frame of animation, which reads as a flicker. The
      sweep's bloom peaks at 16% of a second, so the swap happens under it —
      the light appears to be doing the change rather than playing after it. */
   const sweep = $('#sweep')
-  const swap = () => { $('#wallshot').innerHTML = frame(id, 'data', `${KITS[id].name}, rendered`); showing = id; caption(id) }
+  const swap = () => { $('#wallshot').innerHTML = frame(id, 'data', `${KITS[id].name}, rendered`); showing = id }
   if (showing === null || matchMedia('(prefers-reduced-motion: reduce)').matches) return swap()
   sweep.removeAttribute('data-dir')
   void sweep.offsetWidth                       // restart the animation, not resume it
@@ -436,7 +428,6 @@ $('#wallpick').addEventListener('click', (e) => {
      following your hand rather than playing at it */
   pick(b.dataset.k, ORDER.indexOf(b.dataset.k) >= ORDER.indexOf(showing) ? 'ltr' : 'rtl')
 })
-$('#wallmeta').textContent = `the same board · ${CARDS} cards · ${PARTS} parts`
 
 /* the two values the table is the answer to, named where a fact belongs rather
    than drawn as a swatch that does nothing */

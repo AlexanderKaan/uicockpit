@@ -25,8 +25,7 @@
      matters, so they are the room, and the wall is a strip along the bottom
      until you fold it up. Every id is the one the rail had, so nothing below
      this file had to learn a new name. -->
-<section class="compose">
-  <header class="compose__top">
+<header class="compose__top">
     <a class="mark" href="/" title="UIcockpit — home"><!--MARK--></a>
 
     <!-- A kit you are allowed to keep, and to keep a SECOND of. Half of
@@ -59,9 +58,18 @@
 
     <div class="compose__acts">
       <button class="btn btn--ghost" id="surprise"><!--I:shuffle-->Surprise me</button>
-      <button class="btn btn--go" id="tofold"><!--I:maximize-->See the wall <kbd>F</kbd></button>
+      <!-- ONE button for both directions. Two buttons in two bars sat at
+           almost the same corner, and the almost is what you saw: the switch
+           jumped a few pixels every time you used it. One element cannot
+           disagree with itself about where it is. -->
+      <button class="btn btn--go" id="stageflip">
+        <span class="flip" id="flipsee"><!--I:maximize-->See every component</span>
+        <span class="flip" id="flipback" hidden><!--I:minimize-->Back to the kit</span>
+        <kbd>F</kbd></button>
     </div>
   </header>
+
+<section class="compose">
 
   <div class="compose__head">
     <p class="eyebrow">Second of three</p>
@@ -142,7 +150,7 @@
        one. It was a second row on top of the wall, where it crowded the boards
        and left no room to say why two of the eight are not on offer. -->
   <section class="grp grp--flat" id="panegrp" hidden>
-    <p class="grp__head"><span class="grp__name">What is on the wall</span></p>
+    <p class="grp__head"><span class="grp__name">Sections</span></p>
     <div class="panes" id="panes"></div>
   </section>
 
@@ -151,10 +159,9 @@
 <main class="wall">
   <div class="wall__bar">
     <p class="eyebrow" id="wallhead">This is what your app will look like</p>
-    <div class="seg" id="rungs" role="radiogroup" aria-label="Where on the wall"></div>
+    <div class="seg" id="rungs" role="radiogroup" aria-label="Which section"></div>
     <div class="seg" id="modes" role="radiogroup" aria-label="Light or dark"></div>
     <div class="seg" id="view" role="radiogroup" aria-label="One kit or several"></div>
-    <button class="btn btn--go wall__back" id="tokit"><!--I:minimize-->Back to the kit <kbd>F</kbd></button>
   </div>
   <div class="frames" id="frames"></div>
 
