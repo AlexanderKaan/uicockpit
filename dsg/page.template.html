@@ -71,7 +71,12 @@ body{margin:0;background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--
 .app[data-stage=compose]>.rail,.app[data-stage=compose]>.dock{display:none}
 .app[data-stage=compose]>.wall{border-radius:0;border-top:var(--bw) solid var(--line);
   min-height:340px;padding:0}
+/* the strip under the composer is for LOOKING while you turn knobs: the boards
+   and the pan are the whole point, and six compared panes with nested
+   scrollbars in a 340px band is a wall's job, not a preview's. Light/dark is
+   wall-work too. */
 .app[data-stage=compose] .wall__bar{padding:9px 16px}
+.app[data-stage=compose] #modes,.app[data-stage=compose] #view{display:none}
 
 /* THE WALL, as the room it earned: the rail is down to the one thing that
    belongs beside it, which is what is rendering this. */
@@ -405,6 +410,32 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 .sub{margin:6px 0 0;font-size:var(--fs-xs);color:var(--muted)}
 .sub b{color:var(--ink);font-weight:600}
 
+/* ── the colours, as things you pick up ─────────────────────────────────────
+ * A hex field with a grid of swatches under it reads as a FORM; named cards
+ * with the colour filling them read as parts you assemble. Each card opens
+ * its own sheet. The names come from nameColor, so the system has words. */
+.ccards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.ccard{position:relative;font:inherit;text-align:left;cursor:pointer;padding:0;overflow:hidden;
+  display:flex;flex-direction:column;background:var(--panel);
+  border:var(--bw) solid var(--line);border-radius:calc(var(--r) + 3px);
+  transition:border-color .12s,box-shadow .12s,translate .12s}
+.ccard:hover{border-color:color-mix(in oklab, var(--line), var(--ink) 28%);
+  box-shadow:0 4px 14px rgb(10 15 9 / .08);translate:0 -1px}
+.ccard:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.ccard__fill{height:58px;border-bottom:var(--bw) solid rgb(10 15 9 / .06)}
+.ccard__meta{padding:7px 10px 8px;display:flex;flex-direction:column;gap:1px}
+.ccard__role{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.ccard__val{font-size:var(--fs-sm);font-weight:600;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ccard__hex{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-xs);color:var(--muted)}
+.ccard__tag{position:absolute;top:6px;left:6px;font-size:9px;font-weight:700;letter-spacing:.08em;
+  padding:2px 6px;border-radius:99px;background:rgb(255 255 255 / .92);color:var(--ink)}
+/* the "all eleven" card is an invitation, not a colour */
+.ccard--more{border-style:dashed;background:var(--faint)}
+.ccard--more .ccard__fill{display:grid;place-items:center;border-bottom:0;
+  font-size:22px;font-weight:300;color:var(--muted)}
+.ccard--more:hover .ccard__fill{color:var(--ink)}
+
 /* one colour, and the other ten derived from it */
 .seed{display:flex;gap:6px;align-items:center;margin-top:7px}
 .seed__well{flex:none;width:40px;height:30px;padding:0;cursor:pointer;
@@ -424,9 +455,19 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
  * through, with the sRGB boundary shown rather than clipped past. */
 #cpick{border:0;padding:0;background:0;max-width:none;max-height:none;width:100%;height:100%}
 #cpick::backdrop{background:rgba(10,15,9,.22)}
-.cp{position:fixed;left:346px;top:50%;transform:translateY(-50%);width:288px;max-width:calc(100vw - 24px);
-  display:flex;flex-direction:column;gap:11px;padding:14px;background:var(--panel);
-  border-radius:var(--r);box-shadow:0 18px 44px rgb(10 15 9 / .2)}
+/* Every editing surface is the SAME sheet at the SAME edge: a panel that
+   slides over the work from the right and slides away again. One vocabulary —
+   colour wheel, role families, fonts, your-colour — so summoning any of them
+   feels like opening a drawer on the thing you are building, not like being
+   sent to a settings dialog. (The wheel opening from inside the colour sheet
+   lands on top of it at the same edge; closing peels back one layer.) */
+.sheetside,.cp,.pick{position:fixed;right:12px;top:12px;bottom:12px;left:auto;width:380px;
+  max-width:calc(100vw - 24px);display:flex;flex-direction:column;gap:12px;
+  padding:var(--pad);background:var(--panel);border:var(--bw) solid var(--line);
+  border-radius:var(--r);box-shadow:0 18px 50px rgb(10 15 9 / .18);
+  animation:sheetin .18s cubic-bezier(.2,.8,.3,1)}
+@keyframes sheetin{from{transform:translateX(14px);opacity:0}to{transform:none;opacity:1}}
+.cp{width:336px}
 .cp__field{position:relative;line-height:0;border-radius:var(--r-sm);
   background:repeating-conic-gradient(var(--sunken) 0 25%, transparent 0 50%) 0 0/12px 12px}
 .cp__field:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
@@ -456,14 +497,14 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 /* they wrap now. In a 322px rail seventeen families had to be a row you pushed;
    in a card this wide, hiding twelve of them behind a scroll nobody sees is the
    only reason you would not pick one. */
-.pals{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px;margin-top:6px}
+.pals{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:7px;margin-top:6px;overflow:auto;min-height:0}
 .pal{border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r-sm);
-     padding:4px 5px 3px;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0}
+     padding:5px 6px 4px;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-width:0}
 .pal:hover{border-color:var(--ink)}
 .pal[aria-pressed=true]{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
-.pal__ramp{display:flex;height:14px;border-radius:2px;overflow:hidden}
+.pal__ramp{display:flex;height:22px;border-radius:3px;overflow:hidden}
 .pal__ramp i{flex:1}
-.pal__name{font-size:9px;color:var(--muted);text-align:center;text-transform:capitalize;
+.pal__name{font-size:10px;color:var(--muted);text-align:center;text-transform:capitalize;
            overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
 .sw{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;
@@ -475,8 +516,8 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 .sw code{font-size:9px;color:var(--muted);font-family:ui-monospace,monospace}
 
 /* a role, and the colours the stack has for it */
-.cp--list{width:326px;gap:9px}
-.rp__list{list-style:none;margin:0;padding:0;max-height:min(52vh,420px);overflow:auto;
+.cp--list{width:360px;justify-content:flex-start;gap:9px}
+.rp__list{list-style:none;margin:0;padding:0;flex:1;min-height:0;overflow:auto;
   display:flex;flex-direction:column;gap:2px}
 .rp{width:100%;font:inherit;font-size:var(--fs-md);text-align:left;cursor:pointer;
   display:grid;grid-template-columns:18px 1fr max-content max-content;gap:9px;align-items:center;
@@ -688,13 +729,9 @@ dialog::backdrop{background:#1c1b1966}
 /* A drawer down the left edge, because you are comparing what is IN it against
  * the wall behind it. It slides from the side it lives on; nothing else here
  * moves. */
-#fontpick{border:0;padding:0;background:0;max-width:none;max-height:none;width:100%;height:100%}
-#fontpick::backdrop{background:rgba(10,15,9,.28)}
-.pick{position:fixed;left:12px;top:12px;bottom:12px;width:380px;max-width:calc(100vw - 24px);
-      background:var(--panel);border:var(--bw) solid var(--line);border-radius:var(--r);
-      padding:14px;display:flex;flex-direction:column;gap:11px;
-      box-shadow:0 18px 50px rgba(10,15,9,.16);animation:slide .16s cubic-bezier(.2,.8,.3,1)}
-@keyframes slide{from{transform:translateX(-10px);opacity:0}to{transform:none;opacity:1}}
+#fontpick,#brandsheet{border:0;padding:0;background:0;max-width:none;max-height:none;width:100%;height:100%}
+#fontpick::backdrop,#brandsheet::backdrop{background:rgba(10,15,9,.22)}
+.pick{width:400px}
 @media(prefers-reduced-motion:reduce){.pick{animation:none}}
 .pick__top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .pick__top h2{margin:0;font-size:var(--fs-xl);font-weight:600;letter-spacing:-.01em;line-height:1.15}
@@ -941,7 +978,7 @@ function paint() {
   toUrl()
   markState()
   /* the specimens are drawn FROM the values, so they move when the values do */
-  if (state.stage === 'compose') { drawFeel(); drawScale() }
+  if (state.stage === 'compose') { drawFeel(); drawScale(); drawColourCards() }
 
   function dress(r0, order, routed) {
     const r = routed.find((x) => x.kit === r0.kit) ?? r0
@@ -1282,7 +1319,7 @@ function drawStackPicker() {
       <span class="opt__meta">${parts(id)}</span></span>
     ${on ? `<span class="opt__why">${KITS[id].what}</span>` : ''}
     <span class="opt__run">${runs(id).framework
-      ? `<b>${runs(id).framework} only</b>${cannot(id) ? ' — not where you are building' : ''}`
+      ? `<b>${runs(id).framework} only</b>${cannot(id) ? ', not where you are building' : ''}`
       : '<b>any framework</b>'}${on ? ` · ${KITS[id].license ?? ''}` : ''}</span></button>`
 
   const box = $('#stackpick')
@@ -1410,7 +1447,7 @@ function askSwitch(next) {
   ]
   if (lost.length) rows.push({ k: 'cost', m: '~', b: `${lost.length === 1 ? 'One value' : `${lost.length} values`} stop landing`,
     n: listOf(lost.map(label)),
-    w: lost.map((id) => `<b>${label(id)}</b> — ${hardTo.get(id)}`).join('. ') + '. They stay in your download, and the manifest names them.' })
+    w: lost.map((id) => `<b>${label(id)}</b>: ${hardTo.get(id)}`).join('. ') + '. They stay in your download, and the manifest names them.' })
   if (back.length) rows.push({ k: 'keep', m: '✓', b: `${back.length === 1 ? 'One value' : `${back.length} values`} start landing`,
     n: listOf(back.map(label)), w: `${toName} takes ${back.length === 1 ? 'it' : 'them'} where the stack you are on could not.` })
   if (loseParts.length) rows.push({ k: 'cost', m: '~', b: `${loseParts.length} ${loseParts.length === 1 ? 'part is' : 'parts are'} drawn from tokens`,
@@ -1615,13 +1652,13 @@ function drawPicker() {
     return `<button class="spec" data-stack="${stack.replace(/"/g, '&quot;')}" data-family="${f.stack ? '' : f.family}"
       aria-pressed="${stack === current}">
       <span class="spec__line" style="font-family:${stack.replace(/"/g, '&quot;')}">${PANGRAM}</span>
-      <span class="spec__meta">${f.stack ? `${f.name} — ${f.from.join(', ')} · no download`
+      <span class="spec__meta">${f.stack ? `${f.name} · ${f.from.join(', ')} · no download`
         : `${f.family} · Google · ${(f.tags ?? []).length ? f.tags.join(' ') : f.category}${f.variable ? ' · variable' : ''}`}</span></button>`
   }).join('') + (pool.length > rows.length
     ? `<button class="btn" id="pickmore" style="width:100%">Show ${Math.min(PAGE, pool.length - rows.length)} more of ${pool.length}</button>` : '')
   for (const el of $('#picklist').querySelectorAll('[data-family]:not([data-family=""])')) seeing.observe(el)
   $('#picksum').textContent = pickTab === 'kits'
-    ? `${FONTS.stacks.length} stacks the kits publish — nothing to download`
+    ? `${FONTS.stacks.length} stacks the kits publish, nothing to download`
     : `${FONTS.google.length} families from Google's own list, most used first`
   /* the name on the card, not the first entry of a system stack: "Now:
      -apple-system" tells you nothing you can act on. */
@@ -1761,7 +1798,7 @@ function cpShow() {
   $('#cppairs').innerHTML = rows.map(([label, r, min, how]) => {
     const ok = r >= min
     return `<li${ok ? '' : ' data-bad'}><span class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '✗'}</span>
-      <span>${label}${how ? ` — ${how}` : ''}</span><em>${r.toFixed(2)}:1</em></li>`
+      <span>${label}${how ? `, ${how}` : ''}</span><em>${r.toFixed(2)}:1</em></li>`
   }).join('')
   CP.apply?.(hex)
 }
@@ -1836,14 +1873,14 @@ function buildFrom(value) {
   sync(); paint()
   return true
 }
-const SEED_OPENING = 'One colour, and the other ten come from what your stack publishes — no palette of ours anywhere in it.'
+const SEED_OPENING = 'One colour, and the other ten come from what your stack publishes. No palette of ours anywhere in it.'
 function seedNote(out) {
   if (!out) return ($('#seednote').textContent = SEED_OPENING)
   const named = [...new Set(out.derived.filter((d) => d.from).map((d) => d.from))]
-  $('#seednote').innerHTML = `The greys are <b>${out.neutral.from}</b>'s <b>${out.neutral.name}</b> — the ramp whose hue sits closest to yours. `
+  $('#seednote').innerHTML = `The greys are <b>${out.neutral.from}</b>'s <b>${out.neutral.name}</b>, the ramp whose hue sits closest to yours. `
     + (named.length ? `Success, warning and danger are ${named.map((n) => `<b>${n}</b>`).join(' and ')}'s own, unchanged. ` : '')
     + 'The focus ring is your colour; the ink on it is whichever of black or white clears 4.5:1.'
-    + (out.short.length ? ` <b>${out.short.join(' and ')}</b> could not be met from this — see the checks.` : '')
+    + (out.short.length ? ` <b>${out.short.join(' and ')}</b> could not be met from this; see the checks.` : '')
 }
 $('#seedwell').addEventListener('click', () => cpOpen(state.values.brand ?? '#6644FC', 'Your colour',
   'The one thing you say. Everything else is read out of what your stack publishes.',
@@ -1868,15 +1905,15 @@ function renderPalettes() {
   /* say where the current one came from — a palette you cannot trace is a
      palette we might as well have invented */
   $('#palnote').textContent = !accents.length
-    ? 'This stack publishes no colour families — set the roles below by hand.'
+    ? 'This stack publishes no colour families. Set the roles below by hand.'
     : palAt
-      ? `${palAt.split(':')[1]} — ${KITS[palAt.split(':')[0]].name}, with ${palNeutral ?? 'its'} for the greys`
-        + (palShort.length ? `. ${palShort.join(' and ')} could not be met from this family — see the contrast list.` : '')
+      ? `${palAt.split(':')[1]} from ${KITS[palAt.split(':')[0]].name}, with ${palNeutral ?? 'its'} for the greys`
+        + (palShort.length ? `. ${palShort.join(' and ')} could not be met from this family; see the contrast list.` : '')
       : `${accents.length} families your stack publishes${neutrals.length ? `, each matched to one of its ${neutrals.length} greys` : ''}`
   $('#palettes').innerHTML = accents.map((p, i) => {
     const five = [0, 0.25, 0.5, 0.75, 1].map((f) => p.ramp[Math.round(f * (p.ramp.length - 1))])
     return `<button class="pal" data-pal="${i}" aria-pressed="${palAt === `${p.kit}:${p.name}`}"
-      title="${p.name} — ${p.from}"><span class="pal__ramp">${five.map((c) => `<i style="background:${c}"></i>`).join('')}</span>
+      title="${p.name} · ${p.from}"><span class="pal__ramp">${five.map((c) => `<i style="background:${c}"></i>`).join('')}</span>
       <span class="pal__name">${p.name}</span></button>`
   }).join('')
   return { accents, neutrals }
@@ -2008,6 +2045,53 @@ $('#rpfree').addEventListener('click', () => {
 $('#rpx').addEventListener('click', () => $('#rolepick').close())
 $('#rolepick').addEventListener('click', (e) => { if (e.target.id === 'rolepick') $('#rolepick').close() })
 
+/* ── the colour cards ───────────────────────────────────────────────────────
+ * The composer shows colours as CARDS with names, not as a hex field with a
+ * swatch grid: things you pick up, each opening its own sheet. The main card
+ * summons the colour sheet (seed well + the stack's families, moved there from
+ * the old in-card form); a semantic card opens that role's published options;
+ * neutrals and the "+" open the by-hand grid, because that is where those
+ * eleven actually live. */
+function drawColourCards() {
+  const v = state.values
+  const call = (hex) => { try { return nameColor(hex) } catch { return '' } }
+  const neutrals = ['page', 'surface', 'line', 'inkMuted', 'ink']
+  const stripes = neutrals.map((r, i) => `${v[r]} ${i * 20}% ${(i + 1) * 20}%`).join(', ')
+  const semantic = ['success', 'warning', 'danger']
+  const roleCard = (role) => {
+    const r = SWATCH.find((x) => x.id === role)
+    return `<button class="ccard" data-act="role" data-role="${role}" title="${r ? r.what : ''}">
+      <span class="ccard__fill" style="background:${v[role]}"></span>
+      <span class="ccard__meta"><span class="ccard__role">${r ? r.label : role}</span>
+        <span class="ccard__val">${call(v[role])}</span></span></button>`
+  }
+  $('#colourcards').innerHTML = `
+    <button class="ccard" data-act="brand" title="the colour a primary action wears">
+      <span class="ccard__fill" style="background:${v.brand}"></span>
+      <span class="ccard__tag">MAIN</span>
+      <span class="ccard__meta"><span class="ccard__role">Brand</span>
+        <span class="ccard__val">${call(v.brand)}</span>
+        <span class="ccard__hex">${v.brand}</span></span></button>
+    <button class="ccard" data-act="all" title="page, surface, line and both inks">
+      <span class="ccard__fill" style="background:linear-gradient(90deg, ${stripes})"></span>
+      <span class="ccard__meta"><span class="ccard__role">Neutrals</span>
+        <span class="ccard__val">Page to ink</span></span></button>
+    ${semantic.map(roleCard).join('')}
+    <button class="ccard ccard--more" data-act="all" title="every colour role, one well each">
+      <span class="ccard__fill">+</span>
+      <span class="ccard__meta"><span class="ccard__role">More</span>
+        <span class="ccard__val">All eleven roles</span></span></button>`
+}
+$('#colourcards').addEventListener('click', (e) => {
+  const b = e.target.closest('.ccard')
+  if (!b) return
+  if (b.dataset.act === 'brand') $('#brandsheet').showModal()
+  else if (b.dataset.act === 'role') openRole(b.dataset.role)
+  else { const d = $('#allroles'); d.open = true; d.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }
+})
+$('#brandx').addEventListener('click', () => $('#brandsheet').close())
+$('#brandsheet').addEventListener('click', (e) => { if (e.target.id === 'brandsheet') $('#brandsheet').close() })
+
 $('#swatches').innerHTML = SWATCH.map((r) => `<button class="sw" data-role="${r.id}" title="${r.what}">
   <i class="sw__well" data-r="${r.id}"></i>
   <span>${r.label}</span><code data-hex="${r.id}">${state.values[r.id]}</code></button>`).join('')
@@ -2057,7 +2141,7 @@ $('#chips').addEventListener('click', (e) => {
   const b = PRESETS.find((x) => x.label === btn.dataset.b); if (!b) return
   Object.assign(state.values, b.values)
   sync(); paint()
-  note(`<b>${b.label}</b> — ${b.why}. Every value it moved is still a slider under "by hand".`)
+  note(`<b>${b.label}</b>: ${b.why}. Every value it moved is still a slider under "by hand".`)
 })
 
 /* the same for type: a scale, shown at the size it means */
@@ -2074,7 +2158,7 @@ $('#scales').addEventListener('click', (e) => {
   const t = TYPE_SCALES.find((x) => x.label === btn.dataset.t); if (!t) return
   Object.assign(state.values, t.values)
   sync(); paint()
-  note(`<b>${t.label}</b> — ${t.why}. Line height moves with it, the way a kit publishes the pair.`)
+  note(`<b>${t.label}</b>: ${t.why}. Line height moves with it, the way a kit publishes the pair.`)
 })
 
 $('#shuffle').addEventListener('click', shuffle)
@@ -2098,8 +2182,8 @@ function shuffle() {
   sync(); paint()
   const bad = auditContrast(state.values).filter((p) => !p.passes)
   note(bad.length
-    ? `Rolled <b>${nameColor(brand)}</b> — ${bad.length} pair${bad.length > 1 ? 's are' : ' is'} under its floor. Use this kit shows which.`
-    : `Rolled <b>${nameColor(brand)}</b> — every contrast pair clears its floor.`)
+    ? `Rolled <b>${nameColor(brand)}</b>. ${bad.length} pair${bad.length > 1 ? 's are' : ' is'} under its floor. Use this kit shows which.`
+    : `Rolled <b>${nameColor(brand)}</b>. Every contrast pair clears its floor.`)
 }
 
 function sync() {
@@ -2171,11 +2255,11 @@ function checks(routed) {
     const builds = routed.filter((r) => (r.needsBuild ?? []).some((b) => b.role === role.id))
     if (!takes.length) {
       cannot.push(derives.length
-        ? `<b>${role.label}</b> — <b>${nameOf(derives[0].kit)}</b> computes it from the brand, so your value does not reach it.`
-        : `<b>${role.label}</b> — nothing in this stack has a variable for it.`)
+        ? `<b>${role.label}</b>: <b>${nameOf(derives[0].kit)}</b> computes it from the brand, so your value does not reach it.`
+        : `<b>${role.label}</b>: nothing in this stack has a variable for it.`)
     } else if (builds.length) {
       const line = (builds[0].needsBuild ?? []).find((x) => x.role === role.id)
-      cannot.push(`<b>${role.label}</b> — <b>${nameOf(builds[0].kit)}</b> compiles it: ${line?.why ?? 'a rebuild puts it into the components'}.`
+      cannot.push(`<b>${role.label}</b>: <b>${nameOf(builds[0].kit)}</b> compiles it. ${line?.why ?? 'A rebuild puts it into the components'}.`
         + (line?.sass ? ` Your download carries <code>${line.sass}</code>.` : ''))
     }
   }
@@ -2198,14 +2282,14 @@ function checks(routed) {
      has gone light enough that Bootstrap itself would have picked black. */
   const bsShown = state.compare ? comparing().includes('bootstrap') : state.show === 'bootstrap'
   if (bsShown && HEX6.test(state.values.brand ?? '') && relLum(state.values.brand) > 0.179) {
-    frame.push(`<b>Bootstrap</b> — its text on a filled button is white, chosen by Sass against the brand it was built with. Yours is light enough that Bootstrap would now pick black, and that one choice is the half of it a running page cannot retake.`)
+    frame.push(`<b>Bootstrap</b>: its text on a filled button is white, chosen by Sass against the brand it was built with. Yours is light enough that Bootstrap would now pick black, and that one choice is the half of it a running page cannot retake.`)
   }
   if (!LIVE_BRAND[state.show]) {
     frame.push(state.show === 'bootstrap'
-      ? `<b>${nameOf(state.show)}</b> — its component colours are compiled by Sass, so this frame shows the build we made. Your download carries the Sass lines that change them.`
+      ? `<b>${nameOf(state.show)}</b>: its component colours are compiled by Sass, so this frame shows the build we made. Your download carries the Sass lines that change them.`
       : state.show === 'antd'
-        ? `<b>${nameOf(state.show)}</b> — it publishes no stylesheet: its rules and its variables are generated by its own React at build time, so this frame shows the theme we built. Your download carries the token object that makes it.`
-        : `<b>${nameOf(state.show)}</b> — it derives its colours from the seed with its own generator, so this frame shows a pre-derived scheme. Your download carries the seed.`)
+        ? `<b>${nameOf(state.show)}</b>: it publishes no stylesheet; its rules and its variables are generated by its own React at build time, so this frame shows the theme we built. Your download carries the token object that makes it.`
+        : `<b>${nameOf(state.show)}</b>: it derives its colours from the seed with its own generator, so this frame shows a pre-derived scheme. Your download carries the seed.`)
   }
   /* the compiled roles are NOT repeated here: "this stack compiles it" is a
      fact about the system and lives in the check above. Saying it twice, once
@@ -2214,34 +2298,34 @@ function checks(routed) {
   return [
     { k: 'contrast', label: 'Contrast', ok: !bad.length,
       chip: `Contrast <b>${pairs.length - bad.length} of ${pairs.length}</b>`,
-      why: 'Only the pairs that really meet on screen, each against the floor WCAG sets for it: 4.5:1 for text (1.4.3), and 3:1 for the line that identifies a control (1.4.11). A pair nothing ever renders is not audited — a phantom failure is worse than none.',
+      why: 'Only the pairs that really meet on screen, each against the floor WCAG sets for it: 4.5:1 for text (1.4.3), and 3:1 for the line that identifies a control (1.4.11). A pair nothing ever renders is not audited; a phantom failure is worse than none.',
       body: () => `<ul class="pairs">${pairs.map((p) => `<li${p.passes ? '' : ' data-bad'}>
         <span class="${p.passes ? 'ok' : 'no'}">${p.passes ? '✓' : '✗'}</span>
         <span>${p.label}</span><em>${p.ratio}:1</em></li>`).join('')}</ul>` },
 
     { k: 'lands', label: 'Values this stack can take', ok: !cannot.length,
       chip: cannot.length ? `<b>${cannot.length}</b> it decides for you` : 'Every value lands',
-      why: 'A knob you turned that this stack answers itself — because it computes the value, because it compiles it, or because no kit here has a variable for it.',
-      body: () => li(cannot, 'Nothing — every value you set reaches this stack as you set it.') },
+      why: 'A knob you turned that this stack answers itself, because it computes the value, because it compiles it, or because no kit here has a variable for it.',
+      body: () => li(cannot, 'Nothing. Every value you set reaches this stack as you set it.') },
 
     { k: 'read', label: 'Variables nothing reads', ok: !orphans.length,
       chip: orphans.length ? `<b>${orphans.reduce((n, u) => n + u.names.length, 0)}</b> nothing reads` : 'Every variable is read',
-      why: 'Counted in each kit\'s own stylesheet, and in its component code where its components are code rather than classes. A variable nobody reads is a knob that does nothing — it is written, it is in the download, and turning it changes not one pixel.',
-      body: () => li(orphans.map((u) => `<b>${u.name} · ${u.role}</b> — ${u.names.map((n) => `<code>${n}</code>`).join(' ')}${
+      why: 'Counted in each kit\'s own stylesheet, and in its component code where its components are code rather than classes. A variable nobody reads is a knob that does nothing: it is written, it is in the download, and turning it changes not one pixel.',
+      body: () => li(orphans.map((u) => `<b>${u.name} · ${u.role}</b>: ${u.names.map((n) => `<code>${n}</code>`).join(' ')}${
         u.tokensOnly ? '. A token layer publishes for your code; its own stylesheet reads none of it.'
           : u.instead.length ? `. What it does read is ${u.instead.slice(0, 3).map((n) => `<code>${n}</code>`).join(' ')}${u.instead.length > 3 ? ' and others' : ''}.` : '.'}`),
-        'Nothing — every variable this theme writes is read by the kit it belongs to.') },
+        'Nothing. Every variable this theme writes is read by the kit it belongs to.') },
 
     { k: 'clash', label: 'Names two kits both use', ok: !clash.length,
       chip: clash.length ? `<b>${clash.length}</b> shared name${clash.length > 1 ? 's' : ''}` : 'No shared names',
       why: 'These variables mean different things to different kits you enabled. Whichever stylesheet loads second wins, and nothing warns.',
-      body: () => li(clash.map((c) => `<code>${c.variable}</code> — written for <b>${KITS[c.written].name}</b>, and <b>${KITS[c.read].name}</b> also reads it. Load their stylesheets in separate scopes, or drop one of the two.`),
-        'Nothing — no variable in this stack means two different things.') },
+      body: () => li(clash.map((c) => `<code>${c.variable}</code>, written for <b>${KITS[c.written].name}</b>, and <b>${KITS[c.read].name}</b> also reads it. Load their stylesheets in separate scopes, or drop one of the two.`),
+        'Nothing. No variable in this stack means two different things.') },
 
     { k: 'frame', label: 'What this frame cannot show', ok: !frame.length,
       chip: frame.length ? `<b>${frame.length}</b> the frame cannot show` : 'The frame is live',
       why: 'About the preview, not about your system: two of these kits decide their colours somewhere a running page cannot reach. The download is right either way.',
-      body: () => li(frame, 'Nothing — every value you turn moves this frame as it would move your app.') },
+      body: () => li(frame, 'Nothing. Every value you turn moves this frame as it would move your app.') },
   ]
 }
 
@@ -2288,7 +2372,7 @@ function receipt(routed) {
     ? `<b>${own.elsTheirs} of ${own.els}</b> elements on this screen are ${KITS[top].name}'s own, running their code`
     : own.used
       ? `<b>${own.theirs} of ${own.used}</b> classes on this screen are ${KITS[top].name}'s own${
-          own.theirs < own.used ? ` — ${own.used - own.theirs === 1 ? 'one is' : (own.used - own.theirs) + ' are'} ours` : ''}`
+          own.theirs < own.used ? ` (${own.used - own.theirs === 1 ? 'one is' : (own.used - own.theirs) + ' are'} ours)` : ''}`
       : `<b>nothing of theirs</b> on this screen at all`
 
   lastRouted = routed
@@ -2326,13 +2410,13 @@ function screensHtml() {
 }
 
 const DESTS = [
-  { t: 'Everything', d: 'one .zip — theme, install, manifest, agent brief', go: (f) =>
+  { t: 'Everything', d: 'one .zip: theme, install, manifest, agent brief', go: (f) =>
       grab(`${kitName() || 'design-system'}.zip`, zip(plain(f)), 'application/zip') },
   { t: 'Just the theme', d: 'theme.css, to drop in next to your kits', go: (f) => grab('theme.css', f['theme.css']) },
-  { t: 'Just the system', d: 'DESIGN.md — the tokens, the reasoning and the rules, to Google\'s spec', go: (f) => grab('DESIGN.md', f['DESIGN.md']) },
+  { t: 'Just the system', d: 'DESIGN.md: the tokens, the reasoning and the rules, to Google\'s spec', go: (f) => grab('DESIGN.md', f['DESIGN.md']) },
   { t: 'The manifest', d: 'versions, licences, and what could not be done', go: (f) => grab('MANIFEST.md', f['MANIFEST.md']) },
   { t: 'These screens, as one HTML file', wide: true,
-    d: 'exactly what you are looking at — the kit\'s CSS, your values, its classes. Open it in a browser.',
+    d: 'exactly what you are looking at: the kit\'s CSS, your values, its classes. Open it in a browser.',
     go: () => grab('screens.html', screensHtml(), 'text/html') },
 ]
 
@@ -2359,7 +2443,7 @@ function openSheet() {
   const warn = cs.filter((c) => !c.ok)
   const plainChip = (c) => c.chip.replace(/<[^>]+>/g, '')
   $('#drawerchecks').innerHTML = warn.length
-    ? `The Checks bar under the wall reports ${warn.length === 1 ? 'one thing' : `${warn.length} things`} — ${
+    ? `The Checks bar under the wall reports ${warn.length === 1 ? 'one thing' : `${warn.length} things`}: ${
         warn.map(plainChip).join(' · ')}. The long version is in <b>MANIFEST.md</b>, below.`
     : `Every check in the bar under the wall is clear. The same account, at length, is in <b>MANIFEST.md</b>.`
 
@@ -2451,7 +2535,7 @@ const VIBES = [
     .filter((f, i, a) => a.indexOf(f) === i)
     .map((f) => [f, GOOGLE.get(f)?.rank])
     .filter(([, r]) => !(r > 0 && r <= 50))
-  if (far.length) console.warn('start: no longer in Google\'s top 50 — ' + far.map(([f, r]) => `${f} (${r ?? 'gone'})`).join(', '))
+  if (far.length) console.warn('start: no longer in Google\'s top 50: ' + far.map(([f, r]) => `${f} (${r ?? 'gone'})`).join(', '))
 }
 
 /* THE THREE ROOMS. Nothing is rebuilt when you move between them: the wall is
@@ -2461,6 +2545,9 @@ function stage(next) {
   const from = state.stage
   state.stage = next
   $('.app').dataset.stage = next
+  /* comparing belongs to the wall; folded down to a strip it is six frames
+     fighting for 340 pixels */
+  if (next === 'compose' && state.compare) { state.compare = null; state.solo = null }
   /* IN THE COMPOSER THE STRIP SHOWS WHAT THE VALUES BECOME. Foundations is the
      board that prints the values themselves, which are already the three cards
      directly above it — the same thing twice. Arriving from the question, it
@@ -2660,7 +2747,7 @@ $('#feelshuffle').addEventListener('click', feelShuffle)
    two of the three. */
 $('#surprise').addEventListener('click', () => {
   shuffle(); $('#typeshuffle').click(); feelShuffle()
-  note('<b>All three</b> — colour, type and feel. Shuffle one section at a time to keep what you like.')
+  note('<b>All three</b>: colour, type and feel. Shuffle one section at a time to keep what you like.')
 })
 function feelShuffle() {
   const others = PRESETS.filter((b) => b.label !== lastFeel)
@@ -2669,7 +2756,7 @@ function feelShuffle() {
   ;[...$('#chips').children].forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.b === b.label)))
   Object.assign(state.values, b.values)
   sync(); paint()
-  note(`<b>${b.label}</b> — ${b.why}. Every value it moved is a slider you can still turn.`)
+  note(`<b>${b.label}</b>: ${b.why}. Every value it moved is a slider you can still turn.`)
 }
 let lastFeel = null
 /* ── ONE LETTER, AND ONLY ONE ────────────────────────────────────────────

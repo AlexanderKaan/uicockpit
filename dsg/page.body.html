@@ -56,7 +56,7 @@
     <p class="eyebrow">Second of three</p>
     <h1>Make it look like yours.</h1>
     <p class="compose__lede">Colours, two typefaces, and how solid you want the edges. Nothing here is
-      final, so shuffle as often as you like — the strip along the bottom is really your kit rendering,
+      final, so shuffle as often as you like. The strip along the bottom is really your kit rendering,
       not a picture of one.</p>
   </div>
 
@@ -66,18 +66,16 @@
         <h2>Colours</h2>
         <button class="mini" id="shuffle" title="Shuffle the colour"><!--I:shuffle-->Shuffle</button>
       </header>
-      <p class="cc__say">One colour is all you say. The other ten are read out of what your stack
-        publishes, and the line below names which kit answered for what.</p>
-      <div class="seed">
-        <button class="seed__well" id="seedwell" aria-label="Choose your colour"></button>
-        <input class="seed__hex" id="seedhex" value="#6644FC" spellcheck="false" autocomplete="off" aria-label="Your colour, as hex">
-      </div>
+      <p class="cc__say">One colour is all you say. The rest is read out of what your stack
+        publishes. Click a card to change it.</p>
+      <!-- THE COLOURS ARE THINGS, NOT FIELDS. A hex input with a grid of
+           swatches under it reads as settings; cards you pick up and swap read
+           as assembling. Every card opens its own panel. -->
+      <div class="ccards" id="colourcards"></div>
       <p class="sub" id="seednote"></p>
-      <div class="swatches" id="swatches"></div>
-      <hr class="cc__rule">
-      <p class="eyebrow">Or start from a family your stack already ships</p>
-      <p class="sub" id="palnote"></p>
-      <div class="pals" id="palettes"></div>
+      <details class="byhand" id="allroles"><summary>All eleven roles by hand</summary>
+        <div class="swatches" id="swatches"></div>
+      </details>
     </section>
 
     <section class="cc">
@@ -187,6 +185,25 @@
   </footer>
 </div></dialog>
 
+<!-- ── THE COLOUR SHEET ───────────────────────────────────────────────────
+     Summoned from the brand card. The seed well, the hex and the family strip
+     used to sit in the card itself, where they read as a form; in a panel that
+     slides over the work they read as a drawer you opened on purpose. -->
+<dialog id="brandsheet"><div class="sheetside">
+  <header class="pick__top">
+    <div><h2>Your colour</h2><p class="pick__sum">One value. The other ten roles derive from it and
+      from what your stack publishes, and the note in the card says which kit answered.</p></div>
+    <button class="sheet__x" id="brandx" aria-label="Close"><!--I:x--></button>
+  </header>
+  <div class="seed">
+    <button class="seed__well" id="seedwell" aria-label="Choose your colour"></button>
+    <input class="seed__hex" id="seedhex" value="#6644FC" spellcheck="false" autocomplete="off" aria-label="Your colour, as hex">
+  </div>
+  <p class="eyebrow">Or a family your stack already ships</p>
+  <p class="sub" id="palnote"></p>
+  <div class="pals" id="palettes"></div>
+</div></dialog>
+
 <dialog id="rolepick"><div class="cp cp--list">
   <header class="pick__top">
     <div><h2 id="rptitle"></h2><p class="pick__sum" id="rpsum"></p></div>
@@ -216,7 +233,7 @@
     <span class="cp__called" id="cpcalled"></span>
   </div>
   <ul class="cp__pairs" id="cppairs"></ul>
-  <p class="cp__fine">Lightness up, chroma right, in OKLCH — so a step is the same size wherever you
+  <p class="cp__fine">Lightness up, chroma right, in OKLCH, so a step is the same size wherever you
     are on the wheel. The right edge is as far as <em>that</em> lightness can go in sRGB, which is
     further near white than it is near black.</p>
 </div></dialog>
