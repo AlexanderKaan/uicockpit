@@ -90,7 +90,7 @@ const wall = (id) => `<html${ROOT[id] ?? ''}>${wallMarkup(WALL[id])}`
  * ever saw. Two sets, one read — the chrome's and the cards' — and lucide
  * throws on a name it does not have, so a blank square cannot ship. */
 console.log('reading the icons from lucide…')
-const CHROME_ICONS = ['sparkles', 'shuffle', 'download', 'x', 'check', 'search', 'maximize', 'minimize', 'layers']
+const CHROME_ICONS = ['sparkles', 'shuffle', 'download', 'x', 'check', 'search', 'maximize', 'minimize', 'layers', 'chevron-down']
 const NAMES = [...new Set([...CHROME_ICONS, ...ICON_NAMES])]
 const lu = icons(NAMES)
 useIcons(lu.icons)
