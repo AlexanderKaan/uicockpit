@@ -162,6 +162,11 @@
     <div class="seg" id="rungs" role="radiogroup" aria-label="Which section"></div>
     <div class="seg" id="modes" role="radiogroup" aria-label="Light or dark"></div>
     <div class="seg" id="view" role="radiogroup" aria-label="One kit or several"></div>
+    <!-- THE STRIP TEACHES THE DOOR. Landing straight in the composer, nothing
+         says the band below is a whole room: this repeats the switch's exact
+         words at the place your eye already is, so the button above and the
+         strip become one idea. Compose-stage only; on the wall you are here. -->
+    <button class="strip__open" id="stripopen"><!--I:maximize-->See every component</button>
   </div>
   <div class="frames" id="frames"></div>
 
@@ -271,15 +276,18 @@
 </div></dialog>
 
 <section class="drawer" id="drawer" hidden aria-label="Export">
+  <!-- ONE low row, and both inputs LOOK like inputs at rest. They were
+       borderless until hovered, which read as printed text; and the feel
+       field carried a two-line label that made the bar tall. The label's job
+       moved into the field's own placeholder. -->
   <header class="drawer__top">
     <div class="drawer__name">
       <label for="kitname" class="eyebrow">Name this kit</label>
       <input id="kitname" value="design-system" spellcheck="false" autocomplete="off">
     </div>
-    <label class="drawer__over">
-      <span class="eyebrow">What it should feel like <em>optional</em></span>
-      <input id="kitover" placeholder="Calm, readable, good for older users" autocomplete="off">
-    </label>
+    <input id="kitover" class="drawer__over" autocomplete="off"
+           aria-label="What it should feel like, optional"
+           placeholder="What should it feel like? Optional: calm, readable, good for older users">
     <p class="drawer__sum" id="sum"></p>
     <button class="btn btn--ghost" id="sheetx"><!--I:x-->Close</button>
   </header>

@@ -77,6 +77,14 @@ body{margin:0;background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--
    wall-work too. */
 .app[data-stage=compose] .wall__bar{padding:9px 16px}
 .app[data-stage=compose] #modes,.app[data-stage=compose] #view{display:none}
+/* the strip's own door, compose only: the same words as the switch above, so
+   the band explains the button and the button explains the band */
+.strip__open{display:none;margin-left:auto;align-items:center;gap:7px;cursor:pointer;
+  font:500 var(--fs-md) var(--sans);color:var(--muted);border:0;background:0;
+  padding:4px 9px;border-radius:var(--r-sm)}
+.strip__open:hover{color:var(--ink);background:var(--sunken)}
+.strip__open svg{width:13px;height:13px}
+.app[data-stage=compose] .strip__open{display:inline-flex}
 
 /* THE WALL, as the room it earned: the rail is down to the one thing that
    belongs beside it, which is what is rendering this. */
@@ -689,46 +697,42 @@ dialog::backdrop{background:#1c1b1966}
 /* It rises out of the dock instead of covering the page, because what you are
  * deciding is whether the thing on the wall is the thing you want — and a modal
  * takes the wall away at exactly that moment. */
-.drawer{position:fixed;left:12px;right:12px;bottom:12px;max-height:min(560px,calc(100vh - 96px));
+.drawer{position:fixed;left:12px;right:12px;bottom:12px;height:min(560px,calc(100vh - 96px));
         background:var(--panel);border-radius:var(--r-lg);box-shadow:0 -8px 40px rgba(10,15,9,.18);
         border:var(--bw) solid var(--line);display:flex;flex-direction:column;z-index:30;
         animation:rise .16s ease-out}
 @keyframes rise{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
 @media(prefers-reduced-motion:reduce){.drawer{animation:none}}
 .drawer[hidden]{display:none}
-.drawer__top{display:flex;align-items:center;gap:14px;padding:11px 14px;border-bottom:var(--bw) solid var(--line)}
+.drawer__top{display:flex;align-items:center;gap:14px;padding:10px var(--pad);border-bottom:var(--bw) solid var(--line)}
 .drawer__name{display:flex;align-items:baseline;gap:8px}
-.drawer__name input{font:inherit;font-size:var(--fs-lg);font-weight:600;color:var(--ink);
-                    border:var(--bw) solid transparent;border-radius:var(--r-sm);background:0;padding:3px 6px;min-width:150px}
-.drawer__name input:hover{border-color:var(--line)}
+.drawer__name input{font:inherit;font-size:var(--fs-md);font-weight:600;color:var(--ink);
+  border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r-sm);
+  padding:6px 10px;min-height:32px;width:17ch;min-width:10ch}
 .drawer__name input:focus{border-color:var(--brand);outline:0}
-/* The one thing in the whole export we cannot derive: what it should FEEL
- * like. So it is asked for once, here, where you are already deciding what to
- * hand over — and left out of the file with a reason if you skip it. */
-.drawer__over{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;max-width:420px}
-.drawer__over .eyebrow{display:flex;gap:6px;align-items:baseline}
-.drawer__over em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:400;opacity:.7}
-.drawer__over input{font:inherit;font-size:var(--fs-md);color:var(--ink);border:var(--bw) solid transparent;
-                    border-radius:var(--r-sm);background:0;padding:3px 6px;width:100%}
-.drawer__over input:hover{border-color:var(--line)}
-.drawer__over input:focus{border-color:var(--brand);outline:0}
-.drawer__over input::placeholder{color:var(--muted)}
+.drawer__over{flex:1;min-width:0;max-width:440px;font:inherit;font-size:var(--fs-md);color:var(--ink);
+  border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r-sm);
+  padding:6px 10px;min-height:32px}
+.drawer__over:focus{border-color:var(--brand);outline:0}
+.drawer__over::placeholder{color:var(--muted)}
 .drawer__sum{margin:0;font-size:var(--fs-sm);color:var(--muted)}
 .drawer__top .btn{margin-left:auto}
-.drawer__cols{display:grid;grid-template-columns:1.35fr .95fr;gap:14px;padding:12px 14px 14px;overflow:hidden;min-height:0}
+/* flex:1 with min-height:0, or the grid takes its content height (a 110-line
+   DESIGN.md) and the whole lower half pours out under the drawer's edge */
+.drawer__cols{flex:1 1 0;display:grid;grid-template-columns:1.35fr .95fr;grid-template-rows:minmax(0,1fr);gap:18px;padding:14px var(--pad) var(--pad);overflow:hidden;min-height:0}
 .drawer__file{display:flex;flex-direction:column;gap:8px;min-width:0}
 .filehead{display:flex;align-items:baseline;gap:10px;font-size:var(--fs-sm);color:var(--muted)}
 .filehead .link{margin-left:auto}
 .filebody{margin:0;flex:1;overflow:auto;background:var(--faint);border:var(--bw) solid var(--line);
           border-radius:var(--r);padding:11px 13px;font:11.5px/1.65 ui-monospace,Menlo,monospace;
           color:var(--ink);white-space:pre-wrap;word-break:break-word;scrollbar-width:thin}
-.drawer__side{display:flex;flex-direction:column;gap:9px;overflow-y:auto;min-height:0;scrollbar-width:thin}
-.tree{list-style:none;margin:0;padding:9px 11px;background:var(--faint);border:var(--bw) solid var(--line);
-      border-radius:var(--r);font:11.5px/1.8 ui-monospace,Menlo,monospace}
+.drawer__side{display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:0;scrollbar-width:thin;padding-right:2px}
+.tree{list-style:none;margin:0;padding:8px 11px;background:var(--faint);border:var(--bw) solid var(--line);
+      border-radius:var(--r);font:11.5px/1.6 ui-monospace,Menlo,monospace}
 .tree li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tree span{color:var(--muted)}
 .fine{margin:0;font-size:var(--fs-sm);color:var(--muted);line-height:1.55}
-@media(max-width:900px){.drawer__cols{grid-template-columns:1fr}.drawer{max-height:calc(100vh - 24px)}}
+@media(max-width:900px){.drawer__cols{grid-template-columns:1fr}.drawer{height:calc(100vh - 24px)}}
 
 /* ── the segmented control ────────────────────────────────────────────────── */
 /* A sunken track with one raised pill. It reads as a physical switch rather
@@ -801,13 +805,13 @@ dialog::backdrop{background:#1c1b1966}
 .fact{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:6px 10px;border-radius:var(--r);background:var(--sunken)}
 .fact i{width:11px;height:11px;border-radius:var(--r-sm);flex:none;font-style:normal;border:1px solid #0000001a}
 .fact b{font-weight:600}
-.dests{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.dest--wide{grid-column:1/-1}
+.dests{display:grid;gap:4px}
+.dests .eyebrow{margin:3px 0 2px}
 .dest{text-align:left;font:inherit;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r);
-      padding:11px 13px;cursor:pointer;min-height:56px;display:flex;flex-direction:column;gap:2px}
+      padding:0 12px;cursor:pointer;min-height:36px;display:flex;align-items:center;gap:10px}
 .dest:hover{background:var(--sunken)}
 .dest b{font-size:13px;font-weight:600}
-.dest span{font-size:11.5px;color:var(--muted);line-height:1.4}
+.dest code{margin-left:auto;font:10.5px ui-monospace,Menlo,monospace;color:var(--muted)}
 .pairs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:5px 16px}
 .pairs li{display:grid;grid-template-columns:13px 1fr max-content;gap:8px;align-items:baseline;font-size:12px}
 .pairs .ok{color:#1e6b37;font-weight:700}
@@ -2425,14 +2429,18 @@ function screensHtml() {
 <body>${WALLS[id] ?? ''}`
 }
 
+/* The zip is THE download and the big button owns it. These are the
+ * one-file exits, drawn as quiet rows under it: each names what you get and
+ * which file it is, with the longer story in the title. "Everything" used to
+ * sit here too, as a card that did exactly what the button above it did. */
 const DESTS = [
-  { t: 'Everything', d: 'one .zip: theme, install, manifest, agent brief', go: (f) =>
-      grab(`${kitName() || 'design-system'}.zip`, zip(plain(f)), 'application/zip') },
-  { t: 'Just the theme', d: 'theme.css, to drop in next to your kits', go: (f) => grab('theme.css', f['theme.css']) },
-  { t: 'Just the system', d: 'DESIGN.md: the tokens, the reasoning and the rules, to Google\'s spec', go: (f) => grab('DESIGN.md', f['DESIGN.md']) },
-  { t: 'The manifest', d: 'versions, licences, and what could not be done', go: (f) => grab('MANIFEST.md', f['MANIFEST.md']) },
-  { t: 'These screens, as one HTML file', wide: true,
-    d: 'exactly what you are looking at: the kit\'s CSS, your values, its classes. Open it in a browser.',
+  { t: 'Just the theme', file: 'theme.css', d: 'the tokens as CSS, to drop in next to your kits',
+    go: (f) => grab('theme.css', f['theme.css']) },
+  { t: 'Just the system', file: 'DESIGN.md', d: 'the tokens, the reasoning and the rules, to Google\'s spec',
+    go: (f) => grab('DESIGN.md', f['DESIGN.md']) },
+  { t: 'The manifest', file: 'MANIFEST.md', d: 'versions, licences, and what could not be done',
+    go: (f) => grab('MANIFEST.md', f['MANIFEST.md']) },
+  { t: 'These screens', file: 'screens.html', d: 'exactly what you are looking at: the kit\'s CSS, your values, its classes. Open it in a browser.',
     go: () => grab('screens.html', screensHtml(), 'text/html') },
 ]
 
@@ -2442,13 +2450,12 @@ function openSheet() {
 
   $('#sum').textContent = `${Object.keys(state.values).length} settings · ${on.length} kit${on.length > 1 ? 's' : ''} · ${Object.keys(plain(f)).length} files`
 
-  $('#facts').innerHTML = [
-    ...ROLES.filter((r) => state.values[r.id] != null).map((r) => `<span class="fact">${
-      r.kind === 'colour' ? `<i style="background:${state.values[r.id]}"></i>` : ''}${r.label} <b>${state.values[r.id]}</b></span>`),
-    ...on.map((k) => `<span class="fact">${KITS[k].name} <b>${KITS[k].version ?? 'live'}</b></span>`),
-  ].join('')
+  /* which kits, at which versions, is the one fact the files cannot show you
+     from here; the twenty-one values are the whole left half of this drawer */
+  $('#facts').innerHTML = on.map((k) => `<span class="fact">${KITS[k].name} <b>${KITS[k].version ?? 'live'}</b></span>`).join('')
 
-  $('#dests').innerHTML = DESTS.map((d, i) => `<button class="dest${d.wide ? ' dest--wide' : ''}" data-d="${i}"><b>${d.t}</b><span>${d.d}</span></button>`).join('')
+  $('#dests').innerHTML = `<p class="eyebrow">Or one file on its own</p>` + DESTS.map((d, i) =>
+    `<button class="dest" data-d="${i}" title="${d.d}"><b>${d.t}</b><code>${d.file}</code></button>`).join('')
 
   /* The audit and the caveat list used to be here, in full, and this was the
      only place either of them appeared: you learned what was wrong with your
@@ -2503,7 +2510,7 @@ $('#dests').addEventListener('click', (e) => {
   DESTS[Number(b.dataset.d)].go(files())
 })
 $('#export').addEventListener('click', openSheet)
-$('#downloadzip').addEventListener('click', () => DESTS[0].go(files()))
+$('#downloadzip').addEventListener('click', () => grab(`${kitName() || 'design-system'}.zip`, zip(plain(files())), 'application/zip'))
 /* The dock used to carry a second door to the same drawer, labelled "What could
  * not be done". The Checks bar above it now answers that where you can still act
  * on the answer, so the door is gone rather than sitting there saying the same
@@ -2732,6 +2739,7 @@ $('#keptlist').addEventListener('click', (e) => {
 
 /* ── AND BACK AND FORTH BETWEEN THE OTHER TWO ─────────────────────────────── */
 $('#stageflip').addEventListener('click', () => stage(state.stage === 'wall' ? 'compose' : 'wall'))
+$('#stripopen').addEventListener('click', () => stage('wall'))
 $('#restart').addEventListener('click', () => stage('start'))
 
 /* ONE SHUFFLE PER CARD, so a section you like is not thrown out with one you
