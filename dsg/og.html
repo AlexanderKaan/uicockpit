@@ -1,0 +1,52 @@
+<!doctype html><meta charset="utf-8"><title>og</title>
+<!-- THE SOCIAL CARD, 1280x640. The homepage's own first screen, recomposed for
+     a card: the three checkable facts, the name of the thing, the nine real
+     kits, and the one gradient the house allows, as a ring and never a fill.
+     Rendered to og.png by a headless Chrome at exactly this size; the PNG is
+     what deploys, this file is its source. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=IBM+Plex+Sans:wght@450;500;600&display=swap">
+<style>
+:root{
+  --ground:#f1f0ee; --ink:#111112; --ink-2:#41404a; --muted:#5b5a5e; --rule:#dad9d7;
+  --accent:#6644FC; --go:#111112;
+  --gradient:linear-gradient(90deg,#FE5A48 42.04%,#6645FD 100%);
+  --sans:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+  --display:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+body{width:1280px;height:640px;overflow:hidden;background:var(--ground);color:var(--ink);
+  font:450 16px/1.5 var(--sans);display:flex;flex-direction:column;align-items:center;
+  padding:44px 60px 40px;-webkit-font-smoothing:antialiased}
+.mark{display:flex;align-items:center;gap:9px;font:600 19px var(--sans);letter-spacing:-.01em;align-self:flex-start}
+.ticks{display:flex;gap:9px;margin-top:34px}
+.ticks span{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 15px;
+  background:#fff;border:1px solid var(--rule);border-radius:99px;font:500 15px var(--sans)}
+.ticks svg{width:14px;height:14px;color:var(--accent)}
+h1{font:800 84px/1.02 var(--display);letter-spacing:-.045em;text-align:center;margin-top:26px;text-wrap:balance}
+.kits{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:44px;max-width:770px}
+.kits span{display:inline-flex;align-items:center;min-height:38px;padding:0 17px;background:#fff;
+  border:1px solid var(--rule);border-radius:99px;font:500 16px var(--sans);color:var(--ink-2)}
+.foot{margin-top:auto;display:flex;align-items:center;gap:18px}
+.go{display:inline-flex;align-items:center;min-height:44px;padding:0 22px;border-radius:12px;
+  color:#fff;font:600 16px var(--sans);
+  border:2px solid transparent;
+  background:linear-gradient(var(--go),var(--go)) padding-box,var(--gradient) border-box}
+.site{font:500 16px var(--sans);color:var(--muted)}
+</style>
+<body>
+  <p class="mark"><svg viewBox="0 0 512 512" width="26" height="26" fill="none" aria-hidden="true"><circle cx="256" cy="256" r="256" fill="#111112"/><path d="M255.5 41C269.346 41 282.885 42.3113 296 44.8174V203.73C284.839 194.986 270.778 189.773 255.5 189.773C219.2 189.773 189.773 219.2 189.773 255.5C189.773 291.8 219.2 321.227 255.5 321.227C270.778 321.227 284.838 316.013 296 307.269V466.182C282.885 468.688 269.346 470 255.5 470C137.035 470 41 373.965 41 255.5C41 137.035 137.035 41 255.5 41Z" fill="#fff"/></svg>UIcockpit</p>
+  <div class="ticks">
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Free</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>No sign-up</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Nine real kits</span>
+  </div>
+  <h1>The open-source<br>design system generator</h1>
+  <div class="kits">
+    <span>Tailwind CSS</span><span>daisyUI</span><span>Bootstrap</span><span>shadcn/ui</span><span>Material 3</span><span>Radix Themes</span><span>Mantine</span><span>Ant Design</span><span>Open Props</span>
+  </div>
+  <div class="foot">
+    <span class="go">Design your system</span>
+    <span class="site">uicockpit.com</span>
+  </div>
+</body>
