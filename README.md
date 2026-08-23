@@ -4,6 +4,8 @@
 
 ### The open-source design system generator. Nine real UI kits on one screen, in your colours, before you commit to one.
 
+<a href="https://uicockpit.com"><img src="dsg/og.png" alt="UIcockpit: free, no sign-up, nine real kits. Tailwind CSS, daisyUI, Bootstrap, shadcn/ui, Material 3, Radix Themes, Mantine, Ant Design and Open Props." width="760"></a>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 </div>
