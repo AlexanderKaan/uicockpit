@@ -1,194 +1,86 @@
 <div align="center">
 
-# A2UI Cockpit
+# UIcockpit
 
-### Take a standard A2UI component. Point a library at it. Copy the catalog and the renderer.
-
-**A2UI keeps the catalog and the renderer apart on purpose** — *"the catalog is
-schema-only… each renderer SDK independently maps catalog component types to
-native widgets."* So everyone who defines their own catalog has to build the
-renderer too, in every framework they target, by hand. There is no tooling for
-it, no gallery of catalogs, and the protocol says nothing at all about
-accessibility.
-
-This is that tooling.
+### The open-source design system generator. Nine real UI kits on one screen, in your colours, before you commit to one.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-![Status](https://img.shields.io/badge/status-early-f59e0b)
 
 </div>
 
 ---
 
-**[Why this exists →](./WHY.md)** — the pattern everyone now agrees on, the four
-places it stops, and what is left to build.
+Pick a starting point, turn the knobs, and watch **Tailwind CSS, daisyUI,
+Bootstrap, shadcn/ui, Material 3, Radix Themes, Mantine, Ant Design and Open
+Props** render the same screens side by side. One set of values is routed into
+each kit's own vocabulary: its variables, its Sass, its tokens, its theme
+object. Keep the kit that fits, export the theme, and go build.
 
-## Try it
+Everything runs in the browser. No account, no server, no telemetry. The
+export is a zip: `theme.css`, `DESIGN.md` (to Google's design-system spec),
+`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`, `install.md` and a `MANIFEST.md`
+that lists versions, licences, and what could not be done.
+
+## Nothing here is invented
+
+The claim is not "it looks like Bootstrap". The claim is that it **is**
+Bootstrap: their compiled stylesheet, their class names, their components,
+read from the package they publish. That claim is enforced, not promised:
+
+- **Fidelity, counted.** Every class the wall emits is looked up in the kit
+  that should define it. The meter reads 100 per cent for all eight rendering
+  kits, and a class their CSS does not define fails the build by name.
+- **Anatomy, verified.** A real class in the wrong nest matches nothing and
+  styles nothing, so a rendered sweep asserts that every class on every
+  element is reached by at least one rule of its own kit's stylesheet in that
+  exact DOM.
+- **Behaviour, exercised.** The same sweep re-themes every kit at a second
+  brand and asserts that every colour in the brand's hue family follows, that
+  nothing painted is invisible against its backdrop, and that every checked
+  control renders differently from its unchecked sibling.
+- **Gaps, declared.** What a kit has no component for is named on the screen
+  and in the manifest, never quietly substituted. Ant Design and Material are
+  rendered by their own code; what cannot re-theme live says so.
+- **Their icons too.** Tailwind draws Heroicons, Bootstrap draws Bootstrap
+  Icons, Material draws Material Symbols, Radix draws Radix Icons, Mantine
+  draws Tabler, Ant draws its own set, each read from the package that set
+  publishes.
+
+## Run it
+
+Plain Node, zero dependencies of our own:
 
 ```bash
-cd a2ui && node build.mjs && open index.html
+cd dsg
+npm run kits     # fetch the nine kits from their own published packages
+npm run page     # build generator.html, the tool
+npm run home     # build home.html, the front page
+npm run serve    # serve both locally
 ```
 
-Two pages, both self-contained. **`index.html` is the door**: it runs the check
-over Google's Basic Catalog in front of you and then takes yours — an A2UI
-catalog, a Zod schema or a TypeScript union — and tells you what it cannot say.
-**`builder.html` is the tool.**
-
-The builder is split down the middle: **what your agent sent** on the left,
-**what the reader gets** on the right, with the verdict on it.
-
-The left half is a text box, not an output. Paste the stream your agent
-produced — JSONL, a JSON array, or a single message out of a log — and it
-renders in your stack and gets checked. If the stream names a catalog the page
-knows, it switches to it; if the JSON is broken it tells you which line.
-
-The page itself is built out of the kit it ships — same tokens, same recipes,
-same contrast floors — so a regression in the kit shows up in the tool before it
-shows up in anyone's product. A CSS scope limit keeps that honest: chrome styles
-stop dead at the preview, so nothing the page wears can reach the answer.
-
-Or build a stream by ticking components. You land on **Google's A2UI Basic
-Catalog** — the 18 components every A2UI renderer is expected to know — switch
-between **UIcockpit kit · Tailwind · daisyUI · shadcn/ui**, and copy three
-things you then own: the A2UI stream, the `catalog.json`, the renderer for your
-stack, and — for the union-type-plus-Zod architecture most teams are writing by
-hand — the catalog as a `schema.ts` generated from it, so it cannot drift from
-the vocabulary the agent was actually given.
-
-The second tab is our own **public-service extension** — the components a
-form-and-status service needs that the Basic Catalog has no name for (a task
-list, a summary list, a step-by-step, a status badge). Same bindings, same
-verdict, one switch.
+The gates, if you change anything:
 
 ```bash
-node probe.mjs                    # the conformance verdict on a clean answer
-node probe.mjs broken.jsonl bad   # …and on a deliberately broken one
-node --test test.mjs              # the meter: 27 tests over both catalogs
+npm test         # 109 static tests
+npm run fidelity # every class, looked up in its kit
+npm run sweep    # the rendered sweep: eight kits, two brands, four invariants
 ```
 
-## What it is
+## What this deliberately is not
 
-- **Two catalogs** — Google's Basic Catalog as it is published, and our
-  public-service extension: 12 components, each carrying the source it comes
-  from (GOV.UK, USWDS, NL Design System, WAI-ARIA, the HTML spec), never
-  "because we liked it".
-- **Bindings, as tables** — a binding is a mapping, not a program, so adding a
-  library is an afternoon rather than a rewrite. Four ship today, and each one
-  covers both catalogs: the same component name renders the same way, and where
-  the two differ in shape the table absorbs it (our Button carries a `label`,
-  A2UI's takes a child `Text`, one case handles either).
-- **The catalog as types** — a `schema.ts` generated from it: the union, the Zod
-  schemas, and a parse that reports what it REFUSED instead of returning an
-  empty array. Generated, so it cannot drift from what the agent was handed.
-- **A verdict per answer** — nine rules on the answer itself (heading order,
-  a control without a name, a table without headers, a status carried by colour
-  alone, a control asking for a side effect the catalog never declared…), plus
-  the binding's CI certificate. And six things it refuses to claim.
-  The rules read semantics the catalog *declares*, never component names, so they
-  work on a catalog you did not write — including Google's Basic Catalog, through
-  a sidecar that states the reading instead of guessing it.
+There is no npm package, no CLI and no MCP server for this version. The zip
+you export carries the agent-facing files itself, so nothing needs installing
+to use what you made. The `uicockpit` and `uicockpit-mcp` packages on npm
+belong to a retired earlier version of this project and are deprecated; that
+product lives on in this repository at the tag `archive/cockpit-2026-08-17`.
 
-## What the check found, in Google's catalog and in our own
+## Also in this repository
 
-Running the verdict over the Basic Catalog reports three things no renderer and
-no agent can fix, because the vocabulary to fix them is not in the schema:
+[`a2ui/`](./a2ui/README.md) is a sibling experiment: tooling for Google's A2UI
+protocol that turns a catalog choice into a renderer you own, with a
+conformance verdict on every answer. It has its own README, and
+[WHY.md](./WHY.md) holds the positioning it grew from.
 
-| | |
-|---|---|
-| `Video` | `url` and `posterUrl`, and nothing else — there is no property that can carry a text alternative, so 1.1.1 cannot be met |
-| `Modal` | `trigger` and `content` — the dialog has no name for 4.1.2 |
-| *no heading* | `Text` offers `caption` and `body` and no level, so nothing rendered from this catalog has structure to navigate by (1.3.1) |
-| *no actions* | every `Button` **must** carry an `action` and the catalog enumerates none, so nothing can tell an allowed side effect from an invented one |
+## License
 
-These are reported apart from findings about the answer, because they are not
-the answer's fault. A gap the answer actually *runs into* caps the verdict at
-`partial` and names the catalog; a gap sitting unused is listed and nothing more.
-This is meant as a contribution to a young protocol, not a scoreboard — the
-`instructions` field and the sidecar together are enough to close all three.
-
-It found things in **our own** work too, which is the point of owning a meter:
-
-- extending the certificate to the controls this catalog made us render found a
-  checked checkbox at **1.61:1** against its surface in two dark themes — below
-  the 3:1 that 1.4.11 asks of a state indicator. It is in `binding.json`, by
-  name, and the certificate says 54 of 60 rather than rounding up;
-- measuring the built page found target sizes under the 24px WCAG 2.5.8 asks —
-  a checkbox row at **17px** in the kit binding, a disclosure at 20px in
-  Tailwind and shadcn, a range input at 16px everywhere. All fixed. The
-  certificate used to list target size among the things "measured in CI"; that
-  measurement belonged to the archived library's harness and its own markup, so
-  the claim now says exactly that instead;
-- the Role Canvas floor binds the selected treatment to ARIA, and the `tab`
-  recipe has one of its own — so a selected tab wore both an underline and an
-  inset ring. A recipe with its own treatment has to switch the floor off
-  through the token the floor reads;
-- the kit turned out to have **two tone vocabularies** (`badge--warn` but
-  `alert--warning`), so a Callout with tone `warn` had been rendering with no
-  tone at all;
-- the kit had **no divider recipe** at all, and a bare `<hr>` in a flex column
-  collapses to nothing.
-
-## The split that makes the guarantee honest
-
-Accessibility of a generated answer has two halves, and only one is per-answer.
-
-**The binding is certified once, in CI.** Contrast, target size, focus ring —
-properties of the implementation and its tokens, not of what the agent asked for.
-Measuring them per answer is waste; claiming them without measuring is a lie.
-The certificate is generated from real measurement — 1500 contrast pairs over 60
-theme × mode × density combinations — and travels with the verdict, including
-the part that failed: 54 of those 60 configurations are clean, the other six are
-named. A certificate that rounded that up would be the thing it exists to
-prevent.
-
-**The answer is checked every time**, on the component tree rather than the
-markup — so the same rules hold for shadcn, Tailwind, Flutter or SwiftUI.
-No certificate → the verdict reads `unverified`, never `AA`.
-
-And what a machine cannot judge is returned **by name**, never counted as
-passing: whether the alt text describes the image, whether a heading describes
-its section, whether an error says how to fix it.
-
-## Where this came from
-
-This repository was a design-system configurator: 88 components with a
-four-layer provenance line each, a code audit that reads 97–99 % of sixteen real
-repositories and identified 8 of 8 brands correctly against the running
-product's screen, an accessibility matrix at zero violations across six
-configurations, a component forge, a CLI and an MCP server. 57 000 lines.
-
-It did too many things, and the part worth keeping turned out to be the smallest
-one. All of it is preserved at the tag
-[`archive/cockpit-2026-08-17`](../../tree/archive/cockpit-2026-08-17) — nothing
-was lost, and every measurement above stays citable. What travelled here is the
-kit binding's stylesheet (151 rules extracted from 88 components, down to what
-these bindings actually render) and the certificate that library's accessibility
-harness issued.
-
-## The repository
-
-    a2ui/
-      core.mjs          the A2UI core — stream, data model, dynamic values, tree
-      catalogs/         Google's Basic Catalog, its demos, and the a11y sidecar
-      catalog.json      our public-service extension, each with its source
-      bindings.mjs      four bindings, as tables, over both catalogs
-      check.mjs         the verdict: 9 schema-driven rules, and 6 things it will not claim
-      schema.mjs        the catalog → TypeScript + Zod, refusals reported not dropped
-      kit/              the kit binding's stylesheet — plain CSS, yours to edit
-      binding.json      the certificate: 1500 contrast pairs, 54 of 60 clean
-      vocab.mjs         read a catalog, a Zod schema or a union — and say what it cannot say
-      test.mjs          the meter (node --test)
-      index.* builder.* the door and the tool → two self-contained pages (node build.mjs)
-
-About 2 300 lines, no dependencies, no build step for anything that runs.
-
-## Status
-
-Early, and honest about it. The builder runs, the verdict is real, the generated
-renderer compiles, and 27 tests hold both catalogs against all four bindings.
-Not published to npm, no hosted version, no stable API. Tabs render as
-disclosures in the class-based bindings rather than as a scripted tab widget,
-and only the kit binding has a certificate — the other three read `unverified`,
-which is what they are.
-
-MIT.
+[MIT](./LICENSE)
