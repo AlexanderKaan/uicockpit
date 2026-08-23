@@ -293,7 +293,10 @@ const bootstrap = {
   select:  (n) => `<select class="form-select">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
   checkbox: (n) => `<div class="form-check"><input class="form-check-input" type="checkbox"${n.on ? ' checked' : ''}><label class="form-check-label">${esc(n.text ?? '')}</label></div>`,
   switch:  (n) => `<div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch"${n.on ? ' checked' : ''}><label class="form-check-label">${esc(n.text ?? '')}</label></div>`,
-  badge:   (n, k) => A(n, k, 'span', cls('badge rounded-pill', BS_TONE[n.tone ?? 'neutral'])),
+  /* not rounded-pill: that is a documented VARIANT, and their own headline
+     examples are the plain badge. The sidenav count keeps the pill because
+     Bootstrap's own sidebar example puts one there. */
+  badge:   (n, k) => A(n, k, 'span', cls('badge', BS_TONE[n.tone ?? 'neutral'])),
   alert:   (n, k) => `<div class="${cls('alert mb-0', BS_ALERT[n.tone ?? 'neutral'])}" role="alert">${n.text != null ? esc(n.text) : k}</div>`,
   stat:    (n) => `<div class="card"><div class="card-body"><div class="text-body-secondary small">${esc(n.label)}</div><div class="fs-3 fw-semibold">${esc(n.value)}</div></div></div>`,
   table:   (n) => `<table class="table"><thead><tr>${list(n.cols).map((c) => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead><tbody>${list(n.rows).map((r) => `<tr>${list(r).map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,
@@ -314,7 +317,9 @@ const bootstrap = {
     <p class="text-body-secondary mb-0 mt-3">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="d-flex flex-wrap align-items-center gap-3">${list(n.levels).map((lv, i) =>
     `<div class="card ${['shadow-sm', 'shadow', 'shadow-lg'][i] ?? 'shadow'} d-flex align-items-center justify-content-center small text-body-secondary" style="width:6rem;height:4rem">${esc(lv)}</div>`).join('')}</div>`,
-  tabs:    (n) => `<ul class="nav nav-tabs" role="tablist">${list(n.items).map((t, i) => `<li class="nav-item" role="presentation"><a class="nav-link${i === 0 ? ' active' : ''}" role="tab" aria-selected="${i === 0}">${esc(t)}</a></li>`).join('')}</ul>`,
+  /* buttons, as their own 5.3 markup writes them — an <a> with no href can
+     never take focus */
+  tabs:    (n) => `<ul class="nav nav-tabs" role="tablist">${list(n.items).map((t, i) => `<li class="nav-item" role="presentation"><button type="button" class="nav-link${i === 0 ? ' active' : ''}" role="tab" aria-selected="${i === 0}">${esc(t)}</button></li>`).join('')}</ul>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   /* .form-range, .progress, .breadcrumb, .list-group and .nav-pills are all
@@ -435,8 +440,10 @@ const shadcn = {
     n.on ? `<span data-slot="checkbox-indicator" data-state="checked" class="${sSlot('checkbox-indicator')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="size-3.5"><path d="M20 6 9 17l-5-5"/></svg></span>` : ''}</button>${esc(n.text ?? '')}</label>`,
   radio:   (n) => `<div role="radiogroup" data-slot="radio-group" class="${sSlot('radio-group')}">${list(n.items).map((t, i) => {
     const on = i === (n.on ?? 0)
+    /* their indicator holds a CircleIcon — fill-primary, size-2, centred — and
+       an empty span meant no radio on this wall ever looked chosen */
     return `<label class="${sSlot('label')}" data-slot="label"><button type="button" role="radio" aria-checked="${on}" data-slot="radio-group-item" data-state="${on ? 'checked' : 'unchecked'}" class="${sSlot('radio-group-item')}">${
-      on ? `<span data-slot="radio-group-indicator" class="${sSlot('radio-group-indicator')}"></span>` : ''}</button>${esc(t)}</label>` }).join('')}</div>`,
+      on ? `<span data-slot="radio-group-indicator" data-state="checked" class="${sSlot('radio-group-indicator')}"><svg viewBox="0 0 24 24" fill="currentColor" class="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2"><circle cx="12" cy="12" r="10"/></svg></span>` : ''}</button>${esc(t)}</label>` }).join('')}</div>`,
   switch:  (n) => `<label class="${sSlot('label')}" data-slot="label"><button type="button" role="switch" aria-checked="${!!n.on}" data-slot="switch" data-size="default" data-state="${n.on ? 'checked' : 'unchecked'}" class="${sSlot('switch')}"><span data-slot="switch-thumb" data-state="${n.on ? 'checked' : 'unchecked'}" class="${sSlot('switch-thumb')}"></span></button>${esc(n.text ?? '')}</label>`,
   /* THE THUMB IS A ROLE, NOT A DECORATION.
      Their component renders role=slider, a tabindex and the three aria-value
@@ -917,7 +924,7 @@ const mantine = {
      its own is a zero-sized box. Their nesting, not ours. */
   checkbox: (n) => mnInline(mc('Checkbox'), ' data-variant="filled" data-size="sm"',
     `--checkbox-size:var(--checkbox-size-sm);--checkbox-radius:var(--mantine-radius-sm);--checkbox-color:var(--mantine-primary-color-filled);${MN_LABEL_VARS}`,
-    `<div class="${mc('Checkbox', 'inner')}" data-label-position="right"><input type="checkbox" class="${cls(MN_FOCUS, mc('Checkbox', 'input'))}" data-variant="filled"${n.on ? ' checked' : ''}></div>`,
+    `<div class="${mc('Checkbox', 'inner')}" data-label-position="right"><input type="checkbox" class="${cls(MN_FOCUS, mc('Checkbox', 'input'))}" data-variant="filled"${n.on ? ' checked' : ''}><svg class="${mc('Checkbox', 'icon')}" viewBox="0 0 10 7" fill="none" aria-hidden="true"><path d="M4 4.586L1.707 2.293A1 1 0 1 0 .293 3.707l3 3a.997.997 0 0 0 1.414 0l5-5A1 1 0 1 0 8.293.293L4 4.586z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"/></svg></div>`,
     n.text ?? ''),
   /* the track is a SIBLING of the input, not the same element: Mantine styles
      it through `input:checked + track`. */
@@ -929,7 +936,17 @@ const mantine = {
        <span class="${mc('Switch', 'thumb')}" data-reduce-motion="true"></span></span>`,
     n.text ?? ''),
   badge:   (n, k) => A(n, k, 'span', mc('Badge'), MN_BADGE[n.tone ?? 'neutral'] ? ` style="${MN_BADGE[n.tone ?? 'neutral']}"` : ''),
-  alert:   (n, k) => `<div class="${mc('Alert')}" style="--alert-bg:var(--mantine-color-${{ danger: 'error', warning: 'yellow-light', success: 'success' }[n.tone] ?? 'blue-light'})"><div class="${mc('Text')}">${n.text != null ? esc(n.text) : k}</div></div>`,
+  /* their default variant is LIGHT: a step-1 tint with the step-8 ink, which is
+     what their varsResolver writes. --alert-bg alone with a solid painted the
+     wall in saturated slabs no Mantine screen has ever shown. The brand tone
+     rides the primary family, which follows the knob now. */
+  alert:   (n, k) => {
+    const t = { danger: ['var(--mantine-color-red-light)', 'var(--mantine-color-red-light-color)'],
+      warning: ['var(--mantine-color-yellow-light)', 'var(--mantine-color-yellow-light-color)'],
+      success: ['var(--mantine-color-green-light)', 'var(--mantine-color-green-light-color)'],
+    }[n.tone] ?? ['var(--mantine-primary-color-light)', 'var(--mantine-primary-color-light-color)']
+    return `<div class="${mc('Alert')}" data-variant="light" style="--alert-bg:${t[0]};--alert-color:${t[1]};--alert-bd:1px solid transparent;--alert-radius:var(--mantine-radius-default)"><div class="${mc('Alert', 'body')}"><div class="${mc('Alert', 'message')}">${n.text != null ? esc(n.text) : k}</div></div></div>`
+  },
   stat:    (n) => `<div class="${cls(mc('Paper'), mc('Card'))}" data-with-border="true" data-orientation="vertical" style="--card-padding:var(--mantine-spacing-lg)"><p class="${mc('Text')}" style="--text-color:var(--mantine-color-dimmed);--text-fz:var(--mantine-font-size-sm)">${esc(n.label)}</p><p class="${mc('Title')}" data-order="2" style="--title-fz:var(--mantine-h2-font-size);--title-fw:var(--mantine-h2-font-weight);--title-lh:var(--mantine-h2-line-height)">${esc(n.value)}</p></div>`,
   table:   (n) => `<table class="${mc('Table', 'table')}" data-with-table-border="true" data-with-row-border="true"><thead class="${mc('Table', 'thead')}"><tr class="${mc('Table', 'tr')}">${
     list(n.cols).map((c) => `<th class="${mc('Table', 'th')}">${esc(c)}</th>`).join('')}</tr></thead><tbody class="${mc('Table', 'tbody')}">${
@@ -955,8 +972,11 @@ const mantine = {
     <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-sm);--text-color:var(--mantine-color-dimmed);margin-top:var(--mantine-spacing-lg)">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="${mc('Group')}">${list(n.levels).map((lv) =>
     `<div class="${cls(mc('Paper'), mc('Card'))}" data-orientation="vertical" style="--paper-shadow:var(--mantine-shadow-${lv});width:96px;height:64px;display:flex;align-items:center;justify-content:center"><span class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed)">${esc(lv)}</span></div>`).join('')}</div>`,
-  tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal" data-variant="default" style="--tabs-radius:var(--mantine-radius-md);--tabs-color:var(--mantine-primary-color-filled)"><div class="${mc('Tabs', 'list')}" role="tablist" data-orientation="horizontal" data-variant="default">${
-    list(n.items).map((t, i) => `<button class="${cls(MN_FOCUS, mc('Tabs', 'tab'))}" role="tab"${i === 0 ? ' data-active="true"' : ''}><span class="${mc('Tabs', 'tabLabel')}">${esc(t)}</span></button>`).join('')}</div></div>`,
+  /* the variant is a CLASS in their own module map — tab--default, list--default
+     — which their React merges in. Without those two, the underline lives in no
+     rule that matches and every tab renders as the base box. */
+  tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal" data-variant="default" style="--tabs-radius:var(--mantine-radius-md);--tabs-color:var(--mantine-primary-color-filled)"><div class="${cls(mc('Tabs', 'list'), mc('Tabs', 'list--default'))}" role="tablist" data-orientation="horizontal" data-variant="default">${
+    list(n.items).map((t, i) => `<button class="${cls(MN_FOCUS, mc('Tabs', 'tab'), mc('Tabs', 'tab--default'))}" role="tab" data-variant="default"${i === 0 ? ' data-active="true"' : ''}><span class="${mc('Tabs', 'tabLabel')}">${esc(t)}</span></button>`).join('')}</div></div>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   /* Mantine ships a component for every one of these but the chart: Slider,
@@ -965,7 +985,7 @@ const mantine = {
   textarea: (n) => `<div class="${mc('Input', 'wrapper')}" data-variant="default" data-size="sm" style="${MN_INPUT_VARS}"><textarea rows="3" class="${cls(MN_FOCUS, mc('Input', 'input'))}" data-variant="default" data-multiline="true" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea></div>`,
   radio:   (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-xs)">${list(n.items).map((t, i) => mnInline(mc('Radio'), ' data-variant="filled" data-size="sm"',
     `--radio-size:var(--radio-size-sm);--radio-radius:var(--mantine-radius-xl);--radio-color:var(--mantine-primary-color-filled);${MN_LABEL_VARS}`,
-    `<div class="${mc('Radio', 'inner')}" data-label-position="right"><input type="radio" name="${esc(n.name ?? 'g')}" class="${cls(MN_FOCUS, mc('Radio', 'radio'))}"${i === (n.on ?? 0) ? ' checked' : ''}><span class="${mc('Radio', 'icon')}"></span></div>`,
+    `<div class="${mc('Radio', 'inner')}" data-label-position="right"><input type="radio" name="${esc(n.name ?? 'g')}" class="${cls(MN_FOCUS, mc('Radio', 'radio'))}"${i === (n.on ?? 0) ? ' checked' : ''}><svg class="${mc('Radio', 'icon')}" viewBox="0 0 5 5" aria-hidden="true"><circle cx="2.5" cy="2.5" r="2.5" fill="currentColor"/></svg></div>`,
     t)).join('')}</div>`,
   /* their own size, radius and thumb, and the bar positioned the way their
      component positions it — a width and a left of ours put the bar in roughly

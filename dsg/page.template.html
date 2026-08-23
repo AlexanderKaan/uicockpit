@@ -1009,8 +1009,9 @@ function paint() {
        the relationship Bootstrap's own build put between the two. */
     if (r.kit === 'bootstrap' && BSLIVE.length) {
       const want = state.values.brand
+      const triple = HEX6.test(want ?? '') ? [1, 3, 5].map((i) => parseInt(want.slice(i, i + 2), 16)).join(', ') : null
       live.textContent += BSLIVE.map(([sel, props]) => `${sel}{${props.map(([prop, from]) => {
-        const made = from === 'brand' ? want : relative(want, BSSEED, from)?.hex
+        const made = from === 'brand' ? want : from === 'brandRGB' ? triple : relative(want, BSSEED, from)?.hex
         return made ? `${prop}:${made}` : ''
       }).filter(Boolean).join(';')}}`).join('')
     }
@@ -2685,6 +2686,8 @@ function fromUrl() {
   if (panes.length) state.compare = panes.slice(0, MAX_PANES)
   const card = q.get('card')
   if (card && SCENES.some((c) => c.id === card)) state.solo = card
+  const board = q.get('board')
+  if (board && BOARDS.some((b) => b.id === board)) state.board = board
   const brand = (q.get('brand') || '').replace(/^#/, '')
   if (HEX6.test('#' + brand)) state.values.brand = '#' + brand.toLowerCase()
   /* a link that carries anything at all was sent by somebody who had already

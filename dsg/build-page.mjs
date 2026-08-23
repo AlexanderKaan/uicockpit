@@ -30,7 +30,11 @@ import { join } from 'node:path'
 
 const OUT = process.argv[2] ?? 'index.html'
 const IDS = (process.env.DSG_KITS ?? 'tailwind,daisyui,shadcn,bootstrap,material,radix,mantine,antd,openprops').split(',')
-const SEED = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
+/* THE BAKE MATCHES THE DOOR. The page opens with the state's default brand, so
+   anything compiled at build time — Ant Design's whole render, Tailwind's
+   palette, Bootstrap's Sass — has to be baked with the SAME one, or the frame
+   opens teal and turns violet at the first knob. home builds with it already. */
+const SEED = { brand: '#6644FC', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px', space: '1', elevation: '1',
   lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600', borderWidth: '1px' }
 const kits = Object.fromEntries(IDS.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
@@ -120,6 +124,7 @@ const css = await buildCss(SEED, IDS, kits, (id) => wall(id))
  */
 function bootstrapLive(sheet, seedHex) {
   const seed = String(seedHex).toLowerCase()
+  const seedTriple = [1, 3, 5].map((i) => parseInt(seed.slice(i, i + 2), 16)).join(',')
   const [, seedC, seedH] = hexToOklch(seed)
   const near = (v) => {
     const hex = /^#[0-9a-f]{6}$/i.test(v) ? v : null
@@ -148,6 +153,9 @@ function bootstrapLive(sheet, seedHex) {
     for (const [, prop, raw] of body.matchAll(/(--bs-[a-z0-9-]+)\s*:\s*([^;]+)/gi)) {
       const v = raw.trim()
       if (v.toLowerCase() === seed) props.push([prop, 'brand'])
+      /* the -rgb TRIPLES carry the same brand as `R, G, B`, which no hex scan
+         can see — and .bg-primary reads nothing else */
+      else if (v.replace(/\s+/g, '') === seedTriple) props.push([prop, 'brandRGB'])
       else if (near(v)) props.push([prop, v])
     }
     if (props.length) out.push([sel, props])

@@ -31,7 +31,7 @@ const OUT = process.argv[2] ?? 'wall.html'
  * stayed at its published 700 while the weight knob said 600, and it looked
  * like a binding bug for twenty minutes. Third harness to be caught by this —
  * fidelity and orphans both had it — so it is written out in full here too. */
-const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
+const VALUES = { brand: '#6644FC', onBrand: '#ffffff', page: '#f7f9fa', surface: '#ffffff',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px',
   space: '1', elevation: '1', lineHeight: '1.5', letterSpacing: '0em', fontWeight: '600',
   borderWidth: '1px', success: '#2f9e44', warning: '#f08c00', danger: '#e03131', focus: '#0b6e8a',

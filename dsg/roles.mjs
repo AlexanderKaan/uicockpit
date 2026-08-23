@@ -134,7 +134,15 @@ export const MAP = {
   },
   mantine: {
     _note: 'Semantic variables throughout, and all settable at runtime. Its COMPONENT class names are content hashes, which is a separate problem and not this table\'s.',
-    brand:    { var: '--mantine-primary-color-filled', also: ['--mantine-primary-color-filled-hover'] },
+    /* the light trio and the anchor are steps of the SAME family — blue-1,
+       blue-2, blue-8 and blue-6 in their published theme — so they follow the
+       brand through their own ramp relationship. Without them every Anchor,
+       every light Badge and the active NavLink stayed factory blue while the
+       buttons moved. */
+    brand:    { var: '--mantine-primary-color-filled',
+                also: ['--mantine-primary-color-filled-hover'],
+                tint: ['--mantine-primary-color-light', '--mantine-primary-color-light-hover',
+                       '--mantine-primary-color-light-color', '--mantine-color-anchor'] },
     onBrand:  { var: '--mantine-primary-color-contrast' },
     page:     { var: '--mantine-color-body' },
     surface:  { var: '--mantine-color-default' },
@@ -227,10 +235,17 @@ export const MAP = {
   },
   bootstrap: {
     _note: 'Runtime-themeable for surface, ink, line, radius and type: --bs-border-radius alone is read 105 times. But the BRAND is compiled: .btn-primary hard-codes #0d6efd and `var(--bs-primary)` appears zero times in Bootstrap\'s own stylesheet, so --bs-primary is informational. Changing it for real is a Sass rebuild.',
-    brand:    { var: '--bs-link-color', also: ['--bs-primary'],
+    /* rgb too: .bg-primary and .text-bg-primary read rgba(var(--bs-primary-rgb));
+       without the triple they keep the compiled colour while every button moves,
+       which is how the wall got violet buttons over teal chart bars */
+    brand:    { var: '--bs-link-color', also: ['--bs-primary'], rgb: ['--bs-primary-rgb'],
                 needsBuild: { sass: '$primary', why: 'component colours are compiled; setting --bs-primary alone changes links and nothing else' } },
     onBrand:  { needsBuild: { sass: '$primary-text-emphasis', why: 'the same, compiled into each component' } },
-    page:     { var: '--bs-body-bg', also: ['--bs-secondary-bg'] },
+    /* secondary-bg is NOT an alias of the page: it is the colour of every track
+       and rail — form-range, progress, disabled fields. Stock keeps it a step
+       darker than the body (#fff → #e9ecef), and writing a near-white page into
+       it erased every slider track on the wall. tint keeps their step. */
+    page:     { var: '--bs-body-bg', tint: ['--bs-secondary-bg'], rgb: ['--bs-body-bg-rgb'] },
     surface:  { var: '--bs-tertiary-bg' },
     ink:      { var: '--bs-body-color', also: ['--bs-emphasis-color'] },
     inkMuted: { var: '--bs-secondary-color', also: ['--bs-tertiary-color'] },
@@ -259,7 +274,11 @@ export const MAP = {
                    moves the emphasis text and leaves every component alone */
                 needsBuild: { sass: '$danger', why: 'Bootstrap compiles its component colours; setting --bs-danger alone changes the emphasis text and nothing else' },
                 tint: ['--bs-danger-text-emphasis', '--bs-danger-bg-subtle', '--bs-danger-border-subtle'] },
-    space:    { needsBuild: { sass: '$spacer', why: 'Bootstrap has no spacing variable at runtime; p-3 and gap-4 are compiled from $spacer' } },
+    /* $spacer is 1rem, not 1: the knob is a multiplier and Sass wants a length.
+       Passing the bare number compiled `.alert{--bs-alert-padding-y:1}` and the
+       padding collapsed to zero — every $spacer-derived inset with it. */
+    space:    { needsBuild: { sass: '$spacer', from: (v) => `${parseFloat(v) || 1}rem`,
+                why: 'Bootstrap has no spacing variable at runtime; p-3 and gap-4 are compiled from $spacer' } },
     focus:    { var: '--bs-focus-ring-color', alphaFrom: '--bs-focus-ring-opacity' },
     elevation: { shadows: ['--bs-box-shadow', '--bs-box-shadow-sm', '--bs-box-shadow-lg', '--bs-box-shadow-inset'] },
     lineHeight:   { var: '--bs-body-line-height' },
@@ -783,9 +802,18 @@ export function route(values, kitIds, kits = {}) {
         const t = asRgbTriple(v)
         if (t) vars[name] = t; else unscaled.push(name)
       }
-      /* and the relatives, through the kit's own arithmetic */
+      /* And the relatives, through the kit's own arithmetic. A default here can
+         be a POINTER — Mantine publishes --mantine-primary-color-light as
+         var(--mantine-color-blue-light), three hops from a hex — so the chain
+         is followed to the literal before the ratio is read. */
+      const solid = (name, hops = 0) => {
+        const raw = defaults[name]
+        if (raw == null || hops > 6) return raw
+        const m = /^var\((--[a-z0-9-]+)\)$/i.exec(String(raw).trim())
+        return m ? solid(m[1], hops + 1) : raw
+      }
       for (const name of target.tint ?? []) {
-        const made = relative(v, defaults[target.var], defaults[name])
+        const made = relative(v, solid(target.var), solid(name))
         if (made) vars[name] = made.hex; else unscaled.push(name)
       }
 

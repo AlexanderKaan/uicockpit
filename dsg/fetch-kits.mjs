@@ -336,7 +336,11 @@ const SOURCES = {
           for (const name of p.list(where)) {
             let src
             try { src = p.read(`${where}/${name}/${name}.module.mjs`) } catch { continue }
-            const map = Object.fromEntries([...src.matchAll(/"([A-Za-z0-9_]+)":\s*"(m_[a-z0-9]+)"/g)].map((m) => [m[1], m[2]]))
+            /* the hyphens matter: Mantine names its VARIANT classes tab--default
+               and list--outline, and a pattern without them silently dropped
+               every variant class the kit publishes — which is why our tabs
+               rendered as base-styled boxes instead of their underline */
+            const map = Object.fromEntries([...src.matchAll(/"([A-Za-z0-9_-]+)":\s*"(m_[a-z0-9]+)"/g)].map((m) => [m[1], m[2]]))
             if (Object.keys(map).length) classes[name] ??= map
           }
         }

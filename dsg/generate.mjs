@@ -187,7 +187,7 @@ ${r.needsBuild
    * unset semantic colour silently took the BRAND down with it and the wall
    * showed Bootstrap's factory blue while the note claimed otherwise. */
   .filter((b) => values[b.role] != null && !String(b.sass).startsWith('--'))
-  .map((b) => `${b.sass}: ${values[b.role]};   // ${b.why}`).join('\n') || '// nothing here needs a build-time value'}
+  .map((b) => `${b.sass}: ${b.from ? b.from(values[b.role]) : values[b.role]};   // ${b.why}`).join('\n') || '// nothing here needs a build-time value'}
 
 @import "bootstrap/scss/bootstrap";
 `,

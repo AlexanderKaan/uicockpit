@@ -29,11 +29,11 @@
     "tokens": 28,
     "components": true
   },
-  "version": "5.7.20",
+  "version": "5.7.21",
   "license": "MIT",
   "npm": "daisyui",
   "home": "https://daisyui.com",
-  "source": "npm daisyui@5.7.20 · theme/light.css + theme/dark.css",
+  "source": "npm daisyui@5.7.21 · theme/light.css + theme/dark.css",
   "modes": {
     "light": {
       "--color-base-100": "oklch(100% 0 0)",
