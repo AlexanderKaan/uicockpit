@@ -50,7 +50,7 @@
 
     <div class="compose__acts">
       <button class="btn btn--ghost" id="surprise"><!--I:shuffle-->Surprise me</button>
-      <button class="btn btn--go" id="tofold"><!--I:maximize-->Fold it up <kbd>F</kbd></button>
+      <button class="btn btn--go" id="tofold"><!--I:maximize-->See the wall <kbd>F</kbd></button>
     </div>
   </header>
 
@@ -120,6 +120,9 @@
   <section class="grp grp--flat" id="stackgrp">
     <p class="grp__head"><span class="grp__name">What is rendering this</span></p>
     <div class="card" id="stackcard"></div>
+    <!-- how much of what you are looking at is really theirs: a fact about what
+         is rendering this, which is the question this section answers -->
+    <p class="wall__count" id="wallcount"></p>
     <p class="note" id="stacknote" hidden></p>
     <!-- the list opens IN the card's place, so you never leave the wall you are
          changing and the summary is not printed twice -->
@@ -136,7 +139,6 @@
     <div class="panes" id="panes"></div>
   </section>
 
-  <button class="btn btn--go rail__back" id="tokit"><!--I:minimize-->Open the kit again</button>
 </aside>
 
 <main class="wall">
@@ -145,7 +147,7 @@
     <div class="seg" id="rungs" role="radiogroup" aria-label="Where on the wall"></div>
     <div class="seg" id="modes" role="radiogroup" aria-label="Light or dark"></div>
     <div class="seg" id="view" role="radiogroup" aria-label="One kit or several"></div>
-    <p class="wall__count" id="wallcount"></p>
+    <button class="btn btn--go wall__back" id="tokit"><!--I:minimize-->Back to the kit <kbd>F</kbd></button>
   </div>
   <div class="frames" id="frames"></div>
 
