@@ -64,6 +64,7 @@ The gates, if you change anything:
 npm test         # 109 static tests
 npm run fidelity # every class, looked up in its kit
 npm run sweep    # the rendered sweep: eight kits, two brands, four invariants
+npm run exports  # consumer builds: each export compiled by its own kit's tooling
 ```
 
 ## What this deliberately is not
