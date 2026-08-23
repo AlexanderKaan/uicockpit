@@ -427,7 +427,18 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
  * A hex field with a grid of swatches under it reads as a FORM; named cards
  * with the colour filling them read as parts you assemble. Each card opens
  * its own sheet. The names come from nameColor, so the system has words. */
-.ccards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+/* the hierarchy IS the layout: the colour you chose and the neutrals it
+   brought are the two big cards; success, warning and danger are real but
+   subordinate, so they pack small beside them with the "+". */
+.ccards{display:grid;grid-template-columns:1.3fr 1fr .9fr .9fr;grid-template-rows:repeat(2,92px);
+  gap:8px;margin-top:10px}
+.ccard--tall{grid-row:1/3}
+.ccard--tall .ccard__fill{flex:1;height:auto}
+/* a mini is all fill: the role sits ON the colour, and the name lives in the
+   title, because a subordinate card earns one word, not three */
+.ccard--mini .ccard__fill{flex:1;height:auto;border-bottom:0}
+.ccard__on{position:absolute;left:9px;bottom:7px;font-size:9px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase}
 .ccard{position:relative;font:inherit;text-align:left;cursor:pointer;padding:0;overflow:hidden;
   display:flex;flex-direction:column;background:var(--panel);
   border:var(--bw) solid var(--line);border-radius:var(--r-lg);
@@ -446,7 +457,7 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 /* the "all eleven" card is an invitation, not a colour */
 .ccard--more{border-style:dashed;background:var(--faint)}
 .ccard--more .ccard__fill{display:grid;place-items:center;border-bottom:0;
-  font-size:22px;font-weight:300;color:var(--muted)}
+  font-size:20px;font-weight:300;color:var(--muted)}
 .ccard--more:hover .ccard__fill{color:var(--ink)}
 
 /* one colour, and the other ten derived from it */
@@ -2067,27 +2078,25 @@ function drawColourCards() {
   const semantic = ['success', 'warning', 'danger']
   const roleCard = (role) => {
     const r = SWATCH.find((x) => x.id === role)
-    return `<button class="ccard" data-act="role" data-role="${role}" title="${r ? r.what : ''}">
+    return `<button class="ccard ccard--mini" data-act="role" data-role="${role}"
+      title="${call(v[role])}${r ? ' · ' + r.what : ''}">
       <span class="ccard__fill" style="background:${v[role]}"></span>
-      <span class="ccard__meta"><span class="ccard__role">${r ? r.label : role}</span>
-        <span class="ccard__val">${call(v[role])}</span></span></button>`
+      <span class="ccard__on" style="color:${aaInk(v[role])}">${r ? r.label : role}</span></button>`
   }
   $('#colourcards').innerHTML = `
-    <button class="ccard" data-act="brand" title="the colour a primary action wears">
+    <button class="ccard ccard--tall" data-act="brand" title="the colour a primary action wears">
       <span class="ccard__fill" style="background:${v.brand}"></span>
       <span class="ccard__tag">MAIN</span>
       <span class="ccard__meta"><span class="ccard__role">Brand</span>
         <span class="ccard__val">${call(v.brand)}</span>
         <span class="ccard__hex">${v.brand}</span></span></button>
-    <button class="ccard" data-act="all" title="page, surface, line and both inks">
-      <span class="ccard__fill" style="background:linear-gradient(90deg, ${stripes})"></span>
+    <button class="ccard ccard--tall" data-act="all" title="page, surface, line and both inks">
+      <span class="ccard__fill" style="background:linear-gradient(180deg, ${stripes})"></span>
       <span class="ccard__meta"><span class="ccard__role">Neutrals</span>
         <span class="ccard__val">Page to ink</span></span></button>
     ${semantic.map(roleCard).join('')}
-    <button class="ccard ccard--more" data-act="all" title="every colour role, one well each">
-      <span class="ccard__fill">+</span>
-      <span class="ccard__meta"><span class="ccard__role">More</span>
-        <span class="ccard__val">All eleven roles</span></span></button>`
+    <button class="ccard ccard--mini ccard--more" data-act="all" title="every colour role, one well each">
+      <span class="ccard__fill">+</span></button>`
 }
 $('#colourcards').addEventListener('click', (e) => {
   const b = e.target.closest('.ccard')
