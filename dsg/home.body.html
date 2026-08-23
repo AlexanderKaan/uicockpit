@@ -51,22 +51,18 @@
   <div class="band__head">
     <p class="eyebrow">One value, every vocabulary</p>
     <h2>You turn one knob. Nine systems answer in their own words.</h2>
-    <p class="lede">The table below is not written, it is read: the same router the generator runs,
-      asked what it just wrote and where. Pick a row and the wall above changes with it.</p>
+    <p class="lede">One colour, <code id="knobbrand"></code>, and one length, <code id="knobradius"></code>.
+      The table is not written, it is read: the same router the generator runs, asked what it just
+      wrote and where. Pick a row and both the wall above and the note beside it follow.</p>
   </div>
 
   <div class="vocab">
-    <aside class="knob">
-      <div class="knob__row">
-        <span class="knob__name">Brand</span>
-        <div class="knob__swatch" id="knobswatch"></div>
-        <span class="knob__val" id="knobbrand"></span>
-      </div>
-      <div class="knob__row">
-        <span class="knob__name">Corner</span>
-        <div class="knob__corner" id="knobcorner"></div>
-        <span class="knob__val" id="knobradius"></span>
-      </div>
+    <!-- the selected row's own answer, on the same violet bar that row wears, so
+         the paragraph and the line are visibly one thing -->
+    <aside class="answer" aria-live="polite">
+      <p class="answer__kit" id="answerkit"></p>
+      <p class="answer__kind" id="answerkind"></p>
+      <p class="answer__note" id="answernote"></p>
     </aside>
 
     <div>
@@ -77,11 +73,6 @@
           </tr></thead>
           <tbody id="vocab"></tbody>
         </table>
-      </div>
-
-      <div class="note">
-        <p class="note__who" id="notewho"></p>
-        <p id="notetext"></p>
       </div>
     </div>
   </div>

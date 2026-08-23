@@ -218,9 +218,11 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
 .spec tbody tr[aria-selected=true] .spec__kit{font-weight:600}
 /* the selected row grows a bar in the gutter rather than a border, which would
    shift every cell in it by a pixel */
-/* the bar sits in the first cell's own padding, so nothing shifts when a row is
-   picked and nothing hangs out into the page margin */
-.spec th:first-child,.spec__kit{padding-left:12px}
+/* The bar sits in the first cell's own padding, so nothing shifts when a row is
+   picked and nothing hangs out into the page margin. td.spec__kit, not
+   .spec__kit: the `.spec td` shorthand above sets padding-left to 0 and wins on
+   specificity, which put the kit's name flat against the bar. */
+.spec th:first-child,.spec td.spec__kit{padding-left:13px}
 .spec__kit{white-space:nowrap;font-weight:450}
 .spec tbody tr[aria-selected=true] .spec__kit{box-shadow:inset 3px 0 0 var(--accent)}
 .spec__v{font-family:var(--mono);font-size:12.5px;color:var(--ink);word-break:break-all}
@@ -243,28 +245,29 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
   .spec{font-size:13px;min-width:34rem}
 }
 
-/* the knob, beside the table that is its answer */
-.vocab{display:grid;grid-template-columns:14rem 1fr;gap:3.5rem;align-items:start}
+/* THE RAIL IS THE ANSWER, not an ornament.
+ * It held a colour swatch and a rounded square, and neither did anything: the
+ * column headings already say whose colour and whose corner it is, so the two
+ * were a picture of a knob rather than a control. What belongs beside the table
+ * is the thing the table cannot fit, which is what the kit you picked actually
+ * DOES with the value. It wears the same violet bar as the selected row,
+ * because that is the whole claim of the pairing: this paragraph belongs to
+ * that line. */
+.vocab{display:grid;grid-template-columns:17rem 1fr;gap:3rem;align-items:start}
 /* a grid item's min-width is auto, so the table's min-content width pushed this
    column — and the whole page — past the viewport instead of scrolling inside
    the box built for it */
 .vocab>*{min-width:0}
 @media(max-width:900px){.vocab{grid-template-columns:1fr;gap:2rem}}
-.knob{position:sticky;top:5.5rem;display:grid;gap:1.5rem}
-@media(max-width:900px){.knob{position:static;grid-template-columns:1fr 1fr;gap:1.5rem}}
-.knob__row{display:grid;gap:.55rem}
-.knob__swatch{height:64px;border-radius:12px;border:1px solid var(--rule)}
-.knob__corner{height:64px;width:64px;border:1.5px solid var(--ink)}
-.knob__name{font:500 10.5px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
-.knob__val{font-family:var(--mono);font-size:13px}
+.answer{position:sticky;top:5.5rem;display:grid;gap:.45rem;
+  border-left:3px solid var(--accent);padding-left:16px}
+@media(max-width:900px){.answer{position:static;margin-bottom:.5rem}}
+.answer__kit{font-family:var(--display);font-weight:700;font-size:1.375rem;
+  letter-spacing:-.035em;line-height:1.1}
+.answer__kind{font:500 10.5px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+.answer__note{font-size:14px;line-height:1.62;color:var(--ink-2);margin-top:.4rem}
+.answer code{font-family:var(--mono);font-size:12px;color:var(--ink)}
 
-/* the note under the table is the selected kit's own, written by the router */
-.note{margin-top:1.75rem;padding-top:1.5rem;border-top:1px solid var(--rule);
-  display:grid;gap:.6rem}
-.note p{max-width:46rem}
-.note__who{font:500 10.5px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
-.note p{font-size:15px;line-height:1.6;color:var(--ink-2)}
-.note code{color:var(--ink)}
 
 /* ── WHAT IT WILL NOT DO ──────────────────────────────────────────────────
  * The three principles and the five real manifest lines, in one place. They
@@ -426,10 +429,9 @@ $('#wallpick').addEventListener('click', (e) => {
 })
 $('#wallmeta').textContent = `the same board · ${CARDS} cards · ${PARTS} parts`
 
-/* the knob itself, drawn at the value that was actually routed */
-$('#knobswatch').style.background = KNOB.brand
+/* the two values the table is the answer to, named where a fact belongs rather
+   than drawn as a swatch that does nothing */
 $('#knobbrand').textContent = KNOB.brand
-$('#knobcorner').style.borderRadius = KNOB.radius
 $('#knobradius').textContent = KNOB.radius
 
 /* ── THE VOCABULARY ───────────────────────────────────────────────────────
@@ -483,8 +485,9 @@ for (const t of ['#vocab', '#bands']) {
    colour that is compiled and cannot be set at runtime at all. */
 function writeNote(id) {
   const k = KITS[id], v = VOCAB[id]
-  $('#notewho').textContent = `${k.name} · ${KIND[v.brand.kind]}`
-  $('#notetext').innerHTML = v.note ?? `${k.name} takes the value straight into <code>${v.brand.name}</code>.`
+  $('#answerkit').textContent = k.name
+  $('#answerkind').textContent = `takes it as a ${KIND[v.brand.kind]}`
+  $('#answernote').innerHTML = v.note ?? `${k.name} takes the value straight into <code>${v.brand.name}</code>.`
 }
 
 $('#files').innerHTML = [
