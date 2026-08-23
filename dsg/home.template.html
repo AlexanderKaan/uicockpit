@@ -233,6 +233,10 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
    specificity, which put the kit's name flat against the bar. */
 .spec th:first-child,.spec td.spec__kit{padding-left:13px}
 .spec__kit{white-space:nowrap;font-weight:450}
+/* the ghost: same text, already bold, zero height. The column is as wide as
+   the bold name from the start, so the selection's weight change moves
+   nothing. */
+.spec__kit::after{content:attr(data-name);display:block;font-weight:600;height:0;overflow:hidden;visibility:hidden}
 .spec tbody tr[aria-selected=true] .spec__kit{box-shadow:inset 3px 0 0 var(--accent)}
 .spec__v{font-family:var(--mono);font-size:12.5px;color:var(--ink);word-break:break-all}
 .spec__muted{color:var(--ink-2)}
@@ -450,7 +454,7 @@ const cell = (a) => a.kind === 'choice'
 $('#vocab').innerHTML = ALLK.map((k) => {
   const v = VOCAB[k.id]
   return `<tr data-k="${k.id}" aria-selected="false" tabindex="0">
-    <td class="spec__kit">${k.name}</td>
+    <td class="spec__kit" data-name="${k.name}">${k.name}</td>
     <td>${cell(v.brand)}</td>
     <td>${cell(v.radius)}</td>
     <td><span class="kind" data-k="${v.brand.kind}">${KIND[v.brand.kind]}</span></td>
@@ -465,7 +469,7 @@ $('#bands').innerHTML = ALLK.map((k) => {
   const b = k.bands ?? {}
   const dot = (on) => `<span class="dot"${on ? '' : ' data-off'}></span>`
   return `<tr data-k="${k.id}" aria-selected="false" tabindex="0">
-    <td class="spec__kit">${k.name}</td>
+    <td class="spec__kit" data-name="${k.name}">${k.name}</td>
     <td class="spec__muted">${k.runsIn?.framework ?? 'anything'}</td>
     <td class="spec__muted">${b.behaviour?.by ?? 'none'}</td>
     <td class="spec__muted">${b.engine ?? 'none'}</td>
