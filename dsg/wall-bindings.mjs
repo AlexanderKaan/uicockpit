@@ -291,6 +291,11 @@ const daisyui = {
 const BS_BTN = { brand: 'btn-primary', secondary: 'btn-secondary', ghost: 'btn-link', danger: 'btn-danger' }
 const BS_TONE = { neutral: 'text-bg-secondary', brand: 'text-bg-primary', success: 'text-bg-success', warning: 'text-bg-warning', danger: 'text-bg-danger' }
 const BS_ALERT = { neutral: 'alert-secondary', brand: 'alert-primary', success: 'alert-success', warning: 'alert-warning', danger: 'alert-danger' }
+/* Bootstrap's docs pair every check with an id and a label[for], and put
+ * type="button" on every button that is not submitting a form (none here
+ * submits: the cards are scenes, not applications). Deterministic counter:
+ * the scenes render in one fixed order, so the ids are stable per document. */
+let bsCheck = 0
 const bootstrap = {
   _id: 'Bootstrap',
   stack:   (n, k) => `<div class="d-flex flex-column gap-${Math.min(n.gap ?? 3, 5)}">${k}</div>`,
@@ -302,11 +307,13 @@ const bootstrap = {
   text:    (n, k) => A(n, k, 'p', 'mb-0'),
   muted:   (n, k) => A(n, k, 'p', 'mb-0 text-body-secondary small'),
   label:   (n, k) => A(n, k, 'label', 'form-label mb-1'),
-  button:  (n, k) => A(n, k, 'button', cls('btn', BS_BTN[n.tone ?? 'brand'])),
+  button:  (n, k) => A(n, k, 'button', cls('btn', BS_BTN[n.tone ?? 'brand']), ' type="button"'),
   input:   (n) => `<input class="form-control" value="${esc(n.value ?? '')}" placeholder="${esc(n.placeholder ?? '')}">`,
   select:  (n) => `<select class="form-select">${list(n.options).map((o) => `<option>${esc(o)}</option>`).join('')}</select>`,
-  checkbox: (n) => `<div class="form-check"><input class="form-check-input" type="checkbox"${n.on ? ' checked' : ''}><label class="form-check-label">${esc(n.text ?? '')}</label></div>`,
-  switch:  (n) => `<div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch"${n.on ? ' checked' : ''}><label class="form-check-label">${esc(n.text ?? '')}</label></div>`,
+  checkbox: (n) => { const id = `bs-check-${++bsCheck}`
+    return `<div class="form-check"><input class="form-check-input" type="checkbox" id="${id}"${n.on ? ' checked' : ''}><label class="form-check-label" for="${id}">${esc(n.text ?? '')}</label></div>` },
+  switch:  (n) => { const id = `bs-check-${++bsCheck}`
+    return `<div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="${id}"${n.on ? ' checked' : ''}><label class="form-check-label" for="${id}">${esc(n.text ?? '')}</label></div>` },
   /* not rounded-pill: that is a documented VARIANT, and their own headline
      examples are the plain badge. The sidenav count keeps the pill because
      Bootstrap's own sidebar example puts one there. */
@@ -340,7 +347,8 @@ const bootstrap = {
      Bootstrap components. It ships no chart and no empty state, so those two
      are its own utilities on plain markup. */
   textarea: (n) => `<textarea rows="3" class="form-control" placeholder="${esc(n.placeholder ?? '')}">${esc(n.value ?? '')}</textarea>`,
-  radio:   (n) => `<div>${list(n.items).map((t, i) => `<div class="form-check"><input class="form-check-input" type="radio" name="${esc(n.name ?? 'g')}"${i === (n.on ?? 0) ? ' checked' : ''}><label class="form-check-label">${esc(t)}</label></div>`).join('')}</div>`,
+  radio:   (n) => `<div>${list(n.items).map((t, i) => { const id = `bs-check-${++bsCheck}`
+    return `<div class="form-check"><input class="form-check-input" type="radio" name="${esc(n.name ?? 'g')}" id="${id}"${i === (n.on ?? 0) ? ' checked' : ''}><label class="form-check-label" for="${id}">${esc(t)}</label></div>` }).join('')}</div>`,
   slider:  (n) => `<input type="range" class="form-range" max="100" value="${n.value ?? 60}">`,
   progress: (n) => `<div class="progress" role="progressbar"><div class="progress-bar" style="width:${n.value ?? 60}%"></div></div>`,
   iconrow: (n) => `<div class="btn-group flex-wrap">${list(n.items).map((i) => `<button type="button" aria-label="${esc(i)}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center">${ico(i)}</button>`).join('')}</div>`,
@@ -932,7 +940,7 @@ const mantine = {
      press classes their own stylesheet defines — ours had neither, so a Mantine
      button on this wall had no focus ring at all */
   button:  (n, k) => A(n, k, 'button', cls(MN_FOCUS, 'mantine-active', mc('Button'), mc('UnstyledButton')),
-    ` style="${MN_BTN_VARS}${MN_BTN[n.tone ?? 'brand']}"`),
+    ` type="button" style="${MN_BTN_VARS}${MN_BTN[n.tone ?? 'brand']}"`),
   /* wrapper OUTSIDE, input inside: data-variant on the wrapper is what sets
      --input-bd and --input-bg, and an input without it has `border: 1px solid`
      with no colour — an invisible field, which is what the first pass shipped. */
@@ -994,7 +1002,7 @@ const mantine = {
      — which their React merges in. Without those two, the underline lives in no
      rule that matches and every tab renders as the base box. */
   tabs:    (n) => `<div class="${mc('Tabs')}" data-orientation="horizontal" data-variant="default" style="--tabs-radius:var(--mantine-radius-md);--tabs-color:var(--mantine-primary-color-filled)"><div class="${cls(mc('Tabs', 'list'), mc('Tabs', 'list--default'))}" role="tablist" data-orientation="horizontal" data-variant="default">${
-    list(n.items).map((t, i) => `<button class="${cls(MN_FOCUS, mc('Tabs', 'tab'), mc('Tabs', 'tab--default'))}" role="tab" data-variant="default"${i === 0 ? ' data-active="true"' : ''}><span class="${mc('Tabs', 'tabLabel')}">${esc(t)}</span></button>`).join('')}</div></div>`,
+    list(n.items).map((t, i) => `<button type="button" class="${cls(MN_FOCUS, mc('Tabs', 'tab'), mc('Tabs', 'tab--default'))}" role="tab" data-variant="default"${i === 0 ? ' data-active="true"' : ''}><span class="${mc('Tabs', 'tabLabel')}">${esc(t)}</span></button>`).join('')}</div></div>`,
 
   /* ── the rest of a real screen ─────────────────────────────────────────── */
   /* Mantine ships a component for every one of these but the chart: Slider,
@@ -1016,7 +1024,7 @@ const mantine = {
      section reads --progress-section-size for the width and
      --progress-section-color for the fill, so this bar had neither. */
   progress: (n) => `<div class="${mc('Progress')}"><div class="${mc('Progress', 'section')}" style="--progress-section-size:${n.value ?? 60}%;--progress-section-color:var(--mantine-primary-color-filled)"></div></div>`,
-  iconrow: (n) => `<div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="${cls(MN_FOCUS, 'mantine-active', mc('ActionIcon'), mc('UnstyledButton'))}" data-variant="subtle" style="--ai-size:var(--ai-size-md);--ai-radius:var(--mantine-radius-md);--ai-bg:transparent;--ai-color:var(--mantine-color-text);--ai-hover:var(--mantine-color-default-hover)"><span class="${mc('ActionIcon', 'icon')}">${ico(i)}</span></button>`).join('')}</div>`,
+  iconrow: (n) => `<div class="${mc('Group')}" style="--group-gap:var(--mantine-spacing-xs)">${list(n.items).map((i) => `<button type="button" aria-label="${esc(i)}" class="${cls(MN_FOCUS, 'mantine-active', mc('ActionIcon'), mc('UnstyledButton'))}" data-variant="subtle" style="--ai-size:var(--ai-size-md);--ai-radius:var(--mantine-radius-md);--ai-bg:transparent;--ai-color:var(--mantine-color-text);--ai-hover:var(--mantine-color-default-hover)"><span class="${mc('ActionIcon', 'icon')}">${ico(i)}</span></button>`).join('')}</div>`,
   breadcrumb: (n) => `<div class="${mc('Breadcrumbs')}">${list(n.items).map((t, i, a) => `${i ? `<div class="${mc('Breadcrumbs', 'separator')}">/</div>` : ''}<div class="${mc('Breadcrumbs', 'breadcrumb')}">${i === a.length - 1 ? `<span class="${mc('Text')}">${esc(t)}</span>` : `<a class="${mc('Anchor')}" href="#">${esc(t)}</a>`}</div>`).join('')}</div>`,
   /* THEIR MENU IS A POPOVER WITH A MENU INSIDE IT.
    *
@@ -1034,12 +1042,12 @@ const mantine = {
    * one is --menu-item-color, the variable their own varsResolver writes from
    * the color prop. */
   menu:    (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-xs);align-items:flex-start">
-    <button class="${cls(MN_FOCUS, 'mantine-active', mc('Button'), mc('UnstyledButton'))}" aria-haspopup="menu" aria-expanded="true" style="${MN_BTN_VARS}${MN_BTN.secondary}">${esc(n.trigger ?? 'Actions')}</button>
+    <button type="button" class="${cls(MN_FOCUS, 'mantine-active', mc('Button'), mc('UnstyledButton'))}" aria-haspopup="menu" aria-expanded="true" style="${MN_BTN_VARS}${MN_BTN.secondary}">${esc(n.trigger ?? 'Actions')}</button>
     <div class="${cls(mc('Popover', 'dropdown'), mc('Menu', 'dropdown'))}" role="menu" aria-orientation="vertical" data-menu-dropdown style="position:static;min-width:224px">
       ${n.label ? `<div class="${mc('Menu', 'label')}">${esc(n.label)}</div>` : ''}
-      ${list(n.items).map((t) => `<button class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('Menu', 'item'))}" role="menuitem" data-menu-item><span class="${mc('Menu', 'itemLabel')}" data-menu-item-label>${esc(t)}</span></button>`).join('')}
+      ${list(n.items).map((t) => `<button type="button" class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('Menu', 'item'))}" role="menuitem" data-menu-item><span class="${mc('Menu', 'itemLabel')}" data-menu-item-label>${esc(t)}</span></button>`).join('')}
       <div class="${mc('Menu', 'divider')}"></div>
-      <button class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('Menu', 'item'))}" role="menuitem" data-menu-item style="--menu-item-color:var(--mantine-color-red-6);--menu-item-hover:var(--mantine-color-red-0)"><span class="${mc('Menu', 'itemLabel')}" data-menu-item-label>${esc(n.danger ?? 'Delete')}</span></button></div></div>`,
+      <button type="button" class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('Menu', 'item'))}" role="menuitem" data-menu-item style="--menu-item-color:var(--mantine-color-red-6);--menu-item-hover:var(--mantine-color-red-0)"><span class="${mc('Menu', 'itemLabel')}" data-menu-item-label>${esc(n.danger ?? 'Delete')}</span></button></div></div>`,
   sidenav: (n) => `<div class="${mc('Stack')}" style="--stack-gap:var(--mantine-spacing-md)">${list(n.groups).map((g) => `<div>
     <p class="${mc('Text')}" style="--text-fz:var(--mantine-font-size-xs);--text-color:var(--mantine-color-dimmed);padding:0 var(--mantine-spacing-xs);margin:0 0 4px">${esc(g.title)}</p>${
     list(g.items).map((it) => `<a href="#" class="${cls(MN_FOCUS, mc('UnstyledButton'), mc('NavLink'))}"${it.on ? ' data-active="true"' : ''}><span class="${mc('NavLink', 'section')}" data-position="left">${ico(it.icon)}</span><span class="${mc('NavLink', 'body')}"><span class="${mc('NavLink', 'label')}">${esc(it.text)}</span></span>${it.count ? `<span class="${mc('NavLink', 'section')}" data-position="right"><span class="${mc('Badge')}" style="--badge-height:1.125rem">${esc(it.count)}</span></span>` : ''}</a>`).join('')}</div>`).join('')}</div>`,

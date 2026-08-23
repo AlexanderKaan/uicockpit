@@ -2798,6 +2798,11 @@ addEventListener('keydown', (e) => {
  *           sibling — a different fill, border, or a painted child the other
  *           lacks. This is what caught the shadcn radio that never looked
  *           chosen.
+ *   CONSUMED every class on every element of a class-component kit must be
+ *           reached by at least one rule of that kit's own stylesheet in this
+ *           exact DOM. The fidelity meter holds that every class EXISTS; this
+ *           holds that the anatomy is right, because a real class in the
+ *           wrong nest matches nothing and styles nothing.
  *
  * IN the page, not beside it, so it exercises the same state, the same
  * paint() and the same routing the knobs use — an audit with its own pipeline
@@ -2954,12 +2959,93 @@ async function runSweep(brandBHex) {
       if (!differs) samestate.push(locate(id, on, 'state'))
     }
 
+    /* CONSUMED — 1:1 is a property of the ANATOMY, not the class list. Every
+       class here exists in the kit's stylesheet (the fidelity meter holds that
+       at 100), but a form-check-input outside its .form-check would still
+       score: the classes are real and the structure is wrong, and no rule of
+       theirs would ever match it. So: a class on an element with NO rule of
+       the kit's own sheet selecting that element through it is DEAD, and dead
+       classes fail the sweep. Class-component kits only: utilities consume
+       trivially, and Material and Ant render their own code. */
+    const dead = []
+    if (['bootstrap', 'daisyui', 'radix', 'mantine'].includes(id)) {
+      const consumed = new Map()
+      const eat = (el, cls) => { let set = consumed.get(el); if (!set) consumed.set(el, set = new Set()); set.add(cls) }
+      const rules = []
+      const walk = (list) => { for (const r of list) {
+        if (r.selectorText) rules.push(r.selectorText)
+        else if (r.cssRules) walk(r.cssRules) } }
+      for (const sheet of doc.styleSheets) { try { walk(sheet.cssRules) } catch {} }
+      const unesc = (t) => t.replace(/\\(.)/g, '$1')
+      for (const selector of rules) {
+        /* pseudo-elements, state AND positional pseudo-classes come off so the
+           base anatomy can match: .card-text:last-child is still the rule that
+           makes card-text real. :not() and :has() come out of the CLASS
+           harvest, because appearing inside one is context, not consumption. */
+        const clean = selector.replace(/::[a-z-]+(\([^)]*\))?/gi, '')
+          .replace(/:(focus-visible|focus-within|placeholder-shown|indeterminate|first-child|last-child|only-child|autofill|disabled|checked|visited|hover|focus|active|empty|nth-[a-z]+\([^)]*\))/gi, '')
+          /* state ATTRIBUTES are states too: Radix highlights an open menu's
+             item with [data-highlighted], and a static frame has no open menu.
+             The class placement those rules anticipate is still the anatomy
+             being verified. */
+          .replace(/\[data-(highlighted|hovered|side|align|state|swipe-direction)(=[^\]]*)?\]/gi, '')
+          /* a :where() emptied by the stripping is an invalid selector, and an
+             invalid selector silently skips the whole rule */
+          .replace(/:(?:where|is)\(\s*\)/g, '')
+        let hit
+        try { hit = doc.querySelectorAll(clean) } catch { continue }
+        if (!hit.length) continue
+        const harvest = clean.replace(/:(?:not|has)\(([^)]*)\)/gi, '')
+        /* escape-aware: Tailwind-made selectors write .gap-1\.5 and
+           .text-\[10px\], and the token has to survive to compare with the
+           classList, where it lives unescaped */
+        const named = [...harvest.matchAll(/\.((?:[A-Za-z0-9_-]|\\.)+)/g)].map((m) => unesc(m[1]))
+        if (!named.length) continue
+        /* the page names its stylesheet map CSS, so the platform's CSS.escape
+           is shadowed here: escape by hand */
+        const escCls = (c) => c.replace(/[^a-zA-Z0-9_-]/g, (ch) => '\\' + ch)
+        const sibly = /[+~]/.test(clean)
+        for (const el of hit) for (const cls of named) {
+          /* the matched element consumes its own classes; a class it does not
+             carry belonged to an ANCESTOR (.tabs-border .tab) or a SIBLING —
+             and a sibling rule (.breadcrumb-item + .breadcrumb-item) makes the
+             LEFT neighbour's class as real as the right one's */
+          if (el.classList?.contains(cls)) {
+            eat(el, cls)
+            if (sibly) for (const sib of el.parentElement?.children ?? []) if (sib.classList?.contains(cls)) eat(sib, cls)
+            continue
+          }
+          const anc = el.closest?.('.' + escCls(cls))
+          if (anc) { eat(anc, cls); continue }
+          for (const sib of el.parentElement?.children ?? []) if (sib.classList?.contains(cls)) eat(sib, cls)
+        }
+      }
+      /* anatomy their DOCS mandate that their CSS never selects in this
+         context, verified against the shipped stylesheets by hand:
+         - bootstrap nav-item: selected only inside .nav-tabs/.nav-fill/
+           .nav-justified; the docs' markup for pills and plain navs still
+           reads ul.nav > li.nav-item > a.nav-link
+         - bootstrap card-link: its one rule is .card-link + .card-link, so a
+           card with a single link has the class their docs demand and no rule
+           that can reach it */
+      const CANON = { bootstrap: new Set(['nav-item', 'card-link']) }
+      for (const el of doc.querySelectorAll('#strip [class]')) {
+        if (typeof el.className !== 'string') continue
+        const set = consumed.get(el)
+        for (const cls of el.classList) {
+          if (set?.has(cls) || CANON[id]?.has(cls)) continue
+          dead.push(locate(id, el, 'class .' + cls))
+        }
+      }
+    }
+
     verdict[id] = { checked: A.length, followed: family.length - stale.length, family: family.length,
-      live: !!LIVE_BRAND[id], stale, invisible: [...new Set(invisible)], samestate, passB }
+      live: !!LIVE_BRAND[id], stale, invisible: [...new Set(invisible)], samestate,
+      dead: dead.slice(0, 40), deadCount: dead.length, passB }
     } catch (e) { verdict[id] = { error: String(e && e.message || e) } }
   }
 
-  const fail = Object.values(verdict).some((v) => v.error || v.stale?.length || v.invisible?.length || v.samestate?.length)
+  const fail = Object.values(verdict).some((v) => v.error || v.stale?.length || v.invisible?.length || v.samestate?.length || v.deadCount)
   const pre = document.createElement('pre')
   pre.id = 'sweepverdict'
   pre.textContent = JSON.stringify({ fail, brandA, brandB: brandBHex, verdict })

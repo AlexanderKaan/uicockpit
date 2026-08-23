@@ -82,12 +82,13 @@ try {
   console.log(`\n  brand ${brandA} → ${brandB}\n`)
   for (const [kit, v] of Object.entries(verdict)) {
     if (v.error) { console.log(`  ✗ ${kit.padEnd(10)} ${v.error}`); continue }
-    const bad = (v.stale?.length ?? 0) + (v.invisible?.length ?? 0) + (v.samestate?.length ?? 0)
+    const bad = (v.stale?.length ?? 0) + (v.invisible?.length ?? 0) + (v.samestate?.length ?? 0) + (v.deadCount ?? 0)
     console.log(`  ${bad ? '✗' : '✓'} ${kit.padEnd(10)} ${String(v.checked).padStart(4)} colours · ${
       v.live ? `${v.followed}/${v.family} brand-family followed` : `${v.family} brand-family baked (declared built-not-live)`}${
-      v.invisible?.length ? ` · ${v.invisible.length} invisible` : ''}${v.samestate?.length ? ` · ${v.samestate.length} same-state` : ''}`)
-    for (const s of [...(v.stale ?? []), ...(v.invisible ?? []), ...(v.samestate ?? [])]) console.log(`      ${s}`)
+      v.invisible?.length ? ` · ${v.invisible.length} invisible` : ''}${v.samestate?.length ? ` · ${v.samestate.length} same-state` : ''}${
+      v.deadCount ? ` · ${v.deadCount} dead classes` : ''}`)
+    for (const s of [...(v.stale ?? []), ...(v.invisible ?? []), ...(v.samestate ?? []), ...(v.dead ?? [])]) console.log(`      ${s}`)
   }
   if (fail) { console.error('\nsweep: the wall is not the real kit somewhere — the lines above say where.'); process.exit(1) }
-  console.log('\nEvery brand-family colour follows the knob, nothing painted is invisible, every checked control shows it.')
+  console.log('\nEvery brand-family colour follows the knob, nothing painted is invisible, every checked control shows it, and every class is consumed by its own kit\'s stylesheet.')
 } finally { server.kill() }
