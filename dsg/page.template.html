@@ -142,6 +142,36 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .cc__top h2{margin:0;font-family:var(--display);font-weight:700;font-size:15.5px;letter-spacing:-.025em}
 .cc__say{margin:0;font-size:12.5px;line-height:1.55;color:var(--muted)}
 .cc__rule{border:0;border-top:var(--bw) solid var(--line);margin:3px 0 0}
+
+/* ── A CHOICE YOU CAN SEE ─────────────────────────────────────────────────
+ * Each one draws the values it would set: the corner, the border, the lift, at
+ * the size that preset's spacing gives them. Not a button — the wall below has
+ * real ones, and a second, fake button next to it is exactly the confusion the
+ * wall exists to prevent. */
+/* one row, whatever the count: five presets in a four-wide grid leaves an
+   orphan, and an orphan reads as one that did not belong with the others */
+.feels{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px}
+.feel{font:inherit;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r);
+  padding:0 0 7px;cursor:pointer;display:flex;flex-direction:column;gap:6px;overflow:hidden;text-align:center}
+.feel:hover{border-color:var(--ink)}
+.feel[aria-pressed=true]{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
+.feel__art{display:flex;align-items:center;justify-content:center;gap:4px;min-height:52px;
+  background:var(--faint);border-bottom:var(--bw) solid var(--line)}
+.feel__art i{display:block;width:18px;height:18px;flex:none}
+/* the type specimen is fixed-height on purpose: three cards of different
+   heights would be comparing the box, not the size inside it */
+.feel__art--type{display:block;padding:8px;text-align:left;color:var(--ink);
+  overflow:hidden;height:74px;min-height:0}
+.feel__name{font-size:var(--fs-sm);font-weight:600;color:var(--ink);padding:0 6px}
+.feel__name em{font-style:normal;font-weight:400;color:var(--muted);font-size:var(--fs-xs)}
+
+/* the sliders are still here, one disclosure away */
+.byhand{border-top:var(--bw) solid var(--line);padding-top:9px}
+.byhand summary{cursor:pointer;list-style:none;font-size:var(--fs-sm);color:var(--muted);padding:2px 0}
+.byhand summary::-webkit-details-marker{display:none}
+.byhand summary::after{content:" ▸";color:var(--muted)}
+.byhand[open] summary::after{content:" ▾"}
+.byhand summary:hover{color:var(--ink)}
 .cc__dots{margin:auto 0 0;padding-top:9px;border-top:var(--bw) solid var(--line);
   font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-height:19px}
 .said{max-width:76rem;width:100%;margin:14px auto 0;padding:0 20px;
@@ -443,11 +473,18 @@ button.band[aria-expanded=true] .band__go::after{content:" ▾"}
   oklch(.7 .16 180),oklch(.7 .16 240),oklch(.7 .16 300),oklch(.7 .16 360))}
 
 .typo{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}
+/* THE FACE AT A SIZE YOU CAN JUDGE IT AT.
+ * Seventeen pixels is the size of a label, not of a decision. You are choosing
+ * a typeface, so the card shows the typeface — its own name set in itself, big
+ * enough to see what it does with an a and a g. */
 .font{font:inherit;text-align:left;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r);
-      padding:7px 10px 8px;cursor:pointer;display:flex;flex-direction:column;gap:1px;min-height:62px;overflow:hidden}
+      padding:11px 13px 12px;cursor:pointer;display:flex;flex-direction:column;gap:3px;overflow:hidden}
 .font:hover{border-color:var(--ink)}
-.font__role{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.font__name{font-size:17px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.font__role{display:flex;align-items:baseline;gap:7px;font-size:9.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);font-weight:600}
+.font__role em{font-style:normal;letter-spacing:0;text-transform:none;margin-left:auto;font-weight:400}
+.font__name{font-size:30px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  letter-spacing:-.02em;color:var(--ink)}
 .font__from{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mini{font:inherit;font-size:10.5px;color:var(--muted);border:0;background:0;cursor:pointer;
       display:inline-flex;align-items:center;gap:5px;padding:6px 0 0;align-self:flex-start}
@@ -733,12 +770,32 @@ const slider = (k, v) => Math.round(parseFloat(v) * k.factor)
  * That made them look like autocomplete for a thing that only ever set four
  * numbers — so the field is gone and they are what they always were: buttons
  * that move the sliders below them, where you can still see what moved. */
+/* ── NAMED CHOICES YOU CAN SEE, NOT EIGHT SLIDERS ──────────────────────────
+ * Eight continuous controls made this screen a settings dialog. You do not
+ * drag a corner to thirteen pixels; you decide a kit is round or square, and a
+ * slider makes that decision feel like a measurement.
+ *
+ * It is also the truer control. A kit does not have a continuous radius, it has
+ * a SCALE, and picking a named step of one is closer to what a kit does than
+ * writing 13px into a ramp built on 4, 8 and 16.
+ *
+ * The sliders are still there, one disclosure away, for when you do want the
+ * thirteen. */
 const PRESETS = [
-  { label: 'Readable', values: { baseText: '18px', radius: '8px', space: '1.15', lineHeight: '1.65' }, why: 'larger body text, calmer corners, more room, more air between lines' },
-  { label: 'Rounder', values: { radius: '18px' }, why: 'more rounded corners' },
-  { label: 'Sharper', values: { radius: '2px' }, why: 'almost square corners' },
-  { label: 'Denser', values: { baseText: '14px', radius: '6px', space: '0.85', lineHeight: '1.4' }, why: 'smaller text, tighter corners, less room' },
-  { label: 'Roomier', values: { space: '1.3' }, why: 'more room between everything' },
+  { label: 'Sharp', values: { radius: '2px', borderWidth: '1px', elevation: '0.4' }, why: 'almost square, a hairline, barely any lift' },
+  { label: 'Soft', values: { radius: '8px', borderWidth: '1px', elevation: '1' }, why: 'calm corners and the kit\'s own shadow strength' },
+  { label: 'Round', values: { radius: '18px', borderWidth: '0px', elevation: '1.4' }, why: 'round corners, no border, more lift' },
+  { label: 'Dense', values: { radius: '6px', borderWidth: '1px', elevation: '0.6', space: '0.85' }, why: 'tight corners and less room between everything' },
+  { label: 'Roomy', values: { radius: '12px', borderWidth: '1px', elevation: '1', space: '1.3' }, why: 'more room between everything' },
+]
+
+/* A scale, which is what type is. Four sliders asked you to decide a line
+   height in hundredths; a scale asks whether you want it small, normal or
+   roomy, and sets the pair together the way a kit publishes them. */
+const TYPE_SCALES = [
+  { label: 'Small', why: 'dense, for a tool you live in', values: { baseText: '14px', lineHeight: '1.45' } },
+  { label: 'Normal', why: 'the size most things are set at', values: { baseText: '16px', lineHeight: '1.55' } },
+  { label: 'Large', why: 'roomy, for reading', values: { baseText: '18px', lineHeight: '1.65' } },
 ]
 
 const state = {
@@ -840,6 +897,8 @@ function paint() {
   receipt(routed)
   toUrl()
   markState()
+  /* the specimens are drawn FROM the values, so they move when the values do */
+  if (state.stage === 'compose') { drawFeel(); drawScale() }
 
   function dress(r0, order, routed) {
     const r = routed.find((x) => x.kit === r0.kit) ?? r0
@@ -1374,7 +1433,7 @@ function typoCards() {
     const g = GOOGLE.get(fam)
     const stack = FONTS.stacks.find((s) => s.family === value)
     return `<button class="font" data-font="${r.id}">
-      <span class="font__role">${r.label}</span>
+      <span class="font__role">${r.label}<em>tap to change</em></span>
       <span class="font__name" style="font-family:${value.replace(/"/g, '&quot;')}">${stack ? stack.name : fam}</span>
       <span class="font__from">${g ? `Google · ${(g.tags ?? []).length ? g.tags.join(' ') : g.category}${g.variable ? ' · variable' : ''}`
         : stack ? `${stack.from.join(', ')} · system stack` : 'system stack'}</span></button>`
@@ -1905,14 +1964,49 @@ for (const host of ['#knobs', '#typeknobs']) {
   })
 }
 
-$('#chips').innerHTML = PRESETS.map((b) => `<button class="chip" data-b="${b.label}" aria-pressed="false">${b.label}</button>`).join('')
+/* THE SPECIMEN IS THE VALUES, DRAWN. Not a button — the wall below has real
+   ones, and a second, fake button beside it is exactly the confusion the wall
+   exists to prevent. These are the corner, the border and the lift themselves,
+   at the size that preset's spacing gives them. */
+function drawFeel() {
+  const here = PRESETS.find((b) => Object.entries(b.values).every(([k, v]) => state.values[k] === v))
+  $('#chips').innerHTML = PRESETS.map((b) => {
+    const v = { ...state.values, ...b.values }
+    const e = parseFloat(v.elevation ?? 1)
+    const lift = e > 0.05 ? `0 ${Math.max(1, Math.round(2 * e))}px ${Math.round(7 * e)}px rgb(17 17 18 / .16)` : 'none'
+    const pad = `${Math.round(9 * parseFloat(v.space ?? 1))}px`
+    return `<button class="feel" data-b="${b.label}" aria-pressed="${b === here}">
+      <span class="feel__art" style="padding:${pad} 6px">
+        <i style="border-radius:${v.radius};box-shadow:${lift};background:${state.values.brand}"></i>
+        <i style="border-radius:${v.radius};border:${v.borderWidth} solid ${state.values.line};background:${state.values.surface}"></i>
+      </span>
+      <span class="feel__name">${b.label}</span></button>`
+  }).join('')
+}
+drawFeel()
 $('#chips').addEventListener('click', (e) => {
   const btn = e.target.closest('button'); if (!btn) return
   const b = PRESETS.find((x) => x.label === btn.dataset.b); if (!b) return
-  ;[...$('#chips').children].forEach((c) => c.setAttribute('aria-pressed', c === btn))
   Object.assign(state.values, b.values)
   sync(); paint()
-  note(`<b>${b.label}</b> — ${b.why}. Every value it moved is a slider you can still turn.`)
+  note(`<b>${b.label}</b> — ${b.why}. Every value it moved is still a slider under "by hand".`)
+})
+
+/* the same for type: a scale, shown at the size it means */
+function drawScale() {
+  const here = TYPE_SCALES.find((t) => Object.entries(t.values).every(([k, v]) => state.values[k] === v))
+  $('#scales').innerHTML = TYPE_SCALES.map((t) => `<button class="feel" data-t="${t.label}" aria-pressed="${t === here}">
+    <span class="feel__art feel__art--type" style="font-size:${t.values.baseText};line-height:${t.values.lineHeight}">
+      Body text<br>set here</span>
+    <span class="feel__name">${t.label} <em>${t.values.baseText}</em></span></button>`).join('')
+}
+drawScale()
+$('#scales').addEventListener('click', (e) => {
+  const btn = e.target.closest('button'); if (!btn) return
+  const t = TYPE_SCALES.find((x) => x.label === btn.dataset.t); if (!t) return
+  Object.assign(state.values, t.values)
+  sync(); paint()
+  note(`<b>${t.label}</b> — ${t.why}. Line height moves with it, the way a kit publishes the pair.`)
 })
 
 $('#shuffle').addEventListener('click', shuffle)
@@ -2493,6 +2587,13 @@ $('#restart').addEventListener('click', () => stage('start'))
    than a random number in each slider, which is how you get a kit with 3px
    corners and thirty pixels of air. */
 $('#feelshuffle').addEventListener('click', feelShuffle)
+/* All three at once, which is the fastest way to find out you had no idea what
+   you wanted. The three separate ones stay, because most of the time you like
+   two of the three. */
+$('#surprise').addEventListener('click', () => {
+  shuffle(); $('#typeshuffle').click(); feelShuffle()
+  note('<b>All three</b> — colour, type and feel. Shuffle one section at a time to keep what you like.')
+})
 function feelShuffle() {
   const others = PRESETS.filter((b) => b.label !== lastFeel)
   const b = others[Math.floor(Math.random() * others.length)]
@@ -2504,9 +2605,15 @@ function feelShuffle() {
 }
 let lastFeel = null
 addEventListener('keydown', (e) => {
-  if (state.stage !== 'compose' || /input|textarea/i.test(e.target.tagName) || e.metaKey || e.ctrlKey) return
+  if (/input|textarea/i.test(e.target.tagName) || e.metaKey || e.ctrlKey) return
+  /* F WORKS IN BOTH ROOMS, because going back and forth is the point. Being
+     able to check the wall without losing your place is the difference between
+     a preview and somewhere you are working. */
+  if (e.key === 'f' && state.stage !== 'start') return stage(state.stage === 'compose' ? 'wall' : 'compose')
+  if (state.stage !== 'compose') return
   if (e.key === 't') $('#typeshuffle').click()
   if (e.key === 'u') feelShuffle()
+  if (e.key === 'a') $('#surprise').click()
 })
 
 /* ── THE ADDRESS IS THE STATE ──────────────────────────────────────────────
