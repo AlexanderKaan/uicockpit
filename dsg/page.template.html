@@ -268,6 +268,30 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .stepped__who em{font-style:normal;font-size:var(--fs-xs);color:var(--muted)}
 .stepped .opt__parts{font-size:var(--fs-xs);color:var(--muted);margin:0}
 .lanes__foot{margin:10px 0 0;font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
+
+/* ── THE SWITCH, AS A DIFF ────────────────────────────────────────────────
+ * Four rows, and each one is a count rather than a promise. The mark on the
+ * left says which kind of change it is: something kept, something the new kit
+ * cannot take, something that changes hands, something that stops being read.
+ */
+#switch{border:0;padding:0;background:0;max-width:min(640px,94vw)}
+#switch::backdrop{background:#11111255}
+.switch{background:var(--panel);border-radius:var(--r);padding:16px 18px 14px;display:flex;flex-direction:column;gap:12px}
+.switch__rows{display:flex;flex-direction:column;gap:1px;background:var(--line);
+  border:var(--bw) solid var(--line);border-radius:var(--r);overflow:hidden}
+.srow{display:grid;grid-template-columns:20px 1fr auto;gap:11px;align-items:baseline;
+  padding:11px 13px;background:var(--panel)}
+.srow__m{font-size:13px;line-height:1.3;text-align:center}
+.srow[data-k=keep] .srow__m{color:var(--brand)}
+.srow[data-k=cost] .srow__m{color:var(--accent-3)}
+/* spans inside a span: each one has to be told it is a block, or the label and
+   the sentence run into each other */
+.srow__b{display:block;font-size:var(--fs-md);font-weight:600;color:var(--ink)}
+.srow__w{display:block;margin:3px 0 0;font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
+.srow__w code{font-size:var(--fs-xs)}
+.srow__n{font-size:var(--fs-sm);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.switch__foot{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.switch__foot .lane__fine{margin-left:auto;text-align:right}
 .sumrow{display:flex;align-items:baseline;gap:7px;font-size:var(--fs-md);padding:4px 0}
 .sumrow + .sumrow{border-top:var(--bw) solid var(--line)}
 .sumrow[data-none]{color:var(--muted)}
@@ -1129,9 +1153,98 @@ document.querySelector('.lanes').addEventListener('click', (e) => {
     return
   }
   const b = e.target.closest('button[data-p]'); if (!b || b.disabled) return
-  state.on = toggle(state.on, b.dataset.p, KITS)
+  const next = toggle(state.on, b.dataset.p, KITS)
+  /* ADDING A LAYER IS CHEAP; MOVING THE FLOOR IS NOT. A component you switch on
+     over the same base changes what renders and nothing else, so it happens the
+     moment you click. Changing the base can take a value away, and that does
+     not happen behind your back. */
+  if (stack(next, KITS).base !== stack(state.on, KITS).base) return askSwitch(next)
+  state.on = next
   sync(); paint(); drawStackPicker()
 })
+
+/* ── WHAT MOVING THE BASE WOULD ACTUALLY DO ────────────────────────────────
+ * A diff, not a warning. Every row is read out of the same three things the
+ * rest of the tool reads: what the router can do with your values in the new
+ * stack, which parts that stack ships a component for, and which of the
+ * variables it writes it never reads back.
+ *
+ * It is a DIFF and not a description: what the stack you are on already cannot
+ * do is not news, so only what CHANGES is counted. Switching from a kit that
+ * takes no radius to another that takes no radius costs you nothing, and
+ * saying so twice would be the same noise this screen exists to remove.
+ */
+const hardRoles = (ids) => {
+  const out = new Map()
+  for (const r of route(state.values, ids, KITS)) {
+    for (const id of r.unroutable ?? []) out.set(id, `${KITS[r.kit].name} has no variable for it`)
+    for (const c of r.chosen ?? []) out.set(c.role, `${KITS[r.kit].name} takes the nearest of its own set`)
+    for (const b of r.needsBuild ?? []) out.set(b.role, `${KITS[r.kit].name} compiles it, so it needs a rebuild`)
+  }
+  return out
+}
+const label = (id) => ROLES.find((r) => r.id === id)?.label ?? id
+const listOf = (a) => a.length > 3 ? `${a.slice(0, 3).join(', ')} and ${a.length - 3} more` : a.join(', ')
+
+let pendingOn = null
+function askSwitch(next) {
+  pendingOn = next
+  const now = stack(state.on, KITS), to = stack(next, KITS)
+  const toName = KITS[to.base].name
+
+  const hardNow = hardRoles(now.order), hardTo = hardRoles(to.order)
+  const lost = [...hardTo.keys()].filter((id) => !hardNow.has(id))
+  const back = [...hardNow.keys()].filter((id) => !hardTo.has(id))
+
+  const drawnNow = new Set((OWN[showing(now)] ?? {}).drawn ?? [])
+  const drawnTo = new Set((OWN[showing(to)] ?? {}).drawn ?? [])
+  const loseParts = [...drawnTo].filter((p) => !drawnNow.has(p))
+  const gainParts = [...drawnNow].filter((p) => !drawnTo.has(p))
+
+  const unreadOf = (st) => UNREAD.filter((u) => st.order.includes(u.kit))
+  const namesOf = (rows) => new Set(rows.flatMap((u) => u.names))
+  const wasUnread = namesOf(unreadOf(now))
+  const nowUnread = unreadOf(to).flatMap((u) => u.names).filter((n) => !wasUnread.has(n))
+
+  const set = ROLES.filter((r) => state.values[r.id] != null).length
+  const rows = [
+    { k: 'keep', m: '✓', b: 'Everything you chose by hand', n: 'carries over',
+      w: `All ${set} values stay exactly as you set them. A colour, a typeface and a corner are yours, `
+        + 'not the kit\'s, so nothing about them is rewritten by moving the floor underneath.' },
+  ]
+  if (lost.length) rows.push({ k: 'cost', m: '~', b: `${lost.length === 1 ? 'One value' : `${lost.length} values`} stop landing`,
+    n: listOf(lost.map(label)),
+    w: lost.map((id) => `<b>${label(id)}</b> — ${hardTo.get(id)}`).join('. ') + '. They stay in your download, and the manifest names them.' })
+  if (back.length) rows.push({ k: 'keep', m: '✓', b: `${back.length === 1 ? 'One value' : `${back.length} values`} start landing`,
+    n: listOf(back.map(label)), w: `${toName} takes ${back.length === 1 ? 'it' : 'them'} where the stack you are on could not.` })
+  if (loseParts.length) rows.push({ k: 'cost', m: '~', b: `${loseParts.length} ${loseParts.length === 1 ? 'part is' : 'parts are'} drawn from tokens`,
+    n: `${(OWN[showing(to)] ?? {}).partsTheirs} / ${(OWN[showing(to)] ?? {}).parts} parts`,
+    w: `${toName} ships no component for ${listOf(loseParts)}, so the wall builds ${loseParts.length === 1 ? 'it' : 'them'} out of its tokens instead.` })
+  if (gainParts.length) rows.push({ k: 'keep', m: '✓', b: `${gainParts.length} ${gainParts.length === 1 ? 'part gets' : 'parts get'} a real component`,
+    n: listOf(gainParts), w: `${toName} ships ${gainParts.length === 1 ? 'one' : 'these'} where the stack you are on had to draw ${gainParts.length === 1 ? 'it' : 'them'}.` })
+  if (nowUnread.length) rows.push({ k: 'note', m: '◆', b: `${nowUnread.length} ${nowUnread.length === 1 ? 'variable stops' : 'variables stop'} being read`,
+    n: 'still exported',
+    w: `${toName} writes ${nowUnread.length === 1 ? 'it' : 'them'} and never reaches for ${nowUnread.length === 1 ? 'it' : 'them'} again: `
+      + `<code>${nowUnread.slice(0, 3).join('</code> <code>')}</code>. Your download still carries ${nowUnread.length === 1 ? 'it' : 'them'}.` })
+
+  $('#switchtitle').textContent = `Move to ${toName}?`
+  $('#switchsub').textContent = rows.length === 1
+    ? 'Your kit stays exactly as it is. Nothing you set is touched by this.'
+    : 'Your kit stays. Only what came from a library gets rebuilt, and this is everything that touches.'
+  $('#switchrows').innerHTML = rows.map((r) => `<div class="srow" data-k="${r.k}">
+    <span class="srow__m">${r.m}</span>
+    <span><span class="srow__b">${r.b}</span><span class="srow__w">${r.w}</span></span>
+    <span class="srow__n">${r.n}</span></div>`).join('')
+  $('#switchfine').textContent = 'Nothing is written until you say so.'
+  $('#switch').showModal()
+}
+$('#switchgo').addEventListener('click', () => {
+  if (pendingOn) { state.on = pendingOn; pendingOn = null; sync(); paint(); drawStackPicker() }
+  $('#switch').close()
+})
+$('#switchno').addEventListener('click', () => { pendingOn = null; $('#switch').close() })
+$('#switchx').addEventListener('click', () => { pendingOn = null; $('#switch').close() })
+$('#switch').addEventListener('click', (e) => { if (e.target.id === 'switch') { pendingOn = null; $('#switch').close() } })
 
 /* ── typography ───────────────────────────────────────────────────────────── */
 /* Two published sources and no third. The kits publish system stacks — Open
