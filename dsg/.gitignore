@@ -13,3 +13,4 @@ home.elements.js
 kits/fonts.json
 # the design canvas and its working files — exploration, not the product
 _design/
+dist/

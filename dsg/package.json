@@ -15,6 +15,7 @@
     "fonts": "node fonts.mjs",
     "orphans": "node orphans.mjs",
     "orphans:gate": "node orphans.mjs --gate",
-    "sweep": "node sweep-check.mjs"
+    "sweep": "node sweep-check.mjs",
+    "dist": "rm -rf dist && mkdir dist && cp home.html dist/index.html && cp generator.html dist/generator.html"
   }
 }
