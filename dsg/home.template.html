@@ -258,12 +258,12 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
  * DOES with the value. It wears the same violet bar as the selected row,
  * because that is the whole claim of the pairing: this paragraph belongs to
  * that line. */
-.vocab{display:grid;grid-template-columns:17rem 1fr;gap:3rem;align-items:start}
+.split{display:grid;grid-template-columns:17rem 1fr;gap:3rem;align-items:start}
 /* a grid item's min-width is auto, so the table's min-content width pushed this
    column — and the whole page — past the viewport instead of scrolling inside
    the box built for it */
-.vocab>*{min-width:0}
-@media(max-width:900px){.vocab{grid-template-columns:1fr;gap:2rem}}
+.split>*{min-width:0}
+@media(max-width:900px){.split{grid-template-columns:1fr;gap:2rem}}
 .answer{position:sticky;top:5.5rem;display:grid;gap:.45rem;
   border-left:3px solid var(--accent);padding-left:16px}
 @media(max-width:900px){.answer{position:static;margin-bottom:.5rem}}
@@ -350,6 +350,8 @@ h1{animation-delay:.09s}
   .rise{animation:none}
   [data-reveal]{opacity:1;transform:none;transition:none}
 }
+/* and on paper there is no scrolling to reveal anything with */
+@media print{.rise,[data-reveal]{opacity:1;transform:none;animation:none;transition:none}}
 </style>
 <!--BODY-->
 <script type="module">
@@ -365,6 +367,8 @@ const VOCAB = /*VOCAB*/;
 const KNOB = /*KNOB*/;
 const $ = (s) => document.querySelector(s)
 const ALLK = Object.values(KITS)
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+const word = (n) => WORDS[n] ?? String(n)
 
 /* THE SWITCH.
  * Every frame is compiled into this page, so switching is instantaneous and
@@ -488,11 +492,42 @@ for (const t of ['#vocab', '#bands']) {
    router while it works out what it can and cannot do with your value — which
    is why they say things a marketing page would not dare to, like a brand
    colour that is compiled and cannot be set at runtime at all. */
+/* ── EACH TABLE ANSWERS WHERE YOU CLICKED ──────────────────────────────────
+ * One selection still drives the whole page, but the FEEDBACK has to be next to
+ * the thing you touched. Clicking a row in the bands table changed a paragraph
+ * a thousand pixels above it, which is a click with no visible result.
+ *
+ * The second rail is built from the same four bands its table prints, so it is
+ * the same facts in a sentence rather than a second opinion about them. */
+const bandsLine = (k) => {
+  const b = k.bands ?? {}
+  const engine = b.engine === 'own' ? 'its own engine'
+    : b.engine ? `${KITS[b.engine]?.name ?? b.engine}'s engine`
+    : 'no engine of its own'
+  return [
+    b.behaviour ? `Behaviour from ${b.behaviour.by}` : 'No behaviour of its own',
+    engine,
+    `${b.tokens} variables`,
+    b.components ? 'and the components it ships' : 'and no components',
+  ].join(', ') + '.'
+}
+/* FILLED means BRINGS IT ITSELF. An engine it leans on is the opposite of a
+   band it fills, which is the whole reason the column is worth printing. */
+const fills = (k) => {
+  const b = k.bands ?? {}
+  return [!!b.behaviour, b.engine === 'own', (b.tokens ?? 0) > 0, !!b.components].filter(Boolean).length
+}
+const cap = (t) => t ? t[0].toUpperCase() + t.slice(1) : ''
+
 function writeNote(id) {
   const k = KITS[id], v = VOCAB[id]
   $('#answerkit').textContent = k.name
   $('#answerkind').textContent = `takes it as a ${KIND[v.brand.kind]}`
   $('#answernote').innerHTML = v.note ?? `${k.name} takes the value straight into <code>${v.brand.name}</code>.`
+
+  $('#bandskit').textContent = k.name
+  $('#bandsfills').textContent = `fills ${word(fills(k))} of the four`
+  $('#bandsnote').innerHTML = `${bandsLine(k)}${k.runsIn?.what ? ` ${cap(k.runsIn.what)}.` : ''}`
 }
 
 $('#files').innerHTML = [
@@ -514,8 +549,6 @@ $('#nots').innerHTML = [
 /* THE NUMBERS ARE COUNTED, not typed into the markup. The page's whole claim is
    that it is generated from the same documents the tool reads, and a number
    typed into a marketing page is the first thing to go stale. */
-const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
-const word = (n) => WORDS[n] ?? String(n)
 const FREEK = ALLK.filter((k) => !k.runsIn?.framework)
 for (const el of document.querySelectorAll('[data-count=kits]')) el.textContent = word(ALLK.length)
 for (const el of document.querySelectorAll('[data-count=free]')) el.textContent = word(FREEK.length)
@@ -585,6 +618,12 @@ const io = new IntersectionObserver((entries) => {
   for (const e of entries) if (e.isIntersecting) { e.target.setAttribute('data-in', ''); io.unobserve(e.target) }
 }, { rootMargin: '0px 0px -12% 0px' })
 for (const el of document.querySelectorAll('#vocab tr, #bands tr, .files li, .nots > div, .caveats li')) {
+  /* NOTHING ON SCREEN IS EVER HIDDEN. A row that starts at opacity 0 and waits
+     for an observer is a row that can ship invisible — to a tall window, to a
+     print, to a screenshot — and the rows ARE the argument on this page. So the
+     effect only ever applies to what is below the fold, where it is the only
+     place it can be seen anyway. */
+  if (el.getBoundingClientRect().top < innerHeight) continue
   el.setAttribute('data-reveal', '')
   el.style.transitionDelay = `${Math.min([...el.parentNode.children].indexOf(el), 9) * 34}ms`
   io.observe(el)

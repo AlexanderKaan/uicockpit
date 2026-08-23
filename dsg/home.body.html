@@ -60,7 +60,7 @@
       what it was given. Pick a row and the wall follows.</p>
   </div>
 
-  <div class="vocab">
+  <div class="split">
     <!-- the selected row's own answer, on the same violet bar that row wears, so
          the paragraph and the line are visibly one thing -->
     <aside class="answer" aria-live="polite">
@@ -86,24 +86,35 @@
 <section class="band" id="kits">
   <div class="band__head">
     <p class="eyebrow">Read, never guessed</p>
-    <h2>Four bands make a stack, and no kit fills them all.</h2>
+    <!-- counted, and it was false: five of the nine DO fill all four -->
+    <h2>Four bands make a stack. Some kits are all four, some are one.</h2>
     <p class="lede">Behaviour, an engine, tokens, components. Most kits fill some and lean on the
       rest, which is why a combination is often the answer rather than a single name: shadcn brings
       the behaviour and the tokens and sits on Tailwind's engine. Every count here came out of the
       kit's own package at build time.</p>
   </div>
 
-  <div class="scroller">
-    <table class="spec">
-      <thead><tr>
-        <th>System</th><th>Runs in</th><th>Behaviour</th><th>Engine</th><th>Tokens</th><th>Components</th>
-      </tr></thead>
-      <tbody id="bands"></tbody>
-    </table>
+  <div class="split">
+    <aside class="answer" aria-live="polite">
+      <p class="answer__kit" id="bandskit"></p>
+      <p class="answer__kind" id="bandsfills"></p>
+      <p class="answer__note" id="bandsnote"></p>
+    </aside>
+
+    <div>
+      <div class="scroller">
+        <table class="spec">
+          <thead><tr>
+            <th>System</th><th>Runs in</th><th>Behaviour</th><th>Engine</th><th>Tokens</th><th>Components</th>
+          </tr></thead>
+          <tbody id="bands"></tbody>
+        </table>
+      </div>
+      <p class="fine" style="margin-top:1.25rem"><b data-count="free">Five</b> of the
+        <b data-count="kits">nine</b> name no framework at all. That is read from what each package
+        demands of the app around it, not from what its homepage says.</p>
+    </div>
   </div>
-  <p class="fine" style="margin-top:1.25rem"><b data-count="free">Five</b> of the
-    <b data-count="kits">nine</b> name no framework at all. That is read from what each package
-    demands of the app around it, not from what its homepage says.</p>
 </section>
 
 <!-- ── 5 · WHAT IT WILL NOT DO ──────────────────────────────────────────── -->
