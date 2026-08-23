@@ -1,167 +1,152 @@
 <div class="app">
-<header class="nav">
-  <p class="mark"><!--MARK-->UIcockpit</p>
-  <nav class="nav__links">
-    <a href="#how">How it works</a>
-    <a href="#kits">Kits</a>
-    <a href="#export">What you get</a>
-  </nav>
-  <a class="btn btn--go" href="/generator"><!--I:sparkles-->Open the generator</a>
+<header class="top bleed">
+  <div class="top__in">
+    <p class="top__mark"><!--MARK-->UIcockpit</p>
+    <nav>
+      <a href="#vocabulary">The vocabulary</a>
+      <a href="#kits">The kits</a>
+      <a href="#export">What you get</a>
+    </nav>
+    <a class="btn btn--go" href="/generator"><!--I:sliders-horizontal-->Design your system</a>
+  </div>
 </header>
 
-<!-- ── ATTENTION ─────────────────────────────────────────────────────────── -->
-<section class="hero">
-  <p class="tag">Free &amp; open source</p>
-  <h1>The open-source design&nbsp;system generator</h1>
-  <p class="sub">
-    Not another design system — <strong>the machine that makes yours</strong>. Pick the kits you
-    already use, turn a handful of knobs, and install the result.
-  </p>
-  <p class="hero__acts">
-    <a class="btn btn--go btn--lg" href="/generator"><!--I:sparkles-->Start with your kits</a>
-    <a class="btn btn--lg" href="#export"><!--I:download-->See what you download</a>
-  </p>
+<!-- ── 1 · THE NAME ─────────────────────────────────────────────────────── -->
+<section class="name">
+  <p class="eyebrow rise">Nine systems, one set of knobs</p>
+  <h1 class="rise">The open-source <em>design system generator</em></h1>
+  <p class="lede rise">Not a design system, but the machine that makes yours. Pick from
+    <b data-count="kits">nine</b> real UI kits, read from their own published packages, turn the
+    knobs once, and install the folder that comes out.</p>
+  <!-- NO BUTTON HERE. Four lines in, nobody knows yet what this is, so asking
+       them to start is asking for a decision they cannot make. The thing that
+       explains it is directly below and it is interactive, so this points at
+       it instead. The door itself is in the masthead, sticky, all the way down. -->
+  <p class="cue rise">Pick any of the nine below<!--I:arrow-down--></p>
 </section>
 
-<!-- the proof, before the argument: one screen, every system, one click.
-     It is a SIBLING of the hero, not a child: a bleed inside a bleed offsets
-     itself twice and pushes the page sideways. -->
-<figure class="shot bleed">
-  <figcaption>
-    <span class="eyebrow" id="shotwho">Live</span>
-    <span class="eyebrow" id="shotmeta"></span>
+<!-- The proof before the argument, and the page's only control. It is a SIBLING
+     of the section above, not a child: a bleed inside a bleed offsets itself
+     twice and pushes the whole page sideways. -->
+<figure class="wall bleed rise">
+  <figcaption class="wall__bar">
+    <span class="eyebrow" id="wallwho">Live</span>
+    <span class="eyebrow" id="wallmeta"></span>
   </figcaption>
-  <div class="shot__pick" id="shotpick" role="radiogroup" aria-label="Which system"></div>
-  <div class="shot__stage">
-    <div id="shot"></div>
-    <div class="shot__sweep" id="shotsweep" aria-hidden="true"></div>
+  <div class="wall__pick" id="wallpick" role="radiogroup" aria-label="Which system"></div>
+  <div class="wall__stage">
+    <div id="wallshot"></div>
+    <div class="sweep" id="sweep" aria-hidden="true"></div>
   </div>
 </figure>
 
-<!-- ── INTEREST ──────────────────────────────────────────────────────────── -->
-<!-- the turn, on the ground rather than in a panel: the page needs one place
-     to breathe between the proof and the mechanism -->
+<!-- ── 2 · THE TURN ─────────────────────────────────────────────────────── -->
 <section class="turn">
   <p>A design system hands you someone else's taste.<br>
-    <strong>A generator hands you all of them — in one theme, installable.</strong></p>
+    <b>A generator hands you all of them, in one theme.</b></p>
 </section>
 
-<section class="band-sec" id="how">
-  <p class="eyebrow">How it works</p>
-  <h2>Three decisions, and a folder that installs.</h2>
-  <p class="lede">Everything comes from the kit you picked. We read each one's published defaults, and one
-    knob writes into every enabled kit in its own vocabulary — we never invent a token.</p>
-  <ol class="steps">
-    <li>
-      <b>Pick a stack.</b>
-      <p>Four bands make one: behaviour, an engine, tokens and components. A kit fills some and leans on
-        the rest — shadcn brings the Radix behaviour and its own tokens, and sits on Tailwind's engine.</p>
-      <p class="fine">And it says what you have to be running: <b id="howfree"></b> of the
-        <b id="howcount"></b> kits name no framework at all.</p>
-    </li>
-    <li>
-      <b>Turn a handful of knobs.</b>
-      <p>Twenty roles, no more — a brand colour, a corner radius, the family your body text is set in.
-        One value lands in each kit's own name for it: <code>--primary</code>, <code>--bs-primary</code>,
-        <code>--mantine-primary-color-filled</code>, <code>colorPrimary</code>.</p>
-      <p class="fine">A length keeps its ratio. A shadow keeps its strength. Their arithmetic, your value.</p>
-    </li>
-    <li>
-      <b>Install the result.</b>
-      <p>A folder with the files each kit expects, plus a manifest naming everything that could not be
-        set and why. No accounts, no sign-up, nothing to keep paying for.</p>
-      <p class="fine">Or compare six side by side first — the same values in six vocabularies, one click a card.</p>
-    </li>
-  </ol>
-</section>
+<!-- ── 3 · THE VOCABULARY ───────────────────────────────────────────────── -->
+<section class="band" id="vocabulary">
+  <div class="band__head">
+    <p class="eyebrow">One value, every vocabulary</p>
+    <h2>You turn one knob. Nine systems answer in their own words.</h2>
+    <p class="lede">The table below is not written, it is read: the same router the generator runs,
+      asked what it just wrote and where. Pick a row and the wall above changes with it.</p>
+  </div>
 
-<!-- ── DESIRE ────────────────────────────────────────────────────────────── -->
-<section class="band-sec band-sec--panel" id="export">
-  <p class="eyebrow">What you get</p>
-  <h2>A folder that installs.</h2>
-  <p class="lede">Not a screenshot, not a palette — the files each kit expects, plus the one thing nobody else prints.</p>
-  <div class="two">
-    <div class="panel">
-      <ul class="files" id="files"></ul>
-    </div>
-    <div class="panel panel--quiet">
-      <p class="eyebrow">From a real MANIFEST.md</p>
-      <ul class="caveats" id="caveats"></ul>
-      <p class="fine">Every line of that is generated, not written. A package that quietly leaves out a third of a theme is worse than one that says so.</p>
+  <div class="vocab">
+    <aside class="knob">
+      <div class="knob__row">
+        <span class="knob__name">Brand</span>
+        <div class="knob__swatch" id="knobswatch"></div>
+        <span class="knob__val" id="knobbrand"></span>
+      </div>
+      <div class="knob__row">
+        <span class="knob__name">Corner</span>
+        <div class="knob__corner" id="knobcorner"></div>
+        <span class="knob__val" id="knobradius"></span>
+      </div>
+    </aside>
+
+    <div>
+      <div class="scroller">
+        <table class="spec">
+          <thead><tr>
+            <th>System</th><th>Your brand colour</th><th>Your corner radius</th><th>How it takes it</th>
+          </tr></thead>
+          <tbody id="vocab"></tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <p class="note__who" id="notewho"></p>
+        <p id="notetext"></p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- the bento sits between the mechanism and the proof: it is what the
-     mechanism produces, at a glance, before the page starts listing -->
-<section class="band-sec" id="proof">
-  <p class="eyebrow">The whole claim, counted</p>
-  <h2>Nothing on this page is ours.</h2>
-  <p class="lede">Every class on that wall belongs to the kit that publishes it. Every version, licence and
-    default came out of its own package at build time. Here is the shape of it.</p>
-  <!-- Two rows of two spans each, so the grid closes with no holes:
-       [ shot · shadcn ][ systems ][ runs anywhere ]
-       [               ][ parts   ][               ]
-       [ one value              ][ shot · Material ] -->
-  <div class="bento">
-    <figure class="b--shot b--w2 b--h2" data-frame="shadcn:controls">
-      <figcaption>shadcn/ui<small>the controls board</small></figcaption>
-    </figure>
-
-    <article class="b--cool">
-      <p class="num">Systems</p>
-      <p class="big" id="bkits">9<small>read from their own packages, never typed</small></p>
-    </article>
-
-    <article class="b--h2">
-      <p class="num">Runs anywhere</p>
-      <h3 id="bfree"></h3>
-      <p>The rest name React as a peer dependency — read from what each package demands of the app around
-        it, and the picker says which before you turn a knob.</p>
-      <div class="chips" id="bchips"></div>
-    </article>
-
-    <article>
-      <p class="num">On one screen</p>
-      <p class="big" id="bparts">39<small>parts, on <span id="bcards">29</span> cards, in every kit</small></p>
-    </article>
-
-    <article class="b--warm b--w2 b--h2">
-      <p class="num">One value, every vocabulary</p>
-      <h3>A colour as a colour, a length as a scale.</h3>
-      <p>Turn the corner knob once and Tailwind goes 10&nbsp;→&nbsp;2, daisyUI 5&nbsp;→&nbsp;1,
-        shadcn 8&nbsp;→&nbsp;0, Radix 5&nbsp;→&nbsp;2 — each through its own arithmetic, not ours.</p>
-      <p class="fine">Measured, not claimed: that is one turn of one knob, read back off six frames.</p>
-    </article>
-
-    <figure class="b--shot b--w2 b--h2" data-frame="material:forms">
-      <figcaption>Material 3<small>the same values, its own scheme</small></figcaption>
-    </figure>
+<!-- ── 4 · THE FOUR BANDS ───────────────────────────────────────────────── -->
+<section class="band" id="kits">
+  <div class="band__head">
+    <p class="eyebrow">Read, never guessed</p>
+    <h2>Four bands make a stack, and no kit fills them all.</h2>
+    <p class="lede">Behaviour, an engine, tokens, components. Every version, licence and count here
+      came out of the kit's own package at build time, including which of them ask nothing at all of
+      the app around them.</p>
   </div>
+
+  <div class="scroller">
+    <table class="spec">
+      <thead><tr>
+        <th>System</th><th>Runs in</th><th>Behaviour</th><th>Engine</th><th>Tokens</th><th>Components</th>
+      </tr></thead>
+      <tbody id="bands"></tbody>
+    </table>
+  </div>
+  <p class="fine" style="margin-top:1.25rem"><b data-count="free">Five</b> of the
+    <b data-count="kits">nine</b> name no framework at all. That is read from what each package
+    demands of the app around it, not from what its homepage says.</p>
 </section>
 
-<section class="band-sec" id="kits">
-  <p class="eyebrow">Read, never guessed</p>
-  <h2>Nine systems, one set of knobs.</h2>
-  <p class="lede">Every version, licence and default on this page came out of the kit's own package at build
-    time. A hand-typed default is wrong the day they change it.</p>
-  <div class="kitgrid" id="kitgrid"></div>
-</section>
+<!-- ── 5 · WHAT IT WILL NOT DO ──────────────────────────────────────────── -->
+<section class="band" id="limits">
+  <div class="band__head">
+    <p class="eyebrow">Being straight with you</p>
+    <h2>What it will not do.</h2>
+    <p class="lede">Three things this will never become, and five things it could not do to the
+      values on this page. The second list is generated by the run itself, so it changes when the
+      kits do.</p>
+  </div>
 
-<section class="band-sec" id="limits">
-  <p class="eyebrow">Being straight with you</p>
-  <h2>What it will not do.</h2>
   <div class="nots" id="nots"></div>
+
+  <p class="eyebrow" style="margin-top:2.25rem">Straight out of a real MANIFEST.md</p>
+  <ul class="caveats" id="caveats"></ul>
+  <p class="fine" style="margin-top:1.5rem;max-width:46rem">Every line of that is generated, not
+    written. A package that quietly leaves out a third of a theme is worse than one that says so.</p>
 </section>
 
-<!-- ── ACTION ────────────────────────────────────────────────────────────── -->
-<section class="close bleed">
-  <h2>Start with the kits you already use.</h2>
-  <p>One colour is enough to begin. The other ten come from what your stack publishes.</p>
-  <p class="close__acts">
-    <a class="btn btn--go btn--lg" href="/generator"><!--I:sparkles-->Open the generator</a>
-  </p>
-  <p class="fine">Free and open source. No accounts, no telemetry, no lock-in.</p>
+<!-- ── 6 · WHAT YOU GET, AND THE DOOR ───────────────────────────────────── -->
+<section class="band" id="export">
+  <div class="band__head">
+    <p class="eyebrow">What you get</p>
+    <h2>A folder that installs.</h2>
+    <p class="lede">Not a screenshot and not a palette, but the files each kit expects, plus the
+      one thing nobody else prints.</p>
+  </div>
+
+  <ul class="files" id="files"></ul>
+
+  <div class="door">
+    <h2>Start with the kits you already use.</h2>
+    <p>One colour is enough to begin. The rest comes from what your stack publishes.</p>
+    <p class="acts">
+      <a class="btn btn--lg" href="/generator"><!--I:sliders-horizontal-->Design your system</a>
+    </p>
+    <p class="fine">Free and open source. No accounts, no telemetry, no lock-in.</p>
+  </div>
 </section>
 
 <footer class="foot">
@@ -169,10 +154,10 @@
     <nav class="foot__col" aria-label="The generator">
       <p class="foot__head">The generator</p>
       <a href="/generator">Open it empty</a>
-      <a href="#how">How it works</a>
-      <a href="#export">What you get</a>
+      <a href="#vocabulary">The vocabulary</a>
       <a href="#kits">The nine systems</a>
       <a href="#limits">What it will not do</a>
+      <a href="#export">What you get</a>
     </nav>
 
     <nav class="foot__col" aria-label="Theme one system">

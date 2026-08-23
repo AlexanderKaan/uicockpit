@@ -25,13 +25,9 @@ const SHOT_IDS = ALL.filter((id) => id !== 'openprops')
 const VALUES = { brand: '#0b6e8a', onBrand: '#ffffff', page: '#ffffff', surface: '#f7f9fa',
   ink: '#16181c', inkMuted: '#5c6b72', line: '#dfe2e7', radius: '10px', baseText: '16px' }
 const kits = Object.fromEntries(ALL.map((id) => [id, JSON.parse(readFileSync(`kits/${id}.json`, 'utf8'))]))
-/* COUNTED, not typed. "Five of the nine ask nothing of your app" is the whole
-   positioning in one line, and a number typed into a page is a number that goes
-   wrong the first time a kit is added. */
-const EVERY = ALL
-const FREE = EVERY.filter((id) => !kits[id].runsIn?.framework).length
-const WORD_OF = (n) => ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][n] ?? String(n)
-const WORD = WORD_OF(FREE)
+/* The counts on the page — "five of the nine ask nothing of your app" — are
+   worked out in the page itself, off the same kit documents it already carries.
+   Nothing about them is typed here or there. */
 useMantineClasses(kits.mantine?.classes)
 useShadcnParts(kits.shadcn?.parts)
 useAntdParts(kits.antd?.parts)
@@ -86,12 +82,61 @@ const BODY = Object.fromEntries(SHOT_IDS.map((id) => [id,
 const TAIL = Object.fromEntries(SHOT_IDS.map((id) => [id,
   ELEMENTS[id] ? `<script type="module" src="${ELEMENTS[id]}"></` + 'script>' : '']))
 
+/* ── THE VOCABULARY TABLE ──────────────────────────────────────────────────
+ * The page's whole argument in one object: one value, and the name each kit
+ * has for it. Nothing here is typed — it is the SAME route() the generator
+ * runs, asked what it just wrote and where.
+ *
+ * The four kinds are the honest answers a kit can give. Most take a variable.
+ * Ant Design takes a JavaScript token, because it has no stylesheet to write
+ * into. Material takes a SEED and derives the rest. And Radix takes neither:
+ * it publishes named sets and you pick from them, so the truthful answer to
+ * "what did you do with my hex" is the name of the nearest one it has.
+ */
+const at = (r, role, value) => {
+  const eq = (v) => String(v).toLowerCase().replace(/\s/g, '') === String(value).toLowerCase().replace(/\s/g, '')
+  /* a token beats a variable: where a kit is themed by an object, the object is
+     what you actually set and the variable is what it happens to emit */
+  const tok = Object.entries(r.tokens ?? {}).find(([, v]) => eq(v) || eq(v + 'px'))
+  if (tok) return { kind: 'token', name: tok[0], value: String(tok[1]) }
+  const hit = Object.entries(r.vars ?? {}).filter(([, v]) => eq(v)).map(([k]) => k)
+  if (hit.length) {
+    /* Several variables can carry one value. The one that NAMES the role is the
+       answer — and among those, the one written FIRST, because roles.mjs walks
+       each kit's own map in the kit's own order: the canonical name comes
+       before the aliases hanging off it. Sorting by length instead picked
+       --md-sys-shape-corner-md over Material's published -corner-medium. */
+    const NAMES = { brand: /primary|brand|accent/, radius: /radius|corner|rounded/ }
+    const named = hit.filter((k) => (NAMES[role] ?? /$^/).test(k))
+    const pick = (named.length ? named : hit)[0]
+    const seeded = (r.seeds ?? []).some((s) => s.role === role)
+    return { kind: seeded ? 'seed' : 'var', name: pick, value }
+  }
+  /* no variable took it, so the kit answered with a choice from its own sets */
+  const ATTR = { brand: 'data-accent-color', radius: 'data-radius' }
+  const a = ATTR[role] && (r.attrs ?? {})[ATTR[role]]
+  if (a) return { kind: 'choice', name: ATTR[role], value: a }
+  return { kind: 'none', name: null, value: null }
+}
+const VOCAB = Object.fromEntries(route(VALUES, ALL, kits).map((r) => [r.kit, {
+  brand: at(r, 'brand', VALUES.brand),
+  radius: at(r, 'radius', VALUES.radius),
+  note: r.note ?? null,
+  derived: (r.derived ?? []).length,
+}]))
+{
+  const holes = Object.entries(VOCAB).filter(([, v]) => v.brand.kind === 'none' || v.radius.kind === 'none')
+  if (holes.length) { console.error('build: no answer for ' + holes.map(([k]) => k).join(' ')); process.exit(1) }
+}
+
 /* the caveats on the page are the REAL ones, pulled out of a real manifest */
 const md = generate(VALUES, ALL, kits)['MANIFEST.md']
 const caveats = section(md, '## What could not be done').slice(0, 5)
   .map((l) => l.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>'))
 
-const NAMES = ['box', 'sparkles', 'download']
+/* sliders, not sparkles. This tool has no model in its render path, and a
+   sparkle is the one glyph that promises one. Knobs are what it actually is. */
+const NAMES = ['sliders-horizontal', 'arrow-down']
 const lu = icons(NAMES)
 let page = readFileSync('home.template.html', 'utf8')
   .replace('<!--BODY-->', () => readFileSync('home.body.html', 'utf8'))
@@ -104,10 +149,13 @@ let page = readFileSync('home.template.html', 'utf8')
   /* the cards by name, so the footer can offer "this element, in every kit"
      without typing a title that the wall might have renamed */
   .replace('/*CARDLIST*/', () => JSON.stringify(SCENES.map((c) => ({ id: c.id, title: c.title }))))
-  .replace('/*FRAMEWORKFREE*/', () => WORD)
-  .replace('/*KITCOUNT*/', () => WORD_OF(EVERY.length))
   .replace('/*PARTS*/', () => String(PARTS.length))
   .replace('/*CAVEATS*/', () => JSON.stringify(caveats))
+  .replace('/*VOCAB*/', () => JSON.stringify(VOCAB))
+  /* the knob the vocabulary table is the answer to — the SAME values that
+     were routed into it, so the swatch cannot show a colour the table did
+     not receive */
+  .replace('/*KNOB*/', () => JSON.stringify({ brand: VALUES.brand, radius: VALUES.radius }))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
 page = page.split('<!--MARK-->').join(mark(18))
 /* A placeholder that survives into the output is how a lucide box quietly
