@@ -38,16 +38,24 @@ test('a kit that ships no ramps says so instead of getting one from elsewhere', 
   }
 })
 
-test('the solid step is the kit\'s own where the kit says, and the purest where it does not', () => {
+test('the solid step is the kit\'s own where the kit says, and the one that takes a label where it does not', () => {
   const rx = families(kits.radix).find((f) => f.name === 'teal')
   const roles = paletteRoles(rx, matchNeutral(rx, families(kits.radix).filter((f) => f.kind === 'neutral'), kits.radix), kits.radix)
   assert.equal(roles.values.brand, kits.radix.choices.brand.of.teal,
     'Radix publishes which step its accent is; the palette must use that one')
 
+  /* Tailwind says nothing, so the label decides: the lightest step a white one
+     can sit on at 4.5:1. The purest step is two lighter than that and is what
+     made every family come out neon — Tailwind's own buttons are not its 400. */
   const tw = families(kits.tailwind).find((f) => f.name === 'teal')
+  const brand = paletteRoles(tw, null, kits.tailwind).values.brand
+  assert.ok(contrast('#ffffff', brand) >= 4.5, 'a white label has to clear on the step a button wears')
+  const lighter = tw.ramp.filter((c) => hexToOklch(c)[0] > hexToOklch(brand)[0])
+  assert.ok(lighter.every((c) => contrast('#ffffff', c) < 4.5),
+    'and it is the LIGHTEST such step, not merely one of them')
+
   const purest = tw.ramp.reduce((a, b) => (hexToOklch(b)[1] > hexToOklch(a)[1] ? b : a))
-  assert.equal(paletteRoles(tw, null, kits.tailwind).values.brand, purest,
-    'Tailwind says nothing, so the purest step of the family is taken')
+  assert.notEqual(brand, purest, 'which the purest step is not')
 })
 
 test('the two roles taste usually decides are decided by a published bar', () => {

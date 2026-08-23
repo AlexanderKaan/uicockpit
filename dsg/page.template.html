@@ -153,9 +153,13 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .start h1{font-family:var(--display);font-weight:700;font-size:clamp(2rem,4.4vw,3.25rem);
   line-height:1.05;letter-spacing:-.04em;margin:.7rem 0 0;color:var(--ink)}
 .start__lede{margin:1rem auto 0;max-width:36rem;font-size:15.5px;line-height:1.6;color:var(--muted)}
-.start__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:14px;
+/* auto-fit dropped the fourth card onto a row of its own at the width where
+   three fitted, which reads as one that did not belong. Four, then two, then
+   one: a row is always full. */
+.start__grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;
   width:100%;margin:2.75rem 0 0;text-align:left}
-@media(max-width:900px){.start__grid{grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))}}
+@media(max-width:1120px){.start__grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.start__grid{grid-template-columns:minmax(0,1fr)}}
 
 /* a card is a specimen of the thing it would start you on, so it is set in that
    vibe's own faces at that vibe's own size and shape */
@@ -2223,24 +2227,37 @@ addEventListener('keydown', (e) => { if (e.key === 'Escape') $('#drawer').hidden
  * point of the wall, and picking it for you at the door would answer the
  * question the tool exists to ask.
  */
+/* THE FACES COME OFF THE TOP OF GOOGLE'S OWN ORDER.
+ * A starting point is not the place for a face somebody has to go and like: the
+ * job is to be unsurprising, so every one of these is in Google's own most-used
+ * list, and the rank is theirs and not a word of ours. Checked at load, because
+ * a list we refetch could quietly leave one behind. */
 const VIBES = [
   { name: 'Calm and civic',
     blurb: 'Public services and forms people have to finish. Nothing shouts, everything is legible.',
-    brand: '#1c5f8a', heading: 'Work Sans', body: 'Inter',
+    family: 'Blue', heading: 'Open Sans', body: 'Roboto',
     knobs: { radius: '6px', baseText: '17px', space: '1', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
   { name: 'Bold and consumer',
     blurb: 'Things people download on a whim. Round, warm, and not shy about it.',
-    brand: '#c2410c', heading: 'Sora', body: 'Work Sans',
+    family: 'Fuchsia', heading: 'Poppins', body: 'Nunito',
     knobs: { radius: '18px', baseText: '16px', space: '1.15', elevation: '2', borderWidth: '0px', fontWeight: '700' } },
   { name: 'Quiet and technical',
     blurb: 'Dashboards and tools you live in all day. Dense, flat, out of the way.',
-    brand: '#0b6e8a', heading: 'Space Grotesk', body: 'Inter',
+    family: 'Emerald', heading: 'Inter', body: 'Inter',
     knobs: { radius: '3px', baseText: '13.5px', space: '0.82', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
   { name: 'Print and paper',
     blurb: 'Letters, reports, anything that ends up on a desk. Serif, square, unhurried.',
-    brand: '#7b3560', heading: 'Lora', body: 'Assistant',
+    family: 'Orange', heading: 'Merriweather', body: 'Lato',
     knobs: { radius: '0px', baseText: '17.5px', space: '1.25', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
 ]
+/* the claim is "the popular ones", so it is worth being wrong out loud about */
+{
+  const far = VIBES.flatMap((v) => [v.heading, v.body])
+    .filter((f, i, a) => a.indexOf(f) === i)
+    .map((f) => [f, GOOGLE.get(f)?.rank])
+    .filter(([, r]) => !(r > 0 && r <= 50))
+  if (far.length) console.warn('start: no longer in Google\'s top 50 — ' + far.map(([f, r]) => `${f} (${r ?? 'gone'})`).join(', '))
+}
 
 /* THE THREE ROOMS. Nothing is rebuilt when you move between them: the wall is
    the same element at a different height, and the controls are the same
@@ -2274,18 +2291,33 @@ function stage(next) {
  * two faces, and the colours the stack would really derive from that one hex.
  * A card for the dense technical start is smaller and squarer than the one for
  * the loud consumer start, because that is the difference. */
+/* the family this start names, out of what the stack publishes, run through the
+   same seven-role function the palette row uses */
+function vibeColours(v, order) {
+  const all = palettesFor(order, KITS)
+  const fam = all.find((p) => p.kind === 'accent' && p.name.toLowerCase() === v.family.toLowerCase())
+  if (!fam) return {}
+  const neutrals = all.filter((p) => p.kind === 'neutral')
+  const own = neutrals.filter((n) => n.kit === fam.kit)
+  const grey = matchNeutral(fam, own, KITS[fam.kit]) ?? neutrals[0]
+  return paletteRoles(fam, grey, KITS[fam.kit], seenRef()).values ?? {}
+}
+
 function drawVibes() {
   const order = stack(state.on, KITS).order
-  $('#vibes').innerHTML = VIBES.map((v, i) => {
+  $('#vibes').innerHTML = VIBES.filter((v) => vibeColours(v, order).brand).map((v, i) => {
     const head = `'${v.heading}', sans-serif`, body = `'${v.body}', sans-serif`
     const k = v.knobs
-    /* the same door your own colour goes through, so these are the colours you
-       would actually get and not three we picked to look nice together */
-    const out = fromOneColour(v.brand, order, KITS, {}) ?? { values: {} }
-    const c = out.values
+    /* NOT A HEX WE TYPED. Each start names a colour FAMILY, and the family is
+       looked up in what the stack actually publishes — so the seven roles come
+       out of the same ramp, matched to the same grey, by the same function that
+       runs when you pick one by hand. If a stack has no such family the card
+       simply is not offered, which is more honest than showing a colour that
+       stack could not give you. */
+    const c = vibeColours(v, order)
     const chips = ['brand', 'ink', 'inkMuted', 'line'].map((r) => c[r]).filter(Boolean)
     const pad = `${Math.round(17 * Number(k.space))}px`
-    return `<button class="vibe" data-v="${i}" style="border-radius:${k.radius};border-width:${
+    return `<button class="vibe" data-v="${VIBES.indexOf(v)}" style="border-radius:${k.radius};border-width:${
       k.borderWidth === '0px' ? '1px' : k.borderWidth};padding:${pad};gap:${pad};font-size:${k.baseText}">
       <span class="vibe__chips">${chips.map((h) => `<i style="background:${h}"></i>`).join('')}</span>
       <span class="vibe__head">
@@ -2297,7 +2329,7 @@ function drawVibes() {
           c.brand};color:${c.onBrand ?? '#fff'}">Get started</span>
         <!-- only what the card cannot show you by being it: the corner and the
              size are already there to look at, the names of the faces are not -->
-        <span class="vibe__type">${v.heading} + ${v.body}</span>
+        <span class="vibe__type">${v.heading === v.body ? `${v.heading} throughout` : `${v.heading} + ${v.body}`}</span>
       </span>
     </button>`
   }).join('')
@@ -2305,9 +2337,11 @@ function drawVibes() {
 }
 
 function takeVibe(v) {
-  /* the colour first, through the same routing your own colour takes, so the
-     other ten roles are still the stack's and not ours */
-  buildFrom(v.brand)
+  /* the family first, through the same seven-role path the palette row takes,
+     so the greys are the stack's own ramp and not a tint of ours */
+  const order = stack(state.on, KITS).order
+  Object.assign(state.values, vibeColours(v, order))
+  palAt = null; palNeutral = null; palShort = []
   Object.assign(state.values, v.knobs, {
     fontHeading: `'${v.heading}', sans-serif`, fontBody: `'${v.body}', sans-serif`,
   })

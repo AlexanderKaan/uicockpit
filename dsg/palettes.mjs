@@ -99,11 +99,28 @@ export function matchNeutral(accent, neutrals, kit = null) {
  * conventions genuinely differ: Tailwind's oklch palette peaks at 400 and its
  * buttons use 600, Radix's peak IS its solid at step 9, Mantine's is 6. So the
  * kit is asked first. Radix publishes the answer — it is the same step its
- * data-accent-color selects, which we already read — and where a kit says
- * nothing, the purest step is taken, which is what these ramps are built around.
+ * data-accent-color selects, which we already read.
+ *
+ * Where a kit does not publish the step, the LABEL decides. A solid is the
+ * step a filled button wears, and every kit here that does not publish one
+ * writes a white label on that button — Bootstrap, Mantine, Ant, Material,
+ * daisyUI, all of them. So the solid is the lightest step of the family on
+ * which a white label clears 4.5:1: the same bar the rest of this file uses,
+ * asked of the one thing that has to sit on top of the colour.
+ *
+ * The purest step is not that. Tailwind's oklch ramps peak at 400, so taking
+ * the purest made the note above come true on the screen: every family came out
+ * neon, two steps lighter than anything Tailwind's own buttons use. Matching
+ * the kit's own brand lightness instead is worse again, because shadcn's brand
+ * is a near-black with no chroma at all and every family came back as mud.
+ *
+ * Purest stays as the last resort, for a ramp where nothing clears — a family
+ * of one colour, which is what your own hex becomes.
  */
 const purest = (ramp) => ramp.reduce((a, b) => (hexToOklch(b)[1] > hexToOklch(a)[1] ? b : a))
-const solidOf = (family, kit) => kit?.choices?.brand?.of?.[family.name] ?? purest(family.ramp)
+const takesALabel = (ramp) => byLight(ramp).find((c) => contrast('#ffffff', c) >= 4.5)
+const solidOf = (family, kit) => kit?.choices?.brand?.of?.[family.name]
+  ?? takesALabel(family.ramp) ?? purest(family.ramp)
 const solid = (ramp) => purest(ramp)
 const byLight = (ramp) => [...ramp].sort((a, b) => hexToOklch(b)[0] - hexToOklch(a)[0])
 
