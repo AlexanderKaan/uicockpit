@@ -984,8 +984,10 @@ function paint() {
     root.style.colorScheme = wantDark ? 'dark' : 'light'
     /* and its per-element tones, which live in the markup rather than in a
        variable — the wall is built once, so they are re-tuned in place */
+    /* EVERY chosen role, not only the per-element tones: the brand is a choice
+       too, and elements that carry it in their markup were pinned to the accent
+       the page was built with while the root moved on without them. */
     for (const c of r.chosen ?? []) {
-      if (c.attr !== 'tone') continue    // eslint-disable-line no-continue
       for (const el of f.contentDocument.querySelectorAll(`[data-tone="${c.role}"]`)) el.setAttribute('data-accent-color', c.picked)
     }
     /* the wall is one strip you pan, so a board is a place you go rather than
@@ -1019,7 +1021,10 @@ function paint() {
       const want = state.values.brand
       const triple = HEX6.test(want ?? '') ? [1, 3, 5].map((i) => parseInt(want.slice(i, i + 2), 16)).join(', ') : null
       live.textContent += BSLIVE.map(([sel, props]) => `${sel}{${props.map(([prop, from]) => {
-        const made = from === 'brand' ? want : from === 'brandRGB' ? triple : relative(want, BSSEED, from)?.hex
+        const made = from === 'brand' ? want
+          : from === 'brandRGB' ? triple
+          : from.startsWith('brandA:') ? (triple ? from.split(':')[2].replace(/rgba\([^)]*\)/i, `rgba(${triple}, ${from.split(':')[1]})`) : null)
+          : relative(want, BSSEED, from)?.hex
         return made ? `${prop}:${made}` : ''
       }).filter(Boolean).join(';')}}`).join('')
     }
@@ -2566,7 +2571,9 @@ let saved = null                       // the snapshot as it was last kept, for 
 const same = (a, b) => a && b && JSON.stringify(a) === JSON.stringify(b)
 function markState() {
   const el = $('#conceptstate'); if (!el) return
-  el.textContent = saved ? (same(saved, snap()) ? 'kept' : 'edited') : 'not kept yet'
+  /* "not kept yet" read like a verdict; saved/unsaved is the vocabulary every
+     product already taught people */
+  el.textContent = saved ? (same(saved, snap()) ? 'saved' : 'unsaved changes') : 'unsaved'
 }
 
 function drawKept() {
@@ -2684,6 +2691,198 @@ addEventListener('keydown', (e) => {
   if (/input|textarea/i.test(e.target.tagName) || e.target.isContentEditable || e.metaKey || e.ctrlKey || e.altKey) return
   stage(state.stage === 'compose' ? 'wall' : 'compose')
 })
+
+/* ── THE SWEEP, AS A CHECK THE PAGE RUNS ON ITSELF ─────────────────────────
+ * The hand sweep of 2026-08-23 found seven places the wall was not the real
+ * kit, and none of the existing gates could have seen them: the classes were
+ * all theirs, assembled wrong. Three of the seven reduce to invariants a
+ * rendered page can assert about itself, so behind ?audit= the page does.
+ *
+ *   FOLLOW  every colour that sits in the brand's hue family must move when
+ *           the brand moves. This is what caught the unwritten -rgb triple and
+ *           the stale bake: right classes, one variable left behind.
+ *   VISIBLE a thin, empty element with paint must be distinguishable from its
+ *           backdrop. This is what caught the erased slider tracks.
+ *   STATES  a checked control must render differently from its unchecked
+ *           sibling — a different fill, border, or a painted child the other
+ *           lacks. This is what caught the shadcn radio that never looked
+ *           chosen.
+ *
+ * IN the page, not beside it, so it exercises the same state, the same
+ * paint() and the same routing the knobs use — an audit with its own pipeline
+ * would only prove its own pipeline. `npm run sweep` loads this headless and
+ * reads the verdict. The four findings these three cannot see (a missing icon
+ * that still differs from unchecked, a wrong variant that still renders) stay
+ * what they were: a periodic hand sweep against the kits\' own pages.
+ */
+async function runSweep(brandBHex) {
+  /* setTimeout only: headless virtual time fast-forwards timers but never has
+     to produce a frame, so an awaited rAF can simply never come */
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms)); const raf = () => wait(60)
+  const rgbOf = (v) => { const m = /rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[,/ ]+([\d.]+))?\)/.exec(v ?? '')
+    return m ? { r: +m[1], g: +m[2], b: +m[3], a: m[4] == null ? 1 : +m[4] } : null }
+  const hex = (c) => '#' + [c.r, c.g, c.b].map((n) => Math.round(n).toString(16).padStart(2, '0')).join('')
+  /* COMPOSITED FIRST. A translucent grey is stored over a dark base — Radix's
+     --gray-a6 is rgba(0,0,66,.13) — and the raw triple reads as saturated navy:
+     hue 264, two degrees off the brand. Painted, it is a pale grey. The eye
+     gets the composited colour, so the family test does too. */
+  const comp = (c) => ({ r: c.r * c.a + 255 * (1 - c.a), g: c.g * c.a + 255 * (1 - c.a), b: c.b * c.a + 255 * (1 - c.a), a: 1 })
+  const okl = (c) => { try { return hexToOklch(hex(comp(c))) } catch { return null } }
+  const hueDist = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d }
+  const PROPS = ['color', 'backgroundColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor', 'fill', 'stroke', 'outlineColor']
+  const stackFor = (id) => KITS[id].layer === 'components' && !KITS[id].standalone
+    ? new Set([foundationOf(KITS), id]) : new Set([id])
+  const locate = (kit, el, prop) => `${kit} · ${el.closest('[data-card]')?.dataset.card ?? '?'} · ${el.tagName.toLowerCase()}${
+    (typeof el.className === 'string' ? el.className : '').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((c) => '.' + c).join('')} · ${prop}`
+
+  /* one frame\'s colours, element by element, pseudos included where the paint
+     lives in one (a range track is only a pseudo) */
+  const scan = (doc) => {
+    const out = []
+    for (const el of doc.querySelectorAll('#strip *')) {
+      const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue
+      const targets = [[el, null, getComputedStyle(el)]]
+      for (const ps of ['::before', '::after']) { const cs = getComputedStyle(el, ps); if (cs.content !== 'none') targets.push([el, ps, cs]) }
+      if (el.matches('input[type=range]')) targets.push([el, '::-webkit-slider-runnable-track', getComputedStyle(el, '::-webkit-slider-runnable-track')])
+      for (const [t, ps, cs] of targets) for (const prop of PROPS) {
+        const c = rgbOf(cs[prop]); if (!c || c.a < 0.05) continue
+        out.push({ el: t, ps, prop, c, rect: r })
+      }
+    }
+    return out
+  }
+
+  const brandA = state.values.brand
+  const [, , hueA] = hexToOklch(brandA)
+  const [, , hueB] = hexToOklch(brandBHex)
+  const verdict = {}
+
+  /* a frame is READY when its strip exists and its styles answer — polled,
+     because under virtual time a fixed wait can fire before the srcdoc has
+     even parsed, and measuring a half-built frame reports a wall of noise */
+  const settled = async (id) => {
+    for (let i = 0; i < 60; i++) {
+      const doc = $('#f_' + id)?.contentDocument
+      if (doc?.getElementById('strip') && doc.readyState === 'complete') { await wait(120); return doc }
+      await wait(100)
+    }
+    return null
+  }
+  for (const id of RENDERS) {
+    let passB = null
+    try {
+    state.values.brand = brandA
+    state.on = stackFor(id); state.compare = null; state.solo = null
+    sync(); paint(); await wait(id === 'material' || id === 'antd' ? 2600 : 250)
+    const doc = await settled(id)
+    if (!doc) { verdict[id] = { error: 'no frame' }; continue }
+    const A = scan(doc)
+
+    /* FOLLOW — who claims the brand\'s hue family at pass A */
+    const family = A.filter((e) => { const o = okl(e.c); return o && o[1] > 0.04 && hueDist(o[2], hueA) < 32 })
+    const stale = []
+    if (LIVE_BRAND[id]) {
+      state.values.brand = brandBHex; sync(); paint(); await settled(id)
+      /* SELF-SYNCHRONISED, not timed: under virtual time a fixed wait proves
+         nothing about whether the recalc landed. The first family colour is the
+         probe — measurement starts when it has visibly moved, and only a probe
+         that never moves in three seconds is allowed to mean "stale". */
+      const probe = family[0]
+      let probeMoved = false
+      for (let i = 0; probe && i < 30; i++) {
+        const c = rgbOf(getComputedStyle(probe.el, probe.ps ?? undefined)[probe.prop])
+        if (!c || hex(c) !== hex(probe.c)) { probeMoved = true; break }
+        await wait(100)
+      }
+      let nullReads = 0, detached = 0
+      passB = { probeMoved,
+        liveHasB: ($('#f_' + id)?.contentDocument?.getElementById('live')?.textContent ?? '').toLowerCase().includes(brandBHex.toLowerCase()),
+        sameDoc: $('#f_' + id)?.contentDocument === doc }
+      for (const e of family) {
+        if (!e.el.isConnected) { detached++; continue }
+        const cs = getComputedStyle(e.el, e.ps ?? undefined)
+        const c = rgbOf(cs[e.prop]); const o = c && okl(c)
+        if (!o || o[1] < 0.03) { nullReads++; continue }   // achromatic now: allowed (contrast repick)
+        if (hueDist(o[2], hueB) >= 32) stale.push(locate(id, e.el, e.prop))
+      }
+      passB.nullReads = nullReads; passB.detached = detached
+      state.values.brand = brandA; sync(); paint(); await settled(id)
+    }
+
+    /* VISIBLE — thin, empty, painted, yet indistinguishable from its backdrop */
+    const lum = (c) => relLum(hex(c))
+    const ratio = (x, y) => { const a = lum(x) + 0.05, b = lum(y) + 0.05; return a > b ? a / b : b / a }
+    const backdrop = (el) => { for (let p = el.parentElement; p; p = p.parentElement) {
+      const c = rgbOf(getComputedStyle(p).backgroundColor); if (c && c.a > 0.9) return c } return { r: 255, g: 255, b: 255, a: 1 } }
+    const invisible = []
+    for (const e of A) {
+      if (e.ps || e.prop !== 'backgroundColor') continue
+      const el = e.el, r = e.rect
+      if (r.height > 32 && r.width > 32) continue
+      if (el.textContent.trim() || el.children.length) continue
+      const cs = getComputedStyle(el)
+      const bd = backdrop(el)
+      if (ratio(e.c, bd) >= 1.06) continue
+      const borderShows = ['Top', 'Right', 'Bottom', 'Left'].some((s) => parseFloat(cs['border' + s + 'Width']) > 0
+        && (() => { const bc = rgbOf(cs['border' + s + 'Color']); return bc && bc.a > 0.05 && ratio(bc, bd) >= 1.06 })())
+      if (!borderShows && cs.boxShadow === 'none') invisible.push(locate(id, el, 'backgroundColor'))
+    }
+
+    /* STATES — a checked control must not render like its unchecked sibling */
+    /* only controls that PAINT: Ant and Mantine hide the native input behind a
+       styled sibling, and two invisible inputs are identical by design */
+    const controls = [...doc.querySelectorAll('[role=checkbox],[role=radio],[role=switch],input[type=checkbox],input[type=radio]')]
+      .filter((el) => { const r = el.getBoundingClientRect(); return r.width > 2 && r.height > 2 })
+      .filter((el) => { const cs = getComputedStyle(el)
+        /* a native control the kit left native is the browser's to draw: its
+           computed styles are identical either way and only the pixels differ */
+        return !(el.matches('input') && (cs.appearance === 'auto' || cs.appearance === 'checkbox' || cs.appearance === 'radio')) && cs.opacity !== '0' })
+    const keyOf = (el) => el.tagName + '|' + (typeof el.className === 'string' ? el.className : '')
+    const isOn = (el) => el.checked || el.getAttribute('aria-checked') === 'true' || el.dataset.state === 'checked'
+    const painted = (el) => [...el.querySelectorAll('*')].filter((k) => { const kr = k.getBoundingClientRect()
+      if (!kr.width || !kr.height) return false
+      if (k.tagName === 'svg' || k.tagName === 'circle' || k.tagName === 'path') return true
+      const c = rgbOf(getComputedStyle(k).backgroundColor); return c && c.a > 0.05 }).length
+    const samestate = []
+    const groups = {}
+    for (const el of controls) (groups[keyOf(el)] ??= []).push(el)
+    for (const g of Object.values(groups)) {
+      const on = g.find(isOn), off = g.find((el) => !isOn(el))
+      if (!on || !off) continue
+      const co = getComputedStyle(on), cf = getComputedStyle(off)
+      /* the state can live in a background-image (daisyUI's tick) or a pseudo
+         (Radix's dot is an ::after) — all of those count as looking different */
+      /* position too: Radix's switch track is one gradient whose stops slide —
+         checked and unchecked share every colour and differ only in where the
+         gradient sits */
+      const ps = (el, p) => { const c = getComputedStyle(el, p); return c.content === 'none' ? '' : c.content + c.backgroundColor + c.backgroundImage + c.backgroundPosition + c.opacity }
+      const differs = co.backgroundColor !== cf.backgroundColor || co.borderTopColor !== cf.borderTopColor
+        || co.backgroundImage !== cf.backgroundImage || co.backgroundPosition !== cf.backgroundPosition
+        || ps(on, '::before') !== ps(off, '::before') || ps(on, '::after') !== ps(off, '::after')
+        || painted(on) > painted(off)
+      if (!differs) samestate.push(locate(id, on, 'state'))
+    }
+
+    verdict[id] = { checked: A.length, followed: family.length - stale.length, family: family.length,
+      live: !!LIVE_BRAND[id], stale, invisible: [...new Set(invisible)], samestate, passB }
+    } catch (e) { verdict[id] = { error: String(e && e.message || e) } }
+  }
+
+  const fail = Object.values(verdict).some((v) => v.error || v.stale?.length || v.invisible?.length || v.samestate?.length)
+  const pre = document.createElement('pre')
+  pre.id = 'sweepverdict'
+  pre.textContent = JSON.stringify({ fail, brandA, brandB: brandBHex, verdict })
+  document.body.appendChild(pre)
+  document.title = 'SWEEP ' + (fail ? 'FAIL' : 'OK')
+}
+{
+  const q = new URLSearchParams(location.search)
+  if (q.get('audit')) addEventListener('load', () => { runSweep('#' + q.get('audit').replace(/^#/, '')) })
+  /* the sweep's handles, reachable from outside the module: the runner and a
+     debugging session are the same audience, and a module scope that cannot be
+     probed is a page that can only be guessed about */
+  window.__sweep = { run: runSweep, state, paint, sync, route: (v, ids) => route(v, ids, KITS), BSLIVE }
+}
 
 /* ── THE ADDRESS IS THE STATE ──────────────────────────────────────────────
  * Read BEFORE the seeding below, because every seed is taken from the stack:

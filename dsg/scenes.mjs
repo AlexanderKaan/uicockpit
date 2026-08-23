@@ -421,6 +421,11 @@ body{margin:0;overflow:hidden}
  * the tool and wrong in a hero, where two bars around the one picture the page
  * is built on read as a component that overflowed. The bars go, the panning
  * stays: this hides the furniture, it does not take the movement away. */
+/* THE STRIP'S OWN FURNITURE CARRIES ITS OWN LETTER. The captions and board
+ * names are ours, not the kit's — and Ant Design, alone of the eight, sets no
+ * global body font, so ours fell back to the browser's Times inside its frame.
+ * Inheritance still lets every kit that styles text win on its own content. */
+#strip{font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
 html[data-quiet] #strip{scrollbar-width:none;-ms-overflow-style:none}
 html[data-quiet] #strip::-webkit-scrollbar{width:0;height:0}
 html[data-quiet] #strip{cursor:default}

@@ -150,17 +150,42 @@ function bootstrapLive(sheet, seedHex) {
     const sel = head.split('}').pop().split('{').pop().trim()
     if (!sel || sel.startsWith('@')) continue
     const props = []
-    for (const [, prop, raw] of body.matchAll(/(--bs-[a-z0-9-]+)\s*:\s*([^;]+)/gi)) {
+    /* NOT ONLY THE CUSTOM PROPERTIES. The comment above used to claim every
+       place the brand lands is a --bs- variable, and it is false: the checked
+       checkbox, the checked radio and the focus shadows carry the brand in
+       plain background-color, border-color and rgba() — which is why every
+       ticked box on the wall stayed the baked colour while the buttons moved. */
+    for (const [, prop, raw] of body.matchAll(/(--bs-[a-z0-9-]+|background-color|border-color|color|box-shadow)\s*:\s*([^;]+)/gi)) {
       const v = raw.trim()
+      const alpha = new RegExp(`rgba\\(\\s*${seedTriple.replace(/,/g, '\\s*,\\s*')}\\s*,\\s*([\\d.]+)\\s*\\)`, 'i').exec(v)
       if (v.toLowerCase() === seed) props.push([prop, 'brand'])
-      /* the -rgb TRIPLES carry the same brand as `R, G, B`, which no hex scan
-         can see — and .bg-primary reads nothing else */
       else if (v.replace(/\s+/g, '') === seedTriple) props.push([prop, 'brandRGB'])
-      else if (near(v)) props.push([prop, v])
+      else if (alpha && prop === 'box-shadow') props.push([prop, `brandA:${alpha[1]}:${v}`])
+      else if (/^--/.test(prop) && near(v)) props.push([prop, v])
     }
     if (props.length) out.push([sel, props])
   }
   return out
+}
+/* ── UNITS SURVIVE THE COMPILE ────────────────────────────────────────────
+ * A Sass variable fed a bare number where it wanted a length compiles without
+ * a word and paints as nothing: $spacer: 1 produced `--bs-alert-padding-y: 1`
+ * and every alert collapsed to zero padding. The compiled sheet is scanned for
+ * custom properties that are a bare number under a name that denotes a length;
+ * Bootstrap's own sheet has none, so any hit is a value of ours gone wrong. */
+{
+  /* zero is a length without a unit by design, and a line-height is CORRECT
+     bare — both are Bootstrap's own factory forms, measured before this gate
+     was allowed to exist */
+  const LENGTHY = /-(padding|margin|gap|width|height|radius|size|spacer|indent|offset)(-[a-z]+)?$/
+  const bare = [...(css.bootstrap ?? '').matchAll(/(--bs-[a-z0-9-]+)\s*:\s*(\d+(?:\.\d+)?)\s*[;}]/g)]
+    .map(([, name, val]) => [name, val])
+    .filter(([name, val]) => parseFloat(val) !== 0 && !name.includes('line-height')
+      && LENGTHY.test(name) && !/-(opacity|order|count|columns|zindex)/.test(name))
+  if (bare.length) {
+    console.error(`build: ${bare.map(([n2, v]) => `${n2}:${v}`).join(' ')} — a length compiled as a bare number, which paints as nothing. A build-time value lost its unit on the way into Sass.`)
+    process.exit(1)
+  }
 }
 const BSLIVE = css.bootstrap ? bootstrapLive(css.bootstrap, SEED.brand) : []
 console.log(`  ✓ Bootstrap: ${BSLIVE.reduce((n, [, p]) => n + p.length, 0)} of its compiled brand declarations can be rewritten live, across ${BSLIVE.length} rules`)

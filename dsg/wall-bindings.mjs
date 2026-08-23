@@ -705,7 +705,11 @@ export const useRadixTones = (map) => { RX_TONE = { neutral: 'gray', ...map } }
 const rxAccent = (tone) => {
   const t = tone ?? 'neutral'
   const accent = RX_TONE[t]
-  return `${accent ? ` data-accent-color="${accent}"` : ''}${t === 'neutral' || t === 'brand' ? '' : ` data-tone="${t}"`}`
+  /* data-tone on BRAND too: dress() retunes [data-tone=x] when a knob moves,
+     and leaving brand off pinned every brand-toned element to the accent the
+     page was BUILT with — 254 colours that ignored the knob, found by the
+     sweep the day it first ran. Neutral stays bare: gray is gray. */
+  return `${accent ? ` data-accent-color="${accent}"` : ''}${t === 'neutral' ? '' : ` data-tone="${t}"`}`
 }
 const RX_BTN = { brand: 'solid', secondary: 'soft', ghost: 'ghost', danger: 'solid' }
 /* the steps of its own scales that carry a role it takes as a SETTING */
@@ -764,18 +768,18 @@ const radix = {
   navbar:  (n, k) => `<header class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-5);padding:var(--space-3) var(--space-4);background:var(--color-panel-solid);border-bottom:1px solid var(--gray-a5)">
     <span class="rt-Heading rt-r-size-3">${esc(n.brand)}</span>
     <nav style="display:flex;flex-wrap:wrap;gap:var(--space-4)">${
-      list(n.items).map((t) => `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`).join('')}</nav>
+      list(n.items).map((t) => `<a class="rt-reset rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`).join('')}</nav>
     <span style="margin-left:auto;display:flex;gap:var(--space-2)">${k}</span></header>`,
   mediacard: (n) => `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-2 rt-variant-surface" style="display:flex;flex-direction:column;gap:var(--space-2)">
     <div class="rt-Inset" data-side="top" style="display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;background:var(--gray-a3);color:var(--gray-a9)">${PHOTO}</div>
     <p class="rt-Heading rt-r-size-3">${esc(n.title)}</p>
     <p class="rt-Text rt-r-size-2" data-accent-color="gray">${esc(n.text)}</p>
-    <a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#">${esc(n.action ?? 'Read on')}</a></div>`,
+    <a class="rt-reset rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#">${esc(n.action ?? 'Read on')}</a></div>`,
   footer:  (n) => `<footer style="padding:var(--space-5) var(--space-4);background:var(--color-panel-solid);border-top:1px solid var(--gray-a5)">
     <div class="rt-Grid" style="display:grid;gap:var(--space-5);grid-template-columns:repeat(${list(n.groups).length || 1},minmax(0,1fr))">${
       list(n.groups).map((g) => `<div style="display:flex;flex-direction:column;gap:var(--space-2)">
         <p class="rt-Text rt-r-size-1 rt-Strong">${esc(g.title)}</p>${
-        list(g.items).map((t) => `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
+        list(g.items).map((t) => `<a class="rt-reset rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`).join('')}</div>`).join('')}</div>
     <p class="rt-Text rt-r-size-1" data-accent-color="gray" style="margin-top:var(--space-5)">${esc(n.note)}</p></footer>`,
   elevation: (n) => `<div class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4)">${list(n.levels).map((lv, i) =>
     `<div class="rt-reset rt-BaseCard rt-Card rt-r-size-1 rt-variant-surface" style="width:96px;height:64px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-${i + 2})"><span class="rt-Text rt-r-size-1" data-accent-color="gray">${esc(lv)}</span></div>`).join('')}</div>`,
@@ -802,7 +806,7 @@ const radix = {
   slider:  (n) => `<span class="rt-SliderRoot rt-r-size-2 rt-variant-surface" data-orientation="horizontal" style="width:100%"><span class="rt-SliderTrack" data-orientation="horizontal"><span class="rt-SliderRange" data-orientation="horizontal" style="left:0;width:${n.value ?? 60}%"></span></span><span class="rt-SliderThumb" data-orientation="horizontal" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${n.value ?? 60}" aria-orientation="horizontal" style="position:absolute;left:${n.value ?? 60}%;transform:translateX(-50%)"></span></span>`,
   progress: (n) => `<div class="rt-ProgressRoot rt-r-size-2 rt-variant-surface" data-orientation="horizontal" style="--progress-value:${n.value ?? 60};--progress-max:100"><div class="rt-ProgressIndicator" data-orientation="horizontal"></div></div>`,
   iconrow: (n) => `<div class="rt-Flex" style="display:flex;flex-wrap:wrap;gap:var(--space-1)">${list(n.items).map((i) => `<button aria-label="${esc(i)}" class="rt-reset rt-BaseButton rt-r-size-2 rt-variant-soft rt-IconButton" data-accent-color="gray">${ico(i)}</button>`).join('')}</div>`,
-  breadcrumb: (n) => `<nav class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)">${list(n.items).map((t, i, a) => `${i ? '<span class="rt-Text rt-r-size-2" data-accent-color="gray">/</span>' : ''}${i === a.length - 1 ? `<span class="rt-Text rt-r-size-2 rt-Strong">${esc(t)}</span>` : `<a class="rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`}`).join('')}</nav>`,
+  breadcrumb: (n) => `<nav class="rt-Flex" style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2)">${list(n.items).map((t, i, a) => `${i ? '<span class="rt-Text rt-r-size-2" data-accent-color="gray">/</span>' : ''}${i === a.length - 1 ? `<span class="rt-Text rt-r-size-2 rt-Strong">${esc(t)}</span>` : `<a class="rt-reset rt-Text rt-r-size-2 rt-Link rt-underline-auto" href="#" data-accent-color="gray">${esc(t)}</a>`}`).join('')}</nav>`,
   /* their own menu classes — BaseMenu is what both the dropdown and the
      context menu are built from, and DropdownMenuContent is the surface */
   menu:    (n) => `<div class="rt-Flex" style="display:inline-flex;flex-direction:column;gap:var(--space-2);align-items:flex-start">
