@@ -424,6 +424,12 @@ body{margin:0;overflow:hidden}
 html[data-quiet] #strip{scrollbar-width:none;-ms-overflow-style:none}
 html[data-quiet] #strip::-webkit-scrollbar{width:0;height:0}
 html[data-quiet] #strip{cursor:default}
+/* and it starts lower, because a quiet wall is being used as a picture that
+ * fades in at its top edge. At the board's own 22px the fade landed across
+ * the section heading and half-erased it, which reads as a rendering fault
+ * rather than as a picture settling into the ground. Below the fade the
+ * heading arrives whole. */
+html[data-quiet] #strip > .board{padding-top:66px}
 
 html[data-pick] [data-card]{cursor:zoom-in}
 html[data-pick] [data-card]:hover{outline:1px solid rgb(128 128 128 / .3);outline-offset:7px;border-radius:2px}
