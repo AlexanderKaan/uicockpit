@@ -144,6 +144,9 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .cc__rule{border:0;border-top:var(--bw) solid var(--line);margin:3px 0 0}
 .cc__dots{margin:auto 0 0;padding-top:9px;border-top:var(--bw) solid var(--line);
   font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-height:19px}
+.said{max-width:76rem;width:100%;margin:14px auto 0;padding:0 20px;
+  font-size:var(--fs-md);color:var(--muted);line-height:1.55}
+.said b{color:var(--ink);font-weight:600}
 
 /* ── THE QUESTION ─────────────────────────────────────────────────────────
  * Four ways in, and a door for people who want none of them. A starting point
@@ -247,8 +250,13 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 /* THE FOUR BANDS NEED FOUR BANDS OF ROOM. Packed to three pixels a row they
    read as one block of text, and the whole point of the card is that a stack
    is four separate questions with four separate answers. */
-.band{display:grid;grid-template-columns:82px minmax(0,1fr);gap:10px;align-items:baseline;
-  padding:8px 0;font-size:var(--fs-md)}
+.band{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:10px;align-items:baseline;
+  padding:8px 0;font-size:var(--fs-md);width:100%;text-align:left;font-family:inherit;color:inherit;
+  background:0;border:0}
+button.band{cursor:pointer}
+button.band:hover .band__go,button.band[aria-expanded=true] .band__go{color:var(--link)}
+.band__go{font-size:var(--fs-xs);color:var(--muted);align-self:center}
+button.band[aria-expanded=true] .band__go::after{content:" ▾"}
 .band + .band{border-top:var(--bw) solid var(--line)}
 .band small{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.7}
 .band b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -259,27 +267,21 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .note{margin:8px 0 0;padding:9px 10px;border-radius:var(--r);font-size:var(--fs-sm);line-height:1.5;
       background:var(--warn-bg);border:var(--bw) solid var(--warn-line);color:var(--ink)}
 
-/* ── the picker ───────────────────────────────────────────────────────────── */
-/* its own rules, not an override of .pick — that one is a left-hand drawer and
-   is defined further down, so every property here lost the tie */
-#picker{border:0;padding:0;background:0;max-width:none;max-height:none;width:100%;height:100%}
-#picker::backdrop{background:#11111255}
-.picker{position:fixed;inset:20px;margin:auto;width:min(1020px,calc(100vw - 40px));max-height:calc(100vh - 40px);
-        background:var(--panel);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:14px;
-        box-shadow:0 24px 60px rgba(0,0,0,.24)}
-.lanes{display:grid;grid-template-columns:1fr 1fr .8fr;gap:14px;overflow-y:auto;min-height:0}
-.lane{display:flex;flex-direction:column;gap:7px;min-width:0}
-.lane--sum{background:var(--faint);border:var(--bw) solid var(--line);border-radius:var(--r);padding:12px}
-.lane__top{margin:0;font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:600;display:flex;gap:7px;align-items:baseline}
-.lane__top small{font-size:var(--fs-xs);letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
-.lane__top--sub{margin-top:10px;padding-top:10px;border-top:var(--bw) solid var(--line)}
-.lane__why{margin:0 0 3px;font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
-.lane__list{display:flex;flex-direction:column;gap:7px}
+/* ── THE PICKER, IN THE RAIL ───────────────────────────────────────────────
+ * One column that opens where the card is, so the summary is not printed twice
+ * and you never leave the wall you are changing. */
+.pickrail{display:flex;flex-direction:column;gap:7px;margin-top:9px}
+.pickrail__head{margin:0;font-size:var(--fs-xs);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink);font-weight:600;display:flex;flex-direction:column;gap:2px}
+.pickrail__head small{font-size:var(--fs-xs);letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
+.pickrail__head--sub{margin-top:6px;padding-top:9px;border-top:var(--bw) solid var(--line)}
+.pickrail__why{margin:2px 0 0;font-size:var(--fs-xs);color:var(--muted);line-height:1.5}
 .lane__fine{margin:0;font-size:var(--fs-xs);color:var(--muted);line-height:1.5;text-align:center}
-.pick__run{margin:7px 0 0;font-size:var(--fs-sm);color:var(--muted);display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.runpick{display:inline-flex;gap:3px;padding:2px;border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--sunk)}
+.runline{margin:11px 0 0;padding-top:10px;border-top:var(--bw) solid var(--line);
+  font-size:var(--fs-sm);color:var(--muted);display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.runpick{display:inline-flex;gap:3px;padding:2px;border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--sunken)}
 .runpick button{appearance:none;border:0;background:none;font:inherit;color:var(--muted);padding:2px 9px;border-radius:calc(var(--r) - 3px);cursor:pointer}
-.runpick button[aria-pressed=true]{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgb(0 0 0/.06)}
+.runpick button[aria-pressed=true]{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgb(0 0 0/.06)}
 .opt__run{font-size:var(--fs-xs);color:var(--muted)}
 .opt__run b{font-weight:600;color:var(--ink)}
 .opt[data-cannot]{opacity:.5}
@@ -1083,10 +1085,19 @@ function renderStack() {
      that make a stack a stack: shadcn BRINGS the Radix behaviour package and
      its own tokens, and leans on Tailwind for the engine. All four rows are
      read from what the packages themselves declare. */
-  $('#stackcard').innerHTML = bandsOf(st, KITS).map((b) => `<span class="band"${b.name ? '' : ' data-none'} title="${b.what} — ${b.note}">
-    <small>${b.label}</small>
-    <span><b>${b.name ?? 'none'}</b>${b.via ? `<em>via ${b.via}</em>` : ''}${
-      b.over?.length ? `<em>over ${b.over.join(', ')}</em>` : ''}</span></span>`).join('')
+  /* TWO OF THE FOUR BANDS ARE YOURS TO CHANGE, so those two are the control.
+     Behaviour and tokens are consequences of the other two — a kit brings the
+     behaviour it brings — so they stay as read-outs. */
+  const OPENS = { Engine: 'engine', Components: 'comps' }
+  $('#stackcard').innerHTML = bandsOf(st, KITS).map((b) => {
+    const opens = OPENS[b.label]
+    const T = opens ? 'button' : 'span'
+    return `<${T} class="band"${b.name ? '' : ' data-none'}${opens ? ` data-open="${opens}" aria-expanded="${railAt === opens}"` : ''}>
+      <small>${b.label}</small>
+      <span><b>${b.name ?? 'none'}</b>${b.via ? `<em>via ${b.via}</em>` : ''}${
+        b.over?.length ? `<em>over ${b.over.join(', ')}</em>` : ''}</span>${
+        opens ? '<span class="band__go" aria-hidden="true">change</span>' : ''}</${T}>`
+  }).join('')
     + `<p class="card__facts">${own.parts ? `${own.partsTheirs} of ${own.parts} parts from the kit · ` : ''}${
       [...new Set(st.order.map((k) => KITS[k].license).filter(Boolean))].join(' · ')}</p>`
 
@@ -1099,116 +1110,117 @@ function renderStack() {
   }
 }
 
-/* ── the picker ───────────────────────────────────────────────────────────── */
-/* Two lanes and a summary, because the stack has two questions and people ask
- * them in that order: what is underneath, and what draws the buttons. A kit
- * that cannot sit on the base you picked is shown greyed WITH the reason,
- * rather than hidden — the reason is the useful part. */
+/* ── THE PICKER, IN THE RAIL ───────────────────────────────────────────────
+ * It was a full-screen dialog with three columns: two shelves of cards and a
+ * summary of what you had chosen. The summary was the card in the rail printed
+ * a second time, and the two shelves never needed to be side by side — you ask
+ * what is underneath and what draws the buttons one after the other, not at
+ * once.
+ *
+ * So it opens IN the card, one question at a time, and you never leave the wall
+ * you are changing. Everything the dialog said is still said: what each kit is,
+ * what it asks of your app, how many of the parts it ships, and for the ones
+ * that cannot sit on your base, which base they need and a button that moves
+ * it. A narrow column loses nothing but the second column.
+ */
+let railAt = null                              // 'engine' | 'comps' | null
+
+/* WHAT JUST HAPPENED, in one line under the cards.
+ * Three things call this — a shape preset, a colour shuffle, a feel shuffle —
+ * and none of them has ever printed anything, because the function they call
+ * was never written. Each one did its work and then threw. So a preset moved
+ * four sliders and said nothing about which, and a rolled colour reported a
+ * contrast verdict to an exception handler. */
+function note(html) {
+  const el = $('#said'); if (!el) return
+  el.innerHTML = html
+  el.hidden = !html
+}
+
 function drawStackPicker() {
   const st = stack(state.on, KITS)
   const carrier = foundationOf(KITS)
   const bases = ORDER.filter((id) => KITS[id].standalone || KITS[id].layer === 'utility')
-  const comps = ORDER.filter((id) => !KITS[id].standalone && KITS[id].layer === 'components')
   const under = ORDER.filter((id) => KITS[id].layer === 'tokens')
 
-  /* WHAT YOU HAVE TO BE RUNNING, on every card.
+  /* WHAT YOU HAVE TO BE RUNNING, on every row.
      This is a starting point for a design system whatever you build in, and
      five of these nine ask nothing of your app at all. Saying so is the
      difference between a comparison and a shortlist: without it someone on Vue
      could set every knob on Mantine and download a package they cannot use. */
   const runs = (id) => KITS[id].runsIn ?? { framework: null, what: '' }
-  /* Three answers, and the third is the one that matters. The kits between
-     them name exactly one framework, so a control built only from what they
-     name offers React and nothing else — useless to the person this line is
-     for, who is on Vue or Svelte or nothing at all and only needs to know
-     which of these are closed to them. A kit that demands a framework is
-     closed to everyone not running it, whichever one that is. */
+  /* A kit that demands a framework is closed to everyone not running it,
+     whichever one that is — so "something else" means any framework at all. */
   const cannot = (id) => (state.runIn === 'other'
     ? !!runs(id).framework
     : !!(state.runIn && runs(id).framework && runs(id).framework !== state.runIn))
 
-  const card = (id, { on, disabled, why, tag, extra = '' }) => `<button class="opt" data-p="${id}"
-    aria-pressed="${!!on}"${disabled ? ' disabled' : ''}${cannot(id) ? ' data-cannot' : ''}>
-    ${tag ? `<span class="opt__tag">${tag}</span>` : ''}
+  const parts = (id) => {
+    const o = OWN[id] ?? {}
+    return o.parts ? `<span class="opt__parts"><b>${o.partsTheirs}</b>/${o.parts}</span>` : ''
+  }
+  const row = (id, { on, why }) => `<button class="opt" data-p="${id}"
+    aria-pressed="${!!on}"${cannot(id) ? ' data-cannot' : ''}>
     <span class="opt__top"><b>${KITS[id].name}</b>
-      <span class="opt__meta">${extra}${KITS[id].license ?? ''}${KITS[id].version ? ` · v${KITS[id].version}` : ''}</span></span>
+      <span class="opt__meta">${parts(id)}${KITS[id].license ?? ''}</span></span>
     <span class="opt__why">${why}</span>
-    <span class="opt__run" title="${runs(id).what.replace(/"/g, '&quot;')}">${runs(id).framework
+    <span class="opt__run">${runs(id).framework
       ? `<b>${runs(id).framework} only</b>${cannot(id) ? ' — not where you are building' : ''}`
       : '<b>any framework</b> — it asks nothing of your app'}</span></button>`
 
-  $('#laneBase').innerHTML = bases.map((id) => card(id, {
-    on: st.base === id, tag: st.base === id ? 'engine' : '',
-    why: KITS[id].what,
-  })).join('')
-  $('#laneUnder').innerHTML = under.map((id) => card(id, {
-    on: st.order.includes(id), tag: st.order.includes(id) ? 'added' : '',
-    why: KITS[id].what,
-  })).join('')
-  /* ── EVERY KIT THAT SHIPS COMPONENTS IS ON THE RIGHT SHELF ────────────────
-   * "I want Material's buttons" is a components thought, not a base thought, so
-   * looking for Material in the base column is looking in the wrong place. The
-   * ones that bring their own base are here too — STEPPED BACK, saying what
-   * they need and offering to do it, rather than greyed out with no reason
-   * given or missing entirely. Nothing is hidden and nothing is silent.
-   *
-   * A kit's own bands say which base it needs: 'own' means it IS one, anything
-   * else names the engine it sits on. Nothing below is a list we keep. */
-  const needs = (id) => (KITS[id].bands?.engine === 'own' ? id : KITS[id].bands?.engine ?? carrier)
-  const withParts = (id) => {
-    const o = OWN[id] ?? {}
-    return o.parts ? `<span class="opt__parts"><b>${o.partsTheirs}</b> / ${o.parts} parts</span>` : ''
+  const box = $('#stackpick')
+  box.hidden = !railAt
+  if (railAt === 'engine') {
+    box.innerHTML = `<p class="pickrail__head">Pick an engine <small>how the styles get written, and the scales that come with it</small></p>`
+      + bases.map((id) => row(id, { on: st.base === id, why: KITS[id].what })).join('')
+      + `<p class="pickrail__head pickrail__head--sub">Tokens under everything <small>optional</small></p>`
+      + under.map((id) => row(id, { on: st.order.includes(id), why: KITS[id].what })).join('')
+  } else if (railAt === 'comps') {
+    /* a kit's own bands say which base it needs: 'own' means it is one */
+    const needs = (id) => (KITS[id].bands?.engine === 'own' ? id : KITS[id].bands?.engine ?? carrier)
+    const ships = ORDER.filter((id) => KITS[id].bands?.components)
+    const fits = ships.filter((id) => needs(id) === st.base)
+    const stepped = ships.filter((id) => needs(id) !== st.base)
+    box.innerHTML = `<p class="pickrail__head">Components <small>${fits.length
+      ? `${fits.length} fit ${KITS[st.base].name}` : `none fit ${KITS[st.base].name}`}</small></p>`
+      + fits.map((id) => row(id, { on: st.order.includes(id), why: KITS[id].what })).join('')
+      /* the honest fourth option, which is an answer and not an absence */
+      + `<button class="opt opt--none" data-clear aria-pressed="${!ships.some((id) => st.order.includes(id))}">
+          <span class="opt__top"><b>Nothing yet</b><span class="opt__meta">tokens only</span></span>
+          <span class="opt__why">Take the values and add components later. The wall draws every part
+            from what the base publishes.</span></button>`
+      + (stepped.length ? `<p class="pickrail__head pickrail__head--sub">Stepped back <small>needs a different base</small></p>`
+        + stepped.map((id) => `<div class="stepped">
+            <span class="stepped__who"><b>${KITS[id].name}</b>
+              <em>${needs(id) === id ? 'brings its own base' : `needs ${KITS[needs(id)].name}`}</em></span>
+            ${parts(id)}
+            <button class="link" data-p="${id}">Switch base</button>
+          </div>`).join('')
+        + `<p class="pickrail__why">Nothing is greyed out and left at that: each one says what it
+            needs and offers to fix it for you.</p>` : '')
   }
-  const shipsParts = ORDER.filter((id) => KITS[id].bands?.components)
-  const fitsNow = shipsParts.filter((id) => needs(id) === st.base)
-  const stepped = shipsParts.filter((id) => needs(id) !== st.base)
-
-  $('#compfit').textContent = fitsNow.length
-    ? `${fitsNow.length} fit ${KITS[st.base].name}`
-    : `none fit ${KITS[st.base].name}`
-  $('#laneComp').innerHTML = fitsNow.map((id) => card(id, {
-    on: st.order.includes(id), tag: st.order.includes(id) ? 'added' : '',
-    why: KITS[id].what, extra: withParts(id),
-  })).join('')
-    /* and the honest fourth option, which is a real answer and not an absence */
-    + `<button class="opt opt--none" data-clear aria-pressed="${!shipsParts.some((id) => st.order.includes(id))}">
-        <span class="opt__top"><b>Nothing yet</b><span class="opt__meta">tokens only</span></span>
-        <span class="opt__why">Take the values and add components later. The wall draws every part
-          from what the base publishes.</span></button>`
-
-  $('#backhead').hidden = !stepped.length
-  $('#laneBack').innerHTML = stepped.map((id) => `<div class="stepped">
-    <span class="stepped__who"><b>${KITS[id].name}</b>
-      <em>${needs(id) === id ? 'brings its own base' : `needs ${KITS[needs(id)].name}`}</em></span>
-    ${withParts(id)}
-    <button class="link" data-p="${id}">Switch base</button>
-  </div>`).join('')
 
   /* the choices are the frameworks the KITS name, plus the one that means
      "nothing" — never a list of frameworks we happen to have heard of */
   const FRAMEWORKS = [...new Set(Object.keys(KITS).map((k) => runs(k).framework).filter(Boolean))]
   $('#runpick').innerHTML = [[null, 'anything'], ...FRAMEWORKS.map((f) => [f, f]), ['other', 'something else']]
     .map(([v, label]) => `<button type="button" data-run="${v ?? ''}" aria-pressed="${(state.runIn ?? null) === v}">${label}</button>`).join('')
-
-  const own = OWN[showing(st)] ?? {}
-  /* the same four bands the card shows, so what you are choosing and what you
-     end up with are described in one vocabulary */
-  $('#pickerSum').innerHTML = bandsOf(st, KITS).map((b) => `<p class="sumrow"${b.name ? '' : ' data-none'}>
-    <span>${b.name ?? 'none'}${b.via ? ` <em>via ${b.via}</em>` : ''}</span><small>${b.label}</small></p>`).join('')
-    + `<p class="card__facts">${own.parts ? `${own.partsTheirs} of ${own.parts} parts from the kit` : ''}</p>`
-    + ((own.drawn ?? []).length ? `<p class="note">Not covered by this stack: ${own.drawn.join(', ')}. The generator draws those from tokens.</p>` : '')
 }
+
+/* the card is the control: the two bands you can change open the list */
+$('#stackcard').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-open]'); if (!b) return
+  railAt = railAt === b.dataset.open ? null : b.dataset.open
+  renderStack(); drawStackPicker()
+})
+
 $('#runpick').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-run]')
   if (!b) return
   state.runIn = b.dataset.run || null
   drawStackPicker()
 })
-$('#change').addEventListener('click', () => { drawStackPicker(); $('#picker').showModal() })
-$('#pickerx').addEventListener('click', () => $('#picker').close())
-$('#pickerDone').addEventListener('click', () => $('#picker').close())
-$('#picker').addEventListener('click', (e) => { if (e.target.id === 'picker') $('#picker').close() })
-document.querySelector('.lanes').addEventListener('click', (e) => {
+$('#stackpick').addEventListener('click', (e) => {
   /* the base and nothing on it: a real choice, so it is a button and not the
      absence of one */
   if (e.target.closest('[data-clear]')) {
@@ -2557,6 +2569,9 @@ for (const role of TYPE) {
 
 seedNote(null)
 drawView()
+/* the picker used to be drawn when the dialog opened; it lives in the rail now,
+   so it is drawn once at the start like everything else in there */
+drawStackPicker()
 sync()
 addEventListener('load', () => setTimeout(paint, 60))
 </script>

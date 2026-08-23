@@ -262,6 +262,19 @@ page = page.split('<!--MARK-->').join(mark(17))
   for (const m of chrome.matchAll(/class="([a-z][a-z0-9_ -]*)"/gi)) {
     for (const c of m[1].split(/\s+/)) if (c) written.add(c)
   }
+  /* AND THE SAME CHECK FOR TOKENS. --sunk and --card were written where --sunken
+     and --panel were meant, so the framework picker had a transparent track and
+     a transparent thumb: an invisible control that had been shipping for as
+     long as it had been behind a dialog nobody scrolled to. A var() with a
+     fallback is fine — that is a stated default, not a typo. */
+  const has = new Set([...sheet.matchAll(/(--[a-z0-9-]+)\s*:/gi)].map((m) => m[1]))
+  const ghosts = [...new Set([...sheet.matchAll(/var\((--[a-z0-9-]+)\s*\)/gi)].map((m) => m[1]))]
+    .filter((v) => !has.has(v) && v !== '--cols')
+  if (ghosts.length) {
+    console.error(`build: ${ghosts.join(' ')} ${ghosts.length > 1 ? 'are' : 'is'} read by our stylesheet and set by nothing — a var() with no value and no fallback paints nothing at all.`)
+    process.exit(1)
+  }
+
   const bare = [...written].filter((c) => !styled.has(c))
   if (bare.length) {
     console.error(`build: no rule anywhere for ${bare.join(' ')} — our markup uses ${bare.length > 1 ? 'them' : 'it'} and our stylesheet does not.`)
