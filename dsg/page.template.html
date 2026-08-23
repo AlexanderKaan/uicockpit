@@ -69,8 +69,12 @@ body{margin:0;background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--
 
 /* THE WALL, as the room it earned: the rail is down to the one thing that
    belongs beside it, which is what is rendering this. */
-.app[data-stage=wall]{grid-template-columns:242px minmax(0,1fr)}
+.app[data-stage=wall]{grid-template-columns:286px minmax(0,1fr)}
+@media(max-width:1100px){.app[data-stage=wall]{grid-template-columns:252px minmax(0,1fr)}}
 .app[data-stage=wall]>.compose{display:none}
+/* CHANGING THE STACK IS THE SECOND THING YOU DO ON THIS SCREEN, after looking.
+   It was a five-word link in a corner. */
+.rail__change{width:100%;justify-content:center;margin-top:10px}
 .rail__back{margin-top:auto}
 .eyebrow{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0}
 kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm);background:var(--sunken);color:var(--muted)}
@@ -239,16 +243,19 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .link{font:inherit;font-size:var(--fs-sm);color:var(--link);background:0;border:0;padding:0;cursor:pointer;
       margin-left:auto;text-decoration:underline;text-underline-offset:2px}
 .link:hover{color:var(--ink)}
-.card{border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--faint);padding:10px 11px}
-/* the four bands a stack is really made of, one row each */
-.band{display:grid;grid-template-columns:74px minmax(0,1fr);gap:8px;align-items:baseline;
-  padding:3px 0;font-size:var(--fs-md)}
+.card{border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--faint);padding:13px 14px}
+/* THE FOUR BANDS NEED FOUR BANDS OF ROOM. Packed to three pixels a row they
+   read as one block of text, and the whole point of the card is that a stack
+   is four separate questions with four separate answers. */
+.band{display:grid;grid-template-columns:82px minmax(0,1fr);gap:10px;align-items:baseline;
+  padding:8px 0;font-size:var(--fs-md)}
 .band + .band{border-top:var(--bw) solid var(--line)}
 .band small{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.7}
 .band b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .band[data-none] b{font-weight:400;color:var(--muted)}
 .band em{display:block;font-style:normal;font-size:var(--fs-xs);color:var(--muted);line-height:1.4}
-.card__facts{margin:7px 0 0;font-size:var(--fs-sm);color:var(--muted)}
+.card__facts{margin:11px 0 0;padding-top:10px;border-top:var(--bw) solid var(--line);
+  font-size:var(--fs-sm);color:var(--muted)}
 .note{margin:8px 0 0;padding:9px 10px;border-radius:var(--r);font-size:var(--fs-sm);line-height:1.5;
       background:var(--warn-bg);border:var(--bw) solid var(--warn-line);color:var(--ink)}
 
