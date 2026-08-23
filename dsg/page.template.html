@@ -159,21 +159,22 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 
 /* a card is a specimen of the thing it would start you on, so it is set in that
    vibe's own faces at that vibe's own size and shape */
-.vibe{display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;cursor:pointer;text-align:left;
-  border:var(--bw) solid var(--line);border-radius:13px;background:var(--panel);
+/* border-radius, border-width, padding, gap and font-size all come from the
+   vibe itself, written inline: the card IS the specimen. */
+.vibe{display:flex;flex-direction:column;cursor:pointer;text-align:left;align-items:stretch;
+  border:1px solid var(--line);background:var(--panel);
   transition:border-color .16s,transform .16s,box-shadow .16s}
 .vibe:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:0 8px 22px rgb(17 17 18 / .07)}
 .vibe:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-.vibe__head{padding:16px 17px 14px;display:grid;gap:5px}
+/* the colours this start would really derive, not three we chose to look nice */
+.vibe__chips{display:flex;gap:4px}
+.vibe__chips i{width:22px;height:22px;border-radius:5px}
+.vibe__head{display:grid;gap:6px}
 /* spans in a button, so every one of them has to be told it is a block */
-.vibe__name{display:block;font-family:var(--display);font-weight:700;font-size:16.5px;letter-spacing:-.025em;color:var(--ink)}
-.vibe__blurb{display:block;font-size:12.5px;line-height:1.5;color:var(--muted)}
-/* the specimen half, on the vibe's own page colour */
-.vibe__spec{margin-top:auto;padding:16px 17px 16px;border-top:var(--bw) solid var(--line);
-  display:grid;gap:10px;justify-items:start}
-.vibe__title{display:block;font-weight:600;letter-spacing:-.02em;line-height:1.15;color:#18181a}
-.vibe__body{display:block;font-size:12.5px;line-height:1.5;color:#5b5a5e;margin:0}
-.vibe__btn{display:inline-flex;align-items:center;padding:9px 16px;font-weight:600;font-size:12.5px;
+.vibe__name{display:block;font-size:1.16em;letter-spacing:-.02em;line-height:1.15;color:var(--ink)}
+.vibe__blurb{display:block;font-size:.79em;line-height:1.5}
+.vibe__foot{margin-top:auto;display:grid;gap:9px;justify-items:start}
+.vibe__btn{display:inline-flex;align-items:center;padding:.55em 1.05em;font-weight:600;font-size:.8em;
   border:0;white-space:nowrap}
 .vibe__type{display:block;font:10px ui-monospace,SFMono-Regular,monospace;
   letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
@@ -2226,19 +2227,19 @@ const VIBES = [
   { name: 'Calm and civic',
     blurb: 'Public services and forms people have to finish. Nothing shouts, everything is legible.',
     brand: '#1c5f8a', heading: 'Work Sans', body: 'Inter',
-    knobs: { radius: '6px', baseText: '17px', space: '1', elevation: '0', borderWidth: '1px' } },
+    knobs: { radius: '6px', baseText: '17px', space: '1', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
   { name: 'Bold and consumer',
     blurb: 'Things people download on a whim. Round, warm, and not shy about it.',
     brand: '#c2410c', heading: 'Sora', body: 'Work Sans',
-    knobs: { radius: '18px', baseText: '16px', space: '1.05', elevation: '2', borderWidth: '0px' } },
+    knobs: { radius: '18px', baseText: '16px', space: '1.15', elevation: '2', borderWidth: '0px', fontWeight: '700' } },
   { name: 'Quiet and technical',
     blurb: 'Dashboards and tools you live in all day. Dense, flat, out of the way.',
     brand: '#0b6e8a', heading: 'Space Grotesk', body: 'Inter',
-    knobs: { radius: '4px', baseText: '14px', space: '0.9', elevation: '0', borderWidth: '1px' } },
+    knobs: { radius: '3px', baseText: '13.5px', space: '0.82', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
   { name: 'Print and paper',
     blurb: 'Letters, reports, anything that ends up on a desk. Serif, square, unhurried.',
     brand: '#7b3560', heading: 'Lora', body: 'Assistant',
-    knobs: { radius: '2px', baseText: '17px', space: '1.1', elevation: '0', borderWidth: '1px' } },
+    knobs: { radius: '0px', baseText: '17.5px', space: '1.25', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
 ]
 
 /* THE THREE ROOMS. Nothing is rebuilt when you move between them: the wall is
@@ -2260,22 +2261,43 @@ function stage(next) {
   toUrl()
 }
 
-/* the card is a specimen of what it would start you on: its own two faces, its
-   own size, its own corner, its own colour. A swatch would say less. */
+/* THE CARD IS THE VIBE, not a description of one.
+ *
+ * It used to say "A heading, set in Work Sans" in a face that was not Work
+ * Sans, under a title that was identical on all four cards — so four different
+ * starting points arrived as four identical objects with a small line halfway
+ * down telling you they differed. You cannot choose between four things that
+ * look the same.
+ *
+ * Every card now WEARS what it would give you: its own corner on its own
+ * corners, its own border width on its own border, its own base size, its own
+ * two faces, and the colours the stack would really derive from that one hex.
+ * A card for the dense technical start is smaller and squarer than the one for
+ * the loud consumer start, because that is the difference. */
 function drawVibes() {
+  const order = stack(state.on, KITS).order
   $('#vibes').innerHTML = VIBES.map((v, i) => {
     const head = `'${v.heading}', sans-serif`, body = `'${v.body}', sans-serif`
-    const r = v.knobs.radius
-    return `<button class="vibe" data-v="${i}">
+    const k = v.knobs
+    /* the same door your own colour goes through, so these are the colours you
+       would actually get and not three we picked to look nice together */
+    const out = fromOneColour(v.brand, order, KITS, {}) ?? { values: {} }
+    const c = out.values
+    const chips = ['brand', 'ink', 'inkMuted', 'line'].map((r) => c[r]).filter(Boolean)
+    const pad = `${Math.round(17 * Number(k.space))}px`
+    return `<button class="vibe" data-v="${i}" style="border-radius:${k.radius};border-width:${
+      k.borderWidth === '0px' ? '1px' : k.borderWidth};padding:${pad};gap:${pad};font-size:${k.baseText}">
+      <span class="vibe__chips">${chips.map((h) => `<i style="background:${h}"></i>`).join('')}</span>
       <span class="vibe__head">
-        <span class="vibe__name">${v.name}</span>
-        <span class="vibe__blurb">${v.blurb}</span>
+        <span class="vibe__name" style="font-family:${head};font-weight:${k.fontWeight ?? 600}">${v.name}</span>
+        <span class="vibe__blurb" style="font-family:${body};color:${c.inkMuted ?? 'inherit'}">${v.blurb}</span>
       </span>
-      <span class="vibe__spec">
-        <span class="vibe__title" style="font-family:${head};font-size:${v.knobs.baseText}">A heading, set in ${v.heading}</span>
-        <span class="vibe__body" style="font-family:${body}">And the body text under it, in ${v.body}.</span>
-        <span class="vibe__btn" style="font-family:${body};border-radius:${r};background:${v.brand};color:#fff">Get started</span>
-        <span class="vibe__type">${v.heading} + ${v.body} · ${r} corners</span>
+      <span class="vibe__foot">
+        <span class="vibe__btn" style="font-family:${body};border-radius:${k.radius};background:${
+          c.brand};color:${c.onBrand ?? '#fff'}">Get started</span>
+        <!-- only what the card cannot show you by being it: the corner and the
+             size are already there to look at, the names of the faces are not -->
+        <span class="vibe__type">${v.heading} + ${v.body}</span>
       </span>
     </button>`
   }).join('')
