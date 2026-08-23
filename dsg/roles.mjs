@@ -319,7 +319,18 @@ export const MAP = {
   },
   antd: {
     _note: 'Ant Design publishes no stylesheet and no theme file: 3,056 class rules that read 1,289 variables, and every one of those variables is computed at runtime by its own algorithm out of a handful of SEED tokens. So the knobs here are not variables to write, they are arguments to hand their generator: the same relationship as Material, one layer deeper. The variable each one lands in is named so the swatch can show it, but writing that variable on its own would move one value and leave the two hundred it derives behind.',
-    brand:    { var: '--ant-color-primary', seed: 'colorPrimary', seeds: 'antd' },
+    /* INFO FOLLOWS PRIMARY, because Ant says so. Rendered untouched, their own
+       defaults put colorPrimary, colorInfo and the progress track all at
+       #1677ff: one value under three names. Writing only colorPrimary breaks a
+       relationship they publish, and the visible cost was the progress bars,
+       the only ones on the whole wall that stayed a kit's factory blue while
+       every other kit followed the knob.
+       The four siblings are what their algorithm derives from colorInfo. Their
+       --ant-blue scale is NOT here: that is a fact about their palette, and
+       renaming blue to violet would be a lie. */
+    brand:    { var: '--ant-color-primary', seed: ['colorPrimary', 'colorInfo'], seeds: 'antd',
+                also: ['--ant-color-info', '--ant-color-info-text', '--ant-color-link',
+                       '--ant-progress-default-color'] },
     /* Their algorithm decides what goes on top of the brand — it has a whole
        token for it, colorTextLightSolid — so this is not ours to set. */
     onBrand:  { derives: 'brand' },
@@ -733,7 +744,9 @@ export function route(values, kitIds, kits = {}) {
          generator — and the spread below quietly won. */
       if (target.seed) {
         const made = target.from ? target.from(v) : v
-        if (made != null) tokens[target.seed] = made
+        /* one role can be more than one seed: a kit that publishes two of its
+           inputs at the same value has said they move together */
+        if (made != null) for (const name of [target.seed].flat()) tokens[name] = made
       }
       if (target.derives) continue
       /* the layer under this one already answers it — not a gap, and not ours
