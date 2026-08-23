@@ -608,6 +608,7 @@ function paint() {
 
   layout()
   receipt(routed)
+  toUrl()
 
   function dress(r0, order, routed) {
     const r = routed.find((x) => x.kit === r0.kit) ?? r0
@@ -1861,6 +1862,40 @@ $('#downloadzip').addEventListener('click', () => DESTS[0].go(files()))
  * thing one click further away. */
 $('#sheetx').addEventListener('click', () => ($('#drawer').hidden = true))
 addEventListener('keydown', (e) => { if (e.key === 'Escape') $('#drawer').hidden = true })
+
+/* ── THE ADDRESS IS THE STATE ──────────────────────────────────────────────
+ * Read BEFORE the seeding below, because every seed is taken from the stack:
+ * setting the kits afterwards would leave you looking at one stack's components
+ * wearing another stack's published defaults.
+ *
+ * Four keys and no more. Enough for a link to open the tool on a kit, on a
+ * comparison, or on one card of it — which is the only reason this exists: a
+ * page that says "Mantine, and here is what it cannot take" has to be able to
+ * hand you that, not a front door and instructions.
+ */
+function fromUrl() {
+  const q = new URLSearchParams(location.search)
+  const named = (key, ok) => (q.get(key) || '').split(',').map((x) => x.trim()).filter(ok)
+  const on = named('kits', (k) => KITS[k])
+  if (on.length) state.on = new Set(on)
+  const panes = named('compare', (k) => RENDERS.includes(k))
+  if (panes.length) state.compare = panes.slice(0, MAX_PANES)
+  const card = q.get('card')
+  if (card && SCENES.some((c) => c.id === card)) state.solo = card
+  const brand = (q.get('brand') || '').replace(/^#/, '')
+  if (HEX6.test('#' + brand)) state.values.brand = '#' + brand.toLowerCase()
+}
+/* and written back, so what you are looking at is what you can send someone.
+   replaceState, not pushState: turning a knob is not a page you go back to. */
+function toUrl() {
+  const q = new URLSearchParams()
+  q.set('kits', [...state.on].join(','))
+  if (state.compare) q.set('compare', comparing().join(','))
+  if (state.solo) q.set('card', state.solo)
+  if (HEX6.test(state.values.brand ?? '')) q.set('brand', state.values.brand.slice(1))
+  history.replaceState(null, '', location.pathname + '?' + q)
+}
+fromUrl()
 
 /* The two font knobs start on whatever the kit under them publishes. Seeding
  * them with a face we like would be the one opinion this tool is not allowed to

@@ -250,16 +250,25 @@ h2{margin:0;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.03em;font-weight:6
 .wm{flex:none;vertical-align:-2px}
 .mark{--wm-glyph:var(--mkt-surface)}
 .foot{--wm-glyph:var(--mkt-bg);background:var(--mkt-surface);border-radius:14px;padding:34px 30px 26px;color:var(--mkt-fg-muted)}
-.foot__cols{display:grid;grid-template-columns:1fr 1.6fr 1.4fr;gap:36px;padding-bottom:26px;border-bottom:1px solid var(--mkt-line)}
+.foot__cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:32px;
+  padding-bottom:26px;border-bottom:1px solid var(--mkt-border)}
 .foot__col{display:flex;flex-direction:column;gap:9px;font-size:13.5px}
 .foot__head{margin:0 0 3px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--mkt-fg)}
 .foot__col a{color:var(--mkt-fg-muted);text-decoration:none}
 .foot__col a:hover{color:var(--mkt-fg)}
 .foot__note{margin:0;font-size:12.5px;line-height:1.6}
+.foot__head--sub{margin-top:16px}
+.foot__why{margin:0 0 26px;max-width:46rem;font-size:14px;line-height:1.6;color:var(--mkt-fg-muted)}
+.foot__list{display:flex;flex-direction:column;gap:7px}
+.foot__list a{display:flex;align-items:baseline;gap:6px;color:var(--mkt-fg-muted);text-decoration:none;font-size:13px}
+.foot__list a:hover{color:var(--mkt-fg)}
+.foot__list em{font-style:normal;font-size:11.5px;color:var(--mkt-fg-faint)}
+.foot__ver{font-size:11.5px;color:var(--mkt-fg-faint);text-decoration:none}
+.foot__ver:hover{color:var(--mkt-fg-muted)}
 .foot__kits{display:grid;gap:9px}
-.foot__kit{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:13px}
-.foot__kit a{font-weight:600;color:var(--mkt-fg)}
-.foot__kit small{font-size:11px;color:var(--mkt-fg-muted)}
+.foot__kit{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:13px;margin:0 0 7px}
+.foot__kit a{font-weight:600;color:var(--mkt-fg);text-decoration:none}
+.foot__kit a:hover{text-decoration:underline}
 .foot__kit code{font-family:ui-monospace,monospace;font-size:11px}
 .foot__bottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:20px}
 .foot__bottom p{margin:0;display:flex;align-items:center;gap:8px}
@@ -276,6 +285,7 @@ const BODY = /*BODY*/;
 const TAIL = /*TAIL*/;
 const SHOTFIRST = /*SHOTFIRST*/;
 const CARDS = /*CARDS*/, PARTS = /*PARTS*/;
+const CARDLIST = /*CARDLIST*/;
 const CAVEATS = /*CAVEATS*/;
 const $ = (s) => document.querySelector(s)
 
@@ -363,12 +373,68 @@ $('#files').innerHTML = [
   ['_custom.scss', 'when a kit compiles its brand rather than reading it'],
 ].map(([f, w]) => `<li><code>${f}</code><span>${w}</span></li>`).join('')
 
-/* The footer credits every kit by name, with the version we read and the
-   licence that travels with it. Generated from the same documents the tool
-   uses, so it cannot claim a version we did not actually read. */
+/* ── THE FOOTER IS A SWITCHBOARD ───────────────────────────────────────────
+ * Not a site map and not an SEO hub of pages that do not exist. This tool is
+ * the only place where all nine can be checked and set at once, so somebody
+ * arriving with one of those questions — what does Mantine call its brand,
+ * how does Ant Design differ from Material, which of these run without React —
+ * should land ON the answer rather than at a front door.
+ *
+ * Every row is generated from the kit documents and every link opens the
+ * generator already in that state. Nothing here is typed, so nothing here can
+ * point at a kit we do not have or a version we did not read. */
+const go = (q) => `/generator?${new URLSearchParams(q)}`
+
+/* the name opens the tool on that kit; the version opens the kit's own site,
+   which is the credit it is owed */
 $('#footkits').innerHTML = Object.values(KITS).map((k) => `<p class="foot__kit">
-  <a href="${k.home}" rel="noopener">${k.name}</a>
-  <small>${k.version ? `v${k.version} · ` : ''}${k.license ?? 'licence unknown'}</small></p>`).join('')
+  <a href="${go({ kits: k.id })}">${k.name}</a>
+  <a class="foot__ver" href="${k.home}" rel="noopener">${k.version ? `v${k.version} · ` : ''}${k.license ?? 'licence unknown'}</a></p>`).join('')
+
+/* THE PAIRS ARE DERIVED, not chosen. Two kits are a real question for the same
+   reader only if the same reader could run both, so they are paired inside
+   their own framework group. Tailwind with daisyUI or with shadcn is left out:
+   those STACK, and offering them as a versus would be a comparison nobody has. */
+const RENDERING = Object.values(KITS).filter((k) => k.layer !== 'tokens')
+const STACKED = new Set(['tailwind|daisyui', 'tailwind|shadcn'])
+const pairs = []
+for (const group of ['any', 'React']) {
+  const inGroup = RENDERING.filter((k) => (k.runsIn?.framework ?? 'any') === group)
+  for (let i = 0; i < inGroup.length; i++) {
+    for (let j = i + 1; j < inGroup.length; j++) {
+      const [a, b] = [inGroup[i], inGroup[j]]
+      if (STACKED.has(`${a.id}|${b.id}`) || STACKED.has(`${b.id}|${a.id}`)) continue
+      pairs.push([a, b])
+    }
+  }
+}
+$('#footpairs').innerHTML = pairs.map(([a, b]) =>
+  `<a href="${go({ compare: `${a.id},${b.id}` })}">${a.name} <em>vs</em> ${b.name}</a>`).join('')
+
+/* THE SPLIT THE WHOLE POSITIONING RESTS ON, as two doors — and counted over
+   ALL nine, not over the eight that render. Counting only the renderable ones
+   said four where the rest of the page says five, because Open Props ships no
+   components at all: it is framework-free and there is nothing to put in a
+   pane. The number is about the kits; the link is about what can be shown, and
+   the line says so when those differ. */
+$('#footruns').innerHTML = [['any', 'Runs in anything'], ['React', 'React only']].map(([f, label]) => {
+  const all = Object.values(KITS).filter((k) => (k.runsIn?.framework ?? 'any') === f)
+  const shown = all.filter((k) => k.layer !== 'tokens')
+  const note = all.length === shown.length ? `${all.length} systems` : `${all.length} systems · ${shown.length} to compare`
+  return `<a href="${go({ compare: shown.map((k) => k.id).slice(0, 6).join(',') })}">${label}<em>${note}</em></a>`
+}).join('')
+
+/* and the question this tool answers that nothing else does: the same element,
+   in every kit at once. Straight from the wall's own cards. */
+/* By the card's OWN id, checked against the list the wall publishes — a title
+   typed here would point at a card the wall may have renamed, and the filter
+   below drops anything that is not there rather than shipping a dead link. */
+const ASK = ['actions', 'buttons', 'fields', 'queue', 'trail', 'rail']
+$('#footcards').innerHTML = ASK.map((id) => {
+  const card = CARDLIST.find((c) => c.id === id)
+  if (!card) return ''
+  return `<a href="${go({ compare: RENDERING.slice(0, 6).map((k) => k.id).join(','), card: id })}">${card.title}</a>`
+}).filter(Boolean).join('')
 
 $('#caveats').innerHTML = CAVEATS.map((c) => `<li>${c}</li>`).join('')
 

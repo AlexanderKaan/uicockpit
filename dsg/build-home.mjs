@@ -101,6 +101,9 @@ let page = readFileSync('home.template.html', 'utf8')
   .replace('/*TAIL*/', () => safeJson(TAIL))
   .replace('/*SHOTFIRST*/', () => JSON.stringify(SHOT_IDS[1] ?? SHOT_IDS[0]))
   .replace('/*CARDS*/', () => String(SCENES.length))
+  /* the cards by name, so the footer can offer "this element, in every kit"
+     without typing a title that the wall might have renamed */
+  .replace('/*CARDLIST*/', () => JSON.stringify(SCENES.map((c) => ({ id: c.id, title: c.title }))))
   .replace('/*FRAMEWORKFREE*/', () => WORD)
   .replace('/*KITCOUNT*/', () => WORD_OF(EVERY.length))
   .replace('/*PARTS*/', () => String(PARTS.length))
