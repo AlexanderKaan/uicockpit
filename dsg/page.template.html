@@ -52,14 +52,60 @@ body{margin:0;background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--
  * anything has invited you to. There is a room before that room now, and the
  * shell is switched by one attribute rather than by building a second page. */
 .app[data-stage=start]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);padding:0;gap:0}
-.app[data-stage=start]>.rail,.app[data-stage=start]>.wall,.app[data-stage=start]>.dock{display:none}
+.app[data-stage=start]>.rail,.app[data-stage=start]>.wall,.app[data-stage=start]>.dock,
+.app[data-stage=start]>.compose{display:none}
 .app:not([data-stage=start])>.start{display:none}
+
+/* COMPOSING: one column, the controls on top and the kit itself along the
+   bottom. The wall is not hidden here, it is SHORT — a strip you can see
+   moving while you turn a knob is the difference between composing and filling
+   in a form. */
+.app[data-stage=compose]{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);
+  min-height:100vh;padding:0;gap:0}
+.app[data-stage=compose]>.rail,.app[data-stage=compose]>.dock{display:none}
+.app[data-stage=compose]>.wall{border-radius:0;border-top:var(--bw) solid var(--line);
+  min-height:340px;padding:0}
+.app[data-stage=compose] .wall__bar{padding:9px 16px}
+
+/* THE WALL, as the room it earned: the rail is down to the one thing that
+   belongs beside it, which is what is rendering this. */
+.app[data-stage=wall]{grid-template-columns:242px minmax(0,1fr)}
+.app[data-stage=wall]>.compose{display:none}
+.rail__back{margin-top:auto}
 .eyebrow{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0}
 kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm);background:var(--sunken);color:var(--muted)}
 
 /* everything floats on the ground — no full-width bars */
 .rail,.wall,.dock{background:var(--panel);border-radius:var(--r)}
 .dock{grid-column:1/-1}
+
+/* ── THE COMPOSER ─────────────────────────────────────────────────────────
+ * Three cards, and they are the page rather than a column beside it. Wide
+ * enough that the palette families and the two specimens can breathe, which
+ * they could not at 322px. */
+.compose{display:flex;flex-direction:column;gap:0;padding:0 0 26px;overflow-y:auto}
+.compose__top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;
+  padding:11px 20px;border-bottom:var(--bw) solid var(--line);
+  background:color-mix(in srgb,var(--ground) 90%,transparent);backdrop-filter:blur(8px)}
+.compose__top .mark{margin:0}
+.compose__acts{display:flex;align-items:center;gap:8px;margin-left:auto}
+.compose__head{max-width:76rem;width:100%;margin:0 auto;padding:34px 20px 0}
+.compose__head h1{font-family:var(--display);font-weight:700;font-size:clamp(1.65rem,3vw,2.35rem);
+  line-height:1.1;letter-spacing:-.038em;margin:.5rem 0 0;color:var(--ink)}
+.compose__lede{margin:.7rem 0 0;max-width:44rem;font-size:14.5px;line-height:1.6;color:var(--muted)}
+
+.cards{max-width:76rem;width:100%;margin:0 auto;padding:26px 20px 0;
+  display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;align-items:start}
+@media(max-width:1180px){.cards{grid-template-columns:1fr 1fr}}
+@media(max-width:820px){.cards{grid-template-columns:1fr}}
+.cc{background:var(--panel);border:var(--bw) solid var(--line);border-radius:12px;
+  padding:16px 17px 17px;display:flex;flex-direction:column;gap:11px;min-width:0}
+.cc__top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cc__top h2{margin:0;font-family:var(--display);font-weight:700;font-size:15.5px;letter-spacing:-.025em}
+.cc__say{margin:0;font-size:12.5px;line-height:1.55;color:var(--muted)}
+.cc__rule{border:0;border-top:var(--bw) solid var(--line);margin:3px 0 0}
+.cc__dots{margin:auto 0 0;padding-top:9px;border-top:var(--bw) solid var(--line);
+  font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-height:19px}
 
 /* ── THE QUESTION ─────────────────────────────────────────────────────────
  * Four ways in, and a door for people who want none of them. A starting point
@@ -263,10 +309,12 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .cp__pairs em{font-style:normal;color:var(--muted);font-family:ui-monospace,monospace;font-size:11px}
 .cp__pairs li[data-bad] em{color:#8e2c21;font-weight:600}
 .cp__fine{margin:0;font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
-.pals{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:6px;padding-bottom:2px}
-.pals::-webkit-scrollbar{display:none}
-.pal{flex:none;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r-sm);
-     padding:4px 5px 3px;cursor:pointer;display:flex;flex-direction:column;gap:3px;width:60px}
+/* they wrap now. In a 322px rail seventeen families had to be a row you pushed;
+   in a card this wide, hiding twelve of them behind a scroll nobody sees is the
+   only reason you would not pick one. */
+.pals{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px;margin-top:6px}
+.pal{border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r-sm);
+     padding:4px 5px 3px;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0}
 .pal:hover{border-color:var(--ink)}
 .pal[aria-pressed=true]{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand)}
 .pal__ramp{display:flex;height:14px;border-radius:2px;overflow:hidden}
@@ -600,7 +648,7 @@ const state = {
      never chosen — it is whichever layer is on top. */
   on: new Set(['tailwind', 'shadcn']),
   get show() { return showing(stack(this.on, KITS)) },
-  /* WHICH ROOM YOU ARE IN. 'start' is the question; 'build' is the tool. A link
+  /* WHICH ROOM YOU ARE IN. Three: the question, the composer, the wall. A link
      that carries any state at all skips the question, because somebody who was
      sent a kit is not starting. */
   stage: 'start',
@@ -1144,18 +1192,10 @@ function watch(f) {
   }, { passive: true })
 }
 
-/* ── what each folded group still says ────────────────────────────────────── */
-/* A group that folds away and takes its answer with it is a group nobody will
- * open twice. Collapsed, each one still shows what is in it. */
-function summaries() {
-  $('#sum_colour').innerHTML = SWATCH.slice(0, 6)
-    .map((r) => `<i style="background:${state.values[r.id]}"></i>`).join('')
-  $('#sum_type').textContent = TYPE.map((r) => {
-    const fam = familyOf(state.values[r.id])
-    return FONTS.stacks.find((s) => s.family === state.values[r.id])?.name ?? fam
-  }).join(' · ')
-  $('#sum_shape').textContent = LENGTHS.filter((k) => k.group === 'shape').map((k) => shown(k, state.values[k.id])).join(' · ')
-}
+/* Each card used to be a group that folded away, and a fold needs a line that
+ * says what it took with it. The cards do not fold any more: what was in the
+ * summary is the card. */
+function summaries() {}
 
 $('#typo').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-font]'); if (!b) return
@@ -1618,7 +1658,11 @@ $('#chips').addEventListener('click', (e) => {
 })
 
 $('#shuffle').addEventListener('click', shuffle)
-addEventListener('keydown', (e) => { if (e.key === 's' && !/input|textarea/i.test(e.target.tagName)) shuffle() })
+/* the letters only mean anything in the room that has the cards in it */
+addEventListener('keydown', (e) => {
+  if (state.stage !== 'compose' || /input|textarea/i.test(e.target.tagName) || e.metaKey || e.ctrlKey) return
+  if (e.key === 's') shuffle()
+})
 function shuffle() {
   /* Within the floors, always — and with the SAME maths the export uses, not a
      hand-rolled HSL twin. A shuffle that can hand you an unreadable combination
@@ -1817,7 +1861,11 @@ function receipt(routed) {
      are really their components is only worth something if it is counted where
      the reader can see it — so it is, and Material's honest zero shows too. */
   const top = state.show, own = OWN[top] ?? {}
-  $('#wallhead').textContent = describe(stack(state.on, KITS), KITS)
+  /* the same strip means two things: in the composer it is what you are making
+     right now, on the wall it is the whole of it */
+  $('#wallhead').textContent = state.stage === 'compose'
+    ? `Live · ${describe(stack(state.on, KITS), KITS)}`
+    : describe(stack(state.on, KITS), KITS)
   /* Material's unit is not a class — it ships custom elements, so what counts
      there is how many of the elements on the screen its own package registers. */
   $('#wallcount').innerHTML = own.unit === 'elements'
@@ -1977,10 +2025,22 @@ const VIBES = [
     knobs: { radius: '2px', baseText: '17px', space: '1.1', elevation: '0', borderWidth: '1px' } },
 ]
 
+/* THE THREE ROOMS. Nothing is rebuilt when you move between them: the wall is
+   the same element at a different height, and the controls are the same
+   controls. A stage is a shape the shell takes, not a page. */
 function stage(next) {
+  const from = state.stage
   state.stage = next
   $('.app').dataset.stage = next
-  if (next === 'build') { sync(); paint(); typoCards() }
+  /* IN THE COMPOSER THE STRIP SHOWS WHAT THE VALUES BECOME. Foundations is the
+     board that prints the values themselves, which are already the three cards
+     directly above it — the same thing twice. Arriving from the question, it
+     opens on the parts instead. Once you have moved it yourself it is yours. */
+  if (next === 'compose' && from === 'start' && state.board === 'foundations') state.board = 'controls'
+  if (next !== 'start') { sync(); paint(); typoCards() }
+  /* the frames measure themselves against the box they are in, and the box just
+     changed height by four hundred pixels */
+  if (next !== 'start') requestAnimationFrame(() => dispatchEvent(new Event('resize')))
   toUrl()
 }
 
@@ -2014,7 +2074,7 @@ function takeVibe(v) {
     fontHeading: `'${v.heading}', sans-serif`, fontBody: `'${v.body}', sans-serif`,
   })
   loadFace(document, v.heading); loadFace(document, v.body)
-  stage('build')
+  stage('compose')
 }
 
 drawVibes()
@@ -2022,7 +2082,33 @@ $('#vibes').addEventListener('click', (e) => {
   const b = e.target.closest('.vibe'); if (!b) return
   takeVibe(VIBES[Number(b.dataset.v)])
 })
-$('#startblank').addEventListener('click', () => stage('build'))
+$('#startblank').addEventListener('click', () => stage('compose'))
+
+/* ── AND BACK AND FORTH BETWEEN THE OTHER TWO ─────────────────────────────── */
+$('#tofold').addEventListener('click', () => stage('wall'))
+$('#tokit').addEventListener('click', () => stage('compose'))
+$('#restart').addEventListener('click', () => stage('start'))
+
+/* ONE SHUFFLE PER CARD, so a section you like is not thrown out with one you
+   do not. The feel shuffle takes a preset the tool already publishes rather
+   than a random number in each slider, which is how you get a kit with 3px
+   corners and thirty pixels of air. */
+$('#feelshuffle').addEventListener('click', feelShuffle)
+function feelShuffle() {
+  const others = PRESETS.filter((b) => b.label !== lastFeel)
+  const b = others[Math.floor(Math.random() * others.length)]
+  lastFeel = b.label
+  ;[...$('#chips').children].forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.b === b.label)))
+  Object.assign(state.values, b.values)
+  sync(); paint()
+  note(`<b>${b.label}</b> — ${b.why}. Every value it moved is a slider you can still turn.`)
+}
+let lastFeel = null
+addEventListener('keydown', (e) => {
+  if (state.stage !== 'compose' || /input|textarea/i.test(e.target.tagName) || e.metaKey || e.ctrlKey) return
+  if (e.key === 't') $('#typeshuffle').click()
+  if (e.key === 'u') feelShuffle()
+})
 
 /* ── THE ADDRESS IS THE STATE ──────────────────────────────────────────────
  * Read BEFORE the seeding below, because every seed is taken from the stack:
@@ -2047,7 +2133,9 @@ function fromUrl() {
   if (HEX6.test('#' + brand)) state.values.brand = '#' + brand.toLowerCase()
   /* a link that carries anything at all was sent by somebody who had already
      started, so it opens the tool rather than the question */
-  if (q.get('stage') === 'build' || [...q.keys()].some((k) => k !== 'stage')) state.stage = 'build'
+  const asked = q.get('stage')
+  if (asked === 'compose' || asked === 'wall') state.stage = asked
+  else if (asked === 'build' || [...q.keys()].some((k) => k !== 'stage')) state.stage = 'wall'
   $('.app').dataset.stage = state.stage
 }
 /* and written back, so what you are looking at is what you can send someone.
@@ -2056,6 +2144,7 @@ function toUrl() {
   const q = new URLSearchParams()
   /* the question has no state worth writing down; everything else does */
   if (state.stage === 'start') return history.replaceState(null, '', location.pathname)
+  q.set('stage', state.stage)
   q.set('kits', [...state.on].join(','))
   if (state.compare) q.set('compare', comparing().join(','))
   if (state.solo) q.set('card', state.solo)

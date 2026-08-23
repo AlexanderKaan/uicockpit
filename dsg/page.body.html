@@ -21,6 +21,73 @@
   </div>
 </section>
 
+<!-- ── STAGE TWO · THE COMPOSER ───────────────────────────────────────────
+     The controls used to be a 322px column beside the wall, which made them
+     furniture next to the thing that mattered. They ARE the thing that
+     matters, so they are the room, and the wall is a strip along the bottom
+     until you fold it up. Every id is the one the rail had, so nothing below
+     this file had to learn a new name. -->
+<section class="compose">
+  <header class="compose__top">
+    <a class="mark" href="/" title="UIcockpit — home"><!--MARK--> Design System Generator</a>
+    <div class="compose__acts">
+      <button class="btn btn--ghost" id="restart">Start over</button>
+      <button class="btn btn--go" id="tofold"><!--I:maximize-->Fold it up</button>
+    </div>
+  </header>
+
+  <div class="compose__head">
+    <p class="eyebrow">Second of three</p>
+    <h1>Make it look like yours.</h1>
+    <p class="compose__lede">Colours, two typefaces, and how solid you want the edges. Nothing here is
+      final, so shuffle as often as you like — the strip along the bottom is really your kit rendering,
+      not a picture of one.</p>
+  </div>
+
+  <div class="cards">
+    <section class="cc">
+      <header class="cc__top">
+        <h2>Colours</h2>
+        <button class="mini" id="shuffle" title="Shuffle the colour"><!--I:shuffle-->Shuffle <kbd>S</kbd></button>
+      </header>
+      <p class="cc__say">One colour is all you say. The other ten are read out of what your stack
+        publishes, and the line below names which kit answered for what.</p>
+      <div class="seed">
+        <button class="seed__well" id="seedwell" aria-label="Choose your colour"></button>
+        <input class="seed__hex" id="seedhex" value="#6644FC" spellcheck="false" autocomplete="off" aria-label="Your colour, as hex">
+      </div>
+      <p class="sub" id="seednote"></p>
+      <div class="swatches" id="swatches"></div>
+      <hr class="cc__rule">
+      <p class="eyebrow">Or start from a family your stack already ships</p>
+      <p class="sub" id="palnote"></p>
+      <div class="pals" id="palettes"></div>
+    </section>
+
+    <section class="cc">
+      <header class="cc__top">
+        <h2>Typography</h2>
+        <button class="mini" id="typeshuffle" title="Shuffle the type"><!--I:shuffle-->Shuffle <kbd>T</kbd></button>
+      </header>
+      <p class="cc__say">Two faces is plenty. Every one of them is a real family your stack can load,
+        and the size below is the one everything else is measured against.</p>
+      <div class="typo" id="typo"></div>
+      <div class="knobs" id="typeknobs"></div>
+    </section>
+
+    <section class="cc">
+      <header class="cc__top">
+        <h2>The feel of it</h2>
+        <button class="mini" id="feelshuffle" title="Shuffle the shape"><!--I:shuffle-->Shuffle <kbd>U</kbd></button>
+      </header>
+      <p class="cc__say">Corners, weight and the room between things. This is where a kit stops being
+        a palette and starts having a personality.</p>
+      <div class="chips" id="chips"></div>
+      <div class="knobs" id="knobs"></div>
+    </section>
+  </div>
+</section>
+
 <aside class="rail">
   <a class="mark" href="/" title="UIcockpit — home"><!--MARK--> Design System Generator</a>
 
@@ -31,33 +98,7 @@
     <p class="note" id="stacknote" hidden></p>
   </section>
 
-  <details class="grp" open>
-    <summary><span class="grp__name">Colour</span><span class="grp__sum grp__dots" id="sum_colour"></span></summary>
-    <p class="eyebrow">Start from one colour</p>
-    <div class="seed">
-      <button class="seed__well" id="seedwell" aria-label="Choose your colour"></button>
-      <input class="seed__hex" id="seedhex" value="#0b6e8a" spellcheck="false" autocomplete="off" aria-label="Your colour, as hex">
-    </div>
-    <p class="sub" id="seednote"></p>
-    <hr class="grp__rule">
-    <button class="mini" id="shuffle" title="Shuffle the colour"><!--I:shuffle-->Shuffle the colour <kbd>S</kbd></button>
-    <p class="sub" id="palnote"></p>
-    <div class="pals" id="palettes"></div>
-    <div class="swatches" id="swatches"></div>
-  </details>
-
-  <details class="grp" open>
-    <summary><span class="grp__name">Typography</span><span class="grp__sum" id="sum_type"></span></summary>
-    <div class="typo" id="typo"></div>
-    <div class="knobs" id="typeknobs"></div>
-    <button class="mini" id="typeshuffle" title="Shuffle the type"><!--I:shuffle-->Shuffle the type</button>
-  </details>
-
-  <details class="grp" open>
-    <summary><span class="grp__name">Shape &amp; space</span><span class="grp__sum" id="sum_shape"></span></summary>
-    <div class="chips" id="chips"></div>
-    <div class="knobs" id="knobs"></div>
-  </details>
+  <button class="btn btn--go rail__back" id="tokit"><!--I:minimize-->Open the kit again</button>
 </aside>
 
 <main class="wall">
