@@ -235,7 +235,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .vibe:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:0 8px 22px rgb(17 17 18 / .07)}
 .vibe:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 /* the colours this start would really derive, not three we chose to look nice */
-.vibe__chips{display:flex;gap:4px}
+.vibe__chips{display:flex;gap:4px;min-height:22px}
 .vibe__chips i{width:22px;height:22px;border-radius:5px}
 .vibe__head{display:grid;gap:6px}
 /* spans in a button, so every one of them has to be told it is a block */
@@ -2516,32 +2516,9 @@ addEventListener('keydown', (e) => { if (e.key === 'Escape') $('#drawer').hidden
  * job is to be unsurprising, so every one of these is in Google's own most-used
  * list, and the rank is theirs and not a word of ours. Checked at load, because
  * a list we refetch could quietly leave one behind. */
-const VIBES = [
-  { name: 'Calm and civic',
-    blurb: 'Public services and forms people have to finish. Nothing shouts, everything is legible.',
-    family: 'Blue', heading: 'Open Sans', body: 'Roboto',
-    knobs: { radius: '6px', baseText: '17px', space: '1', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
-  { name: 'Bold and consumer',
-    blurb: 'Things people download on a whim. Round, warm, and not shy about it.',
-    family: 'Fuchsia', heading: 'Poppins', body: 'Nunito',
-    knobs: { radius: '18px', baseText: '16px', space: '1.15', elevation: '2', borderWidth: '0px', fontWeight: '700' } },
-  { name: 'Quiet and technical',
-    blurb: 'Dashboards and tools you live in all day. Dense, flat, out of the way.',
-    family: 'Emerald', heading: 'Inter', body: 'Inter',
-    knobs: { radius: '3px', baseText: '13.5px', space: '0.82', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
-  { name: 'Print and paper',
-    blurb: 'Letters, reports, anything that ends up on a desk. Serif, square, unhurried.',
-    family: 'Orange', heading: 'Merriweather', body: 'Lato',
-    knobs: { radius: '0px', baseText: '17.5px', space: '1.25', elevation: '0', borderWidth: '1px', fontWeight: '600' } },
-]
-/* the claim is "the popular ones", so it is worth being wrong out loud about */
-{
-  const far = VIBES.flatMap((v) => [v.heading, v.body])
-    .filter((f, i, a) => a.indexOf(f) === i)
-    .map((f) => [f, GOOGLE.get(f)?.rank])
-    .filter(([, r]) => !(r > 0 && r <= 50))
-  if (far.length) console.warn('start: no longer in Google\'s top 50: ' + far.map(([f, r]) => `${f} (${r ?? 'gone'})`).join(', '))
-}
+/* Each renderable kit's own out-of-the-box values, read from its package at
+   build time by kit-defaults.mjs. The start screen is these, verbatim. */
+const STARTS = /*STARTS*/;
 
 /* THE THREE ROOMS. Nothing is rebuilt when you move between them: the wall is
    the same element at a different height, and the controls are the same
@@ -2582,68 +2559,66 @@ function stage(next) {
  * the loud consumer start, because that is the difference. */
 /* the family this start names, out of what the stack publishes, run through the
    same seven-role function the palette row uses */
-function vibeColours(v, order) {
-  const all = palettesFor(order, KITS)
-  const fam = all.find((p) => p.kind === 'accent' && p.name.toLowerCase() === v.family.toLowerCase())
-  if (!fam) return {}
-  const neutrals = all.filter((p) => p.kind === 'neutral')
-  const own = neutrals.filter((n) => n.kit === fam.kit)
-  const grey = matchNeutral(fam, own, KITS[fam.kit]) ?? neutrals[0]
-  return paletteRoles(fam, grey, KITS[fam.kit], seenRef()).values ?? {}
+/* the name a font stack goes by: the kit-published stacks are all in
+   FONTS.stacks with real names ("System stack"), a Google family by its own */
+function faceName(family) {
+  if (!family) return null
+  const hit = FONTS.stacks.find((f) => f.family === family)
+  return hit ? hit.name : familyOf(family)
 }
 
-function drawVibes() {
-  const order = stack(state.on, KITS).order
-  $('#vibes').innerHTML = VIBES.filter((v) => vibeColours(v, order).brand).map((v, i) => {
-    const head = `'${v.heading}', sans-serif`, body = `'${v.body}', sans-serif`
-    const k = v.knobs
-    /* NOT A HEX WE TYPED. Each start names a colour FAMILY, and the family is
-       looked up in what the stack actually publishes — so the seven roles come
-       out of the same ramp, matched to the same grey, by the same function that
-       runs when you pick one by hand. If a stack has no such family the card
-       simply is not offered, which is more honest than showing a colour that
-       stack could not give you. */
-    const c = vibeColours(v, order)
-    const chips = ['brand', 'ink', 'inkMuted', 'line'].map((r) => c[r]).filter(Boolean)
-    /* the padding is the house figure, the same on all four; the RHYTHM inside
-       is still the vibe's own, which is where its spacing actually reads */
-    const gap = `${Math.round(17 * Number(k.space))}px`
-    return `<button class="vibe" data-v="${VIBES.indexOf(v)}" style="border-width:${
-      k.borderWidth === '0px' ? '1px' : k.borderWidth};gap:${gap};font-size:${k.baseText}">
+function drawStarts() {
+  /* Bootstrap writes "Segoe UI" with double quotes in its published stack, and
+     a double quote ends a style attribute: escape what goes into one */
+  const attr = (x) => String(x).replaceAll('"', '&quot;')
+  $('#vibes').innerHTML = Object.values(STARTS).map((d) => {
+    const v = d.values
+    const chips = ['brand', 'ink', 'inkMuted', 'line'].map((r) => v[r]).filter(Boolean)
+    const face = v.fontBody ? `font-family:${attr(v.fontBody)};` : ''
+    /* the button IS the kit's default: its colour, its corner, its face. A kit
+       with no house colour gets an ink button and says so in the foot. */
+    const btn = v.brand
+      ? `background:${v.brand};color:${aaInk(v.brand)};`
+      : `background:${v.ink ?? 'var(--ink)'};color:#fff;`
+    const foot = [
+      v.brand ? `${nameColor(v.brand)} ${v.brand}` : null,
+      faceName(v.fontBody),
+      v.radius != null ? `${parseInt(v.radius)}px corners` : null,
+    ].filter(Boolean).join(' · ')
+    return `<button class="vibe" data-k="${d.id}">
       <span class="vibe__chips">${chips.map((h) => `<i style="background:${h}"></i>`).join('')}</span>
       <span class="vibe__head">
-        <span class="vibe__name" style="font-family:${head};font-weight:${k.fontWeight ?? 600}">${v.name}</span>
-        <span class="vibe__blurb" style="font-family:${body};color:${c.inkMuted ?? 'inherit'}">${v.blurb}</span>
+        <span class="vibe__name" style="${face}">${d.name}</span>
+        ${d.gap ? `<span class="vibe__blurb">It ${d.gap}.</span>` : ''}
       </span>
       <span class="vibe__foot">
-        <span class="vibe__btn" style="font-family:${body};background:${
-          c.brand};color:${c.onBrand ?? '#fff'}">Get started</span>
-        <!-- only what the card cannot show you by being it: the corner and the
-             size are already there to look at, the names of the faces are not -->
-        <span class="vibe__type">${v.heading === v.body ? `${v.heading} throughout` : `${v.heading} + ${v.body}`}</span>
+        <span class="vibe__btn" style="${face}${btn}border-radius:${v.radius ?? 'var(--r)'}">Get started</span>
+        <span class="vibe__type">${foot}</span>
       </span>
     </button>`
   }).join('')
-  for (const v of VIBES) { loadFace(document, v.heading); loadFace(document, v.body) }
+  /* Material's Roboto Flex is a real downloadable face; system stacks need no load */
+  for (const d of Object.values(STARTS)) {
+    const head = d.values.fontBody?.split(',')[0]?.trim().replace(/^['"]|['"]$/g, '')
+    if (head && GOOGLE.has(head)) loadFace(document, head)
+  }
 }
 
-function takeVibe(v) {
-  /* the family first, through the same seven-role path the palette row takes,
-     so the greys are the stack's own ramp and not a tint of ours */
-  const order = stack(state.on, KITS).order
-  Object.assign(state.values, vibeColours(v, order))
+function takeStart(d) {
+  state.on = new Set(d.stack)
+  Object.assign(state.values, d.values)
+  if (d.values.brand) state.values.onBrand = aaInk(d.values.brand)
   palAt = null; palNeutral = null; palShort = []
-  Object.assign(state.values, v.knobs, {
-    fontHeading: `'${v.heading}', sans-serif`, fontBody: `'${v.body}', sans-serif`,
-  })
-  loadFace(document, v.heading); loadFace(document, v.body)
+  const head = d.values.fontBody?.split(',')[0]?.trim().replace(/^['"]|['"]$/g, '')
+  if (head && GOOGLE.has(head)) loadFace(document, head)
+  sync(); paint(); drawStackPicker()
   stage('compose')
 }
 
-drawVibes()
+drawStarts()
 $('#vibes').addEventListener('click', (e) => {
   const b = e.target.closest('.vibe'); if (!b) return
-  takeVibe(VIBES[Number(b.dataset.v)])
+  takeStart(STARTS[b.dataset.k])
 })
 $('#startblank').addEventListener('click', () => stage('compose'))
 

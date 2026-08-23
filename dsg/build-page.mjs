@@ -18,6 +18,7 @@ import { render, PARTS } from './parts.mjs'
 import { WALL, useMantineClasses, useRadixTones, useIcons, useIconSets, iconKit, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES, BOARDS, wallMarkup, safeJson } from './scenes.mjs'
 import { readIconSets, KIT_ICON_SETS } from './icon-sets.mjs'
+import { kitDefaults } from './kit-defaults.mjs'
 import { ownage, partOwnage } from './fidelity.mjs'
 import { analyse, unread } from './orphans.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
@@ -281,6 +282,9 @@ let page = readFileSync('page.template.html', 'utf8')
    * nothing said a word. Every placeholder here takes a function now. */
   .replace('/*SCRIPTS*/', () => safeJson({ material: mdw.js }))
   .replace('/*WALLS*/', () => safeJson(Object.fromEntries(RENDERS.map((id) => [id, wall(id)]))))
+  /* the start screen's cards: each renderable kit's own out-of-the-box values,
+     read from the fetched packages at build time */
+  .replace('/*STARTS*/', () => safeJson(kitDefaults(kits, RENDERS)))
   .replace('/*ICONS*/', () => JSON.stringify(lu.icons))
 for (const n of CHROME_ICONS) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
 page = page.split('<!--MARK-->').join(mark(17))
@@ -351,7 +355,7 @@ if (left.length) { console.error(`build: unreplaced ${[...new Set(left)].join(' 
 
 /* And exactly one of each: a substitution pattern in a replacement value once
  * spliced the whole page in twice, and it still loaded. */
-for (const decl of ['const CSS =', 'const KITS =', 'const SCRIPTS =', 'const WALLS =']) {
+for (const decl of ['const CSS =', 'const KITS =', 'const SCRIPTS =', 'const WALLS =', 'const STARTS =']) {
   const n = page.split(decl).length - 1
   if (n !== 1) { console.error(`build: "${decl}" appears ${n} times — the page is corrupt`); process.exit(1) }
 }
