@@ -198,10 +198,8 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .start{grid-column:1/-1;min-height:100vh;display:flex;flex-direction:column;
   align-items:center;justify-content:center;padding:48px 24px;overflow-y:auto}
 .start__in{width:100%;max-width:70rem;display:grid;gap:0;justify-items:center;text-align:center}
-.start__mark{display:flex;align-items:center;gap:9px;font:600 14px var(--sans);color:var(--muted);margin-bottom:34px}
-.start__mark .wm{--wm-glyph:var(--ground)}
 .start h1{font-family:var(--display);font-weight:700;font-size:clamp(2rem,4.4vw,3.25rem);
-  line-height:1.05;letter-spacing:-.04em;margin:.7rem 0 0;color:var(--ink)}
+  line-height:1.05;letter-spacing:-.04em;margin:0;color:var(--ink)}
 .start__lede{margin:1rem auto 0;max-width:36rem;font-size:15.5px;line-height:1.6;color:var(--muted)}
 /* auto-fit dropped the fourth card onto a row of its own at the width where
    three fitted, which reads as one that did not belong. Four, then two, then
@@ -216,7 +214,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 /* border-radius, border-width, padding, gap and font-size all come from the
    vibe itself, written inline: the card IS the specimen. */
 .vibe{display:flex;flex-direction:column;cursor:pointer;text-align:left;align-items:stretch;
-  border:1px solid var(--line);background:var(--panel);
+  padding:var(--pad);border:1px solid var(--line);background:var(--panel);
   transition:border-color .16s,transform .16s,box-shadow .16s}
 .vibe:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:0 8px 22px rgb(17 17 18 / .07)}
 .vibe:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
@@ -2473,9 +2471,11 @@ function drawVibes() {
        stack could not give you. */
     const c = vibeColours(v, order)
     const chips = ['brand', 'ink', 'inkMuted', 'line'].map((r) => c[r]).filter(Boolean)
-    const pad = `${Math.round(17 * Number(k.space))}px`
+    /* the padding is the house figure, the same on all four; the RHYTHM inside
+       is still the vibe's own, which is where its spacing actually reads */
+    const gap = `${Math.round(17 * Number(k.space))}px`
     return `<button class="vibe" data-v="${VIBES.indexOf(v)}" style="border-radius:${k.radius};border-width:${
-      k.borderWidth === '0px' ? '1px' : k.borderWidth};padding:${pad};gap:${pad};font-size:${k.baseText}">
+      k.borderWidth === '0px' ? '1px' : k.borderWidth};gap:${gap};font-size:${k.baseText}">
       <span class="vibe__chips">${chips.map((h) => `<i style="background:${h}"></i>`).join('')}</span>
       <span class="vibe__head">
         <span class="vibe__name" style="font-family:${head};font-weight:${k.fontWeight ?? 600}">${v.name}</span>
