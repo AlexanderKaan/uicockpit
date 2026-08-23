@@ -108,11 +108,19 @@
 <aside class="rail">
   <a class="mark" href="/" title="UIcockpit — home"><!--MARK--> Design System Generator</a>
 
-  <section class="grp grp--flat">
+  <section class="grp grp--flat" id="stackgrp">
     <p class="grp__head"><span class="grp__name">What is rendering this</span></p>
     <div class="card" id="stackcard"></div>
     <p class="note" id="stacknote" hidden></p>
     <button class="btn rail__change" id="change"><!--I:layers-->Change the stack</button>
+  </section>
+
+  <!-- Comparing, the rail answers the same question with six names instead of
+       one. It was a second row on top of the wall, where it crowded the boards
+       and left no room to say why two of the eight are not on offer. -->
+  <section class="grp grp--flat" id="panegrp" hidden>
+    <p class="grp__head"><span class="grp__name">What is on the wall</span></p>
+    <div class="panes" id="panes"></div>
   </section>
 
   <button class="btn btn--go rail__back" id="tokit"><!--I:minimize-->Open the kit again</button>
@@ -126,7 +134,6 @@
     <div class="seg" id="view" role="radiogroup" aria-label="One kit or several"></div>
     <p class="wall__count" id="wallcount"></p>
   </div>
-  <div class="panes" id="panes" hidden></div>
   <div class="frames" id="frames"></div>
 
 </main>

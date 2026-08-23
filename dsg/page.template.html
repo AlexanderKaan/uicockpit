@@ -458,6 +458,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 
 .wall{min-width:0;padding:12px 14px;display:flex;flex-direction:column}
 .wall__bar{display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap}
+.app[data-compare] #wallhead,.app[data-compare] .wall__count{display:none}
 .wall__count{margin-left:auto}
 .wall__count{margin:0;font-size:11.5px;color:var(--muted)}
 .wall__count b{color:var(--ink);font-weight:600}
@@ -488,15 +489,21 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .pane figcaption{display:none}
 .pane[hidden]{display:none}
 
-.panes{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}
-.panes__cap{margin:0;font-size:var(--fs-sm);color:var(--muted)}
+.panes{display:flex;flex-direction:column;gap:5px}
+.panes__cap{margin:0 0 3px;font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
 .panes__cap b{color:var(--ink);font-weight:600}
-.pchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:var(--bw) solid var(--line);
-  border-radius:var(--r);background:var(--panel);font-size:var(--fs-md);color:var(--muted);cursor:pointer}
+.pchip{display:flex;align-items:center;gap:8px;width:100%;min-height:32px;padding:0 10px;
+  border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--panel);
+  font:inherit;font-size:var(--fs-md);color:var(--muted);cursor:pointer;text-align:left}
+.pchip:hover:not([disabled]){border-color:var(--ink);color:var(--ink)}
 .pchip[aria-pressed=true]{border-color:var(--ink);color:var(--ink);font-weight:600}
 .pchip[disabled]{opacity:.45;cursor:not-allowed}
-.pchip i{width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.55}
-.solobar{display:inline-flex;align-items:center;gap:8px;margin-left:auto;font-size:var(--fs-sm);color:var(--muted)}
+.pchip i{flex:none;width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.55}
+.panes__why{margin:4px 0 0;font-size:var(--fs-xs);color:var(--muted);line-height:1.5}
+.solobar{margin:9px 0 0;padding-top:9px;border-top:var(--bw) solid var(--line);
+  font-size:var(--fs-sm);color:var(--muted);line-height:1.5}
+.solobar b{color:var(--ink);font-weight:600}
+.solobar .link{margin:0;display:inline}
 /* ── the checks, next to the wall ───────────────────────────────────────────
  * These used to live inside the export drawer, which is to say: you found out
  * what was wrong with your system at the moment you were done with it. They sit
@@ -959,7 +966,15 @@ function layout() {
     if (note) note.textContent = state.compare && !LIVE_BRAND[id] ? 'built, not live' : ''
     solo($('#f_' + id))
   }
-  $('#panes').hidden = !state.compare
+  /* ── A · THE BAR DROPS WHAT STOPS BEING TRUE ────────────────────────────
+     Comparing, the wall holds six kits, so the stack's name and "420 of 420
+     classes are shadcn/ui's own" are both about something that is no longer
+     what you are looking at. The busiest row was carrying the least true
+     line on the screen. */
+  $('.app').dataset.compare = state.compare ? '' : null
+  if (!state.compare) delete $('.app').dataset.compare
+  $('#stackgrp').hidden = !!state.compare
+  $('#panegrp').hidden = !state.compare
   if (state.compare) drawPanes()
 }
 
@@ -1012,17 +1027,20 @@ function drawPanes() {
   const on = comparing()
   const full = on.length >= MAX_PANES
   $('#panes').innerHTML =
-    `<p class="panes__cap"><b>${on.length}</b> of ${MAX_PANES} — the same values, in each kit's own vocabulary</p>`
+    `<p class="panes__cap"><b>${on.length}</b> of ${MAX_PANES} panes, the same values in each kit's own vocabulary</p>`
     + RENDERS.map((id) => {
       const lit = on.includes(id)
       const stop = !lit && full
-      return `<button class="pchip" data-k="${id}" aria-pressed="${lit}"${stop ? ' disabled' : ''}
-        title="${lit ? 'showing' : stop ? `six is the most that still reads — drop one first` : 'add to the grid'}"><i></i>${KITS[id].name}</button>`
+      return `<button class="pchip" data-k="${id}" aria-pressed="${lit}"${stop ? ' disabled' : ''}><i></i>${KITS[id].name}</button>`
     }).join('')
+    /* THE REASON, NOT A TOOLTIP. Two of the eight go quiet at six, and a
+       control that dims without saying why is the thing this tool spent a
+       commit removing from the stack picker. */
+    + (full ? `<p class="panes__why">Six is the most that still reads at this size. Drop one to add another.</p>` : '')
     + (state.solo
-      ? `<span class="solobar">showing <b>${(SCENES.find((c) => c.id === state.solo) ?? {}).title ?? state.solo}</b> in all ${on.length}
-         <button class="link" id="unsolo">show the whole wall</button></span>`
-      : `<span class="solobar">click any card to compare just that one</span>`)
+      ? `<p class="solobar">Showing <b>${(SCENES.find((c) => c.id === state.solo) ?? {}).title ?? state.solo}</b> in all ${on.length}.
+         <button class="link" id="unsolo">Show the whole wall</button></p>`
+      : `<p class="solobar">Click any card in a pane to compare just that one.</p>`)
 }
 
 $('#panes').addEventListener('click', (e) => {
