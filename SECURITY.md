@@ -2,10 +2,9 @@
 
 ## Supported versions
 
-UIcockpit is a continuously deployed single-page app — the latest version at
-[uicockpit.com](https://uicockpit.com) (and the kit served from
-`kit.uicockpit.com`) is the only supported version. There are no long-lived
-releases to back-port fixes to.
+UIcockpit is a continuously deployed site: the latest version at
+[uicockpit.com](https://uicockpit.com) is the only supported version. There
+are no long-lived releases to back-port fixes to.
 
 ## Reporting a vulnerability
 

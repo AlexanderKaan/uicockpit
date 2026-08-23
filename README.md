@@ -75,14 +75,9 @@ There is no npm package, no CLI and no MCP server for this version. The zip
 you export carries the agent-facing files itself, so nothing needs installing
 to use what you made. The `uicockpit` and `uicockpit-mcp` packages on npm
 belong to a retired earlier version of this project and are deprecated; that
-product lives on in this repository at the tag `archive/cockpit-2026-08-17`.
-
-## Also in this repository
-
-[`a2ui/`](./a2ui/README.md) is a sibling experiment: tooling for Google's A2UI
-protocol that turns a catalog choice into a renderer you own, with a
-conformance verdict on every answer. It has its own README, and
-[WHY.md](./WHY.md) holds the positioning it grew from.
+product lives on in this repository at the tag `archive/cockpit-2026-08-17`,
+and the A2UI catalog experiment that briefly lived beside this one is at
+`archive/a2ui-2026-08-24`.
 
 ## License
 

@@ -1,5 +1,0 @@
-# Generated. Rebuild with `node build.mjs`; the certificate with
-#   cd ../cockpit && npx vite-node ../a2ui/certify.ts   (until the engine moves in)
-builder.html
-preview.html
-index.html
