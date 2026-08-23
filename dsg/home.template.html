@@ -161,7 +161,11 @@ h1 em{display:block;font-style:normal}
 /* tall enough that no kit's board scrolls inside the shot: the tallest
    (Material, 873px) fits with room, measured across widths. A picture of an
    app that scrolls inside itself reads as a broken window, not a picture. */
-.wall iframe{width:100%;height:900px;border:0;background:#fff;display:block}
+.wall iframe{width:100%;height:900px;border:0;background:#fff;display:block;
+  /* it is a PICTURE of an app: with pointer events on, the wheel lands in the
+     frame's document, which has nothing to scroll, and the page under your
+     cursor goes dead. Nothing inside is clickable anyway. */
+  pointer-events:none}
 
 /* ── THE LIGHT SWEEP ──────────────────────────────────────────────────────
  * Not decoration: the light is the thing DOING the change. It travels from the
