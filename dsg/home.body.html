@@ -21,20 +21,22 @@
     <a class="btn btn--go btn--lg" href="/generator"><!--I:sparkles-->Start with your kits</a>
     <a class="btn btn--lg" href="#export"><!--I:download-->See what you download</a>
   </p>
-
-  <!-- the proof, before the argument: one screen, every system, one click -->
-  <figure class="shot bleed">
-    <figcaption>
-      <span class="eyebrow" id="shotwho">Live</span>
-      <span class="eyebrow" id="shotmeta"></span>
-    </figcaption>
-    <div class="shot__pick" id="shotpick" role="radiogroup" aria-label="Which system"></div>
-    <div class="shot__stage">
-      <div id="shot"></div>
-      <div class="shot__sweep" id="shotsweep" aria-hidden="true"></div>
-    </div>
-  </figure>
 </section>
+
+<!-- the proof, before the argument: one screen, every system, one click.
+     It is a SIBLING of the hero, not a child: a bleed inside a bleed offsets
+     itself twice and pushes the page sideways. -->
+<figure class="shot bleed">
+  <figcaption>
+    <span class="eyebrow" id="shotwho">Live</span>
+    <span class="eyebrow" id="shotmeta"></span>
+  </figcaption>
+  <div class="shot__pick" id="shotpick" role="radiogroup" aria-label="Which system"></div>
+  <div class="shot__stage">
+    <div id="shot"></div>
+    <div class="shot__sweep" id="shotsweep" aria-hidden="true"></div>
+  </div>
+</figure>
 
 <!-- ── INTEREST ──────────────────────────────────────────────────────────── -->
 <!-- the turn, on the ground rather than in a panel: the page needs one place

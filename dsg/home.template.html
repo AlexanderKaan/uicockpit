@@ -37,7 +37,16 @@ body{margin:0;background:var(--mkt-bg);color:var(--mkt-fg);
      font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
      -webkit-font-smoothing:antialiased}
 a{color:inherit}
-.app{display:flex;flex-direction:column;gap:12px;padding:12px;max-width:78rem;margin-inline:auto;width:100%}
+/* ONE COLUMN, AND A NAMED WAY OUT OF IT.
+ * The page is three columns — gutter, content, gutter — so a section that wants
+ * the whole width asks for the outer line instead of measuring the viewport.
+ * 100vw counts the scrollbar, and a bleed nested inside a bleed doubles its own
+ * offset; between them the page carried a sideways scroll of 31px. A grid line
+ * cannot be off by a scrollbar, and it cannot compound. */
+.app{display:grid;column-gap:0;row-gap:12px;padding-block:12px;width:100%;
+     grid-template-columns:[full-start] minmax(12px,1fr) [wide-start] minmax(0,calc(78rem - 24px)) [wide-end] minmax(12px,1fr) [full-end]}
+.app>*{grid-column:wide;min-width:0}
+.bleed{grid-column:full}
 .mkt__container{max-width:72rem;margin:0 auto;width:100%}
 .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mkt-fg-faint);font-weight:600;margin:0}
 .fine{font-size:13px;color:var(--mkt-fg-muted);margin:12px 0 0}
@@ -50,12 +59,6 @@ code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.85em}
  * needs framing; where the content is already made of cards, the cards are the
  * objects and the ground is the ground. */
 .nav,.band-sec--panel,.foot{background:var(--mkt-surface);border-radius:14px}
-/* A full-bleed child is 100vw wide and 100vw counts the scrollbar, so the page
-   gained a sideways scroll of exactly one scrollbar. clip rather than hidden:
-   hidden makes the element a scroll container, which breaks position:sticky on
-   the bar above it. */
-html,body{overflow-x:clip}
-.bleed{width:100vw;margin-inline:calc(50% - 50vw)}
 .nav{padding:12px 18px;display:flex;align-items:center;gap:20px;position:sticky;top:12px;z-index:20}
 .mark{display:flex;align-items:center;gap:9px;margin:0;font-weight:600;letter-spacing:-.02em;font-size:15px}
 .nav__links{display:flex;gap:20px;margin-left:auto;font-size:14px}
@@ -86,13 +89,13 @@ h1{letter-spacing:-.035em;text-wrap:balance;max-width:54rem;margin:0 auto 1.5rem
 .sub{color:var(--mkt-fg-muted);text-wrap:balance;max-width:40rem;margin:0 auto 2rem;
      font-size:clamp(1.0625rem,2vw,1.25rem);line-height:1.5}
 .sub strong{color:var(--mkt-fg);font-weight:600}
-.hero__acts{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin:0 0 3.5rem}
+.hero__acts{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin:0}
 /* THE PICTURE IS FULL BLEED AND FEATHERED.
  * It is the one thing the page is built on, so it runs the whole width — and it
  * has no frame, no card and no edge. It fades out at the top and both sides so
  * it settles into the ground instead of ending at a line. Two masks composited:
  * one for the top, one for the sides, intersected so a corner gets both. */
-.shot{margin:3.25rem 0 0;padding:0;background:0;position:relative}
+.shot{margin:2.5rem 0 0;padding:0;background:0;position:relative}
 .shot figcaption{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   max-width:72rem;margin:0 auto;padding:0 1.5rem 10px}
 .shot__stage{position:relative;isolation:isolate;
