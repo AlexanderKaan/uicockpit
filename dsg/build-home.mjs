@@ -5,7 +5,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { buildCss } from './build-css.mjs'
 import { icons, svg } from './icons.mjs'
 import { render, PARTS } from './parts.mjs'
-import { WALL, useIcons, useMantineClasses, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
+import { WALL, useIcons, useIconSets, iconKit, useMantineClasses, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
+import { readIconSets, KIT_ICON_SETS } from './icon-sets.mjs'
 import { SCENES, BOARDS, ICON_NAMES, wallMarkup, safeJson } from './scenes.mjs'
 import { generate, section, plain } from './generate.mjs'
 import { route } from './roles.mjs'
@@ -36,6 +37,8 @@ useMantineClasses(kits.mantine?.classes)
 useShadcnParts(kits.shadcn?.parts)
 useAntdParts(kits.antd?.parts)
 useIcons(icons(ICON_NAMES).icons)
+const ownSets = readIconSets(ICON_NAMES).sets
+useIconSets(ownSets)
 
 /* The wrapper a kit needs to be itself. Without data-theme, daisyUI's dark
  * theme wins on a dark OS and the frame shows its factory purple — which is
@@ -62,7 +65,8 @@ console.log('compiling the bouquet, once per kit…')
    is about to compile — the same body, one round earlier. Every board at once,
    so a class used only on the bento tiles is compiled too. */
 const css = {}
-Object.assign(css, await buildCss(VALUES, SHOT_IDS, kits, (id) => wallMarkup(WALL[id], boardsOf(SHOWN))))
+const kitWall = (id, boards) => { iconKit(KIT_ICON_SETS[id] ?? null); return wallMarkup(WALL[id], boards) }
+Object.assign(css, await buildCss(VALUES, SHOT_IDS, kits, (id) => kitWall(id, boardsOf(SHOWN)), console.log, { antdIcons: ownSets['antd-icons'] }))
 
 /* Material's components are code. Written BESIDE the page, not into the srcdoc
    attribute, where every quote in 320 kB of their bundle would become six
@@ -82,7 +86,7 @@ const ELEMENTS = { material: './' + OUT.replace(/\.html$/, '') + '.elements.js' 
 const HEAD = Object.fromEntries(SHOT_IDS.map((id) => [id,
   `<html data-quiet${ROOT[id] ?? ''}${attrs(id)}><meta charset="utf-8"><style>${css[id] ?? ''}</style>`]))
 const BODY = Object.fromEntries(SHOT_IDS.map((id) => [id,
-  Object.fromEntries(SHOWN.map((b) => [b, wallMarkup(WALL[id], boardsOf([b]))]))]))
+  Object.fromEntries(SHOWN.map((b) => [b, kitWall(id, boardsOf([b]))]))]))
 const TAIL = Object.fromEntries(SHOT_IDS.map((id) => [id,
   ELEMENTS[id] ? `<script type="module" src="${ELEMENTS[id]}"></` + 'script>' : '']))
 
@@ -140,7 +144,7 @@ const caveats = section(md, '## What could not be done').slice(0, 5)
 
 /* sliders, not sparkles. This tool has no model in its render path, and a
    sparkle is the one glyph that promises one. Knobs are what it actually is. */
-const NAMES = ['sliders-horizontal', 'arrow-down']
+const NAMES = ['sliders-horizontal', 'check']
 const lu = icons(NAMES)
 let page = readFileSync('home.template.html', 'utf8')
   .replace('<!--BODY-->', () => readFileSync('home.body.html', 'utf8'))

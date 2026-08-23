@@ -72,10 +72,10 @@ const list = (v) => (Array.isArray(v) ? v : [])
 const text = (v) => (v == null ? '' : String(v))
 
 /* ── icons ────────────────────────────────────────────────────────────────
- * lucide, the same set every other kit on this wall draws, so the icon is a
- * constant across the comparison rather than one more thing that changed. Ant
- * ships its own set; using it here would turn a row of icons into a comparison
- * of icon libraries instead of of kits.
+ * Handed in by the caller. A map value is either a lucide BODY (a string,
+ * the old shape) or a whole glyph {body, box, stroke} from icon-sets.mjs —
+ * which for Ant means Ant Design's own icons, read from @ant-design/icons-svg,
+ * because a kit's own icons are part of what the kit looks like.
  *
  * React only gets a marker. The glyph is parsed as SVG and put in through the
  * DOM afterwards, in the same pass that settles the popups. */
@@ -95,8 +95,11 @@ function drawIcons(root) {
     const body = ICONS[slot.getAttribute('data-lucide')]
     if (!body) continue
     const size = slot.getAttribute('data-size') || '16'
-    const svg = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor"`
-      + ` stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`
+    const g = typeof body === 'string' ? { body, box: '0 0 24 24', stroke: 1.75 } : body
+    const paint = g.stroke
+      ? ` fill="none" stroke="currentColor" stroke-width="${g.stroke}" stroke-linecap="round" stroke-linejoin="round"`
+      : ' fill="currentColor"'
+    const svg = `<svg width="${size}" height="${size}" viewBox="${g.box}"${paint} aria-hidden="true">${g.body}</svg>`
     const el = parser.parseFromString(svg, 'text/html').body.firstElementChild
     if (!el) continue
     slot.replaceChildren(document.importNode(el, true))

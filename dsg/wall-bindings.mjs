@@ -22,15 +22,29 @@ const cls = (...c) => c.filter(Boolean).join(' ')
 const A = (n, k, tag, c, extra = '') => `<${tag} class="${c}"${extra}>${n.text != null ? esc(n.text) : k}</${tag}>`
 
 /* ── the icons ────────────────────────────────────────────────────────────
- * lucide, read from lucide at build time and HANDED IN — the same hand-in as
- * Mantine's class map, and for the same reason: this module is also inlined
- * into a page where there is no filesystem to read a package from.
- * A name lucide does not have is an error at build time, in icons.mjs, so
- * nothing here can quietly render an empty square. */
+ * Read at build time and HANDED IN — the same hand-in as Mantine's class map,
+ * and for the same reason: this module is also inlined into a page where
+ * there is no filesystem to read a package from. Two hand-ins now: the flat
+ * lucide map (the fallback, and the whole answer for kits that name no icon
+ * set), and the per-set maps from icon-sets.mjs. iconKit() points at the set
+ * the kit being rendered actually ships with, so a Tailwind frame draws
+ * Heroicons and an Ant frame draws Ant's own, from their own packages.
+ * A name a set does not have is an error at build time, never a blank. */
 let IC = {}
+let IC_SETS = {}
+let IC_CUR = null
 export const useIcons = (map) => { IC = map ?? {} }
+export const useIconSets = (sets) => { IC_SETS = sets ?? {} }
+export const iconKit = (setId) => { IC_CUR = (setId && IC_SETS[setId]) || null }
 
 export const ico = (name, size = 16, cls = '') => {
+  const own = IC_CUR?.[name]
+  if (own) {
+    const paint = own.stroke
+      ? ` fill="none" stroke="currentColor" stroke-width="${own.stroke}" stroke-linecap="round" stroke-linejoin="round"`
+      : ' fill="currentColor"'
+    return `<svg${cls ? ` class="${cls}"` : ''} width="${size}" height="${size}" viewBox="${own.box}"${paint} aria-hidden="true">${own.body}</svg>`
+  }
   /* An icon that was never handed in used to come out as an empty <svg>, and an
      empty svg inside a ghost button is an invisible button. The toolbar shipped
      that way in the multi-kit preview and looked like a blank card. A hole is

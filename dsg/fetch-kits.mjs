@@ -26,6 +26,7 @@ import { antdNodes } from './antd-nodes.mjs'
 import { SCENES, ICON_NAMES } from './scenes.mjs'
 import { SPECIMEN } from './parts.mjs'
 import { icons } from './icons.mjs'
+import { readIconSets } from './icon-sets.mjs'
 
 const CHECK = process.argv.includes('--check')
 
@@ -387,8 +388,9 @@ const SOURCES = {
        * a fact about their components and not about our tokens. */
       const meta = antdBundle()
       const nodes = antdNodes(SCENES, SPECIMEN)
-      const light = antdRender({ nodes, icons: icons(ICON_NAMES).icons })
-      const dark = antdRender({ nodes, dark: true, icons: icons(ICON_NAMES).icons })
+      const antdOwn = { ...icons(ICON_NAMES).icons, ...readIconSets(ICON_NAMES, ['antd-icons']).sets['antd-icons'] }
+      const light = antdRender({ nodes, icons: antdOwn })
+      const dark = antdRender({ nodes, dark: true, icons: antdOwn })
       const vars = (css) => Object.fromEntries([...css.matchAll(/(--ant-[a-z0-9-]+)\s*:\s*([^;}]+)/gi)]
         .map((m) => [m[1], m[2].trim()]))
       return { version: meta.version, license: meta.license, npm: meta.npm, home: meta.home,

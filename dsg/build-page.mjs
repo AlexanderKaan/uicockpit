@@ -15,8 +15,9 @@ import { DARK, generate } from './generate.mjs'
 import { buildCss } from './build-css.mjs'
 import { deriveMaterial } from './derive-material.mjs'
 import { render, PARTS } from './parts.mjs'
-import { WALL, useMantineClasses, useRadixTones, useIcons, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
+import { WALL, useMantineClasses, useRadixTones, useIcons, useIconSets, iconKit, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
 import { SCENES, ICON_NAMES, BOARDS, wallMarkup, safeJson } from './scenes.mjs'
+import { readIconSets, KIT_ICON_SETS } from './icon-sets.mjs'
 import { ownage, partOwnage } from './fidelity.mjs'
 import { analyse, unread } from './orphans.mjs'
 import { COMPONENT_GAPS } from './generate.mjs'
@@ -86,22 +87,30 @@ const ROOT = { daisyui: ' data-theme="yourkit"', bootstrap: ' data-bs-theme="lig
 const RENDERS = IDS.filter((id) => kits[id].layer !== 'tokens')
 
 /* The wall for one kit: the same boards, columns and cards the preview and the
- * hero shot render, from the one implementation in scenes.mjs. */
-const wall = (id) => `<html${ROOT[id] ?? ''}>${wallMarkup(WALL[id])}`
+ * hero shot render, from the one implementation in scenes.mjs — pointed first
+ * at the icon set THIS kit ships with, so a Tailwind frame draws Heroicons
+ * and an Ant frame draws Ant's own. */
+const wall = (id) => { iconKit(KIT_ICON_SETS[id] ?? null); return `<html${ROOT[id] ?? ''}>${wallMarkup(WALL[id])}` }
 
 /* The icons the wall names are read BEFORE the CSS is built, because the wall
  * is what Tailwind scans: an icon read afterwards would be markup no stylesheet
- * ever saw. Two sets, one read — the chrome's and the cards' — and lucide
- * throws on a name it does not have, so a blank square cannot ship. */
+ * ever saw. lucide is the chrome's set and the fallback; every kit that names
+ * a companion set gets that set, read from its own package, and a translation
+ * to a name a package does not contain is an error here, not a blank square. */
 console.log('reading the icons from lucide…')
 const CHROME_ICONS = ['sparkles', 'shuffle', 'download', 'x', 'check', 'search', 'maximize', 'minimize', 'layers', 'chevron-down']
 const NAMES = [...new Set([...CHROME_ICONS, ...ICON_NAMES])]
 const lu = icons(NAMES)
 useIcons(lu.icons)
 console.log(`  ✓ lucide ${lu.version} · ${lu.license} — ${CHROME_ICONS.length} for the chrome, ${ICON_NAMES.length} the cards name`)
+console.log('reading each kit\'s own icon set…')
+const own = readIconSets(ICON_NAMES)
+useIconSets(own.sets)
+for (const line of own.provenance) console.log(`  ✓ ${line}`)
+if (own.fallbacks.length) console.log(`  · lucide fills in where a set has no glyph: ${own.fallbacks.map((f) => `${f.set} ${f.name}`).join(', ')}`)
 
 console.log('building each kit\'s real CSS…')
-const css = await buildCss(SEED, IDS, kits, (id) => wall(id))
+const css = await buildCss(SEED, IDS, kits, (id) => wall(id), console.log, { antdIcons: own.sets['antd-icons'] })
 
 /**
  * BOOTSTRAP, LIVE AFTER ALL.

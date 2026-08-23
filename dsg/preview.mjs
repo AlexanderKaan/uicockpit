@@ -19,7 +19,8 @@ import { route } from './roles.mjs'
 import { materialElements } from './material-elements.mjs'
 import { buildCss } from './build-css.mjs'
 import { render } from './parts.mjs'
-import { WALL, useIcons, useMantineClasses, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
+import { WALL, useIcons, useIconSets, iconKit, useMantineClasses, useShadcnParts, useAntdParts } from './wall-bindings.mjs'
+import { readIconSets, KIT_ICON_SETS } from './icon-sets.mjs'
 import { SCENES, ICON_NAMES, wallMarkup } from './scenes.mjs'
 import { icons } from './icons.mjs'
 
@@ -47,10 +48,12 @@ useMantineClasses(JSON.parse(readFileSync('kits/mantine.json', 'utf8')).classes)
 useShadcnParts(JSON.parse(readFileSync('kits/shadcn.json', 'utf8')).parts)
 useAntdParts(JSON.parse(readFileSync('kits/antd.json', 'utf8')).parts)
 useIcons(icons(ICON_NAMES).icons)
+const ownSets = readIconSets(ICON_NAMES).sets
+useIconSets(ownSets)
 
-const body = (id) => wallMarkup(WALL[id])
+const body = (id) => { iconKit(KIT_ICON_SETS[id] ?? null); return wallMarkup(WALL[id]) }
 
-const css = await buildCss(VALUES, IDS, kits, body)
+const css = await buildCss(VALUES, IDS, kits, body, console.log, { antdIcons: ownSets['antd-icons'] })
 
 /* Material's components are code. Written beside the page rather than into the
  * srcdoc attribute, where every quote in 260 kB of their bundle would become

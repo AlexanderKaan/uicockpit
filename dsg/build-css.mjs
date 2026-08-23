@@ -32,7 +32,7 @@ import { icons } from './icons.mjs'
  */
 export const noBom = (s) => s.replace(/^\uFEFF/, '')
 
-export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
+export async function buildCss(VALUES, IDS, kits, body, log = console.log, extras = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'dsg-css-'))
   const css = {}
   try {
@@ -152,7 +152,7 @@ export async function buildCss(VALUES, IDS, kits, body, log = console.log) {
   if (IDS.includes('antd')) {
     log("running Ant Design's own components for their CSS…")
     const routed = route(VALUES, ['antd'], kits)[0]
-    const got = antdRender({ token: routed.tokens, nodes: antdNodes(SCENES, SPECIMEN), icons: icons(ICON_NAMES).icons })
+    const got = antdRender({ token: routed.tokens, nodes: antdNodes(SCENES, SPECIMEN), icons: { ...icons(ICON_NAMES).icons, ...(extras.antdIcons ?? {}) } })
     log(`  ✓ ${Object.keys(routed.tokens).length} tokens in, ${(got.css.length / 1024).toFixed(0)} kB of their CSS out`)
     css.antd = got.css + '\n' + (files._blocks.antd ?? '')
   }
