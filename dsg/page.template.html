@@ -1,6 +1,8 @@
 <!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Design System Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap">
 <style>
 /* THE CHROME'S OWN TOKENS.
  *
@@ -32,18 +34,75 @@
   --accent-2:#ed46ba; --accent-3:#fe5a48;
   --gradient:linear-gradient(90deg,#fe5a48 42.04%,#6645fd 100%);
   --warn-bg:#fdf8e8; --warn-line:#f0e3b8;
+  /* THE CHROME HAS A VOICE NOW, and it is the site's. A tool you are supposed
+     to enjoy being in cannot be set in the system UI font while it asks you to
+     care about typography. It stays QUIET, which is a different thing from
+     having no opinion: two faces, no colour, and the previews still own the
+     look because they are in frames of their own. */
+  --sans:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Plus Jakarta Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
   --r:7px; --r-sm:4px; --bw:1px;
   --fs-xs:10px; --fs-sm:11.5px; --fs-md:12.5px; --fs-lg:13.5px; --fs-xl:19px; --fs-2xl:24px;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--ground);color:var(--ink);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 .app{min-height:100vh;display:grid;grid-template-columns:322px minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:12px;padding:12px}
+/* ── THE STAGES ───────────────────────────────────────────────────────────
+ * The tool opened on a form beside a wall, which asks you to configure before
+ * anything has invited you to. There is a room before that room now, and the
+ * shell is switched by one attribute rather than by building a second page. */
+.app[data-stage=start]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);padding:0;gap:0}
+.app[data-stage=start]>.rail,.app[data-stage=start]>.wall,.app[data-stage=start]>.dock{display:none}
+.app:not([data-stage=start])>.start{display:none}
 .eyebrow{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0}
 kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm);background:var(--sunken);color:var(--muted)}
 
 /* everything floats on the ground — no full-width bars */
 .rail,.wall,.dock{background:var(--panel);border-radius:var(--r)}
 .dock{grid-column:1/-1}
+
+/* ── THE QUESTION ─────────────────────────────────────────────────────────
+ * Four ways in, and a door for people who want none of them. A starting point
+ * is not a decision: everything it sets is a knob you can move a second later,
+ * and the screen says so rather than letting you find out. */
+.start{grid-column:1/-1;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:48px 24px;overflow-y:auto}
+.start__in{width:100%;max-width:70rem;display:grid;gap:0;justify-items:center;text-align:center}
+.start__mark{display:flex;align-items:center;gap:9px;font:600 14px var(--sans);color:var(--muted);margin-bottom:34px}
+.start__mark .wm{--wm-glyph:var(--ground)}
+.start h1{font-family:var(--display);font-weight:700;font-size:clamp(2rem,4.4vw,3.25rem);
+  line-height:1.05;letter-spacing:-.04em;margin:.7rem 0 0;color:var(--ink)}
+.start__lede{margin:1rem auto 0;max-width:36rem;font-size:15.5px;line-height:1.6;color:var(--muted)}
+.start__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:14px;
+  width:100%;margin:2.75rem 0 0;text-align:left}
+@media(max-width:900px){.start__grid{grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))}}
+
+/* a card is a specimen of the thing it would start you on, so it is set in that
+   vibe's own faces at that vibe's own size and shape */
+.vibe{display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;cursor:pointer;text-align:left;
+  border:var(--bw) solid var(--line);border-radius:13px;background:var(--panel);
+  transition:border-color .16s,transform .16s,box-shadow .16s}
+.vibe:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:0 8px 22px rgb(17 17 18 / .07)}
+.vibe:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.vibe__head{padding:16px 17px 14px;display:grid;gap:5px}
+/* spans in a button, so every one of them has to be told it is a block */
+.vibe__name{display:block;font-family:var(--display);font-weight:700;font-size:16.5px;letter-spacing:-.025em;color:var(--ink)}
+.vibe__blurb{display:block;font-size:12.5px;line-height:1.5;color:var(--muted)}
+/* the specimen half, on the vibe's own page colour */
+.vibe__spec{margin-top:auto;padding:16px 17px 16px;border-top:var(--bw) solid var(--line);
+  display:grid;gap:10px;justify-items:start}
+.vibe__title{display:block;font-weight:600;letter-spacing:-.02em;line-height:1.15;color:#18181a}
+.vibe__body{display:block;font-size:12.5px;line-height:1.5;color:#5b5a5e;margin:0}
+.vibe__btn{display:inline-flex;align-items:center;padding:9px 16px;font-weight:600;font-size:12.5px;
+  border:0;white-space:nowrap}
+.vibe__type{display:block;font:10px ui-monospace,SFMono-Regular,monospace;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+
+.start__foot{display:grid;justify-items:center;gap:12px;margin-top:2rem}
+.start__blank{font:500 13.5px var(--sans);color:var(--ink);background:0;border:0;padding:5px 2px;cursor:pointer;
+  border-bottom:1px solid var(--line)}
+.start__blank:hover{border-bottom-color:var(--ink)}
+.start__own{font-size:12px;line-height:1.55;color:var(--muted);max-width:30rem}
 
 /* ── the rail ─────────────────────────────────────────────────────────────── */
 /* Ten swatches, two type cards and three sliders in one horizontal band was a
@@ -541,6 +600,10 @@ const state = {
      never chosen — it is whichever layer is on top. */
   on: new Set(['tailwind', 'shadcn']),
   get show() { return showing(stack(this.on, KITS)) },
+  /* WHICH ROOM YOU ARE IN. 'start' is the question; 'build' is the tool. A link
+     that carries any state at all skips the question, because somebody who was
+     sent a kit is not starting. */
+  stage: 'start',
   board: 'foundations',
   mode: 'light',
   /* what you said you are building in, or null for "anything". Only ever dims
@@ -1884,6 +1947,83 @@ $('#downloadzip').addEventListener('click', () => DESTS[0].go(files()))
 $('#sheetx').addEventListener('click', () => ($('#drawer').hidden = true))
 addEventListener('keydown', (e) => { if (e.key === 'Escape') $('#drawer').hidden = true })
 
+/* ── STAGE ONE · FOUR WAYS IN ──────────────────────────────────────────────
+ * The one place this tool types an opinion, and it says so on the screen. Each
+ * one is a handful of knob positions and a colour, nothing more: no kit, no
+ * components, no palette. The colour goes through the same door your own colour
+ * goes through, so the other ten roles still come out of what your stack
+ * publishes rather than out of this list.
+ *
+ * Which kits render it is deliberately NOT here. Finding that out is the whole
+ * point of the wall, and picking it for you at the door would answer the
+ * question the tool exists to ask.
+ */
+const VIBES = [
+  { name: 'Calm and civic',
+    blurb: 'Public services and forms people have to finish. Nothing shouts, everything is legible.',
+    brand: '#1c5f8a', heading: 'Work Sans', body: 'Inter',
+    knobs: { radius: '6px', baseText: '17px', space: '1', elevation: '0', borderWidth: '1px' } },
+  { name: 'Bold and consumer',
+    blurb: 'Things people download on a whim. Round, warm, and not shy about it.',
+    brand: '#c2410c', heading: 'Sora', body: 'Work Sans',
+    knobs: { radius: '18px', baseText: '16px', space: '1.05', elevation: '2', borderWidth: '0px' } },
+  { name: 'Quiet and technical',
+    blurb: 'Dashboards and tools you live in all day. Dense, flat, out of the way.',
+    brand: '#0b6e8a', heading: 'Space Grotesk', body: 'Inter',
+    knobs: { radius: '4px', baseText: '14px', space: '0.9', elevation: '0', borderWidth: '1px' } },
+  { name: 'Print and paper',
+    blurb: 'Letters, reports, anything that ends up on a desk. Serif, square, unhurried.',
+    brand: '#7b3560', heading: 'Lora', body: 'Assistant',
+    knobs: { radius: '2px', baseText: '17px', space: '1.1', elevation: '0', borderWidth: '1px' } },
+]
+
+function stage(next) {
+  state.stage = next
+  $('.app').dataset.stage = next
+  if (next === 'build') { sync(); paint(); typoCards() }
+  toUrl()
+}
+
+/* the card is a specimen of what it would start you on: its own two faces, its
+   own size, its own corner, its own colour. A swatch would say less. */
+function drawVibes() {
+  $('#vibes').innerHTML = VIBES.map((v, i) => {
+    const head = `'${v.heading}', sans-serif`, body = `'${v.body}', sans-serif`
+    const r = v.knobs.radius
+    return `<button class="vibe" data-v="${i}">
+      <span class="vibe__head">
+        <span class="vibe__name">${v.name}</span>
+        <span class="vibe__blurb">${v.blurb}</span>
+      </span>
+      <span class="vibe__spec">
+        <span class="vibe__title" style="font-family:${head};font-size:${v.knobs.baseText}">A heading, set in ${v.heading}</span>
+        <span class="vibe__body" style="font-family:${body}">And the body text under it, in ${v.body}.</span>
+        <span class="vibe__btn" style="font-family:${body};border-radius:${r};background:${v.brand};color:#fff">Get started</span>
+        <span class="vibe__type">${v.heading} + ${v.body} · ${r} corners</span>
+      </span>
+    </button>`
+  }).join('')
+  for (const v of VIBES) { loadFace(document, v.heading); loadFace(document, v.body) }
+}
+
+function takeVibe(v) {
+  /* the colour first, through the same routing your own colour takes, so the
+     other ten roles are still the stack's and not ours */
+  buildFrom(v.brand)
+  Object.assign(state.values, v.knobs, {
+    fontHeading: `'${v.heading}', sans-serif`, fontBody: `'${v.body}', sans-serif`,
+  })
+  loadFace(document, v.heading); loadFace(document, v.body)
+  stage('build')
+}
+
+drawVibes()
+$('#vibes').addEventListener('click', (e) => {
+  const b = e.target.closest('.vibe'); if (!b) return
+  takeVibe(VIBES[Number(b.dataset.v)])
+})
+$('#startblank').addEventListener('click', () => stage('build'))
+
 /* ── THE ADDRESS IS THE STATE ──────────────────────────────────────────────
  * Read BEFORE the seeding below, because every seed is taken from the stack:
  * setting the kits afterwards would leave you looking at one stack's components
@@ -1905,11 +2045,17 @@ function fromUrl() {
   if (card && SCENES.some((c) => c.id === card)) state.solo = card
   const brand = (q.get('brand') || '').replace(/^#/, '')
   if (HEX6.test('#' + brand)) state.values.brand = '#' + brand.toLowerCase()
+  /* a link that carries anything at all was sent by somebody who had already
+     started, so it opens the tool rather than the question */
+  if (q.get('stage') === 'build' || [...q.keys()].some((k) => k !== 'stage')) state.stage = 'build'
+  $('.app').dataset.stage = state.stage
 }
 /* and written back, so what you are looking at is what you can send someone.
    replaceState, not pushState: turning a knob is not a page you go back to. */
 function toUrl() {
   const q = new URLSearchParams()
+  /* the question has no state worth writing down; everything else does */
+  if (state.stage === 'start') return history.replaceState(null, '', location.pathname)
   q.set('kits', [...state.on].join(','))
   if (state.compare) q.set('compare', comparing().join(','))
   if (state.solo) q.set('card', state.solo)
