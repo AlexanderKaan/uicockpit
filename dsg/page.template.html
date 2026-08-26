@@ -1,4 +1,5 @@
 <!doctype html><html lang="en"><meta charset="utf-8">
+<script>try{const t=localStorage.getItem('uic-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch{}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Design System Generator · UIcockpit</title>
 <meta name="description" content="Pick a stack, turn the knobs, and watch nine real UI kits render your values live. Start from any kit's own defaults and export your design system.">
@@ -61,6 +62,7 @@
      a 24px card inside it is 96px of nothing. */
   --pad:24px; --pad-sm:16px;
   --r:10px; --r-sm:7px; --r-lg:14px; --bw:1px; --go-ink:#fff;
+  --ok:#1e6b37; --warn:#b8651a; --bad:#8e2c21;
   --fs-xs:10px; --fs-sm:11.5px; --fs-md:12.5px; --fs-lg:13.5px; --fs-xl:19px; --fs-2xl:24px;
 }
 /* ── DARK, as the OS asks ──────────────────────────────────────────────────
@@ -68,11 +70,18 @@
  * wall's own Light/Dark switch governs what the kits render, and a preview
  * that silently obeyed the OS would be showing you a mode you did not pick. */
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --ground:#141416; --panel:#1d1d20; --sunken:#2a2a2f; --faint:#232327;
     --ink:#e7e6ec; --muted:#a09fa8; --line:#333338;
     --link:#a08cff; --go:#26262b; --go-ink:#e7e6ec;
+    --ok:#5fbf7d; --warn:#d9913f; --bad:#e08477;
   }
+}
+:root[data-theme="dark"]{
+  --ground:#141416; --panel:#1d1d20; --sunken:#2a2a2f; --faint:#232327;
+  --ink:#e7e6ec; --muted:#a09fa8; --line:#333338;
+  --link:#a08cff; --go:#26262b; --go-ink:#e7e6ec;
+  --ok:#5fbf7d; --warn:#d9913f; --bad:#e08477;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
@@ -269,7 +278,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 .vibe:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 /* the colours this start would really set, straight from the kit's package */
 .vibe__chips{display:flex;gap:5px;min-height:24px}
-.vibe__chips i{width:24px;height:24px;border-radius:7px;border:1px solid rgb(17 17 18 / .08)}
+.vibe__chips i{width:24px;height:24px;border-radius:7px;border:1px solid color-mix(in srgb, var(--ink) 10%, transparent)}
 /* spans in a button, so every one of them has to be told it is a block */
 .vibe__name{display:block;font-size:1.16em;font-weight:650;letter-spacing:-.02em;line-height:1.15;color:var(--ink)}
 .vibe__foot{margin-top:auto;display:grid;gap:12px;justify-items:start}
@@ -479,14 +488,14 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 .ccard:hover{border-color:color-mix(in oklab, var(--line), var(--ink) 28%);
   box-shadow:0 4px 14px rgb(10 15 9 / .08);translate:0 -1px}
 .ccard:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-.ccard__fill{height:58px;border-bottom:var(--bw) solid rgb(10 15 9 / .06)}
+.ccard__fill{height:58px;border-bottom:var(--bw) solid color-mix(in srgb, var(--ink) 7%, transparent)}
 .ccard__meta{padding:7px 10px 8px;display:flex;flex-direction:column;gap:1px}
 .ccard__role{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .ccard__val{font-size:var(--fs-sm);font-weight:600;color:var(--ink);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ccard__hex{font-family:ui-monospace,Menlo,monospace;font-size:var(--fs-xs);color:var(--muted)}
 .ccard__tag{position:absolute;top:6px;left:6px;font-size:9px;font-weight:700;letter-spacing:.08em;
-  padding:2px 6px;border-radius:99px;background:rgb(255 255 255 / .92);color:var(--ink)}
+  padding:2px 6px;border-radius:99px;background:rgb(255 255 255 / .92);color:#141416}
 /* the "all eleven" card is an invitation, not a colour */
 .ccard--more{border-style:dashed;background:var(--faint)}
 .ccard--more .ccard__fill{display:grid;place-items:center;border-bottom:0;
@@ -546,10 +555,10 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 .cp__called{font-size:var(--fs-sm);color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cp__pairs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .cp__pairs li{display:grid;grid-template-columns:11px 1fr max-content;gap:7px;align-items:baseline;font-size:var(--fs-sm)}
-.cp__pairs .ok{color:#1e6b37;font-weight:700}
-.cp__pairs .no{color:#8e2c21;font-weight:700}
+.cp__pairs .ok{color:var(--ok);font-weight:700}
+.cp__pairs .no{color:var(--bad);font-weight:700}
 .cp__pairs em{font-style:normal;color:var(--muted);font-family:ui-monospace,monospace;font-size:11px}
-.cp__pairs li[data-bad] em{color:#8e2c21;font-weight:600}
+.cp__pairs li[data-bad] em{color:var(--bad);font-weight:600}
 .cp__fine{margin:0;font-size:var(--fs-xs);line-height:1.5;color:var(--muted)}
 /* they wrap now. In a 322px rail seventeen families had to be a row you pushed;
    in a card this wide, hiding twelve of them behind a scroll nobody sees is the
@@ -587,7 +596,7 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 .rp__name{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rp__from{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap}
 .rp em{font-style:normal;font-size:11px;color:var(--muted);font-family:ui-monospace,monospace}
-.rp em[data-bad]{color:#8e2c21;font-weight:600}
+.rp em[data-bad]{color:var(--bad);font-weight:600}
 .rp__none{margin:0;font-size:var(--fs-md);line-height:1.5;color:var(--muted);padding:2px 2px 0}
 .rp--free{margin-top:4px;border-top:var(--bw) solid var(--line);border-radius:0 0 var(--r-sm) var(--r-sm);padding-top:7px;min-height:36px}
 .rp__any{background:conic-gradient(oklch(.7 .16 0),oklch(.7 .16 60),oklch(.7 .16 120),
@@ -697,10 +706,10 @@ button.band[aria-expanded=true] .band__go svg{transform:rotate(180deg)}
 .lint__c:hover{color:var(--ink)}
 .lint__c:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 .lint__c[aria-expanded=true]{background:var(--sunken);color:var(--ink);border-color:var(--muted)}
-.lint__c i{width:6px;height:6px;border-radius:50%;background:#1e6b37;flex:none}
-.lint__c[data-state=warn] i{background:#b8651a}
+.lint__c i{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:none}
+.lint__c[data-state=warn] i{background:var(--warn)}
 .lint__c b{color:var(--ink);font-weight:600}
-.lint__c[data-state=warn] b{color:#8e2c21}
+.lint__c[data-state=warn] b{color:var(--bad)}
 .lint__panel{position:absolute;left:14px;right:14px;bottom:calc(100% + 8px);z-index:6;max-height:52vh;overflow:auto;
   padding:12px 14px;background:var(--panel);border:var(--bw) solid var(--line);border-radius:var(--r);
   box-shadow:0 14px 34px rgb(10 15 9 / .14);animation:rise .16s ease}
@@ -868,7 +877,7 @@ dialog::backdrop{background:#1c1b1966}
 .fact b{font-weight:600}
 .dests{display:grid;gap:4px}
 .dests .eyebrow{margin:3px 0 2px}
-.dest{text-align:left;font:inherit;border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r);
+.dest{text-align:left;font:inherit;color:var(--ink);border:var(--bw) solid var(--line);background:var(--panel);border-radius:var(--r);
       padding:0 12px;cursor:pointer;min-height:36px;display:flex;align-items:center;gap:10px}
 .dest:hover{background:var(--sunken)}
 .dest b{font-size:13px;font-weight:600}
@@ -975,7 +984,9 @@ const state = {
   /* the strip and the wall open in the mode the visitor's OS asked for: that
      is still the KIT's own dark render, not our chrome's; the Light/Dark
      switch stays the boss, and a kit without a dark mode stays light */
-  mode: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+  mode: (() => { try { const t = localStorage.getItem('uic-theme')
+    if (t === 'dark' || t === 'light') return t } catch {}
+    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light' })(),
   /* what you said you are building in, or null for "anything". Only ever dims
      the cards that cannot run there — it never picks for you. */
   runIn: null,

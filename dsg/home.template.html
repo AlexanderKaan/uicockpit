@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>try{const t=localStorage.getItem('uic-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch{}</script>
 <title>UIcockpit · The open-source design system generator</title>
 <meta name="description" content="Try nine real UI kits on one screen, in your own colours, and find out which one fits before you build on it. Compare six side by side, then export the one you kept. Free and open source.">
 <link rel="canonical" href="https://uicockpit.com/">
@@ -78,7 +79,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
   font:400 16.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 h1,h2,h3,p,ul,ol,dl,figure{margin:0}
-::selection{background:#111112;color:#efeeec}
+::selection{background:var(--ink);color:var(--ground)}
 
 /* ONE COLUMN, AND A NAMED WAY OUT OF IT.
  * Three columns — gutter, content, gutter — so a section that wants the whole
@@ -361,7 +362,13 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
 .foot__kit{margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .foot__kit>a:first-child{font-size:13px;color:var(--ink);font-weight:450}
 .foot__ver{font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
-.foot__bottom{padding-top:18px}
+.foot__bottom{padding-top:18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+/* the manual switch: three states, because the missing one is always Auto */
+.theme{display:inline-flex;gap:2px;background:var(--bar);padding:3px;border-radius:99px;margin-left:auto;order:2}
+.theme button{font:500 12px var(--sans);border:0;background:0;color:var(--ink-3);cursor:pointer;
+  padding:5px 12px;border-radius:99px}
+.theme button[aria-checked="true"]{background:var(--paper);color:var(--ink)}
+.theme button:hover{color:var(--ink)}
 .foot__bottom p{margin:0;font-size:12.5px;color:var(--ink-3)}
 .foot__bottom a{font-size:inherit}
 .foot__bottom .wm{margin-right:7px}
@@ -386,31 +393,51 @@ h1{animation-delay:.09s}
 }
 /* and on paper there is no scrolling to reveal anything with */
 @media print{.rise,[data-reveal]{opacity:1;transform:none;animation:none;transition:none}}
-/* ── DARK, as the OS asks. Last in the sheet, because two of these are RULE
-   overrides and source order decides those; the shot keeps its light frames
-   (they are the kits' render), traded from a white glow-fade to a framed
-   panel that sits calmly on a dark ground. */
+/* ── DARK, through two gates ───────────────────────────────────────────────
+ * The same payload twice on purpose: once for the OS (unless the visitor
+ * explicitly chose light), once for the explicit choice. The footer's
+ * Light/Auto/Dark switch writes data-theme and localStorage('uic-theme'),
+ * and the generator reads the same key, so the choice is site-wide. */
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --ground:#141416; --paper:#1d1d20; --bar:#2a2a2f; --ink:#e7e6ec;
     --ink-2:#bdbcc6; --ink-3:#8b8a94; --rule:#333338; --rule-2:#29292e;
     --go:#26262b; --go-ink:#e7e6ec; --accent:#8d78ff;
   }
-  .ticks span,.wall__pick button{background:var(--paper)}
-  /* the door stops inverting in the dark: a big light panel is glare, so it
-     becomes an ELEVATED dark surface and the gradient ring carries the CTA */
-  .door{background:var(--paper);border:1px solid var(--rule)}
-  .door h2{color:var(--ink)}
-  .door p{color:var(--ink-2)}
-  .door .fine{color:var(--ink-3)}
-  .door .btn{color:var(--ink);
+  :root:not([data-theme="light"]) :is(.ticks span,.wall__pick button){background:var(--paper)}
+  :root:not([data-theme="light"]) .door{background:var(--paper);border:1px solid var(--rule)}
+  :root:not([data-theme="light"]) .door h2{color:var(--ink)}
+  :root:not([data-theme="light"]) .door p{color:var(--ink-2)}
+  :root:not([data-theme="light"]) .door .fine{color:var(--ink-3)}
+  :root:not([data-theme="light"]) .door .btn{color:var(--ink);
     background:linear-gradient(var(--bar),var(--bar)) padding-box,var(--gradient) border-box}
-  .door .btn:hover{filter:brightness(1.15)}
-  .wall__pick button[aria-checked=true]{background:#3a3a41;border-color:#3a3a41;color:var(--ink)}
-  .wall__pick button:hover{border-color:#4b4b53}
-  .wall__stage{-webkit-mask-image:none;mask-image:none;border-radius:14px;
+  :root:not([data-theme="light"]) .door .btn:hover{filter:brightness(1.15)}
+  :root:not([data-theme="light"]) .wall__pick button[aria-checked=true]{background:#3a3a41;border-color:#3a3a41;color:var(--ink)}
+  :root:not([data-theme="light"]) .wall__pick button:hover{border-color:#4b4b53}
+  :root:not([data-theme="light"]) .wall__stage{-webkit-mask-image:none;mask-image:none;border-radius:14px;
     overflow:hidden;border:1px solid var(--rule)}
+  :root:not([data-theme="light"]) .sweep::after{background:linear-gradient(90deg,rgb(255 255 255/0) 0%,rgb(255 255 255/.10) 32%,
+    rgb(255 255 255/.22) 50%,rgb(255 255 255/.10) 68%,rgb(255 255 255/0) 100%)}
 }
+:root[data-theme="dark"]{
+  --ground:#141416; --paper:#1d1d20; --bar:#2a2a2f; --ink:#e7e6ec;
+    --ink-2:#bdbcc6; --ink-3:#8b8a94; --rule:#333338; --rule-2:#29292e;
+    --go:#26262b; --go-ink:#e7e6ec; --accent:#8d78ff;
+}
+[data-theme="dark"] :is(.ticks span,.wall__pick button){background:var(--paper)}
+[data-theme="dark"] .door{background:var(--paper);border:1px solid var(--rule)}
+[data-theme="dark"] .door h2{color:var(--ink)}
+[data-theme="dark"] .door p{color:var(--ink-2)}
+[data-theme="dark"] .door .fine{color:var(--ink-3)}
+[data-theme="dark"] .door .btn{color:var(--ink);
+  background:linear-gradient(var(--bar),var(--bar)) padding-box,var(--gradient) border-box}
+[data-theme="dark"] .door .btn:hover{filter:brightness(1.15)}
+[data-theme="dark"] .wall__pick button[aria-checked=true]{background:#3a3a41;border-color:#3a3a41;color:var(--ink)}
+[data-theme="dark"] .wall__pick button:hover{border-color:#4b4b53}
+[data-theme="dark"] .wall__stage{-webkit-mask-image:none;mask-image:none;border-radius:14px;
+  overflow:hidden;border:1px solid var(--rule)}
+[data-theme="dark"] .sweep::after{background:linear-gradient(90deg,rgb(255 255 255/0) 0%,rgb(255 255 255/.10) 32%,
+  rgb(255 255 255/.22) 50%,rgb(255 255 255/.10) 68%,rgb(255 255 255/0) 100%)}
 </style>
 <!--BODY-->
 <script type="module">
@@ -448,7 +475,8 @@ const HOMEDARK = {
   daisyui: "r.setAttribute('data-theme','yourkitdark')",
 }
 const doc = (id, board) => `<!doctype html>${HEAD[id]}<body>${BODY[id][board]}${TAIL[id]}${
-  HOMEDARK[id] ? `<scr` + `ipt>if(matchMedia('(prefers-color-scheme: dark)').matches){const r=document.documentElement;${HOMEDARK[id]};r.style.colorScheme='dark'}</scr` + `ipt>` : ''}`
+  HOMEDARK[id] ? `<scr` + `ipt>{const p=window.frameElement?.ownerDocument.documentElement.dataset.theme;
+    if(p==='dark'||(p!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches)){const r=document.documentElement;${HOMEDARK[id]};r.style.colorScheme='dark'}}</scr` + `ipt>` : ''}`
 const frame = (id, board, title) => `<iframe title="${title}" loading="lazy" srcdoc="${srcdoc(doc(id, board))}"></iframe>`
 
 /* ── ONE SELECTION, AND THE WHOLE PAGE ANSWERS ─────────────────────────────
@@ -693,4 +721,23 @@ for (const el of document.querySelectorAll('#vocab tr, #bands tr, .files li, .no
 }
 
 pick(SHOTFIRST, 'ltr')
+
+/* ── the manual theme switch ──────────────────────────────────────────────── */
+{
+  const group = document.querySelector('.theme')
+  const current = () => document.documentElement.dataset.theme ?? 'auto'
+  const paintTheme = () => { for (const b of group.querySelectorAll('button'))
+    b.setAttribute('aria-checked', String(b.dataset.t === current())) }
+  group.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return
+    const t = b.dataset.t
+    if (t === 'auto') { delete document.documentElement.dataset.theme; try { localStorage.removeItem('uic-theme') } catch {} }
+    else { document.documentElement.dataset.theme = t; try { localStorage.setItem('uic-theme', t) } catch {} }
+    paintTheme()
+    /* the shot follows the choice: rebuild the visible frame so its kit
+       applies (or drops) its own dark root */
+    if (showing != null) { const was = showing; showing = null; showKit(was, 'ltr') }
+  })
+  paintTheme()
+}
 </script>
