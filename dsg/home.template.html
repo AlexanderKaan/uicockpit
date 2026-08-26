@@ -280,7 +280,11 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
  * both worse than this one: hiding columns takes away the half of the table
  * that is the argument, and letting it push the page means the whole document
  * slides sideways. It keeps every column and moves on its own. */
-.scroller{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+/* overflow-x:auto silently computes overflow-y to auto as well, and during
+   the font swap the table is a fraction taller than its box: a vertical
+   scrollbar flashed on the right for a beat. The y axis is clipped, because
+   nothing here may ever scroll vertically. */
+.scroller{overflow-x:auto;overflow-y:clip;overscroll-behavior-x:contain;scrollbar-width:thin}
 @media(max-width:820px){
   .spec{font-size:13px;min-width:34rem}
 }
