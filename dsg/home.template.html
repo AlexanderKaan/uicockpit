@@ -406,6 +406,7 @@ h1{animation-delay:.09s}
   .door .btn{color:var(--ink);
     background:linear-gradient(var(--bar),var(--bar)) padding-box,var(--gradient) border-box}
   .door .btn:hover{filter:brightness(1.15)}
+  .wall__pick button[aria-checked=true]{background:#3a3a41;border-color:#3a3a41;color:var(--ink)}
   .wall__stage{-webkit-mask-image:none;mask-image:none;border-radius:14px;
     overflow:hidden;border:1px solid var(--rule)}
 }
@@ -434,7 +435,19 @@ const word = (n) => WORDS[n] ?? String(n)
  * stylesheet is full of them — escape only the quotes and 800 kB of CSS
  * arrives mangled with nothing in the console to say why. */
 const srcdoc = (html) => html.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-const doc = (id, board) => `<!doctype html>${HEAD[id]}<body>${BODY[id][board]}${TAIL[id]}`
+/* when the OS is dark, each frame applies ITS KIT's own dark switch: the
+   baked css already carries both halves (the kit's dark rules and ours), so
+   flipping the root is all a static shot needs. Ant re-derives dark with its
+   algorithm and Tailwind ships none, so those two honestly stay light. */
+const HOMEDARK = {
+  shadcn: "r.classList.add('dark')",
+  radix: "r.classList.add('dark');r.classList.remove('light')",
+  bootstrap: "r.setAttribute('data-bs-theme','dark')",
+  mantine: "r.setAttribute('data-mantine-color-scheme','dark')",
+  daisyui: "r.setAttribute('data-theme','yourkitdark')",
+}
+const doc = (id, board) => `<!doctype html>${HEAD[id]}<body>${BODY[id][board]}${TAIL[id]}${
+  HOMEDARK[id] ? `<scr` + `ipt>if(matchMedia('(prefers-color-scheme: dark)').matches){const r=document.documentElement;${HOMEDARK[id]};r.style.colorScheme='dark'}</scr` + `ipt>` : ''}`
 const frame = (id, board, title) => `<iframe title="${title}" loading="lazy" srcdoc="${srcdoc(doc(id, board))}"></iframe>`
 
 /* ── ONE SELECTION, AND THE WHOLE PAGE ANSWERS ─────────────────────────────
