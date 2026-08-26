@@ -655,6 +655,20 @@ export function seedFrom(roleId, kits, ids = Object.keys(kits)) {
  * which — guessing on its behalf would be exactly the invention we refuse.
  */
 export function darken(routed, kits) {
+  /* Mantine publishes half its pairs as POINTERS (--primary-color-light is
+     var(--mantine-color-blue-light), three hops from a hex). A pointer pair
+     reads as "not a colour", the dark set then carried their FACTORY pointer,
+     our dark write never named those variables with real colours, and the
+     baked light tints (the seed's violet) showed through every dark frame —
+     which is exactly what the dark sweep caught on the rail. Resolve pointers
+     inside their own mode's map first; only then judge the pair. */
+  const solidIn = (map, v, hops = 0) => {
+    if (hops > 6 || typeof v !== 'string') return v
+    const m = /^var\((--[a-z0-9-]+)\s*(?:,\s*([^)]+))?\)$/i.exec(v.trim())
+    if (!m) return v
+    const next = map[m[1]] ?? m[2]
+    return next == null ? v : solidIn(map, String(next), hops + 1)
+  }
   return routed.map((r) => {
     const light = kits[r.kit]?.modes?.light ?? {}
     const dark = kits[r.kit]?.modes?.dark
@@ -662,8 +676,9 @@ export function darken(routed, kits) {
     const vars = {}, greyscale = []
     for (const [name, value] of Object.entries(r.vars)) {
       /* absent from their dark block = unchanged by them */
-      const theirDark = dark[name]
-      if (theirDark == null || theirDark === light[name]) { vars[name] = value; continue }
+      const theirDark = dark[name] == null ? null : solidIn(dark, dark[name])
+      const theirLight = light[name] == null ? light[name] : solidIn(light, light[name])
+      if (theirDark == null || theirDark === theirLight) { vars[name] = value; continue }
 
       /* A GREYSCALE pair says nothing about a colour.
        *
@@ -673,7 +688,7 @@ export function darken(routed, kits) {
        * and the answer is white. That is not deriving their intent, it is
        * extrapolating from a statement they never made about colour — so the
        * value is carried across unchanged and the manifest says why. */
-      const made = relative(value, light[name], theirDark)
+      const made = relative(value, theirLight, theirDark)
       /* a pair we cannot read as colour — a length, a keyword, a var() chain,
          anything translucent — is carried across as their own dark value
          rather than as our guess */

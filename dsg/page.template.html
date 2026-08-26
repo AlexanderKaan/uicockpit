@@ -1146,7 +1146,19 @@ function paint() {
     if (r.kit === 'material') vars = { ...(state.mode === 'dark' ? DERIVED.dark : DERIVED.light) ?? {}, ...vars }
     /* the same selector the generated file uses — a block only wins if it
        out-specifies the kit's own, which :root does not always do */
-    live.textContent = `${scopeOf(r.kit)}{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
+    /* IN THE DARK, WRITE WHERE THEIR DARK LIVES. The baked stylesheet carries
+       the kit's own dark block under its own switch selector — for Mantine
+       that is :root[data-mantine-color-scheme='dark'], MORE SPECIFIC than the
+       bare :root these live values used to land on, so the baked seed tints
+       beat every re-theme and nothing in a dark frame followed the knob. The
+       dark set now lands under the kit's own dark selector and wins the tie
+       the way the light set always did. */
+    const darkSel = state.mode === 'dark' && typeof DARKSWITCH[r.kit] === 'string'
+      && DARKSWITCH[r.kit].includes('[') || (DARKSWITCH[r.kit] ?? '').startsWith('.')
+      ? DARKSWITCH[r.kit] : null
+    const liveScope = state.mode === 'dark' && darkSel && !darkSel.startsWith('@') && darkSel !== 'theme' && darkSel !== 'algorithm'
+      ? darkSel : scopeOf(r.kit)
+    live.textContent = `${liveScope}{${Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')}}`
     /* AND BOOTSTRAP'S COMPILED HALF, REWRITTEN.
        Its component colours are Sass output, which is why they never moved —
        but every one of them landed in a --bs- custom property, and a custom
@@ -2945,14 +2957,30 @@ async function runSweep(brandBHex) {
     }
     return null
   }
-  for (const id of RENDERS) {
+  /* EVERY INVARIANT, IN THE KIT'S OWN DARK TOO. The dark components (their
+     toggles, radios, borders, whites) come from the kit's own dark blocks; a
+     second pass per dark-capable live kit asserts FOLLOW, VISIBLE, STATES and
+     CONSUMED against that dark DOM, so "their dark" is measured, not assumed.
+     Baked kits (Material, Ant) keep their declared light bake out of it. */
+  /* Dark passes run where the whole chain is proven. Two are DECLARED OPEN,
+     not skipped quietly: mantine's chart tints in dark are alpha pairs that
+     relative() cannot read yet (eight bars hold the baked tint), and the
+     shadcn dark frame scans a third of its light element count for a reason
+     not yet found. Both are named here so the next session starts at the
+     right line instead of at a green light that lied. */
+  const DARK_PROVEN = new Set(['daisyui', 'bootstrap', 'radix'])
+  const runs = RENDERS.flatMap((id) => [[id, 'light'],
+    ...(DARK_PROVEN.has(id) && DARKSWITCH[id] && LIVE_BRAND[id] ? [[id, 'dark']] : [])])
+  for (const [id, sweepMode] of runs) {
     let passB = null
     try {
     state.values.brand = brandA
     state.on = stackFor(id); state.compare = null; state.solo = null
+    state.mode = sweepMode
     sync(); paint(); await wait(id === 'material' || id === 'antd' ? 2600 : 250)
     const doc = await settled(id)
-    if (!doc) { verdict[id] = { error: 'no frame' }; continue }
+    const vkey = sweepMode === 'dark' ? id + '·dark' : id
+    if (!doc) { verdict[vkey] = { error: 'no frame' }; continue }
     const A = scan(doc)
 
     /* FOLLOW — who claims the brand\'s hue family at pass A */
@@ -3120,10 +3148,10 @@ async function runSweep(brandBHex) {
       }
     }
 
-    verdict[id] = { checked: A.length, followed: family.length - stale.length, family: family.length,
+    verdict[vkey] = { checked: A.length, followed: family.length - stale.length, family: family.length,
       live: !!LIVE_BRAND[id], stale, invisible: [...new Set(invisible)], samestate,
       dead: dead.slice(0, 40), deadCount: dead.length, passB }
-    } catch (e) { verdict[id] = { error: String(e && e.message || e) } }
+    } catch (e) { verdict[sweepMode === 'dark' ? id + '·dark' : id] = { error: String(e && e.message || e) } }
   }
 
   const fail = Object.values(verdict).some((v) => v.error || v.stale?.length || v.invisible?.length || v.samestate?.length || v.deadCount)
