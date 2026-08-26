@@ -1564,12 +1564,12 @@ function askSwitch(next) {
       w: `All ${set} values stay exactly as you set them. A colour, a typeface and a corner are yours, `
         + 'not the kit\'s, so nothing about them is rewritten by moving the floor underneath.' },
   ]
-  if (lost.length) rows.push({ k: 'cost', m: '~', b: `${lost.length === 1 ? 'One value' : `${lost.length} values`} stop landing`,
+  if (lost.length) rows.push({ k: 'cost', m: '−', b: `${lost.length === 1 ? 'One value' : `${lost.length} values`} stop landing`,
     n: listOf(lost.map(label)),
     w: lost.map((id) => `<b>${label(id)}</b>: ${hardTo.get(id)}`).join('. ') + '. They stay in your download, and the manifest names them.' })
   if (back.length) rows.push({ k: 'keep', m: '✓', b: `${back.length === 1 ? 'One value' : `${back.length} values`} start landing`,
     n: listOf(back.map(label)), w: `${toName} takes ${back.length === 1 ? 'it' : 'them'} where the stack you are on could not.` })
-  if (loseParts.length) rows.push({ k: 'cost', m: '~', b: `${loseParts.length} ${loseParts.length === 1 ? 'part is' : 'parts are'} drawn from tokens`,
+  if (loseParts.length) rows.push({ k: 'cost', m: '−', b: `${loseParts.length} ${loseParts.length === 1 ? 'part is' : 'parts are'} drawn from tokens`,
     n: `${(OWN[showing(to)] ?? {}).partsTheirs} / ${(OWN[showing(to)] ?? {}).parts} parts`,
     w: `${toName} ships no component for ${listOf(loseParts)}, so the preview builds ${loseParts.length === 1 ? 'it' : 'them'} out of its tokens instead.` })
   if (gainParts.length) rows.push({ k: 'keep', m: '✓', b: `${gainParts.length} ${gainParts.length === 1 ? 'part gets' : 'parts get'} a real component`,
@@ -1583,7 +1583,8 @@ function askSwitch(next) {
   $('#switchsub').textContent = rows.length === 1
     ? 'Your kit stays exactly as it is. Nothing you set is touched by this.'
     : 'Your kit stays. Only what came from a library gets rebuilt, and this is everything that touches.'
-  $('#switchrows').innerHTML = rows.map((r) => `<div class="srow" data-k="${r.k}">
+  const MARK_SAYS = { keep: 'carries over as it is', cost: 'changes if you switch', note: 'worth knowing, costs nothing' }
+  $('#switchrows').innerHTML = rows.map((r) => `<div class="srow" data-k="${r.k}" title="${MARK_SAYS[r.k] ?? ''}">
     <span class="srow__m">${r.m}</span>
     <span><span class="srow__b">${r.b}</span><span class="srow__w">${r.w}</span></span>
     <span class="srow__n">${r.n}</span></div>`).join('')
