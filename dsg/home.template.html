@@ -173,10 +173,12 @@ h1 em{display:block;font-style:normal}
   font-size:13.5px;color:var(--ink-2)}
 .wall__after a{color:var(--accent);text-underline-offset:3px}
 .wall__stage{position:relative;isolation:isolate;
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 9%),
-    linear-gradient(to right,transparent 0,#000 7%,#000 93%,transparent 100%);
-  mask-image:linear-gradient(to bottom,transparent 0,#000 9%),
-    linear-gradient(to right,transparent 0,#000 7%,#000 93%,transparent 100%);
+  /* the feather runs the WHOLE edge, and it is the same feather in the dark:
+     the shot dissolves into whichever ground it sits on */
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%),
+    linear-gradient(to right,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%);
+  mask-image:linear-gradient(to bottom,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%),
+    linear-gradient(to right,transparent 0,#000 34px,#000 calc(100% - 34px),transparent 100%);
   -webkit-mask-composite:source-in;mask-composite:intersect}
 /* tall enough that no kit's board scrolls inside the shot: the tallest
    (Material, 873px) fits with room, measured across widths. A picture of an
@@ -422,8 +424,6 @@ h1{animation-delay:.09s}
   :root:not([data-theme="light"]) .door .btn:hover{filter:brightness(1.15)}
   :root:not([data-theme="light"]) .wall__pick button[aria-checked=true]{background:#3a3a41;border-color:#3a3a41;color:var(--ink)}
   :root:not([data-theme="light"]) .wall__pick button:hover{border-color:#4b4b53}
-  :root:not([data-theme="light"]) .wall__stage{-webkit-mask-image:none;mask-image:none;border-radius:14px;
-    overflow:hidden;border:1px solid var(--rule)}
   :root:not([data-theme="light"]) .sweep::after{background:linear-gradient(90deg,rgb(255 255 255/0) 0%,rgb(255 255 255/.10) 32%,
     rgb(255 255 255/.22) 50%,rgb(255 255 255/.10) 68%,rgb(255 255 255/0) 100%)}
 }
@@ -442,8 +442,6 @@ h1{animation-delay:.09s}
 [data-theme="dark"] .door .btn:hover{filter:brightness(1.15)}
 [data-theme="dark"] .wall__pick button[aria-checked=true]{background:#3a3a41;border-color:#3a3a41;color:var(--ink)}
 [data-theme="dark"] .wall__pick button:hover{border-color:#4b4b53}
-[data-theme="dark"] .wall__stage{-webkit-mask-image:none;mask-image:none;border-radius:14px;
-  overflow:hidden;border:1px solid var(--rule)}
 [data-theme="dark"] .sweep::after{background:linear-gradient(90deg,rgb(255 255 255/0) 0%,rgb(255 255 255/.10) 32%,
   rgb(255 255 255/.22) 50%,rgb(255 255 255/.10) 68%,rgb(255 255 255/0) 100%)}
 </style>
