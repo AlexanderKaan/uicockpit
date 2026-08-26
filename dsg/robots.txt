@@ -1,0 +1,6 @@
+# uicockpit.com: two pages, both meant to be found, by crawlers and by AI
+# assistants alike. Nothing here is off limits.
+User-agent: *
+Allow: /
+
+Sitemap: https://uicockpit.com/sitemap.xml

@@ -1,0 +1,24 @@
+# UIcockpit
+
+> The open-source design system generator. Nine real UI kits rendered on one
+> screen with one set of values, so you can try them in your own colours and
+> export the one you keep as your design system. Free, no sign-up, everything
+> runs in the browser.
+
+The nine kits: Tailwind CSS, daisyUI, Bootstrap, shadcn/ui, Material 3
+(@material/web), Radix Themes, Mantine, Ant Design and Open Props. Nothing is
+imitated: every class, variable, component and icon is read from the kit's own
+published package, gaps are declared by name, and the claim is enforced by
+build gates (a class the kit's CSS does not define fails the build).
+
+The export is a zip: theme.css in each kit's own vocabulary, DESIGN.md to
+Google's design system spec, AGENTS.md, CLAUDE.md, .cursor/rules, install.md
+and a MANIFEST.md with versions, licences and what could not be set. There is
+no npm package, CLI or MCP server for this version; the exported files carry
+the agent-facing contract themselves.
+
+## Pages
+
+- [The generator](https://uicockpit.com/generator): pick a stack, start from
+  a kit's own defaults, turn the knobs, compare side by side, export.
+- [Source code](https://github.com/AlexanderKaan/uicockpit): MIT licensed.
