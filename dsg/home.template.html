@@ -394,9 +394,18 @@ h1{animation-delay:.09s}
   :root{
     --ground:#141416; --paper:#1d1d20; --bar:#2a2a2f; --ink:#e7e6ec;
     --ink-2:#bdbcc6; --ink-3:#8b8a94; --rule:#333338; --rule-2:#29292e;
-    --go:#e2e1e7; --go-ink:#141416; --accent:#8d78ff;
+    --go:#26262b; --go-ink:#e7e6ec; --accent:#8d78ff;
   }
   .ticks span,.wall__pick button{background:var(--paper)}
+  /* the door stops inverting in the dark: a big light panel is glare, so it
+     becomes an ELEVATED dark surface and the gradient ring carries the CTA */
+  .door{background:var(--paper);border:1px solid var(--rule)}
+  .door h2{color:var(--ink)}
+  .door p{color:var(--ink-2)}
+  .door .fine{color:var(--ink-3)}
+  .door .btn{color:var(--ink);
+    background:linear-gradient(var(--bar),var(--bar)) padding-box,var(--gradient) border-box}
+  .door .btn:hover{filter:brightness(1.15)}
   .wall__stage{-webkit-mask-image:none;mask-image:none;border-radius:14px;
     overflow:hidden;border:1px solid var(--rule)}
 }
