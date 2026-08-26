@@ -125,6 +125,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
   padding:11px var(--pad);border-bottom:var(--bw) solid var(--line);
   background:color-mix(in srgb,var(--ground) 90%,transparent);backdrop-filter:blur(8px)}
 .flip{display:inline-flex;align-items:center;gap:7px}
+.btn__t{display:inline}
 .flip[hidden]{display:none}
 .compose__top .mark{margin:0}
 .compose__acts{display:flex;align-items:center;gap:8px;margin-left:auto}
@@ -746,6 +747,34 @@ dialog::backdrop{background:#1c1b1966}
 .tree span{color:var(--muted)}
 .fine{margin:0;font-size:var(--fs-sm);color:var(--muted);line-height:1.55}
 @media(max-width:900px){.drawer__cols{grid-template-columns:1fr}.drawer{height:calc(100vh - 24px)}}
+
+/* ── PHONES ────────────────────────────────────────────────────────────────
+ * The app was two desktop rooms squeezed onto glass: the switch fell off the
+ * right edge of the bar, and the wall kept its rail BESIDE a preview five
+ * centimetres wide. On a phone the bar goes icon-tight, and the wall becomes
+ * one column: preview first, the checks under it, the rail last — reading
+ * order instead of workbench order. */
+@media (max-width: 700px){
+  .compose__top{padding:8px 12px;gap:8px}
+  .compose__top .btn__t,#stageflip kbd{display:none}
+  .compose__top .btn{padding:0 10px;min-height:36px}
+  .concept__btn{padding:5px 6px;gap:6px}
+  .concept__title{max-width:11ch}
+  .concept__state{display:none}
+  .app[data-stage=wall]{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto}
+  .app[data-stage=wall]>.wall{order:1;min-height:72vh}
+  .app[data-stage=wall]>.dock{order:2}
+  .app[data-stage=wall]>.rail{order:3;max-height:none}
+  .wall__bar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .wall__bar::-webkit-scrollbar{display:none}
+}
+/* the colour cards reshape rather than shrink: the two big ones side by side,
+   the four minis in one row under them */
+@media (max-width: 600px){
+  .ccards{grid-template-columns:repeat(4,1fr);grid-template-rows:112px 74px}
+  .ccard--tall{grid-row:1;grid-column:span 2}
+  .font__role em{display:none}
+}
 
 /* ── the segmented control ────────────────────────────────────────────────── */
 /* A sunken track with one raised pill. It reads as a physical switch rather

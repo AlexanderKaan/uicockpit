@@ -130,6 +130,10 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(2.75rem,6.6vw,5rem
 /* the two halves each take a line, so the break can never fall inside "design
    system" the way a balanced wrap kept choosing to put it */
 h1 em{display:block;font-style:normal}
+/* the hyphenated word is one word: a phone was breaking it as "The open-" /
+   "source", and a compound split mid-hyphen reads as a typo */
+.nb{white-space:nowrap}
+@media (max-width:430px){h1{font-size:2.35rem}}
 /* three short checkable facts where the slogan stood, drawn as quiet pills */
 .ticks{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0;
   font:500 13px var(--sans);color:var(--ink)}
@@ -179,6 +183,13 @@ h1 em{display:block;font-style:normal}
      frame's document, which has nothing to scroll, and the page under your
      cursor goes dead. Nothing inside is clickable anyway. */
   pointer-events:none}
+/* phones see the WHOLE board at half scale instead of the left third of it:
+   the frame lays out at double width and is scaled back into the viewport,
+   so the shot stays a complete picture of an app */
+@media (max-width:720px){
+  .wall__stage{height:900px;overflow:hidden}
+  .wall iframe{width:200%;height:1800px;transform:scale(.5);transform-origin:0 0}
+}
 
 /* ── THE LIGHT SWEEP ──────────────────────────────────────────────────────
  * Not decoration: the light is the thing DOING the change. It travels from the

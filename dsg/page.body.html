@@ -57,14 +57,14 @@
     </div>
 
     <div class="compose__acts">
-      <button class="btn btn--ghost" id="surprise"><!--I:shuffle-->Surprise me</button>
+      <button class="btn btn--ghost" id="surprise" aria-label="Surprise me"><!--I:shuffle--><span class="btn__t">Surprise me</span></button>
       <!-- ONE button for both directions. Two buttons in two bars sat at
            almost the same corner, and the almost is what you saw: the switch
            jumped a few pixels every time you used it. One element cannot
            disagree with itself about where it is. -->
       <button class="btn btn--go" id="stageflip">
-        <span class="flip" id="flipsee"><!--I:maximize-->See every component</span>
-        <span class="flip" id="flipback" hidden><!--I:minimize-->Back to the kit</span>
+        <span class="flip" id="flipsee"><!--I:maximize--><span class="btn__t">See every component</span></span>
+        <span class="flip" id="flipback" hidden><!--I:minimize--><span class="btn__t">Back to the kit</span></span>
         <kbd>F</kbd></button>
     </div>
   </header>
