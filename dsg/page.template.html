@@ -60,8 +60,19 @@
      rail keeps a little less because it is 286px wide and 24 on both sides of
      a 24px card inside it is 96px of nothing. */
   --pad:24px; --pad-sm:16px;
-  --r:10px; --r-sm:7px; --r-lg:14px; --bw:1px;
+  --r:10px; --r-sm:7px; --r-lg:14px; --bw:1px; --go-ink:#fff;
   --fs-xs:10px; --fs-sm:11.5px; --fs-md:12.5px; --fs-lg:13.5px; --fs-xl:19px; --fs-2xl:24px;
+}
+/* ── DARK, as the OS asks ──────────────────────────────────────────────────
+ * The chrome flips through its tokens; the FRAMES do not follow, because the
+ * wall's own Light/Dark switch governs what the kits render, and a preview
+ * that silently obeyed the OS would be showing you a mode you did not pick. */
+@media (prefers-color-scheme: dark){
+  :root{
+    --ground:#141416; --panel:#1d1d20; --sunken:#2a2a2f; --faint:#232327;
+    --ink:#f2f1f4; --muted:#a5a4ad; --line:#333338;
+    --link:#a08cff; --go:#f2f1f4; --go-ink:#141416;
+  }
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
@@ -301,7 +312,7 @@ kbd{font:10px/1 ui-monospace,monospace;padding:2px 5px;border-radius:var(--r-sm)
 /* THE GRADIENT IS A BORDER AND NEVER A FILL. Two backgrounds: the solid one
    clipped to the padding box, the gradient to the border box, so the ring
    follows the radius the way a real border does. */
-.btn--go{color:#fff;font-weight:600;border:2px solid transparent;
+.btn--go{color:var(--go-ink,#fff);font-weight:600;border:2px solid transparent;
   background:linear-gradient(var(--go),var(--go)) padding-box,var(--gradient) border-box}
 .btn--go:hover{background:linear-gradient(#2b2a30,#2b2a30) padding-box,var(--gradient) border-box}
 
@@ -766,6 +777,13 @@ dialog::backdrop{background:#1c1b1966}
   .app[data-stage=wall]>.dock{order:2}
   .app[data-stage=wall]>.rail{order:3;max-height:none}
   .wall__bar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  /* the stack's name folded into a four-line block beside the tabs; the rail
+     names the stack in full, so the bar keeps only the tabs */
+  .app[data-stage=compose] #wallhead{display:none}
+  /* the way home must be a fingertip's width: the glyph stays its size, the
+     target grows to 44 around it */
+  .compose__top .mark{min-width:44px;min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center;margin:-6px 0}
   .wall__bar::-webkit-scrollbar{display:none}
 }
 /* the colour cards reshape rather than shrink: the two big ones side by side,

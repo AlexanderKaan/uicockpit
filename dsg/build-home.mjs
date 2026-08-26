@@ -165,7 +165,7 @@ let page = readFileSync('home.template.html', 'utf8')
      not receive */
   .replace('/*KNOB*/', () => JSON.stringify({ brand: VALUES.brand, radius: VALUES.radius }))
 for (const n of NAMES) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
-page = page.split('<!--MARK-->').join(mark(18))
+page = page.split('<!--MARK-->').join(mark(26))
 /* A placeholder that survives into the output is how a lucide box quietly
  * became the logo for weeks. Nothing silently ships with a hole in it. */
 const left = [...page.matchAll(/<!--(MARK|I:[a-z-]+)-->/g)].map((m) => m[0])

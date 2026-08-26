@@ -97,7 +97,9 @@ h1,h2,h3,p,ul,ol,dl,figure{margin:0}
 /* the rule runs the whole width because it is the page's own edge; the contents
    still sit on the content column, so the mark lines up with everything below */
 .top__in{max-width:74rem;margin:0 auto;padding:15px 20px 14px;display:flex;align-items:center;gap:26px}
-.top__mark{display:flex;align-items:center;gap:9px;font-weight:600;font-size:15.5px;letter-spacing:-.015em}
+.top__in>.btn{margin-left:auto}
+.top__mark{display:flex;align-items:center}
+.fine .wm{height:15px;width:auto;vertical-align:-3px;margin-right:7px}
 .top nav{display:flex;gap:22px;margin-left:auto;font-size:14px;color:var(--ink-2)}
 .top nav a{text-decoration:none;padding-bottom:2px;border-bottom:1px solid transparent;transition:border-color .18s,color .18s}
 .top nav a:hover{color:var(--ink);border-bottom-color:var(--accent)}
@@ -112,9 +114,9 @@ h1,h2,h3,p,ul,ol,dl,figure{margin:0}
 /* THE GRADIENT IS A BORDER AND NEVER A FILL. Two backgrounds: the solid one
    clipped to the padding box, the gradient to the border box, so the ring
    follows the radius the way a real border does. */
-.btn--go{color:#fff;border:2px solid transparent;
-  background:linear-gradient(var(--ink),var(--ink)) padding-box,var(--gradient) border-box}
-.btn--go:hover{background:linear-gradient(#2b2a30,#2b2a30) padding-box,var(--gradient) border-box}
+.btn--go{color:var(--go-ink,#fff);border:2px solid transparent;
+  background:linear-gradient(var(--go,var(--ink)),var(--go,var(--ink))) padding-box,var(--gradient) border-box}
+.btn--go:hover{filter:brightness(1.12)}
 .btn--lg{min-height:48px;padding:0 22px;font-size:15.5px}
 
 /* ── 1 · THE NAME ─────────────────────────────────────────────────────────── */
@@ -207,7 +209,7 @@ h1 em{display:block;font-style:normal}
 .sweep[data-dir=rtl]::before{left:107%;animation-name:sweep-rtl}
 @keyframes sweep-ltr{to{left:107%}}
 @keyframes sweep-rtl{to{left:-45%}}
-.sweep::after{content:"";position:absolute;inset:0;background:#fff;opacity:0;
+.sweep::after{content:"";position:absolute;inset:0;background:var(--paper);opacity:0;
   animation:sweep-bloom 1s ease-out forwards}
 @keyframes sweep-bloom{0%{opacity:0}16%{opacity:.34}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.sweep[data-dir]{display:none}}
@@ -384,6 +386,20 @@ h1{animation-delay:.09s}
 }
 /* and on paper there is no scrolling to reveal anything with */
 @media print{.rise,[data-reveal]{opacity:1;transform:none;animation:none;transition:none}}
+/* ── DARK, as the OS asks. Last in the sheet, because two of these are RULE
+   overrides and source order decides those; the shot keeps its light frames
+   (they are the kits' render), traded from a white glow-fade to a framed
+   panel that sits calmly on a dark ground. */
+@media (prefers-color-scheme: dark){
+  :root{
+    --ground:#141416; --paper:#1d1d20; --bar:#2a2a2f; --ink:#f2f1f4;
+    --ink-2:#c9c8d0; --ink-3:#8f8e98; --rule:#333338; --rule-2:#29292e;
+    --go:#f2f1f4; --go-ink:#141416; --accent:#8d78ff;
+  }
+  .ticks span,.wall__pick button{background:var(--paper)}
+  .wall__stage{-webkit-mask-image:none;mask-image:none;border-radius:14px;
+    overflow:hidden;border:1px solid var(--rule)}
+}
 </style>
 <!--BODY-->
 <script type="module">

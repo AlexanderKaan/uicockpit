@@ -287,7 +287,7 @@ let page = readFileSync('page.template.html', 'utf8')
   .replace('/*STARTS*/', () => safeJson(kitDefaults(kits, RENDERS)))
   .replace('/*ICONS*/', () => JSON.stringify(lu.icons))
 for (const n of CHROME_ICONS) page = page.split(`<!--I:${n}-->`).join(svg(lu.icons, n, 14))
-page = page.split('<!--MARK-->').join(mark(17))
+page = page.split('<!--MARK-->').join(mark(22))
 /* A class in OUR markup with no rule anywhere.
  *
  * Three edits to the stylesheet took the whole font picker and the segmented

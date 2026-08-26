@@ -389,6 +389,16 @@ export const wallMarkup = (bind, boards = BOARDS) => `<main id="strip">${boards.
 html,body{height:100%}
 body{margin:0;overflow:hidden}
 #strip{height:100%;display:flex;align-items:stretch;overflow:auto;scroll-snap-type:x proximity;overscroll-behavior-x:contain;cursor:grab}
+/* ON GLASS the strip stops being a desk you pan and becomes a deck you swipe:
+   every board is exactly one screen wide and snap is mandatory, the vertical
+   axis lives INSIDE the board, and overscroll stays contained so a swipe on
+   the strip never drags the page underneath in two directions at once. */
+@media (max-width:560px){
+  #strip{scroll-snap-type:x mandatory;overscroll-behavior:contain;overflow-y:hidden}
+  .board{width:100vw;min-width:100vw;box-sizing:border-box;padding:16px 16px 20px;
+    overflow-y:auto;overscroll-behavior:contain}
+  .board__cols{flex-direction:column;align-items:stretch;gap:16px}
+}
 #strip.pan{cursor:grabbing;user-select:none}
 .board{flex:none;display:flex;flex-direction:column;gap:16px;padding:22px 26px;scroll-snap-align:start;border-inline-end:1px solid rgb(128 128 128 / .16)}
 .board:last-child{border-inline-end:0}
