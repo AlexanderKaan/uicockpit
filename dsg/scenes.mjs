@@ -437,6 +437,14 @@ body{margin:0;overflow:hidden}
  * Inheritance still lets every kit that styles text win on its own content. */
 #strip{font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
 html[data-quiet] #strip{scrollbar-width:none;-ms-overflow-style:none}
+/* THE QUIET FRAME IS A BOUQUET, NOT A STRIP. On the homepage the shot is one
+   board filling the whole width, so the pan-strip's fixed columns would leave
+   the right half empty on a wide screen. The column wrappers dissolve and the
+   cards flow into as many masonry columns as the width affords. */
+html[data-quiet] #strip{display:block;height:auto;overflow:visible;columns:330px;column-gap:20px;padding:26px;cursor:default}
+html[data-quiet] .board,html[data-quiet] .board__cols,html[data-quiet] .board__cols .col{display:contents}
+html[data-quiet] .board__top{break-inside:avoid;margin:6px 0 14px}
+html[data-quiet] .card{break-inside:avoid;margin:0 0 20px;width:auto}
 html[data-quiet] #strip::-webkit-scrollbar{width:0;height:0}
 html[data-quiet] #strip{cursor:default}
 /* and it starts lower, because a quiet wall is being used as a picture that

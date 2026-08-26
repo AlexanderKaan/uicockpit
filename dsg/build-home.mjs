@@ -86,7 +86,8 @@ const ELEMENTS = { material: './' + OUT.replace(/\.html$/, '') + '.elements.js' 
 const HEAD = Object.fromEntries(SHOT_IDS.map((id) => [id,
   `<html data-quiet${ROOT[id] ?? ''}${attrs(id)}><meta charset="utf-8"><style>${css[id] ?? ''}</style>`]))
 const BODY = Object.fromEntries(SHOT_IDS.map((id) => [id,
-  Object.fromEntries(SHOWN.map((b) => [b, kitWall(id, boardsOf([b]))]))]))
+  Object.fromEntries([...SHOWN.map((b) => [b, kitWall(id, boardsOf([b]))],
+  ), ['all', kitWall(id, boardsOf(SHOWN))]])]))
 const TAIL = Object.fromEntries(SHOT_IDS.map((id) => [id,
   ELEMENTS[id] ? `<script type="module" src="${ELEMENTS[id]}"></` + 'script>' : '']))
 

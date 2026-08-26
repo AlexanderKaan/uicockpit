@@ -268,6 +268,10 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
 .spec__v{font-family:var(--mono);font-size:12.5px;color:var(--ink);word-break:break-all}
 .spec__muted{color:var(--ink-2)}
 .spec__num{color:var(--ink-2)}
+.spec__dots{white-space:nowrap}
+.spec__dots .dot{margin-right:4px}
+.answer__vars{margin:.8rem 0 0;font-size:12.5px;color:var(--ink-2)}
+.answer__vars code{font-family:var(--mono);font-size:12px}
 /* HOW A KIT ANSWERS. Two of these four are the interesting ones — a kit that
    derives from a seed, and a kit that will not take a value at all — so those
    two carry the warm ink and the ordinary ones stay quiet. */
@@ -515,7 +519,7 @@ function showKit(id, dir) {
      sweep's bloom peaks at 16% of a second, so the swap happens under it —
      the light appears to be doing the change rather than playing after it. */
   const sweep = $('#sweep')
-  const swap = () => { $('#wallshot').innerHTML = frame(id, 'data', `${KITS[id].name}, rendered`); showing = id }
+  const swap = () => { $('#wallshot').innerHTML = frame(id, 'all', `${KITS[id].name}, rendered`); showing = id }
   if (showing === null || matchMedia('(prefers-reduced-motion: reduce)').matches) return swap()
   sweep.removeAttribute('data-dir')
   void sweep.offsetWidth                       // restart the animation, not resume it
@@ -546,42 +550,29 @@ const KIND = { var: 'variable', token: 'token', seed: 'seed', choice: 'choice' }
 const cell = (a) => a.kind === 'choice'
   ? `<span class="spec__v">${a.name}="${a.value}"</span>`
   : `<span class="spec__v">${a.name}</span>`
-$('#vocab').innerHTML = ALLK.map((k) => {
-  const v = VOCAB[k.id]
-  return `<tr data-k="${k.id}" aria-selected="false" tabindex="0">
-    <td class="spec__kit" data-name="${k.name}">${k.name}</td>
-    <td>${cell(v.brand)}</td>
-    <td>${cell(v.radius)}</td>
-    <td><span class="kind" data-k="${v.brand.kind}">${KIND[v.brand.kind]}</span></td>
-  </tr>`
-}).join('')
-
-/* ── THE FOUR BANDS ───────────────────────────────────────────────────────
- * Behaviour, an engine, tokens and components. A kit fills some and leans on
- * the rest, and this is where you can see that at a glance instead of reading
- * nine cards that all look the same. */
-$('#bands').innerHTML = ALLK.map((k) => {
-  const b = k.bands ?? {}
-  const dot = (on) => `<span class="dot"${on ? '' : ' data-off'}></span>`
+/* ── ONE TABLE, ONE CARD ──────────────────────────────────────────────────
+ * The vocabulary and the four bands used to be two near-identical nine-row
+ * tables with a card each, wired to one selection: clicking the lower one
+ * rewrote the upper card. Now the table is the INDEX (four scannable columns)
+ * and the card is the DETAIL, carrying both stories for the kit you picked. */
+$('#kitrows').innerHTML = ALLK.map((k) => {
+  const v = VOCAB[k.id], b = k.bands ?? {}
+  const four = [!!b.behaviour, b.engine === 'own', (b.tokens ?? 0) > 0, !!b.components]
   return `<tr data-k="${k.id}" aria-selected="false" tabindex="0">
     <td class="spec__kit" data-name="${k.name}">${k.name}</td>
     <td class="spec__muted">${k.runsIn?.framework ?? 'anything'}</td>
-    <td class="spec__muted">${b.behaviour?.by ?? 'none'}</td>
-    <td class="spec__muted">${b.engine ?? 'none'}</td>
-    <td class="spec__num">${b.tokens ?? 'none'}</td>
-    <td>${dot(b.components)}</td>
+    <td><span class="kind" data-k="${v.brand.kind}">${KIND[v.brand.kind]}</span></td>
+    <td class="spec__dots">${four.map((on) => `<span class="dot"${on ? '' : ' data-off'}></span>`).join('')}</td>
   </tr>`
 }).join('')
 
-/* both tables are the same control as the picker */
-for (const t of ['#vocab', '#bands']) {
-  $(t).addEventListener('click', (e) => { const r = e.target.closest('tr'); if (r) pick(r.dataset.k) })
-  $(t).addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return
-    const r = e.target.closest('tr'); if (!r) return
-    e.preventDefault(); pick(r.dataset.k)
-  })
-}
+/* the table is the same control as the picker */
+$('#kitrows').addEventListener('click', (e) => { const r = e.target.closest('tr'); if (r) pick(r.dataset.k) })
+$('#kitrows').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return
+  const r = e.target.closest('tr'); if (!r) return
+  e.preventDefault(); pick(r.dataset.k)
+})
 
 /* THE NOTE IS THE KIT'S OWN. Every one of these sentences is written by the
    router while it works out what it can and cannot do with your value — which
@@ -616,13 +607,12 @@ const cap = (t) => t ? t[0].toUpperCase() + t.slice(1) : ''
 
 function writeNote(id) {
   const k = KITS[id], v = VOCAB[id]
+  const spec = (a) => a.kind === 'choice' ? `${a.name}="${a.value}"` : a.name
   $('#answerkit').textContent = k.name
-  $('#answerkind').textContent = `takes it as a ${KIND[v.brand.kind]}`
+  $('#answerkind').textContent = `takes it as a ${KIND[v.brand.kind]} · fills ${word(fills(k))} of the four`
+  $('#answervars').innerHTML = `<code>${spec(v.brand)}</code> · <code>${spec(v.radius)}</code>`
   $('#answernote').innerHTML = v.note ?? `${k.name} takes the value straight into <code>${v.brand.name}</code>.`
-
-  $('#bandskit').textContent = k.name
-  $('#bandsfills').textContent = `fills ${word(fills(k))} of the four`
-  $('#bandsnote').innerHTML = `${bandsLine(k)}${k.runsIn?.what ? ` ${cap(k.runsIn.what)}.` : ''}`
+  $('#answerbands').innerHTML = `${bandsLine(k)}${k.runsIn?.what ? ` ${cap(k.runsIn.what)}.` : ''}`
 }
 
 $('#files').innerHTML = [

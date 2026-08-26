@@ -3,7 +3,6 @@
   <div class="top__in">
     <p class="top__mark"><!--MARK--></p>
     <nav>
-      <a href="#vocabulary">The vocabulary</a>
       <a href="#kits">The kits</a>
       <a href="#export">What you get</a>
     </nav>
@@ -50,64 +49,35 @@
 </section>
 
 <!-- ── 3 · THE VOCABULARY ───────────────────────────────────────────────── -->
-<section class="band" id="vocabulary">
-  <div class="band__head">
-    <p class="eyebrow">One value, every vocabulary</p>
+<section class="band" id="kits">
+  <div class="band__head" id="vocabulary">
+    <p class="eyebrow">Read, never guessed</p>
     <h2>You turn one knob. Nine systems answer in their own words.</h2>
-    <p class="lede">That is what makes them comparable. Every frame above is holding the same
-      colour, <code id="knobbrand"></code>, and the same corner, <code id="knobradius"></code>, in
-      each kit's own name for it, so what you are looking at is the kit and not a difference in
-      what it was given. Pick a row and the preview follows.</p>
+    <p class="lede">Every frame above is holding the same colour, <code id="knobbrand"></code>, and
+      the same corner, <code id="knobradius"></code>, each in the kit's own name for it. Four bands
+      make a stack: behaviour, an engine, tokens, components. Pick a row and the preview follows;
+      the card reads that kit's whole answer out of its package.</p>
   </div>
 
   <div class="split">
-    <!-- the selected row's own answer, on the same violet bar that row wears, so
-         the paragraph and the line are visibly one thing -->
+    <!-- ONE card for ONE selection. There used to be two of these beside two
+         near-identical tables, and clicking the lower one visibly rewrote the
+         upper card: the same fact told twice, jumping in stereo. -->
     <aside class="answer" aria-live="polite">
       <p class="answer__kit" id="answerkit"></p>
       <p class="answer__kind" id="answerkind"></p>
+      <p class="answer__vars" id="answervars"></p>
       <p class="answer__note" id="answernote"></p>
+      <p class="answer__note" id="answerbands"></p>
     </aside>
 
     <div>
       <div class="scroller">
         <table class="spec">
           <thead><tr>
-            <th>System</th><th>Your brand colour</th><th>Your corner radius</th><th>How it takes it</th>
+            <th>System</th><th>Runs in</th><th>Takes it as</th><th>Fills</th>
           </tr></thead>
-          <tbody id="vocab"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── 4 · THE FOUR BANDS ───────────────────────────────────────────────── -->
-<section class="band" id="kits">
-  <div class="band__head">
-    <p class="eyebrow">Read, never guessed</p>
-    <!-- counted, and it was false: five of the nine DO fill all four -->
-    <h2>Four bands make a stack. Some kits are all four, some are one.</h2>
-    <p class="lede">Behaviour, an engine, tokens, components. Most kits fill some and lean on the
-      rest, which is why a combination is often the answer rather than a single name: shadcn brings
-      the behaviour and the tokens and sits on Tailwind's engine. Every count here came out of the
-      kit's own package at build time.</p>
-  </div>
-
-  <div class="split">
-    <aside class="answer" aria-live="polite">
-      <p class="answer__kit" id="bandskit"></p>
-      <p class="answer__kind" id="bandsfills"></p>
-      <p class="answer__note" id="bandsnote"></p>
-    </aside>
-
-    <div>
-      <div class="scroller">
-        <table class="spec">
-          <thead><tr>
-            <th>System</th><th>Runs in</th><th>Behaviour</th><th>Engine</th><th>Tokens</th><th>Components</th>
-          </tr></thead>
-          <tbody id="bands"></tbody>
+          <tbody id="kitrows"></tbody>
         </table>
       </div>
       <p class="fine" style="margin-top:1.25rem"><b data-count="free">Five</b> of the
@@ -162,7 +132,6 @@
     <nav class="foot__col" aria-label="The generator">
       <p class="foot__head">The generator</p>
       <a href="/generator">Open it empty</a>
-      <a href="#vocabulary">The vocabulary</a>
       <a href="#kits">The nine systems</a>
       <a href="#limits">What it will not do</a>
       <a href="#export">What you get</a>
