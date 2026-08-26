@@ -98,7 +98,7 @@ h1,h2,h3,p,ul,ol,dl,figure{margin:0}
    still sit on the content column, so the mark lines up with everything below */
 .top__in{max-width:74rem;margin:0 auto;padding:15px 20px 14px;display:flex;align-items:center;gap:26px}
 .top__in>.btn{margin-left:auto}
-.top__mark{display:flex;align-items:center}
+.top__mark{display:flex;align-items:center;--wm-glyph:var(--ground)}
 .fine .wm{height:15px;width:auto;vertical-align:-3px;margin-right:7px}
 .top nav{display:flex;gap:22px;margin-left:auto;font-size:14px;color:var(--ink-2)}
 .top nav a{text-decoration:none;padding-bottom:2px;border-bottom:1px solid transparent;transition:border-color .18s,color .18s}
@@ -335,13 +335,13 @@ code,.mono{font-family:var(--mono);font-size:.86em;font-variant-ligatures:none}
  * inverts, because it is the one place you act. */
 .door{margin-top:clamp(2.5rem,5vw,4rem);background:var(--ink);color:var(--ground);
   border-radius:var(--r-lg);padding:clamp(3rem,6vw,4.5rem) 2rem;text-align:center}
-.door h2{color:#fff;margin:0 auto;max-width:16ch}
-.door p{margin:1rem auto 0;max-width:34rem;color:#a3a2a6;font-size:1.0625rem}
+.door h2{color:var(--ground);margin:0 auto;max-width:16ch}
+.door p{margin:1rem auto 0;max-width:34rem;color:color-mix(in srgb,var(--ground) 62%,var(--ink));font-size:1.0625rem}
 .door .acts{margin-top:2rem}
 .door .btn{color:var(--ink);border:2px solid transparent;
-  background:linear-gradient(#fff,#fff) padding-box,var(--gradient) border-box}
+  background:linear-gradient(var(--paper),var(--paper)) padding-box,var(--gradient) border-box}
 .door .btn:hover{background:linear-gradient(var(--ground),var(--ground)) padding-box,var(--gradient) border-box}
-.door .fine{color:#8a898e;margin-top:1.5rem}
+.door .fine{color:color-mix(in srgb,var(--ground) 52%,var(--ink));margin-top:1.5rem}
 
 /* ── FOOTER ───────────────────────────────────────────────────────────────
  * A switchboard, not a site map: this is the only place all nine can be

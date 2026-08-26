@@ -971,7 +971,10 @@ const state = {
      sent a kit is not starting. */
   stage: 'start',
   board: 'foundations',
-  mode: 'light',
+  /* the strip and the wall open in the mode the visitor's OS asked for: that
+     is still the KIT's own dark render, not our chrome's; the Light/Dark
+     switch stays the boss, and a kit without a dark mode stays light */
+  mode: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
   /* what you said you are building in, or null for "anything". Only ever dims
      the cards that cannot run there — it never picks for you. */
   runIn: null,
