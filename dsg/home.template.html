@@ -74,6 +74,8 @@
   --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,monospace;
 }
 *{box-sizing:border-box}
+:root{color-scheme:light}
+button{color:inherit}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--ground);color:var(--ink);
   font:400 16.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
@@ -410,6 +412,7 @@ h1{animation-delay:.09s}
  * and the generator reads the same key, so the choice is site-wide. */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
+    color-scheme:dark;
     --ground:#141416; --paper:#1d1d20; --bar:#2a2a2f; --ink:#e7e6ec;
     --ink-2:#bdbcc6; --ink-3:#8b8a94; --rule:#333338; --rule-2:#29292e;
     --go:#26262b; --go-ink:#e7e6ec; --accent:#8d78ff;
@@ -428,6 +431,7 @@ h1{animation-delay:.09s}
     rgb(255 255 255/.22) 50%,rgb(255 255 255/.10) 68%,rgb(255 255 255/0) 100%)}
 }
 :root[data-theme="dark"]{
+  color-scheme:dark;
   --ground:#141416; --paper:#1d1d20; --bar:#2a2a2f; --ink:#e7e6ec;
     --ink-2:#bdbcc6; --ink-3:#8b8a94; --rule:#333338; --rule-2:#29292e;
     --go:#26262b; --go-ink:#e7e6ec; --accent:#8d78ff;

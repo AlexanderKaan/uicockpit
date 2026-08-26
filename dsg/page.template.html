@@ -71,6 +71,7 @@
  * that silently obeyed the OS would be showing you a mode you did not pick. */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
+    color-scheme:dark;
     --ground:#141416; --panel:#1d1d20; --sunken:#2a2a2f; --faint:#232327;
     --ink:#e7e6ec; --muted:#a09fa8; --line:#333338;
     --link:#a08cff; --go:#26262b; --go-ink:#e7e6ec;
@@ -78,12 +79,20 @@
   }
 }
 :root[data-theme="dark"]{
+  color-scheme:dark;
   --ground:#141416; --panel:#1d1d20; --sunken:#2a2a2f; --faint:#232327;
   --ink:#e7e6ec; --muted:#a09fa8; --line:#333338;
   --link:#a08cff; --go:#26262b; --go-ink:#e7e6ec;
   --ok:#5fbf7d; --warn:#d9913f; --bad:#e08477;
 }
 *{box-sizing:border-box}
+/* the whole CLASS of black-on-dark bugs at the root: a <dialog> paints its
+   text in CanvasText (black unless the page declares its scheme) and a
+   <button> never inherits colour. Declare the scheme per mode, let both
+   elements read the ink, and the disease is gone instead of the symptoms. */
+:root{color-scheme:light}
+dialog{color:var(--ink)}
+button{color:inherit}
 body{margin:0;background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 .app{min-height:100vh;display:grid;grid-template-columns:322px minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:12px;padding:12px}
 /* ── THE STAGES ───────────────────────────────────────────────────────────
