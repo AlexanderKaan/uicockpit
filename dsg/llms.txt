@@ -21,4 +21,4 @@ the agent-facing contract themselves.
 
 - [The generator](https://uicockpit.com/generator): pick a stack, start from
   a kit's own defaults, turn the knobs, compare side by side, export.
-- [Source code](https://github.com/AlexanderKaan/uicockpit): MIT licensed.
+- [Source code](https://github.com/Ideelab/uicockpit): MIT licensed.
